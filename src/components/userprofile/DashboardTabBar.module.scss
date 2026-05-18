@@ -1,0 +1,50 @@
+@use '../../design-system/styles/mixins' as *;
+
+.tabBar {
+  width: 100%;
+  background: var(--color-white-primary); // matches top nav white — tab bar sits within the header's white region
+  display: flex;
+  justify-content: center;
+  padding: var(--space-9) 0; // 48px ≈ Figma: ~50px above / ~45px below the gray tab strip, nearest token
+}
+
+.tabs {
+  display: flex;
+  gap: var(--gap-inline-sm); // 10px — Figma: 9px gap between tabs
+  align-items: center;
+  background-color: var(--color-gray-light);
+  background-image: repeating-linear-gradient(135deg, transparent 0px, transparent 4px, var(--color-black-alpha-01) 4px, var(--color-black-alpha-01) 6px);
+  padding: var(--space-1-5) 0; // 5px ≈ Figma: ~7px top/bottom inside gray container, nearest token
+}
+
+@include mobile {
+  .tabBar {
+    justify-content: flex-start;
+    padding: var(--space-1-5) 0 var(--space-1-5) var(--space-4); // 5px top/bottom, 16px left — scroll from left with indent
+    background: var(--color-white-dark); // Figma: full-width gray bg on mobile
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin; // Firefox — show thin scrollbar
+    scrollbar-color: var(--color-blue-primary) var(--color-gray-300); // Firefox: blue thumb, gray track
+
+    &::-webkit-scrollbar {
+      height: 3px; // thin horizontal scrollbar indicator below tabs
+    }
+
+    &::-webkit-scrollbar-track {
+      background: var(--color-gray-300); // gray track
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--color-blue-primary); // blue pill indicator
+      border-radius: var(--radius-full);
+    }
+  }
+
+  .tabs {
+    background: transparent; // gray bg promoted to .tabBar on mobile
+    padding: 0;
+    flex-shrink: 0;
+    gap: var(--space-5); // 20px ≈ 19px Figma gap between tabs on mobile, nearest token
+  }
+}

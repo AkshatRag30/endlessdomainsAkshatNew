@@ -1,0 +1,44 @@
+@use '../../styles/mixins' as *;
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3); // 12px ≈ 13px Figma, nearest token
+  width: 100%;
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav); // 14px — Figma: Satoshi Bold 14px
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black-primary);
+  line-height: var(--leading-normal);
+  text-transform: capitalize;
+}
+
+.input {
+  width: 100%;
+  height: var(--space-8); // 40px — Figma exact
+  padding: 0 var(--space-2-5);
+  border: 1px solid var(--color-gray-300); // Figma: #e0e5f2, nearest token --color-gray-300 #DADADA
+  border-radius: 0;
+  background: var(--color-white-primary);
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-blue-primary);
+  outline: none;
+  transition: border-color 0.15s ease;
+
+  &::placeholder {
+    color: var(--color-gray-medium);
+    font-weight: var(--font-weight-regular);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}

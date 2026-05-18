@@ -1,0 +1,108 @@
+@use 'mixins' as *;
+
+// ── Right panel container ─────────────────────────────────────────────────────
+// White background, vertically centered content, full height.
+
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  background-color: var(--color-white-primary);
+}
+
+// ── Inner content ─────────────────────────────────────────────────────────────
+// Constrained width column, vertically stacked with consistent gaps.
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 420px;
+  padding: 0 var(--space-6);
+  gap: var(--space-7);
+}
+
+// ── Grid block (logo + heading with grid background) ──────────────────────────
+
+.gridBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-7);
+  width: 100%;
+  padding: var(--space-8) var(--space-6);
+  background-image:
+    linear-gradient(rgba(38, 57, 237, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(38, 57, 237, 0.05) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+// ── Logo ──────────────────────────────────────────────────────────────────────
+
+.logo {
+  display: block;
+  height: 48px;
+  width: auto;
+}
+
+// ── Heading block ─────────────────────────────────────────────────────────────
+
+.headingBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  text-align: center;
+}
+
+.heading {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-display-sm);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-h3);
+  color: var(--color-black-primary);
+}
+
+.subheading {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--leading-body);
+  color: var(--color-gray-dark);
+}
+
+// ── Button stack ──────────────────────────────────────────────────────────────
+
+.buttonStack {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: var(--space-4);
+}
+
+// ── Footer ────────────────────────────────────────────────────────────────────
+
+.footer {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  color: var(--color-gray-dark);
+  text-align: center;
+}
+
+.signupLink {
+  color: var(--color-blue-primary);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

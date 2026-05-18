@@ -1,0 +1,223 @@
+@import '@newstyles/_mixins.scss';
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+// design-specific: Figma-exact asymmetric octagon — large diagonal cut at top-right only.
+// Derived from SVG path (381×49 viewBox). Top-right cut ≈ 15px wide × 18px tall;
+// all other corners ≈ 7–9px. Do not normalise to a symmetric shape.
+$clip: polygon(
+  7px 0px,
+  calc(100% - 15px) 0px,
+  100% 18px,
+  100% calc(100% - 7px),
+  calc(100% - 7.5px) 100%,
+  5px 100%,
+  0px calc(100% - 7px),
+  0px 9px
+);
+
+// Proportionally scaled version for sm size (≈60% of corner cuts)
+$clip-sm: polygon(
+  5px 0px,
+  calc(100% - 10px) 0px,
+  100% 12px,
+  100% calc(100% - 5px),
+  calc(100% - 5px) 100%,
+  3px 100%,
+  0px calc(100% - 5px),
+  0px 6px
+);
+
+.button {
+  position: relative;
+  min-height: var(--button-height-mobile);
+  width: fit-content;
+  padding: 0 var(--gap-inline);
+  border: none;
+  cursor: pointer;
+  clip-path: #{$clip};
+  background: var(--color-gray-300); // Figma stroke #D9D6D6 ≈ --color-gray-300 #DADADA
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gap-inline-sm);
+
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-button);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.5px;
+  color: var(--color-white-primary);
+
+  transition: all 0.3s ease;
+
+  @include mobile-up {
+    height: var(--button-height);
+    padding: 0 var(--space-6);
+  }
+
+  &.fullWidth {
+    width: 100%;
+  }
+
+  &.disabled {
+    cursor: not-allowed;
+    background: var(--color-gray-light);
+    color: var(--color-gray-light-active);
+  }
+
+  &.transparent {
+    background: var(--color-gray-light-hover);
+    color: var(--color-black-primary);
+  }
+
+  &.dark {
+    background: var(--color-surface-dark);
+    color: var(--color-white-primary);
+  }
+
+  &.error {
+    background: var(--color-error);
+    color: var(--color-white-primary);
+  }
+
+  &.sm {
+    height: var(--button-height-sm-mobile);
+    padding: 0 var(--space-4);
+    clip-path: #{$clip-sm};
+    font-size: var(--text-nav);
+    gap: var(--space-2);
+
+    @include mobile-up {
+      height: var(--button-height-sm);
+      padding: 0 var(--space-5);
+    }
+
+    &::before {
+      clip-path: #{$clip-sm};
+    }
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 1.2px; // design-specific: matches Figma stroke-width 1.206px
+    clip-path: #{$clip};
+    // Figma fill: linear-gradient(181deg, #2639ED 15.43%, rgba(38,57,237,0.33) 133.94%)
+    // --color-blue-primary-alpha-30 (0.30) ≈ Figma 0.33, nearest token
+    background: linear-gradient(
+      181deg,
+      var(--color-blue-primary) 15.43%,
+      var(--color-blue-primary-alpha-30) 133.94%
+    );
+    box-shadow: inset 0 0 20px 0 var(--color-white-alpha-40); // Figma: rgba(255,255,255,0.5) inset glow, nearest token
+    z-index: 0;
+    transition: all 0.3s ease;
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  &:not(.disabled):hover::before {
+    background: linear-gradient(
+      180deg,
+      var(--color-blue-primary) 0%,
+      var(--color-blue-primary-alpha-50) 140%
+    );
+    box-shadow:
+      0 0 16px var(--color-blue-primary-alpha-70),
+      inset 0 0 12px var(--color-white-alpha-40);
+  }
+
+  &:not(.disabled):active::before {
+    background: var(--color-blue-dark);
+    box-shadow:
+      inset 0 2px 4px var(--color-black-alpha-55),
+      inset 0 0 6px var(--color-white-alpha-30);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  &.disabled::before {
+    background: var(--color-gray-light-hover);
+    box-shadow: none;
+  }
+
+  &.transparent::before {
+    background: var(--color-white-primary);
+  }
+
+  &.transparent:not(.disabled):hover::before {
+    background: var(--color-white-light-hover);
+  }
+
+  &.transparent.disabled::before {
+    background: transparent;
+  }
+
+  &.dark::before {
+    background: var(--color-surface-dark-mid);
+  }
+
+  &.dark:not(.disabled):hover::before {
+    background: var(--color-surface-hover);
+    box-shadow:
+      0 0 16px var(--color-black-alpha-55),
+      inset 0 0 12px var(--color-white-alpha-26);
+  }
+
+  &.dark:not(.disabled):active::before {
+    background: var(--color-black-primary);
+    box-shadow:
+      inset 0 2px 4px var(--color-black-alpha-55),
+      inset 0 0 6px var(--color-white-alpha-30);
+  }
+
+  &.dark.disabled::before {
+    background: var(--color-surface-dark-alt);
+  }
+
+  &.error::before {
+    background: var(--color-error);
+  }
+
+  &.error:not(.disabled):hover::before {
+    background: var(--color-error);
+    box-shadow: none;
+  }
+
+  &.error:not(.disabled):active::before {
+    background: var(--color-error);
+    box-shadow: inset 0 2px 4px var(--color-black-alpha-10);
+  }
+
+  &.error.disabled::before {
+    background: var(--color-error);
+  }
+
+  &.error:focus-visible {
+    outline-color: var(--color-blue-primary);
+  }
+}
+
+.spinner {
+  width: 18px; // design-specific: Figma-exact spinner size — smaller than --btn-icon-size (24px) by intent
+  height: 18px;
+  border: 2px solid var(--color-white-alpha-30);
+  border-top-color: var(--color-white-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.iconRight { margin-left: var(--gap-inline-sm); }
+
+.iconRight,
+.iconLeft {
+  font-size: var(--text-body);
+}

@@ -1,0 +1,98 @@
+@use '../../design-system/styles/mixins' as *;
+
+.fields {
+  display: flex;
+  gap: var(--space-5); // 20px — Figma gap between columns
+  align-items: flex-start;
+  flex-wrap: wrap;
+
+  @include tablet-down {
+    flex-wrap: wrap;
+  }
+}
+
+.field {
+  flex: 1;
+  min-width: 220px;
+  max-width: 291px; // Figma: input width 291px per column
+}
+
+.fieldPhone {
+  flex: 0 0 auto; // phone column is wider: 90px country + 8px gap + 291px input = 389px
+  max-width: none;
+}
+
+// Email field: input + verify badge side-by-side
+.emailWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3); // 12px ≈ 13px Figma, nearest token
+  width: 100%;
+}
+
+.fieldLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black-primary);
+  line-height: var(--leading-normal);
+  text-transform: capitalize;
+}
+
+.emailInputRow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: var(--space-8); // 40px
+  border: 1px solid var(--color-gray-300); // Figma: #e0e5f2, nearest --color-gray-300
+  background: var(--color-white-primary);
+  transition: border-color 0.15s ease;
+
+  &:focus-within {
+    border-color: var(--color-blue-primary);
+  }
+}
+
+.emailInput {
+  flex: 1;
+  height: 100%;
+  padding: 0 var(--space-2-5);
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-gray-primary); // Figma: #7c7c7c placeholder value
+  min-width: 0;
+
+  &::placeholder {
+    color: var(--color-gray-medium);
+    font-weight: var(--font-weight-regular);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+@include mobile {
+  .fields {
+    flex-direction: column;
+    gap: var(--space-4); // 16px — Figma: 16px gap between stacked fields on mobile
+  }
+
+  .field {
+    max-width: 100%;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .fieldPhone {
+    width: 100%;
+  }
+}

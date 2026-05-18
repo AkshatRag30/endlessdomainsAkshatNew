@@ -1,0 +1,57 @@
+@use '../../design-system/styles/mixins' as *;
+
+.header {
+  width: 100%;
+  background: var(--color-white-primary);
+  padding: 0;
+  overflow: hidden;
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6); // 24px — Figma gap
+  padding: var(--space-4) var(--space-6); // 16px 24px
+  min-height: 107px; // Figma exact profile header height
+}
+
+.textRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4); // 17px gap — Figma
+  padding: 0 var(--space-1);
+}
+
+.title {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small); // 17px — Figma exact
+  font-weight: var(--font-weight-bold);
+  color: var(--color-blue-primary);
+  white-space: nowrap;
+  text-transform: capitalize;
+}
+
+.chevrons {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-blue-primary);
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+
+// Blue underline spanning full width — Figma: 11px tall, #2639ed with inset white glow
+.underline {
+  width: 100%;
+  height: 11px; // Figma exact: borderline height 11px
+  background: var(--color-blue-primary);
+  box-shadow: inset 0 0 9.8px 0 var(--color-white-primary);
+}
+
+@include mobile {
+  .inner {
+    padding: var(--space-3) var(--space-4); // 12px 16px — Figma: compact header on mobile
+    min-height: 82px; // Figma: mobile profile header 82px
+    gap: var(--space-5); // 20px ≈ 21.5px Figma gap, nearest token
+  }
+}

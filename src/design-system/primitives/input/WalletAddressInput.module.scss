@@ -1,0 +1,78 @@
+@use '../../styles/mixins' as *;
+
+.wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: var(--space-8); // 40px — Figma exact
+  border: 1px solid var(--color-gray-300); // Figma: #e0e5f2, nearest --color-gray-300
+  background: var(--color-white-primary);
+}
+
+.input {
+  flex: 1;
+  height: 100%;
+  padding: 0 var(--space-3);
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-gray-medium); // Figma: #aeaeae placeholder, nearest --color-gray-medium
+
+  &::placeholder {
+    color: var(--color-gray-medium);
+    font-weight: var(--font-weight-bold);
+    text-transform: capitalize;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.addBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1-5);
+  height: auto;
+  align-self: center;
+  margin-right: var(--space-2); // 8px gap from right input border
+  padding: var(--space-1) var(--space-3); // 4px top/bottom — inset from input border edge
+  border: 1px solid var(--color-white-alpha-40);
+  border-radius: 0;
+  background: var(--color-black-primary);
+  box-shadow: inset 0 0 12px 0 var(--color-white-primary); // Figma: inset 0 0 12.3px 0 white
+  cursor: pointer;
+  flex-shrink: 0;
+  white-space: nowrap;
+  transition: background-color 0.15s ease;
+
+  span {
+    font-family: var(--font-satoshi);
+    font-size: var(--text-small-12);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-white-primary);
+    letter-spacing: 0.03em;
+    text-transform: capitalize;
+  }
+
+  &:hover {
+    background: var(--color-black-hover);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.walletIcon {
+  display: block;
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  flex-shrink: 0;
+}

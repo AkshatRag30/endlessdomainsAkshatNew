@@ -1,0 +1,103 @@
+@use '../../styles/mixins' as *;
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3); // 12px ≈ 13px Figma, nearest token
+  width: auto;
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black-primary);
+  line-height: var(--leading-normal);
+  text-transform: capitalize;
+}
+
+.row {
+  display: flex;
+  gap: var(--space-2); // 8px ≈ 7px Figma, nearest token
+  align-items: stretch;
+}
+
+.countrySelector {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-inline-sm);
+  height: var(--space-8); // 40px — Figma exact
+  width: 90px; // Figma: 90px country selector width
+  padding: 0 var(--space-1-5);
+  border: 1px solid var(--color-gray-300); // Figma: #e0e5f2, nearest token
+  background: var(--color-white-primary);
+  cursor: pointer;
+  flex-shrink: 0;
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.flag {
+  display: block;
+  width: 28px;
+  height: 20px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.code {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-blue-primary);
+  white-space: nowrap;
+  flex: 1;
+}
+
+.caret {
+  width: 16px;
+  height: 16px;
+  color: var(--color-gray-primary);
+  flex-shrink: 0;
+}
+
+.input {
+  flex: none;
+  width: 291px; // Figma: phone number input is 291px, same as other inputs
+  height: var(--space-8); // 40px
+  padding: 0 var(--space-2-5);
+  border: 1px solid var(--color-gray-300);
+  border-radius: 0;
+  background: var(--color-white-primary);
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-blue-primary);
+  outline: none;
+  transition: border-color 0.15s ease;
+
+  &::placeholder {
+    color: var(--color-gray-medium);
+    font-weight: var(--font-weight-regular);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+@include mobile {
+  .wrapper {
+    width: 100%; // full-width on mobile
+  }
+
+  .input {
+    flex: 1; // fill remaining space after 90px country selector
+    width: auto; // override fixed 291px desktop value
+  }
+}

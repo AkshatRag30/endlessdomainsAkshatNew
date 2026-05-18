@@ -1,0 +1,217 @@
+@use 'mixins' as *;
+
+// ── Page shell ─────────────────────────────────────────────────────────────────
+
+.page {
+  display: flex;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+.leftPanel {
+  width: 50%;
+  flex-shrink: 0;
+  position: relative;
+
+  @include mobile {
+    display: none;
+  }
+}
+
+// ── Right panel ────────────────────────────────────────────────────────────────
+// LoginRightSection owns its own layout and centering.
+
+.rightPanel {
+  flex: 1;
+  overflow-y: auto;
+
+  @include mobile {
+    width: 100%;
+  }
+}
+
+.inner {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+// ── Logo ───────────────────────────────────────────────────────────────────────
+
+.logoWrap {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-inline-sm);
+}
+
+.logoImg {
+  height: 40px;
+  width: auto;
+  display: block;
+}
+
+// ── Heading block ──────────────────────────────────────────────────────────────
+
+.headingBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.heading {
+  font-size: var(--text-h3);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-blue-darker);
+  line-height: var(--leading-snug);
+  margin: 0;
+}
+
+.subheading {
+  font-size: var(--text-body-small);
+  color: var(--color-gray-dark);
+  line-height: var(--leading-body);
+  margin: 0;
+}
+
+// ── Wallet options ─────────────────────────────────────────────────────────────
+
+.walletList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.walletBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--radius-md);
+  background-color: var(--color-white-primary);
+  cursor: pointer;
+  transition: border-color 140ms ease, background-color 140ms ease;
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-darker);
+  text-align: left;
+
+  &:hover {
+    border-color: var(--color-blue-primary);
+    background-color: var(--color-blue-primary-alpha-07);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-blue-primary);
+    outline-offset: 2px;
+  }
+}
+
+.walletIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.walletLabel {
+  flex: 1;
+}
+
+.walletArrow {
+  color: var(--color-gray-medium);
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+// ── Divider ────────────────────────────────────────────────────────────────────
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-gray-medium);
+  font-size: var(--text-small-13);
+
+  &::before,
+  &::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background-color: var(--color-gray-300);
+  }
+}
+
+// ── Email form ──────────────────────────────────────────────────────────────────
+
+.emailForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.emailInput {
+  width: 100%;
+  height: var(--button-height);
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--radius-md);
+  font-size: var(--text-body-small);
+  color: var(--color-blue-darker);
+  background-color: var(--color-white-primary);
+  outline: none;
+  transition: border-color 140ms ease;
+
+  &::placeholder {
+    color: var(--color-gray-medium);
+  }
+
+  &:focus {
+    border-color: var(--color-blue-primary);
+  }
+}
+
+.emailBtn {
+  width: 100%;
+  height: var(--button-height);
+  border: none;
+  border-radius: var(--radius-md);
+  background-color: var(--color-blue-primary);
+  color: var(--color-white-primary);
+  font-size: var(--text-button);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition: background-color 140ms ease;
+
+  &:hover {
+    background-color: var(--color-blue-dark);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-blue-primary);
+    outline-offset: 2px;
+  }
+}
+
+// ── Footer ─────────────────────────────────────────────────────────────────────
+
+.footer {
+  font-size: var(--text-small-12);
+  color: var(--color-gray-medium);
+  text-align: center;
+  line-height: var(--leading-body);
+
+  a {
+    color: var(--color-blue-primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+
+    &:hover {
+      color: var(--color-blue-dark);
+    }
+  }
+}

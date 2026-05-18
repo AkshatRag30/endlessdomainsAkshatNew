@@ -1,0 +1,60 @@
+// ── Solana wallet button ──────────────────────────────────────────────────────
+// Same structure as MultiChainWalletButton but white outer background.
+// border.svg crosshair frame is still present as decorative overlay.
+
+.btn {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  width: 100%;
+  height: 58px;
+  padding: 6px;
+  gap: 10px;
+  background: var(--color-white-primary);
+  box-shadow:
+    0px 1.5px 0px rgba(255, 255, 255, 0.1),
+    inset 0px 0px 2px rgba(0, 0, 0, 0.08);
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.borderFrame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.inner {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  background: var(--color-white-primary);
+  border-radius: 0;
+}
+
+.label {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  letter-spacing: 0.01em;
+}
+
+.icon {
+  display: block;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}

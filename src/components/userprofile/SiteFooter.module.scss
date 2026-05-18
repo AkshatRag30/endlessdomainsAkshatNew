@@ -1,0 +1,414 @@
+@use '../../design-system/styles/mixins' as *;
+
+// ── Footer shell ─────────────────────────────────────────────────────────────
+.footer {
+  position: relative;
+  width: 100%;
+  background: var(--color-surface-dark); // Figma: #090909
+  overflow: hidden;
+  padding-top: var(--footer-padding-top); // token-driven 80px desktop
+}
+
+// ── Watermark ─────────────────────────────────────────────────────────────────
+// Figma: Satoshi Medium 183.69px, rgba(255,255,255,0.15), tracking -4.53px
+// design-specific: large decorative watermark text behind footer content
+.watermark {
+  position: absolute;
+  bottom: 120px; // Figma: vertically centred around footer divider line
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-satoshi);
+  font-size: 140px; // design-specific: Figma 183.69px scaled to fit; use clamp at build time
+  font-weight: var(--font-weight-medium);
+  color: var(--color-white-alpha-25); // Figma: rgba(255,255,255,0.15), nearest --color-white-alpha-25
+  letter-spacing: -0.025em; // Figma: -4.53px ≈ -0.025em
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+}
+
+// ── Top content row ───────────────────────────────────────────────────────────
+.topRow {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: var(--gap-section); // 48px
+  align-items: flex-start;
+  padding: 0 var(--container-padding-x);
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding-bottom: var(--space-13); // 96px spacing above newsletter
+
+  @include tablet-down {
+    flex-wrap: wrap;
+    gap: var(--space-9);
+  }
+}
+
+// ── Brand block ───────────────────────────────────────────────────────────────
+.brand {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5); // 19px — Figma
+  flex-shrink: 0;
+  width: 372px; // Figma: company info block 372px wide
+
+  @include tablet-down {
+    width: 100%;
+  }
+}
+
+.brandLogoLink {
+  display: inline-block;
+  text-decoration: none;
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.brandLogo {
+  display: block;
+  width: 351px; // Figma: logo width 351px
+  height: auto;
+  object-fit: contain;
+}
+
+.tagline {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-button); // 18px — Figma
+  font-weight: var(--font-weight-regular);
+  color: var(--color-white-primary);
+  line-height: var(--leading-normal);
+  margin: 0;
+  max-width: 373px; // Figma
+}
+
+// "Help & Support" outlined button — Figma: dark pill with white text
+// design-specific: Figma exact 146×48px, radius 4.472px, white alpha border
+.helpBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3); // 12px
+  height: 48px; // Figma: 48.184px
+  width: 146px; // Figma: 146.133px
+  padding: 0 var(--space-7); // approximate
+  border: 1px solid var(--color-white-alpha-40);
+  border-radius: var(--radius-sm); // Figma: 4.472px, nearest --radius-sm
+  background: transparent;
+  text-decoration: none;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav); // 14px
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white-alpha-90); // Figma: rgba(255,255,255,0.81), nearest --color-white-alpha-90
+  white-space: nowrap;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+
+  svg {
+    flex-shrink: 0;
+    color: var(--color-white-alpha-90);
+  }
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// ── Link columns ─────────────────────────────────────────────────────────────
+.linkCols {
+  display: flex;
+  gap: var(--space-12); // 88px — Figma gap between columns
+  align-items: flex-start;
+  flex: 1;
+
+  @include tablet-down {
+    gap: var(--space-7);
+    flex-wrap: wrap;
+  }
+}
+
+.linkCol {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2-5); // 10px — Figma
+}
+
+.colHeading {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-normal); // 20px — Figma
+  font-weight: var(--font-weight-medium);
+  color: var(--color-white-primary);
+  margin: 0;
+  line-height: var(--leading-normal);
+}
+
+.colLinks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1-5); // 7px — Figma gap between links
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.colLink {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav); // 14px
+  font-weight: var(--font-weight-regular);
+  color: var(--color-black-light); // Figma: #bfbfbf, nearest --color-black-light #e6e6e6 (use alpha)
+  color: var(--color-white-alpha-70); // rgba(255,255,255,0.7) ≈ #bfbfbf on dark bg
+  text-decoration: none;
+  line-height: var(--leading-normal);
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: var(--color-white-primary);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.web3Group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2-5);
+}
+
+.web3Cols {
+  display: flex;
+  gap: var(--space-12); // 88px — Figma
+}
+
+// ── Social icons ─────────────────────────────────────────────────────────────
+.socials {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1); // Figma: social icons close-packed
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.socialLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px; // Figma: each social icon container ~60px
+  height: 30px;
+  color: var(--color-white-primary);
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+
+  &:hover {
+    opacity: 0.75;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// ── Newsletter strip ──────────────────────────────────────────────────────────
+// Figma: full-width black strip, 81px tall, white border 1px
+.newsletter {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-7);
+  background: var(--color-black-primary);
+  border: 1px solid var(--color-white-alpha-40);
+  height: 81px; // Figma exact
+  padding: 0 var(--space-9);
+  margin: 0 var(--space-12); // Figma: 87px from edge
+  box-shadow: inset 0 0 20px 0 var(--color-white-alpha-08);
+
+  @include tablet-down {
+    flex-direction: column;
+    height: auto;
+    padding: var(--space-5) var(--space-5);
+    margin: 0 var(--space-5);
+  }
+}
+
+.newsletterText {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-body); // 22px — Figma
+  font-weight: var(--font-weight-regular);
+  color: var(--color-white-primary);
+  white-space: nowrap;
+  margin: 0;
+
+  @include tablet-down {
+    white-space: normal;
+    font-size: var(--text-normal);
+  }
+}
+
+.newsletterForm {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--color-white-primary);
+  background: var(--color-white-primary);
+  height: 56px; // Figma: email input container 56px
+  width: 401px; // Figma: exact 401px
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: inset 0 0 20px 0 var(--color-white-alpha-40);
+
+  @include tablet-down {
+    width: 100%;
+  }
+}
+
+.emailInput {
+  flex: 1;
+  height: 100%;
+  padding: 0 var(--space-3);
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav); // Figma: 13.96px ≈ --text-nav 14px
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-primary); // Figma: #606060 placeholder, nearest --color-gray-primary
+  letter-spacing: 0.03em;
+
+  &::placeholder {
+    color: var(--color-gray-primary);
+    text-transform: capitalize;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.subscribeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 0 var(--space-5);
+  background: var(--color-black-primary);
+  border: 1px solid var(--color-white-alpha-40);
+  border-radius: 0;
+  cursor: pointer;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-white-primary);
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  box-shadow: inset 0 0 12px 0 var(--color-white-primary);
+  transition: opacity 0.15s ease;
+
+  &:hover {
+    opacity: 0.85;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// ── Bottom strip ──────────────────────────────────────────────────────────────
+// Figma: full-width dark strip with copyright left, links right
+.bottomStrip {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-7);
+  padding: var(--space-5) var(--container-padding-x);
+  margin-top: var(--space-3);
+  padding-bottom: var(--footer-padding-bottom);
+
+  @include tablet-down {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+.copyright {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-nav); // 14px
+  font-weight: var(--font-weight-medium);
+  color: var(--color-surface-mid); // Figma: #404040, exact match --color-surface-mid
+  margin: 0;
+  white-space: nowrap;
+}
+
+.legalLinks {
+  display: flex;
+  align-items: center;
+  gap: var(--space-7); // 32px — Figma
+}
+
+.support {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-surface-mid);
+  white-space: nowrap;
+}
+
+.legalLink {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-surface-mid);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: var(--color-white-primary);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+@include mobile {
+  .brandLogo {
+    width: 130px; // Figma: smaller logo on mobile (130px from Figma node width)
+  }
+
+  .tagline {
+    font-size: var(--text-body-small); // 17px — Figma: tagline smaller on mobile
+  }
+
+  .newsletter {
+    margin: 0 var(--space-4); // 16px — tighter side margin on mobile
+    padding: var(--space-4); // 16px all sides
+  }
+
+  .socials {
+    justify-content: center; // center social icons row on mobile
+    width: 100%;
+  }
+
+  .legalLinks {
+    flex-direction: column;
+    gap: var(--space-2); // 8px — tight stack on mobile
+    align-items: center;
+  }
+
+  .copyright {
+    white-space: normal;
+    text-align: center;
+  }
+}

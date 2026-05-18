@@ -1,0 +1,177 @@
+@use '../../design-system/styles/mixins' as *;
+
+// design-specific: same asymmetric octagon as PrimaryButton — large top-right diagonal cut
+$clip-btn: polygon(
+  7px 0px,
+  calc(100% - 15px) 0px,
+  100% 18px,
+  100% calc(100% - 7px),
+  calc(100% - 7.5px) 100%,
+  5px 100%,
+  0px calc(100% - 7px),
+  0px 9px
+);
+
+.header {
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+  background: var(--color-white-primary);
+  height: var(--header-height); // token-driven, 72px desktop
+
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  padding: 0 var(--header-padding-x);
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  gap: var(--space-6);
+}
+
+.logoLink {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  text-decoration: none;
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.logo {
+  display: block;
+  height: 48px; // Figma: logo height ~48px in nav
+  width: auto;
+  object-fit: contain;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2-5); // Figma: 10.93px gap between nav items ≈ --space-2-5 10px
+
+  @include tablet-down {
+    display: none;
+  }
+}
+
+.userMenu {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5); // 20px — Figma gap
+  flex-shrink: 0;
+}
+
+.avatarWrapper {
+  flex-shrink: 0;
+}
+
+// Menu button — dark pill with hamburger icon
+// Figma: dark fill (#000 gradient), Geist Mono Bold 15px, 91×50px, radius ~4.7px
+.menuBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3); // ~12px — Figma
+  height: 50px; // Figma: MenuTextContainer height ~50px
+  padding: 0 var(--space-6);
+  // Figma: linear-gradient(181deg, #2639ED 1.02%, rgba(38,57,237,0.33) 117.15%)
+  // --color-blue-primary-alpha-30 (0.30) ≈ Figma 0.33, nearest token
+  background: linear-gradient(181deg, var(--color-blue-primary) 1.02%, var(--color-blue-primary-alpha-30) 117.15%);
+  border: none;
+  clip-path: #{$clip-btn};
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow: inset 0 0 20px 0 var(--color-white-alpha-08);
+  transition: opacity 0.15s ease;
+
+  &:hover {
+    opacity: 0.85;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.menuLabel {
+  font-family: 'Geist Mono', monospace; // design-specific: Figma uses Geist Mono Bold
+  font-size: 15px; // design-specific: Figma exact 15px
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white-primary);
+  white-space: nowrap;
+}
+
+// Hamburger icon
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 20px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.bar {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: var(--color-white-primary);
+  border-radius: var(--radius-full);
+}
+
+// Cart button
+.cartBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--space-1);
+  color: var(--color-black-primary);
+  transition: opacity 0.15s ease;
+
+  &:hover {
+    opacity: 0.7;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+@include mobile {
+  .inner {
+    padding: 0 var(--space-4); // 16px — Figma: 16px side padding on mobile nav
+  }
+
+  .logo {
+    height: 36px; // Figma: logo scales down on mobile
+  }
+
+  .avatarWrapper {
+    display: none; // Figma: avatar hidden on mobile nav
+  }
+
+  .userMenu {
+    gap: var(--space-2); // 8px — compact gap for mobile right items
+  }
+
+  .menuBtn {
+    width: 36px; // Figma: compact square button on mobile
+    height: 36px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .menuLabel {
+    display: none; // Figma: "Menu" text hidden on mobile — icon only
+  }
+}

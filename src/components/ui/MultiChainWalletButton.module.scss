@@ -1,0 +1,69 @@
+// ── Multi-chain wallet button ─────────────────────────────────────────────────
+// Outer btn: rgba(209,213,236,0.82) bg + padding 6px → creates colored frame.
+// border.svg positioned absolutely as decorative crosshair overlay (z=1).
+// Inner white content area sits above the frame (z=2).
+
+.btn {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  width: 100%;
+  height: 58px;
+  padding: 6px;
+  gap: 10px;
+  background: rgba(209, 213, 236, 0.819608);
+  box-shadow:
+    0px 1.5px 0px rgba(255, 255, 255, 0.1),
+    inset 0px 0px 2px rgba(0, 0, 0, 0.08);
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+// border.svg stretched to cover the full button, providing crosshair frame
+.borderFrame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  pointer-events: none;
+  z-index: 1;
+}
+
+// White content area inset by the 6px padding
+.inner {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  background: var(--color-white-primary);
+  border-radius: 0;
+}
+
+.label {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  letter-spacing: 0.01em;
+}
+
+.iconGroup {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.icon {
+  display: block;
+  height: 24px;
+  width: auto;
+}

@@ -1,0 +1,40 @@
+@use '../../styles/mixins' as *;
+
+.card {
+  width: 100%;
+  background: var(--color-white-primary);
+  overflow: hidden;
+}
+
+.titleRow {
+  padding: var(--space-5) var(--space-6); // 20px 24px — Figma title padding
+  border-bottom: none;
+}
+
+.title {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small); // 17px — Figma exact
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black-primary);
+  line-height: var(--leading-normal);
+  text-transform: capitalize;
+  margin: 0;
+}
+
+.body {
+  padding: var(--space-5) var(--space-6);
+}
+
+@include mobile {
+  .titleRow {
+    padding: var(--space-5) var(--space-4); // 20px 16px — Figma: 16px side padding on mobile
+  }
+
+  .title {
+    font-size: var(--text-body); // 22px — Figma: section titles 22px on mobile (vs 17px desktop)
+  }
+
+  .body {
+    padding: var(--space-4); // 16px all sides — Figma: 16px/17px inner padding on mobile
+  }
+}

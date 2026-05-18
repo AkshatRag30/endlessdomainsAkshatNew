@@ -1,0 +1,49 @@
+@use '../../styles/mixins' as *;
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  text-decoration: none;
+  position: relative;
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// Bracket characters — IBM Plex Mono Bold per Figma
+// design-specific: IBM Plex Mono not in token font vars; using monospace stack
+.bracket {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 17px; // design-specific: Figma exact 17.216px bracket font size
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.15em; // Figma: tracking 2.5825px ≈ 0.15em at 17px
+  text-transform: uppercase;
+  line-height: 1;
+  color: inherit;
+}
+
+.label {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav); // 14px
+  font-weight: var(--font-weight-bold);
+  white-space: nowrap;
+  color: inherit;
+}
+
+.arrow {
+  display: block;
+  flex-shrink: 0;
+  color: inherit;
+}
+
+// Active state — blue
+.active {
+  color: var(--color-blue-primary);
+}
+
+// Inactive state — gray
+.link:not(.active) {
+  color: var(--color-gray-darkest); // #6e6e6e
+}

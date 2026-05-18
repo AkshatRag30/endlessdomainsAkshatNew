@@ -1,0 +1,53 @@
+@use '../../styles/mixins' as *;
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-white-primary);
+}
+
+// Page content area — Figma: #f5f5f5 bg, 1508px wide, positioned below nav+tabs
+.main {
+  flex: 1;
+  background: var(--color-gray-light); // Figma: #f5f5f5, exact match --color-gray-light
+}
+
+.content {
+  max-width: 1508px; // Figma: content container width
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-11); // Figma: 62px horizontal margins from 1508px container → ~40px effective
+}
+
+// Three stacked section cards — Figma: gap 20px between cards
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5); // 20px — Figma exact gap between section cards
+  margin-top: var(--space-5); // 20px gap between profile header and first card
+}
+
+.saveActions {
+  display: flex;
+  justify-content: flex-start;
+  padding: var(--space-5);
+  background: var(--color-white-primary);
+}
+
+.saveBtn {
+  min-width: 381px; // design-specific: Figma-exact 381px elongated button width
+}
+
+@include mobile {
+  .content {
+    padding: var(--space-4) var(--space-2); // 16px 8px — 9px card margin from Figma, nearest token
+  }
+
+  .sections {
+    gap: var(--space-4); // 16px ≈ 15px Figma gap between cards, nearest token
+  }
+
+  .saveBtn {
+    min-width: 100%;
+  }
+}

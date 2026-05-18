@@ -1,0 +1,203 @@
+@use "../../styles/mixins" as *;
+
+// ── Float animation ─────────────────────────────────────────────────────────────
+// translate(-50%,-50%) must appear in every keyframe stop so centering is
+// not lost mid-animation when translateY is applied on top.
+@keyframes coinFloat {
+  0%, 100% { transform: translate(-50%, -50%) translateY(0px);  }
+  50%       { transform: translate(-50%, -50%) translateY(-8px); }
+}
+
+// ── Container ───────────────────────────────────────────────────────────────────
+
+.container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  overflow: hidden;
+  background-color: var(--color-white-primary);
+
+  @include mobile {
+    display: none;
+  }
+}
+
+// ── Heading border frame ─────────────────────────────────────────────────────────
+// border.svg is 834×176 — a crosshair frame with 4 corner dots.
+// Positioned to enclose the heading text block with ~30px padding on each side.
+// Heading is at top=7.39% (68px), left=6.88% (53px), width=64.29% (495px).
+
+.headingBorder {
+  position: absolute;
+  top: 3%;
+  left: 3%;
+  width: 88%;
+  height: 20%;
+  object-fit: fill;
+  pointer-events: none;
+  z-index: 6;
+}
+
+// ── Heading ─────────────────────────────────────────────────────────────────────
+// Figma: x=53, y=68, w=495 in 770×920. Satoshi Medium 30px, letter-spacing −1.122px.
+// Gradient: 91.5deg, #2639ED 49.3% → white 131.6%.
+
+.heading {
+  position: absolute;
+  top: 7.39%;
+  left: 6.88%;
+  width: 64.29%;
+  z-index: 7;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h3);
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -0.037em;
+  background: linear-gradient(
+    91.5deg,
+    var(--color-blue-primary) 49.3%,
+    rgba(255, 255, 255, 0.35) 131.6%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+// ── Gradient diamond ─────────────────────────────────────────────────────────────
+// SVG is 769×325 — a chevron shape with blue gradient (transparent → #2639ED top→bottom).
+// Spans the full width behind the coin arc. Top aligned just above coinUD row (~35%).
+
+.gradientDiamond {
+  position: absolute;
+  left: 0;
+  top: 18%;
+  width: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+// ── Grey coin-column bars ────────────────────────────────────────────────────────
+// greyrectangles.svg is ONE 59×539px rounded vertical bar (fill-opacity 0.27).
+// Each bar is positioned at the same left% as its coin column, starting from the
+// top of the diamond area (top: 18%) and extending downward.
+
+.coinBarsArea {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.coinBar {
+  position: absolute;
+  top: 18%;
+  transform: translateX(-50%);
+  height: 34%;
+  overflow: hidden;
+}
+
+// Bar left positions — one per coin column (same X as coin slots)
+.coinBar.coinUD       { left: 12.53%; }
+.coinBar.coinENS      { left: 25.39%; }
+.coinBar.coinStarknet { left: 38.25%; }
+.coinBar.coinTezos    { left: 50.58%; }
+.coinBar.coinBNB      { left: 63.93%; }
+.coinBar.coinDark     { left: 76.77%; }
+.coinBar.coinArbitrum { left: 89.61%; }
+
+.coinBarImg {
+  display: block;
+  width: 40px;
+  height: 100%;
+  object-fit: fill;
+}
+
+// ── Coin icons ───────────────────────────────────────────────────────────────────
+
+.coinsArea {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.coin {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  animation: coinFloat 3s ease-in-out infinite backwards;
+}
+
+// Positions: centre of each 73×73px icon as % of the 770×920 Figma reference.
+// leftCentre = (figmaLeft + 36.5) / 770 — topCentre = (figmaTop + 36.5) / 920
+//
+// Row 1 (figmaTop=322): UD @ left=60,   Arbitrum @ left=653.4
+// Row 2 (figmaTop=379): ENS @ left=159,  Dark     @ left=554.6
+// Row 3 (figmaTop=416): Starknet @ 258,  BNB      @ left=455.8
+// Centre (figmaTop=483): Tezos @ left=352.71
+
+.coinUD       { left: 12.53%; top: 32%; animation-delay: 0s;     }
+.coinENS      { left: 25.39%; top: 38%; animation-delay: 0.25s;  }
+.coinStarknet { left: 38.25%; top: 42%; animation-delay: 0.50s;  }
+.coinTezos    { left: 50.58%; top: 48%; animation-delay: 0.75s;  }
+.coinBNB      { left: 63.93%; top: 42%; animation-delay: 0.60s;  }
+.coinDark     { left: 76.77%; top: 38%; animation-delay: 0.30s;  }
+.coinArbitrum { left: 89.61%; top: 32%; animation-delay: 0.10s;  }
+
+.coinImg {
+  display: block;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  object-fit: contain;
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.12),
+    0 1px 4px  rgba(0, 0, 0, 0.08);
+}
+
+.coinImgTezos {
+  background-color: var(--color-white-primary);
+}
+
+// ── Logo border frame ────────────────────────────────────────────────────────────
+// border.svg reused to frame the 3D logo. Logo centre: left=50%, top=76.24%.
+// Width set wider than the logo (22.55%) and height stretched to frame it.
+
+.logoBorder {
+  position: absolute;
+  left: 50%;
+  top: 63%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 18%;
+  object-fit: fill;
+  pointer-events: none;
+  z-index: 6;
+}
+
+// ── 3D Logo ──────────────────────────────────────────────────────────────────────
+
+.logo3d {
+  position: absolute;
+  left: 50%;
+  top: 63%;
+  transform: translate(-50%, -50%);
+  width: 16%;
+  z-index: 7;
+  pointer-events: none;
+  filter: drop-shadow(0 8px 28px rgba(148, 87, 246, 0.40));
+}
+
+// ── Bottom platform ───────────────────────────────────────────────────────────────
+
+.platform {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  display: block;
+  z-index: 5;
+  pointer-events: none;
+}

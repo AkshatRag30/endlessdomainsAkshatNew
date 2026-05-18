@@ -1,0 +1,49 @@
+@use '../../design-system/styles/mixins' as *;
+
+.wallets {
+  display: flex;
+  gap: var(--space-5); // 20px — Figma gap
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.walletCol {
+  flex: 1;
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.walletHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2-5); // 9px — Figma gap
+}
+
+.walletIconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.walletLabel {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav); // 14px
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black-primary);
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+@include mobile {
+  .wallets {
+    flex-direction: column;
+  }
+
+  .walletCol {
+    min-width: 100%;
+    width: 100%;
+  }
+}
