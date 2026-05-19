@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import React from 'react'
 import styles from './Avatar.module.scss'
 
@@ -9,7 +10,7 @@ export interface AvatarProps {
 
 export const Avatar: React.FC<AvatarProps> = ({ src, alt, size = 'md' }) => (
   <div className={`${styles.wrapper} ${styles[size]}`}>
-    <img src={src} alt={alt} className={styles.img} />
+    <Image src={src} alt={alt} fill className={styles.img} />
   </div>
 )
 

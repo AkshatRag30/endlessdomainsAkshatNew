@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import React from 'react'
 import { NavLink } from '@/design-system/primitives/button/NavLink'
 import { Avatar } from '@/design-system/primitives/display/Avatar'
@@ -23,9 +24,9 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({
 }) => (
   <header className={styles.header} role="banner">
     <div className={styles.inner}>
-      <a href="/" className={styles.logoLink} aria-label="Endless Domains home">
+      <Link href="/" className={styles.logoLink} aria-label="Endless Domains home">
         <img src={logoSrc} alt="Endless Domains" className={styles.logo} />
-      </a>
+      </Link>
 
       <nav className={styles.nav} aria-label="Main navigation">
         {NAV_LINKS.map(link => (
