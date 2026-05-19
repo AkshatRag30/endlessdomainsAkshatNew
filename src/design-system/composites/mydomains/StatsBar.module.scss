@@ -1,0 +1,101 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Full-width stats band ──────────────────────────────────────────────────────
+
+.bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 17px; // design-specific: Figma-exact inter-tile gap — no token at this scale
+  background: var(--color-gray-light); // #f5f5f5 ≈ Figma #f3f3f3, nearest token
+  padding: var(--space-4) var(--container-padding-x);
+
+  @include tablet-down {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+  }
+
+  @include mobile {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+  }
+}
+
+// ── Individual stat tile ───────────────────────────────────────────────────────
+
+.tile {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5); // minimum gap prevents label and badge from touching
+  height: 76px; // design-specific: tile height — matches reference
+  padding: 0 var(--space-6);
+  background: var(--color-white-primary);
+  border: 1px solid var(--color-blue-primary-alpha-18);
+  overflow: hidden;
+
+  @include tablet-down {
+    height: 64px; // design-specific: reduced tile height for tablet
+    padding: 0 var(--space-5);
+  }
+
+  @include mobile {
+    height: auto; // design-specific: auto height lets tile breathe when label wraps
+    min-height: 52px; // design-specific: ensures badge remains vertically centered
+    padding: var(--space-3) var(--space-4);
+    gap: var(--space-3);
+  }
+}
+
+// ── Label ─────────────────────────────────────────────────────────────────────
+
+.label {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small); // 17px — Figma-exact
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  white-space: nowrap;
+  text-transform: capitalize;
+  letter-spacing: 0.4px; // design-specific: Figma-exact label tracking — no token match
+}
+
+// ── Count badge ───────────────────────────────────────────────────────────────
+
+.countBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 52px; // design-specific: badge min-width — wider than before to match reference
+  height: 34px; // design-specific: Figma-exact badge height
+  padding: 0 var(--space-3);
+  background: linear-gradient(to bottom, var(--color-surface-mid), var(--color-surface-hover));
+  box-shadow:
+    3px 3px 3px 0px var(--color-black-alpha-15),
+    inset 0px 1px 1px 0px var(--color-white-alpha-25);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small); // 17px — Figma-exact
+  font-weight: var(--font-weight-medium);
+  color: var(--color-white-primary);
+  flex-shrink: 0;
+  letter-spacing: 0.2px; // design-specific: slight badge number tracking
+}
+
+// ── Mobile: compact tiles ─────────────────────────────────────────────────────
+
+@include mobile {
+  .label {
+    font-size: var(--text-small-13);
+    white-space: normal; // allow wrapping so long labels don't squeeze the badge
+    line-height: 1.3; // design-specific: tighter leading for wrapped label lines
+  }
+
+  .countBadge {
+    min-width: 40px; // design-specific: badge min-width for mobile — matches reference
+    height: 30px; // design-specific: badge height for mobile — matches reference
+    font-size: var(--text-small-13);
+    padding: 0 var(--space-2);
+    flex-shrink: 0; // never let the badge collapse
+    align-self: center;
+  }
+}

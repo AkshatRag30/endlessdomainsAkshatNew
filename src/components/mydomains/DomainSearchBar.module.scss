@@ -1,0 +1,159 @@
+@import '@newstyles/_mixins.scss';
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+
+  @include mobile {
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+}
+
+// ── Search input + clear ───────────────────────────────────────────────────────
+
+.inputWrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.input {
+  width: 100%;
+  height: var(--button-height-sm);
+  padding: 0 var(--space-9) 0 var(--space-4);
+  background: var(--color-white-primary);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-md);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  outline: none;
+  transition: border-color 0.2s ease;
+
+  &::placeholder {
+    color: var(--color-gray-medium);
+  }
+
+  &:focus {
+    border-color: var(--color-blue-primary);
+  }
+}
+
+.clearBtn {
+  position: absolute;
+  top: 50%;
+  right: var(--space-3);
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-gray-primary);
+  cursor: pointer;
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: var(--color-black-primary);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+    border-radius: var(--radius-full);
+  }
+}
+
+// ── Search Domain button ───────────────────────────────────────────────────────
+
+.searchBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--button-height-sm);
+  padding: 0 var(--space-5);
+  background: var(--color-black-primary);
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-white-primary);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    background: var(--color-surface-hover);
+    box-shadow: 0 4px 12px var(--color-black-alpha-25);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  @include mobile {
+    padding: 0 var(--space-4);
+
+    span:last-child {
+      display: none;
+    }
+  }
+}
+
+.searchIcon {
+  flex-shrink: 0;
+}
+
+// ── View toggle group ──────────────────────────────────────────────────────────
+
+.viewToggle {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.toggleBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px; // design-specific: compact icon-only toggle — smaller than button-height-sm (44px)
+  height: 40px; // design-specific: compact icon-only toggle — smaller than button-height-sm (44px)
+  background: var(--color-white-primary);
+  border: none;
+  color: var(--color-gray-primary);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+
+  &:hover {
+    background: var(--color-gray-light-bg);
+    color: var(--color-black-primary);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  &:first-child {
+    border-right: 1px solid var(--color-gray-200);
+  }
+}
+
+.toggleActive {
+  background: var(--color-black-primary);
+  color: var(--color-white-primary);
+
+  &:hover {
+    background: var(--color-surface-hover);
+    color: var(--color-white-primary);
+  }
+}

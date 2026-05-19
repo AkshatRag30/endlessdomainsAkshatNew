@@ -1,0 +1,319 @@
+@import '@newstyles/_mixins.scss';
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5); // 20px — Figma-exact toolbar gap
+
+  @include mobile {
+    flex-wrap: nowrap;
+    gap: var(--space-2);
+  }
+}
+
+// ── Combined search form (input + search button in one container) ──────────────
+
+.formWrap {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  height: 48px; // design-specific: Figma-exact form height
+  background: var(--color-filter-input-bg); // rgba(255,255,255,0.88) — Figma-exact
+  box-shadow:
+    0.287px 0.287px 0.287px 0px var(--color-filter-shadow-primary),
+    0px 0px 0.287px 0px var(--color-filter-shadow-subtle);
+  overflow: hidden;
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 var(--space-4) 0 var(--space-4-5); // left: 18px ≈ Figma 18px
+  background: transparent;
+  border: none;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-nav); // 14px — Figma-exact
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  outline: none;
+
+  &::placeholder {
+    color: rgba(69, 69, 69, 0.63); // design-specific: Figma-exact placeholder color — no token match
+  }
+}
+
+.formRight {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  flex-shrink: 0;
+}
+
+.clearArea {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 31px; // design-specific: Figma-exact clear zone width
+  height: 38px; // design-specific: Figma-exact clear zone height
+  border-right: 1px solid #EDEDEE; // design-specific: Figma-exact divider color — no token match
+}
+
+.clearBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 25px; // design-specific: Figma-exact clear button size
+  height: 25px; // design-specific: Figma-exact clear button size
+  border-radius: var(--radius-full);
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: var(--text-nav);
+  color: var(--color-gray-primary);
+  cursor: pointer;
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: var(--color-black-primary);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+    border-radius: var(--radius-full);
+  }
+}
+
+.searchBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  height: 41px; // design-specific: Figma-exact inner button height (within 48px container)
+  padding: 0 var(--space-4);
+  margin: 0 var(--space-1); // small inset from container edges
+  background: linear-gradient(to bottom, var(--color-surface-mid), var(--color-surface-hover));
+  box-shadow:
+    3px 3px 3px 0px var(--color-black-alpha-15),
+    inset 0px 1px 1px 0px var(--color-white-alpha-25);
+  border: none;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav); // 14px ≈ Figma 14.9px, nearest token
+  font-weight: var(--font-weight-medium);
+  color: var(--color-white-primary);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  letter-spacing: 0.447px; // design-specific: Figma-exact letter-spacing — no token match
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  @include mobile {
+    span:last-child {
+      display: none;
+    }
+  }
+}
+
+.searchIcon {
+  flex-shrink: 0;
+}
+
+// ── View toggle (single dark container, active icon gets white pill) ────────────
+
+.viewToggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 108px; // design-specific: Figma-exact toggle container width
+  height: 47px; // design-specific: Figma-exact toggle container height
+  gap: 23px; // design-specific: Figma-exact gap between icons
+  background: linear-gradient(to bottom, var(--color-surface-mid), var(--color-surface-hover));
+  box-shadow:
+    3px 3px 3px 0px var(--color-black-alpha-15),
+    inset 0px 1px 1px 0px var(--color-white-alpha-25);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.toggleBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--color-white-primary);
+  opacity: 0.49; // design-specific: Figma-exact inactive icon opacity
+  transition: opacity 0.15s ease;
+
+  &:hover {
+    opacity: 0.75;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.toggleActive {
+  opacity: 1;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  .iconWrap {
+    width: 40px; // design-specific: Figma-exact active pill width (≈39.593px)
+    height: 32px; // design-specific: Figma-exact active pill height
+    background: var(--color-white-primary);
+    box-shadow:
+      2.169px 4.339px 1.085px 0px var(--color-border-black-subtle),
+      inset 0px -1.627px 0.271px 0px #B6B6B6, // design-specific: Figma-exact pill inset shadow — no token match
+      inset 0px 0.542px 0px 0px var(--color-white-primary);
+    color: var(--color-black-primary);
+  }
+}
+
+.iconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// ── Mobile: compact form + hidden sync ────────────────────────────────────────
+
+@include mobile {
+  .formWrap {
+    height: 44px; // design-specific: slightly shorter form on mobile
+  }
+
+  .input {
+    padding-left: var(--space-3);
+  }
+
+  .viewToggle {
+    display: none;
+  }
+
+  .syncNowBtn {
+    display: inline-flex;
+    width: 44px; // design-specific: icon-only square on mobile
+    height: 44px; // design-specific: icon-only square on mobile
+    background: var(--color-white-primary);
+    border: 1px solid var(--color-gray-200);
+    box-shadow: none;
+    transition: none;
+  }
+
+  .syncNowBtn_syncing {
+    width: 44px; // no elongation on mobile
+  }
+
+  .syncPill {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    box-shadow: none;
+    transition: none;
+
+    .syncNowBtn_syncing & {
+      width: 100%;
+    }
+  }
+
+  .syncLabel {
+    display: none;
+  }
+}
+
+// ── Sync Now button (dark container, white pill inside) ────────────────────────
+
+.syncNowBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 133px; // design-specific: Figma-exact sync button width
+  height: 47px; // design-specific: Figma-exact sync button height
+  background: linear-gradient(to bottom, var(--color-surface-mid), var(--color-surface-hover));
+  box-shadow:
+    3px 3px 3px 0px var(--color-black-alpha-15),
+    inset 0px 1px 1px 0px var(--color-white-alpha-25);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: width 0.4s ease, opacity 0.2s ease;
+
+  &:hover:not(:disabled) {
+    opacity: 0.9;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.syncNowBtn_syncing {
+  width: 175px; // design-specific: expanded width during 45s sync — accommodates gif
+}
+
+.syncPill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  width: 127px; // design-specific: Figma-exact inner pill width
+  height: 39px; // design-specific: Figma-exact inner pill height
+  background: var(--color-white-primary);
+  box-shadow:
+    2.169px 4.339px 1.085px 0px var(--color-border-black-subtle),
+    inset 0px -1.627px 0.271px 0px #B6B6B6, // design-specific: Figma-exact pill inset shadow — no token match
+    inset 0px 0.542px 0px 0px var(--color-white-primary);
+  color: var(--color-blue-primary);
+  transition: width 0.4s ease;
+  overflow: hidden;
+
+  .syncNowBtn_syncing & {
+    width: 169px; // design-specific: expanded pill width during sync — 127px + gif (20px) + gap (8px) + padding (14px)
+  }
+}
+
+.syncGif {
+  width: 20px; // design-specific: clock gif display size
+  height: 20px; // design-specific: clock gif display size
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+@keyframes syncSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.syncIconSpin {
+  animation: syncSpin 1.2s linear 1 forwards;
+  flex-shrink: 0;
+}
+
+.syncLabel {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-nav); // 14px — Figma-exact
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+  white-space: nowrap;
+}

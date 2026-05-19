@@ -1,0 +1,31 @@
+// ── Shared domain provider/chain icon circles ─────────────────────────────────
+// Imported by DomainCardGrid.module.scss and DomainCardList.module.scss
+
+.iconCircle {
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+  display: inline-block;
+}
+
+.chain_polygon    { background: var(--color-purple-primary); }
+.chain_ethereum   { background: var(--color-blue-primary); }
+.chain_solana     { background: var(--color-purple-dark); }
+.chain_tezos      { background: var(--color-blue-dark); }
+.chain_aptos      { background: var(--color-gray-darker); }
+
+.provider_unstoppable { background: var(--color-blue-primary); }
+.provider_ens         { background: var(--color-purple-primary); }
+.provider_arbitrum    { background: var(--color-blue-dark); }
+.provider_bonfida     { background: var(--color-gray-darker); }
+.provider_tezos       { background: var(--color-blue-dark); }
+.provider_aptos       { background: var(--color-gray-darker); }
+
+.expiryDot {
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+  display: inline-block;
+}
+
+.dot_active   { background: var(--color-status-available); }
+.dot_expiring { background: var(--color-error); }
+.dot_lifetime { background: var(--color-blue-primary); }

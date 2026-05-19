@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React from 'react'
+import { useRouter } from 'next/router'
 import { PiChartBar, PiGlobeSimple, PiShoppingCart, PiUsers } from 'react-icons/pi'
 import { FiUser } from 'react-icons/fi'
 import { TabButton } from '@/design-system/primitives/button/TabButton'
@@ -12,6 +13,14 @@ const TABS = [
   { id: 'reputation', label: 'Reputation', icon: <PiUsers size={22} aria-hidden="true" /> },
 ]
 
+const TAB_ROUTES: Record<string, string> = {
+  profile: '/profile',
+  domains: '/profile/mydomains',
+  orders: '/profile/orders',
+  analytics: '/profile/analytics',
+  reputation: '/profile/reputation',
+}
+
 export interface DashboardTabBarProps {
   activeTab?: string
   onTabChange?: (tabId: string) => void
@@ -21,10 +30,12 @@ export const DashboardTabBar: React.FC<DashboardTabBarProps> = ({
   activeTab = 'profile',
   onTabChange,
 }) => {
-  const [active, setActive] = useState(activeTab)
+  const router = useRouter()
+  const active = Object.entries(TAB_ROUTES).find(([, path]) => router.pathname === path)?.[0] ?? activeTab
 
   const handleClick = (id: string) => {
-    setActive(id)
+    const route = TAB_ROUTES[id]
+    if (route) router.push(route)
     onTabChange?.(id)
   }
 

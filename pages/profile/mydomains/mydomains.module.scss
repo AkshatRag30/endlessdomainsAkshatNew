@@ -1,0 +1,135 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Layout shell (wraps nav + tab bar + content + footer) ──────────────────────
+
+.shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-white-primary);
+}
+
+.mainArea {
+  flex: 1;
+  background: var(--color-gray-light-bg);
+}
+
+// ── Page content (inner padded area) ──────────────────────────────────────────
+
+.page {
+  min-height: 100vh;
+  background: var(--color-gray-light-bg);
+  padding: var(--space-7) var(--container-padding-x);
+
+  @include tablet-down {
+    padding: var(--space-6) var(--space-5);
+  }
+
+  @include mobile {
+    padding: var(--space-4) var(--space-4);
+  }
+}
+
+// ── Control bar: filter toggle + search bar ────────────────────────────────────
+
+.controlBar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) 0;
+  flex-wrap: wrap;
+}
+
+.filterToggleGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-shrink: 0;
+}
+
+.filterToggleBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+
+  &:focus-visible {
+    @include focus-ring;
+    border-radius: var(--radius-sm);
+  }
+}
+
+.filterLabel {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+}
+
+.resetBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-primary);
+  cursor: pointer;
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: var(--color-black-primary);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+    border-radius: var(--radius-sm);
+  }
+}
+
+.searchBarWrap {
+  flex: 1;
+  min-width: 0;
+}
+
+// ── Two-column content area ────────────────────────────────────────────────────
+
+.contentArea {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-6);
+
+  @include tablet-down {
+    flex-direction: column;
+  }
+}
+
+.filterPanel {
+  width: 280px; // design-specific: Figma sidebar width — no layout token for sidebar
+  flex-shrink: 0;
+  background: var(--color-white-primary);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+
+  @include tablet-down {
+    width: 100%;
+  }
+}
+
+.mainContent {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+@import '../../../src/design-system/composites/mydomains/MyDomains.mobile.scss';

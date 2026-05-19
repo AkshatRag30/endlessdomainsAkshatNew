@@ -1,0 +1,361 @@
+@import '@newstyles/_mixins.scss';
+
+// ─── Animated border keyframe ─────────────────────────────────────────────────
+
+@property --border-angle {
+  syntax: '<angle>';
+  inherits: true;
+  initial-value: 0deg;
+}
+
+@keyframes borderAngleRotate {
+  to {
+    --border-angle: 360deg;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ─── Hero: outer wrapper ───────────────────────────────────────────────────────
+
+.searchWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+      transform: translate(0px, var(--space-3));
+}
+
+// ─── Hero: animated border container ──────────────────────────────────────────
+
+.searchContainer {
+  --border-angle: 0deg;
+  position: relative;
+  width: clamp(280px, 85%, 580px);
+  height: clamp(48px, 8vw, 60px);
+  margin: 0 auto;
+  border-radius: var(--radius-xl);
+  border: 3px solid transparent;
+  background:
+    linear-gradient(var(--color-white-primary), var(--color-white-primary)) padding-box,
+    conic-gradient(
+      from var(--border-angle),
+      var(--color-search-border-a) 0deg,
+      var(--color-search-border-b) 45deg,
+      var(--color-search-border-c) 90deg,
+      var(--color-search-border-d) 135deg,
+      var(--color-search-border-e) 180deg,
+      var(--color-search-border-f) 225deg,
+      var(--color-search-border-g) 270deg,
+      var(--color-search-border-h) 315deg,
+      var(--color-search-border-a) 360deg
+    ) border-box;
+  animation: borderAngleRotate 3s linear infinite;
+
+  // outer glow
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -15px;
+    border-radius: inherit;
+    background: conic-gradient(
+      from var(--border-angle),
+      transparent 0deg,
+      var(--color-search-glow-a) 60deg,
+      var(--color-search-glow-b) 120deg,
+      var(--color-search-glow-c) 180deg,
+      var(--color-search-glow-d) 240deg,
+      var(--color-search-glow-a) 300deg,
+      transparent 360deg
+    );
+    filter: blur(25px);
+    opacity: 0.7;
+    z-index: -1;
+    animation: borderAngleRotate 3s linear infinite;
+  }
+
+  @include tablet-down {
+    width: 80%;
+  }
+
+  @include mobile {
+    width: 80%;
+    height: 48px;
+    border-radius: var(--radius-md);
+    border-width: 2px;
+  }
+
+  @include small-mobile {
+    width: 90%;
+    height: 52px;
+  }
+}
+
+// ─── Hero: inner form row ─────────────────────────────────────────────────────
+
+.inputContent {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0 var(--space-2) 0 var(--space-6);
+
+  @include mobile {
+    padding: 0 6px 0 var(--space-4);
+    gap: var(--space-2);
+  }
+}
+
+// ─── Hero: text input ─────────────────────────────────────────────────────────
+
+.searchInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: var(--font-satoshi);
+  font-size: clamp(14px, 2vw, 16px);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+
+  &::placeholder {
+    color: var(--color-blue-primary);
+    font-weight: var(--font-weight-medium);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  @include mobile {
+    font-size: var(--text-nav);
+  }
+}
+
+// ─── Hero: submit button ──────────────────────────────────────────────────────
+
+.searchButton {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  height: 48px;
+  background: var(--color-black-primary);
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  overflow: hidden;
+  isolation: isolate;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+
+  // glass shimmer on hover
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, var(--color-white-alpha-40), transparent);
+    transition: left 0.7s ease;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  &:not(:disabled):hover {
+    background: var(--color-black-hover);
+    box-shadow: 0 4px 12px var(--color-blue-primary-alpha-30);
+
+    &::after {
+      left: 100%;
+    }
+
+    .icon {
+      color: var(--color-white-primary);
+    }
+
+    .labelUp {
+      top: -100%;
+    }
+  }
+
+  &:not(:disabled):active {
+    transform: scale(0.98);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-white-primary);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  @include mobile {
+    padding: var(--space-3);
+    height: 40px;
+    gap: 0;
+  }
+}
+
+// ─── Button internals ─────────────────────────────────────────────────────────
+
+.spinner {
+  position: relative;
+  z-index: 2;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--color-white-alpha-30);
+  border-top-color: var(--color-white-primary);
+  border-radius: var(--radius-full);
+  animation: spin 0.6s linear infinite;
+  flex-shrink: 0;
+}
+
+.icon {
+  position: relative;
+  z-index: 2;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: var(--color-gray-medium);
+  transition: color 0.3s ease;
+}
+
+.labelWrapper {
+  position: relative;
+  z-index: 2;
+  display: block;
+  height: 24px;
+  overflow: hidden;
+  line-height: 24px;
+
+  @include mobile {
+    display: none;
+  }
+}
+
+.labelUp {
+  display: block;
+  position: relative;
+  top: 0;
+  color: var(--color-gray-medium);
+  transition: top 0.3s ease;
+
+  &:last-child {
+    color: var(--color-white-primary);
+  }
+}
+
+// ─── Domain extension pills ───────────────────────────────────────────────────
+
+.extensionList {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-2);
+  transform: translateY(-40px);
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 0 var(--container-padding-x);
+  width: 100%;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  @include mobile-up {
+    flex-wrap: wrap;
+    overflow-x: visible;
+    padding: 0;
+    width: auto;
+  }
+
+  @include small-mobile {
+    transform: translateY(-60px);
+    gap: var(--space-1);
+  }
+
+  span {
+    border-radius: var(--radius-full);
+    background: var(--color-white-primary);
+    box-shadow:
+      0 1px 1px 0 var(--color-black-alpha-15) inset,
+      0 1px 2.2px 0 var(--color-black-alpha-05);
+    color: var(--color-black-primary);
+    font-family: var(--font-space-grotesk);
+    font-size: var(--text-small-12);
+    font-weight: var(--font-weight-medium);
+    text-transform: lowercase;
+    padding: var(--space-1-5) var(--space-4);
+    flex-shrink: 0;
+    white-space: nowrap;
+
+    @include mobile-up {
+      padding: var(--space-1-5) var(--space-5);
+    }
+  }
+}
+
+// ─── Filter variant ───────────────────────────────────────────────────────────
+
+.filterContainer {
+  position: relative;
+  width: 100%;
+  height: 48px;
+  display: flex;
+  align-items: center;
+}
+
+.filterIcon {
+  position: absolute;
+  left: var(--space-4);
+  width: 16px;
+  height: 16px;
+  color: var(--color-gray-dark);
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+.filterInput {
+  width: 100%;
+  height: 100%;
+  padding: 0 var(--space-4) 0 44px;
+  background: var(--color-filter-input-bg);
+  border: none;
+  border-radius: var(--radius-md);
+  box-shadow:
+    0.287px 0.287px 0.287px 0 var(--color-filter-shadow-primary),
+    0 0 0.287px 0 var(--color-filter-shadow-subtle);
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-dark-hover);
+  outline: none;
+
+  &::placeholder {
+    color: var(--color-gray-dark);
+  }
+
+  &:focus {
+    box-shadow:
+      0 0 0 2px var(--color-blue-primary-alpha-13),
+      0.287px 0.287px 0.287px 0 var(--color-filter-shadow-primary);
+  }
+}

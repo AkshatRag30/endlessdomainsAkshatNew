@@ -1,0 +1,169 @@
+@import '@newstyles/_mixins.scss';
+
+// Column template shared with DomainCollection.module.scss via CSS custom property --list-cols
+// set on the parent .listWrapper. Fallback defined here for standalone rendering.
+.row {
+  display: grid;
+  grid-template-columns: var(--list-cols, 2.5fr 1fr 1.2fr 1fr 0.8fr);
+  align-items: center;
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-gray-200);
+  background: var(--color-white-primary);
+  transition: background 0.15s ease, box-shadow 0.25s ease;
+
+  &:hover {
+    background: var(--color-gray-light-bg);
+    box-shadow: inset 0 0 0 2px var(--color-blue-primary);
+  }
+
+  @include tablet-down {
+    grid-template-columns: 2fr 1fr 1fr;
+
+    .cellAction {
+      display: none;
+    }
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr auto;
+    gap: var(--space-2);
+    padding: var(--space-3);
+
+    .cell,
+    .cellExpiry {
+      display: none;
+    }
+  }
+}
+
+// ── Name cell ──────────────────────────────────────────────────────────────────
+
+.cellName {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.name {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-15);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tldBadge {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-amber);
+  border: 1px solid var(--color-amber);
+  border-radius: var(--radius-full);
+  padding: 2px var(--space-2); // design-specific: Figma-exact pill padding
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+// ── Data cells ─────────────────────────────────────────────────────────────────
+
+.cell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.cellText {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-darker);
+}
+
+.cellExpiry {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.cellAction {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+// ── Domain icons ───────────────────────────────────────────────────────────────
+
+.iconImg {
+  width: 20px; // design-specific: list-row icon — compact scale for row layout
+  height: 20px; // design-specific: list-row icon — compact scale for row layout
+  border-radius: 50%;
+  object-fit: contain;
+  flex-shrink: 0;
+  background: var(--color-white-primary);
+}
+
+.iconFallback {
+  display: inline-block;
+  width: 20px; // design-specific: list-row icon — compact scale for row layout
+  height: 20px; // design-specific: list-row icon — compact scale for row layout
+  border-radius: 50%;
+  background: var(--color-gray-200);
+  flex-shrink: 0;
+}
+
+// ── Expiry dot ─────────────────────────────────────────────────────────────────
+
+.expiryDot {
+  width: 8px; // design-specific: status indicator dot — no token at this scale
+  height: 8px; // design-specific: status indicator dot — no token at this scale
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+  display: inline-block;
+}
+
+.dot_active   { background: var(--color-status-available); }
+.dot_expiring { background: var(--color-error); }
+.dot_lifetime { background: var(--color-blue-primary); }
+
+// ── Manage button ──────────────────────────────────────────────────────────────
+
+.manageBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  cursor: pointer;
+  transition: color 0.2s ease;
+
+  &:focus-visible {
+    @include focus-ring;
+    border-radius: var(--radius-sm);
+  }
+}
+
+.labelWrapper {
+  display: flex;
+  flex-direction: column;
+  height: 1em;
+  overflow: hidden;
+  line-height: 1;
+}
+
+.labelUp {
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+.row:hover .manageBtn .labelUp {
+  transform: translateY(-100%);
+}

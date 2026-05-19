@@ -1,0 +1,57 @@
+@import '@newstyles/_mixins.scss';
+
+// ── My Domains page — mobile layout overrides ─────────────────────────────────
+// All rules are scoped inside @include mobile (max-width: 767px).
+// Zero desktop styles live in this file.
+
+@include mobile {
+
+  // ── Page padding ─────────────────────────────────────────────────────────────
+  .page {
+    padding: var(--space-4) var(--space-3);
+    min-height: auto;
+  }
+
+  // ── Control bar: two rows — filter row then search row ───────────────────────
+  .controlBar {
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) 0;
+  }
+
+  .filterToggleGroup {
+    flex: 0 0 100%;
+    justify-content: space-between;
+    gap: var(--space-2);
+  }
+
+  .filterLabel {
+    font-size: var(--text-small-12);
+  }
+
+  .resetBtn {
+    font-size: var(--text-small-12);
+  }
+
+  .searchBarWrap {
+    flex: 0 0 100%;
+    min-width: 0;
+  }
+
+  // ── Content area: single column, filter panel stacks above cards ───────────────
+  .contentArea {
+    flex-direction: column;
+    align-items: stretch; // override flex-start so mainContent fills full width
+    gap: var(--space-3);
+  }
+
+  .filterPanel {
+    width: 100%;
+    border-radius: 0;
+  }
+
+  .mainContent {
+    gap: var(--space-3);
+  }
+}
