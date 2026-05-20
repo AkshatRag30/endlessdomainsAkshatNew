@@ -2,6 +2,19 @@
 
 // ── Card shell ─────────────────────────────────────────────────────────────────
 
+// filter must live on a parent — clip-path clips filter on the same element
+.cardOuter {
+  transition: filter 0.25s ease;
+
+  &:hover {
+    filter:
+      drop-shadow(2px 0 0 var(--color-blue-primary))
+      drop-shadow(-2px 0 0 var(--color-blue-primary))
+      drop-shadow(0 2px 0 var(--color-blue-primary))
+      drop-shadow(0 -2px 0 var(--color-blue-primary));
+  }
+}
+
 .cardWrap {
   clip-path: polygon(
     20px 0,
@@ -13,11 +26,6 @@
   );
   padding: 2px; // design-specific: border width — clip-path border trick, gap shows wrapper bg as border
   background: var(--color-white-primary);
-  transition: background 0.25s ease;
-
-  &:hover {
-    background: var(--color-blue-primary);
-  }
 }
 
 .card {
@@ -204,6 +212,6 @@
   transition: transform 0.3s ease;
 }
 
-.cardWrap:hover .manageBtn .labelUp {
+.cardOuter:hover .manageBtn .labelUp {
   transform: translateY(-100%);
 }

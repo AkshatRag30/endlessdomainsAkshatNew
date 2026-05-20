@@ -64,6 +64,7 @@ export function DomainCardGrid({ domain, onManage }: DomainCardGridProps) {
   const displayName = domain.name.length > 22 ? `${domain.name.slice(0, 20)}…` : domain.name
 
   return (
+    <div className={styles.cardOuter}>
     <div className={styles.cardWrap}>
     <article className={styles.card} aria-label={`${domain.name}${domain.tld}`}>
       <div className={styles.cardTop}>
@@ -110,6 +111,7 @@ export function DomainCardGrid({ domain, onManage }: DomainCardGridProps) {
         </button>
       </div>
     </article>
+    </div>
     </div>
   )
 }

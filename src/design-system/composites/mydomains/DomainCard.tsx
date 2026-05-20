@@ -1,8 +1,7 @@
+import Image from 'next/image'
 import React from 'react'
-import { MdOutlineAddShoppingCart } from 'react-icons/md'
-
-
 import { BsCartCheck } from 'react-icons/bs'
+import { MdOutlineAddShoppingCart } from 'react-icons/md'
 
 import PrimaryButton from '@/design-system/primitives/buttons/primary-button'
 import { getProviderLabel, getProviderColor, DomainProviderKey } from '@helpers/chaincurrency/chaincurrency'
@@ -96,7 +95,7 @@ export function DomainCard({ domain, onAddToCart }: DomainCardProps) {
           <div className={styles.cardProviderRow}>
             <div className={styles.cardProviderIcons} aria-hidden="true">
               {domain.providerIcons.map((icon, idx) => (
-                <img key={idx} src={icon} alt="" width={34} height={34} />
+                <Image key={idx} src={icon} alt="" width={34} height={34} />
               ))}
             </div>
             <span className={styles.cardProviderName}>{providerLabel}</span>

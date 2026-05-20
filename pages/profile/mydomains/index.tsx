@@ -41,7 +41,7 @@ const PLACEHOLDER_STATS: DomainStats = {
 const CHAINS: DomainChain[] = ['polygon', 'ethereum', 'solana', 'tezos', 'aptos']
 const STATUSES: DomainStatus[] = ['unstoppable', 'ens', 'arbitrum', 'bonfida', 'tezos', 'aptos']
 
-const PLACEHOLDER_DOMAINS: DomainItem[] = Array.from({ length: 120 }, (_, i) => ({
+const PLACEHOLDER_DOMAINS: DomainItem[] = Array.from({ length: 3 }, (_, i) => ({
   id: `domain-${i + 1}`,
   name: 'theforceisunstoppcdzcasxassable',
   tld: '.ud',

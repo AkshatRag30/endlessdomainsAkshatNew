@@ -6,6 +6,11 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  images: {
+    remotePatterns: [
+      { hostname: 'cryptologos.cc' },
+    ],
+  },
   sassOptions: {
     includePaths: [path.join(__dirname, 'src/design-system/styles')],
     additionalData: `@use 'sass:math';`,
