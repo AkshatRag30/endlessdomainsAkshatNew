@@ -1,0 +1,184 @@
+@import '@newstyles/_mixins.scss';
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: var(--color-white-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 0 54px rgba(0, 0, 0, 0.15); // design-specific: Figma-exact modal shadow
+  width: 100%;
+  max-width: 540px; // design-specific: Figma-exact modal width
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  margin: var(--space-4);
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
+}
+
+.modalTitle {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-heading-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  margin: 0;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-gray-primary);
+  display: flex;
+  align-items: center;
+  padding: var(--space-1);
+  border-radius: var(--radius-full);
+  transition: color 0.15s ease;
+
+  &:hover { color: var(--color-black-primary); }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// ── Divider ───────────────────────────────────────────────────────────────────
+
+.divider {
+  border: none;
+  border-top: 1px dashed var(--color-gray-200); // design-specific: Figma shows dashed divider
+  margin: 0;
+  flex-shrink: 0;
+}
+
+// ── Search ────────────────────────────────────────────────────────────────────
+
+.searchWrap {
+  padding: var(--space-3) var(--space-5);
+  flex-shrink: 0;
+}
+
+.searchInput {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-md);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  color: var(--color-black-primary);
+  outline: none;
+  background: var(--color-white-primary);
+
+  &::placeholder { color: var(--color-gray-primary); }
+  &:focus { border-color: var(--color-blue-primary); }
+}
+
+// ── Currency list ─────────────────────────────────────────────────────────────
+
+.currencyList {
+  list-style: none;
+  margin: 0;
+  padding: var(--space-2) var(--space-4) var(--space-4);
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+// ── Currency row ──────────────────────────────────────────────────────────────
+
+.currencyRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--color-gray-light-bg); // design-specific: Figma-exact row bg #f3f3f3
+  border-radius: var(--radius-sm);
+  padding: 0 var(--space-3);
+  height: 40px; // design-specific: Figma-exact row height
+}
+
+.currencyInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.coinCircle {
+  width: 29px; // design-specific: Figma-exact coin circle size
+  height: 29px;
+  border-radius: var(--radius-full);
+  background: var(--color-white-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.iconFallback {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-full);
+  background: var(--color-gray-200);
+  display: inline-block;
+}
+
+.currencyName {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+}
+
+// ── Add button ────────────────────────────────────────────────────────────────
+
+.addBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  text-transform: capitalize;
+  transition: color 0.15s ease;
+
+  &:hover { color: var(--color-blue-primary); }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// ── Empty state ───────────────────────────────────────────────────────────────
+
+.emptyState {
+  padding: var(--space-6) var(--space-4);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  color: var(--color-gray-primary);
+  text-align: center;
+}

@@ -1,0 +1,344 @@
+@import '@newstyles/_mixins.scss';
+
+.section {
+  background: var(--color-white-primary);
+  padding: var(--space-5) var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+
+  @include mobile {
+    padding: var(--space-4);
+    gap: var(--space-4);
+  }
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.titleIcon {
+  color: var(--color-blue-primary);
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.title {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-heading-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+  margin: 0;
+  text-transform: capitalize;
+}
+
+.description {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  color: var(--color-gray-primary);
+  margin: 0;
+  line-height: 1.5;
+
+  @include mobile {
+    font-size: var(--text-small-12);
+  }
+}
+
+// ── Content ───────────────────────────────────────────────────────────────────
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+// ── Status badge ──────────────────────────────────────────────────────────────
+
+.badgeOuter {
+  display: inline-flex;
+  align-items: center;
+  background: #f7f7f9; // design-specific: Figma badge outer bg
+  border: 0.717px solid var(--color-white-primary);
+  padding: 7px; // design-specific: Figma-exact outer padding
+}
+
+.badgeInner {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: linear-gradient(180deg, #2c2c2c 0%, #201f1b 100%); // design-specific: Figma dark pill gradient
+  border: 0.717px solid #000;
+  box-shadow: 1.434px 2.151px 2.868px 0px rgba(0, 0, 0, 0.25); // design-specific: Figma badge shadow
+  padding: 8px 13px; // design-specific: Figma-exact inner padding
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  color: var(--color-white-primary);
+  white-space: nowrap;
+}
+
+.dotParked {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: #22c55e; // design-specific: parked green dot
+  flex-shrink: 0;
+}
+
+.dotUnparked {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--color-gray-primary);
+  flex-shrink: 0;
+}
+
+// ── Parked state actions ──────────────────────────────────────────────────────
+
+.actionRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+// Width/height overrides for SecondaryButton used as the remove button
+.removeWrap {
+  width: 215px; // design-specific: Figma-exact remove area width
+
+  @include mobile {
+    width: 140px; // narrower on mobile so updateBtn has breathing room
+  }
+}
+
+.removeLabel {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-error);
+  text-transform: capitalize;
+}
+
+// Flex fill wrapper for PrimaryButton inside the actionRow
+.updateBtnFill {
+  flex: 1;
+}
+
+// ── UnParked state — Create ───────────────────────────────────────────────────
+
+.createRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+// Blue glowing square icon button
+.addIconBtn {
+  width: 40px; // design-specific: Figma-exact icon button size
+  height: 39px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(182.36deg, rgba(241, 241, 241, 0.5) 27.4%, rgba(153, 153, 153, 0) 151.75%); // design-specific: Figma gradient overlay
+  border: none;
+  cursor: pointer;
+  color: var(--color-blue-primary);
+  flex-shrink: 0;
+  // design-specific: Figma blue glow box-shadow
+  box-shadow:
+    0px 0.429px 0px 0px rgba(255, 255, 255, 0.4),
+    0px 16.679px 31.504px 0px rgba(0, 42, 254, 0.25),
+    0px 5.028px 9.498px 0px rgba(0, 42, 254, 0.11),
+    0px 2.088px 3.945px 0px rgba(0, 42, 254, 0.08),
+    0px 0.755px 1.427px 0px rgba(0, 42, 254, 0.06);
+  transition: opacity 0.15s ease;
+
+  &:hover { opacity: 0.85; }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// "Create" text button
+.createBtn {
+  height: 40px; // design-specific: Figma-exact create button height
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--space-5);
+  min-width: 132px; // design-specific: Figma-exact create button min-width
+  background: #f9f9f9; // design-specific: Figma create button bg
+  border: 1px solid rgba(38, 57, 237, 0.15); // design-specific: Figma blue-tinted border
+  cursor: pointer;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  color: #2626ff; // design-specific: Figma create button text blue
+  text-transform: capitalize;
+  transition: background 0.15s ease;
+
+  &:hover { background: rgba(38, 57, 237, 0.06); }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// ── Remove confirmation modal ─────────────────────────────────────────────────
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.removeModal {
+  background: var(--color-white-primary);
+  box-shadow: 0 0 54px rgba(0, 0, 0, 0.15); // design-specific: Figma modal shadow
+  width: 100%;
+  max-width: 480px; // design-specific: Figma modal width
+  padding: 64px var(--space-6) var(--space-6); // top padding makes room for overflowing icon
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  margin: var(--space-4);
+  position: relative;
+
+  @include mobile {
+    padding: 60px var(--space-4) var(--space-4);
+    gap: var(--space-4);
+  }
+}
+
+// Icon circle — positioned at top-center, half-overflowing card top
+.modalIconWrap {
+  position: absolute;
+  top: -43px; // design-specific: half of outer circle (86px) to sit on card edge
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modalIconOuter {
+  width: 86px; // design-specific: Figma outer glow circle
+  height: 86px;
+  border-radius: var(--radius-full);
+  background: rgba(239, 68, 68, 0.2); // design-specific: semi-transparent red glow ring
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 8px 24px rgba(239, 68, 68, 0.35)); // design-specific: red glow shadow
+}
+
+.modalIconInner {
+  width: 65px; // design-specific: Figma inner red circle
+  height: 65px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, #ef4444 0%, #ff6b6b 100%); // design-specific: Figma red gradient
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-white-primary);
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.45); // design-specific: inner circle drop shadow
+}
+
+.modalTitle {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-heading-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-black-primary);
+  margin: 0;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.modalActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+// Cancel — bracket-corner decoration style
+.cancelBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  height: 48px;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-primary);
+  background-image:
+    linear-gradient(var(--color-gray-200), var(--color-gray-200)),
+    linear-gradient(var(--color-gray-200), var(--color-gray-200)),
+    linear-gradient(var(--color-gray-200), var(--color-gray-200)),
+    linear-gradient(var(--color-gray-200), var(--color-gray-200)),
+    linear-gradient(var(--color-gray-200), var(--color-gray-200)),
+    linear-gradient(var(--color-gray-200), var(--color-gray-200)),
+    linear-gradient(var(--color-gray-200), var(--color-gray-200)),
+    linear-gradient(var(--color-gray-200), var(--color-gray-200));
+  background-repeat: no-repeat;
+  background-position:
+    0 0,       0 0,
+    100% 0,    100% 0,
+    0 100%,    0 100%,
+    100% 100%, 100% 100%;
+  background-size:
+    14px 2px, 2px 14px,
+    14px 2px, 2px 14px,
+    14px 2px, 2px 14px,
+    14px 2px, 2px 14px;
+  transition: color 0.15s ease;
+
+  &:hover { color: var(--color-black-primary); }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// Flex fill wrapper for error PrimaryButton inside the modal actions row
+.confirmBtnFill {
+  flex: 1.5;
+}
+
+// ── Misc ──────────────────────────────────────────────────────────────────────
+
+.disabledMsg {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  color: var(--color-gray-primary);
+  margin: 0;
+}
+
+.unavailable {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  color: var(--color-gray-primary);
+  padding: var(--space-4);
+}

@@ -1,0 +1,270 @@
+@import '@newstyles/_mixins.scss';
+
+.section {
+  background: var(--color-white-primary);
+  padding: var(--space-5) var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+
+  @include mobile {
+    padding: var(--space-4);
+    gap: var(--space-3);
+  }
+}
+
+// ── Title row ─────────────────────────────────────────────────────────────────
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.titleIcon {
+  color: var(--color-blue-primary);
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.title {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-heading-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-blue-primary);
+  margin: 0;
+}
+
+.subtitle {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  color: var(--color-gray-primary);
+  margin: 0;
+}
+
+// ── Warning banner ────────────────────────────────────────────────────────────
+
+.warningBanner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: rgba(239, 68, 68, 0.08); // design-specific: Figma-exact warning banner bg
+  border: 1px solid rgba(239, 68, 68, 0.28); // design-specific: Figma-exact warning banner border
+  padding: var(--space-3) var(--space-4);
+}
+
+.warningIcon {
+  color: #ef4444; // design-specific: Figma-exact warning icon red
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.warningText {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  color: #ef4444; // design-specific: Figma-exact warning text red
+  margin: 0;
+  line-height: 1.4;
+}
+
+// ── Body ──────────────────────────────────────────────────────────────────────
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+// ── Action button ─────────────────────────────────────────────────────────────
+
+.actionBtn {
+  width: 50%; // design-specific: matches Reverse/Crypto — roughly half the section width
+  min-width: 280px;
+
+  @include mobile {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.fieldLabel {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-black-primary);
+}
+
+.input {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-gray-200);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  color: var(--color-black-primary);
+  background: var(--color-white-primary);
+  outline: none;
+  width: 100%;
+
+  &:focus { border-color: var(--color-blue-primary); }
+}
+
+.inputError {
+  border-color: var(--color-error);
+}
+
+// ── Agreement ─────────────────────────────────────────────────────────────────
+
+.agreementItem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  cursor: pointer;
+}
+
+.checkbox {
+  margin-top: 2px; // design-specific: aligns checkbox with first line of label text
+  flex-shrink: 0;
+  accent-color: var(--color-blue-primary);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.agreementLabel {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  color: var(--color-gray-primary);
+  line-height: 1.5;
+}
+
+.agreementLabelChecked {
+  color: var(--color-black-primary);
+}
+
+
+// ── Confirmation modal overlay ─────────────────────────────────────────────────
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  position: relative;
+  background: var(--color-white-primary);
+  box-shadow: 0 0 54px rgba(0, 0, 0, 0.15); // design-specific: Figma-exact modal shadow
+  width: 458px; // design-specific: Figma-exact modal width
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-8) var(--space-6);
+  margin: var(--space-4);
+
+  @include mobile {
+    width: 100%;
+    padding: var(--space-6) var(--space-4);
+  }
+}
+
+.closeBtn {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-gray-primary);
+  transition: color 0.15s ease;
+
+  &:hover { color: var(--color-black-primary); }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// ── Sad face icon ─────────────────────────────────────────────────────────────
+
+.iconCircle {
+  width: 68px; // design-specific: Figma-exact icon circle size
+  height: 68px;
+  border-radius: var(--radius-full);
+  background: #e5e7eb; // design-specific: Figma-exact gray circle bg
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sadIcon {
+  width: 36px; // design-specific: Figma-exact sad face icon size
+  height: 36px;
+  color: #6b7280; // design-specific: Figma-exact icon gray
+}
+
+// ── Modal text ────────────────────────────────────────────────────────────────
+
+.modalText {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.modalTitle {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-heading-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-black-primary);
+  margin: 0;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.modalSubtitle {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  color: var(--color-gray-primary);
+  margin: 0;
+  text-align: center;
+  max-width: 228px; // design-specific: Figma-exact subtitle max-width
+  line-height: 1.5;
+}
+
+// ── Modal actions ─────────────────────────────────────────────────────────────
+
+.modalActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+// Flex fill wrapper for SecondaryButton inside the modal actions row
+.cancelBtnFill {
+  flex: 1;
+}
+
+// Flex fill wrapper for PrimaryButton inside the modal actions row
+.confirmBtnFill {
+  flex: 1.5;
+}

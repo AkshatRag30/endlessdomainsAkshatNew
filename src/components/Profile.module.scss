@@ -1,0 +1,74 @@
+@import './variables.scss';
+
+.profile_section {
+  @media screen and (min-width: 769px) {
+    padding-bottom: $spacer * 8;
+  }
+
+  :global(.subtitle) {
+    font-size: $spacer * 3;
+    line-height: $spacer * 5;
+  }
+
+  :global(.btn-primary) {
+    background-color: $checkout-button-bg-color;
+
+    &:hover {
+      background-color: rgba($checkout-button-bg-color, 0.95);
+      border-color: rgba($checkout-button-bg-color, 0.95);
+    }
+  }
+}
+
+.scroll {
+  white-space: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: -ms-autohiding-scrollbar;
+}
+
+.scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.wallet_detail {
+  background-color: $form-banner-bg;
+  border-radius: $spacer * 2;
+  padding: $spacer * 5;
+  margin-top: 10px;
+  font-weight: bold;
+
+  :global(.subtitle) {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    font-size: 1em;
+    cursor: pointer;
+  }
+}
+
+.wallet_network {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+
+  p {
+    margin-bottom: 0;
+  }
+}
+.address_network p {
+
+  margin-bottom: 0px;
+}
+
+.supported_chains img {
+  margin-right: 5px;
+
+}
+
+.supported_chains {
+ margin-bottom: 5px;
+
+}

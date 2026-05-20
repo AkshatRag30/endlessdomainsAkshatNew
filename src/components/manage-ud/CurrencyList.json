@@ -1,0 +1,1889 @@
+{
+  "BTC": [
+    {
+      "crypto.BTC.address": ""
+    }
+  ],
+  "B2M": [
+    {
+      "crypto.B2M.version.MATIC.address": ""
+    },
+    {
+      "crypto.B2M.version.BEP20.address": ""
+    },
+    {
+      "crypto.B2M.version.ERC20.address": ""
+    }
+  ],
+  "ETH": [
+    {
+      "crypto.ETH.address": ""
+    }
+  ],
+  "ZIL": [
+    {
+      "crypto.ZIL.address": ""
+    }
+  ],
+  "LTC": [
+    {
+      "crypto.LTC.address": ""
+    }
+  ],
+  "ETC": [
+    {
+      "crypto.ETC.address": ""
+    }
+  ],
+  "EQL": [
+    {
+      "crypto.EQL.address": ""
+    }
+  ],
+  "LINK": [
+    {
+      "crypto.LINK.address": ""
+    }
+  ],
+  "FARMS": [
+    {
+      "crypto.FARMS.version.MATIC.address": ""
+    }
+  ],
+  "USDC": [
+    {
+      "crypto.USDC.address": ""
+    },
+    {
+      "crypto.USDC.version.ERC20.address": ""
+    },
+    {
+      "crypto.USDC.version.OKT.address": ""
+    },
+    {
+      "crypto.USDC.version.MATIC.address": ""
+    },
+    {
+      "crypto.USDC.version.SOL.address": ""
+    }
+  ],
+  "BAT": [
+    {
+      "crypto.BAT.address": ""
+    }
+  ],
+  "REP": [
+    {
+      "crypto.REP.address": ""
+    }
+  ],
+  "ZRX": [
+    {
+      "crypto.ZRX.address": ""
+    }
+  ],
+  "DAI": [
+    {
+      "crypto.DAI.address": ""
+    }
+  ],
+  "BCH": [
+    {
+      "crypto.BCH.address": ""
+    }
+  ],
+  "XMR": [
+    {
+      "crypto.XMR.address": ""
+    }
+  ],
+  "DASH": [
+    {
+      "crypto.DASH.address": ""
+    }
+  ],
+  "NEO": [
+    {
+      "crypto.NEO.address": ""
+    }
+  ],
+  "SWTH": [
+    {
+      "crypto.SWTH.address": ""
+    }
+  ],
+  "DOGE": [
+    {
+      "crypto.DOGE.address": ""
+    }
+  ],
+  "XRP": [
+    {
+      "crypto.XRP.address": ""
+    }
+  ],
+  "ZEC": [
+    {
+      "crypto.ZEC.address": ""
+    }
+  ],
+  "YEC": [
+    {
+      "crypto.YEC.address": ""
+    }
+  ],
+  "ADA": [
+    {
+      "crypto.ADA.address": ""
+    }
+  ],
+  "EOS": [
+    {
+      "crypto.EOS.address": ""
+    }
+  ],
+  "XLM": [
+    {
+      "crypto.XLM.address": ""
+    }
+  ],
+  "BNB": [
+    {
+      "crypto.BNB.address": ""
+    },
+    {
+      "crypto.BNB.version.BEP2.address": ""
+    },
+    {
+      "crypto.BNB.version.BEP20.address": ""
+    }
+  ],
+  "BTG": [
+    {
+      "crypto.BTG.address": ""
+    }
+  ],
+  "NANO": [
+    {
+      "crypto.NANO.address": ""
+    }
+  ],
+  "WAVES": [
+    {
+      "crypto.WAVES.address": ""
+    }
+  ],
+  "KMD": [
+    {
+      "crypto.KMD.address": ""
+    }
+  ],
+  "AE": [
+    {
+      "crypto.AE.address": ""
+    }
+  ],
+  "RSK": [
+    {
+      "crypto.RSK.address": ""
+    }
+  ],
+  "WAN": [
+    {
+      "crypto.WAN.address": ""
+    }
+  ],
+  "STRAT": [
+    {
+      "crypto.STRAT.address": ""
+    }
+  ],
+  "UBQ": [
+    {
+      "crypto.UBQ.address": ""
+    }
+  ],
+  "XTZ": [
+    {
+      "crypto.XTZ.address": ""
+    }
+  ],
+  "IOTA": [
+    {
+      "crypto.IOTA.address": ""
+    }
+  ],
+  "VET": [
+    {
+      "crypto.VET.address": ""
+    }
+  ],
+  "QTUM": [
+    {
+      "crypto.QTUM.address": ""
+    }
+  ],
+  "ICX": [
+    {
+      "crypto.ICX.address": ""
+    }
+  ],
+  "DGB": [
+    {
+      "crypto.DGB.address": ""
+    }
+  ],
+  "XZC": [
+    {
+      "crypto.XZC.address": ""
+    }
+  ],
+  "FIRO": [
+    {
+      "crypto.FIRO.address": ""
+    }
+  ],
+  "BURST": [
+    {
+      "crypto.BURST.address": ""
+    }
+  ],
+  "DCR": [
+    {
+      "crypto.DCR.address": ""
+    }
+  ],
+  "XEM": [
+    {
+      "crypto.XEM.address": ""
+    }
+  ],
+  "LSK": [
+    {
+      "crypto.LSK.address": ""
+    }
+  ],
+  "ATOM": [
+    {
+      "crypto.ATOM.address": ""
+    }
+  ],
+  "ONG": [
+    {
+      "crypto.ONG.address": ""
+    }
+  ],
+  "ONT": [
+    {
+      "crypto.ONT.address": ""
+    }
+  ],
+  "SMART": [
+    {
+      "crypto.SMART.address": ""
+    }
+  ],
+  "TPAY": [
+    {
+      "crypto.TPAY.address": ""
+    }
+  ],
+  "GRS": [
+    {
+      "crypto.GRS.address": ""
+    }
+  ],
+  "BSV": [
+    {
+      "crypto.BSV.address": ""
+    }
+  ],
+  "GAS": [
+    {
+      "crypto.GAS.address": ""
+    }
+  ],
+  "TRX": [
+    {
+      "crypto.TRX.address": ""
+    }
+  ],
+  "VTHO": [
+    {
+      "crypto.VTHO.address": ""
+    }
+  ],
+  "BCD": [
+    {
+      "crypto.BCD.address": ""
+    }
+  ],
+  "BTT": [
+    {
+      "crypto.BTT.address": ""
+    }
+  ],
+  "KIN": [
+    {
+      "crypto.KIN.address": ""
+    }
+  ],
+  "RVN": [
+    {
+      "crypto.RVN.address": ""
+    }
+  ],
+  "ARK": [
+    {
+      "crypto.ARK.address": ""
+    }
+  ],
+  "XVG": [
+    {
+      "crypto.XVG.address": ""
+    }
+  ],
+  "ALGO": [
+    {
+      "crypto.ALGO.address": ""
+    }
+  ],
+  "NEBL": [
+    {
+      "crypto.NEBL.address": ""
+    }
+  ],
+  "XPM": [
+    {
+      "crypto.XPM.address": ""
+    }
+  ],
+  "ONE": [
+    {
+      "crypto.ONE.address": ""
+    }
+  ],
+  "BNTY": [
+    {
+      "crypto.BNTY.address": ""
+    }
+  ],
+  "CRO": [
+    {
+      "crypto.CRO.address": ""
+    }
+  ],
+  "TWT": [
+    {
+      "crypto.TWT.address": ""
+    }
+  ],
+  "SIERRA": [
+    {
+      "crypto.SIERRA.address": ""
+    }
+  ],
+  "VSYS": [
+    {
+      "crypto.VSYS.address": ""
+    }
+  ],
+  "HIVE": [
+    {
+      "crypto.HIVE.address": ""
+    }
+  ],
+  "HT": [
+    {
+      "crypto.HT.address": ""
+    }
+  ],
+  "ENJ": [
+    {
+      "crypto.ENJ.address": ""
+    }
+  ],
+  "YFI": [
+    {
+      "crypto.YFI.address": ""
+    }
+  ],
+  "MTA": [
+    {
+      "crypto.MTA.address": ""
+    }
+  ],
+  "COMP": [
+    {
+      "crypto.COMP.address": ""
+    }
+  ],
+  "BAL": [
+    {
+      "crypto.BAL.address": ""
+    }
+  ],
+  "AMPL": [
+    {
+      "crypto.AMPL.address": ""
+    }
+  ],
+  "LEND": [
+    {
+      "crypto.LEND.address": ""
+    }
+  ],
+  "TLOS": [
+    {
+      "crypto.TLOS.address": ""
+    }
+  ],
+  "XDC": [
+    {
+      "crypto.XDC.address": ""
+    }
+  ],
+  "XST": [
+    {
+      "crypto.XST.address": ""
+    }
+  ],
+  "STRAX": [
+    {
+      "crypto.STRAX.address": ""
+    }
+  ],
+  "SIGNA": [
+    {
+      "crypto.SIGNA.address": ""
+    }
+  ],
+  "NIM": [
+    {
+      "crypto.NIM.address": ""
+    }
+  ],
+  "GUAP": [
+    {
+      "crypto.GUAP.address": ""
+    }
+  ],
+  "YLD": [
+    {
+      "crypto.YLD.address": ""
+    }
+  ],
+  "OKT": [
+    {
+      "crypto.OKT.address": ""
+    }
+  ],
+  "ELA": [
+    {
+      "crypto.ELA.version.ELA.address": ""
+    },
+    {
+      "crypto.ELA.version.ESC.address": ""
+    }
+  ],
+  "WETH": [
+    {
+      "crypto.WETH.version.ERC20.address": ""
+    },
+    {
+      "crypto.WETH.version.MATIC.address": ""
+    },
+    {
+      "crypto.WETH.version.BEP20.address": ""
+    }
+  ],
+  "USDT": [
+    {
+      "crypto.USDT.version.ERC20.address": ""
+    },
+    {
+      "crypto.USDT.version.MATIC.address": ""
+    },
+    {
+      "crypto.USDT.version.TRON.address": ""
+    },
+    {
+      "crypto.USDT.version.EOS.address": ""
+    },
+    {
+      "crypto.USDT.version.OMNI.address": ""
+    },
+    {
+      "crypto.USDT.version.OKB.address": ""
+    },
+    {
+      "crypto.USDT.version.OKC.address": ""
+    }
+  ],
+  "FTM": [
+    {
+      "crypto.FTM.version.ERC20.address": ""
+    },
+    {
+      "crypto.FTM.version.BEP2.address": ""
+    },
+    {
+      "crypto.FTM.version.OPERA.address": ""
+    }
+  ],
+  "FUSE": [
+    {
+      "crypto.FUSE.version.ERC20.address": ""
+    },
+    {
+      "crypto.FUSE.version.FUSE.address": ""
+    }
+  ],
+  "MATIC": [
+    {
+      "crypto.MATIC.version.MATIC.address": ""
+    },
+    {
+      "crypto.MATIC.version.BEP20.address": ""
+    },
+    {
+      "crypto.MATIC.version.ERC20.address": ""
+    }
+  ],
+  "DOT": [
+    {
+      "crypto.DOT.address": ""
+    }
+  ],
+  "UNI": [
+    {
+      "crypto.UNI.version.ERC20.address": ""
+    },
+    {
+      "crypto.UNI.version.BEP20.address": ""
+    },
+    {
+      "crypto.UNI.version.MATIC.address": ""
+    },
+    {
+      "crypto.UNI.version.HRC20.address": ""
+    },
+    {
+      "crypto.UNI.version.XDAI.address": ""
+    }
+  ],
+  "SOL": [
+    {
+      "crypto.SOL.address": ""
+    }
+  ],
+  "BUSD": [
+    {
+      "crypto.BUSD.version.ERC20.address": ""
+    },
+    {
+      "crypto.BUSD.version.BEP20.address": ""
+    },
+    {
+      "crypto.BUSD.version.HRC20.address": ""
+    }
+  ],
+  "ICP": [
+    {
+      "crypto.ICP.address": ""
+    }
+  ],
+  "THETA": [
+    {
+      "crypto.THETA.address": ""
+    }
+  ],
+  "WBTC": [
+    {
+      "crypto.WBTC.version.ERC20.address": ""
+    },
+    {
+      "crypto.WBTC.version.MATIC.address": ""
+    },
+    {
+      "crypto.WBTC.version.FANTOM.address": ""
+    },
+    {
+      "crypto.WBTC.version.HRC20.address": ""
+    },
+    {
+      "crypto.WBTC.version.XDAI.address": ""
+    }
+  ],
+  "FIL": [
+    {
+      "crypto.FIL.address": ""
+    }
+  ],
+  "CDAI": [
+    {
+      "crypto.CDAI.address": ""
+    }
+  ],
+  "KSM": [
+    {
+      "crypto.KSM.address": ""
+    }
+  ],
+  "OKB": [
+    {
+      "crypto.OKB.address": ""
+    }
+  ],
+  "AAVE": [
+    {
+      "crypto.AAVE.version.ERC20.address": ""
+    },
+    {
+      "crypto.AAVE.version.MATIC.address": ""
+    },
+    {
+      "crypto.AAVE.version.FANTOM.address": ""
+    },
+    {
+      "crypto.AAVE.version.HRC20.address": ""
+    }
+  ],
+  "BLOCKS": [
+    {
+      "crypto.BLOCKS.address": ""
+    }
+  ],
+  "SHIB": [
+    {
+      "crypto.SHIB.version.ERC20.address": ""
+    },
+    {
+      "crypto.SHIB.version.MATIC.address": ""
+    },
+    {
+      "crypto.SHIB.version.FANTOM.address": ""
+    }
+  ],
+  "CEL": [
+    {
+      "crypto.CEL.version.ERC20.address": ""
+    },
+    {
+      "crypto.CEL.version.MATIC.address": ""
+    },
+    {
+      "crypto.CEL.version.FANTOM.address": ""
+    },
+    {
+      "crypto.CEL.version.HRC20.address": ""
+    }
+  ],
+  "CUSDC": [
+    {
+      "crypto.CUSDC.address": ""
+    }
+  ],
+  "CETH": [
+    {
+      "crypto.CETH.address": ""
+    }
+  ],
+  "AMP": [
+    {
+      "crypto.AMP.address": ""
+    }
+  ],
+  "CAKE": [
+    {
+      "crypto.CAKE.version.BEP20.address": ""
+    },
+    {
+      "crypto.CAKE.version.HRC20.address": ""
+    }
+  ],
+  "MIOTA": [
+    {
+      "crypto.MIOTA.address": ""
+    }
+  ],
+  "FTT": [
+    {
+      "crypto.FTT.address": ""
+    }
+  ],
+  "MKR": [
+    {
+      "crypto.MKR.address": ""
+    }
+  ],
+  "TFUEL": [
+    {
+      "crypto.TFUEL.address": ""
+    }
+  ],
+  "KLAY": [
+    {
+      "crypto.KLAY.address": ""
+    }
+  ],
+  "LUNA": [
+    {
+      "crypto.LUNA.address": ""
+    }
+  ],
+  "LEO": [
+    {
+      "crypto.LEO.address": ""
+    }
+  ],
+  "SAFEMOON": [
+    {
+      "crypto.SAFEMOON.version.BEP20.address": ""
+    },
+    {
+      "crypto.SAFEMOON.version.HRC20.address": ""
+    }
+  ],
+  "UST": [
+    {
+      "crypto.UST.address": ""
+    }
+  ],
+  "RUNE": [
+    {
+      "crypto.RUNE.address": ""
+    }
+  ],
+  "HBAR": [
+    {
+      "crypto.HBAR.address": ""
+    }
+  ],
+  "TEL": [
+    {
+      "crypto.TEL.version.ERC20.address": ""
+    },
+    {
+      "crypto.TEL.version.MATIC.address": ""
+    }
+  ],
+  "CHZ": [
+    {
+      "crypto.CHZ.address": ""
+    }
+  ],
+  "SUSHI": [
+    {
+      "crypto.SUSHI.version.ERC20.address": ""
+    },
+    {
+      "crypto.SUSHI.version.BEP20.address": ""
+    },
+    {
+      "crypto.SUSHI.version.MATIC.address": ""
+    },
+    {
+      "crypto.SUSHI.version.FANTOM.address": ""
+    },
+    {
+      "crypto.SUSHI.version.HRC20.address": ""
+    }
+  ],
+  "EGLD": [
+    {
+      "crypto.EGLD.address": ""
+    }
+  ],
+  "TUSD": [
+    {
+      "crypto.TUSD.version.ERC20.address": ""
+    },
+    {
+      "crypto.TUSD.version.BEP20.address": ""
+    },
+    {
+      "crypto.TUSD.version.HRC20.address": ""
+    },
+    {
+      "crypto.TUSD.version.BEP2.address": ""
+    },
+    {
+      "crypto.TUSD.version.TRON.address": ""
+    }
+  ],
+  "HBTC": [
+    {
+      "crypto.HBTC.version.ERC20.address": ""
+    },
+    {
+      "crypto.HBTC.version.HRC20.address": ""
+    }
+  ],
+  "SNX": [
+    {
+      "crypto.SNX.version.ERC20.address": ""
+    },
+    {
+      "crypto.SNX.version.MATIC.address": ""
+    },
+    {
+      "crypto.SNX.version.FANTOM.address": ""
+    },
+    {
+      "crypto.SNX.version.HRC20.address": ""
+    }
+  ],
+  "HOT": [
+    {
+      "crypto.HOT.version.ERC20.address": ""
+    },
+    {
+      "crypto.HOT.version.HRC20.address": ""
+    }
+  ],
+  "NEAR": [
+    {
+      "crypto.NEAR.address": ""
+    }
+  ],
+  "HNT": [
+    {
+      "crypto.HNT.address": ""
+    }
+  ],
+  "STETH": [
+    {
+      "crypto.STETH.address": ""
+    }
+  ],
+  "NEXO": [
+    {
+      "crypto.NEXO.version.ERC20.address": ""
+    },
+    {
+      "crypto.NEXO.version.FANTOM.address": ""
+    }
+  ],
+  "PAX": [
+    {
+      "crypto.PAX.address": ""
+    }
+  ],
+  "STX": [
+    {
+      "crypto.STX.address": ""
+    }
+  ],
+  "MANA": [
+    {
+      "crypto.MANA.version.ERC20.address": ""
+    },
+    {
+      "crypto.MANA.version.MATIC.address": ""
+    }
+  ],
+  "MDX": [
+    {
+      "crypto.MDX.version.HRC20.address": ""
+    },
+    {
+      "crypto.MDX.version.BEP20.address": ""
+    }
+  ],
+  "ZEN": [
+    {
+      "crypto.ZEN.address": ""
+    }
+  ],
+  "ARRR": [
+    {
+      "crypto.ARRR.address": ""
+    }
+  ],
+  "BNT": [
+    {
+      "crypto.BNT.address": ""
+    }
+  ],
+  "LUSD": [
+    {
+      "crypto.LUSD.version.ERC20.address": ""
+    },
+    {
+      "crypto.LUSD.version.MATIC.address": ""
+    }
+  ],
+  "GRT": [
+    {
+      "crypto.GRT.version.ERC20.address": ""
+    },
+    {
+      "crypto.GRT.version.MATIC.address": ""
+    },
+    {
+      "crypto.GRT.version.HRC20.address": ""
+    }
+  ],
+  "SC": [
+    {
+      "crypto.SC.address": ""
+    }
+  ],
+  "HUSD": [
+    {
+      "crypto.HUSD.version.ERC20.address": ""
+    },
+    {
+      "crypto.HUSD.version.HRC20.address": ""
+    }
+  ],
+  "CRV": [
+    {
+      "crypto.CRV.version.ERC20.address": ""
+    },
+    {
+      "crypto.CRV.version.MATIC.address": ""
+    },
+    {
+      "crypto.CRV.version.FANTOM.address": ""
+    }
+  ],
+  "UMA": [
+    {
+      "crypto.UMA.address": ""
+    }
+  ],
+  "WRX": [
+    {
+      "crypto.WRX.version.BEP2.address": ""
+    },
+    {
+      "crypto.WRX.version.MATIC.address": ""
+    }
+  ],
+  "AR": [
+    {
+      "crypto.AR.address": ""
+    }
+  ],
+  "OMG": [
+    {
+      "crypto.OMG.address": ""
+    }
+  ],
+  "GT": [
+    {
+      "crypto.GT.address": ""
+    }
+  ],
+  "QNT": [
+    {
+      "crypto.QNT.address": ""
+    }
+  ],
+  "CHSB": [
+    {
+      "crypto.CHSB.address": ""
+    }
+  ],
+  "IOST": [
+    {
+      "crypto.IOST.address": ""
+    }
+  ],
+  "NXM": [
+    {
+      "crypto.NXM.address": ""
+    }
+  ],
+  "KCS": [
+    {
+      "crypto.KCS.address": ""
+    }
+  ],
+  "LPT": [
+    {
+      "crypto.LPT.version.ERC20.address": ""
+    },
+    {
+      "crypto.LPT.version.HRC20.address": ""
+    }
+  ],
+  "XSUSHI": [
+    {
+      "crypto.XSUSHI.address": ""
+    }
+  ],
+  "CUSDT": [
+    {
+      "crypto.CUSDT.address": ""
+    }
+  ],
+  "FLOW": [
+    {
+      "crypto.FLOW.address": ""
+    }
+  ],
+  "ANKR": [
+    {
+      "crypto.ANKR.address": ""
+    }
+  ],
+  "HBC": [
+    {
+      "crypto.HBC.address": ""
+    }
+  ],
+  "VGX": [
+    {
+      "crypto.VGX.address": ""
+    }
+  ],
+  "FEI": [
+    {
+      "crypto.FEI.address": ""
+    }
+  ],
+  "BAKE": [
+    {
+      "crypto.BAKE.version.BEP20.address": ""
+    },
+    {
+      "crypto.BAKE.version.HRC20.address": ""
+    }
+  ],
+  "1INCH": [
+    {
+      "crypto.1INCH.version.ERC20.address": ""
+    },
+    {
+      "crypto.1INCH.version.BEP20.address": ""
+    },
+    {
+      "crypto.1INCH.version.MATIC.address": ""
+    },
+    {
+      "crypto.1INCH.version.HRC20.address": ""
+    }
+  ],
+  "CKB": [
+    {
+      "crypto.CKB.address": ""
+    }
+  ],
+  "WOO": [
+    {
+      "crypto.WOO.version.ERC20.address": ""
+    },
+    {
+      "crypto.WOO.version.HRC20.address": ""
+    }
+  ],
+  "TITAN": [
+    {
+      "crypto.TITAN.address": ""
+    }
+  ],
+  "OMI": [
+    {
+      "crypto.OMI.address": ""
+    }
+  ],
+  "MINA": [
+    {
+      "crypto.MINA.address": ""
+    }
+  ],
+  "SETH": [
+    {
+      "crypto.SETH.address": ""
+    }
+  ],
+  "RSR": [
+    {
+      "crypto.RSR.address": ""
+    }
+  ],
+  "OXY": [
+    {
+      "crypto.OXY.version.SOLANA.address": ""
+    },
+    {
+      "crypto.OXY.version.ERC20.address": ""
+    }
+  ],
+  "REN": [
+    {
+      "crypto.REN.version.ERC20.address": ""
+    },
+    {
+      "crypto.REN.version.HRC20.address": ""
+    }
+  ],
+  "XCH": [
+    {
+      "crypto.XCH.address": ""
+    }
+  ],
+  "RENBTC": [
+    {
+      "crypto.RENBTC.version.ERC20.address": ""
+    },
+    {
+      "crypto.RENBTC.version.BEP20.address": ""
+    },
+    {
+      "crypto.RENBTC.version.HRC20.address": ""
+    }
+  ],
+  "USDN": [
+    {
+      "crypto.USDN.address": ""
+    }
+  ],
+  "BCHA": [
+    {
+      "crypto.BCHA.address": ""
+    }
+  ],
+  "LRC": [
+    {
+      "crypto.LRC.address": ""
+    }
+  ],
+  "PUNDIX": [
+    {
+      "crypto.PUNDIX.address": ""
+    }
+  ],
+  "ERG": [
+    {
+      "crypto.ERG.address": ""
+    }
+  ],
+  "WIN": [
+    {
+      "crypto.WIN.address": ""
+    }
+  ],
+  "NPXS": [
+    {
+      "crypto.NPXS.address": ""
+    }
+  ],
+  "TRIBE": [
+    {
+      "crypto.TRIBE.address": ""
+    }
+  ],
+  "MAID": [
+    {
+      "crypto.MAID.address": ""
+    }
+  ],
+  "ASD": [
+    {
+      "crypto.ASD.address": ""
+    }
+  ],
+  "CUNI": [
+    {
+      "crypto.CUNI.address": ""
+    }
+  ],
+  "CELO": [
+    {
+      "crypto.CELO.address": ""
+    }
+  ],
+  "DENT": [
+    {
+      "crypto.DENT.address": ""
+    }
+  ],
+  "SNT": [
+    {
+      "crypto.SNT.address": ""
+    }
+  ],
+  "FEG": [
+    {
+      "crypto.FEG.version.ERC20.address": ""
+    },
+    {
+      "crypto.FEG.version.HRC20.address": ""
+    }
+  ],
+  "SKL": [
+    {
+      "crypto.SKL.address": ""
+    }
+  ],
+  "ALUSD": [
+    {
+      "crypto.ALUSD.address": ""
+    }
+  ],
+  "MIR": [
+    {
+      "crypto.MIR.version.ERC20.address": ""
+    },
+    {
+      "crypto.MIR.version.BEP20.address": ""
+    }
+  ],
+  "GLM": [
+    {
+      "crypto.GLM.address": ""
+    }
+  ],
+  "PAXG": [
+    {
+      "crypto.PAXG.version.ERC20.address": ""
+    },
+    {
+      "crypto.PAXG.version.HRC20.address": ""
+    }
+  ],
+  "CFX": [
+    {
+      "crypto.CFX.address": ""
+    }
+  ],
+  "UOS": [
+    {
+      "crypto.UOS.address": ""
+    }
+  ],
+  "SVCS": [
+    {
+      "crypto.SVCS.address": ""
+    }
+  ],
+  "REEF": [
+    {
+      "crypto.REEF.version.ERC20.address": ""
+    },
+    {
+      "crypto.REEF.version.BEP20.address": ""
+    },
+    {
+      "crypto.REEF.version.HRC20.address": ""
+    }
+  ],
+  "GNO": [
+    {
+      "crypto.GNO.address": ""
+    }
+  ],
+  "USDP": [
+    {
+      "crypto.USDP.address": ""
+    }
+  ],
+  "KAVA": [
+    {
+      "crypto.KAVA.address": ""
+    }
+  ],
+  "ALCX": [
+    {
+      "crypto.ALCX.address": ""
+    }
+  ],
+  "EWT": [
+    {
+      "crypto.EWT.address": ""
+    }
+  ],
+  "TON": [
+    {
+      "crypto.TON.address": ""
+    }
+  ],
+  "RLC": [
+    {
+      "crypto.RLC.address": ""
+    }
+  ],
+  "AXS": [
+    {
+      "crypto.AXS.address": ""
+    }
+  ],
+  "AUDIO": [
+    {
+      "crypto.AUDIO.address": ""
+    }
+  ],
+  "XVS": [
+    {
+      "crypto.XVS.address": ""
+    }
+  ],
+  "BAND": [
+    {
+      "crypto.BAND.version.ERC20.address": ""
+    },
+    {
+      "crypto.BAND.version.FANTOM.address": ""
+    }
+  ],
+  "NMR": [
+    {
+      "crypto.NMR.address": ""
+    }
+  ],
+  "INJ": [
+    {
+      "crypto.INJ.version.ERC20.address": ""
+    },
+    {
+      "crypto.INJ.version.BEP20.address": ""
+    }
+  ],
+  "WAXP": [
+    {
+      "crypto.WAXP.address": ""
+    }
+  ],
+  "UQC": [
+    {
+      "crypto.UQC.address": ""
+    }
+  ],
+  "IOTX": [
+    {
+      "crypto.IOTX.address": ""
+    }
+  ],
+  "FUN": [
+    {
+      "crypto.FUN.address": ""
+    }
+  ],
+  "OCEAN": [
+    {
+      "crypto.OCEAN.address": ""
+    }
+  ],
+  "SAND": [
+    {
+      "crypto.SAND.version.ERC20.address": ""
+    },
+    {
+      "crypto.SAND.version.HRC20.address": ""
+    }
+  ],
+  "CTSI": [
+    {
+      "crypto.CTSI.version.ERC20.address": ""
+    },
+    {
+      "crypto.CTSI.version.BEP20.address": ""
+    },
+    {
+      "crypto.CTSI.version.MATIC.address": ""
+    }
+  ],
+  "RAY": [
+    {
+      "crypto.RAY.address": ""
+    }
+  ],
+  "ANC": [
+    {
+      "crypto.ANC.version.TERRA.address": ""
+    },
+    {
+      "crypto.ANC.version.ERC20.address": ""
+    }
+  ],
+  "IQ": [
+    {
+      "crypto.IQ.version.ERC20.address": ""
+    },
+    {
+      "crypto.IQ.version.BEP20.address": ""
+    },
+    {
+      "crypto.IQ.version.MATIC.address": ""
+    }
+  ],
+  "SUSD": [
+    {
+      "crypto.SUSD.version.ERC20.address": ""
+    },
+    {
+      "crypto.SUSD.version.FANTOM.address": ""
+    }
+  ],
+  "KLV": [
+    {
+      "crypto.KLV.address": ""
+    }
+  ],
+  "BTCST": [
+    {
+      "crypto.BTCST.address": ""
+    }
+  ],
+  "TLM": [
+    {
+      "crypto.TLM.address": ""
+    }
+  ],
+  "AKT": [
+    {
+      "crypto.AKT.address": ""
+    }
+  ],
+  "STMX": [
+    {
+      "crypto.STMX.address": ""
+    }
+  ],
+  "PROM": [
+    {
+      "crypto.PROM.address": ""
+    }
+  ],
+  "XPRT": [
+    {
+      "crypto.XPRT.address": ""
+    }
+  ],
+  "SRM": [
+    {
+      "crypto.SRM.version.ERC20.address": ""
+    },
+    {
+      "crypto.SRM.version.SOLANA.address": ""
+    }
+  ],
+  "RPL": [
+    {
+      "crypto.RPL.address": ""
+    }
+  ],
+  "AGIX": [
+    {
+      "crypto.AGIX.address": ""
+    }
+  ],
+  "CELR": [
+    {
+      "crypto.CELR.address": ""
+    }
+  ],
+  "FET": [
+    {
+      "crypto.FET.address": ""
+    },
+    {
+      "crypto.FET.version.ERC20.address": ""
+    },
+    {
+      "crypto.FET.version.FETCHAI.address": ""
+    }
+  ],
+  "OXT": [
+    {
+      "crypto.OXT.address": ""
+    }
+  ],
+  "ARDR": [
+    {
+      "crypto.ARDR.address": ""
+    }
+  ],
+  "MATH": [
+    {
+      "crypto.MATH.address": ""
+    }
+  ],
+  "10SET": [
+    {
+      "crypto.10SET.address": ""
+    }
+  ],
+  "POLY": [
+    {
+      "crypto.POLY.address": ""
+    }
+  ],
+  "GUSD": [
+    {
+      "crypto.GUSD.address": ""
+    }
+  ],
+  "NKN": [
+    {
+      "crypto.NKN.address": ""
+    }
+  ],
+  "CVC": [
+    {
+      "crypto.CVC.address": ""
+    }
+  ],
+  "GTC": [
+    {
+      "crypto.GTC.address": ""
+    }
+  ],
+  "STEEM": [
+    {
+      "crypto.STEEM.address": ""
+    }
+  ],
+  "ORN": [
+    {
+      "crypto.ORN.address": ""
+    }
+  ],
+  "KEEP": [
+    {
+      "crypto.KEEP.version.ERC20.address": ""
+    },
+    {
+      "crypto.KEEP.version.HRC20.address": ""
+    }
+  ],
+  "HXRO": [
+    {
+      "crypto.HXRO.address": ""
+    }
+  ],
+  "ORBS": [
+    {
+      "crypto.ORBS.address": ""
+    }
+  ],
+  "ALPHA": [
+    {
+      "crypto.ALPHA.version.ERC20.address": ""
+    },
+    {
+      "crypto.ALPHA.version.BEP20.address": ""
+    }
+  ],
+  "MCONTENT": [
+    {
+      "crypto.MCONTENT.version.ERC20.address": ""
+    },
+    {
+      "crypto.MCONTENT.version.BEP20.address": ""
+    }
+  ],
+  "DODO": [
+    {
+      "crypto.DODO.version.ERC20.address": ""
+    },
+    {
+      "crypto.DODO.version.BEP20.address": ""
+    }
+  ],
+  "OGN": [
+    {
+      "crypto.OGN.address": ""
+    }
+  ],
+  "KNCL": [
+    {
+      "crypto.KNCL.version.ERC20.address": ""
+    },
+    {
+      "crypto.KNCL.version.FANTOM.address": ""
+    },
+    {
+      "crypto.KNCL.version.HRC20.address": ""
+    }
+  ],
+  "MED": [
+    {
+      "crypto.MED.address": ""
+    }
+  ],
+  "XAUT": [
+    {
+      "crypto.XAUT.address": ""
+    }
+  ],
+  "VLX": [
+    {
+      "crypto.VLX.address": ""
+    }
+  ],
+  "PHA": [
+    {
+      "crypto.PHA.address": ""
+    }
+  ],
+  "KOBE": [
+    {
+      "crypto.KOBE.address": ""
+    }
+  ],
+  "PERP": [
+    {
+      "crypto.PERP.address": ""
+    }
+  ],
+  "XHV": [
+    {
+      "crypto.XHV.address": ""
+    }
+  ],
+  "META": [
+    {
+      "crypto.META.address": ""
+    }
+  ],
+  "SEUR": [
+    {
+      "crypto.SEUR.address": ""
+    }
+  ],
+  "MONA": [
+    {
+      "crypto.MONA.address": ""
+    }
+  ],
+  "ANT": [
+    {
+      "crypto.ANT.address": ""
+    }
+  ],
+  "HYDRA": [
+    {
+      "crypto.HYDRA.address": ""
+    }
+  ],
+  "ZKS": [
+    {
+      "crypto.ZKS.address": ""
+    }
+  ],
+  "SXP": [
+    {
+      "crypto.SXP.version.ERC20.address": ""
+    },
+    {
+      "crypto.SXP.version.BEP20.address": ""
+    },
+    {
+      "crypto.SXP.version.HRC20.address": ""
+    }
+  ],
+  "CSPR": [
+    {
+      "crypto.CSPR.address": ""
+    }
+  ],
+  "MTL": [
+    {
+      "crypto.MTL.address": ""
+    }
+  ],
+  "NU": [
+    {
+      "crypto.NU.address": ""
+    }
+  ],
+  "ZMT": [
+    {
+      "crypto.ZMT.address": ""
+    }
+  ],
+  "LOC": [
+    {
+      "crypto.LOC.address": ""
+    }
+  ],
+  "TKO": [
+    {
+      "crypto.TKO.address": ""
+    }
+  ],
+  "ETN": [
+    {
+      "crypto.ETN.address": ""
+    }
+  ],
+  "UBT": [
+    {
+      "crypto.UBT.version.ERC20.address": ""
+    },
+    {
+      "crypto.UBT.version.MATIC.address": ""
+    }
+  ],
+  "EXRD": [
+    {
+      "crypto.EXRD.address": ""
+    }
+  ],
+  "NMX": [
+    {
+      "crypto.NMX.address": ""
+    }
+  ],
+  "RIF": [
+    {
+      "crypto.RIF.address": ""
+    }
+  ],
+  "STORJ": [
+    {
+      "crypto.STORJ.version.ERC20.address": ""
+    },
+    {
+      "crypto.STORJ.version.HRC20.address": ""
+    }
+  ],
+  "AVA": [
+    {
+      "crypto.AVA.address": ""
+    }
+  ],
+  "DPI": [
+    {
+      "crypto.DPI.version.ERC20.address": ""
+    },
+    {
+      "crypto.DPI.version.MATIC.address": ""
+    }
+  ],
+  "DOG": [
+    {
+      "crypto.DOG.version.MATIC.address": ""
+    },
+    {
+      "crypto.DOG.version.BEP20.address": ""
+    },
+    {
+      "crypto.DOG.version.ERC20.address": ""
+    },
+    {
+      "crypto.DOG.version.AETH.address": ""
+    },
+    {
+      "crypto.DOG.version.OP.address": ""
+    }
+  ],
+  "GALA": [
+    {
+      "crypto.GALA.version.ERC20.address": ""
+    },
+    {
+      "crypto.GALA.version.BEP20.address": ""
+    }
+  ],
+  "MOBX": [
+    {
+      "crypto.MOBX.address": ""
+    }
+  ],
+  "FAB": [
+    {
+      "crypto.FAB.address": ""
+    }
+  ],
+  "BEAM": [
+    {
+      "crypto.BEAM.address": ""
+    }
+  ],
+  "DESO": [
+    {
+      "crypto.DESO.address": ""
+    }
+  ],
+  "FLR": [
+    {
+      "crypto.FLR.address": ""
+    }
+  ],
+  "SGB": [
+    {
+      "crypto.SGB.address": ""
+    }
+  ],
+  "0ZK": [
+    {
+      "crypto.0ZK.version.ERC20.address": ""
+    },
+    {
+      "crypto.0ZK.version.BEP20.address": ""
+    },
+    {
+      "crypto.0ZK.version.MATIC.address": ""
+    },
+    {
+      "crypto.0ZK.version.0ZK.address": ""
+    }
+  ],
+  "SUI": [
+    {
+      "crypto.SUI.address": ""
+    }
+  ],
+  "MOON": [
+    {
+      "crypto.MOON.address": ""
+    }
+  ],
+  "SWEAT": [
+    {
+      "crypto.SWEAT.version.ERC20.address": ""
+    },
+    {
+      "crypto.SWEAT.version.NEP-141.address": ""
+    }
+  ],
+  "POKT": [
+    {
+      "crypto.POKT.address": ""
+    }
+  ],
+  "KAI": [
+    {
+      "crypto.KAI.address": ""
+    }
+  ],
+  "XLA": [
+    {
+      "crypto.XLA.address": ""
+    }
+  ],
+  "APT": [
+    {
+      "crypto.APT.address": ""
+    }
+  ],
+  "GTH": [
+    {
+      "crypto.GTH.address": ""
+    }
+  ],
+  "HI": [
+    {
+      "crypto.HI.version.ERC20.address": ""
+    },
+    {
+      "crypto.HI.version.BEP20.address": ""
+    }
+  ],
+  "VERSE": [
+    {
+      "crypto.VERSE.address": ""
+    }
+  ],
+  "NIBI": [
+    {
+      "crypto.NIBI.address": ""
+    }
+  ]
+}
