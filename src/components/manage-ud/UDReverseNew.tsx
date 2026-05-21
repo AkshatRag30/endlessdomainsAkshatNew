@@ -32,7 +32,7 @@ export function UDReverseNew({ domain, currentRecord }: UDReverseNewProps) {
           <div className={styles.card}>
             <p className={styles.cardHint}>Will Set To This Domain</p>
             <div className={styles.cardValueRow}>
-              <span className={styles.cardValueBlue}>{domain}</span>
+              <p className={styles.cardValueBlue}>{domain}</p>
               <PiSealCheckFill className={styles.sealIcon} aria-hidden="true" />
             </div>
           </div>
@@ -48,7 +48,7 @@ export function UDReverseNew({ domain, currentRecord }: UDReverseNewProps) {
 
               <div className={styles.card}>
                 <p className={styles.cardHint}>Will Set To This Domain</p>
-                <span className={styles.cardValueBlue}>{domain}</span>
+                <p className={styles.cardValueBlue}>{domain}</p>
               </div>
             </div>
 

@@ -79,7 +79,7 @@ export function CurrencyModal({ onClose, onAdd }: CurrencyModalProps) {
                 <div className={styles.coinCircle}>
                   <CurrencyIcon symbol={key} />
                 </div>
-                <span className={styles.currencyName}>{key}</span>
+                <strong className={styles.currencyName}>{key}</strong>
               </div>
               <button
                 type="button"
@@ -87,7 +87,7 @@ export function CurrencyModal({ onClose, onAdd }: CurrencyModalProps) {
                 onClick={() => handleAdd(key)}
                 aria-label={`Add ${key}`}
               >
-                <span>Add</span>
+                Add
                 <FiArrowRight size={18} aria-hidden="true" />
               </button>
             </li>

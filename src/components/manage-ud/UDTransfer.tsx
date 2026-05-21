@@ -43,9 +43,9 @@ export function UDTransfer({ domain }: UDTransferProps) {
 
         <div className={styles.warningBanner} role="alert">
           <GoAlert className={styles.warningIcon} aria-hidden="true" />
-          <span className={styles.warningText}>
+          <p className={styles.warningText}>
             Transferring This Domain Permanently Removes Your Ownership. You Will Lose All Management Access.&quot;
-          </span>
+          </p>
         </div>
 
         <div className={styles.body}>

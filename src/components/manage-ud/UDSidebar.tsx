@@ -32,7 +32,7 @@ export function UDSidebar({ selectedMenu, setSelectedMenu }: UDSidebarProps) {
             aria-current={selectedMenu === item.key ? 'page' : undefined}
           >
             {item.icon}
-            <span>{item.label}</span>
+            {item.label}
           </button>
         ))}
       </div>
@@ -49,7 +49,7 @@ export function UDSidebar({ selectedMenu, setSelectedMenu }: UDSidebarProps) {
             aria-current={selectedMenu === item.key ? 'page' : undefined}
           >
             {item.icon}
-            <span>{item.label}</span>
+            {item.label}
           </button>
         ))}
       </div>

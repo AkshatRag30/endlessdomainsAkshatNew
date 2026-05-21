@@ -118,7 +118,7 @@ export function UDCrypto({ domain }: UDCryptoProps) {
             <div className={styles.entryHeader}>
               <div className={styles.entryMeta}>
                 <CoinIcon symbol={entry.key} />
-                <span className={styles.currencyName}>{entry.name}</span>
+                <strong className={styles.currencyName}>{entry.name}</strong>
                 <span className={styles.chainBadge}>{entry.chain}</span>
               </div>
               <button
@@ -127,7 +127,7 @@ export function UDCrypto({ domain }: UDCryptoProps) {
                 onClick={() => handleRemove(entry.key)}
                 aria-label={`Remove ${entry.name}`}
               >
-                <span>Remove</span>
+                Remove
                 <FiTrash2 size={16} aria-hidden="true" />
               </button>
             </div>
@@ -159,7 +159,7 @@ export function UDCrypto({ domain }: UDCryptoProps) {
       {/* Add currency link */}
       <button type="button" className={styles.addCurrencyBtn} onClick={() => setIsModalOpen(true)}>
         <FiPlus size={20} aria-hidden="true" />
-        <span>Add Currency</span>
+        Add Currency
       </button>
 
       {/* Save changes */}

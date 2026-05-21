@@ -70,6 +70,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 60vw;
+  margin: 0;
 
   @include mobile {
     max-width: 52vw;
@@ -94,6 +95,7 @@
   font-size: var(--text-nav);
   font-weight: var(--font-weight-medium);
   color: var(--color-blue-primary);
+  margin: 0;
 }
 
 // ── Blue accent strip ─────────────────────────────────────────────────────────
@@ -173,6 +175,7 @@
   padding: var(--space-2) var(--space-3);
   min-height: 45px; // design-specific: Figma-exact info box height
   min-width: 140px;
+  margin: 0; // reset <dd> browser default margin-inline-start
 
   @include mobile {
     width: 100%;

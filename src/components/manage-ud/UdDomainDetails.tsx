@@ -53,10 +53,10 @@ export function UdDomainDetails({ domain, owner, expiry }: UdDomainDetailsProps)
 
         <div className={styles.nameCol}>
           <div className={styles.nameRow}>
-            <span className={styles.domainName}>{name}</span>
+            <h1 className={styles.domainName}>{name}</h1>
             <span className={styles.tldBadge}>{tld}</span>
           </div>
-          <span className={styles.providerLabel}>unstoppable domains</span>
+          <p className={styles.providerLabel}>unstoppable domains</p>
         </div>
       </div>
 
@@ -64,19 +64,19 @@ export function UdDomainDetails({ domain, owner, expiry }: UdDomainDetailsProps)
       <div className={styles.strip} aria-hidden="true" />
 
       {/* ── Info row: chain / owner / expiry ────────────────────────────── */}
-      <div className={styles.infoRow}>
+      <dl className={styles.infoRow}>
 
         <div className={styles.field}>
-          <span className={styles.fieldLabel}>Chain Provider</span>
-          <div className={styles.fieldBox}>
+          <dt className={styles.fieldLabel}>Chain Provider</dt>
+          <dd className={styles.fieldBox}>
             <SiPolygon size={22} className={styles.polygonIcon} aria-hidden="true" />
             <span className={styles.fieldText}>Polygon</span>
-          </div>
+          </dd>
         </div>
 
         <div className={`${styles.field} ${styles.fieldOwner}`}>
-          <span className={styles.fieldLabel}>Owner</span>
-          <div className={styles.fieldBox}>
+          <dt className={styles.fieldLabel}>Owner</dt>
+          <dd className={styles.fieldBox}>
             <span className={styles.ownerAddress}>{owner}</span>
             <button
               type="button"
@@ -88,18 +88,18 @@ export function UdDomainDetails({ domain, owner, expiry }: UdDomainDetailsProps)
                 ? <MdCheck size={18} aria-hidden="true" />
                 : <MdContentCopy size={18} aria-hidden="true" />}
             </button>
-          </div>
+          </dd>
         </div>
 
         <div className={styles.field}>
-          <span className={styles.fieldLabel}>Expiry</span>
-          <div className={styles.fieldBox}>
+          <dt className={styles.fieldLabel}>Expiry</dt>
+          <dd className={styles.fieldBox}>
             <span className={styles.expiryDot} aria-hidden="true" />
             <span className={styles.fieldText}>{formatExpiry(expiry)}</span>
-          </div>
+          </dd>
         </div>
 
-      </div>
+      </dl>
     </div>
   )
 }
