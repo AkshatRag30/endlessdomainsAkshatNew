@@ -2,6 +2,7 @@
 
 .wrapper {
   background: var(--color-white-primary);
+  background-image: repeating-linear-gradient(135deg, transparent 0px, transparent 4px, var(--color-black-alpha-01) 4px, var(--color-black-alpha-01) 6px);
   display: flex;
   flex-direction: column;
   width: 100%;

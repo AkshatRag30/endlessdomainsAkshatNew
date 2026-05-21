@@ -16,6 +16,7 @@
   gap: var(--space-1);
   padding: var(--space-2);
   background: var(--color-white-primary);
+  background-image: repeating-linear-gradient(135deg, transparent 0px, transparent 4px, var(--color-black-alpha-01) 4px, var(--color-black-alpha-01) 6px);
 
   // stack icon above label so all four items fit within the white bar
   .navItem {
@@ -40,6 +41,7 @@
   flex-direction: column;
   gap: var(--space-1);
   background: var(--color-white-primary);
+  background-image: repeating-linear-gradient(135deg, transparent 0px, transparent 4px, var(--color-black-alpha-01) 4px, var(--color-black-alpha-01) 6px);
   padding: var(--space-3);
 
   @include desktop {

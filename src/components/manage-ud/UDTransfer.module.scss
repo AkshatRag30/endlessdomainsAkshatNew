@@ -2,6 +2,7 @@
 
 .section {
   background: var(--color-white-primary);
+  background-image: repeating-linear-gradient(135deg, transparent 0px, transparent 4px, var(--color-black-alpha-01) 4px, var(--color-black-alpha-01) 6px);
   padding: var(--space-5) var(--space-6);
   display: flex;
   flex-direction: column;
@@ -31,7 +32,7 @@
 .title {
   font-family: var(--font-satoshi);
   font-size: var(--text-heading-sm);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-medium);
   color: var(--color-blue-primary);
   margin: 0;
 }
