@@ -1,0 +1,243 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Section shell ─────────────────────────────────────────────────────────────
+
+.section {
+  background: var(--color-gray-light-bg);
+  padding-bottom: var(--space-13);
+
+  @include tablet-down {
+    padding-bottom: var(--space-11);
+  }
+
+  @include mobile {
+    padding-bottom: var(--space-9);
+  }
+}
+
+// ── Leaderboard banner (clip-path trapezoid shape) ────────────────────────────
+
+.banner {
+  width: 100%;
+  height: 110px; // design-specific: Figma-exact banner height matching clip-path spec
+  background: var(--color-blue-primary);
+  // design-specific: Figma-exact inset white glow spread — no shadow token for this treatment
+  box-shadow: inset 0 0 132px 0 var(--color-white-primary);
+  // design-specific: Figma-exact trapezoid with center downward tab —
+  // top 74% is the full-width bar, bottom 26% cuts to a center notch
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% 74%,
+    67% 74%,
+    65.5% 100%,
+    34.5% 100%,
+    33% 74%,
+    0 74%
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-9);
+}
+
+.bannerTitle {
+  font-family: var(--font-satoshi);
+  font-size: 52px; // design-specific: Figma-exact banner title size — no token match
+  font-weight: var(--font-weight-medium);
+  color: var(--color-white-primary);
+  letter-spacing: 0.04em; // design-specific: Figma 2px letter-spacing at 52px — no exact token
+  text-transform: uppercase;
+  margin: 0;
+}
+
+// ── Inner container ───────────────────────────────────────────────────────────
+
+.inner {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 var(--container-padding-x);
+
+  @include tablet-down {
+    padding: 0 var(--space-6);
+  }
+
+  @include mobile {
+    padding: 0 var(--space-4);
+  }
+}
+
+// ── Table container ───────────────────────────────────────────────────────────
+
+.tableWrap {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+// Table is blurred to tease the content behind the join CTA
+.tableBlur {
+  filter: blur(5px);
+  pointer-events: none;
+  user-select: none;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-white-primary);
+}
+
+.th {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-dark);
+  text-align: left;
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-gray-200);
+  letter-spacing: var(--tracking-nav);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.tr {
+  border-bottom: 1px solid var(--color-gray-200);
+  transition: background 150ms ease;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: var(--color-gray-light);
+  }
+}
+
+.td {
+  padding: var(--space-4) var(--space-5);
+  vertical-align: middle;
+}
+
+// ── Rank cell ─────────────────────────────────────────────────────────────────
+
+.rankGold {
+  font-size: 22px; // design-specific: icon size for rank-1 trophy — no token match
+  color: #f4c430; // design-specific: gold trophy color — intentional, no design token for award gold
+}
+
+.rankNum {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-gray-dark);
+  margin: 0;
+}
+
+// ── User cell ─────────────────────────────────────────────────────────────────
+
+.userCell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.avatar {
+  width: 34px; // design-specific: avatar size — Figma-exact
+  height: 34px;
+  border-radius: var(--radius-full);
+  background: var(--color-blue-primary-alpha-13);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-blue-primary);
+  font-size: 16px; // design-specific: icon size within avatar
+  flex-shrink: 0;
+}
+
+.username {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  margin: 0;
+  white-space: nowrap;
+}
+
+// ── Stat and score cells ──────────────────────────────────────────────────────
+
+.statCell {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-gray-dark);
+  margin: 0;
+}
+
+.scoreCell {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-normal);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-blue-primary);
+  margin: 0;
+}
+
+// ── Gradient fade overlay (smooths blur into CTA) ─────────────────────────────
+
+.fadeOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    var(--color-gray-light-bg-85) 45%,
+    var(--color-gray-light-bg) 100%
+  );
+  pointer-events: none;
+}
+
+// ── Join CTA card ─────────────────────────────────────────────────────────────
+
+.ctaCard {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--color-white-primary);
+  border-radius: var(--radius-xl);
+  box-shadow:
+    0 8px 40px var(--color-black-alpha-25),
+    0 2px 8px var(--color-black-alpha-12);
+  padding: var(--space-8) var(--space-9);
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  text-align: center;
+  z-index: 2;
+
+  @include mobile {
+    padding: var(--space-6);
+    max-width: calc(100% - var(--space-8));
+  }
+}
+
+.ctaHeading {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-display-sm); // 28px
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black-primary);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-h3);
+  margin: 0;
+}
+
+.ctaDescription {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  color: var(--color-gray-dark);
+  line-height: var(--leading-body);
+  margin: 0;
+}

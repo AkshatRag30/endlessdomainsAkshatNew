@@ -1,0 +1,609 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Outer wrapper ──────────────────────────────────────────────────────────────
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 480px; // design-specific: Figma-exact card width for right column
+  position: relative;
+
+  // design-specific: Figma outer-frame top and bottom horizontal border lines
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px; // design-specific: border line stroke — no spacing token
+    background: var(--color-gray-300);
+    pointer-events: none;
+  }
+
+  &::before { top: 0; }
+  &::after { bottom: 0; }
+
+  // design-specific: Figma outer-frame 4 corner dot markers (7px each)
+  background-image:
+    radial-gradient(circle, var(--color-gray-300) 3px, transparent 3px),
+    radial-gradient(circle, var(--color-gray-300) 3px, transparent 3px),
+    radial-gradient(circle, var(--color-gray-300) 3px, transparent 3px),
+    radial-gradient(circle, var(--color-gray-300) 3px, transparent 3px);
+  background-position:
+    0 0,
+    100% 0,
+    0 100%,
+    100% 100%;
+  background-size: 7px 7px;
+  background-repeat: no-repeat;
+
+  @include mobile {
+    max-width: 100%;
+  }
+}
+
+// ── Corner-dot decoration ──────────────────────────────────────────────────────
+// 4 radial-gradient dots at each corner — shared by step bar and card panels
+
+%cornerDots {
+  // design-specific: 5px panel corner dots — Figma inner-panel Group 2085666142 treatment
+  background-image:
+    radial-gradient(circle, var(--color-gray-medium) 2.5px, transparent 2.5px),
+    radial-gradient(circle, var(--color-gray-medium) 2.5px, transparent 2.5px),
+    radial-gradient(circle, var(--color-gray-medium) 2.5px, transparent 2.5px),
+    radial-gradient(circle, var(--color-gray-medium) 2.5px, transparent 2.5px);
+  background-position:
+    var(--space-2) var(--space-2),
+    calc(100% - var(--space-2)) var(--space-2),
+    var(--space-2) calc(100% - var(--space-2)),
+    calc(100% - var(--space-2)) calc(100% - var(--space-2));
+  background-size: 5px 5px; // design-specific: Figma-exact ~5.2px corner dot diameter
+  background-repeat: no-repeat;
+}
+
+// ── Step bar ───────────────────────────────────────────────────────────────────
+
+.stepBar {
+  @extend %cornerDots;
+  background-color: var(--color-gray-light-bg); // near-white panel bg matching Figma #f7f7f7
+  border: 0.5px solid var(--color-black-alpha-10); // design-specific: Figma-exact 0.5px subtle border
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4);
+  // design-specific: Figma-exact drop shadow + inset border overlay on step bar panel
+  box-shadow: 0 4px 12px var(--color-black-alpha-05), inset 0 0 0 1px var(--color-border-black-subtle);
+}
+
+.stepsRow {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.stepPill {
+  flex-shrink: 0;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-white-primary);
+  background: rgba(0, 0, 0, 0.36); // design-specific: Figma inactive pill bg — no dark-gray-alpha token
+  white-space: nowrap;
+  transition: background 220ms ease;
+  // design-specific: Figma-exact inset white glow on all pills (active and inactive)
+  box-shadow: inset 0 0 8px var(--color-white-primary);
+}
+
+.stepPillActive {
+  background: var(--color-blue-primary);
+  font-weight: var(--font-weight-bold);
+  box-shadow: inset 0 0 8px var(--color-white-primary); // design-specific: Figma active pill inner glow
+}
+
+.connHoriz {
+  flex: 1;
+  height: 1px; // design-specific: step connector line thickness — no spacing token
+  background: var(--color-gray-300);
+  transition: background 220ms ease;
+}
+
+.connHorizActive {
+  background: var(--color-blue-primary);
+}
+
+// ── Vertical connector ticks (between step bar and card) ───────────────────────
+
+.connTicks {
+  display: flex;
+  justify-content: space-around;
+  padding: 0 var(--space-9);
+}
+
+.connTick {
+  width: 1px; // design-specific: tick stroke width — no token
+  height: var(--space-4);
+  background: var(--color-gray-200);
+}
+
+// ── Form card ──────────────────────────────────────────────────────────────────
+
+.card {
+  @extend %cornerDots;
+  background-color: var(--color-white-primary); // use background-color so corner dots from @extend are not reset
+  border: 0.5px solid var(--color-black-alpha-10); // design-specific: Figma-exact 0.5px subtle border
+  border-radius: var(--radius-sm);
+  // design-specific: Figma-exact drop shadow + inset border overlay on form card panel
+  box-shadow: 0 4px 12px var(--color-black-alpha-05), inset 0 0 0 1px var(--color-border-black-subtle);
+}
+
+// ── Card body ──────────────────────────────────────────────────────────────────
+
+.body {
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.heading {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-display-sm); // 28px
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black-primary);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-h3);
+  margin: 0;
+}
+
+.optional {
+  font-size: var(--text-normal); // 20px
+  font-weight: var(--font-weight-regular);
+  color: var(--color-gray-dark);
+  letter-spacing: 0;
+}
+
+// ── Fields ─────────────────────────────────────────────────────────────────────
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.fieldLabel {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-dark);
+  letter-spacing: var(--tracking-nav);
+  margin: 0;
+}
+
+.textInput {
+  height: 48px; // design-specific: Figma-exact input height — no token match
+  padding: 0 var(--space-4);
+  border: 1.5px solid var(--color-gray-300);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  color: var(--color-black-primary);
+  background: var(--color-white-primary);
+  width: 100%;
+  outline: none;
+  transition: border-color 150ms ease;
+
+  &::placeholder {
+    color: var(--color-gray-medium);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+    border-color: var(--color-blue-primary);
+  }
+}
+
+.textInputDark {
+  background: var(--color-black-primary);
+  color: var(--color-white-primary);
+  border-color: var(--color-black-primary);
+  font-family: monospace; // design-specific: wallet address — system monospace, no token
+
+  &::placeholder {
+    color: var(--color-white-alpha-40);
+  }
+
+  &:focus-visible {
+    border-color: var(--color-blue-primary);
+  }
+}
+
+.textInputValid {
+  border-color: var(--color-status-available);
+}
+
+.hint {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  color: var(--color-gray-dark);
+  margin: 0;
+  line-height: var(--leading-body);
+}
+
+// ── Chain selector dropdown ────────────────────────────────────────────────────
+
+.chainDropdown {
+  position: relative;
+}
+
+.chainTrigger {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  height: 48px; // design-specific: matches input height
+  padding: 0 var(--space-4);
+  border: 1.5px solid var(--color-gray-300);
+  border-radius: var(--radius-sm);
+  background: var(--color-white-primary);
+  cursor: pointer;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  color: var(--color-black-primary);
+  text-align: left;
+  transition: border-color 150ms ease;
+
+  &:focus-visible {
+    @include focus-ring;
+    border-color: var(--color-blue-primary);
+  }
+
+  .chainDropdownOpen & {
+    border-color: var(--color-blue-primary);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+}
+
+.chainLabel {
+  flex: 1;
+}
+
+.chainChevron {
+  width: 16px; // design-specific: chevron icon size — no token
+  height: 16px;
+  color: var(--color-gray-primary);
+  flex-shrink: 0;
+  transition: transform 200ms ease;
+
+  .chainDropdownOpen & {
+    transform: rotate(180deg);
+  }
+}
+
+.chainIconWrap {
+  display: inline-flex;
+  align-items: center;
+  font-size: 20px; // design-specific: chain icon render size — no token
+  flex-shrink: 0;
+
+  &[data-chain='btc'] { color: #F7931A; } // design-specific: Bitcoin brand orange
+  &[data-chain='eth'] { color: #627EEA; } // design-specific: Ethereum brand blue
+  &[data-chain='sol'] { color: #9945FF; } // design-specific: Solana brand purple
+  &[data-chain='bnb'] { color: #F3BA2F; } // design-specific: BNB Chain brand gold
+}
+
+.chainIconWrapSm {
+  font-size: 14px; // design-specific: smaller size for inline review row display
+}
+
+.chainOptions {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  border: 1.5px solid var(--color-blue-primary);
+  border-top: none;
+  border-bottom-left-radius: var(--radius-sm);
+  border-bottom-right-radius: var(--radius-sm);
+  background: var(--color-white-primary);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  z-index: 10;
+  overflow: hidden;
+  box-shadow: 0 4px 12px var(--color-black-alpha-12);
+
+  .chainDropdownOpen & {
+    display: block;
+  }
+}
+
+.chainOption {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  color: var(--color-black-primary);
+  cursor: pointer;
+  transition: background 120ms ease;
+
+  &:hover {
+    background: var(--color-gray-light);
+  }
+}
+
+.chainOptionActive {
+  background: var(--color-blue-light);
+  color: var(--color-blue-primary);
+}
+
+// ── Wallet connect button ──────────────────────────────────────────────────────
+
+.walletConnectBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 48px; // design-specific: matches input height
+  border: 1.5px solid var(--color-gray-300);
+  border-radius: var(--radius-sm);
+  background: var(--color-blue-primary-alpha-07);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease;
+
+  &:hover {
+    background: var(--color-blue-primary-alpha-13);
+    border-color: var(--color-blue-primary-alpha-30);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// ── Divider ────────────────────────────────────────────────────────────────────
+
+.dividerText {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  color: var(--color-gray-medium);
+  text-align: center;
+  margin: 0;
+}
+
+// ── Success banner (valid referral) ───────────────────────────────────────────
+
+.successBanner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  background: rgba(34, 197, 94, 0.12); // design-specific: green tint bg, no token for green-light-alpha
+  color: var(--color-status-available);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+
+  p {
+    margin: 0;
+  }
+}
+
+// ── Skip row (step 3) ─────────────────────────────────────────────────────────
+
+.skipRow {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.skipBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-dark);
+  cursor: pointer;
+  transition: color 150ms ease;
+
+  &:hover {
+    color: var(--color-blue-primary);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+    border-radius: var(--radius-sm);
+  }
+}
+
+// ── Review table (step 4) ─────────────────────────────────────────────────────
+
+.reviewTable {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  margin: 0;
+}
+
+.reviewRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-white-primary);
+  border-bottom: 1px solid var(--color-gray-200);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:nth-child(even) {
+    background: var(--color-gray-light-bg);
+  }
+}
+
+.reviewLabel {
+  flex-shrink: 0;
+  width: 80px; // design-specific: Figma-exact label column width
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-dark);
+  margin: 0;
+}
+
+.reviewValue {
+  flex: 1;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin: 0;
+}
+
+.reviewValueGreen {
+  color: var(--color-status-available);
+}
+
+.verifyCheck {
+  flex-shrink: 0;
+  width: 14px; // design-specific: inline verify check icon size — no token
+  height: 14px;
+}
+
+.reviewEdit {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+  cursor: pointer;
+  transition: color 150ms ease;
+
+  &:hover {
+    color: var(--color-blue-dark);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+    border-radius: var(--radius-sm);
+  }
+}
+
+// ── Points banner (step 4) ────────────────────────────────────────────────────
+
+.pointsBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-5) var(--space-6);
+  background: var(--color-black-primary);
+  border-radius: var(--radius-sm);
+  // design-specific: amber glow border — Figma-exact award/accent treatment, no shadow token
+  box-shadow: 0 0 0 1.5px var(--color-amber), 0 0 18px var(--color-amber);
+}
+
+.pointsLabel {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-white-primary);
+  margin: 0;
+}
+
+.pointsValue {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-display-sm); // 28px
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white-primary);
+  margin: 0;
+}
+
+// ── Legal text (step 4) ───────────────────────────────────────────────────────
+
+.legalText {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  color: var(--color-gray-dark);
+  line-height: var(--leading-body);
+  margin: 0;
+  text-align: center;
+}
+
+// ── Back button ───────────────────────────────────────────────────────────────
+
+.backBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  align-self: center;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-dark);
+  cursor: pointer;
+  transition: color 150ms ease;
+
+  &:hover {
+    color: var(--color-black-primary);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+    border-radius: var(--radius-sm);
+  }
+}
+
+// ── Success state (post-submit) ───────────────────────────────────────────────
+
+.successState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  padding: var(--space-8) var(--space-6);
+  text-align: center;
+}
+
+.successIconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-9); // 48px
+  height: var(--space-9);
+  border-radius: var(--radius-full);
+  background: rgba(34, 197, 94, 0.12); // design-specific: green tint bg — see successBanner
+  color: var(--color-status-available);
+  font-size: var(--space-7); // 32px icon size
+}

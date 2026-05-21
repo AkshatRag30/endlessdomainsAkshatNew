@@ -1,0 +1,85 @@
+@import '@newstyles/_mixins.scss';
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-top: var(--space-8);
+
+  @include mobile {
+    margin-top: var(--space-6);
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+}
+
+.divider {
+  width: 1px;
+  height: 48px;
+  background: var(--color-gray-300);
+  flex-shrink: 0;
+  margin: 0 var(--space-7);
+
+  @include mobile {
+    display: none;
+  }
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+}
+
+// Corner bracket decoration using background-image gradient technique
+.bracketBox {
+  position: relative;
+  padding: var(--space-3) var(--space-5);
+  background-image:
+    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
+    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
+    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
+    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
+    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
+    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
+    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
+    linear-gradient(var(--color-blue-primary), var(--color-blue-primary));
+  background-position:
+    top left,
+    top left,
+    top right,
+    top right,
+    bottom left,
+    bottom left,
+    bottom right,
+    bottom right;
+  background-size:
+    2px 12px,
+    12px 2px,
+    2px 12px,
+    12px 2px,
+    2px 12px,
+    12px 2px,
+    2px 12px,
+    12px 2px;
+  background-repeat: no-repeat;
+}
+
+.value {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-display-sm); // 28px — Figma-exact
+  font-weight: var(--font-weight-bold);
+  color: var(--color-blue-primary);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-h3);
+  margin: 0;
+}
+
+.label {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  margin: 0;
+  margin-top: var(--space-1);
+  white-space: nowrap;
+}
