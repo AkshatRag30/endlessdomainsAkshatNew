@@ -5,6 +5,7 @@
 .section {
   background: var(--color-white-primary);
   padding: var(--space-14) var(--container-padding-x); // 120px top/bottom
+  overflow-x: clip; // section-level containment — prevents any child from causing horizontal scroll
 
   @include tablet-down {
     padding: var(--space-12) var(--space-6);
@@ -28,6 +29,10 @@
     grid-template-columns: 1fr;
     gap: var(--space-9);
   }
+
+  @include mobile {
+    gap: var(--space-7); // 32px between left text and form card on mobile
+  }
 }
 
 // ── Gap connector SVG ─────────────────────────────────────────────────────────
@@ -35,9 +40,9 @@
 .connectorWrap {
   position: absolute;
   left: 50%;
-  top: 50%;
+  top: 35%; // design-specific: Figma node 1:1237 sits ~34% from inner top, not centered
   transform: translate(-50%, -50%);
-  z-index: 2;
+  z-index: 0; // behind .left and .right (both z-index: 1)
   pointer-events: none;
 
   @include tablet-down {
@@ -45,17 +50,91 @@
   }
 }
 
-.connectorSvg {
-  width: 380px; // design-specific: Figma-exact connector size spanning the column gap
+.connectorBase {
+  // design-specific: Figma node 1:1237 is 317×108.5px; at width 380px → height 130px
+  display: block;
+  width: 380px;
   height: auto;
+}
+
+// ── Animated glow layer — sits exactly over the base SVG ─────────────────────
+
+.connectorGlow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible; // allow drop-shadow glow to bleed slightly outside bounds
+  pointer-events: none;
+  // soft blue-white drop-shadow provides the ambient glow halo around both paths
+  filter:
+    drop-shadow(0 0 4px rgba(255, 255, 255, 0.9))
+    drop-shadow(0 0 10px rgba(38, 57, 237, 0.55))
+    drop-shadow(0 0 20px rgba(38, 57, 237, 0.3));
+
+  @include tablet-down {
+    opacity: 0.55;
+  }
+}
+
+// shared base state for both animated paths
+.glowPath1,
+.glowPath2 {
+  // single 80-unit visible beam; enormous gap keeps only one beam visible at a time
+  stroke-dasharray: 80 9999;
+  // beam starts 80 units before path origin — fully hidden at t=0
+  stroke-dashoffset: 80;
+  opacity: 0;
+}
+
+.glowPath1 {
+  animation: flowBeam 4s linear infinite;
+}
+
+.glowPath2 {
+  // staggered by 2 s so the two beams never overlap — creates natural depth
+  animation: flowBeam 4s linear infinite 2s;
+}
+
+// ── Keyframes ─────────────────────────────────────────────────────────────────
+
+// Traveling energy pulse: enters from the left, crosses the path, exits right.
+// stroke-dashoffset range = beam (80) + path-length (~330) = 410 user-units total.
+@keyframes flowBeam {
+  0% {
+    stroke-dashoffset: 80;    // beam is 80 units before path start — invisible
+    opacity: 0;
+    stroke-width: 1.5;
+  }
+  12% {
+    opacity: 0.85;            // fades in as beam crosses the path entry
+    stroke-width: 2;
+  }
+  50% {
+    opacity: 1;               // peak brightness at the mid-point
+    stroke-width: 2.5;        // subtle swell at the centre of the arc
+  }
+  88% {
+    opacity: 0.85;
+    stroke-width: 2;
+  }
+  100% {
+    stroke-dashoffset: -410;  // beam is 80 units past path end — invisible again
+    opacity: 0;
+    stroke-width: 1.5;
+  }
 }
 
 // ── Left column ───────────────────────────────────────────────────────────────
 
 .left {
+  position: relative;
+  z-index: 1; // stacks above .connectorWrap (z-index: 0)
   display: flex;
   flex-direction: column;
   max-width: 640px;
+  min-width: 0; // grid child — prevents content from forcing column wider than 1fr
 
   @include tablet-down {
     max-width: 100%;
@@ -66,7 +145,14 @@
 .phaseTag {
   display: inline-flex;
   align-items: center;
+  align-self: flex-start; // prevents flex column from stretching the tag to full column width
   margin-bottom: var(--space-6);
+
+  @include mobile {
+    margin-bottom: var(--space-4);
+    max-width: 100%;
+    overflow: hidden;
+  }
   background-image:
     linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
     linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
@@ -106,6 +192,11 @@
   text-transform: uppercase;
   padding: var(--space-2) var(--space-4);
   margin: 0;
+
+  @include mobile {
+    white-space: normal;
+    letter-spacing: 0.04em; // reduced from 0.08em to save horizontal space at narrow viewports
+  }
 }
 
 // Main heading
@@ -142,21 +233,93 @@
   color: var(--color-gray-dark);
   line-height: var(--leading-body);
   margin: 0;
+  position: relative;
+  border-top: 0.5px solid var(--color-border-black-subtle);
+  border-bottom: 0.5px solid var(--color-border-black-subtle);
+  padding-left: var(--space-4);
+
+  // left vertical line — extends 5px past each horizontal corner
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: -5px;
+    bottom: -5px;
+    width: 0.5px;
+    background: var(--color-border-black-subtle);
+    pointer-events: none;
+  }
+
+  // right vertical line — same extension
+  &::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: -5px;
+    bottom: -5px;
+    width: 0.5px;
+    background: var(--color-border-black-subtle);
+    pointer-events: none;
+  }
 
   @include mobile {
     font-size: var(--text-body-small); // 17px
+    padding-left: var(--space-3);
+  }
+}
+
+.statRowWrap {
+  position: relative;
+  border-top: 0.5px solid var(--color-border-black-subtle);
+  border-bottom: 0.5px solid var(--color-border-black-subtle);
+  padding-bottom: var(--space-4);
+  padding-left: var(--space-4);
+
+  @include mobile {
+    padding-left: var(--space-3);
+    padding-bottom: var(--space-3);
+    padding-right: var(--space-3);
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: -5px;
+    bottom: -5px;
+    width: 0.5px;
+    background: var(--color-border-black-subtle);
+    pointer-events: none;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: -5px;
+    bottom: -5px;
+    width: 0.5px;
+    background: var(--color-border-black-subtle);
+    pointer-events: none;
   }
 }
 
 // ── Right column ──────────────────────────────────────────────────────────────
 
 .right {
+  position: relative;
+  z-index: 1; // stacks above .connectorWrap (z-index: 0)
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 0; // grid child — prevents content from forcing column wider than 1fr
 
   @include tablet-down {
     justify-content: flex-start;
+  }
+
+  @include mobile {
+    justify-content: center;
   }
 }
 
@@ -166,7 +329,6 @@
   max-width: 520px;
   min-height: 440px;
   background: var(--color-gray-light-bg); // near-white panel bg matching Figma #f8f6f6
-  border-radius: var(--radius-xl);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -177,7 +339,8 @@
 
   @include mobile {
     min-height: auto;
-    padding: var(--space-6);
+    padding: var(--space-5); // tighter on mobile so form content has more width
+    box-shadow: none; // 62px blur extends ~27px past viewport right edge on mobile — causes horizontal overflow
   }
 }
 
@@ -189,10 +352,112 @@
   opacity: 0.45;
   pointer-events: none;
   user-select: none;
+
+  @include mobile {
+    display: none; // scale(2.8) pushes element ~270px beyond viewport right edge on mobile
+  }
 }
 
 .cardWrap {
   position: relative;
   z-index: 1;
   width: 100%;
+}
+
+// ── Outer decorative frame (wraps the entire glow panel) ──────────────────────
+// 4-line border + 4 concentric-circle dots at each intersection, matching
+// the login_border pattern used elsewhere in the project.
+
+.formFrame {
+  position: relative;
+  width: 100%;
+
+  // top and bottom horizontal lines
+  border-top: 1px solid var(--color-gray-300);
+  border-bottom: 1px solid var(--color-gray-300);
+
+  // horizontal padding pushes visualWrap inward so vertical lines at left/right: 30px are exposed
+  // vertical padding creates the gap between the border lines and the glow panel
+  padding: var(--space-4) var(--space-10); // 16px 56px — 56 > 30 so lines are always outside the panel
+
+  // left vertical hairline
+  &::before {
+    content: '';
+    position: absolute;
+    top: -9px; // design-specific: extends slightly past the horizontal line
+    bottom: -9px;
+    left: 30px; // design-specific: aligns with dot center (left: 25px + half-dot 5px = 30px)
+    width: 0.3px; // design-specific: Figma-exact hairline stroke
+    background: var(--color-gray-300);
+    pointer-events: none;
+  }
+
+  // right vertical hairline
+  &::after {
+    content: '';
+    position: absolute;
+    top: -9px;
+    bottom: -9px;
+    right: 46px;
+    width: 0.3px;
+    background: var(--color-gray-300);
+    pointer-events: none;
+  }
+
+  @include mobile {
+    padding: var(--space-3) 0; // 0 horizontal — form card takes full section width on mobile
+
+    &::before,
+    &::after {
+      display: none; // hairlines can't align at 0 padding — hide on mobile
+    }
+  }
+}
+
+// ── Corner dots ───────────────────────────────────────────────────────────────
+// Each dot: white outer disc → gray ring → gray-medium inner core.
+
+.dot {
+  position: absolute;
+  width: 10px; // design-specific: Figma-exact dot diameter
+  height: 10px;
+  border-radius: var(--radius-full);
+  background: var(--color-white-primary);
+  box-shadow: 0 0.3px 0.4px var(--color-black-alpha-31); // design-specific: Figma-exact dot shadow
+  z-index: 1;
+  pointer-events: none;
+
+  // gray ring
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0.8px; // design-specific: Figma-exact ring inset
+    border-radius: var(--radius-full);
+    background: var(--color-gray-300);
+  }
+
+  // inner core
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 1.6px; // design-specific: Figma-exact inner dot inset
+    border-radius: var(--radius-full);
+    background: var(--color-gray-medium);
+  }
+}
+
+// dot left edge (25px) + half-dot (5px) = 30px → lands on vertical line
+.topLeft    { top: -5px;    left: 25px;  }
+.bottomLeft { bottom: -5px; left: 25px;  }
+.topRight   { top: -5px;    right: 41px; }
+.bottomRight{ bottom: -5px; right: 41px; }
+
+// dots sit at fixed positions tied to hairline offset — hide when hairlines are hidden
+@include mobile {
+  .topLeft,
+  .bottomLeft,
+  .topRight,
+  .bottomRight {
+    display: none;
+  }
 }

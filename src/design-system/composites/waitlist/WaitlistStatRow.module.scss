@@ -9,7 +9,8 @@
   @include mobile {
     margin-top: var(--space-6);
     flex-wrap: wrap;
-    gap: var(--space-4);
+    justify-content: center;
+    gap: 0;
   }
 }
 
@@ -28,12 +29,21 @@
 .stat {
   display: flex;
   align-items: center;
+
+  @include mobile {
+    flex: 0 0 50%;
+    justify-content: center;
+  }
 }
 
 // Corner bracket decoration using background-image gradient technique
 .bracketBox {
   position: relative;
   padding: var(--space-3) var(--space-5);
+
+  @include mobile {
+    padding: var(--space-2) var(--space-3); // 8px 12px — compact bracket box on mobile
+  }
   background-image:
     linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
     linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
@@ -62,6 +72,8 @@
     2px 12px,
     12px 2px;
   background-repeat: no-repeat;
+
+  text-align: center;
 }
 
 .value {
@@ -72,6 +84,10 @@
   line-height: var(--leading-snug);
   letter-spacing: var(--tracking-h3);
   margin: 0;
+
+  @include mobile {
+    font-size: var(--text-h3); // 22px on mobile — all 3 items fit on one row
+  }
 }
 
 .label {

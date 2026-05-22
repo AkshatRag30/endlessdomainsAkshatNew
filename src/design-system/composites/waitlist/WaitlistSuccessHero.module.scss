@@ -1,0 +1,597 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Corner-dot decoration (shared by both inner panels) ────────────────────────
+// 3 radial-gradient layers per dot × 4 corners = 12 gradients total
+
+%cornerDots {
+  background-image:
+    radial-gradient(circle, var(--color-gray-medium) 3.4px, transparent 3.4px),
+    radial-gradient(circle, var(--color-gray-300)    4.2px, transparent 4.2px),
+    radial-gradient(circle, var(--color-white-primary) 5px, transparent   5px),
+    radial-gradient(circle, var(--color-gray-medium) 3.4px, transparent 3.4px),
+    radial-gradient(circle, var(--color-gray-300)    4.2px, transparent 4.2px),
+    radial-gradient(circle, var(--color-white-primary) 5px, transparent   5px),
+    radial-gradient(circle, var(--color-gray-medium) 3.4px, transparent 3.4px),
+    radial-gradient(circle, var(--color-gray-300)    4.2px, transparent 4.2px),
+    radial-gradient(circle, var(--color-white-primary) 5px, transparent   5px),
+    radial-gradient(circle, var(--color-gray-medium) 3.4px, transparent 3.4px),
+    radial-gradient(circle, var(--color-gray-300)    4.2px, transparent 4.2px),
+    radial-gradient(circle, var(--color-white-primary) 5px, transparent   5px);
+  background-position:
+    var(--space-2) var(--space-2),
+    var(--space-2) var(--space-2),
+    var(--space-2) var(--space-2),
+    calc(100% - var(--space-2)) var(--space-2),
+    calc(100% - var(--space-2)) var(--space-2),
+    calc(100% - var(--space-2)) var(--space-2),
+    var(--space-2) calc(100% - var(--space-2)),
+    var(--space-2) calc(100% - var(--space-2)),
+    var(--space-2) calc(100% - var(--space-2)),
+    calc(100% - var(--space-2)) calc(100% - var(--space-2)),
+    calc(100% - var(--space-2)) calc(100% - var(--space-2)),
+    calc(100% - var(--space-2)) calc(100% - var(--space-2));
+  background-size: 10px 10px; // design-specific: 10px dot area for 3-ring concentric effect
+  background-repeat: no-repeat;
+}
+
+// ── Section shell ─────────────────────────────────────────────────────────────
+
+.section {
+  background: var(--color-white-primary);
+  padding: var(--space-14) var(--container-padding-x);
+  overflow-x: clip;
+
+  @include tablet-down {
+    padding: var(--space-12) var(--space-6);
+  }
+
+  @include mobile {
+    padding: var(--space-9) var(--space-4);
+  }
+}
+
+.inner {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: start;
+  gap: var(--space-11);
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+
+  @include tablet-down {
+    grid-template-columns: 1fr;
+    gap: var(--space-9);
+  }
+
+  @include mobile {
+    gap: var(--space-7); // 32px between left text and referral card on mobile
+  }
+}
+
+// ── Left column ───────────────────────────────────────────────────────────────
+
+.left {
+  display: flex;
+  flex-direction: column;
+  max-width: 640px;
+  min-width: 0; // grid child — prevents content from forcing column wider than 1fr
+
+  @include tablet-down {
+    max-width: 100%;
+  }
+}
+
+// ── Phase tag ─────────────────────────────────────────────────────────────────
+
+.phaseTag {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  margin-bottom: var(--space-6);
+
+  @include mobile {
+    margin-bottom: var(--space-4);
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  background-image:
+    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
+    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
+    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
+    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
+    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
+    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
+    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
+    linear-gradient(var(--color-blue-primary), var(--color-blue-primary));
+  background-position:
+    top left,
+    top left,
+    top right,
+    top right,
+    bottom left,
+    bottom left,
+    bottom right,
+    bottom right;
+  background-size:
+    2px 10px,
+    10px 2px,
+    2px 10px,
+    10px 2px,
+    2px 10px,
+    10px 2px,
+    2px 10px,
+    10px 2px;
+  background-repeat: no-repeat;
+}
+
+.phaseText {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+  letter-spacing: 0.08em; // design-specific: Figma-exact phase tag tracking
+  text-transform: uppercase;
+  padding: var(--space-2) var(--space-4);
+  margin: 0;
+
+  @include mobile {
+    white-space: normal;
+    letter-spacing: 0.04em; // reduced from 0.08em to save horizontal space at narrow viewports
+  }
+}
+
+// ── Heading ───────────────────────────────────────────────────────────────────
+
+.heading {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2); // 55px
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black-primary);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-h2);
+  margin: 0 0 var(--space-6) 0;
+
+  @include tablet-down {
+    font-size: var(--text-display-md);
+  }
+
+  @include mobile {
+    font-size: var(--text-display-sm);
+    margin-bottom: var(--space-5);
+  }
+}
+
+.accent {
+  background: none;
+  color: var(--color-blue-primary);
+  padding: 0;
+}
+
+// ── Description ───────────────────────────────────────────────────────────────
+
+.description {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-normal); // 20px
+  font-weight: var(--font-weight-regular);
+  color: var(--color-gray-dark);
+  line-height: var(--leading-body);
+  margin: 0 0 var(--space-8) 0;
+
+  @include mobile {
+    font-size: var(--text-body-small);
+    margin-bottom: var(--space-6);
+  }
+}
+
+// ── Stats row ─────────────────────────────────────────────────────────────────
+
+.statsRow {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--space-8);
+
+  @include mobile {
+    flex-wrap: nowrap;
+    justify-content: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-6);
+  }
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+}
+
+.statDivider {
+  width: 1px;
+  height: 48px;
+  background: var(--color-gray-300);
+  flex-shrink: 0;
+  margin: 0 var(--space-7);
+
+  @include mobile {
+    display: none;
+  }
+}
+
+.bracketBox {
+  padding: var(--space-3) var(--space-5);
+  text-align: center;
+  background-image:
+    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
+    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
+    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
+    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
+    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
+    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
+    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
+    linear-gradient(var(--color-blue-primary), var(--color-blue-primary));
+  background-position:
+    top left,
+    top left,
+    top right,
+    top right,
+    bottom left,
+    bottom left,
+    bottom right,
+    bottom right;
+  background-size:
+    2px 12px,
+    12px 2px,
+    2px 12px,
+    12px 2px,
+    2px 12px,
+    12px 2px,
+    2px 12px,
+    12px 2px;
+  background-repeat: no-repeat;
+}
+
+.statValue {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-display-sm); // 28px
+  font-weight: var(--font-weight-bold);
+  color: var(--color-blue-primary);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-h3);
+  margin: 0;
+}
+
+.statLabel {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  margin: 0;
+  margin-top: var(--space-1);
+  white-space: nowrap;
+}
+
+// ── How to Climb ──────────────────────────────────────────────────────────────
+
+.climbSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.climbHeading {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small); // 17px
+  font-weight: var(--font-weight-bold);
+  color: var(--color-blue-primary);
+  margin: 0;
+}
+
+.climbList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  padding-left: var(--space-4); // room for outside-positioned bullets
+}
+
+.climbItem {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav); // 14px
+  font-weight: var(--font-weight-regular);
+  color: var(--color-gray-dark);
+  line-height: var(--leading-body);
+  list-style: disc; // outside position (default) — wrapped text indents correctly
+  margin: 0;
+}
+
+// ── Right column ──────────────────────────────────────────────────────────────
+
+.right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0; // grid child — prevents content from forcing column wider than 1fr
+
+  @include tablet-down {
+    justify-content: flex-start;
+  }
+
+  @include mobile {
+    justify-content: center;
+  }
+}
+
+// ── Outer decorative frame ────────────────────────────────────────────────────
+
+.formFrame {
+  position: relative;
+  width: 100%;
+
+  border-top: 1px solid var(--color-gray-300);
+  border-bottom: 1px solid var(--color-gray-300);
+  padding: var(--space-4) var(--space-10);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -9px;
+    bottom: -9px;
+    left: 30px; // design-specific: aligns with dot center
+    width: 0.3px;
+    background: var(--color-gray-300);
+    pointer-events: none;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: -9px;
+    bottom: -9px;
+    right: 46px;
+    width: 0.3px;
+    background: var(--color-gray-300);
+    pointer-events: none;
+  }
+
+  @include mobile {
+    padding: var(--space-3) 0; // 0 horizontal — card takes full section width on mobile
+
+    &::before,
+    &::after {
+      display: none; // hairlines can't align at 0 padding — hide on mobile
+    }
+  }
+}
+
+// ── Corner dots ───────────────────────────────────────────────────────────────
+
+.dot {
+  position: absolute;
+  width: 10px; // design-specific: Figma-exact dot diameter
+  height: 10px;
+  border-radius: var(--radius-full);
+  background: var(--color-white-primary);
+  box-shadow: 0 0.3px 0.4px var(--color-black-alpha-31);
+  z-index: 1;
+  pointer-events: none;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0.8px;
+    border-radius: var(--radius-full);
+    background: var(--color-gray-300);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 1.6px;
+    border-radius: var(--radius-full);
+    background: var(--color-gray-medium);
+  }
+}
+
+.topLeft    { top: -5px;    left: 25px;  }
+.bottomLeft { bottom: -5px; left: 25px;  }
+.topRight   { top: -5px;    right: 41px; }
+.bottomRight{ bottom: -5px; right: 41px; }
+
+// ── Referral wrap (glow panel) ────────────────────────────────────────────────
+
+.referralWrap {
+  width: 100%;
+  max-width: 520px;
+  background: var(--color-gray-light-bg);
+  // design-specific: Figma-exact blue glow from top-left
+  box-shadow: -35px -11px 62px 0 rgba(38, 57, 237, 0.1);
+  padding: var(--space-8);
+
+  @include mobile {
+    padding: var(--space-5); // 20px — tighter card padding on mobile
+    box-shadow: none; // -35 offset + 62px blur extends +27px past viewport right edge on mobile
+  }
+}
+
+// ── Referral card (fields + social) ──────────────────────────────────────────
+
+.referralCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0; // panels sit flush against connector ticks
+}
+
+// ── Inner panels (bordered, with corner dots) ─────────────────────────────────
+
+.panel {
+  @extend %cornerDots;
+  background-color: var(--color-white-primary); // background-color preserves corner dots from @extend
+  border: 2px solid var(--color-gray-300);
+  box-shadow: 0 4px 12px var(--color-black-alpha-05);
+}
+
+.panelBody {
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+
+  @include mobile {
+    padding: var(--space-5);
+    gap: var(--space-4);
+  }
+}
+
+// ── Connector ticks (between panels) ─────────────────────────────────────────
+
+.connTicks {
+  display: flex;
+  justify-content: space-around;
+  padding: 0 var(--space-9);
+}
+
+.connTick {
+  width: 1px; // design-specific: tick stroke width — no token
+  height: var(--space-4);
+  background: var(--color-gray-200);
+}
+
+// ── Field group ───────────────────────────────────────────────────────────────
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.fieldLabel {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav); // 14px
+  font-weight: var(--font-weight-regular);
+  color: var(--color-gray-dark);
+  margin: 0;
+}
+
+.inputRow {
+  display: flex;
+  align-items: center;
+  background: var(--color-white-primary);
+  border: 1px solid var(--color-gray-200);
+  height: 44px; // design-specific: Figma-exact field row height
+  overflow: hidden;
+}
+
+.inputValue {
+  flex: 1;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav); // 14px
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+  padding: 0 var(--space-4);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.copyBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 100%;
+  background: linear-gradient(to bottom, var(--color-surface-mid), var(--color-black-hover));
+  border: none;
+  border-left: 1px solid var(--color-gray-200);
+  color: var(--color-white-primary);
+  font-size: var(--text-body-small);
+  cursor: pointer;
+
+  &:hover {
+    background: linear-gradient(to bottom, var(--color-gray-darker), var(--color-black-primary));
+  }
+
+  @include focus-ring;
+}
+
+// ── Quote ─────────────────────────────────────────────────────────────────────
+
+.quote {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav); // 14px
+  font-weight: var(--font-weight-regular);
+  color: var(--color-gray-dark);
+  line-height: var(--leading-body);
+  margin: 0;
+}
+
+// ── Social section ────────────────────────────────────────────────────────────
+
+.socialSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.socialDividerLine {
+  width: 100%;
+  height: 1px;
+  background: var(--color-gray-200);
+}
+
+.socialLabel {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav); // 14px
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-dark);
+  margin: 0;
+}
+
+.socialIcons {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.socialBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  background: var(--color-gray-light);
+  color: var(--color-gray-dark);
+  font-size: var(--text-body-small);
+  text-decoration: none;
+  transition: background 150ms ease, color 150ms ease;
+
+  &:hover {
+    background: var(--color-blue-primary);
+    color: var(--color-white-primary);
+  }
+
+  @include focus-ring;
+}
+
+// ── Mobile overrides ──────────────────────────────────────────────────────────
+
+@include mobile {
+  .bracketBox {
+    padding: var(--space-2) var(--space-3); // compact bracket box on mobile
+  }
+
+  .statValue {
+    font-size: var(--text-normal); // 20px on mobile — smaller than desktop 28px so all 3 fit
+  }
+
+  // dots sit at fixed positions tied to hairline offset — hide when hairlines are hidden
+  .topLeft,
+  .bottomLeft,
+  .topRight,
+  .bottomRight {
+    display: none;
+  }
+}

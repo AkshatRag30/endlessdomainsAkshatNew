@@ -1,0 +1,625 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Full-screen overlay ───────────────────────────────────────────────────────
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: var(--color-white-primary);
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+// ── Nav ───────────────────────────────────────────────────────────────────────
+
+.nav {
+  width: 100%;
+  background: var(--color-white-primary);
+  height: 108px; // design-specific: Figma-exact nav height
+  flex-shrink: 0;
+
+  @include mobile {
+    height: 72px;
+  }
+}
+
+.navInner {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 var(--container-padding-x);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  @include tablet-down {
+    padding: 0 var(--space-6);
+  }
+
+  @include mobile {
+    padding: 0 var(--space-4); // --container-padding-x (80px) leaves only 230px content on 390px mobile
+  }
+}
+
+.navLogo {
+  display: block;
+  height: auto;
+}
+
+.logoutBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2) var(--space-7);
+  // design-specific: Figma-exact logout button gradient and border-radius
+  background: linear-gradient(to bottom right, var(--color-blue-primary), var(--color-purple-primary));
+  color: var(--color-white-primary);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-bold);
+  text-transform: capitalize;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  letter-spacing: var(--tracking-btn);
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  @include focus-ring;
+}
+
+// ── Hero section ──────────────────────────────────────────────────────────────
+
+.hero {
+  background: var(--color-white-primary);
+  padding-top: var(--space-9);
+  padding-bottom: 0;
+  position: relative;
+
+  @include mobile {
+    padding-top: var(--space-6);
+  }
+}
+
+.heroInner {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 var(--container-padding-x);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  text-align: center;
+
+  @include mobile {
+    padding: 0 var(--space-4);
+    gap: var(--space-4);
+  }
+}
+
+// ── "LIVE RANKINGS" corner-bracket tag ────────────────────────────────────────
+
+.liveTag {
+  display: inline-flex;
+  align-items: center;
+  align-self: center;
+  background-image:
+    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
+    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
+    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
+    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
+    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
+    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
+    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
+    linear-gradient(var(--color-blue-primary), var(--color-blue-primary));
+  background-position:
+    top left,
+    top left,
+    top right,
+    top right,
+    bottom left,
+    bottom left,
+    bottom right,
+    bottom right;
+  background-size:
+    2px 10px,
+    10px 2px,
+    2px 10px,
+    10px 2px,
+    2px 10px,
+    10px 2px,
+    2px 10px,
+    10px 2px;
+  background-repeat: no-repeat;
+}
+
+.liveTagText {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+  letter-spacing: 0.08em; // design-specific: Figma-exact tag tracking
+  text-transform: uppercase;
+  padding: var(--space-2) var(--space-4);
+}
+
+// ── Heading with SVG background ───────────────────────────────────────────────
+
+.headingWrap {
+  display: grid;
+  place-items: center;
+  width: 100%;
+}
+
+.headingBg {
+  grid-column: 1;
+  grid-row: 1;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+}
+
+.heroHeading {
+  grid-column: 1;
+  grid-row: 1;
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2); // 55px
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  line-height: var(--leading-snug);
+  text-transform: capitalize;
+  margin: 0;
+  // design-specific: Figma-exact text shadow on heading
+  text-shadow: 0 1px 1.3px var(--color-black-alpha-25);
+
+  @include tablet-down {
+    font-size: var(--text-display-md);
+  }
+
+  @include mobile {
+    font-size: var(--text-display-sm);
+  }
+}
+
+.heroSubtitle {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-body); // 22px
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-body);
+  line-height: var(--leading-normal);
+  max-width: 713px; // design-specific: Figma-exact subtitle max-width
+  margin: 0;
+  text-align: center;
+
+  @include mobile {
+    font-size: var(--text-normal);
+  }
+}
+
+// decorative horizontal line below hero content
+.heroDecor {
+  margin-top: var(--space-9);
+  width: 100%;
+  height: 1px;
+  background: var(--color-gray-200);
+}
+
+// ── Alert ─────────────────────────────────────────────────────────────────────
+
+.alertWrap {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-6) var(--container-padding-x);
+  background: var(--color-white-primary);
+
+  @include mobile {
+    padding: var(--space-4);
+  }
+}
+
+.alert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  width: 100%;
+  max-width: 972px; // design-specific: Figma-exact alert max-width
+  padding: var(--space-2-5) var(--space-5);
+  // design-specific: Figma-exact red frosted glass alert
+  background: rgba(239, 68, 68, 0.3);
+  backdrop-filter: blur(262px);
+  border: 1px solid var(--color-search-border-a);
+}
+
+.alertContent {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.alertIcon {
+  font-size: var(--text-body-small);
+  color: #930303; // design-specific: Figma-exact dark red icon color
+  flex-shrink: 0;
+}
+
+.alertText {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: #930303; // design-specific: Figma-exact dark red alert text
+  text-transform: capitalize;
+  margin: 0;
+  letter-spacing: 0.07px; // design-specific: Figma-exact tracking on alert
+}
+
+.alertClose {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #930303;
+  flex-shrink: 0;
+  font-size: var(--text-body-small);
+
+  &:hover {
+    opacity: 0.7;
+  }
+}
+
+// ── Table section ─────────────────────────────────────────────────────────────
+
+.tableSection {
+  background: var(--color-gray-light-bg);
+  padding: var(--space-6) 0 var(--space-8);
+  flex: 1;
+}
+
+.tableSectionInner {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 var(--container-padding-x);
+
+  @include tablet-down {
+    padding: 0 var(--space-6);
+  }
+
+  @include mobile {
+    padding: 0 var(--space-4);
+  }
+}
+
+// ── Live status bar ───────────────────────────────────────────────────────────
+
+.liveBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-5);
+
+  @include mobile {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-3);
+  }
+}
+
+.liveStatus {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2-5);
+  background: var(--color-white-primary);
+  border: 1px solid var(--color-gray-200);
+  padding: 0 var(--space-4);
+  height: 39px; // design-specific: Figma-exact status bar height
+}
+
+.liveDot {
+  display: block;
+  flex-shrink: 0;
+  width: 9px; // design-specific: Figma-exact dot size
+  height: 9px;
+  border-radius: var(--radius-full);
+  background: var(--color-status-available);
+  box-shadow: 0 0 6px 1px rgba(34, 197, 94, 0.5); // design-specific: green glow
+}
+
+.liveText {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  white-space: nowrap;
+  text-transform: capitalize;
+
+  @include mobile {
+    white-space: normal;
+    font-size: var(--text-small-12);
+    line-height: var(--leading-normal);
+  }
+}
+
+.enterOsBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2-5);
+  height: 39px; // design-specific: Figma-exact button height
+  padding: 0 var(--space-5);
+  background: linear-gradient(to bottom, var(--color-surface-mid), var(--color-black-hover));
+  color: var(--color-white-primary);
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  text-transform: capitalize;
+  border: none;
+  cursor: pointer;
+  filter: drop-shadow(3px 3px 1.5px var(--color-black-alpha-15));
+  box-shadow: inset 0 1px 1px var(--color-white-alpha-25);
+  white-space: nowrap;
+
+  &:hover {
+    background: linear-gradient(to bottom, var(--color-gray-darker), var(--color-black-primary));
+  }
+
+  @include mobile {
+    align-self: center;
+  }
+}
+
+.enterOsIcon {
+  font-size: 18px; // design-specific: Figma-exact icon size
+  flex-shrink: 0;
+}
+
+// ── Table ─────────────────────────────────────────────────────────────────────
+
+.tableWrap {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: var(--space-5);
+
+  @include mobile {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 0;
+  }
+}
+
+.table {
+  width: 100%;
+  min-width: 520px; // prevents table from collapsing below readable size on mobile (tableWrap scrolls)
+  border-collapse: collapse;
+  background: var(--color-white-primary);
+}
+
+.th {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  text-align: left;
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-gray-200);
+  letter-spacing: var(--tracking-nav);
+  text-transform: capitalize;
+  white-space: nowrap;
+
+  @include mobile {
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-small-12);
+  }
+}
+
+.tr {
+  border-bottom: 1px solid var(--color-gray-200);
+  transition: background 150ms ease;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: var(--color-gray-light);
+  }
+}
+
+.td {
+  padding: var(--space-4) var(--space-5);
+  vertical-align: middle;
+
+  @include mobile {
+    padding: var(--space-3) var(--space-4);
+  }
+}
+
+// ── Rank cell ─────────────────────────────────────────────────────────────────
+
+.rankNum {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black-primary);
+  margin: 0;
+}
+
+// ── Node cell ─────────────────────────────────────────────────────────────────
+
+.nodePill {
+  display: inline-flex;
+  align-items: center;
+  background: var(--color-black-primary);
+  color: var(--color-white-primary);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.03em; // design-specific: Figma-exact tracking on wallet address
+  text-transform: capitalize;
+  padding: var(--space-1-5) var(--space-3);
+  white-space: nowrap;
+}
+
+// ── Chain cell ────────────────────────────────────────────────────────────────
+
+.chainCell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2-5);
+}
+
+.chainAvatar {
+  width: 26px; // design-specific: Figma-exact chain token avatar size
+  height: 26px;
+  border-radius: var(--radius-full);
+  background: var(--color-gray-dark);
+  border: 0.565px solid var(--color-blue-primary-alpha-30);
+  box-shadow: 0 0.565px 3px var(--color-blue-primary-alpha-20);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-white-primary);
+  font-size: var(--text-nav);
+  flex-shrink: 0;
+}
+
+.chainUsername {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  margin: 0;
+  white-space: nowrap;
+}
+
+// ── Points cell ───────────────────────────────────────────────────────────────
+
+.pointsCell {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black-primary);
+  margin: 0;
+}
+
+// ── Referrals cell ────────────────────────────────────────────────────────────
+
+.referralsCell {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  margin: 0;
+}
+
+// ── Pagination ────────────────────────────────────────────────────────────────
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--space-5);
+
+  @include mobile {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    justify-content: flex-start;
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
+    padding-bottom: var(--space-2);
+  }
+}
+
+.paginationGroup {
+  display: inline-flex;
+  align-items: stretch;
+  background: var(--color-white-primary);
+  border: 1px solid var(--color-gray-200);
+  box-shadow: 0 1px 1px var(--color-black-alpha-05);
+  overflow: hidden;
+}
+
+.pageDivider {
+  width: 1px;
+  background: var(--color-gray-200);
+  flex-shrink: 0;
+}
+
+.pageNavBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 38px; // design-specific: Figma-exact pagination button height
+  padding: 0 var(--space-3);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-dark);
+  white-space: nowrap;
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  &:not(:disabled):hover {
+    background: var(--color-gray-light);
+  }
+
+  @include focus-ring;
+
+  @include mobile {
+    padding: 0 var(--space-2);
+    font-size: var(--text-small-12);
+  }
+}
+
+.pageNum {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px; // design-specific: Figma-exact pagination item width
+  height: 38px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-dark);
+
+  &:hover:not(.pageNumActive) {
+    background: var(--color-gray-light);
+  }
+
+  @include focus-ring;
+}
+
+.pageNumActive {
+  background: var(--color-gray-200);
+  color: var(--color-gray-dark);
+  cursor: default;
+}
+
+.pageDots {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px; // design-specific: Figma-exact pagination item width
+  height: 38px;
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-dark);
+}

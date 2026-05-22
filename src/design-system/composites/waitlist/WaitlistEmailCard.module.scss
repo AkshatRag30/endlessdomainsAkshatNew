@@ -7,39 +7,55 @@
   flex-direction: column;
   width: 100%;
   max-width: 480px; // design-specific: Figma-exact card width for right column
-  position: relative;
-
-  // design-specific: Figma outer-frame top and bottom horizontal border lines
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    height: 1px; // design-specific: border line stroke — no spacing token
-    background: var(--color-gray-300);
-    pointer-events: none;
-  }
-
-  &::before { top: 0; }
-  &::after { bottom: 0; }
-
-  // design-specific: Figma outer-frame 4 corner dot markers (7px each)
-  background-image:
-    radial-gradient(circle, var(--color-gray-300) 3px, transparent 3px),
-    radial-gradient(circle, var(--color-gray-300) 3px, transparent 3px),
-    radial-gradient(circle, var(--color-gray-300) 3px, transparent 3px),
-    radial-gradient(circle, var(--color-gray-300) 3px, transparent 3px);
-  background-position:
-    0 0,
-    100% 0,
-    0 100%,
-    100% 100%;
-  background-size: 7px 7px;
-  background-repeat: no-repeat;
 
   @include mobile {
     max-width: 100%;
+  }
+}
+
+// ── Mobile overrides ───────────────────────────────────────────────────────────
+
+@include mobile {
+  .stepBar {
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .connTicks {
+    padding: 0 var(--space-3);
+  }
+
+  .body {
+    padding: var(--space-5);
+    gap: var(--space-5);
+  }
+
+  .heading {
+    font-size: var(--text-h3); // 22px on mobile token — compact form heading
+  }
+
+  .textInput,
+  .chainTrigger,
+  .walletConnectBtn {
+    height: 40px; // design-specific: Figma mobile input height — no token match
+  }
+
+  .stepPill {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-small-12);
+  }
+
+  .reviewRow {
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .reviewLabel {
+    width: 70px; // design-specific: slightly narrower on mobile to give value more room
+  }
+
+  .pointsBanner {
+    padding: var(--space-2) var(--space-3);
   }
 }
 
@@ -47,18 +63,35 @@
 // 4 radial-gradient dots at each corner — shared by step bar and card panels
 
 %cornerDots {
-  // design-specific: 5px panel corner dots — Figma inner-panel Group 2085666142 treatment
+  // design-specific: 10px concentric-circle dot at each corner — white outer → gray-300 ring → gray-medium core
+  // 3 radial-gradient layers per dot × 4 corners = 12 gradients total (same visual as hero corner dots)
   background-image:
-    radial-gradient(circle, var(--color-gray-medium) 2.5px, transparent 2.5px),
-    radial-gradient(circle, var(--color-gray-medium) 2.5px, transparent 2.5px),
-    radial-gradient(circle, var(--color-gray-medium) 2.5px, transparent 2.5px),
-    radial-gradient(circle, var(--color-gray-medium) 2.5px, transparent 2.5px);
+    radial-gradient(circle, var(--color-gray-medium) 3.4px, transparent 3.4px),
+    radial-gradient(circle, var(--color-gray-300)    4.2px, transparent 4.2px),
+    radial-gradient(circle, var(--color-white-primary) 5px, transparent   5px),
+    radial-gradient(circle, var(--color-gray-medium) 3.4px, transparent 3.4px),
+    radial-gradient(circle, var(--color-gray-300)    4.2px, transparent 4.2px),
+    radial-gradient(circle, var(--color-white-primary) 5px, transparent   5px),
+    radial-gradient(circle, var(--color-gray-medium) 3.4px, transparent 3.4px),
+    radial-gradient(circle, var(--color-gray-300)    4.2px, transparent 4.2px),
+    radial-gradient(circle, var(--color-white-primary) 5px, transparent   5px),
+    radial-gradient(circle, var(--color-gray-medium) 3.4px, transparent 3.4px),
+    radial-gradient(circle, var(--color-gray-300)    4.2px, transparent 4.2px),
+    radial-gradient(circle, var(--color-white-primary) 5px, transparent   5px);
   background-position:
     var(--space-2) var(--space-2),
+    var(--space-2) var(--space-2),
+    var(--space-2) var(--space-2),
+    calc(100% - var(--space-2)) var(--space-2),
+    calc(100% - var(--space-2)) var(--space-2),
     calc(100% - var(--space-2)) var(--space-2),
     var(--space-2) calc(100% - var(--space-2)),
+    var(--space-2) calc(100% - var(--space-2)),
+    var(--space-2) calc(100% - var(--space-2)),
+    calc(100% - var(--space-2)) calc(100% - var(--space-2)),
+    calc(100% - var(--space-2)) calc(100% - var(--space-2)),
     calc(100% - var(--space-2)) calc(100% - var(--space-2));
-  background-size: 5px 5px; // design-specific: Figma-exact ~5.2px corner dot diameter
+  background-size: 10px 10px; // design-specific: 10px dot area for 3-ring concentric effect
   background-repeat: no-repeat;
 }
 
@@ -67,9 +100,8 @@
 .stepBar {
   @extend %cornerDots;
   background-color: var(--color-gray-light-bg); // near-white panel bg matching Figma #f7f7f7
-  border: 0.5px solid var(--color-black-alpha-10); // design-specific: Figma-exact 0.5px subtle border
-  border-radius: var(--radius-sm);
-  padding: var(--space-3) var(--space-4);
+  border: 2px solid var(--color-gray-300); // design-specific: Figma-exact 0.5px subtle border
+  padding: var(--space-4) var(--space-6);
   // design-specific: Figma-exact drop shadow + inset border overlay on step bar panel
   box-shadow: 0 4px 12px var(--color-black-alpha-05), inset 0 0 0 1px var(--color-border-black-subtle);
 }
@@ -84,7 +116,7 @@
 
 .stepPill {
   flex-shrink: 0;
-  padding: var(--space-1) var(--space-3);
+  padding: var(--space-3) var(--space-6);
   border-radius: var(--radius-sm);
   font-family: var(--font-satoshi);
   font-size: var(--text-small-13);
@@ -133,8 +165,7 @@
 .card {
   @extend %cornerDots;
   background-color: var(--color-white-primary); // use background-color so corner dots from @extend are not reset
-  border: 0.5px solid var(--color-black-alpha-10); // design-specific: Figma-exact 0.5px subtle border
-  border-radius: var(--radius-sm);
+  border: 2px solid var(--color-gray-300); // design-specific: Figma-exact 0.5px subtle border
   // design-specific: Figma-exact drop shadow + inset border overlay on form card panel
   box-shadow: 0 4px 12px var(--color-black-alpha-05), inset 0 0 0 1px var(--color-border-black-subtle);
 }
@@ -142,10 +173,10 @@
 // ── Card body ──────────────────────────────────────────────────────────────────
 
 .body {
-  padding: var(--space-6);
+  padding: var(--space-7);
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: var(--space-6);
 }
 
 .heading {
@@ -186,7 +217,6 @@
   height: 48px; // design-specific: Figma-exact input height — no token match
   padding: 0 var(--space-4);
   border: 1.5px solid var(--color-gray-300);
-  border-radius: var(--radius-sm);
   font-family: var(--font-satoshi);
   font-size: var(--text-body-small);
   color: var(--color-black-primary);
@@ -208,6 +238,7 @@
 .textInputDark {
   background: var(--color-black-primary);
   color: var(--color-white-primary);
+  border-radius: 0;
   border-color: var(--color-black-primary);
   font-family: monospace; // design-specific: wallet address — system monospace, no token
 
@@ -230,6 +261,7 @@
   color: var(--color-gray-dark);
   margin: 0;
   line-height: var(--leading-body);
+  text-align: center;
 }
 
 // ── Chain selector dropdown ────────────────────────────────────────────────────
@@ -246,7 +278,7 @@
   height: 48px; // design-specific: matches input height
   padding: 0 var(--space-4);
   border: 1.5px solid var(--color-gray-300);
-  border-radius: var(--radius-sm);
+  border-radius: 0;
   background: var(--color-white-primary);
   cursor: pointer;
   font-family: var(--font-satoshi);
@@ -262,8 +294,6 @@
 
   .chainDropdownOpen & {
     border-color: var(--color-blue-primary);
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
   }
 }
 
@@ -307,8 +337,8 @@
   right: 0;
   border: 1.5px solid var(--color-blue-primary);
   border-top: none;
-  border-bottom-left-radius: var(--radius-sm);
-  border-bottom-right-radius: var(--radius-sm);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
   background: var(--color-white-primary);
   list-style: none;
   margin: 0;
@@ -351,19 +381,20 @@
   justify-content: center;
   width: 100%;
   height: 48px; // design-specific: matches input height
-  border: 1.5px solid var(--color-gray-300);
-  border-radius: var(--radius-sm);
-  background: var(--color-blue-primary-alpha-07);
+  border: 1.5px solid var(--color-blue-primary-alpha-30);
+  background: var(--color-white-primary);
   font-family: var(--font-satoshi);
   font-size: var(--text-body-small);
   font-weight: var(--font-weight-medium);
   color: var(--color-black-primary);
   cursor: pointer;
-  transition: background 150ms ease, border-color 150ms ease;
+  box-shadow: 0 0 0 6px var(--color-blue-primary-alpha-07), 0 0 20px var(--color-blue-primary-alpha-13);
+  transition: background 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
 
   &:hover {
-    background: var(--color-blue-primary-alpha-13);
-    border-color: var(--color-blue-primary-alpha-30);
+    background: var(--color-blue-primary-alpha-07);
+    border-color: var(--color-blue-primary-alpha-50);
+    box-shadow: 0 0 0 6px var(--color-blue-primary-alpha-13), 0 0 24px var(--color-blue-primary-alpha-18);
   }
 
   &:focus-visible {
@@ -388,8 +419,8 @@
   align-items: center;
   gap: var(--space-2);
   padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-sm);
-  background: rgba(34, 197, 94, 0.12); // design-specific: green tint bg, no token for green-light-alpha
+  background-color: rgba(96, 192, 0, 0.2); // design-specific: Figma-exact green tint — no token
+  background-image: repeating-linear-gradient(135deg, transparent 0px, transparent 4px, var(--color-black-alpha-01) 4px, var(--color-black-alpha-01) 6px);
   color: var(--color-status-available);
   font-family: var(--font-satoshi);
   font-size: var(--text-small-13);
@@ -436,9 +467,7 @@
 .reviewTable {
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--color-gray-200);
-  border-radius: var(--radius-sm);
-  overflow: hidden;
+  gap: var(--space-2);
   margin: 0;
 }
 
@@ -448,14 +477,11 @@
   gap: var(--space-2);
   padding: var(--space-3) var(--space-4);
   background: var(--color-white-primary);
-  border-bottom: 1px solid var(--color-gray-200);
-
-  &:last-child {
-    border-bottom: none;
-  }
+  border: 1px solid var(--color-gray-200);
+  background-image: repeating-linear-gradient(135deg, transparent 0px, transparent 4px, var(--color-black-alpha-01) 4px, var(--color-black-alpha-01) 6px);
 
   &:nth-child(even) {
-    background: var(--color-gray-light-bg);
+    background-color: var(--color-gray-light-bg);
   }
 }
 
@@ -523,16 +549,15 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-5) var(--space-6);
+  padding: var(--space-3) var(--space-4);
   background: var(--color-black-primary);
-  border-radius: var(--radius-sm);
-  // design-specific: amber glow border — Figma-exact award/accent treatment, no shadow token
-  box-shadow: 0 0 0 1.5px var(--color-amber), 0 0 18px var(--color-amber);
+  border-radius: 0;
+  box-shadow: inset 0 0 17px var(--color-white-primary);
 }
 
 .pointsLabel {
   font-family: var(--font-satoshi);
-  font-size: var(--text-small-13);
+  font-size: var(--text-nav); // 14px — Figma-exact
   font-weight: var(--font-weight-medium);
   color: var(--color-white-primary);
   margin: 0;
@@ -540,7 +565,7 @@
 
 .pointsValue {
   font-family: var(--font-satoshi);
-  font-size: var(--text-display-sm); // 28px
+  font-size: var(--text-body-small); // 17px — Figma-exact
   font-weight: var(--font-weight-bold);
   color: var(--color-white-primary);
   margin: 0;

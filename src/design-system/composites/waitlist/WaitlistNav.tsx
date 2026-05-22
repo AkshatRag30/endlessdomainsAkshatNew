@@ -3,7 +3,11 @@ import React from 'react'
 import PrimaryButton from '@/design-system/primitives/button'
 import styles from './WaitlistNav.module.scss'
 
-export function WaitlistNav() {
+export interface WaitlistNavProps {
+  isRegistered?: boolean
+}
+
+export function WaitlistNav({ isRegistered = false }: WaitlistNavProps) {
   return (
     <nav className={styles.nav} aria-label="Waitlist navigation">
       <div className={styles.inner}>
@@ -16,9 +20,15 @@ export function WaitlistNav() {
             priority
           />
         </div>
-        <PrimaryButton size="sm" type="button">
-          Already Registered?
-        </PrimaryButton>
+        {isRegistered ? (
+          <button type="button" className={styles.logoutBtn}>
+            Logout
+          </button>
+        ) : (
+          <PrimaryButton size="sm" type="button">
+            Already Registered?
+          </PrimaryButton>
+        )}
       </div>
     </nav>
   )

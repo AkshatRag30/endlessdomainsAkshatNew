@@ -4,6 +4,7 @@ import React, { useCallback, useState } from 'react'
 import {
   WaitlistNav,
   WaitlistHero,
+  WaitlistSuccessHero,
   WaitlistLeaderboard,
 } from '@/design-system/composites/waitlist'
 import styles from './waitlist.module.scss'
@@ -32,10 +33,14 @@ const WaitlistPage: NextPage = () => {
       </Head>
 
       <div className={styles.page}>
-        <WaitlistNav />
+        <WaitlistNav isRegistered={isRegistered} />
 
         <main className={styles.main}>
-          <WaitlistHero onComplete={handleComplete} />
+          {isRegistered ? (
+            <WaitlistSuccessHero />
+          ) : (
+            <WaitlistHero onComplete={handleComplete} />
+          )}
           <WaitlistLeaderboard isJoined={isRegistered} />
         </main>
       </div>

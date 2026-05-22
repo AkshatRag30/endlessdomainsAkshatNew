@@ -5,6 +5,7 @@
 .section {
   background: var(--color-gray-light-bg);
   padding-bottom: var(--space-13);
+  overflow-x: clip;
 
   @include tablet-down {
     padding-bottom: var(--space-11);
@@ -39,6 +40,11 @@
   align-items: center;
   justify-content: center;
   margin-bottom: var(--space-9);
+
+  @include mobile {
+    height: 69px; // design-specific: Figma mobile banner height
+    margin-bottom: var(--space-6);
+  }
 }
 
 .bannerTitle {
@@ -49,6 +55,11 @@
   letter-spacing: 0.04em; // design-specific: Figma 2px letter-spacing at 52px — no exact token
   text-transform: uppercase;
   margin: 0;
+
+  @include mobile {
+    font-size: var(--text-button); // 18px — scales down proportionally with 69px mobile banner
+    letter-spacing: 0.04em;
+  }
 }
 
 // ── Inner container ───────────────────────────────────────────────────────────
@@ -67,12 +78,103 @@
   }
 }
 
+// ── Live status bar ───────────────────────────────────────────────────────────
+
+.liveBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-5);
+
+  @include mobile {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-3);
+  }
+}
+
+.liveStatus {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2-5);
+  background: var(--color-white-primary);
+  border: 1px solid var(--color-gray-200);
+  padding: 0 var(--space-4);
+  height: 39px; // design-specific: Figma-exact status bar height
+}
+
+.liveDot {
+  display: block;
+  flex-shrink: 0;
+  width: 9px; // design-specific: Figma-exact dot size
+  height: 9px;
+  border-radius: var(--radius-full);
+  background: var(--color-status-available);
+  // design-specific: Figma-exact green glow around status dot
+  box-shadow: 0 0 6px 1px rgba(34, 197, 94, 0.5);
+}
+
+.liveText {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  white-space: nowrap;
+  text-transform: capitalize;
+
+  @include mobile {
+    white-space: normal; // nowrap causes overflow at 390px viewport — text is ~361px including padding
+    font-size: var(--text-small-12);
+    line-height: var(--leading-normal);
+  }
+}
+
+.viewFullBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2-5);
+  height: 39px; // design-specific: Figma-exact button height
+  padding: 0 var(--space-5);
+  // design-specific: Figma dark gradient — uses surface tokens, no single button token
+  background: linear-gradient(to bottom, var(--color-surface-mid), var(--color-black-hover));
+  color: var(--color-white-primary);
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  border: none;
+  cursor: pointer;
+  // design-specific: Figma-exact drop shadow on button
+  filter: drop-shadow(3px 3px 1.5px var(--color-black-alpha-15));
+  // design-specific: Figma-exact inner top glow
+  box-shadow: inset 0 1px 1px var(--color-white-alpha-25);
+  white-space: nowrap;
+
+  &:hover {
+    background: linear-gradient(to bottom, var(--color-gray-darker), var(--color-black-primary));
+  }
+
+  @include mobile {
+    align-self: center;
+  }
+}
+
+.viewFullIcon {
+  font-size: 18px; // design-specific: Figma-exact icon size — no token match
+  flex-shrink: 0;
+}
+
 // ── Table container ───────────────────────────────────────────────────────────
 
 .tableWrap {
   position: relative;
   border-radius: var(--radius-lg);
   overflow: hidden;
+
+  @include mobile {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 0;
+  }
 }
 
 // Table is blurred to tease the content behind the join CTA
@@ -86,19 +188,28 @@
   width: 100%;
   border-collapse: collapse;
   background: var(--color-white-primary);
+
+  @include mobile {
+    min-width: 460px; // prevents column collapse — tableWrap overflow-x: auto handles the scroll
+  }
 }
 
 .th {
   font-family: var(--font-satoshi);
-  font-size: var(--text-small-13);
+  font-size: var(--text-nav);
   font-weight: var(--font-weight-medium);
-  color: var(--color-gray-dark);
+  color: var(--color-black-primary);
   text-align: left;
   padding: var(--space-4) var(--space-5);
   border-bottom: 1px solid var(--color-gray-200);
   letter-spacing: var(--tracking-nav);
-  text-transform: uppercase;
+  text-transform: capitalize;
   white-space: nowrap;
+
+  @include mobile {
+    padding: var(--space-3);
+    font-size: var(--text-small-12);
+  }
 }
 
 .tr {
@@ -117,45 +228,63 @@
 .td {
   padding: var(--space-4) var(--space-5);
   vertical-align: middle;
+
+  @include mobile {
+    padding: var(--space-3);
+  }
 }
 
 // ── Rank cell ─────────────────────────────────────────────────────────────────
 
-.rankGold {
-  font-size: 22px; // design-specific: icon size for rank-1 trophy — no token match
-  color: #f4c430; // design-specific: gold trophy color — intentional, no design token for award gold
-}
-
 .rankNum {
   font-family: var(--font-satoshi);
-  font-size: var(--text-body-small);
+  font-size: var(--text-nav);
   font-weight: var(--font-weight-bold);
-  color: var(--color-gray-dark);
+  color: var(--color-black-primary);
   margin: 0;
 }
 
-// ── User cell ─────────────────────────────────────────────────────────────────
+// ── Node cell (wallet address pill) ──────────────────────────────────────────
 
-.userCell {
-  display: flex;
+.nodePill {
+  display: inline-flex;
   align-items: center;
-  gap: var(--space-3);
+  background: var(--color-black-primary);
+  color: var(--color-white-primary);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.03em; // design-specific: Figma-exact tracking on wallet address
+  text-transform: capitalize;
+  padding: var(--space-1-5) var(--space-3);
+  white-space: nowrap;
 }
 
-.avatar {
-  width: 34px; // design-specific: avatar size — Figma-exact
-  height: 34px;
+// ── Chain cell (avatar + username) ────────────────────────────────────────────
+
+.chainCell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2-5);
+}
+
+.chainAvatar {
+  width: 26px; // design-specific: Figma-exact chain token avatar size
+  height: 26px;
   border-radius: var(--radius-full);
-  background: var(--color-blue-primary-alpha-13);
+  background: var(--color-gray-dark);
+  // design-specific: Figma-exact blue ring and glow on chain avatar
+  border: 0.565px solid var(--color-blue-primary-alpha-30);
+  box-shadow: 0 0.565px 3px var(--color-blue-primary-alpha-20);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-blue-primary);
-  font-size: 16px; // design-specific: icon size within avatar
+  color: var(--color-white-primary);
+  font-size: var(--text-nav);
   flex-shrink: 0;
 }
 
-.username {
+.chainUsername {
   font-family: var(--font-satoshi);
   font-size: var(--text-body-small);
   font-weight: var(--font-weight-medium);
@@ -164,21 +293,23 @@
   white-space: nowrap;
 }
 
-// ── Stat and score cells ──────────────────────────────────────────────────────
+// ── Points cell ───────────────────────────────────────────────────────────────
 
-.statCell {
+.pointsCell {
   font-family: var(--font-satoshi);
-  font-size: var(--text-body-small);
-  font-weight: var(--font-weight-regular);
-  color: var(--color-gray-dark);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black-primary);
   margin: 0;
 }
 
-.scoreCell {
+// ── Referrals cell ────────────────────────────────────────────────────────────
+
+.referralsCell {
   font-family: var(--font-satoshi);
-  font-size: var(--text-normal);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-blue-primary);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
   margin: 0;
 }
 
@@ -204,7 +335,6 @@
   left: 50%;
   transform: translate(-50%, -50%);
   background: var(--color-white-primary);
-  border-radius: var(--radius-xl);
   box-shadow:
     0 8px 40px var(--color-black-alpha-25),
     0 2px 8px var(--color-black-alpha-12);

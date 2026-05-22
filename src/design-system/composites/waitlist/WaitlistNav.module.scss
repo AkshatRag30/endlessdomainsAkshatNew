@@ -5,8 +5,8 @@
   top: 0;
   z-index: 100;
   background: var(--color-white-primary);
-  border-bottom: 1px solid var(--color-gray-200);
   height: var(--header-height);
+  overflow-x: clip;
 }
 
 .inner {
@@ -31,4 +31,28 @@
   display: flex;
   align-items: center;
   flex-shrink: 0;
+}
+
+.logoutBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2) var(--space-7);
+  // design-specific: Figma-exact logout button gradient
+  background: linear-gradient(to bottom right, var(--color-blue-primary), var(--color-purple-primary));
+  color: var(--color-white-primary);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-bold);
+  text-transform: capitalize;
+  letter-spacing: var(--tracking-btn);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  @include focus-ring;
 }
