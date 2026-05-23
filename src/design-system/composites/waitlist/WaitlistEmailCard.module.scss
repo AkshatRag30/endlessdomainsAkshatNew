@@ -16,9 +16,47 @@
 // ── Mobile overrides ───────────────────────────────────────────────────────────
 
 @include mobile {
+
+  // ── Step bar — Figma mobile exact (node 48:6902 / 48:6923) ────────────────
+
   .stepBar {
-    padding: var(--space-3) var(--space-4);
+    height: 58px; // design-specific: Figma-exact mobile step bar height (58.086px)
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
+
+  .stepsRow {
+    gap: clamp(3px, 1.2vw, 5px); // design-specific: fluid gap — 3px at 320px → 5px at 430px
+  }
+
+  .stepPill {
+    flex-shrink: 0;
+    width: clamp(36px, 9.8vw, 42px); // design-specific: fluid pill width — 36px at 367px viewport → 42px at 430px
+    height: clamp(15px, 4.2vw, 17px); // design-specific: fluid pill height
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px; // design-specific: Figma-exact mobile pill radius (3.951px)
+    font-family: var(--font-space-grotesk);
+    font-size: clamp(8px, 2.2vw, 9px); // design-specific: fluid font size — 8px at small → 9px at 430px
+    font-weight: var(--font-weight-regular);
+    box-shadow: inset 0 0 6px var(--color-white-primary); // design-specific: Figma-exact pill inner glow (6.064px)
+  }
+
+  .stepPillActive {
+    font-weight: var(--font-weight-medium);
+    box-shadow: inset 0 0 6px var(--color-white-primary); // design-specific: Figma-exact active pill inner glow
+  }
+
+  .connHoriz {
+    flex: none;
+    width: clamp(20px, 6.5vw, 28px); // design-specific: fluid connector — 20px at 308px viewport → 28px at 430px
+  }
+
+  // ── Rest of mobile overrides ───────────────────────────────────────────────
 
   .connTicks {
     padding: 0 var(--space-3);
@@ -37,11 +75,6 @@
   .chainTrigger,
   .walletConnectBtn {
     height: 40px; // design-specific: Figma mobile input height — no token match
-  }
-
-  .stepPill {
-    padding: var(--space-2) var(--space-3);
-    font-size: var(--text-small-12);
   }
 
   .reviewRow {
@@ -157,7 +190,7 @@
 .connTick {
   width: 1px; // design-specific: tick stroke width — no token
   height: var(--space-4);
-  background: var(--color-gray-200);
+  background: var(--color-blue-primary);
 }
 
 // ── Form card ──────────────────────────────────────────────────────────────────

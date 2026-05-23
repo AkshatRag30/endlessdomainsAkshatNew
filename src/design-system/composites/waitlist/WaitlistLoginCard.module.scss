@@ -1,0 +1,134 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Corner-dot decoration (shared pattern with WaitlistEmailCard) ──────────────
+
+%cornerDots {
+  // design-specific: 10px concentric-circle dot at each corner — white outer → gray-300 ring → gray-medium core
+  background-image:
+    radial-gradient(circle, var(--color-gray-medium) 3.4px, transparent 3.4px),
+    radial-gradient(circle, var(--color-gray-300)    4.2px, transparent 4.2px),
+    radial-gradient(circle, var(--color-white-primary) 5px, transparent   5px),
+    radial-gradient(circle, var(--color-gray-medium) 3.4px, transparent 3.4px),
+    radial-gradient(circle, var(--color-gray-300)    4.2px, transparent 4.2px),
+    radial-gradient(circle, var(--color-white-primary) 5px, transparent   5px),
+    radial-gradient(circle, var(--color-gray-medium) 3.4px, transparent 3.4px),
+    radial-gradient(circle, var(--color-gray-300)    4.2px, transparent 4.2px),
+    radial-gradient(circle, var(--color-white-primary) 5px, transparent   5px),
+    radial-gradient(circle, var(--color-gray-medium) 3.4px, transparent 3.4px),
+    radial-gradient(circle, var(--color-gray-300)    4.2px, transparent 4.2px),
+    radial-gradient(circle, var(--color-white-primary) 5px, transparent   5px);
+  background-position:
+    var(--space-2) var(--space-2),
+    var(--space-2) var(--space-2),
+    var(--space-2) var(--space-2),
+    calc(100% - var(--space-2)) var(--space-2),
+    calc(100% - var(--space-2)) var(--space-2),
+    calc(100% - var(--space-2)) var(--space-2),
+    var(--space-2) calc(100% - var(--space-2)),
+    var(--space-2) calc(100% - var(--space-2)),
+    var(--space-2) calc(100% - var(--space-2)),
+    calc(100% - var(--space-2)) calc(100% - var(--space-2)),
+    calc(100% - var(--space-2)) calc(100% - var(--space-2)),
+    calc(100% - var(--space-2)) calc(100% - var(--space-2));
+  background-size: 10px 10px; // design-specific: 10px dot area for 3-ring concentric effect
+  background-repeat: no-repeat;
+}
+
+// ── Outer wrapper ──────────────────────────────────────────────────────────────
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 480px; // design-specific: Figma-exact card width for right column
+
+  @include mobile {
+    max-width: 100%;
+  }
+}
+
+// ── Form card ──────────────────────────────────────────────────────────────────
+
+.card {
+  @extend %cornerDots;
+  background-color: var(--color-gray-light-bg); // near-white panel bg matching Figma #f7f7f7
+  border: 0.5px solid var(--color-border-black-subtle);
+  // design-specific: Figma-exact drop shadow + inset border overlay
+  box-shadow: 0 4px 12px var(--color-black-alpha-05), inset 0 0 0 1px var(--color-border-black-subtle);
+  overflow: clip;
+}
+
+// ── Form body ──────────────────────────────────────────────────────────────────
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding: var(--space-8) var(--space-7);
+
+  @include mobile {
+    padding: var(--space-5);
+    gap: var(--space-5);
+  }
+}
+
+// ── Heading ────────────────────────────────────────────────────────────────────
+
+.heading {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body); // design-specific: Figma node 48:3054 — 17px, no exact heading token
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-body);
+  margin: 0;
+  text-transform: capitalize;
+}
+
+// ── Field group ────────────────────────────────────────────────────────────────
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+// ── Hint / subtitle ────────────────────────────────────────────────────────────
+
+.hint {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small); // 14px
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-dark); // Figma: rgba(0,0,0,0.5) — nearest token
+  margin: 0;
+
+  @include mobile {
+    white-space: normal;
+  }
+}
+
+// ── Text input ────────────────────────────────────────────────────────────────
+
+.textInput {
+  width: 100%;
+  height: 39px; // design-specific: Figma-exact input height (node 48:3058)
+  border: 1px solid var(--color-gray-300); // Figma: #ded2d9 — nearest gray-300 token
+  background: var(--color-white-primary);
+  padding: 0 var(--space-3);
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-blue-primary);
+  letter-spacing: var(--tracking-body);
+  outline: none;
+  box-sizing: border-box;
+
+  &::placeholder {
+    color: var(--color-blue-primary); // design-specific: Figma node 48:3060 — blue placeholder text
+    opacity: 1;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}

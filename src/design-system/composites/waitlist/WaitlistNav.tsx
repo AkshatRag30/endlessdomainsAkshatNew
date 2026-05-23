@@ -5,9 +5,11 @@ import styles from './WaitlistNav.module.scss'
 
 export interface WaitlistNavProps {
   isRegistered?: boolean
+  onAlreadyRegistered?: () => void
+  onLogout?: () => void
 }
 
-export function WaitlistNav({ isRegistered = false }: WaitlistNavProps) {
+export function WaitlistNav({ isRegistered = false, onAlreadyRegistered, onLogout }: WaitlistNavProps) {
   return (
     <nav className={styles.nav} aria-label="Waitlist navigation">
       <div className={styles.inner}>
@@ -20,15 +22,17 @@ export function WaitlistNav({ isRegistered = false }: WaitlistNavProps) {
             priority
           />
         </div>
-        {isRegistered ? (
-          <button type="button" className={styles.logoutBtn}>
-            Logout
-          </button>
-        ) : (
-          <PrimaryButton size="sm" type="button">
-            Already Registered?
-          </PrimaryButton>
-        )}
+        <div className={styles.btnWrap}>
+          {isRegistered ? (
+            <PrimaryButton size="sm" type="button" onClick={onLogout}>
+              Logout
+            </PrimaryButton>
+          ) : (
+            <PrimaryButton size="sm" type="button" onClick={onAlreadyRegistered}>
+              Already Registered?
+            </PrimaryButton>
+          )}
+        </div>
       </div>
     </nav>
   )

@@ -1,6 +1,8 @@
 export { WaitlistNav } from './WaitlistNav'
 export { WaitlistHero } from './WaitlistHero'
 export { WaitlistSuccessHero } from './WaitlistSuccessHero'
+export { WaitlistLoginCard } from './WaitlistLoginCard'
+export { WaitlistLoginPage } from './WaitlistLoginPage'
 export { WaitlistEmailCard } from './WaitlistEmailCard'
 export { WaitlistStatRow } from './WaitlistStatRow'
 export { WaitlistLeaderboard } from './WaitlistLeaderboard'

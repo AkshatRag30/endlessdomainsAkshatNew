@@ -11,13 +11,14 @@
     flex-wrap: wrap;
     justify-content: center;
     gap: 0;
+    row-gap: var(--space-6);
   }
 }
 
 .divider {
   width: 1px;
   height: 48px;
-  background: var(--color-gray-300);
+  background: transparent;
   flex-shrink: 0;
   margin: 0 var(--space-7);
 
@@ -33,6 +34,14 @@
   @include mobile {
     flex: 0 0 50%;
     justify-content: center;
+
+    &:last-child {
+      flex: 0 0 100%;
+
+      .value {
+        font-size: var(--text-display-sm);
+      }
+    }
   }
 }
 
@@ -42,17 +51,17 @@
   padding: var(--space-3) var(--space-5);
 
   @include mobile {
-    padding: var(--space-2) var(--space-3); // 8px 12px — compact bracket box on mobile
+    padding: var(--space-3) var(--space-5); // 12px 20px — matches desktop, gives bracket enough breathing room
   }
   background-image:
-    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
-    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
-    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
-    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
-    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
-    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
-    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
-    linear-gradient(var(--color-blue-primary), var(--color-blue-primary));
+    linear-gradient(var(--color-gray-300), var(--color-gray-300)),
+    linear-gradient(var(--color-gray-300), var(--color-gray-300)),
+    linear-gradient(var(--color-gray-300), var(--color-gray-300)),
+    linear-gradient(var(--color-gray-300), var(--color-gray-300)),
+    linear-gradient(var(--color-gray-300), var(--color-gray-300)),
+    linear-gradient(var(--color-gray-300), var(--color-gray-300)),
+    linear-gradient(var(--color-gray-300), var(--color-gray-300)),
+    linear-gradient(var(--color-gray-300), var(--color-gray-300)); // design-specific: #D9D9D9 bracket corners
   background-position:
     top left,
     top left,

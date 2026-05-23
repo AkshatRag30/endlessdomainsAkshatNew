@@ -15,6 +15,7 @@ interface LeaderboardEntry {
 
 export interface WaitlistLeaderboardProps {
   isJoined?: boolean
+  onLogout?: () => void
 }
 
 const DEMO_DATA: LeaderboardEntry[] = [
@@ -27,12 +28,12 @@ const DEMO_DATA: LeaderboardEntry[] = [
   { rank: 7, walletAddress: '0x123asdwdasw...Abc', chainUsername: 'jay.hk.pol', points: 1450, referrals: 14 },
 ]
 
-export function WaitlistLeaderboard({ isJoined = false }: WaitlistLeaderboardProps) {
+export function WaitlistLeaderboard({ isJoined = false, onLogout }: WaitlistLeaderboardProps) {
   const [showFull, setShowFull] = useState(false)
 
   return (
     <>
-    {showFull && <FullLeaderboard onClose={() => setShowFull(false)} />}
+    {showFull && <FullLeaderboard onClose={() => setShowFull(false)} onLogout={onLogout} />}
     <section className={styles.section} aria-labelledby="leaderboard-heading">
 
       {/* ── Shaped banner ── */}
@@ -45,7 +46,7 @@ export function WaitlistLeaderboard({ isJoined = false }: WaitlistLeaderboardPro
       <div className={styles.inner}>
 
         {/* ── Live status bar ── */}
-        <div className={styles.liveBar}>
+        <div className={`${styles.liveBar}${!isJoined ? ` ${styles.liveBarBlur}` : ''}`}>
           <div className={styles.liveStatus}>
             <span className={styles.liveDot} aria-hidden="true" />
             <span className={styles.liveText}>Live Leaderboard · Top Nodes · Auto-Refresh 2 Min</span>

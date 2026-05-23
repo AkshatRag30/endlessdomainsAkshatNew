@@ -6,15 +6,19 @@ import {
   WaitlistHero,
   WaitlistSuccessHero,
   WaitlistLeaderboard,
+  WaitlistLoginPage,
 } from '@/design-system/composites/waitlist'
 import styles from './waitlist.module.scss'
 
-const WaitlistPage: NextPage = () => {
-  const [isRegistered, setIsRegistered] = useState(false)
+type View = 'home' | 'login' | 'dashboard'
 
-  const handleComplete = useCallback(() => {
-    setIsRegistered(true)
-  }, [])
+const WaitlistPage: NextPage = () => {
+  const [view, setView] = useState<View>('home')
+
+  const handleRegistered = useCallback(() => setView('dashboard'), [])
+  const handleAlreadyRegistered = useCallback(() => setView('login'), [])
+  const handleLoginComplete = useCallback(() => setView('dashboard'), [])
+  const handleLogout = useCallback(() => setView('login'), [])
 
   return (
     <>
@@ -33,16 +37,33 @@ const WaitlistPage: NextPage = () => {
       </Head>
 
       <div className={styles.page}>
-        <WaitlistNav isRegistered={isRegistered} />
+        {view === 'home' && (
+          <>
+            <WaitlistNav onAlreadyRegistered={handleAlreadyRegistered} />
+            <main className={styles.main}>
+              <WaitlistHero onComplete={handleRegistered} />
+              <WaitlistLeaderboard isJoined={false} onLogout={handleLogout} />
+            </main>
+          </>
+        )}
 
-        <main className={styles.main}>
-          {isRegistered ? (
-            <WaitlistSuccessHero />
-          ) : (
-            <WaitlistHero onComplete={handleComplete} />
-          )}
-          <WaitlistLeaderboard isJoined={isRegistered} />
-        </main>
+        {view === 'login' && (
+          <WaitlistLoginPage
+            onComplete={handleLoginComplete}
+            onBackToHome={() => setView('home')}
+            onLogout={handleLogout}
+          />
+        )}
+
+        {view === 'dashboard' && (
+          <>
+            <WaitlistNav isRegistered onLogout={handleLogout} />
+            <main className={styles.main}>
+              <WaitlistSuccessHero />
+              <WaitlistLeaderboard isJoined onLogout={handleLogout} />
+            </main>
+          </>
+        )}
       </div>
     </>
   )

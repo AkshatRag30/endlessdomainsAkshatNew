@@ -2,6 +2,7 @@ import Image from 'next/image'
 import React, { useCallback, useState } from 'react'
 import { FiArrowUpRight, FiX } from 'react-icons/fi'
 import { HiOutlineLockClosed, HiOutlineUser } from 'react-icons/hi'
+import PrimaryButton from '@/design-system/primitives/button'
 import styles from './FullLeaderboard.module.scss'
 
 interface LeaderboardEntry {
@@ -14,6 +15,7 @@ interface LeaderboardEntry {
 
 export interface FullLeaderboardProps {
   onClose: () => void
+  onLogout?: () => void
 }
 
 const DEMO_DATA: LeaderboardEntry[] = [
@@ -28,7 +30,7 @@ const DEMO_DATA: LeaderboardEntry[] = [
 
 const TOTAL_PAGES = 10
 
-export function FullLeaderboard({ onClose }: FullLeaderboardProps) {
+export function FullLeaderboard({ onClose, onLogout }: FullLeaderboardProps) {
   const [alertVisible, setAlertVisible] = useState(true)
   const [currentPage, setCurrentPage] = useState(1)
 
@@ -49,9 +51,9 @@ export function FullLeaderboard({ onClose }: FullLeaderboardProps) {
             height={53}
             className={styles.navLogo}
           />
-          <button type="button" className={styles.logoutBtn} onClick={onClose}>
+          <PrimaryButton size="sm" type="button" onClick={onLogout}>
             Logout
-          </button>
+          </PrimaryButton>
         </div>
       </nav>
 
@@ -167,7 +169,7 @@ export function FullLeaderboard({ onClose }: FullLeaderboardProps) {
                 disabled={currentPage === 1}
                 aria-label="Previous page"
               >
-                <span aria-hidden="true">«</span>
+                <span className={styles.pageNavChevron} aria-hidden="true">«</span>
                 Previous
               </button>
               <div className={styles.pageDivider} aria-hidden="true" />
@@ -203,7 +205,7 @@ export function FullLeaderboard({ onClose }: FullLeaderboardProps) {
                 aria-label="Next page"
               >
                 Next
-                <span aria-hidden="true">»</span>
+                <span className={styles.pageNavChevron} aria-hidden="true">»</span>
               </button>
             </div>
           </nav>

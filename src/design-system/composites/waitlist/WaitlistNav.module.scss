@@ -31,6 +31,27 @@
   display: flex;
   align-items: center;
   flex-shrink: 0;
+  margin-left: calc(-1 * var(--container-padding-x));
+
+  @include tablet-down {
+    margin-left: calc(-1 * var(--space-6));
+  }
+
+  @include mobile {
+    margin-left: 0;
+
+    img {
+      width: 89px; // design-specific: Figma-exact mobile logo width (Svg_logo_White Text 1)
+      height: 30px; // design-specific: Figma-exact mobile logo height (29.63px)
+    }
+  }
+}
+
+.btnWrap {
+  @include mobile {
+    transform: scale(0.8);
+    transform-origin: right center;
+  }
 }
 
 .logoutBtn {
@@ -47,12 +68,9 @@
   text-transform: capitalize;
   letter-spacing: var(--tracking-btn);
   border: none;
-  border-radius: var(--radius-sm);
   cursor: pointer;
 
   &:hover {
     opacity: 0.9;
   }
-
-  @include focus-ring;
 }

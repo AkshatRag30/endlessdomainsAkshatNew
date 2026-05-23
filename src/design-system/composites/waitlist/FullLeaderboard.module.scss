@@ -49,29 +49,6 @@
   height: auto;
 }
 
-.logoutBtn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-2) var(--space-7);
-  // design-specific: Figma-exact logout button gradient and border-radius
-  background: linear-gradient(to bottom right, var(--color-blue-primary), var(--color-purple-primary));
-  color: var(--color-white-primary);
-  font-family: var(--font-satoshi);
-  font-size: var(--text-small-13);
-  font-weight: var(--font-weight-bold);
-  text-transform: capitalize;
-  border: none;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  letter-spacing: var(--tracking-btn);
-
-  &:hover {
-    opacity: 0.9;
-  }
-
-  @include focus-ring;
-}
 
 // ── Hero section ──────────────────────────────────────────────────────────────
 
@@ -400,8 +377,9 @@
 .table {
   width: 100%;
   min-width: 520px; // prevents table from collapsing below readable size on mobile (tableWrap scrolls)
-  border-collapse: collapse;
-  background: var(--color-white-primary);
+  border-collapse: separate;
+  border-spacing: 0 5px; // design-specific: Figma-exact ~11px gap between rows (5px above + 5px below each row)
+  background: transparent; // section bg visible through row gaps
 }
 
 .th {
@@ -412,9 +390,15 @@
   text-align: left;
   padding: var(--space-4) var(--space-5);
   border-bottom: 1px solid var(--color-gray-200);
+  border-right: 1px solid var(--color-gray-200);
+  background: var(--color-white-primary);
   letter-spacing: var(--tracking-nav);
   text-transform: capitalize;
   white-space: nowrap;
+
+  &:last-child {
+    border-right: none;
+  }
 
   @include mobile {
     padding: var(--space-3) var(--space-4);
@@ -423,12 +407,8 @@
 }
 
 .tr {
-  border-bottom: 1px solid var(--color-gray-200);
+  background: var(--color-white-primary); // each row is a white block; gaps show section bg
   transition: background 150ms ease;
-
-  &:last-child {
-    border-bottom: none;
-  }
 
   &:hover {
     background: var(--color-gray-light);
@@ -438,6 +418,11 @@
 .td {
   padding: var(--space-4) var(--space-5);
   vertical-align: middle;
+  border-right: 1px solid var(--color-gray-200);
+
+  &:last-child {
+    border-right: none;
+  }
 
   @include mobile {
     padding: var(--space-3) var(--space-4);
@@ -578,7 +563,6 @@
     background: var(--color-gray-light);
   }
 
-  @include focus-ring;
 
   @include mobile {
     padding: 0 var(--space-2);
@@ -603,14 +587,18 @@
   &:hover:not(.pageNumActive) {
     background: var(--color-gray-light);
   }
-
-  @include focus-ring;
 }
 
 .pageNumActive {
   background: var(--color-gray-200);
   color: var(--color-gray-dark);
   cursor: default;
+}
+
+.pageNavChevron {
+  font-size: var(--text-small-15); // 15px ≈ Figma 16px chevron, nearest token
+  color: var(--color-gray-dark-hover);
+  line-height: 1;
 }
 
 .pageDots {

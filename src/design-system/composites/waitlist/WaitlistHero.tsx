@@ -6,9 +6,10 @@ import styles from './WaitlistHero.module.scss'
 
 export interface WaitlistHeroProps {
   onComplete?: () => void
+  renderCard?: () => React.ReactNode
 }
 
-export function WaitlistHero({ onComplete }: WaitlistHeroProps) {
+export function WaitlistHero({ onComplete, renderCard }: WaitlistHeroProps) {
   return (
     <section className={styles.section} aria-labelledby="waitlist-hero-heading">
       <div className={styles.inner}>
@@ -48,7 +49,7 @@ export function WaitlistHero({ onComplete }: WaitlistHeroProps) {
 
             <div className={styles.visualWrap}>
               <div className={styles.cardWrap}>
-                <WaitlistEmailCard onComplete={onComplete} />
+                {renderCard ? renderCard() : <WaitlistEmailCard onComplete={onComplete} />}
               </div>
             </div>
           </div>

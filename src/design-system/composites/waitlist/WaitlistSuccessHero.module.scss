@@ -94,17 +94,18 @@
     margin-bottom: var(--space-4);
     max-width: 100%;
     overflow: hidden;
+    align-self: center;
   }
 
   background-image:
-    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
-    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
-    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
-    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
-    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
-    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
-    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
-    linear-gradient(var(--color-blue-primary), var(--color-blue-primary));
+    linear-gradient(var(--color-gray-300), var(--color-gray-300)),
+    linear-gradient(var(--color-gray-300), var(--color-gray-300)),
+    linear-gradient(var(--color-gray-300), var(--color-gray-300)),
+    linear-gradient(var(--color-gray-300), var(--color-gray-300)),
+    linear-gradient(var(--color-gray-300), var(--color-gray-300)),
+    linear-gradient(var(--color-gray-300), var(--color-gray-300)),
+    linear-gradient(var(--color-gray-300), var(--color-gray-300)),
+    linear-gradient(var(--color-gray-300), var(--color-gray-300)); // design-specific: #D9D9D9 bracket corners
   background-position:
     top left,
     top left,
@@ -160,6 +161,7 @@
   @include mobile {
     font-size: var(--text-display-sm);
     margin-bottom: var(--space-5);
+    text-align: center;
   }
 }
 
@@ -182,6 +184,7 @@
   @include mobile {
     font-size: var(--text-body-small);
     margin-bottom: var(--space-6);
+    text-align: center;
   }
 }
 
@@ -193,9 +196,10 @@
   margin-bottom: var(--space-8);
 
   @include mobile {
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     justify-content: center;
-    gap: var(--space-2);
+    row-gap: var(--space-5); // design-specific: Figma-exact row gap between stat rows (16px ≈ space-5)
+    column-gap: 0;
     margin-bottom: var(--space-6);
   }
 }
@@ -208,7 +212,7 @@
 .statDivider {
   width: 1px;
   height: 48px;
-  background: var(--color-gray-300);
+  background: transparent;
   flex-shrink: 0;
   margin: 0 var(--space-7);
 
@@ -221,14 +225,14 @@
   padding: var(--space-3) var(--space-5);
   text-align: center;
   background-image:
-    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
-    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
-    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
-    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
-    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
-    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
-    linear-gradient(var(--color-blue-primary), var(--color-blue-primary)),
-    linear-gradient(var(--color-blue-primary), var(--color-blue-primary));
+    linear-gradient(var(--color-gray-300), var(--color-gray-300)),
+    linear-gradient(var(--color-gray-300), var(--color-gray-300)),
+    linear-gradient(var(--color-gray-300), var(--color-gray-300)),
+    linear-gradient(var(--color-gray-300), var(--color-gray-300)),
+    linear-gradient(var(--color-gray-300), var(--color-gray-300)),
+    linear-gradient(var(--color-gray-300), var(--color-gray-300)),
+    linear-gradient(var(--color-gray-300), var(--color-gray-300)),
+    linear-gradient(var(--color-gray-300), var(--color-gray-300)); // design-specific: #D9D9D9 bracket corners
   background-position:
     top left,
     top left,
@@ -501,18 +505,16 @@
   flex-shrink: 0;
   width: 40px;
   height: 100%;
-  background: linear-gradient(to bottom, var(--color-surface-mid), var(--color-black-hover));
+  background: none;
   border: none;
   border-left: 1px solid var(--color-gray-200);
-  color: var(--color-white-primary);
+  color: var(--color-blue-primary);
   font-size: var(--text-body-small);
   cursor: pointer;
 
   &:hover {
-    background: linear-gradient(to bottom, var(--color-gray-darker), var(--color-black-primary));
+    color: var(--color-blue-primary-alpha-70);
   }
-
-  @include focus-ring;
 }
 
 // ── Quote ─────────────────────────────────────────────────────────────────────
@@ -579,12 +581,35 @@
 // ── Mobile overrides ──────────────────────────────────────────────────────────
 
 @include mobile {
+  .stat {
+    flex: 0 0 50%;
+    justify-content: center;
+
+    &:last-child {
+      flex: 0 0 100%;
+    }
+  }
+
   .bracketBox {
     padding: var(--space-2) var(--space-3); // compact bracket box on mobile
   }
 
   .statValue {
     font-size: var(--text-normal); // 20px on mobile — smaller than desktop 28px so all 3 fit
+  }
+
+  .climbHeading {
+    text-align: center;
+  }
+
+  .climbList {
+    padding-left: 0;
+    text-align: center;
+  }
+
+  .climbItem {
+    list-style: none;
+    text-align: center;
   }
 
   // dots sit at fixed positions tied to hairline offset — hide when hairlines are hidden
