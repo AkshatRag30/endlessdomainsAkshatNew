@@ -402,7 +402,8 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: var(--color-white-primary);
+  background-color: var(--color-white-primary);
+  background-image: repeating-linear-gradient(135deg, transparent 0px, transparent 4px, var(--color-black-alpha-01) 4px, var(--color-black-alpha-01) 6px);
   box-shadow:
     0 8px 40px var(--color-black-alpha-25),
     0 2px 8px var(--color-black-alpha-12);
