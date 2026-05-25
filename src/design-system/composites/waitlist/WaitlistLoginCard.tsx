@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from 'react'
 import { FiArrowRight } from 'react-icons/fi'
+import { BsWallet2 } from 'react-icons/bs'
 import PrimaryButton from '@/design-system/primitives/button'
 import styles from './WaitlistLoginCard.module.scss'
 
@@ -9,7 +10,6 @@ export interface WaitlistLoginCardProps {
 
 export function WaitlistLoginCard({ onComplete }: WaitlistLoginCardProps) {
   const [email, setEmail] = useState('')
-
   const handleContinue = useCallback(() => {
     onComplete?.()
   }, [onComplete])
@@ -42,6 +42,23 @@ export function WaitlistLoginCard({ onComplete }: WaitlistLoginCardProps) {
             onClick={handleContinue}
           >
             Continue
+          </PrimaryButton>
+
+          <div className={styles.divider} aria-hidden="true">
+            <span className={styles.dividerLine} />
+            <span className={styles.dividerText}>or</span>
+            <span className={styles.dividerLine} />
+          </div>
+
+          <PrimaryButton
+            type="button"
+            fullWidth
+            variant="transparent"
+            icon={<BsWallet2 />}
+            iconPosition="left"
+            onClick={undefined}
+          >
+            Connect Wallet
           </PrimaryButton>
         </div>
       </div>

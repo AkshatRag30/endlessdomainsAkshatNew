@@ -285,11 +285,30 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: var(--space-5);
+  border-top: 1px solid var(--color-gray-200);
+  border-bottom: 1px solid var(--color-gray-200);
+  padding-top: var(--space-2);
+  padding-bottom: var(--space-2);
+  margin-left: calc(-1 * var(--container-padding-x));
+  margin-right: calc(-1 * var(--container-padding-x));
+  padding-left: var(--container-padding-x);
+  padding-right: var(--container-padding-x);
+
+  @include tablet-down {
+    margin-left: calc(-1 * var(--space-6));
+    margin-right: calc(-1 * var(--space-6));
+    padding-left: var(--space-6);
+    padding-right: var(--space-6);
+  }
 
   @include mobile {
     flex-direction: column;
     align-items: stretch;
     gap: var(--space-3);
+    margin-left: calc(-1 * var(--space-4));
+    margin-right: calc(-1 * var(--space-4));
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
   }
 }
 
@@ -297,20 +316,54 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-2-5);
-  background: var(--color-white-primary);
+  background-color: var(--color-white-primary);
+  background-image: repeating-linear-gradient(135deg, transparent 0px, transparent 4px, var(--color-black-alpha-01) 4px, var(--color-black-alpha-01) 6px);
   border: 1px solid var(--color-gray-200);
   padding: 0 var(--space-4);
   height: 39px; // design-specific: Figma-exact status bar height
 }
 
 .liveDot {
-  display: block;
+  // design-specific: Figma-exact dark gradient container for status indicator
+  position: relative;
+  display: flex;
   flex-shrink: 0;
-  width: 9px; // design-specific: Figma-exact dot size
-  height: 9px;
+  align-items: center;
+  justify-content: center;
+  width: 19px;
+  height: 19px;
   border-radius: var(--radius-full);
-  background: var(--color-status-available);
-  box-shadow: 0 0 6px 1px rgba(34, 197, 94, 0.5); // design-specific: green glow
+  background: linear-gradient(180deg, #2C2C2C 0%, #201F1B 100%);
+  border: 0.6px solid #000;
+  box-shadow: 1.2px 1.8px 2.4px rgba(0, 0, 0, 0.25);
+
+  // Ellipse 1: solid green core with layered glow
+  &::before {
+    content: '';
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    border-radius: var(--radius-full);
+    background: #27FF00; // design-specific: Figma-exact bright green indicator
+    box-shadow:
+      0 2.3px 5.8px rgba(39, 255, 0, 0.31),
+      0 11.6px 11.6px rgba(39, 255, 0, 0.27),
+      0 25.6px 15.1px rgba(39, 255, 0, 0.16),
+      0 45.4px 18.6px rgba(39, 255, 0, 0.05),
+      0 70.9px 19.8px rgba(39, 255, 0, 0.01);
+  }
+
+  // Ellipse 2+3: blurred bloom — creates the outer concentric glow ring
+  &::after {
+    content: '';
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    border-radius: var(--radius-full);
+    background: #27FF00; // design-specific: Figma-exact green bloom
+    mix-blend-mode: plus-lighter;
+    filter: blur(2px); // design-specific: Figma range 1.55px–2.2px, averaged
+  }
 }
 
 .liveText {
@@ -391,7 +444,8 @@
   padding: var(--space-4) var(--space-5);
   border-bottom: 1px solid var(--color-gray-200);
   border-right: 1px solid var(--color-gray-200);
-  background: var(--color-white-primary);
+  background-color: var(--color-white-primary);
+  background-image: repeating-linear-gradient(135deg, transparent 0px, transparent 4px, var(--color-black-alpha-01) 4px, var(--color-black-alpha-01) 6px);
   letter-spacing: var(--tracking-nav);
   text-transform: capitalize;
   white-space: nowrap;
@@ -407,7 +461,8 @@
 }
 
 .tr {
-  background: var(--color-white-primary); // each row is a white block; gaps show section bg
+  background-color: var(--color-white-primary); // each row is a white block; gaps show section bg
+  background-image: repeating-linear-gradient(135deg, transparent 0px, transparent 4px, var(--color-black-alpha-01) 4px, var(--color-black-alpha-01) 6px);
   transition: background 150ms ease;
 
   &:hover {

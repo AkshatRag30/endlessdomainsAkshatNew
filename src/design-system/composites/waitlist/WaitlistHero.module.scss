@@ -375,8 +375,8 @@
   width: 100%;
 
   // top and bottom horizontal lines
-  border-top: 1px solid var(--color-gray-300);
-  border-bottom: 1px solid var(--color-gray-300);
+  border-top: 1px solid var(--color-gray-200);
+  border-bottom: 1px solid var(--color-gray-200);
 
   // horizontal padding pushes visualWrap inward so vertical lines at left/right: 30px are exposed
   // vertical padding creates the gap between the border lines and the glow panel
@@ -390,7 +390,7 @@
     bottom: -9px;
     left: 30px; // design-specific: aligns with dot center (left: 25px + half-dot 5px = 30px)
     width: 0.3px; // design-specific: Figma-exact hairline stroke
-    background: var(--color-gray-300);
+    background: var(--color-gray-200);
     pointer-events: none;
   }
 
@@ -402,7 +402,7 @@
     bottom: -9px;
     right: 46px;
     width: 0.3px;
-    background: var(--color-gray-300);
+    background: var(--color-gray-200);
     pointer-events: none;
   }
 

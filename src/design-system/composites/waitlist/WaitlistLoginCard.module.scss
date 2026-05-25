@@ -132,3 +132,25 @@
     @include focus-ring;
   }
 }
+
+// ── Divider ────────────────────────────────────────────────────────────────────
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.dividerLine {
+  flex: 1;
+  height: 1px;
+  background: var(--color-gray-300);
+}
+
+.dividerText {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-gray-dark);
+  white-space: nowrap;
+}
