@@ -16,6 +16,7 @@ interface LeaderboardEntry {
 export interface WaitlistLeaderboardProps {
   isJoined?: boolean
   onLogout?: () => void
+  isLoginPage?: boolean
 }
 
 const DEMO_DATA: LeaderboardEntry[] = [
@@ -28,7 +29,7 @@ const DEMO_DATA: LeaderboardEntry[] = [
   { rank: 7, walletAddress: '0x123asdwdasw...Abc', chainUsername: 'jay.hk.pol', points: 1450, referrals: 14 },
 ]
 
-export function WaitlistLeaderboard({ isJoined = false, onLogout }: WaitlistLeaderboardProps) {
+export function WaitlistLeaderboard({ isJoined = false, onLogout, isLoginPage = false }: WaitlistLeaderboardProps) {
   const [showFull, setShowFull] = useState(false)
 
   return (
@@ -105,14 +106,14 @@ export function WaitlistLeaderboard({ isJoined = false, onLogout }: WaitlistLead
               <div className={styles.fadeOverlay} aria-hidden="true" />
               <div className={styles.ctaCard} role="complementary" aria-label="Join waitlist call to action">
                 <h3 className={styles.ctaHeading}>
-                  Join The Waitlist To See The Full Leaderboard
+                  {isLoginPage ? 'Login now, to see the full leaderboard.' : 'Join The Waitlist To See The Full Leaderboard'}
                 </h3>
                 <p className={styles.ctaDescription}>
                   The OD rewards platform has 100 spots in the OS. Secure your place in the
                   top — join the waitlist now to unlock your score and full ranking.
                 </p>
                 <PrimaryButton type="button" icon={<FiArrowRight />} iconPosition="right">
-                  Join The Waitlist
+                  {isLoginPage ? 'Login now.' : 'Join The Waitlist'}
                 </PrimaryButton>
               </div>
             </>

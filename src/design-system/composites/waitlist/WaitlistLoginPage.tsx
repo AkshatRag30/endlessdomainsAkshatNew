@@ -18,7 +18,7 @@ export function WaitlistLoginPage({ onComplete, onBackToHome, onLogout }: Waitli
       <WaitlistNav isRegistered={false} onAlreadyRegistered={onBackToHome} />
       <main>
         <WaitlistHero renderCard={renderLoginCard} />
-        <WaitlistLeaderboard isJoined={false} onLogout={onLogout} />
+        <WaitlistLeaderboard isJoined={false} isLoginPage onLogout={onLogout} />
       </main>
     </>
   )
