@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useId } from 'react'
 import { TbFileText } from 'react-icons/tb'
-import { FiPlus, FiTrash2, FiEdit2, FiX, FiArrowRight, FiCheck } from 'react-icons/fi'
+import { FiPlus, FiEdit2, FiX, FiArrowRight, FiCheck } from 'react-icons/fi'
 import { BsCheck2 } from 'react-icons/bs'
 
 import { PrimaryButton } from '@/design-system/primitives/button'
@@ -177,9 +177,6 @@ export function FreenameRecords({ orderId: _orderId }: FreenameRecordsProps) {
     setEditingId(null)
   }, [])
 
-  const handleDelete = useCallback((id: string) => {
-    setRecords(prev => prev.filter(r => r.id !== id))
-  }, [])
 
   return (
     <section className={styles.section}>
@@ -198,12 +195,10 @@ export function FreenameRecords({ orderId: _orderId }: FreenameRecordsProps) {
             <thead>
               <tr className={styles.tableHead}>
                 <th className={styles.th} scope="col">Type</th>
-                <th className={styles.th} scope="col">Host</th>
-                <th className={`${styles.th} ${styles.thContent}`} scope="col">Content</th>
+                <th className={styles.th} scope="col">Name</th>
+                <th className={`${styles.th} ${styles.thContent}`} scope="col">Value</th>
                 <th className={styles.th} scope="col">TTL</th>
-                <th className={`${styles.th} ${styles.thActions}`} scope="col">
-                  <span className="visually-hidden">Actions</span>
-                </th>
+                <th className={`${styles.th} ${styles.thActions}`} scope="col">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -235,15 +230,8 @@ export function FreenameRecords({ orderId: _orderId }: FreenameRecordsProps) {
                         aria-label={`Edit ${record.type} record for ${record.host}`}
                         aria-expanded={editingId === record.id}
                       >
-                        <FiEdit2 size={15} aria-hidden="true" />
-                      </button>
-                      <button
-                        type="button"
-                        className={styles.deleteBtn}
-                        onClick={() => handleDelete(record.id)}
-                        aria-label={`Delete ${record.type} record for ${record.host}`}
-                      >
-                        <FiTrash2 size={15} aria-hidden="true" />
+                        <span className={styles.editLabel}>Edit</span>
+                        <FiEdit2 size={13} aria-hidden="true" />
                       </button>
                     </td>
                   </tr>,

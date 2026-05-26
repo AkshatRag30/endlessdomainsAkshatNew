@@ -66,23 +66,34 @@
 }
 
 .tableHead {
-  background: #f8f8f8; // design-specific: Figma-exact table header background
-  border-bottom: 1px solid #e2e2e2; // design-specific: Figma-exact table divider
+  background: var(--color-white-primary);
 }
 
 .th {
-  font-size: var(--text-small-12);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
   font-weight: var(--font-weight-medium);
-  color: rgba(0, 0, 0, 0.55); // design-specific: muted header label
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  padding: var(--space-2) var(--space-3);
+  color: rgba(7, 7, 7, 0.6); // design-specific: Figma-exact header label opacity
+  text-transform: capitalize;
+  padding: 0 var(--space-4);
   text-align: left;
   white-space: nowrap;
+  height: 57px; // design-specific: Figma-exact row height
+  vertical-align: middle;
+  border-bottom: 1px solid rgba(7, 7, 7, 0.1); // design-specific: Figma-exact row divider
+  border-right: 1px solid rgba(7, 7, 7, 0.1); // design-specific: Figma-exact column divider
+
+  &:first-child {
+    width: 132px; // design-specific: Figma-exact type column width
+  }
+
+  &:last-child {
+    border-right: none;
+  }
 }
 
 .thContent {
-  width: 40%;
+  width: 22%; // design-specific: Figma-proportional value column width
 
   @include mobile {
     width: auto;
@@ -90,12 +101,11 @@
 }
 
 .thActions {
-  width: 80px; // design-specific: fixed width for action buttons column
-  text-align: right;
+  width: 130px; // design-specific: Figma-exact action column width
+  text-align: left;
 }
 
 .tableRow {
-  border-bottom: 1px solid #f0f0f0; // design-specific: subtle row divider
   transition: background 0.1s ease;
 
   &:hover {
@@ -112,8 +122,15 @@
 }
 
 .td {
-  padding: var(--space-3);
+  padding: 0 var(--space-4);
   vertical-align: middle;
+  height: 57px; // design-specific: Figma-exact row height
+  border-bottom: 1px solid rgba(7, 7, 7, 0.1); // design-specific: Figma-exact row divider
+  border-right: 1px solid rgba(7, 7, 7, 0.1); // design-specific: Figma-exact column divider
+
+  &:last-child {
+    border-right: none;
+  }
 }
 
 .tdContent {
@@ -125,52 +142,66 @@
 }
 
 .tdActions {
-  text-align: right;
+  text-align: left;
 }
 
 .typeBadge {
-  display: inline-block;
-  font-size: var(--text-small-12);
-  font-weight: var(--font-weight-medium);
-  color: var(--color-blue-primary);
-  background: var(--color-blue-primary-alpha-07);
-  border: 1px solid var(--color-blue-primary-alpha-18);
-  padding: 2px var(--space-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-black-primary);
+  background: var(--color-white-primary);
+  border: 0.651px solid #9457f6; // design-specific: Figma-exact purple badge border
+  border-radius: 10.41px; // design-specific: Figma-exact badge pill radius
+  width: 61px; // design-specific: Figma-exact badge width
+  height: 23px; // design-specific: Figma-exact badge height
   white-space: nowrap;
 }
 
 .hostText {
+  font-family: var(--font-satoshi);
   font-size: var(--text-nav);
   font-weight: var(--font-weight-medium);
-  color: var(--color-black-primary);
-  font-family: 'Courier New', monospace; // design-specific: monospace for DNS host values
+  color: #070707; // design-specific: Figma-exact cell text color
+  text-transform: capitalize;
 }
 
 .contentText {
-  font-size: var(--text-small-12);
-  color: var(--color-gray-darker);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: #070707; // design-specific: Figma-exact cell text color
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   display: block;
+  text-transform: capitalize;
 }
 
 .ttlText {
-  font-size: var(--text-small-12);
-  color: var(--color-gray-primary);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: #070707; // design-specific: Figma-exact cell text color
   white-space: nowrap;
+  text-transform: capitalize;
 }
 
 .editBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px; // design-specific: Figma-exact gap between "Edit" label and icon
   background: none;
   border: none;
   cursor: pointer;
-  padding: var(--space-1);
-  color: var(--color-gray-primary);
-  transition: color 0.15s ease;
-  margin-right: var(--space-1);
+  padding: 0;
+  color: var(--color-blue-primary);
+  transition: opacity 0.15s ease;
 
-  &:hover { color: var(--color-blue-primary); }
+  &:hover { opacity: 0.75; }
 
   &:focus-visible {
     @include focus-ring;
@@ -178,20 +209,13 @@
   }
 }
 
-.deleteBtn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: var(--space-1);
-  color: var(--color-gray-primary);
-  transition: color 0.15s ease;
-
-  &:hover { color: var(--color-error); }
-
-  &:focus-visible {
-    @include focus-ring;
-    border-radius: var(--radius-sm);
-  }
+.editLabel {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+  text-transform: capitalize;
+  white-space: nowrap;
 }
 
 // ── Edit row ──────────────────────────────────────────────────────────────────
