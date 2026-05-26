@@ -1,0 +1,501 @@
+@import '@newstyles/_mixins.scss';
+
+.section {
+  background: var(--color-white-primary);
+  background-image: repeating-linear-gradient(135deg, transparent 0px, transparent 4px, var(--color-black-alpha-01) 4px, var(--color-black-alpha-01) 6px);
+  padding: var(--space-5) var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+
+  @include mobile {
+    padding: var(--space-4);
+    gap: var(--space-3);
+  }
+}
+
+// ── Title row ─────────────────────────────────────────────────────────────────
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.titleIcon {
+  color: var(--color-blue-primary);
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.title {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-heading-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+  margin: 0;
+}
+
+.subtitle {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  color: var(--color-gray-darker);
+  margin: 0;
+}
+
+// ── Table ─────────────────────────────────────────────────────────────────────
+
+.tableWrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.emptyState {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  color: var(--color-gray-primary);
+  margin: 0;
+  padding: var(--space-5) 0;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-satoshi);
+}
+
+.tableHead {
+  background: #f8f8f8; // design-specific: Figma-exact table header background
+  border-bottom: 1px solid #e2e2e2; // design-specific: Figma-exact table divider
+}
+
+.th {
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-medium);
+  color: rgba(0, 0, 0, 0.55); // design-specific: muted header label
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.thContent {
+  width: 40%;
+
+  @include mobile {
+    width: auto;
+  }
+}
+
+.thActions {
+  width: 80px; // design-specific: fixed width for action buttons column
+  text-align: right;
+}
+
+.tableRow {
+  border-bottom: 1px solid #f0f0f0; // design-specific: subtle row divider
+  transition: background 0.1s ease;
+
+  &:hover {
+    background: var(--color-gray-light-bg);
+  }
+}
+
+.tableRowEditing {
+  background: var(--color-blue-primary-alpha-07);
+
+  &:hover {
+    background: var(--color-blue-primary-alpha-07);
+  }
+}
+
+.td {
+  padding: var(--space-3);
+  vertical-align: middle;
+}
+
+.tdContent {
+  max-width: 260px;
+
+  @include mobile {
+    max-width: 140px;
+  }
+}
+
+.tdActions {
+  text-align: right;
+}
+
+.typeBadge {
+  display: inline-block;
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+  background: var(--color-blue-primary-alpha-07);
+  border: 1px solid var(--color-blue-primary-alpha-18);
+  padding: 2px var(--space-2);
+  white-space: nowrap;
+}
+
+.hostText {
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  font-family: 'Courier New', monospace; // design-specific: monospace for DNS host values
+}
+
+.contentText {
+  font-size: var(--text-small-12);
+  color: var(--color-gray-darker);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+}
+
+.ttlText {
+  font-size: var(--text-small-12);
+  color: var(--color-gray-primary);
+  white-space: nowrap;
+}
+
+.editBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--space-1);
+  color: var(--color-gray-primary);
+  transition: color 0.15s ease;
+  margin-right: var(--space-1);
+
+  &:hover { color: var(--color-blue-primary); }
+
+  &:focus-visible {
+    @include focus-ring;
+    border-radius: var(--radius-sm);
+  }
+}
+
+.deleteBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--space-1);
+  color: var(--color-gray-primary);
+  transition: color 0.15s ease;
+
+  &:hover { color: var(--color-error); }
+
+  &:focus-visible {
+    @include focus-ring;
+    border-radius: var(--radius-sm);
+  }
+}
+
+// ── Edit row ──────────────────────────────────────────────────────────────────
+
+.editRow {
+  background: var(--color-blue-primary-alpha-07);
+}
+
+.editCell {
+  padding: var(--space-4) var(--space-3);
+}
+
+// ── Add form wrap ─────────────────────────────────────────────────────────────
+
+.addFormWrap {
+  background: #f8f8f8; // design-specific: Figma-exact form bg
+  border: 1px solid #e2e2e2; // design-specific: Figma-exact form border
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.addFormTitle {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  margin: 0;
+}
+
+// ── Shared record form ────────────────────────────────────────────────────────
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 100px 1fr 2fr 120px;
+  gap: var(--space-3);
+  align-items: end;
+
+  @include tablet-down {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.formFieldContent {
+  @include mobile {
+    order: 3;
+  }
+}
+
+.formField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.formLabel {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-medium);
+  color: rgba(0, 0, 0, 0.75); // design-specific: Figma-exact label opacity
+}
+
+.formSelect,
+.formInput {
+  height: 40px; // design-specific: Figma-exact input height
+  padding: 0 var(--space-3);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  background: var(--color-white-primary);
+  border: 1px solid var(--color-gray-200);
+  outline: none;
+  width: 100%;
+  transition: border-color 0.15s ease;
+
+  &:focus { border-color: var(--color-blue-primary); }
+}
+
+.formSelect {
+  appearance: auto;
+  cursor: pointer;
+}
+
+.formActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.cancelFormBtn {
+  background: none;
+  border: 1px solid var(--color-gray-200);
+  padding: var(--space-2) var(--space-4);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-darker);
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+
+  &:hover {
+    border-color: var(--color-gray-primary);
+    color: var(--color-black-primary);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.saveFormBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  background: var(--color-blue-primary);
+  color: var(--color-white-primary);
+  border: none;
+  padding: var(--space-2) var(--space-5);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover { background: var(--color-blue-dark); }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// ── Bottom actions ────────────────────────────────────────────────────────────
+
+.bottomActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.addRecordBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: #474747; // design-specific: Figma-exact add record label colour
+  padding: 0;
+  transition: color 0.15s ease;
+
+  &:hover { color: var(--color-black-primary); }
+
+  &:focus-visible {
+    @include focus-ring;
+    border-radius: var(--radius-sm);
+  }
+}
+
+.actionBtn {
+  width: 50%; // design-specific: button is roughly half the section width
+  min-width: 280px;
+
+  @include mobile {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+// ── Success modal ─────────────────────────────────────────────────────────────
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  position: relative;
+  background: var(--color-white-primary);
+  border: 1px solid rgba(110, 218, 0, 0.28); // design-specific: Figma-exact green border
+  box-shadow: 0 0 54px rgba(0, 0, 0, 0.15); // design-specific: Figma-exact modal shadow
+  width: 458px; // design-specific: Figma-exact modal width
+  min-height: 269px; // design-specific: Figma-exact modal height
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-8) var(--space-6);
+  margin: var(--space-4);
+
+  @include mobile {
+    width: 100%;
+    padding: var(--space-6) var(--space-4);
+  }
+}
+
+.closeBtn {
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  width: 42px; // design-specific: Figma-exact close button size
+  height: 42px;
+  border-radius: var(--radius-full);
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-gray-primary);
+  transition: color 0.15s ease;
+
+  &:hover { color: var(--color-black-primary); }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.iconWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px; // design-specific: gap between circle and shadow ellipse
+}
+
+.iconOuter {
+  width: 68px; // design-specific: Figma-exact outer pale circle size
+  height: 68px;
+  border-radius: var(--radius-full);
+  background: rgba(108, 215, 0, 0.26); // design-specific: Figma-exact pale green bg
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iconInner {
+  width: 61.49px; // design-specific: from Figma CSS spec
+  height: 61.49px;
+  border-radius: 144.824px; // design-specific: from Figma CSS spec
+  background: linear-gradient(134.58deg, #5ebd00 10.17%, #73e500 59.57%, #5ebd00 98.68%); // design-specific: Figma-exact green gradient
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.checkIcon {
+  color: var(--color-white-primary);
+  width: 30px; // design-specific: Figma-exact check icon size
+  height: 30px;
+}
+
+.iconShadow {
+  width: 52px; // design-specific: Figma-exact shadow ellipse width
+  height: 3px;
+  border-radius: var(--radius-full);
+  background: rgba(0, 0, 0, 0.12);
+  filter: blur(2px);
+}
+
+.modalText {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.modalTitle {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-heading-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  margin: 0;
+  text-transform: capitalize;
+}
+
+.modalSubtitle {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  color: var(--color-gray-darker);
+  margin: 0;
+  text-align: center;
+  max-width: 228px; // design-specific: Figma-exact subtitle max-width
+  line-height: 1.5;
+}

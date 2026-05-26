@@ -16,6 +16,7 @@ export function UDTransfer({ domain }: UDTransferProps) {
   const [recipient, setRecipient] = useState('')
   const [agreed, setAgreed] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [transferred, setTransferred] = useState(false)
 
   const canTransfer = agreed && recipient.length > 0
 
@@ -25,11 +26,32 @@ export function UDTransfer({ domain }: UDTransferProps) {
 
   const handleConfirm = useCallback(() => {
     setShowConfirmModal(false)
+    setTransferred(true)
   }, [])
 
   const handleCancel = useCallback(() => {
     setShowConfirmModal(false)
   }, [])
+
+  if (transferred) {
+    return (
+      <section className={styles.section}>
+        <div className={styles.titleRow}>
+          <GoArrowSwitch className={styles.titleIcon} aria-hidden="true" />
+          <h2 className={styles.title}>Transfer Domain Ownership</h2>
+        </div>
+
+        <p className={styles.subtitle}>Link payment addresses</p>
+
+        <div className={styles.transferredBanner} role="alert">
+          <GoAlert className={styles.transferredIcon} aria-hidden="true" />
+          <p className={styles.transferredText}>
+            You can not manage this domain since you do not own this domain
+          </p>
+        </div>
+      </section>
+    )
+  }
 
   return (
     <>

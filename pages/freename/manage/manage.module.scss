@@ -1,0 +1,76 @@
+@import '@newstyles/_mixins.scss';
+
+.shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #f3f3f3; // design-specific: Figma-exact page background
+}
+
+.main {
+  flex: 1;
+  padding: var(--space-6) 0;
+}
+
+.page {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.workspace {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+
+  @include desktop {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--space-6);
+  }
+}
+
+.panel {
+  flex: 1;
+  min-width: 0;
+}
+
+// ── Loading / error states ────────────────────────────────────────────────────
+
+.loadingWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-12) 0;
+}
+
+.loadingSpinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--color-gray-200);
+  border-top-color: var(--color-blue-primary);
+  border-radius: var(--radius-full);
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.errorWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-12) 0;
+}
+
+.errorText {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  color: var(--color-gray-primary);
+  margin: 0;
+}

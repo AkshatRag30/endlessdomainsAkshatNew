@@ -7,9 +7,9 @@ import { TbCurrencyBitcoin } from 'react-icons/tb'
 
 import { PrimaryButton } from '@/design-system/primitives/button'
 import CurrencyModal from '@/components/manage-ud/CurrencyModal'
-import styles from './ENSCrypto.module.scss'
+import styles from './FreenameToken.module.scss'
 
-interface ENSCryptoProps {
+interface FreenameTokenProps {
   domain: string
 }
 
@@ -20,7 +20,10 @@ interface CryptoEntry {
   address: string
 }
 
-const DEMO_CRYPTO: CryptoEntry[] = [
+// ── Demo data — replace by fetching token records for the domain ──────────────
+// To integrate: load entries from the domain's token records via API
+
+const DEMO_TOKENS: CryptoEntry[] = [
   { key: 'ETH', name: 'Ethereum', chain: 'Ethereum (chain)', address: '' },
   { key: 'BTC', name: 'Bitcoin',  chain: 'Bitcoin (chain)',  address: '' },
 ]
@@ -66,8 +69,8 @@ function SuccessModal({ onClose }: { onClose: () => void }) {
   )
 }
 
-export function ENSCrypto({ domain }: ENSCryptoProps) {
-  const [entries, setEntries] = useState<CryptoEntry[]>(DEMO_CRYPTO)
+export function FreenameToken({ domain }: FreenameTokenProps) {
+  const [entries, setEntries]       = useState<CryptoEntry[]>(DEMO_TOKENS)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
 
@@ -93,7 +96,7 @@ export function ENSCrypto({ domain }: ENSCryptoProps) {
         <TbCurrencyBitcoin className={styles.titleIcon} aria-hidden="true" />
         <h2 className={styles.title}>Crypto Addresses</h2>
       </div>
-      <p className={styles.subtitle}>Link payment addresses</p>
+      <p className={styles.subtitle}>Link payment addresses to {domain}</p>
 
       <div className={styles.list}>
         {entries.length === 0 && (
@@ -166,4 +169,4 @@ export function ENSCrypto({ domain }: ENSCryptoProps) {
   )
 }
 
-export default ENSCrypto
+export default FreenameToken

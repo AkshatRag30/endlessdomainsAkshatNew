@@ -109,8 +109,7 @@ export function WaitlistLeaderboard({ isJoined = false, onLogout, isLoginPage = 
                   {isLoginPage ? 'Login now, to see the full leaderboard.' : 'Join The Waitlist To See The Full Leaderboard'}
                 </h3>
                 <p className={styles.ctaDescription}>
-                  The OD rewards platform has 100 spots in the OS. Secure your place in the
-                  top — join the waitlist now to unlock your score and full ranking.
+                  The OS records every position. The top 500 at the OS Reveal own their place in it first.
                 </p>
                 <PrimaryButton type="button" icon={<FiArrowRight />} iconPosition="right">
                   {isLoginPage ? 'Login now.' : 'Join The Waitlist'}

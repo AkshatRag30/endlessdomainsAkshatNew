@@ -1,193 +1,170 @@
-import { useState } from 'react'
-import { ImSpinner } from 'react-icons/im'
-import { Button, CardBody, CardHeader, Col, Row } from 'reactstrap'
-import { TOAST_TYPE } from '@/core/enum/toast-type.enum'
-import btnstyles from '@styles/Profile-Link.module.scss'
-import { handleTransferDomain } from '@/helpers/bnb'
-import ToastMessage from '../toast-message'
-import * as apiService from '@/core/services/api.service'
-import { API_ENDPOINT } from '@/core/enum/api-endpoint.enum'
-import { useRouter } from 'next/router'
-import { BiError } from 'react-icons/bi'
-const BNBTransfer = ({ domain }: { domain: string }) => {
-  const [newOwner, setNewOwner] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const ROUTER = useRouter()
-  const [agreements, setAgreements] = useState({
-    c1: false,
-    c2: false,
-    c3: false,
-  })
-  const allChecked = Object.values(agreements).every(Boolean)
+import { useState, useCallback } from 'react'
+import { GoArrowSwitch, GoAlert } from 'react-icons/go'
+import { TbMoodSad } from 'react-icons/tb'
+import { MdKeyboardDoubleArrowRight } from 'react-icons/md'
+import { FiArrowRight, FiX } from 'react-icons/fi'
 
-  const handleTransfer = async () => {
-    const res = [1, 2, 3].map(i => {
-      const agreeClause = document.getElementById(`agree-clause-${i}`) as HTMLInputElement
-      if (!agreeClause.checked) {
-        setError('Please agree to all the clauses')
-        return false
-      }
-    })
-    if (newOwner.length !== 42) {
-      setError('Invalid address')
-      return
-    }
-    if (res.includes(false)) return
-    else setError('')
-    setLoading(true)
-    if (/Mobi|Android/i.test(navigator.userAgent)) {
-      ToastMessage(TOAST_TYPE.INFO_SUCCESS, '', 'Please check your wallet and confirm the transaction.')
-    }
-    const result = await handleTransferDomain(domain, newOwner)
-    console.error(result.error)
-    console.error(result.data)
-    setLoading(false)
-    if (result.error) {
-      setError(result.error)
-      return
-    }
-    if (!result.data) {
-      setError('Something went wrong')
-      return
-    }
-    setError('')
-    setNewOwner('')
-    ToastMessage(TOAST_TYPE.SUCCESS, '', 'Domain transferred successfully')
-    ToastMessage(
-      TOAST_TYPE.SUCCESS,
-      '',
-      'We are fetching your updated domains. This may take a few seconds. If you don’t see the latest update, please hit the refresh icon.',
+import { PrimaryButton } from '@/design-system/primitives/button'
+import { SecondaryButton } from '@/design-system/primitives/secondary-button'
+import styles from './BNBTransfer.module.scss'
+
+interface BNBTransferProps {
+  domain: string
+}
+
+export function BNBTransfer({ domain }: BNBTransferProps) {
+  const [recipient, setRecipient] = useState('')
+  const [agreed, setAgreed] = useState(false)
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [transferred, setTransferred] = useState(false)
+
+  const canTransfer = agreed && recipient.length > 0
+
+  const handleTransferClick = useCallback(() => {
+    setShowConfirmModal(true)
+  }, [])
+
+  const handleConfirm = useCallback(() => {
+    setShowConfirmModal(false)
+    setTransferred(true)
+  }, [])
+
+  const handleCancel = useCallback(() => {
+    setShowConfirmModal(false)
+  }, [])
+
+  if (transferred) {
+    return (
+      <section className={styles.section}>
+        <div className={styles.titleRow}>
+          <GoArrowSwitch className={styles.titleIcon} aria-hidden="true" />
+          <h2 className={styles.title}>Transfer Domain Ownership</h2>
+        </div>
+
+        <p className={styles.subtitle}>Permanently transfer this BNB domain to another BSC address.</p>
+
+        <div className={styles.transferredBanner} role="alert">
+          <GoAlert className={styles.transferredIcon} aria-hidden="true" />
+          <p className={styles.transferredText}>
+            You can not manage this domain since you do not own this domain
+          </p>
+        </div>
+      </section>
     )
-    ROUTER.push('/profile/domains')
-
-    // ✅ Background refresh (DO NOT BLOCK UI)
-    await apiService.getApi(`${API_ENDPOINT.REFRESH_MY_DOMAINS}?limit=100`, true).catch((err: any) => {
-      console.error('Refresh domains API failed', err)
-      // silently fail — UX is not affected
-    })
-  }
-  const handleCheckboxChange = (key: keyof typeof agreements) => {
-    setAgreements(prev => ({ ...prev, [key]: !prev[key] }))
   }
 
   return (
-    <div className={`${btnstyles.sidenav_item} h-auto mt-3 py-4`}>
-      <CardHeader>
-        <h1>Transfer your BNB domain to another wallet</h1>
-        <p className="text-secondary">
-          You must have the private key in order to manage your domain. If you transfer this domain to an exchange or any other custodial
-          account where you do not control the private key, you will not be able to access your domain. Not your keys, not your domain.
-        </p>
-      </CardHeader>
-      <hr className="my-2"></hr>
-      <CardBody>
-        <Row className="mt-2">
-          <Col>
-            {error && (
-              <p className={btnstyles.text_danger}>
-                <BiError /> {error}
-              </p>
-            )}
-          </Col>
-        </Row>
+    <>
+      <section className={styles.section}>
+        <div className={styles.titleRow}>
+          <GoArrowSwitch className={styles.titleIcon} aria-hidden="true" />
+          <h2 className={styles.title}>Transfer Domain Ownership</h2>
+        </div>
 
-        <Row>
-          <Col>
-            <b style={{ marginRight: 10 }}>Recipient Address:</b>
-            <br />
+        <p className={styles.subtitle}>Permanently transfer this BNB domain to another BSC address.</p>
+
+        <div className={styles.warningBanner} role="alert">
+          <GoAlert className={styles.warningIcon} aria-hidden="true" />
+          <p className={styles.warningText}>
+            Transferring This Domain Permanently Removes Your Ownership. You Will Lose All Management Access.
+          </p>
+        </div>
+
+        <div className={styles.body}>
+          <div className={styles.fieldGroup}>
+            <label htmlFor="bnb-recipient-address" className={styles.fieldLabel}>
+              Recipient Address:
+            </label>
             <input
+              id="bnb-recipient-address"
               type="text"
-              name="recipient-address"
-              id="recipient-address"
-              placeholder="Enter your ETH/BSC Address"
-              style={{
-                width: '80%',
-                padding: '10px',
-                borderRadius: '8px',
-                border: error ? '1px solid #991B1B' : '1px solid rgb(103 103 103)',
-              }}
-              value={newOwner}
-              onChange={e => setNewOwner(e.target.value)}
+              className={[styles.input, recipient.length > 0 && recipient.length !== 42 ? styles.inputError : ''].filter(Boolean).join(' ')}
+              placeholder="Enter Recipient BSC/ETH Address (0x...)"
+              value={recipient}
+              onChange={e => setRecipient(e.target.value)}
             />
-          </Col>
-        </Row>
-        <Row className="mt-3">
-          <Col>
-            <div className="form-check">
-              <input
-                type="checkbox"
-                id="agree-clause-1"
-                className="form-check-input"
-                checked={agreements.c1}
-                onChange={() => handleCheckboxChange('c1')}
-              />
-              <label htmlFor="agree-clause-1" style={{ color: agreements.c1 == true ? '#000' : 'rgb(103 103 103)' }}>
-                I agree that I am transferring ownership of this domain and this action is irreversible.
-              </label>
-            </div>
-          </Col>
-        </Row>
-        <Row className="mt-2">
-          <Col>
-            <div className="form-check">
-              <input
-                className="form-check-input"
-                type="checkbox"
-                id="agree-clause-2"
-                checked={agreements.c2}
-                onChange={() => handleCheckboxChange('c2')}
-              />
-              <label htmlFor="agree-clause-2" style={{ color: agreements.c2 == true ? '#000' : 'rgb(103 103 103)' }}>
-                I&apos;m not transferring this domain to an exchange or any other custodial account.
-              </label>
-            </div>
-          </Col>
-        </Row>
-        <Row className="mt-2">
-          <Col>
-            <div className="form-check">
-              <input
-                type="checkbox"
-                className="form-check-input"
-                id="agree-clause-3"
-                checked={agreements.c3}
-                onChange={() => handleCheckboxChange('c3')}
-              />
-              <label htmlFor="agree-clause-3" style={{ color: agreements.c3 == true ? '#000' : 'rgb(103 103 103)' }}>
-                I&apos;m transferring this domain to an BSC Address.
-              </label>
-            </div>
-          </Col>
-        </Row>
+          </div>
 
-        <Row className="mt-3">
-          <Col className="text-right">
-            <Button
-              color="primary"
-              disabled={!allChecked || loading}
-              onClick={handleTransfer}
-              style={{
-                backgroundColor: allChecked ? '#2639ED' : '#e0e0e0',
-                borderColor: allChecked ? '#2639ED' : '#e0e0e0',
-                color: allChecked ? '#fff' : '#9e9e9e',
-                cursor: allChecked ? 'pointer' : 'not-allowed',
-                width: '200px',
-              }}
+          <label className={styles.agreementItem}>
+            <input
+              type="checkbox"
+              className={styles.checkbox}
+              checked={agreed}
+              onChange={() => setAgreed(prev => !prev)}
+            />
+            <span className={[styles.agreementLabel, agreed ? styles.agreementLabelChecked : ''].filter(Boolean).join(' ')}>
+              I understand this transfer is permanent and cannot be undone
+            </span>
+          </label>
+
+          {canTransfer && (
+            <PrimaryButton
+              variant="error"
+              className={styles.actionBtn}
+              onClick={handleTransferClick}
+              icon={<FiArrowRight aria-hidden="true" />}
+              iconPosition="right"
             >
-              Save Changes
-              <ImSpinner
-                className="ml-2 spinner"
-                style={{
-                  marginLeft: 5,
-                  display: loading ? 'inline-block' : 'none',
-                }}
-              />
-            </Button>
-          </Col>
-        </Row>
-      </CardBody>
-    </div>
+              Transfer Domain
+            </PrimaryButton>
+          )}
+        </div>
+      </section>
+
+      {showConfirmModal && (
+        <div
+          className={styles.overlay}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="bnb-transfer-modal-title"
+          onClick={e => { if (e.target === e.currentTarget) handleCancel() }}
+        >
+          <div className={styles.modal}>
+            <button
+              type="button"
+              className={styles.closeBtn}
+              onClick={handleCancel}
+              aria-label="Close"
+            >
+              <FiX size={18} />
+            </button>
+
+            <div className={styles.iconCircle} aria-hidden="true">
+              <TbMoodSad className={styles.sadIcon} />
+            </div>
+
+            <div className={styles.modalText}>
+              <h3 id="bnb-transfer-modal-title" className={styles.modalTitle}>
+                Are You Sure You Want To Transfer This Domain?
+              </h3>
+              <p className={styles.modalSubtitle}>
+                This action is permanent and cannot be undone. The domain will be transferred to the recipient address.
+              </p>
+            </div>
+
+            <div className={styles.modalActions}>
+              <SecondaryButton
+                danger
+                className={styles.cancelBtnFill}
+                onClick={handleCancel}
+                icon={<MdKeyboardDoubleArrowRight aria-hidden="true" />}
+                iconPosition="right"
+              >
+                Cancel
+              </SecondaryButton>
+              <PrimaryButton
+                className={styles.confirmBtnFill}
+                onClick={handleConfirm}
+                icon={<FiArrowRight aria-hidden="true" />}
+                iconPosition="right"
+              >
+                Confirm
+              </PrimaryButton>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   )
 }
 

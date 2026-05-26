@@ -1,25 +1,23 @@
-import { BsArrowRepeat } from 'react-icons/bs'
+import { TbFileText, TbCurrencyBitcoin } from 'react-icons/tb'
 import { GoArrowSwitch } from 'react-icons/go'
-import { TbWorld } from 'react-icons/tb'
 
-import type { ARBViewMenu } from './types'
-import styles from './ARBSidebar.module.scss'
+import type { FreenameViewMenu } from './types'
+import styles from './FreenameSidebar.module.scss'
 
-interface ARBSidebarProps {
-  selectedMenu: ARBViewMenu
-  setSelectedMenu: (menu: ARBViewMenu) => void
+interface FreenameSidebarProps {
+  selectedMenu: FreenameViewMenu
+  setSelectedMenu: (menu: FreenameViewMenu) => void
 }
 
-const NAV_ITEMS: { key: ARBViewMenu; label: string; icon: React.ReactNode }[] = [
-  { key: 'reverse',  label: 'Reverse',        icon: <BsArrowRepeat size={18} aria-hidden="true" /> },
-  { key: 'transfer', label: 'Transfer',        icon: <GoArrowSwitch size={18} aria-hidden="true" /> },
-  { key: 'pd',       label: 'Parked Domains',  icon: <TbWorld size={18} aria-hidden="true" /> },
+const NAV_ITEMS: { key: FreenameViewMenu; label: string; icon: React.ReactNode }[] = [
+  { key: 'records',  label: 'Records',  icon: <TbFileText size={18} aria-hidden="true" /> },
+  { key: 'token',    label: 'Token',    icon: <TbCurrencyBitcoin size={18} aria-hidden="true" /> },
+  { key: 'transfer', label: 'Transfer', icon: <GoArrowSwitch size={18} aria-hidden="true" /> },
 ]
 
-export function ARBSidebar({ selectedMenu, setSelectedMenu }: ARBSidebarProps) {
+export function FreenameSidebar({ selectedMenu, setSelectedMenu }: FreenameSidebarProps) {
   return (
     <nav className={styles.sidebar} aria-label="Domain management sections">
-      {/* Mobile: horizontal no-scroll grid */}
       <div className={styles.mobileNav} role="list">
         {NAV_ITEMS.map(item => (
           <button
@@ -36,7 +34,6 @@ export function ARBSidebar({ selectedMenu, setSelectedMenu }: ARBSidebarProps) {
         ))}
       </div>
 
-      {/* Desktop: vertical sidebar */}
       <div className={styles.desktopNav} role="list">
         {NAV_ITEMS.map(item => (
           <button
@@ -56,4 +53,4 @@ export function ARBSidebar({ selectedMenu, setSelectedMenu }: ARBSidebarProps) {
   )
 }
 
-export default ARBSidebar
+export default FreenameSidebar

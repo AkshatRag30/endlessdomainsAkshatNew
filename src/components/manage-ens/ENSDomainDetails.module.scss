@@ -1,0 +1,237 @@
+@import '@newstyles/_mixins.scss';
+
+.wrapper {
+  background: var(--color-white-primary);
+  background-image: repeating-linear-gradient(135deg, transparent 0px, transparent 4px, var(--color-black-alpha-01) 4px, var(--color-black-alpha-01) 6px);
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+// ── Top banner ────────────────────────────────────────────────────────────────
+
+.banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  min-height: 79px; // design-specific: Figma-exact banner row height
+
+  @include mobile {
+    padding: var(--space-3) var(--space-4);
+    min-height: 0;
+    gap: var(--space-2);
+  }
+}
+
+.avatarWrap {
+  width: 49px; // design-specific: Figma-exact avatar circle size
+  height: 49px;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(98, 126, 234, 0.36); // design-specific: ENS brand blue ring
+  box-shadow: 0 1px 6px rgba(98, 126, 234, 0.2); // design-specific: ENS brand blue glow
+  background: var(--color-white-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+
+  @include mobile {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+.avatarImg {
+  display: block;
+}
+
+.nameCol {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex-wrap: wrap;
+}
+
+.domainName {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-heading-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-black-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 60vw;
+  margin: 0;
+
+  @include mobile {
+    max-width: 52vw;
+    font-size: var(--text-nav);
+  }
+}
+
+.tldBadge {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-black-primary);
+  border: 1px solid #627eea; // design-specific: ENS brand blue TLD badge border
+  border-radius: var(--radius-full);
+  padding: 1px var(--space-2);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.providerLabel {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+  margin: 0;
+}
+
+// ── Blue accent strip ─────────────────────────────────────────────────────────
+
+.strip {
+  position: relative;
+  width: 100%;
+  height: 11px; // design-specific: Figma-exact strip height
+  background: var(--color-blue-primary);
+  box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.4); // design-specific: inner white glow
+
+  // design-specific: white dotted line centered within the blue bar
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    border-top: 1px dotted rgba(255, 255, 255, 0.8);
+    pointer-events: none;
+  }
+}
+
+// ── Info row ──────────────────────────────────────────────────────────────────
+
+.infoRow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-8);
+  padding: var(--space-4);
+  flex-wrap: wrap;
+
+  @include mobile {
+    gap: var(--space-4); // 16px — tight gap between field groups on mobile
+    padding: var(--space-3) var(--space-4);
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+
+  @include mobile {
+    width: 100%;
+    gap: 13px; // design-specific: Figma-exact label-to-box gap on mobile
+  }
+}
+
+.fieldOwner {
+  flex: 1;
+  min-width: 280px;
+
+  @include mobile {
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+.fieldLabel {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-medium);
+  color: rgba(0, 0, 0, 0.75); // design-specific: Figma-exact label opacity
+  letter-spacing: -0.02em;
+  text-transform: capitalize;
+}
+
+.fieldBox {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: #f2f2f2; // design-specific: Figma-exact info field background
+  border: 1px solid #e2e2e2; // design-specific: Figma-exact info field border
+  padding: var(--space-2) var(--space-3);
+  min-height: 45px; // design-specific: Figma-exact info box height
+  min-width: 140px;
+  margin: 0; // reset <dd> browser default margin-inline-start
+
+  @include mobile {
+    width: 100%;
+  }
+}
+
+.fieldText {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  white-space: nowrap;
+}
+
+// ── Owner address ─────────────────────────────────────────────────────────────
+
+.ownerAddress {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.copyBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-gray-primary);
+  display: flex;
+  align-items: center;
+  padding: 0;
+  flex-shrink: 0;
+  transition: color 0.15s ease;
+
+  &:hover { color: var(--color-black-primary); }
+
+  &:focus-visible {
+    @include focus-ring;
+    border-radius: var(--radius-sm);
+  }
+}
+
+// ── Expiry dot ────────────────────────────────────────────────────────────────
+
+.expiryDot {
+  display: inline-block;
+  width: 10px; // design-specific: Figma-exact dot size
+  height: 10px;
+  border-radius: var(--radius-full);
+  background: var(--color-error);
+  box-shadow:
+    0 4px 8px rgba(239, 68, 68, 0.33),
+    0 2px 4px rgba(239, 68, 68, 0.24); // design-specific: Figma-exact red glow
+  flex-shrink: 0;
+}

@@ -6,19 +6,19 @@ import { FiArrowRight, FiX } from 'react-icons/fi'
 
 import { PrimaryButton } from '@/design-system/primitives/button'
 import { SecondaryButton } from '@/design-system/primitives/secondary-button'
-import styles from './ENSTransfer.module.scss'
+import styles from './FreenameTransfer.module.scss'
 
-interface ENSTransferProps {
+interface FreenameTransferProps {
   domain: string
 }
 
-export function ENSTransfer({ domain }: ENSTransferProps) {
-  const [recipient, setRecipient] = useState('')
-  const [agreed, setAgreed] = useState(false)
+export function FreenameTransfer({ domain }: FreenameTransferProps) {
+  const [recipient, setRecipient]           = useState('')
+  const [agreed, setAgreed]                 = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
-  const [transferred, setTransferred] = useState(false)
+  const [transferred, setTransferred]       = useState(false)
 
-  const canTransfer = agreed && recipient.length > 0
+  const canTransfer = agreed && recipient.trim().length > 0
 
   const handleTransferClick = useCallback(() => {
     setShowConfirmModal(true)
@@ -41,7 +41,7 @@ export function ENSTransfer({ domain }: ENSTransferProps) {
           <h2 className={styles.title}>Transfer Domain Ownership</h2>
         </div>
 
-        <p className={styles.subtitle}>Permanently transfer this ENS domain to another Ethereum address.</p>
+        <p className={styles.subtitle}>Permanently transfer this Freename domain to another account.</p>
 
         <div className={styles.transferredBanner} role="alert">
           <GoAlert className={styles.transferredIcon} aria-hidden="true" />
@@ -61,7 +61,7 @@ export function ENSTransfer({ domain }: ENSTransferProps) {
           <h2 className={styles.title}>Transfer Domain Ownership</h2>
         </div>
 
-        <p className={styles.subtitle}>Permanently transfer this ENS domain to another Ethereum address.</p>
+        <p className={styles.subtitle}>Permanently transfer {domain} to another account.</p>
 
         <div className={styles.warningBanner} role="alert">
           <GoAlert className={styles.warningIcon} aria-hidden="true" />
@@ -72,14 +72,14 @@ export function ENSTransfer({ domain }: ENSTransferProps) {
 
         <div className={styles.body}>
           <div className={styles.fieldGroup}>
-            <label htmlFor="ens-recipient-address" className={styles.fieldLabel}>
-              Recipient Address:
+            <label htmlFor="freename-recipient-address" className={styles.fieldLabel}>
+              Recipient Address or Account:
             </label>
             <input
-              id="ens-recipient-address"
+              id="freename-recipient-address"
               type="text"
-              className={[styles.input, recipient.length > 0 && recipient.length !== 42 ? styles.inputError : ''].filter(Boolean).join(' ')}
-              placeholder="Enter Recipient ETH Address (0x...)"
+              className={[styles.input, recipient.length > 0 && recipient.length < 5 ? styles.inputError : ''].filter(Boolean).join(' ')}
+              placeholder="Enter recipient address or username"
               value={recipient}
               onChange={e => setRecipient(e.target.value)}
             />
@@ -116,7 +116,7 @@ export function ENSTransfer({ domain }: ENSTransferProps) {
           className={styles.overlay}
           role="dialog"
           aria-modal="true"
-          aria-labelledby="ens-transfer-modal-title"
+          aria-labelledby="freename-transfer-modal-title"
           onClick={e => { if (e.target === e.currentTarget) handleCancel() }}
         >
           <div className={styles.modal}>
@@ -134,11 +134,11 @@ export function ENSTransfer({ domain }: ENSTransferProps) {
             </div>
 
             <div className={styles.modalText}>
-              <h3 id="ens-transfer-modal-title" className={styles.modalTitle}>
+              <h3 id="freename-transfer-modal-title" className={styles.modalTitle}>
                 Are You Sure You Want To Transfer This Domain?
               </h3>
               <p className={styles.modalSubtitle}>
-                This action is permanent and cannot be undone. The domain will be transferred to the recipient address.
+                This action is permanent and cannot be undone. The domain will be transferred to the recipient.
               </p>
             </div>
 
@@ -168,4 +168,4 @@ export function ENSTransfer({ domain }: ENSTransferProps) {
   )
 }
 
-export default ENSTransfer
+export default FreenameTransfer

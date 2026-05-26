@@ -3,12 +3,12 @@ import Image from 'next/image'
 import { MdContentCopy, MdCheck } from 'react-icons/md'
 
 import { getDomainProvider } from '@/helpers/chaincurrency/chaincurrency'
-import styles from './ARBDomainDetails.module.scss'
+import styles from './FreenameDomainDetails.module.scss'
 
-interface ARBDomainDetailsProps {
+interface FreenameDomainDetailsProps {
   domain: string
-  owner: string
-  expiry: string
+  orderId: string
+  status: string
 }
 
 function parseDomain(fullName: string): { name: string; tld: string } {
@@ -17,25 +17,18 @@ function parseDomain(fullName: string): { name: string; tld: string } {
   return { name: fullName.slice(0, lastDot), tld: fullName.slice(lastDot) }
 }
 
-function formatExpiry(dateStr: string): string {
-  const d = new Date(dateStr)
-  if (isNaN(d.getTime())) return dateStr
-  const dd = String(d.getDate()).padStart(2, '0')
-  const mm = String(d.getMonth() + 1).padStart(2, '0')
-  const yyyy = d.getFullYear()
-  return `${dd}/${mm}/${yyyy}`
-}
-
-export function ARBDomainDetails({ domain, owner, expiry }: ARBDomainDetailsProps) {
+export function FreenameDomainDetails({ domain, orderId, status }: FreenameDomainDetailsProps) {
   const [copied, setCopied] = useState(false)
   const { name, tld } = parseDomain(domain)
-  const arbProvider = getDomainProvider('Arbitrum')!
+  const provider = getDomainProvider('Freename')!
 
   const handleCopy = useCallback(async () => {
-    await navigator.clipboard.writeText(owner)
+    await navigator.clipboard.writeText(orderId)
     setCopied(true)
     setTimeout(() => setCopied(false), 1500)
-  }, [owner])
+  }, [orderId])
+
+  const isActive = status.toLowerCase() === 'active'
 
   return (
     <div className={styles.wrapper}>
@@ -44,8 +37,8 @@ export function ARBDomainDetails({ domain, owner, expiry }: ARBDomainDetailsProp
       <div className={styles.banner}>
         <div className={styles.avatarWrap}>
           <Image
-            src={arbProvider.image}
-            alt={arbProvider.label}
+            src={provider.image}
+            alt={provider.label}
             width={41}
             height={41}
             className={styles.avatarImg}
@@ -57,33 +50,33 @@ export function ARBDomainDetails({ domain, owner, expiry }: ARBDomainDetailsProp
             <h1 className={styles.domainName}>{name}</h1>
             <span className={styles.tldBadge}>{tld}</span>
           </div>
-          <p className={styles.providerLabel}>arbitrum</p>
+          <p className={styles.providerLabel}>freename</p>
         </div>
       </div>
 
       {/* ── Accent strip ─────────────────────────────────────────────────── */}
       <div className={styles.strip} aria-hidden="true" />
 
-      {/* ── Info row: chain / owner / expiry ────────────────────────────── */}
+      {/* ── Info row: provider / order id / status ───────────────────────── */}
       <dl className={styles.infoRow}>
 
         <div className={styles.field}>
           <dt className={styles.fieldLabel}>Chain Provider</dt>
           <dd className={styles.fieldBox}>
-            <Image src={arbProvider.image} alt="" width={22} height={22} aria-hidden="true" />
-            <span className={styles.fieldText}>{arbProvider.label}</span>
+            <Image src={provider.image} alt="" width={22} height={22} aria-hidden="true" />
+            <span className={styles.fieldText}>{provider.label}</span>
           </dd>
         </div>
 
-        <div className={`${styles.field} ${styles.fieldOwner}`}>
-          <dt className={styles.fieldLabel}>Owner</dt>
+        <div className={`${styles.field} ${styles.fieldOrderId}`}>
+          <dt className={styles.fieldLabel}>Order ID</dt>
           <dd className={styles.fieldBox}>
-            <span className={styles.ownerAddress}>{owner}</span>
+            <span className={styles.orderIdText}>{orderId}</span>
             <button
               type="button"
               className={styles.copyBtn}
               onClick={handleCopy}
-              aria-label={copied ? 'Copied' : 'Copy owner address'}
+              aria-label={copied ? 'Copied' : 'Copy order ID'}
             >
               {copied
                 ? <MdCheck size={18} aria-hidden="true" />
@@ -93,10 +86,13 @@ export function ARBDomainDetails({ domain, owner, expiry }: ARBDomainDetailsProp
         </div>
 
         <div className={styles.field}>
-          <dt className={styles.fieldLabel}>Expiry</dt>
+          <dt className={styles.fieldLabel}>Status</dt>
           <dd className={styles.fieldBox}>
-            <span className={styles.expiryDot} aria-hidden="true" />
-            <span className={styles.fieldText}>{formatExpiry(expiry)}</span>
+            <span
+              className={isActive ? styles.statusDotActive : styles.statusDotInactive}
+              aria-hidden="true"
+            />
+            <span className={styles.fieldText}>{status}</span>
           </dd>
         </div>
 
@@ -105,4 +101,4 @@ export function ARBDomainDetails({ domain, owner, expiry }: ARBDomainDetailsProp
   )
 }
 
-export default ARBDomainDetails
+export default FreenameDomainDetails

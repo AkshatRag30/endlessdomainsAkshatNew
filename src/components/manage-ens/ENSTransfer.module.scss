@@ -105,18 +105,6 @@
   gap: var(--space-5);
 }
 
-// ── Action button ─────────────────────────────────────────────────────────────
-
-.actionBtn {
-  width: 50%; // design-specific: matches Reverse/Crypto — roughly half the section width
-  min-width: 280px;
-
-  @include mobile {
-    width: 100%;
-    min-width: 0;
-  }
-}
-
 .fieldGroup {
   display: flex;
   flex-direction: column;
@@ -147,8 +135,6 @@
   border-color: var(--color-error);
 }
 
-// ── Agreement ─────────────────────────────────────────────────────────────────
-
 .agreementItem {
   display: flex;
   align-items: flex-start;
@@ -176,6 +162,17 @@
   color: var(--color-black-primary);
 }
 
+// ── Action button ─────────────────────────────────────────────────────────────
+
+.actionBtn {
+  width: 50%; // design-specific: matches other section buttons — half the section width
+  min-width: 280px;
+
+  @include mobile {
+    width: 100%;
+    min-width: 0;
+  }
+}
 
 // ── Confirmation modal overlay ─────────────────────────────────────────────────
 
@@ -287,12 +284,10 @@
   width: 100%;
 }
 
-// Flex fill wrapper for SecondaryButton inside the modal actions row
 .cancelBtnFill {
   flex: 1;
 }
 
-// Flex fill wrapper for PrimaryButton inside the modal actions row
 .confirmBtnFill {
   flex: 1.5;
 }

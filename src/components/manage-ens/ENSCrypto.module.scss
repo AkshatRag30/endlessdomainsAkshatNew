@@ -1,0 +1,353 @@
+@import '@newstyles/_mixins.scss';
+
+.section {
+  background: var(--color-white-primary);
+  background-image: repeating-linear-gradient(135deg, transparent 0px, transparent 4px, var(--color-black-alpha-01) 4px, var(--color-black-alpha-01) 6px);
+  padding: var(--space-5) var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+
+  @include mobile {
+    padding: var(--space-4);
+    gap: var(--space-3);
+  }
+}
+
+// ── Title row ─────────────────────────────────────────────────────────────────
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.titleIcon {
+  color: var(--color-blue-primary);
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.title {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-heading-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+  margin: 0;
+}
+
+.subtitle {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  color: var(--color-gray-darker);
+  margin: 0;
+}
+
+// ── Entry list ────────────────────────────────────────────────────────────────
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.emptyState {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  color: var(--color-gray-primary);
+  margin: 0;
+}
+
+// ── Entry row ─────────────────────────────────────────────────────────────────
+
+.entryRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.entryHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.entryMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.currencyName {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-medium);
+  color: rgba(0, 0, 0, 0.75); // design-specific: Figma-exact label opacity
+  letter-spacing: -0.02em;
+  text-transform: capitalize;
+}
+
+.chainBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  background: var(--color-white-primary);
+  border: 1px solid #acacac; // design-specific: Figma-exact chain badge border
+  padding: 2px var(--space-2);
+}
+
+.removeBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  color: var(--color-gray-primary);
+  padding: var(--space-1);
+  transition: color 0.15s ease;
+
+  &:hover { color: var(--color-error); }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// ── Input row ─────────────────────────────────────────────────────────────────
+
+.inputRow {
+  position: relative; // anchors status icons inside the input boundary
+  display: flex;
+  align-items: center;
+}
+
+.input {
+  flex: 1;
+  width: 100%;
+  height: 40px; // design-specific: Figma-exact input height
+  padding: 0 44px 0 var(--space-3); // right padding reserves space for the status icon
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-medium);
+  background: var(--color-white-primary);
+  outline: none;
+  transition: border-color 0.15s ease;
+
+  &:focus { border-color: var(--color-blue-primary); }
+}
+
+.inputActive {
+  border: 1px solid rgba(38, 57, 237, 0.5); // design-specific: Figma-exact active input border
+  color: var(--color-blue-primary);
+}
+
+.inputPending {
+  border: 1px solid var(--color-gray-primary);
+  color: var(--color-gray-primary);
+}
+
+// ── Status indicators — absolutely positioned inside the input ─────────────────
+
+.statusCheck {
+  position: absolute;
+  right: var(--space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  color: #22c55e; // design-specific: Figma-exact green check colour
+  width: 22px;
+  height: 22px;
+  pointer-events: none;
+}
+
+.pendingState {
+  position: absolute;
+  right: var(--space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  pointer-events: none;
+}
+
+.pendingIcon {
+  color: #b9b4b4; // design-specific: Figma-exact pending icon colour
+  width: 22px;
+  height: 22px;
+}
+
+.pendingText {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-medium);
+  color: #b9b4b4; // design-specific: Figma-exact pending text colour
+  white-space: nowrap;
+}
+
+// ── Add currency link ─────────────────────────────────────────────────────────
+
+.addCurrencyBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: #474747; // design-specific: Figma-exact add currency label colour
+  padding: 0;
+  transition: color 0.15s ease;
+
+  &:hover { color: var(--color-black-primary); }
+
+  &:focus-visible {
+    @include focus-ring;
+    border-radius: var(--radius-sm);
+  }
+}
+
+// ── Action button ─────────────────────────────────────────────────────────────
+
+.actionBtn {
+  width: 50%; // design-specific: Figma — button is roughly half the section width
+  min-width: 280px;
+
+  @include mobile {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+// ── Success modal overlay ─────────────────────────────────────────────────────
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  position: relative;
+  background: var(--color-white-primary);
+  border: 1px solid rgba(110, 218, 0, 0.28); // design-specific: Figma-exact green border
+  box-shadow: 0 0 54px rgba(0, 0, 0, 0.15); // design-specific: Figma-exact modal shadow
+  width: 458px; // design-specific: Figma-exact modal width
+  min-height: 269px; // design-specific: Figma-exact modal height
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-8) var(--space-6);
+  margin: var(--space-4);
+
+  @include mobile {
+    width: 100%;
+    padding: var(--space-6) var(--space-4);
+  }
+}
+
+.closeBtn {
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  width: 42px; // design-specific: Figma-exact close button size
+  height: 42px;
+  border-radius: var(--radius-full);
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-gray-primary);
+  transition: color 0.15s ease;
+
+  &:hover { color: var(--color-black-primary); }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.iconWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px; // design-specific: gap between circle and shadow ellipse
+}
+
+.iconOuter {
+  width: 68px; // design-specific: Figma-exact outer pale circle size
+  height: 68px;
+  border-radius: var(--radius-full);
+  background: rgba(108, 215, 0, 0.26); // design-specific: Figma-exact pale green bg
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iconInner {
+  width: 61.49px; // design-specific: from Figma CSS spec
+  height: 61.49px;
+  border-radius: 144.824px; // design-specific: from Figma CSS spec
+  background: linear-gradient(134.58deg, #5ebd00 10.17%, #73e500 59.57%, #5ebd00 98.68%); // design-specific: Figma-exact green gradient
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.checkIcon {
+  color: var(--color-white-primary);
+  width: 30px; // design-specific: Figma-exact check icon size
+  height: 30px;
+}
+
+.iconShadow {
+  width: 52px; // design-specific: Figma-exact shadow ellipse width
+  height: 3px;
+  border-radius: var(--radius-full);
+  background: rgba(0, 0, 0, 0.12); // design-specific: soft drop shadow
+  filter: blur(2px);
+}
+
+.modalText {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.modalTitle {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-heading-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  margin: 0;
+  text-transform: capitalize;
+}
+
+.modalSubtitle {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  color: var(--color-gray-darker);
+  margin: 0;
+  text-align: center;
+  max-width: 228px; // design-specific: Figma-exact subtitle max-width
+  line-height: 1.5;
+}

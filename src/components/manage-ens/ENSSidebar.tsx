@@ -1,151 +1,61 @@
-import { Dispatch, ReactNode, SetStateAction } from 'react'
 import { AiOutlineUser } from 'react-icons/ai'
-import { Button, Col, Nav, NavItem } from 'reactstrap'
-import btnstyles from '@styles/Profile-Link.module.scss'
-import style from '@styles/Profile.module.scss'
-import { TbWorld } from "react-icons/tb";
-import { BsArrow90DegRight, BsArrowRepeat } from 'react-icons/bs'
+import { BsArrowRepeat, BsArrow90DegRight } from 'react-icons/bs'
 import { GoArrowSwitch } from 'react-icons/go'
+import { TbWorld } from 'react-icons/tb'
+
+import type { ENSViewMenu } from './types'
+import styles from './ENSSidebar.module.scss'
 
 interface ENSSidebarProps {
-  selectedMenu: string
-  setSelectedMenu: Dispatch<SetStateAction<'reverse' | 'profile' | 'crypto' | 'transfer' | 'pd'>>
-  children?: ReactNode
+  selectedMenu: ENSViewMenu
+  setSelectedMenu: (menu: ENSViewMenu) => void
 }
-const ENSSidebar = ({ selectedMenu, setSelectedMenu, children }: ENSSidebarProps) => {
+
+const NAV_ITEMS: { key: ENSViewMenu; label: string; icon: React.ReactNode }[] = [
+  { key: 'profile',  label: 'Profile',        icon: <AiOutlineUser size={18} aria-hidden="true" /> },
+  { key: 'reverse',  label: 'Reverse',         icon: <BsArrowRepeat size={18} aria-hidden="true" /> },
+  { key: 'crypto',   label: 'Crypto',          icon: <BsArrow90DegRight size={18} aria-hidden="true" /> },
+  { key: 'transfer', label: 'Transfer',        icon: <GoArrowSwitch size={18} aria-hidden="true" /> },
+  { key: 'pd',       label: 'Parked Domains',  icon: <TbWorld size={18} aria-hidden="true" /> },
+]
+
+export function ENSSidebar({ selectedMenu, setSelectedMenu }: ENSSidebarProps) {
   return (
-    <>
-      <div
-        className={`${style.scroll} d-block d-lg-none py-md-4 order-0 w-100`}
-        style={{
-          overflowY: 'auto',
-          backgroundColor: '#fff',
-          boxShadow: '0px 25px 75px 0px rgba(6, 7, 20, 0.1019607843)',
-          borderRadius: '16px',
-          borderBottom: '2px solid #bcbcbc'
-        }}
-      >
-        <Nav pills className="flex-nowrap">
-          <NavItem>
-            <Button
-              color="link"
-              className={`${btnstyles.profile_links} ${selectedMenu === 'reverse' && btnstyles.active}`}
-              tag="a"
-              onClick={() => setSelectedMenu('reverse')}
-            >
-              <BsArrowRepeat size={20} />
-              Reverse
-            </Button>
-          </NavItem>
-          <NavItem>
-            <Button
-              color="link"
-              className={`${btnstyles.profile_links} ${selectedMenu === 'profile' && btnstyles.active}`}
-              tag="a"
-              onClick={() => setSelectedMenu('profile')}
-            >
-              <AiOutlineUser size={20} />
-              Profile
-            </Button>
-          </NavItem>
-          <NavItem>
-            <Button
-              color="link"
-              className={`${btnstyles.profile_links} ${selectedMenu === 'crypto' && btnstyles.active}`}
-              tag="a"
-              onClick={() => setSelectedMenu('crypto')}
-            >
-              <BsArrow90DegRight size={20} />
-              Crypto
-            </Button>
-          </NavItem>
-          <NavItem>
-            <Button
-              color="link"
-              className={`${btnstyles.profile_links} ${selectedMenu === 'transfer' && btnstyles.active}`}
-              tag="a"
-              onClick={() => setSelectedMenu('transfer')}
-            >
-              <GoArrowSwitch size={20} />
-              Transfer
-            </Button>
-          </NavItem>
-          <NavItem>
-            <Button
-              color="link"
-              className={`${btnstyles.profile_links} ${selectedMenu === 'pd' && btnstyles.active}`}
-              tag="a"
-              onClick={() => setSelectedMenu('pd')}
-            >
-              <TbWorld size={20} />
-              Parked Domains
-            </Button>
-          </NavItem>
-        </Nav>
+    <nav className={styles.sidebar} aria-label="Domain management sections">
+      {/* Mobile: horizontal no-scroll grid */}
+      <div className={styles.mobileNav} role="list">
+        {NAV_ITEMS.map(item => (
+          <button
+            key={item.key}
+            role="listitem"
+            type="button"
+            className={[styles.navItem, selectedMenu === item.key ? styles.navItemActive : ''].filter(Boolean).join(' ')}
+            onClick={() => setSelectedMenu(item.key)}
+            aria-current={selectedMenu === item.key ? 'page' : undefined}
+          >
+            {item.icon}
+            {item.label}
+          </button>
+        ))}
       </div>
-      <Col lg={3} md={4} className="d-none d-lg-block order-0">
-        <Nav className={`flex-column flex-nowrap overflow-auto h-100 ${btnstyles.sidenav_item}`}>
-          <NavItem>
-            <Button
-              color="link"
-              className={`${btnstyles.profile_links} ${selectedMenu === 'reverse' && btnstyles.active}`}
-              tag="a"
-              onClick={() => setSelectedMenu('reverse')}
-            >
-              <BsArrowRepeat size={20} />
-              Reverse
-            </Button>
-          </NavItem>
-          <NavItem>
-            <Button
-              color="link"
-              className={`${btnstyles.profile_links} ${selectedMenu === 'profile' && btnstyles.active}`}
-              tag="a"
-              onClick={() => setSelectedMenu('profile')}
-            >
-              <AiOutlineUser size={20} />
-              Profile
-            </Button>
-          </NavItem>
-          <NavItem>
-            <Button
-              color="link"
-              className={`${btnstyles.profile_links} ${selectedMenu === 'crypto' && btnstyles.active}`}
-              tag="a"
-              onClick={() => setSelectedMenu('crypto')}
-            >
-              <BsArrow90DegRight size={20} />
-              Crypto
-            </Button>
-          </NavItem>
-          <NavItem>
-            <Button
-              color="link"
-              className={`${btnstyles.profile_links} ${selectedMenu === 'transfer' && btnstyles.active}`}
-              tag="a"
-              onClick={() => setSelectedMenu('transfer')}
-            >
-              <GoArrowSwitch size={20} />
-              Transfer
-            </Button>
-          </NavItem>
-          <NavItem>
-            <Button
-              color="link"
-              className={`${btnstyles.profile_links} ${selectedMenu === 'pd' && btnstyles.active}`}
-              tag="a"
-              onClick={() => setSelectedMenu('pd')}
-            >
-              <TbWorld size={20} />
-              Parked Domains
-            </Button>
-          </NavItem>
-        </Nav>
-      </Col>
-      <Col lg={9} className="order-2">
-        {children}
-      </Col>
-    </>
+
+      {/* Desktop: vertical sidebar */}
+      <div className={styles.desktopNav} role="list">
+        {NAV_ITEMS.map(item => (
+          <button
+            key={item.key}
+            role="listitem"
+            type="button"
+            className={[styles.navItem, selectedMenu === item.key ? styles.navItemActive : ''].filter(Boolean).join(' ')}
+            onClick={() => setSelectedMenu(item.key)}
+            aria-current={selectedMenu === item.key ? 'page' : undefined}
+          >
+            {item.icon}
+            {item.label}
+          </button>
+        ))}
+      </div>
+    </nav>
   )
 }
 

@@ -1,140 +1,146 @@
-import { useEffect, useState } from 'react'
-import { ImSpinner } from 'react-icons/im'
-import { Button, CardBody, CardHeader, Col, Row } from 'reactstrap'
-import btnstyles from '@styles/Profile-Link.module.scss'
-import { TOAST_TYPE } from '@/core/enum/toast-type.enum'
-import { handleGetProfileData, handleUpdateProfileData } from '@/helpers/ens'
+import { useState, useCallback } from 'react'
+import { AiOutlineUser } from 'react-icons/ai'
+import { FiArrowRight, FiX } from 'react-icons/fi'
+import { BsCheck2 } from 'react-icons/bs'
+import {
+  MdEmail,
+  MdPhone,
+} from 'react-icons/md'
+import {
+  FaTwitter,
+  FaDiscord,
+  FaTelegram,
+  FaGithub,
+  FaReddit,
+  FaInstagram,
+  FaLinkedin,
+  FaFacebook,
+} from 'react-icons/fa'
+import { TbWorld, TbFileDescription } from 'react-icons/tb'
 
-import ToastMessage from '../toast-message'
+import { PrimaryButton } from '@/design-system/primitives/button'
+import styles from './ENSProfile.module.scss'
 
-const ENSProfile = ({ domain }: { domain: string }) => {
-  const [error, setError] = useState<string>('')
-  const [profileData, setProfileData] = useState<Array<string>>(new Array(12).fill(''))
-  const [initialProfileData, setInitialProfileData] = useState<Array<string>>(new Array(12).fill(''))
+interface ENSProfileProps {
+  domain: string
+}
 
-  const [loading, setLoading] = useState(false)
-  const getProfileData = async () => {
-    const response = await handleGetProfileData(domain)
-    if (response.error) {
-      setError(response.error)
-      return
-    }
-    if (!response.data) {
-      return
-    }
-    setProfileData(response.data)
-    setError('')
-  }
+interface ProfileField {
+  key: string
+  label: string
+  icon: React.ReactNode
+  placeholder: string
+  type?: string
+}
 
-  const handleProfileDataChange = (index: number, value: string) => {
-    const newProfileData = [...profileData]
-    newProfileData[index] = value
-    setProfileData(newProfileData)
-  }
+const PROFILE_FIELDS: ProfileField[] = [
+  { key: 'email',       label: 'Email',       icon: <MdEmail     size={18} aria-hidden="true" />, placeholder: 'user@example.com',   type: 'email' },
+  { key: 'mobile',      label: 'Mobile',      icon: <MdPhone     size={18} aria-hidden="true" />, placeholder: '+1 234 567 8900' },
+  { key: 'website',     label: 'Website',     icon: <TbWorld     size={18} aria-hidden="true" />, placeholder: 'https://yoursite.com', type: 'url' },
+  { key: 'description', label: 'Description', icon: <TbFileDescription size={18} aria-hidden="true" />, placeholder: 'A short bio...' },
+  { key: 'twitter',     label: 'Twitter',     icon: <FaTwitter   size={18} aria-hidden="true" />, placeholder: '@handle' },
+  { key: 'discord',     label: 'Discord',     icon: <FaDiscord   size={18} aria-hidden="true" />, placeholder: 'username#0000' },
+  { key: 'telegram',    label: 'Telegram',    icon: <FaTelegram  size={18} aria-hidden="true" />, placeholder: '@handle' },
+  { key: 'github',      label: 'GitHub',      icon: <FaGithub    size={18} aria-hidden="true" />, placeholder: 'username' },
+  { key: 'reddit',      label: 'Reddit',      icon: <FaReddit    size={18} aria-hidden="true" />, placeholder: 'u/username' },
+  { key: 'instagram',   label: 'Instagram',   icon: <FaInstagram size={18} aria-hidden="true" />, placeholder: '@handle' },
+  { key: 'linkedin',    label: 'LinkedIn',    icon: <FaLinkedin  size={18} aria-hidden="true" />, placeholder: 'linkedin.com/in/username' },
+  { key: 'facebook',    label: 'Facebook',    icon: <FaFacebook  size={18} aria-hidden="true" />, placeholder: 'facebook.com/username' },
+]
 
-  const updateProfileData = async () => {
-    const confirm = window.confirm('Are you sure you want to update your profile data?')
-    if (!confirm) return
-    setLoading(true)
-    if (/Mobi|Android/i.test(navigator.userAgent)) {
-      ToastMessage(TOAST_TYPE.INFO_SUCCESS, '', 'Please check your wallet and confirm the transaction.')
-    }
-    const response = await handleUpdateProfileData(domain, profileData)
-    setLoading(false)
-    if (response.error) {
-      ToastMessage(TOAST_TYPE.ERROR, '', response.error)
+export function ENSProfile({ domain }: ENSProfileProps) {
+  const [values, setValues] = useState<Record<string, string>>(
+    Object.fromEntries(PROFILE_FIELDS.map(f => [f.key, '']))
+  )
+  const [showSuccess, setShowSuccess] = useState(false)
 
-      return
-    }
-    if (!response.data) {
-      return
-    }
-    ToastMessage(TOAST_TYPE.SUCCESS, '', 'Profile data updated successfully')
+  const handleChange = useCallback((key: string, value: string) => {
+    setValues(prev => ({ ...prev, [key]: value }))
+  }, [])
 
-    setProfileData(response.data)
-    setInitialProfileData(response.data)
-  }
-
-  useEffect(() => {
-    getProfileData()
-  }, [domain])
-  if (!domain)
-    return (
-      <>
-        <div className="container">
-          <p>Profile details not found</p>
-        </div>
-      </>
-    )
-  const isDisabled = JSON.stringify(profileData) === JSON.stringify(initialProfileData) || loading
+  const handleSave = useCallback(() => {
+    setShowSuccess(true)
+  }, [])
 
   return (
-    <div className={`${btnstyles.sidenav_item} h-auto mt-3`}>
-      <CardHeader>
-        <h1>Profile</h1>
-      </CardHeader>
-      <hr className="my-2"></hr>
-      <CardBody>
-        <p>
-          {error !== '' && (
-            <div className="alert alert-danger" role="alert">
-              {error}
-            </div>
-          )}
+    <>
+      <section className={styles.section}>
+        <div className={styles.titleRow}>
+          <AiOutlineUser className={styles.titleIcon} aria-hidden="true" />
+          <h2 className={styles.title}>Profile Records</h2>
+        </div>
+
+        <p className={styles.subtitle}>
+          Set public profile information linked to {domain}. These records are stored on-chain and visible to anyone.
         </p>
-        {[
-          'Email',
-          'Mobile',
-          'Description',
-          'Twitter',
-          'Facebook',
-          'LinkedIn',
-          'Discord',
-          'Telegram',
-          'Instagram',
-          'Github',
-          'Reddit',
-          'URL',
-        ].map((item, index) => (
-          <Row className="mt-2" key={index}>
-            <Col md={2}>
-              <label>
-                <b>{item}</b>
+
+        <div className={styles.body}>
+          {PROFILE_FIELDS.map(field => (
+            <div key={field.key} className={styles.fieldGroup}>
+              <label htmlFor={`ens-profile-${field.key}`} className={styles.fieldLabel}>
+                <span className={styles.fieldIcon}>{field.icon}</span>
+                {field.label}
               </label>
-            </Col>
-            <Col md={9}>
               <input
-                type="text"
-                className="form-control"
-                defaultValue={profileData[index]}
-                onChange={e => handleProfileDataChange(index, e.target.value)}
+                id={`ens-profile-${field.key}`}
+                type={field.type ?? 'text'}
+                className={styles.input}
+                placeholder={field.placeholder}
+                value={values[field.key]}
+                onChange={e => handleChange(field.key, e.target.value)}
               />
-            </Col>
-          </Row>
-        ))}
-        <Row className="mt-2">
-          <Col className="text-right">
-            <Button
-              disabled={isDisabled}
-              onClick={updateProfileData}
-              style={{
-                padding: '5px 20px',
-                width: '200px',
-                marginTop: '20px',
-                border: 0,
-                backgroundColor: isDisabled ? '#bcbcbc' : '#2639ED',
-                color: '#fff',
-                cursor: isDisabled ? 'not-allowed' : 'pointer',
-                opacity: isDisabled ? 0.7 : 1,
-              }}
+            </div>
+          ))}
+
+          <PrimaryButton
+            className={styles.actionBtn}
+            onClick={handleSave}
+            icon={<FiArrowRight aria-hidden="true" />}
+            iconPosition="right"
+          >
+            Save Changes
+          </PrimaryButton>
+        </div>
+      </section>
+
+      {/* ── Success modal ──────────────────────────────────────────────────── */}
+      {showSuccess && (
+        <div
+          className={styles.overlay}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Save successful"
+          onClick={e => { if (e.target === e.currentTarget) setShowSuccess(false) }}
+        >
+          <div className={styles.modal}>
+            <button
+              type="button"
+              className={styles.closeBtn}
+              onClick={() => setShowSuccess(false)}
+              aria-label="Close"
             >
-              Save Changes
-              <ImSpinner className="ml-2 spinner" style={{ marginLeft: 5, display: loading ? 'inline-block' : 'none' }} />
-            </Button>
-          </Col>
-        </Row>
-      </CardBody>
-    </div>
+              <FiX size={18} aria-hidden="true" />
+            </button>
+
+            <div className={styles.iconWrap}>
+              <div className={styles.iconOuter}>
+                <div className={styles.iconInner}>
+                  <BsCheck2 className={styles.checkIcon} aria-hidden="true" />
+                </div>
+              </div>
+              <div className={styles.iconShadow} aria-hidden="true" />
+            </div>
+
+            <div className={styles.modalText}>
+              <p className={styles.modalTitle}>Profile Updated</p>
+              <p className={styles.modalSubtitle}>
+                Your profile records have been saved successfully.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   )
 }
 
