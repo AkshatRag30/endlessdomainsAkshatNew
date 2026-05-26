@@ -1,8 +1,7 @@
 @import '@newstyles/_mixins.scss';
 
 .section {
-  background: var(--color-white-primary);
-  background-image: repeating-linear-gradient(135deg, transparent 0px, transparent 4px, var(--color-black-alpha-01) 4px, var(--color-black-alpha-01) 6px);
+  background: var(--color-gray-light-bg);
   padding: var(--space-5) var(--space-6);
   display: flex;
   flex-direction: column;
@@ -44,11 +43,106 @@
   margin: 0;
 }
 
+// ── Records header box ────────────────────────────────────────────────────────
+
+.recordsHeader {
+  background-color: var(--color-white-primary);
+  background-image: repeating-linear-gradient(135deg, transparent 0px, transparent 4px, var(--color-black-alpha-01) 4px, var(--color-black-alpha-01) 6px);
+  padding: var(--space-5) var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+
+  @include mobile {
+    padding: var(--space-4);
+    gap: var(--space-3);
+  }
+}
+
+.addRecordsBtn {
+  display: inline-flex;
+  align-items: stretch;
+  align-self: flex-start;
+  gap: 6px; // design-specific: Figma-exact 6.25px gap between icon and label frames
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+
+  &:hover .addRecordsBtnLabel {
+    background: var(--color-blue-primary-alpha-07);
+  }
+
+  &:hover .addRecordsBtnIcon {
+    // design-specific: hover amplifies the blue glow cascade
+    filter:
+      drop-shadow(0px 0.429365px 0px rgba(255, 255, 255, 0.5))
+      drop-shadow(0px 20px 38px rgba(0, 42, 254, 0.42))
+      drop-shadow(0px 7px 14px rgba(0, 42, 254, 0.2))
+      drop-shadow(0px 3px 6px rgba(0, 42, 254, 0.14))
+      drop-shadow(0px 1px 2px rgba(0, 42, 254, 0.1));
+    transform: scale(1.05);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.addRecordsBtnIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  // design-specific: Figma-exact glass gradient base
+  background: linear-gradient(182.41deg, rgba(241, 241, 241, 0.5) -27.41%, rgba(153, 153, 153, 0) 151.75%);
+  // design-specific: Figma-exact inset top white highlight + bottom blue depth line
+  box-shadow:
+    inset 0px 0.85873px 0px rgba(255, 255, 255, 0.6),
+    inset 0px -1.71746px 0px rgba(0, 42, 254, 0.3);
+  // design-specific: Figma-exact multi-layer blue drop-shadow cascade
+  filter:
+    drop-shadow(0px 0.429365px 0px rgba(255, 255, 255, 0.4))
+    drop-shadow(0px 16.6786px 31.5039px rgba(0, 42, 254, 0.25))
+    drop-shadow(0px 5.0281px 9.49751px rgba(0, 42, 254, 0.1115))
+    drop-shadow(0px 2.08841px 3.94478px rgba(0, 42, 254, 0.08))
+    drop-shadow(0px 0.755338px 1.42675px rgba(0, 42, 254, 0.06));
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: var(--color-white-primary);
+  flex-shrink: 0;
+  transition: filter 200ms ease, transform 150ms ease;
+}
+
+.addRecordsBtnLabel {
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-5);
+  height: 44px;
+  border: 1px solid var(--color-gray-200);
+  border-left: none;
+  border-radius: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+  background: var(--color-white-primary);
+  transition: background 150ms ease;
+  white-space: nowrap;
+}
+
 // ── Table ─────────────────────────────────────────────────────────────────────
 
 .tableWrap {
   width: 100%;
-  overflow-x: auto;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+
+  @include mobile {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 0;
+  }
 }
 
 .emptyState {
@@ -61,13 +155,12 @@
 
 .table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0 5px; // floating rows — 5px gap above and below each row
+  background: transparent;
   font-family: var(--font-satoshi);
 }
 
-.tableHead {
-  background: var(--color-white-primary);
-}
 
 .th {
   font-family: var(--font-satoshi);
@@ -75,13 +168,15 @@
   font-weight: var(--font-weight-medium);
   color: rgba(7, 7, 7, 0.6); // design-specific: Figma-exact header label opacity
   text-transform: capitalize;
-  padding: 0 var(--space-4);
+  padding: var(--space-4) var(--space-5);
   text-align: left;
   white-space: nowrap;
-  height: 57px; // design-specific: Figma-exact row height
   vertical-align: middle;
-  border-bottom: 1px solid rgba(7, 7, 7, 0.1); // design-specific: Figma-exact row divider
-  border-right: 1px solid rgba(7, 7, 7, 0.1); // design-specific: Figma-exact column divider
+  background-color: var(--color-white-primary);
+  background-image: repeating-linear-gradient(135deg, transparent 0px, transparent 4px, var(--color-black-alpha-01) 4px, var(--color-black-alpha-01) 6px);
+  border-bottom: 1px solid var(--color-gray-200);
+  border-right: 1px solid var(--color-gray-200);
+  letter-spacing: var(--tracking-nav);
 
   &:first-child {
     width: 132px; // design-specific: Figma-exact type column width
@@ -89,6 +184,11 @@
 
   &:last-child {
     border-right: none;
+  }
+
+  @include mobile {
+    padding: var(--space-3);
+    font-size: var(--text-small-12);
   }
 }
 
@@ -106,30 +206,28 @@
 }
 
 .tableRow {
-  transition: background 0.1s ease;
+  background-color: var(--color-white-primary);
+  background-image: repeating-linear-gradient(135deg, transparent 0px, transparent 4px, var(--color-black-alpha-01) 4px, var(--color-black-alpha-01) 6px);
+  transition: background 150ms ease;
 
   &:hover {
-    background: var(--color-gray-light-bg);
+    background: var(--color-gray-light);
+    background-image: none;
   }
 }
 
-.tableRowEditing {
-  background: var(--color-blue-primary-alpha-07);
-
-  &:hover {
-    background: var(--color-blue-primary-alpha-07);
-  }
-}
 
 .td {
-  padding: 0 var(--space-4);
+  padding: var(--space-4) var(--space-5);
   vertical-align: middle;
-  height: 57px; // design-specific: Figma-exact row height
-  border-bottom: 1px solid rgba(7, 7, 7, 0.1); // design-specific: Figma-exact row divider
-  border-right: 1px solid rgba(7, 7, 7, 0.1); // design-specific: Figma-exact column divider
+  border-right: 1px solid var(--color-gray-200);
 
   &:last-child {
     border-right: none;
+  }
+
+  @include mobile {
+    padding: var(--space-3);
   }
 }
 
@@ -218,84 +316,98 @@
   white-space: nowrap;
 }
 
-// ── Edit row ──────────────────────────────────────────────────────────────────
+// ── Create / Edit record modal ─────────────────────────────────────────────────
 
-.editRow {
-  background: var(--color-blue-primary-alpha-07);
-}
-
-.editCell {
-  padding: var(--space-4) var(--space-3);
-}
-
-// ── Add form wrap ─────────────────────────────────────────────────────────────
-
-.addFormWrap {
-  background: #f8f8f8; // design-specific: Figma-exact form bg
-  border: 1px solid #e2e2e2; // design-specific: Figma-exact form border
+.recordOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
   padding: var(--space-4);
+}
+
+.recordModal {
+  background: var(--color-white-primary);
+  border: 1px solid var(--color-gray-200);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.14); // design-specific: Figma-exact modal elevation
+  width: 100%;
+  max-width: 420px; // design-specific: Figma-exact modal width
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
 }
 
-.addFormTitle {
+.recordModalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
+}
+
+.recordModalTitle {
   font-family: var(--font-satoshi);
   font-size: var(--text-nav);
   font-weight: var(--font-weight-medium);
   color: var(--color-black-primary);
-  margin: 0;
 }
 
-// ── Shared record form ────────────────────────────────────────────────────────
+.recordModalClose {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-gray-primary);
+  transition: color 0.15s ease;
+  flex-shrink: 0;
 
-.form {
+  &:hover { color: var(--color-black-primary); }
+
+  &:focus-visible {
+    @include focus-ring;
+    border-radius: var(--radius-sm);
+  }
+}
+
+.recordModalDivider {
+  height: 1px;
+  background: var(--color-gray-200);
+}
+
+.recordModalForm {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
+  padding: var(--space-5);
 }
 
-.formGrid {
-  display: grid;
-  grid-template-columns: 100px 1fr 2fr 120px;
-  gap: var(--space-3);
-  align-items: end;
-
-  @include tablet-down {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  @include mobile {
-    grid-template-columns: 1fr;
-  }
-}
-
-.formFieldContent {
-  @include mobile {
-    order: 3;
-  }
-}
-
-.formField {
+.recordModalField {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: var(--space-2);
 }
 
-.formLabel {
+.recordModalLabel {
   font-family: var(--font-satoshi);
   font-size: var(--text-small-12);
   font-weight: var(--font-weight-medium);
   color: rgba(0, 0, 0, 0.75); // design-specific: Figma-exact label opacity
 }
 
-.formSelect,
-.formInput {
+.recordModalSelect,
+.recordModalInput {
   height: 40px; // design-specific: Figma-exact input height
   padding: 0 var(--space-3);
   font-family: var(--font-satoshi);
-  font-size: var(--text-small-12);
-  font-weight: var(--font-weight-medium);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-regular);
   color: var(--color-black-primary);
   background: var(--color-white-primary);
   border: 1px solid var(--color-gray-200);
@@ -303,53 +415,30 @@
   width: 100%;
   transition: border-color 0.15s ease;
 
+  &::placeholder { color: var(--color-gray-primary); }
   &:focus { border-color: var(--color-blue-primary); }
 }
 
-.formSelect {
+.recordModalSelect {
   appearance: auto;
   cursor: pointer;
 }
 
-.formActions {
+.recordModalSubmit {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-}
-
-.cancelFormBtn {
-  background: none;
-  border: 1px solid var(--color-gray-200);
-  padding: var(--space-2) var(--space-4);
-  font-family: var(--font-satoshi);
-  font-size: var(--text-nav);
-  font-weight: var(--font-weight-medium);
-  color: var(--color-gray-darker);
-  cursor: pointer;
-  transition: border-color 0.15s ease, color 0.15s ease;
-
-  &:hover {
-    border-color: var(--color-gray-primary);
-    color: var(--color-black-primary);
-  }
-
-  &:focus-visible {
-    @include focus-ring;
-  }
-}
-
-.saveFormBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
+  justify-content: center;
+  gap: var(--space-2);
+  width: 100%;
+  height: 44px; // design-specific: Figma-exact CTA height
   background: var(--color-blue-primary);
   color: var(--color-white-primary);
   border: none;
-  padding: var(--space-2) var(--space-5);
   font-family: var(--font-satoshi);
   font-size: var(--text-nav);
   font-weight: var(--font-weight-medium);
   cursor: pointer;
+  margin-top: var(--space-1);
   transition: background 0.15s ease;
 
   &:hover { background: var(--color-blue-dark); }
@@ -368,27 +457,6 @@
   flex-wrap: wrap;
 }
 
-.addRecordBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-family: var(--font-satoshi);
-  font-size: var(--text-nav);
-  font-weight: var(--font-weight-medium);
-  color: #474747; // design-specific: Figma-exact add record label colour
-  padding: 0;
-  transition: color 0.15s ease;
-
-  &:hover { color: var(--color-black-primary); }
-
-  &:focus-visible {
-    @include focus-ring;
-    border-radius: var(--radius-sm);
-  }
-}
 
 .actionBtn {
   width: 50%; // design-specific: button is roughly half the section width

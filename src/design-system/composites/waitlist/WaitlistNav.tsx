@@ -27,11 +27,11 @@ export function WaitlistNav({ isRegistered = false, onAlreadyRegistered, onLogou
             <PrimaryButton size="sm" type="button" onClick={onLogout}>
               Logout
             </PrimaryButton>
-          ) : (
+          ) : onAlreadyRegistered ? (
             <PrimaryButton size="sm" type="button" onClick={onAlreadyRegistered}>
               Already Registered?
             </PrimaryButton>
-          )}
+          ) : null}
         </div>
       </div>
     </nav>
