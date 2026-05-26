@@ -69,9 +69,102 @@
   }
 }
 
+// ── Gap connector SVG ─────────────────────────────────────────────────────────
+
+.connectorWrap {
+  position: absolute;
+  left: 50%;
+  top: 35%; // design-specific: Figma node 1:1237 sits ~34% from inner top, not centered
+  transform: translate(-50%, -50%);
+  z-index: 0; // behind .left and .right (both z-index: 1)
+  pointer-events: none;
+
+  @include tablet-down {
+    display: none;
+  }
+}
+
+.connectorBase {
+  // design-specific: Figma node 1:1237 is 317×108.5px; at width 380px → height 130px
+  display: block;
+  width: 380px;
+  height: auto;
+}
+
+// ── Animated glow layer — sits exactly over the base SVG ─────────────────────
+
+.connectorGlow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible; // allow drop-shadow glow to bleed slightly outside bounds
+  pointer-events: none;
+  // soft blue-white drop-shadow provides the ambient glow halo around both paths
+  filter:
+    drop-shadow(0 0 4px rgba(255, 255, 255, 0.9))
+    drop-shadow(0 0 10px rgba(38, 57, 237, 0.55))
+    drop-shadow(0 0 20px rgba(38, 57, 237, 0.3));
+
+  @include tablet-down {
+    opacity: 0.55;
+  }
+}
+
+// shared base state for both animated paths
+.glowPath1,
+.glowPath2 {
+  // single 80-unit visible beam; enormous gap keeps only one beam visible at a time
+  stroke-dasharray: 80 9999;
+  // beam starts 80 units before path origin — fully hidden at t=0
+  stroke-dashoffset: 80;
+  opacity: 0;
+}
+
+.glowPath1 {
+  animation: flowBeam 4s linear infinite;
+}
+
+.glowPath2 {
+  // staggered by 2 s so the two beams never overlap — creates natural depth
+  animation: flowBeam 4s linear infinite 2s;
+}
+
+// ── Keyframes ─────────────────────────────────────────────────────────────────
+
+// Traveling energy pulse: enters from the left, crosses the path, exits right.
+// stroke-dashoffset range = beam (80) + path-length (~330) = 410 user-units total.
+@keyframes flowBeam {
+  0% {
+    stroke-dashoffset: 80;    // beam is 80 units before path start — invisible
+    opacity: 0;
+    stroke-width: 1.5;
+  }
+  12% {
+    opacity: 0.85;            // fades in as beam crosses the path entry
+    stroke-width: 2;
+  }
+  50% {
+    opacity: 1;               // peak brightness at the mid-point
+    stroke-width: 2.5;        // subtle swell at the centre of the arc
+  }
+  88% {
+    opacity: 0.85;
+    stroke-width: 2;
+  }
+  100% {
+    stroke-dashoffset: -410;  // beam is 80 units past path end — invisible again
+    opacity: 0;
+    stroke-width: 1.5;
+  }
+}
+
 // ── Left column ───────────────────────────────────────────────────────────────
 
 .left {
+  position: relative;
+  z-index: 1; // stacks above .connectorWrap (z-index: 0)
   display: flex;
   flex-direction: column;
   max-width: 640px;
@@ -312,6 +405,8 @@
 // ── Right column ──────────────────────────────────────────────────────────────
 
 .right {
+  position: relative;
+  z-index: 1; // stacks above .connectorWrap (z-index: 0)
   display: flex;
   align-items: center;
   justify-content: center;
