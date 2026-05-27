@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
 import { TbRefresh } from 'react-icons/tb'
 import { FiArrowRight, FiX, FiCheck } from 'react-icons/fi'
-import { MdVerified } from 'react-icons/md'
+import { PiSealCheck } from 'react-icons/pi'
 import { GoArrowRight } from 'react-icons/go'
 
 import { PrimaryButton } from '@/design-system/primitives/button'
@@ -18,11 +18,11 @@ export function ARBReverseNew({ domain, currentRecord }: ARBReverseNewProps) {
 
   const handleSet = useCallback(() => {
     setShowSuccess(true)
-    setSaved(true)
   }, [])
 
   const handleCloseModal = useCallback(() => {
     setShowSuccess(false)
+    setSaved(true)
   }, [])
 
   return (
@@ -30,38 +30,36 @@ export function ARBReverseNew({ domain, currentRecord }: ARBReverseNewProps) {
       <section className={styles.section}>
         <div className={styles.titleRow}>
           <TbRefresh className={styles.syncIcon} aria-hidden="true" />
-          <h2 className={styles.title}>Reverse Resolution</h2>
+          <h2 className={styles.title}>Web3 Identity - Onchain Identity</h2>
         </div>
 
         <p className={styles.subtitle}>
-          Reverse resolution links your domain name to an address on the blockchain, letting apps show your domain instead of your wallet address.
+          Your primary on-chain identity is what apps and wallets display instead of your raw address.
         </p>
 
         <div className={styles.body}>
           {saved ? (
             /* ── Already-set state: show domain with seal ── */
-            <div className={styles.cardRow}>
-              <div className={styles.card}>
-                <p className={styles.cardHint}>Primary Domain</p>
-                <div className={styles.cardValueRow}>
-                  <MdVerified className={styles.sealIcon} aria-hidden="true" />
-                  <p className={styles.cardValueBlue}>{domain}</p>
-                </div>
-              </div>
+            <div className={`${styles.card} ${styles.cardStandalone}`}>
+              <p className={styles.cardHint}>Will set to this identity</p>
+              <div className={styles.cardValueRow}>
+              <p className={styles.cardValueBlue}>{domain}</p>
+              <PiSealCheck className={styles.sealIcon} aria-hidden="true" />
+            </div>
             </div>
           ) : (
             /* ── Not-set state: before / after cards ── */
             <div className={styles.cardRow}>
               <div className={styles.card}>
-                <p className={styles.cardHint}>Current reverse record</p>
-                <p className={styles.cardValue}>{currentRecord || 'Not set'}</p>
+                <p className={styles.cardHint}>Your wallet is currently not associated with any identity.</p>
+                <p className={styles.cardValue}>No Identity Set</p>
               </div>
 
               <GoArrowRight className={styles.arrowIcon} aria-hidden="true" />
 
               <div className={styles.card}>
-                <p className={styles.cardHint}>Will resolve to</p>
-                <p className={styles.cardValue}>{domain}</p>
+                <p className={styles.cardHint}>Will set to this identity</p>
+                <p className={styles.cardValueBlue}>{domain}</p>
               </div>
             </div>
           )}
@@ -73,7 +71,7 @@ export function ARBReverseNew({ domain, currentRecord }: ARBReverseNewProps) {
               icon={<FiArrowRight aria-hidden="true" />}
               iconPosition="right"
             >
-              Set Reverse Record
+              Set to {domain}
             </PrimaryButton>
           )}
         </div>
@@ -108,10 +106,10 @@ export function ARBReverseNew({ domain, currentRecord }: ARBReverseNewProps) {
 
             <div className={styles.modalText}>
               <h3 id="arb-reverse-modal-title" className={styles.modalTitle}>
-                Reverse Record Set
+                Updated Successfully.
               </h3>
               <p className={styles.modalSubtitle}>
-                Your ARB domain is now set as the primary reverse record for your wallet address.
+                Your primary on-chain identity has been updated. Apps and wallets will now display your identity instead of your raw wallet address. Changes may take a few minutes to propagate across all integrated protocols.
               </p>
             </div>
           </div>

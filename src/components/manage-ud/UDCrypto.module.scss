@@ -247,6 +247,7 @@
 .modal {
   position: relative;
   background: var(--color-white-primary);
+  background-image: repeating-linear-gradient(135deg, transparent 0px, transparent 4px, var(--color-black-alpha-01) 4px, var(--color-black-alpha-01) 6px);
   border: 1px solid rgba(110, 218, 0, 0.28); // design-specific: Figma-exact green border
   box-shadow: 0 0 54px rgba(0, 0, 0, 0.15); // design-specific: Figma-exact modal shadow
   width: 458px; // design-specific: Figma-exact modal width
@@ -351,6 +352,6 @@
   color: var(--color-gray-darker);
   margin: 0;
   text-align: center;
-  max-width: 228px; // design-specific: Figma-exact subtitle max-width
+  max-width: 300px; // design-specific: Figma-exact subtitle max-width
   line-height: 1.5;
 }

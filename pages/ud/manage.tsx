@@ -15,7 +15,7 @@ import styles from './manage.module.scss'
 // ── Demo data (replace with API call when ready) ───────────────────────────────
 
 const DEMO = {
-  fullName: 'myawesomeudomain.crypto',
+  fullName: 'myawesomeudomain.ud',
   owner: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
   expiry: '2026-12-12',
 }
@@ -46,12 +46,10 @@ export default function ManageUDPage() {
             <UDSidebar selectedMenu={selectedMenu} setSelectedMenu={setSelectedMenu} />
 
             <div className={styles.panel}>
-              {selectedMenu === 'crypto'   && <UDCrypto domain={DEMO.fullName} />}
-              {selectedMenu === 'reverse'  && <UDReverseNew domain={DEMO.fullName} currentRecord="" />}
-              {selectedMenu === 'transfer' && <UDTransfer domain={DEMO.fullName} />}
-              {selectedMenu === 'pd'       && (
-                <ParkedDomains domain={DEMO.fullName} provider="ud" />
-              )}
+              <div className={selectedMenu !== 'crypto'   ? styles.panelHidden : undefined}><UDCrypto domain={DEMO.fullName} /></div>
+              <div className={selectedMenu !== 'reverse'  ? styles.panelHidden : undefined}><UDReverseNew domain={DEMO.fullName} currentRecord="" /></div>
+              <div className={selectedMenu !== 'transfer' ? styles.panelHidden : undefined}><UDTransfer domain={DEMO.fullName} /></div>
+              <div className={selectedMenu !== 'pd'       ? styles.panelHidden : undefined}><ParkedDomains domain={DEMO.fullName} provider="ud" /></div>
             </div>
           </div>
         </div>

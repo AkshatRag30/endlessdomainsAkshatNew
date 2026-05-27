@@ -1,7 +1,7 @@
 import { BsArrowRepeat, BsArrow90DegRight } from 'react-icons/bs'
 import { GoArrowSwitch } from 'react-icons/go'
 import { TbWorld } from 'react-icons/tb'
-
+import { RiCopperCoinLine } from 'react-icons/ri'
 import type { UDViewMenu } from './types'
 import styles from './UDSidebar.module.scss'
 
@@ -12,7 +12,7 @@ interface UDSidebarProps {
 
 const NAV_ITEMS: { key: UDViewMenu; label: string; icon: React.ReactNode }[] = [
   { key: 'reverse',  label: 'Reverse',        icon: <BsArrowRepeat size={18} aria-hidden="true" /> },
-  { key: 'crypto',   label: 'Crypto',          icon: <BsArrow90DegRight size={18} aria-hidden="true" /> },
+  { key: 'crypto',   label: 'Add Currency',          icon: <RiCopperCoinLine size={18} aria-hidden="true" /> },
   { key: 'transfer', label: 'Transfer',        icon: <GoArrowSwitch size={18} aria-hidden="true" /> },
   { key: 'pd',       label: 'Parked Domains',  icon: <TbWorld size={18} aria-hidden="true" /> },
 ]

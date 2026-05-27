@@ -14,10 +14,10 @@ import {
   FaReddit,
   FaInstagram,
   FaLinkedin,
-  FaFacebook,
+  FaFacebook
 } from 'react-icons/fa'
 import { TbWorld, TbFileDescription } from 'react-icons/tb'
-
+import { FaXTwitter } from "react-icons/fa6";
 import { PrimaryButton } from '@/design-system/primitives/button'
 import styles from './ENSProfile.module.scss'
 
@@ -38,7 +38,7 @@ const PROFILE_FIELDS: ProfileField[] = [
   { key: 'mobile',      label: 'Mobile',      icon: <MdPhone     size={18} aria-hidden="true" />, placeholder: '+1 234 567 8900' },
   { key: 'website',     label: 'Website',     icon: <TbWorld     size={18} aria-hidden="true" />, placeholder: 'https://yoursite.com', type: 'url' },
   { key: 'description', label: 'Description', icon: <TbFileDescription size={18} aria-hidden="true" />, placeholder: 'A short bio...' },
-  { key: 'twitter',     label: 'Twitter',     icon: <FaTwitter   size={18} aria-hidden="true" />, placeholder: '@handle' },
+  { key: 'twitter',     label: 'Twitter',     icon: <FaXTwitter   size={18} aria-hidden="true" />, placeholder: '@handle' },
   { key: 'discord',     label: 'Discord',     icon: <FaDiscord   size={18} aria-hidden="true" />, placeholder: 'username#0000' },
   { key: 'telegram',    label: 'Telegram',    icon: <FaTelegram  size={18} aria-hidden="true" />, placeholder: '@handle' },
   { key: 'github',      label: 'GitHub',      icon: <FaGithub    size={18} aria-hidden="true" />, placeholder: 'username' },

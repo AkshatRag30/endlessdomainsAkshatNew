@@ -1,10 +1,10 @@
 import { useState, useCallback } from 'react'
 import { SiBitcoin, SiEthereum, SiSolana } from 'react-icons/si'
-import { FiPlus, FiTrash2, FiX, FiArrowRight } from 'react-icons/fi'
+import { FiTrash2, FiX, FiArrowRight } from 'react-icons/fi'
 import { BsCheck2 } from 'react-icons/bs'
 import { LuLoader } from 'react-icons/lu'
-import { TbCurrencyBitcoin } from 'react-icons/tb'
-
+import { RiCopperCoinLine } from 'react-icons/ri'
+import { LuSquarePlus } from "react-icons/lu";
 import { PrimaryButton } from '@/design-system/primitives/button'
 import CurrencyModal from './CurrencyModal'
 import styles from './UDCrypto.module.scss'
@@ -32,7 +32,7 @@ function CoinIcon({ symbol }: { symbol: string }) {
   if (s === 'BTC') return <SiBitcoin size={20} color="#F7931A" aria-hidden="true" />
   if (s === 'ETH') return <SiEthereum size={20} color="#627EEA" aria-hidden="true" />
   if (s === 'SOL') return <SiSolana size={20} color="#9945FF" aria-hidden="true" />
-  return <TbCurrencyBitcoin size={20} aria-hidden="true" />
+  return <RiCopperCoinLine size={20} aria-hidden="true" />
 }
 
 // ── Success modal (shared with reverse) ───────────────────────────────────────
@@ -59,9 +59,9 @@ function SuccessModal({ onClose }: { onClose: () => void }) {
           <div className={styles.iconShadow} aria-hidden="true" />
         </div>
         <div className={styles.modalText}>
-          <p className={styles.modalTitle}>Save Change Successfull</p>
+          <p className={styles.modalTitle}>Your wallet address is updated.</p>
           <p className={styles.modalSubtitle}>
-            Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+            Your new address is live. All payments to this identity on this chain will now resolve to the updated address.
           </p>
         </div>
       </div>
@@ -100,15 +100,15 @@ export function UDCrypto({ domain }: UDCryptoProps) {
     <section className={styles.section}>
       {/* Title */}
       <div className={styles.titleRow}>
-        <TbCurrencyBitcoin className={styles.titleIcon} aria-hidden="true" />
-        <h2 className={styles.title}>Crypto Addresses</h2>
+        <RiCopperCoinLine className={styles.titleIcon} aria-hidden="true" />
+        <h2 className={styles.title}>Wallet Addresses</h2>
       </div>
-      <p className={styles.subtitle}>Link payment addresses</p>
+      <p className={styles.subtitle}>Link the wallet addresses you want to receive payments on.</p>
 
       {/* Entry list */}
       <div className={styles.list}>
         {entries.length === 0 && (
-          <p className={styles.emptyState}>No crypto addresses added yet.</p>
+          <p className={styles.emptyState}>No wallet addresses added yet.</p>
         )}
 
         {entries.map(entry => (
@@ -158,7 +158,7 @@ export function UDCrypto({ domain }: UDCryptoProps) {
 
       {/* Add currency link */}
       <button type="button" className={styles.addCurrencyBtn} onClick={() => setIsModalOpen(true)}>
-        <FiPlus size={20} aria-hidden="true" />
+        <LuSquarePlus size={20} aria-hidden="true" />
         Add Currency
       </button>
 

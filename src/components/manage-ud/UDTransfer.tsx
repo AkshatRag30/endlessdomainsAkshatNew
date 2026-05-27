@@ -58,7 +58,7 @@ export function UDTransfer({ domain }: UDTransferProps) {
       <section className={styles.section}>
         <div className={styles.titleRow}>
           <GoArrowSwitch className={styles.titleIcon} aria-hidden="true" />
-          <h2 className={styles.title}>Transfer Domain Ownership</h2>
+          <h2 className={styles.title}>Transfer Identity Ownership</h2>
         </div>
 
         <p className={styles.subtitle}>Link payment addresses</p>
@@ -66,7 +66,7 @@ export function UDTransfer({ domain }: UDTransferProps) {
         <div className={styles.warningBanner} role="alert">
           <GoAlert className={styles.warningIcon} aria-hidden="true" />
           <p className={styles.warningText}>
-            Transferring This Domain Permanently Removes Your Ownership. You Will Lose All Management Access.&quot;
+            You are about to permanently transfer this identity to another wallet. This action cannot be undone.
           </p>
         </div>
 
@@ -79,7 +79,7 @@ export function UDTransfer({ domain }: UDTransferProps) {
               id="recipient-address"
               type="text"
               className={[styles.input, recipient.length > 0 && recipient.length !== 42 ? styles.inputError : ''].filter(Boolean).join(' ')}
-              placeholder="Enter Your ETH/Polygon Address Here"
+              placeholder="Enter the wallet address of the new owner"
               value={recipient}
               onChange={e => setRecipient(e.target.value)}
             />
@@ -135,10 +135,10 @@ export function UDTransfer({ domain }: UDTransferProps) {
 
             <div className={styles.modalText}>
               <h3 id="transfer-modal-title" className={styles.modalTitle}>
-                Are You Sure You Want This Domain Permanently
+                Are you sure you want this Transfer Permanently?
               </h3>
               <p className={styles.modalSubtitle}>
-                Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+                This identity will be removed from your wallet and ownership will pass to the recipient address. You cannot undo this.
               </p>
             </div>
 
@@ -150,15 +150,16 @@ export function UDTransfer({ domain }: UDTransferProps) {
                 icon={<MdKeyboardDoubleArrowRight aria-hidden="true" />}
                 iconPosition="right"
               >
-                Cancel
+                Go Back
               </SecondaryButton>
               <PrimaryButton
+                variant="error"
                 className={styles.confirmBtnFill}
                 onClick={handleConfirm}
                 icon={<FiArrowRight aria-hidden="true" />}
                 iconPosition="right"
               >
-                Confirm
+                Yes, Transfer
               </PrimaryButton>
             </div>
           </div>

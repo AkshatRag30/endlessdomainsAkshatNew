@@ -45,9 +45,9 @@ export default function ManageARBPage() {
             <ARBSidebar selectedMenu={selectedMenu} setSelectedMenu={setSelectedMenu} />
 
             <div className={styles.panel}>
-              {selectedMenu === 'reverse'  && <ARBReverseNew domain={DEMO.fullName} currentRecord="" />}
-              {selectedMenu === 'transfer' && <ARBTransfer domain={DEMO.fullName} />}
-              {selectedMenu === 'pd'       && <ParkedDomains domain={DEMO.fullName} provider="arb" />}
+              <div className={selectedMenu !== 'reverse'  ? styles.panelHidden : undefined}><ARBReverseNew domain={DEMO.fullName} currentRecord="" /></div>
+              <div className={selectedMenu !== 'transfer' ? styles.panelHidden : undefined}><ARBTransfer domain={DEMO.fullName} /></div>
+              <div className={selectedMenu !== 'pd'       ? styles.panelHidden : undefined}><ParkedDomains domain={DEMO.fullName} provider="arb" /></div>
             </div>
           </div>
         </div>

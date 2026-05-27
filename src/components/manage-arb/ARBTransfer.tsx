@@ -38,7 +38,7 @@ export function ARBTransfer({ domain }: ARBTransferProps) {
       <section className={styles.section}>
         <div className={styles.titleRow}>
           <GoArrowSwitch className={styles.titleIcon} aria-hidden="true" />
-          <h2 className={styles.title}>Transfer Domain Ownership</h2>
+          <h2 className={styles.title}>Transfer Identity Ownership</h2>
         </div>
 
         <p className={styles.subtitle}>Permanently transfer this ARB domain to another Arbitrum address.</p>
@@ -58,7 +58,7 @@ export function ARBTransfer({ domain }: ARBTransferProps) {
       <section className={styles.section}>
         <div className={styles.titleRow}>
           <GoArrowSwitch className={styles.titleIcon} aria-hidden="true" />
-          <h2 className={styles.title}>Transfer Domain Ownership</h2>
+          <h2 className={styles.title}>Transfer Identity Ownership</h2>
         </div>
 
         <p className={styles.subtitle}>Permanently transfer this ARB domain to another Arbitrum address.</p>
@@ -66,20 +66,20 @@ export function ARBTransfer({ domain }: ARBTransferProps) {
         <div className={styles.warningBanner} role="alert">
           <GoAlert className={styles.warningIcon} aria-hidden="true" />
           <p className={styles.warningText}>
-            Transferring This Domain Permanently Removes Your Ownership. You Will Lose All Management Access.
+            You are about to permanently transfer this identity to another wallet. This action cannot be undone.
           </p>
         </div>
 
         <div className={styles.body}>
           <div className={styles.fieldGroup}>
             <label htmlFor="arb-recipient-address" className={styles.fieldLabel}>
-              Recipient Address:
+              Recipient Address
             </label>
             <input
               id="arb-recipient-address"
               type="text"
               className={[styles.input, recipient.length > 0 && recipient.length !== 42 ? styles.inputError : ''].filter(Boolean).join(' ')}
-              placeholder="Enter Recipient ARB/ETH Address (0x...)"
+              placeholder="Enter the wallet address of the new owner"
               value={recipient}
               onChange={e => setRecipient(e.target.value)}
             />
@@ -93,7 +93,7 @@ export function ARBTransfer({ domain }: ARBTransferProps) {
               onChange={() => setAgreed(prev => !prev)}
             />
             <span className={[styles.agreementLabel, agreed ? styles.agreementLabelChecked : ''].filter(Boolean).join(' ')}>
-              I understand this transfer is permanent and cannot be undone
+              I understand this transfer is permanent and cannot be reversed.
             </span>
           </label>
 
@@ -105,7 +105,7 @@ export function ARBTransfer({ domain }: ARBTransferProps) {
               icon={<FiArrowRight aria-hidden="true" />}
               iconPosition="right"
             >
-              Transfer Domain
+              Transfer Identity
             </PrimaryButton>
           )}
         </div>
@@ -135,10 +135,10 @@ export function ARBTransfer({ domain }: ARBTransferProps) {
 
             <div className={styles.modalText}>
               <h3 id="arb-transfer-modal-title" className={styles.modalTitle}>
-                Are You Sure You Want To Transfer This Domain?
+                Are you sure you want this Transfer Permanently?
               </h3>
               <p className={styles.modalSubtitle}>
-                This action is permanent and cannot be undone. The domain will be transferred to the recipient address.
+                This identity will be removed from your wallet and ownership will pass to the recipient address. You cannot undo this.
               </p>
             </div>
 
@@ -150,15 +150,16 @@ export function ARBTransfer({ domain }: ARBTransferProps) {
                 icon={<MdKeyboardDoubleArrowRight aria-hidden="true" />}
                 iconPosition="right"
               >
-                Cancel
+                Go Back
               </SecondaryButton>
               <PrimaryButton
+                variant="error"
                 className={styles.confirmBtnFill}
                 onClick={handleConfirm}
                 icon={<FiArrowRight aria-hidden="true" />}
                 iconPosition="right"
               >
-                Confirm
+                Yes, Transfer
               </PrimaryButton>
             </div>
           </div>

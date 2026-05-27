@@ -30,7 +30,11 @@ function RemoveModal({ onCancel, onConfirm }: { onCancel: () => void; onConfirm:
           </div>
         </div>
 
-        <h2 className={styles.modalTitle}>Are You Sure You Want To Remove</h2>
+        <h2 className={styles.modalTitle}>Are You Sure You Want To Remove?</h2>
+
+        <p className={styles.modalDesc}>
+          Removing this parked identity will take your profile offline immediately. Your identity will stop earning passive revenue and your public profile will no longer be discoverable.
+        </p>
 
         <div className={styles.modalActions}>
           <button
@@ -96,10 +100,12 @@ const ParkedDomains = ({ domain, provider, disabled = false }: { domain: string;
         <div className={styles.header}>
           <div className={styles.titleRow}>
             <TbWorld className={styles.titleIcon} aria-hidden="true" />
-            <h2 className={styles.title}>Parked Your Domains</h2>
+            <h2 className={styles.title}>Park Your Identity</h2>
           </div>
           <p className={styles.description}>
-            Parked domains let users create a Web3 profile with contact info, social media links, and descriptions. Others can view these profiles using the domain name.
+            {currentRecord
+              ? 'Parking your identity lets you create an on-chain profile with contact info, social links, and a description. Others can discover and view your profile using your identity name. Your identity earns passive revenue while it sits parked.'
+              : 'No parked profile set. Helper text: Park this identity to make it discoverable and start earning passive revenue.'}
           </p>
         </div>
 
@@ -134,7 +140,7 @@ const ParkedDomains = ({ domain, provider, disabled = false }: { domain: string;
                   icon={<FiArrowRight size={22} aria-hidden="true" />}
                   iconPosition="right"
                 >
-                  update
+                  Park Identities
                 </PrimaryButton>
               </div>
             ) : (

@@ -101,6 +101,14 @@
   }
 }
 
+// Confirmed / already-set single card — constrain to image width, don't stretch full row
+.cardStandalone {
+  flex: unset;
+  width: 420px; // design-specific: Figma-exact single confirmed card width
+  max-width: 100%;
+  min-width: 0;
+}
+
 .cardHint {
   font-family: var(--font-satoshi);
   font-size: var(--text-small-12);
@@ -278,6 +286,6 @@
   color: var(--color-gray-darker);
   margin: 0;
   text-align: center;
-  max-width: 228px; // design-specific: Figma-exact subtitle width
+  max-width: 400px; // design-specific: Figma-exact subtitle width
   line-height: 1.5;
 }

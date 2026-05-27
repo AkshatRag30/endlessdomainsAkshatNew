@@ -47,11 +47,11 @@ export default function ManageENSPage() {
             <ENSSidebar selectedMenu={selectedMenu} setSelectedMenu={setSelectedMenu} />
 
             <div className={styles.panel}>
-              {selectedMenu === 'profile'  && <ENSProfile  domain={DEMO.fullName} />}
-              {selectedMenu === 'reverse'  && <ENSReverseNew domain={DEMO.fullName} currentRecord="" />}
-              {selectedMenu === 'crypto'   && <ENSCrypto   domain={DEMO.fullName} />}
-              {selectedMenu === 'transfer' && <ENSTransfer domain={DEMO.fullName} />}
-              {selectedMenu === 'pd'       && <ParkedDomains domain={DEMO.fullName} provider="ens" />}
+              <div className={selectedMenu !== 'profile'  ? styles.panelHidden : undefined}><ENSProfile  domain={DEMO.fullName} /></div>
+              <div className={selectedMenu !== 'reverse'  ? styles.panelHidden : undefined}><ENSReverseNew domain={DEMO.fullName} currentRecord="" /></div>
+              <div className={selectedMenu !== 'crypto'   ? styles.panelHidden : undefined}><ENSCrypto   domain={DEMO.fullName} /></div>
+              <div className={selectedMenu !== 'transfer' ? styles.panelHidden : undefined}><ENSTransfer domain={DEMO.fullName} /></div>
+              <div className={selectedMenu !== 'pd'       ? styles.panelHidden : undefined}><ParkedDomains domain={DEMO.fullName} provider="ens" /></div>
             </div>
           </div>
         </div>

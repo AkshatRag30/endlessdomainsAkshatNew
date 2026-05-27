@@ -1,7 +1,8 @@
 import { AiOutlineUser } from 'react-icons/ai'
-import { BsArrowRepeat, BsArrow90DegRight } from 'react-icons/bs'
+import { BsArrowRepeat } from 'react-icons/bs'
 import { GoArrowSwitch } from 'react-icons/go'
 import { TbWorld } from 'react-icons/tb'
+import { RiCopperCoinLine } from 'react-icons/ri'
 
 import type { ENSViewMenu } from './types'
 import styles from './ENSSidebar.module.scss'
@@ -14,7 +15,7 @@ interface ENSSidebarProps {
 const NAV_ITEMS: { key: ENSViewMenu; label: string; icon: React.ReactNode }[] = [
   { key: 'profile',  label: 'Profile',        icon: <AiOutlineUser size={18} aria-hidden="true" /> },
   { key: 'reverse',  label: 'Reverse',         icon: <BsArrowRepeat size={18} aria-hidden="true" /> },
-  { key: 'crypto',   label: 'Crypto',          icon: <BsArrow90DegRight size={18} aria-hidden="true" /> },
+  { key: 'crypto',   label: 'Crypto',          icon: <RiCopperCoinLine size={18} aria-hidden="true" /> },
   { key: 'transfer', label: 'Transfer',        icon: <GoArrowSwitch size={18} aria-hidden="true" /> },
   { key: 'pd',       label: 'Parked Domains',  icon: <TbWorld size={18} aria-hidden="true" /> },
 ]

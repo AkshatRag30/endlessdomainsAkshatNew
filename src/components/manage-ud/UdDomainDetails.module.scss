@@ -182,6 +182,18 @@
   }
 }
 
+.chainIconCircle {
+  width: 36px; // design-specific: Figma-exact circle size
+  height: 36px;
+  border-radius: var(--radius-full);
+  border: 1.5px solid #7b3fe4; // design-specific: Polygon brand purple border
+  background: var(--color-white-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
 .polygonIcon {
   color: #7b3fe4; // design-specific: Polygon brand purple
   flex-shrink: 0;

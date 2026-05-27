@@ -1,9 +1,9 @@
 import { useState, useCallback } from 'react'
 import { SiBitcoin, SiEthereum, SiLitecoin, SiDogecoin, SiPolygon } from 'react-icons/si'
-import { FiPlus, FiTrash2, FiX, FiArrowRight } from 'react-icons/fi'
+import { FiTrash2, FiX, FiArrowRight } from 'react-icons/fi'
 import { BsCheck2 } from 'react-icons/bs'
-import { LuLoader } from 'react-icons/lu'
-import { TbCurrencyBitcoin } from 'react-icons/tb'
+import { LuLoader, LuSquarePlus } from 'react-icons/lu'
+import { RiCopperCoinLine } from 'react-icons/ri'
 
 import { PrimaryButton } from '@/design-system/primitives/button'
 import CurrencyModal from '@/components/manage-ud/CurrencyModal'
@@ -31,7 +31,7 @@ function CoinIcon({ symbol }: { symbol: string }) {
   if (symbol === 'LTC')  return <SiLitecoin  size={20} color="#345D9D" aria-hidden="true" />
   if (symbol === 'DOGE') return <SiDogecoin  size={20} color="#C2A633" aria-hidden="true" />
   if (symbol === 'MATIC')return <SiPolygon   size={20} color="#7B3FE4" aria-hidden="true" />
-  return <TbCurrencyBitcoin size={20} aria-hidden="true" />
+  return <RiCopperCoinLine size={20} aria-hidden="true" />
 }
 
 function SuccessModal({ onClose }: { onClose: () => void }) {
@@ -56,9 +56,9 @@ function SuccessModal({ onClose }: { onClose: () => void }) {
           <div className={styles.iconShadow} aria-hidden="true" />
         </div>
         <div className={styles.modalText}>
-          <p className={styles.modalTitle}>Save Change Successful</p>
+          <p className={styles.modalTitle}>Your wallet address is updated.</p>
           <p className={styles.modalSubtitle}>
-            Your crypto addresses have been updated successfully.
+            Your new address is live. All payments to this identity on this chain will now resolve to the updated address.
           </p>
         </div>
       </div>
@@ -90,10 +90,10 @@ export function ENSCrypto({ domain }: ENSCryptoProps) {
   return (
     <section className={styles.section}>
       <div className={styles.titleRow}>
-        <TbCurrencyBitcoin className={styles.titleIcon} aria-hidden="true" />
-        <h2 className={styles.title}>Crypto Addresses</h2>
+        <RiCopperCoinLine className={styles.titleIcon} aria-hidden="true" />
+        <h2 className={styles.title}>Wallet Addresses</h2>
       </div>
-      <p className={styles.subtitle}>Link payment addresses</p>
+      <p className={styles.subtitle}>Link the wallet addresses you want to receive payments on.</p>
 
       <div className={styles.list}>
         {entries.length === 0 && (
@@ -144,7 +144,7 @@ export function ENSCrypto({ domain }: ENSCryptoProps) {
       </div>
 
       <button type="button" className={styles.addCurrencyBtn} onClick={() => setIsModalOpen(true)}>
-        <FiPlus size={20} aria-hidden="true" />
+        <LuSquarePlus size={20} aria-hidden="true" />
         Add Currency
       </button>
 

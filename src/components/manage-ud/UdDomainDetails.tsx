@@ -69,7 +69,9 @@ export function UdDomainDetails({ domain, owner, expiry }: UdDomainDetailsProps)
         <div className={styles.field}>
           <dt className={styles.fieldLabel}>Chain Provider</dt>
           <dd className={styles.fieldBox}>
-            <SiPolygon size={22} className={styles.polygonIcon} aria-hidden="true" />
+            <span className={styles.chainIconCircle}>
+              <SiPolygon size={16} className={styles.polygonIcon} aria-hidden="true" />
+            </span>
             <span className={styles.fieldText}>Polygon</span>
           </dd>
         </div>

@@ -45,9 +45,9 @@ export default function ManageBNBPage() {
             <BNBSidebar selectedMenu={selectedMenu} setSelectedMenu={setSelectedMenu} />
 
             <div className={styles.panel}>
-              {selectedMenu === 'reverse'  && <BNBReverseNew domain={DEMO.fullName} currentRecord="" />}
-              {selectedMenu === 'transfer' && <BNBTransfer domain={DEMO.fullName} />}
-              {selectedMenu === 'pd'       && <ParkedDomains domain={DEMO.fullName} provider="bnb" />}
+              <div className={selectedMenu !== 'reverse'  ? styles.panelHidden : undefined}><BNBReverseNew domain={DEMO.fullName} currentRecord="" /></div>
+              <div className={selectedMenu !== 'transfer' ? styles.panelHidden : undefined}><BNBTransfer domain={DEMO.fullName} /></div>
+              <div className={selectedMenu !== 'pd'       ? styles.panelHidden : undefined}><ParkedDomains domain={DEMO.fullName} provider="bnb" /></div>
             </div>
           </div>
         </div>
