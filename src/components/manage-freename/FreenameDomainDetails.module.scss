@@ -181,6 +181,18 @@
   }
 }
 
+.chainIconWrap {
+  width: 28px; // design-specific: white circle frame around provider logo
+  height: 28px;
+  border-radius: var(--radius-full);
+  background: var(--color-white-primary);
+  border: 1px solid #e2e2e2; // design-specific: matches fieldBox border color
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
 .fieldText {
   font-family: var(--font-satoshi);
   font-size: var(--text-small-12);
@@ -225,14 +237,17 @@
 
 .statusDotActive {
   display: inline-block;
-  width: 10px; // design-specific: Figma-exact dot size
+  width: 10px;
   height: 10px;
   border-radius: var(--radius-full);
-  background: var(--color-status-available);
-  box-shadow:
-    0 4px 8px rgba(34, 197, 94, 0.33),
-    0 2px 4px rgba(34, 197, 94, 0.24); // design-specific: green glow for active
   flex-shrink: 0;
+
+  // design-specific: white center dot → green ring — exact same pattern as UdDomainDetails expiryDot with green substituted for red
+  background: radial-gradient(circle at center, #ffffff 0%, #ffffff 18%, #22c55e 22%, #22c55e 100%);
+
+  box-shadow:
+    0 0 6px 3px rgba(34, 197, 94, 0.45),
+    0 0 2px 1px rgba(34, 197, 94, 0.3);
 }
 
 .statusDotInactive {

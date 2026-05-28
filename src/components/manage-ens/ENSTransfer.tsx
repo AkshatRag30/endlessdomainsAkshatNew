@@ -41,7 +41,7 @@ export function ENSTransfer({ domain }: ENSTransferProps) {
           <h2 className={styles.title}>Transfer Identity Ownership</h2>
         </div>
 
-        <p className={styles.subtitle}>Permanently transfer this ENS domain to another Ethereum address.</p>
+        <p className={styles.subtitle}>Link payment addresses</p>
 
         <div className={styles.transferredBanner} role="alert">
           <GoAlert className={styles.transferredIcon} aria-hidden="true" />
@@ -61,7 +61,7 @@ export function ENSTransfer({ domain }: ENSTransferProps) {
           <h2 className={styles.title}>Transfer Identity Ownership</h2>
         </div>
 
-        <p className={styles.subtitle}>Permanently transfer this ENS domain to another Ethereum address.</p>
+        <p className={styles.subtitle}>Link payment addresses</p>
 
         <div className={styles.warningBanner} role="alert">
           <GoAlert className={styles.warningIcon} aria-hidden="true" />

@@ -114,6 +114,8 @@
   padding: var(--space-1);
   transition: color 0.15s ease;
 
+  svg { color: var(--color-error); }
+
   &:hover { color: var(--color-error); }
 
   &:focus-visible {

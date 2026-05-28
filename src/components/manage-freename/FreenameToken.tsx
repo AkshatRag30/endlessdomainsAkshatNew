@@ -1,9 +1,10 @@
 import { useState, useCallback } from 'react'
 import { SiBitcoin, SiEthereum, SiLitecoin, SiDogecoin, SiPolygon } from 'react-icons/si'
-import { FiPlus, FiTrash2, FiX, FiArrowRight } from 'react-icons/fi'
+import { FiTrash2, FiX, FiArrowRight } from 'react-icons/fi'
 import { BsCheck2 } from 'react-icons/bs'
-import { LuLoader } from 'react-icons/lu'
-import { TbCurrencyBitcoin } from 'react-icons/tb'
+import { AiOutlineLoading3Quarters } from 'react-icons/ai'
+import { RiCopperCoinLine } from 'react-icons/ri'
+import { LuSquarePlus } from 'react-icons/lu'
 
 import { PrimaryButton } from '@/design-system/primitives/button'
 import CurrencyModal from '@/components/manage-ud/CurrencyModal'
@@ -93,7 +94,7 @@ export function FreenameToken({ domain }: FreenameTokenProps) {
   return (
     <section className={styles.section}>
       <div className={styles.titleRow}>
-        <TbCurrencyBitcoin className={styles.titleIcon} aria-hidden="true" />
+        <RiCopperCoinLine className={styles.titleIcon} aria-hidden="true" />
         <h2 className={styles.title}>Crypto Addresses</h2>
       </div>
       <p className={styles.subtitle}>Link payment addresses to {domain}</p>
@@ -136,7 +137,7 @@ export function FreenameToken({ domain }: FreenameTokenProps) {
                 <BsCheck2 className={styles.statusCheck} aria-hidden="true" />
               ) : (
                 <div className={styles.pendingState}>
-                  <LuLoader className={styles.pendingIcon} aria-hidden="true" />
+                  <AiOutlineLoading3Quarters className={styles.pendingIcon} aria-hidden="true" />
                   <span className={styles.pendingText}>Pending</span>
                 </div>
               )}
@@ -147,7 +148,7 @@ export function FreenameToken({ domain }: FreenameTokenProps) {
       </div>
 
       <button type="button" className={styles.addCurrencyBtn} onClick={() => setIsModalOpen(true)}>
-        <FiPlus size={20} aria-hidden="true" />
+        <LuSquarePlus size={20} aria-hidden="true" />
         Add Currency
       </button>
 

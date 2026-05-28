@@ -93,7 +93,7 @@ export function UDTransfer({ domain }: UDTransferProps) {
               onChange={() => setAgreed(prev => !prev)}
             />
             <span className={[styles.agreementLabel, agreed ? styles.agreementLabelChecked : ''].filter(Boolean).join(' ')}>
-              I understand this transfer is permanent and cannot be undone
+              I understand this transfer is permanent and cannot be reversed.
             </span>
           </label>
 
@@ -105,7 +105,7 @@ export function UDTransfer({ domain }: UDTransferProps) {
               icon={<FiArrowRight aria-hidden="true" />}
               iconPosition="right"
             >
-              Transfer Domain
+              Transfer Identity
             </PrimaryButton>
           )}
         </div>
@@ -150,7 +150,7 @@ export function UDTransfer({ domain }: UDTransferProps) {
                 icon={<MdKeyboardDoubleArrowRight aria-hidden="true" />}
                 iconPosition="right"
               >
-                Go Back
+                No, Go Back
               </SecondaryButton>
               <PrimaryButton
                 variant="error"

@@ -2,8 +2,6 @@ import React, { useState, useCallback, useId } from 'react'
 import { FiEdit2, FiX, FiArrowRight } from 'react-icons/fi'
 import { TbFileText, TbSquarePlus } from 'react-icons/tb'
 import { BsCheck2 } from 'react-icons/bs'
-import { MdArrowForward } from 'react-icons/md'
-
 import { PrimaryButton } from '@/design-system/primitives/button'
 import type { DnsRecord } from './types'
 import styles from './FreenameRecords.module.scss'
@@ -17,7 +15,7 @@ const DEMO_RECORDS: DnsRecord[] = [
 
 const DNS_TYPES = ['A', 'AAAA', 'CNAME', 'MX', 'TXT', 'NS', 'SRV', 'CAA']
 
-const EMPTY_FORM = { type: 'A', host: '', content: '', ttl: 3600 }
+const EMPTY_FORM = { type: '', host: '', content: '', ttl: 3600 }
 
 interface RecordFormState {
   type: string
@@ -100,7 +98,7 @@ function RecordModal({ initialValues, onSave, onClose, formId }: RecordModalProp
         {/* Header */}
         <div className={styles.recordModalHeader}>
           <span className={styles.recordModalTitle}>
-            {isEdit ? 'Edit Record' : 'Create Records'}
+            {isEdit ? 'Edit Your Records' : 'Create Records'}
           </span>
           <button
             type="button"
@@ -121,13 +119,14 @@ function RecordModal({ initialValues, onSave, onClose, formId }: RecordModalProp
           onSubmit={handleSubmit}
         >
           <div className={styles.recordModalField}>
-            <label htmlFor={typeId} className={styles.recordModalLabel}>Select Type</label>
             <select
               id={typeId}
               className={styles.recordModalSelect}
               value={form.type}
               onChange={e => setForm(prev => ({ ...prev, type: e.target.value }))}
+              required
             >
+              <option value="" disabled>Select Type</option>
               {DNS_TYPES.map(t => (
                 <option key={t} value={t}>{t}</option>
               ))}
@@ -142,7 +141,7 @@ function RecordModal({ initialValues, onSave, onClose, formId }: RecordModalProp
               className={styles.recordModalInput}
               value={form.host}
               onChange={e => setForm(prev => ({ ...prev, host: e.target.value }))}
-              placeholder="@ or subdomain"
+              placeholder={isEdit ? 'Enter name' : 'Name'}
               required
             />
           </div>
@@ -173,10 +172,15 @@ function RecordModal({ initialValues, onSave, onClose, formId }: RecordModalProp
             />
           </div>
 
-          <button type="submit" className={styles.recordModalSubmit}>
-            {isEdit ? 'Update' : 'Create'}
-            <MdArrowForward size={16} aria-hidden="true" />
-          </button>
+          <PrimaryButton
+            type="submit"
+            fullWidth
+            icon={<FiArrowRight size={18} aria-hidden="true" />}
+            iconPosition="right"
+            className={styles.recordModalSubmit}
+          >
+            {isEdit ? 'Update Record' : 'Create'}
+          </PrimaryButton>
         </form>
       </div>
     </div>
@@ -203,6 +207,7 @@ export function FreenameRecords({ orderId: _orderId }: FreenameRecordsProps) {
   const handleAdd = useCallback((values: RecordFormState) => {
     setRecords(prev => [...prev, { id: String(Date.now()), ...values }])
     closeModal()
+    setShowSuccess(true)
   }, [closeModal])
 
   const handleUpdate = useCallback((id: string, values: RecordFormState) => {
@@ -279,18 +284,6 @@ export function FreenameRecords({ orderId: _orderId }: FreenameRecordsProps) {
             </tbody>
           </table>
         )}
-      </div>
-
-      {/* ── Bottom actions ─────────────────────────────────────────────────── */}
-      <div className={styles.bottomActions}>
-        <PrimaryButton
-          className={styles.actionBtn}
-          onClick={() => setShowSuccess(true)}
-          icon={<FiArrowRight aria-hidden="true" />}
-          iconPosition="right"
-        >
-          Save Changes
-        </PrimaryButton>
       </div>
 
       {/* ── Create / Edit record modal ──────────────────────────────────────── */}

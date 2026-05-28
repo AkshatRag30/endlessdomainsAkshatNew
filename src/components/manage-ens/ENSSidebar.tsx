@@ -15,7 +15,7 @@ interface ENSSidebarProps {
 const NAV_ITEMS: { key: ENSViewMenu; label: string; icon: React.ReactNode }[] = [
   { key: 'profile',  label: 'Profile',        icon: <AiOutlineUser size={18} aria-hidden="true" /> },
   { key: 'reverse',  label: 'Reverse',         icon: <BsArrowRepeat size={18} aria-hidden="true" /> },
-  { key: 'crypto',   label: 'Crypto',          icon: <RiCopperCoinLine size={18} aria-hidden="true" /> },
+  { key: 'crypto',   label: 'Add Currency',     icon: <RiCopperCoinLine size={18} aria-hidden="true" /> },
   { key: 'transfer', label: 'Transfer',        icon: <GoArrowSwitch size={18} aria-hidden="true" /> },
   { key: 'pd',       label: 'Parked Domains',  icon: <TbWorld size={18} aria-hidden="true" /> },
 ]

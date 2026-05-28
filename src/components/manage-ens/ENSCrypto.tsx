@@ -2,8 +2,9 @@ import { useState, useCallback } from 'react'
 import { SiBitcoin, SiEthereum, SiLitecoin, SiDogecoin, SiPolygon } from 'react-icons/si'
 import { FiTrash2, FiX, FiArrowRight } from 'react-icons/fi'
 import { BsCheck2 } from 'react-icons/bs'
-import { LuLoader, LuSquarePlus } from 'react-icons/lu'
+import { LuSquarePlus } from 'react-icons/lu'
 import { RiCopperCoinLine } from 'react-icons/ri'
+import { AiOutlineLoading3Quarters } from 'react-icons/ai'
 
 import { PrimaryButton } from '@/design-system/primitives/button'
 import CurrencyModal from '@/components/manage-ud/CurrencyModal'
@@ -133,7 +134,7 @@ export function ENSCrypto({ domain }: ENSCryptoProps) {
                 <BsCheck2 className={styles.statusCheck} aria-hidden="true" />
               ) : (
                 <div className={styles.pendingState}>
-                  <LuLoader className={styles.pendingIcon} aria-hidden="true" />
+                  <AiOutlineLoading3Quarters className={styles.pendingIcon} aria-hidden="true" />
                   <span className={styles.pendingText}>Pending</span>
                 </div>
               )}

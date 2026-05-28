@@ -1,7 +1,7 @@
 @import '@newstyles/_mixins.scss';
 
 .section {
-  background: var(--color-gray-light-bg);
+  background: transparent;
   padding: var(--space-5) var(--space-6);
   display: flex;
   flex-direction: column;
@@ -95,8 +95,11 @@
   justify-content: center;
   width: 44px;
   height: 44px;
-  // design-specific: Figma-exact glass gradient base
-  background: linear-gradient(182.41deg, rgba(241, 241, 241, 0.5) -27.41%, rgba(153, 153, 153, 0) 151.75%);
+  border-radius: 7px; // design-specific: Figma-exact rounded square corner — matches image
+  // design-specific: glass gradient overlay on top of #1B68ED blue base — matches Figma Ellipse 7396 + Frame gradient
+  background:
+    linear-gradient(182.41deg, rgba(241, 241, 241, 0.5) -27.41%, rgba(153, 153, 153, 0) 151.75%),
+    #1B68ED;
   // design-specific: Figma-exact inset top white highlight + bottom blue depth line
   box-shadow:
     inset 0px 0.85873px 0px rgba(255, 255, 255, 0.6),

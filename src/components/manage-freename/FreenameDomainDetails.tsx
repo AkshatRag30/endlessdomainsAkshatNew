@@ -63,7 +63,9 @@ export function FreenameDomainDetails({ domain, orderId, status }: FreenameDomai
         <div className={styles.field}>
           <dt className={styles.fieldLabel}>Chain Provider</dt>
           <dd className={styles.fieldBox}>
-            <Image src={provider.image} alt="" width={22} height={22} aria-hidden="true" />
+            <div className={styles.chainIconWrap} aria-hidden="true">
+              <Image src={provider.image} alt="" width={18} height={18} />
+            </div>
             <span className={styles.fieldText}>{provider.label}</span>
           </dd>
         </div>

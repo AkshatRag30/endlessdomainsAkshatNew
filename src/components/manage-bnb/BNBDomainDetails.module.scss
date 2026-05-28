@@ -226,12 +226,13 @@
 
 .expiryDot {
   display: inline-block;
-  width: 10px; // design-specific: Figma-exact dot size
+  width: 10px;
   height: 10px;
   border-radius: var(--radius-full);
-  background: var(--color-error);
-  box-shadow:
-    0 4px 8px rgba(239, 68, 68, 0.33),
-    0 2px 4px rgba(239, 68, 68, 0.24); // design-specific: Figma-exact red glow
   flex-shrink: 0;
+  // design-specific: white center dot → red ring with hard stops, matching UdDomainDetails
+  background: radial-gradient(circle at center, #ffffff 0%, #ffffff 18%, #e53535 22%, #e53535 100%);
+  box-shadow:
+    0 0 6px 3px rgba(239, 68, 68, 0.45),
+    0 0 2px 1px rgba(239, 68, 68, 0.3);
 }

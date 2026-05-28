@@ -1,4 +1,5 @@
-import { TbFileText, TbCurrencyBitcoin } from 'react-icons/tb'
+import { TbFileText } from 'react-icons/tb'
+import { RiCopperCoinLine } from 'react-icons/ri'
 import { GoArrowSwitch } from 'react-icons/go'
 
 import type { FreenameViewMenu } from './types'
@@ -11,7 +12,7 @@ interface FreenameSidebarProps {
 
 const NAV_ITEMS: { key: FreenameViewMenu; label: string; icon: React.ReactNode }[] = [
   { key: 'records',  label: 'Records',  icon: <TbFileText size={18} aria-hidden="true" /> },
-  { key: 'token',    label: 'Token',    icon: <TbCurrencyBitcoin size={18} aria-hidden="true" /> },
+  { key: 'token',    label: 'Token',    icon: <RiCopperCoinLine size={18} aria-hidden="true" /> },
   { key: 'transfer', label: 'Transfer', icon: <GoArrowSwitch size={18} aria-hidden="true" /> },
 ]
 

@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react'
 import { SiBitcoin, SiEthereum, SiSolana } from 'react-icons/si'
 import { FiTrash2, FiX, FiArrowRight } from 'react-icons/fi'
 import { BsCheck2 } from 'react-icons/bs'
-import { LuLoader } from 'react-icons/lu'
+import { AiOutlineLoading3Quarters } from 'react-icons/ai'
 import { RiCopperCoinLine } from 'react-icons/ri'
 import { LuSquarePlus } from "react-icons/lu";
 import { PrimaryButton } from '@/design-system/primitives/button'
@@ -146,7 +146,7 @@ export function UDCrypto({ domain }: UDCryptoProps) {
                 <BsCheck2 className={styles.statusCheck} aria-hidden="true" />
               ) : (
                 <div className={styles.pendingState}>
-                  <LuLoader className={styles.pendingIcon} aria-hidden="true" />
+                  <AiOutlineLoading3Quarters className={styles.pendingIcon} aria-hidden="true" />
                   <span className={styles.pendingText}>Pending</span>
                 </div>
               )}

@@ -37,15 +37,15 @@ function RemoveModal({ onCancel, onConfirm }: { onCancel: () => void; onConfirm:
         </p>
 
         <div className={styles.modalActions}>
-          <button
-            type="button"
+          <SecondaryButton
+            danger
             className={styles.cancelBtn}
             onClick={onCancel}
-            aria-label="Cancel removal"
+            icon={<FiChevronsRight size={16} aria-hidden="true" />}
+            iconPosition="right"
           >
-            <span>Cancel</span>
-            <FiChevronsRight size={16} aria-hidden="true" />
-          </button>
+            Cancel
+          </SecondaryButton>
 
           <PrimaryButton
             variant="error"
@@ -117,7 +117,7 @@ const ParkedDomains = ({ domain, provider, disabled = false }: { domain: string;
             <div className={styles.badgeOuter}>
               <div className={styles.badgeInner}>
                 <span className={currentRecord ? styles.dotParked : styles.dotUnparked} aria-hidden="true" />
-                <span>Status: {currentRecord ? 'Parked' : 'UnParked'}</span>
+                <span>Status: {currentRecord ? 'Active' : 'Unparked'}</span>
               </div>
             </div>
 
@@ -131,7 +131,7 @@ const ParkedDomains = ({ domain, provider, disabled = false }: { domain: string;
                   icon={<FiTrash2 size={17} aria-hidden="true" />}
                   iconPosition="right"
                 >
-                  remove
+                  Remove
                 </SecondaryButton>
 
                 <PrimaryButton
@@ -140,7 +140,7 @@ const ParkedDomains = ({ domain, provider, disabled = false }: { domain: string;
                   icon={<FiArrowRight size={22} aria-hidden="true" />}
                   iconPosition="right"
                 >
-                  Park Identities
+                  Parked Identities
                 </PrimaryButton>
               </div>
             ) : (
