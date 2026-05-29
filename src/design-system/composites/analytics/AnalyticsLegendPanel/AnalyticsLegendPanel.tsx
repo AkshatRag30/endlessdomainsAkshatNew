@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+﻿import React, { useCallback, useEffect, useState } from 'react'
 import Image from 'next/image'
 import { BsArrowRight } from 'react-icons/bs'
 import styles from '../Analytics.module.scss'
@@ -157,3 +157,4 @@ const AnalyticsLegendPanel: React.FC<Props> = ({ stats, selectedProvider, onProv
 }
 
 export default AnalyticsLegendPanel
+

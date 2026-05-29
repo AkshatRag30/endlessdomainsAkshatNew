@@ -1,9 +1,9 @@
-import React, { useMemo } from 'react'
+﻿import React, { useMemo } from 'react'
 import dynamic from 'next/dynamic'
 import { FiArrowUpRight } from 'react-icons/fi'
-import styles from './Analytics.module.scss'
-import { mockAnalyticsDomains, applyPDFilter, computePVStats } from './mockAnalyticsData'
-import type { PDFilterState } from './mockAnalyticsData'
+import styles from '../Analytics.module.scss'
+import { mockAnalyticsDomains, applyPDFilter, computePVStats } from '../data/mockAnalyticsData'
+import type { PDFilterState } from '../data/mockAnalyticsData'
 
 const PVSparkline = dynamic(() => import('./PVSparkline'), { ssr: false })
 const PortfolioBarChart = dynamic(() => import('./PortfolioBarChart'), { ssr: false })
@@ -94,3 +94,4 @@ const AnalyticsPortfolioValue: React.FC<Props> = ({ filterState }) => {
 }
 
 export default AnalyticsPortfolioValue
+

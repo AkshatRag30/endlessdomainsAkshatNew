@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+﻿import React, { useCallback } from 'react'
 import styles from '../Analytics.module.scss'
 import MiniCalendar from '@/design-system/primitives/MiniCalendar'
 import type { PDFilterState } from '../data/mockAnalyticsData'
@@ -89,3 +89,4 @@ const AnalyticsPDFilterBar: React.FC<Props> = ({ value, onChange }) => {
 }
 
 export default AnalyticsPDFilterBar
+

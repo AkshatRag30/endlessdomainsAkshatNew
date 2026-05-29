@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+﻿import React, { useCallback } from 'react'
 import styles from '../Analytics.module.scss'
 import {
   TLD_OPTIONS,
@@ -72,3 +72,4 @@ const AnalyticsFilterBar: React.FC<Props> = ({ value, onChange }) => {
 }
 
 export default AnalyticsFilterBar
+

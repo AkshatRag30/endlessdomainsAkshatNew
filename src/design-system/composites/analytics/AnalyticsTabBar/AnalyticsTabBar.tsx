@@ -1,4 +1,4 @@
-import React from 'react'
+﻿import React from 'react'
 import styles from '../Analytics.module.scss'
 import type { AnalyticsTab } from '../data/mockAnalyticsData'
 
@@ -36,3 +36,4 @@ const AnalyticsTabBar: React.FC<Props> = ({ activeTab, onTabChange }) => (
 )
 
 export default AnalyticsTabBar
+

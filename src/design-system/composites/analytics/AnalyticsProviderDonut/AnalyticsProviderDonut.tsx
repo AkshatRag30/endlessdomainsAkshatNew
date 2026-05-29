@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import React, { useCallback, useEffect, useState } from 'react'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
 import styles from '../Analytics.module.scss'
@@ -183,3 +183,4 @@ const AnalyticsProviderDonut: React.FC<Props> = ({
 }
 
 export default AnalyticsProviderDonut
+

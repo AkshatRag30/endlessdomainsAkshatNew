@@ -1,4 +1,4 @@
-import React from 'react'
+﻿import React from 'react'
 import Image from 'next/image'
 import styles from '../Analytics.module.scss'
 import { mockProviderStats } from '../data/mockAnalyticsData'
@@ -95,3 +95,4 @@ const AnalyticsDomainList: React.FC<Props> = ({ domains, selectedProvider, wrapp
 }
 
 export default AnalyticsDomainList
+

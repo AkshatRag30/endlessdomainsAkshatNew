@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react'
+﻿import React, { useState, useCallback, useMemo } from 'react'
 import dynamic from 'next/dynamic'
 import styles from '../Analytics.module.scss'
 import AnalyticsDomainList from '../AnalyticsDomainList'
@@ -60,3 +60,4 @@ const AnalyticsProviderDistribution: React.FC<Props> = ({ filterState }) => {
 }
 
 export default AnalyticsProviderDistribution
+

@@ -1,6 +1,6 @@
-import React from 'react'
+﻿import React from 'react'
 import { AreaChart, Area, ResponsiveContainer } from 'recharts'
-import { pvSparklineData } from './mockAnalyticsData'
+import { pvSparklineData } from '../data/mockAnalyticsData'
 
 interface Props {
   data?: Array<{ i: number; v: number }>
@@ -30,3 +30,4 @@ const PVSparkline: React.FC<Props> = ({ data }) => (
 )
 
 export default PVSparkline
+

@@ -1,12 +1,12 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+﻿import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import { BsArrowRight } from 'react-icons/bs'
-import styles from './Analytics.module.scss'
-import { mockAnalyticsDomains, applyPBFilter, computeBreakdownStats } from './mockAnalyticsData'
-import type { AnalyticsProvider, AnalyticsFilterState } from './mockAnalyticsData'
+import styles from '../Analytics.module.scss'
+import { mockAnalyticsDomains, applyPBFilter, computeBreakdownStats } from '../data/mockAnalyticsData'
+import type { AnalyticsProvider, AnalyticsFilterState } from '../data/mockAnalyticsData'
 
-const AnalyticsProviderDonut = dynamic(() => import('./AnalyticsProviderDonut'), { ssr: false })
+const AnalyticsProviderDonut = dynamic(() => import('../AnalyticsProviderDonut'), { ssr: false })
 
 const VISIBLE_COUNT = 6
 
@@ -211,3 +211,4 @@ const AnalyticsPortfolioBreakdown: React.FC<Props> = ({ filterState, onFilterCha
 }
 
 export default AnalyticsPortfolioBreakdown
+

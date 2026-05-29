@@ -1,7 +1,7 @@
-import React, { useState, useCallback } from 'react'
-import styles from './Analytics.module.scss'
-import { pvBarProviders, PV_BAR_MAX } from './mockAnalyticsData'
-import type { PVBarProvider } from './mockAnalyticsData'
+﻿import React, { useState, useCallback } from 'react'
+import styles from '../Analytics.module.scss'
+import { pvBarProviders, PV_BAR_MAX } from '../data/mockAnalyticsData'
+import type { PVBarProvider } from '../data/mockAnalyticsData'
 
 interface Props {
   providers?: PVBarProvider[]
@@ -126,3 +126,4 @@ const PortfolioBarChart: React.FC<Props> = ({ providers, maxValue }) => {
 }
 
 export default PortfolioBarChart
+
