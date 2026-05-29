@@ -1,0 +1,90 @@
+@import './variables.scss';
+
+.transaction_tab {
+  border-bottom: none;
+  :global(.btn-group) {
+    margin-bottom: $spacer * 4;
+    button {
+      background-color: $form-banner-bg;
+      border-color: $table-border-color;
+      color: $secondary-text-color;
+      font: normal normal normal 14px/18px 'Plus Jakarta Sans';
+      padding: $spacer * 2 $spacer * 4 !important;
+      &.active {
+        color: $white-color;
+        background-color: $checkout-button-bg-color;
+        font-weight: 600;
+      }
+    }
+  }
+}
+.table {
+  [data-attribute='pending'] {
+    color: $offer-color;
+  }
+  [data-attribute='cancelled'] {
+    color: $danger-color;
+  }
+  [data-attribute='processing'] {
+    color: $domain-status-registered;
+  }
+  [data-attribute='completed'] {
+    color: $sucess-color;
+  }
+  :global(.table) {
+    border: 1px solid $table-border-color;
+    background-color: $form-banner-bg;
+    > :not(caption) > * > * {
+      padding: 12px 24px;
+    }
+    [data-attribute='pending'] {
+      color: $offer-color;
+    }
+    [data-attribute='cancelled'] {
+      color: $danger-color;
+    }
+    [data-attribute='processing'] {
+      color: $domain-status-registered;
+    }
+    [data-attribute='completed'] {
+      color: $sucess-color;
+    }
+    th {
+      color: $primary-text-color;
+      font: normal normal 600 14px/21px 'Plus Jakarta Sans';
+    }
+    td {
+      color: $black-color;
+      font: normal normal normal 14px/21px 'Plus Jakarta Sans';
+
+      button {
+        padding: $spacer $spacer * 2 !important;
+        font: normal normal normal 14px/21px 'Poppins';
+      }
+    }
+    .manage_button {
+      border-color: $black-color;
+      color: $black-color;
+      margin-right: $spacer * 3;
+      &:hover {
+        color: $white-color;
+        background-color: $black-color;
+      }
+    }
+    .delete_button {
+      border-color: $danger-color;
+      color: $danger-color;
+      margin-right: $spacer * 3;
+      &:hover {
+        color: $white-color;
+        background-color: $danger-color;
+      }
+    }
+  }
+}
+.checkout_btn {
+  @media (max-width: 600px) {
+    font-size: 14px;
+    width: 100%;
+  }
+}

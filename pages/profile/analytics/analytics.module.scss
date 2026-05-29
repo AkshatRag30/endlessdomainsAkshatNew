@@ -1,4 +1,4 @@
-@import '@newstyles/_mixins.scss';
+@import '_mixins.scss';
 
 // ── Page shell ────────────────────────────────────────────────────────────────
 
@@ -56,13 +56,43 @@
   margin: 0;
 }
 
-// ── Analytics card (main bordered container) ──────────────────────────────────
+// ── Analytics card — outer container ─────────────────────────────────────────
 
 .analyticsCard {
+  background: transparent; // gray page background shows through the gaps between sections
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5); // 20px gap — gray background visible between each section
+}
+
+// ── Section 1: sub-tab bar ────────────────────────────────────────────────────
+
+.tabSection {
   background: var(--color-white-primary);
-  border: 1px solid var(--color-black-primary);
-  border-radius: var(--radius-md);
-  overflow: hidden;
+
+  @include tablet-down {
+    overflow: hidden; // clips the horizontally-scrolling subTabBar within bounds
+  }
+}
+
+// ── Section 2: filter bar wrapper ────────────────────────────────────────────
+
+.filterSection {
+  background: var(--color-white-primary);
+  padding: var(--space-5);
+
+  @include tablet-down {
+    padding: var(--space-3) var(--space-4) var(--space-4);
+  }
+}
+
+// ── Section 3: main content ───────────────────────────────────────────────────
+
+.contentSection {
+  background: transparent; // each content component owns its own white bg + padding
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5); // gray page bg visible between sub-sections (e.g. PV stat row vs chart)
 }
 
 // ── Placeholder for unbuilt tabs ──────────────────────────────────────────────

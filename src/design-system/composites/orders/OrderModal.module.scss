@@ -1,0 +1,153 @@
+@import '_mixins.scss';
+
+// ── Overlay ───────────────────────────────────────────────────────────────────
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--color-black-alpha-55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--space-4);
+}
+
+// ── Modal panel ───────────────────────────────────────────────────────────────
+
+.modal {
+  background: var(--color-white-primary);
+  border-radius: var(--radius-md);
+  width: 100%;
+  max-width: 800px; // design-specific: matches "lg" modal width from original design
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 var(--space-2) var(--space-9) var(--color-black-alpha-25);
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-5) var(--space-6);
+  border-bottom: 1px solid var(--color-gray-200);
+  flex-shrink: 0;
+}
+
+.title {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-15);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black-primary);
+  margin: 0;
+}
+
+.closeBtn {
+  background: transparent;
+  border: none;
+  color: var(--color-gray-dark);
+  cursor: pointer;
+  padding: var(--space-1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  transition: color 0.15s ease, background-color 0.15s ease;
+
+  &:hover {
+    color: var(--color-black-primary);
+    background: var(--color-gray-light);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// ── Body ──────────────────────────────────────────────────────────────────────
+
+.body {
+  padding: var(--space-5) var(--space-6);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.subtitle {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  color: var(--color-gray-dark);
+  margin: 0;
+}
+
+// ── Domain table inside modal ─────────────────────────────────────────────────
+
+.tableWrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table {
+  width: 100%;
+  min-width: 360px; // design-specific: 3 columns — prevent collapse below readable width
+  border-collapse: collapse;
+  border: 1px solid var(--color-gray-300);
+
+  th,
+  td {
+    padding: var(--space-3) var(--space-5);
+    font-family: var(--font-satoshi);
+    font-size: var(--text-nav);
+    text-align: left;
+  }
+
+  th {
+    font-weight: var(--font-weight-bold);
+    color: var(--color-black-primary);
+    background: var(--color-gray-light);
+    border-bottom: 1px solid var(--color-gray-300);
+    white-space: nowrap;
+  }
+
+  td {
+    font-weight: var(--font-weight-regular);
+    color: var(--color-black-primary);
+    border-bottom: 1px solid var(--color-gray-200);
+    vertical-align: middle;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+}
+
+.emptyRow td {
+  text-align: center;
+  padding: var(--space-6) var(--space-5);
+  color: var(--color-gray-dark);
+  font-style: italic;
+  border-bottom: none;
+}
+
+// ── Actions — layout wrapper for primitive buttons ────────────────────────────
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+
+  @include mobile {
+    flex-direction: column;
+
+    > * {
+      width: 100%;
+    }
+  }
+}

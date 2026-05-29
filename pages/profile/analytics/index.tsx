@@ -8,21 +8,19 @@ import AnalyticsPDFilterBar from '@/components/user-analytic/AnalyticsPDFilterBa
 import AnalyticsProviderDistribution from '@/components/user-analytic/AnalyticsProviderDistribution'
 import AnalyticsPortfolioValue from '@/components/user-analytic/AnalyticsPortfolioValue'
 import AnalyticsPortfolioBreakdown from '@/components/user-analytic/AnalyticsPortfolioBreakdown'
-import type { AnalyticsTab, AnalyticsFilterState } from '@/components/user-analytic/mockAnalyticsData'
-import { DEFAULT_FILTER_STATE } from '@/components/user-analytic/mockAnalyticsData'
-import styles from '../analytics/analytics.module.scss'
+import type { AnalyticsTab, AnalyticsFilterState, PDFilterState } from '@/components/user-analytic/mockAnalyticsData'
+import { DEFAULT_FILTER_STATE, DEFAULT_PD_FILTER_STATE } from '@/components/user-analytic/mockAnalyticsData'
+import styles from './analytics.module.scss'
 
-const UserAnalyticPage: React.FC = () => {
+export default function AnalyticsPage() {
   const [activeTab, setActiveTab] = useState<AnalyticsTab>('provider-distribution')
+  const [pdFilterState, setPdFilterState] = useState<PDFilterState>(DEFAULT_PD_FILTER_STATE)
   const [pbFilterState, setPbFilterState] = useState<AnalyticsFilterState>(DEFAULT_FILTER_STATE)
 
-  const handleTabChange = useCallback((tab: AnalyticsTab) => {
-    setActiveTab(tab)
-  }, [])
+  const handleTabChange = useCallback((tab: AnalyticsTab) => setActiveTab(tab), [])
 
-  const handlePbFilterChange = useCallback((state: AnalyticsFilterState) => {
-    setPbFilterState(state)
-  }, [])
+  const handlePdFilterChange = useCallback((state: PDFilterState) => setPdFilterState(state), [])
+  const handlePbFilterChange = useCallback((state: AnalyticsFilterState) => setPbFilterState(state), [])
 
   return (
     <div className={styles.shell}>
@@ -40,21 +38,30 @@ const UserAnalyticPage: React.FC = () => {
           </header>
           <div className={styles.analyticsCard}>
 
+            {/* Section 1 — sub-tab navigation */}
             <div className={styles.tabSection}>
               <AnalyticsTabBar activeTab={activeTab} onTabChange={handleTabChange} />
             </div>
 
+            {/* Section 2 — filter bar */}
             <div className={styles.filterSection}>
-              {activeTab === 'provider-distribution' && <AnalyticsPDFilterBar />}
+              {activeTab === 'provider-distribution' && (
+                <AnalyticsPDFilterBar value={pdFilterState} onChange={handlePdFilterChange} />
+              )}
               {activeTab === 'portfolio-breakdown' && (
                 <AnalyticsFilterBar value={pbFilterState} onChange={handlePbFilterChange} />
               )}
-              {activeTab === 'portfolio-value' && <AnalyticsPDFilterBar />}
+              {activeTab === 'portfolio-value' && (
+                <AnalyticsPDFilterBar value={pdFilterState} onChange={handlePdFilterChange} />
+              )}
             </div>
 
+            {/* Section 3 — main content */}
             <div className={styles.contentSection}>
-              {activeTab === 'provider-distribution' && <AnalyticsProviderDistribution />}
-              {activeTab === 'portfolio-value' && <AnalyticsPortfolioValue />}
+              {activeTab === 'provider-distribution' && (
+                <AnalyticsProviderDistribution filterState={pdFilterState} />
+              )}
+              {activeTab === 'portfolio-value' && <AnalyticsPortfolioValue filterState={pdFilterState} />}
               {activeTab === 'portfolio-breakdown' && (
                 <AnalyticsPortfolioBreakdown filterState={pbFilterState} onFilterChange={handlePbFilterChange} />
               )}
@@ -67,5 +74,3 @@ const UserAnalyticPage: React.FC = () => {
     </div>
   )
 }
-
-export default UserAnalyticPage

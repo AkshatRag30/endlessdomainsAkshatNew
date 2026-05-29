@@ -1,0 +1,89 @@
+{
+    "message": "Domain Order Fetch Successful",
+    "result": [
+        {
+            "id": "f12f43ca-c5bb-4103-b306-ab26e9b20bb0",
+            "lastChangedDateTime": "2025-12-31T06:58:07.430Z",
+            "orderNumber": "1767162185293",
+            "orderStatus": "Cancelled",
+            "promoValue": null,
+            "promoApplied": false,
+            "domainName": "strangerthings.u",
+            "domainProvider": "UD",
+            "mintStatus": "Failed",
+            "price": 2
+        },
+        {
+            "id": "1a896ecc-1447-4e7f-b693-9b74982775d3",
+            "lastChangedDateTime": "2025-12-31T06:39:11.252Z",
+            "orderNumber": "1767162688734",
+            "orderStatus": "Completed",
+            "promoValue": 10,
+            "promoApplied": true,
+            "domainName": "strangerthings.u",
+            "domainProvider": "UD",
+            "mintStatus": "Completed",
+            "price": 2
+        },
+        {
+            "id": "91a8c8a8-51b3-4c8b-9094-b5ec4969bfac",
+            "lastChangedDateTime": "2025-12-24T12:15:00.219Z",
+            "orderNumber": "1766577373042",
+            "orderStatus": "Pending",
+            "promoValue": 10,
+            "promoApplied": true,
+            "domainName": "hellouniverse.og",
+            "domainProvider": "UD",
+            "mintStatus": "Pending",
+            "price": 2
+        },
+        {
+            "id": "cd9d9bf0-0fe0-4c70-b1c8-7472709fda0e",
+            "lastChangedDateTime": "2025-11-28T10:26:24.838Z",
+            "orderNumber": "1764318373493",
+            "orderStatus": "Cancelled",
+            "promoValue": 10,
+            "promoApplied": true,
+            "domainName": "believeit.u",
+            "domainProvider": "UD",
+            "mintStatus": "Failed",
+            "price": 2
+        },
+        {
+            "id": "6828b970-1c9a-43b5-a93b-a59ec0d0b08b",
+            "lastChangedDateTime": "2025-11-28T08:34:45.214Z",
+            "orderNumber": "1764315909085",
+            "orderStatus": "Cancelled",
+            "promoValue": 10,
+            "promoApplied": true,
+            "domainName": "believeit.u",
+            "domainProvider": "UD",
+            "mintStatus": "Failed",
+            "price": 2
+        },
+        {
+            "id": "12bb9160-9cdd-464f-bcc5-8aa8f8b60b23",
+            "lastChangedDateTime": "2025-11-28T07:42:36.448Z",
+            "orderNumber": "1764315627267",
+            "orderStatus": "Completed",
+            "promoValue": null,
+            "promoApplied": false,
+            "domainName": "codemint.bnb",
+            "domainProvider": "BinanceSmartChain",
+            "mintStatus": "Completed",
+            "price": 5
+        },
+        {
+            "id": "77f6317e-f640-4d9a-88d4-cff18b559b9a",
+            "lastChangedDateTime": "2025-11-05T07:57:58.332Z",
+            "orderNumber": "1762329038686",
+            "orderStatus": "Completed",
+            "promoValue": null,
+            "promoApplied": false,
+            "domainName": "tpenguofficial.og",
+            "domainProvider": "UD",
+            "mintStatus": "Completed",
+            "price": 2
+        }
+    ]
+}
