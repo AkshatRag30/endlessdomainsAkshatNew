@@ -149,7 +149,7 @@ const OrderModal: React.FC<OrderModalProps> = ({
         {/* ── Footer: pending shows buttons, all others show contact support ── */}
         {isPending ? (
           <div className={styles.footer}>
-            <SecondaryButton type="button" onClick={onCancelOrder ?? (() => {})}>
+            <SecondaryButton type="button" danger onClick={onCancelOrder ?? (() => {})}>
               Cancel Order
             </SecondaryButton>
             <PrimaryButton

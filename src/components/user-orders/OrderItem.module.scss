@@ -383,11 +383,11 @@
   object-fit: contain;
 }
 
-// ── Mobile: card layout ───────────────────────────────────────────────────────
-// The table display model is reset in OrdersTable.module.scss on mobile.
+// ── Tablet + Mobile: card layout ─────────────────────────────────────────────
+// The table display model is reset in OrdersTable.module.scss on tablet-down.
 // Here each <tr>.row becomes a white card via CSS grid.
 
-@include mobile {
+@include tablet-down {
 
   // ── Main order card ─────────────────────────────────────────────────────────
   .row {

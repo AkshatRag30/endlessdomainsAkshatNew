@@ -13,6 +13,7 @@
 .tableWrap {
   border-radius: var(--radius-lg);
   overflow: hidden;
+  min-width: fit-content; // lets tableWrapper scroll rather than clip when table exceeds viewport
 }
 
 // ── Table ─────────────────────────────────────────────────────────────────────
@@ -70,9 +71,9 @@
   background: var(--color-white-primary);
 }
 
-// ── Mobile: disable table layout so rows can render as cards ─────────────────
+// ── Tablet + Mobile: disable table layout so rows can render as cards ────────
 
-@include mobile {
+@include tablet-down {
   .tableWrapper {
     overflow-x: visible;
   }
