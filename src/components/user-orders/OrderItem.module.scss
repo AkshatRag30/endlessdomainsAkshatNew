@@ -1,32 +1,529 @@
 @import '_mixins.scss';
 
-.orderId {
-  max-width: 22ch;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: var(--color-gray-dark);
-  font-size: var(--text-small-12);
+// ── Table row ─────────────────────────────────────────────────────────────────
+
+.row {
+  background-color: var(--color-white-primary);
+  background-image: repeating-linear-gradient(135deg, transparent 0px, transparent 4px, var(--color-black-alpha-01) 4px, var(--color-black-alpha-01) 6px);
+  transition: background 150ms ease;
+
+  &:hover {
+    background-color: var(--color-gray-light);
+    background-image: none;
+  }
 }
 
-.viewBtn {
-  background: transparent;
-  border: 1px solid var(--color-black-primary);
-  color: var(--color-black-primary);
+.subRow {
+  background-color: var(--color-gray-light-bg);
+  background-image: none;
+}
+
+.td {
+  padding: var(--space-4) var(--space-5);
+  vertical-align: middle;
   font-family: var(--font-satoshi);
   font-size: var(--text-nav);
-  padding: var(--space-1) var(--space-3);
-  border-radius: var(--radius-sm);
+  color: #070707; // design-specific: Figma-exact near-black text
+  border-right: 1px solid var(--color-gray-200);
+
+  &:last-child {
+    border-right: none;
+  }
+}
+
+.tdAction {
+  padding: var(--space-3) var(--space-5);
+  vertical-align: middle;
+  border-right: none;
+
+  // Specificity 0,2,1 — beats .button.sm (0,2,0) without !important
+  > button.viewBtn {
+    font-size: var(--text-small-12);
+    font-weight: var(--font-weight-regular);
+    padding-left: var(--space-7);
+    padding-right: var(--space-7);
+
+    > span { // icon spans — overrides .iconRight/.iconLeft font-size from PrimaryButton
+      font-size: var(--text-small-12);
+      display: inline-flex;
+      align-items: center;
+      line-height: 1;
+    }
+  }
+}
+
+// ── Domain name cell ──────────────────────────────────────────────────────────
+
+.domainCell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.domainTopRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2-5);
+  min-width: 0;
+}
+
+.tokenCircle {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-full);
+  border: 0.565px solid rgba(38, 57, 237, 0.36); // design-specific: Figma-exact token border
+  box-shadow: 0 0.565px 3.024px rgba(38, 57, 237, 0.2); // design-specific: Figma-exact token glow
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  background: var(--color-gray-dark);
+}
+
+.tokenIcon {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+}
+
+.domainName {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small); // 17px — Figma-exact
+  font-weight: var(--font-weight-medium);
+  color: #070707; // design-specific: Figma-exact
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0; // required: flex items won't shrink below content size without this, breaking text-overflow
+}
+
+.bulkBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 27px; // design-specific: Figma-exact badge height
+  min-width: 29px;
+  padding: 0 var(--space-2);
+  background: var(--color-white-primary);
+  border: 1px solid rgba(38, 57, 237, 0.4); // design-specific: Figma-exact
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
   cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  flex-shrink: 0;
   white-space: nowrap;
 
   &:hover {
-    background: var(--color-black-primary);
-    color: var(--color-white-primary);
+    background: var(--color-gray-light);
   }
 
   &:focus-visible {
     @include focus-ring;
+  }
+}
+
+.viewAllBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-9);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+  text-transform: capitalize;
+  white-space: nowrap;
+  text-align: left;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.chevron {
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.subDomainRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2-5);
+  padding-left: var(--space-9);
+}
+
+// ── View All popup ────────────────────────────────────────────────────────────
+
+.popupAnchor {
+  position: relative;
+}
+
+// Portal popup — rendered at document.body so it escapes clip-path + overflow
+// on the card. Positioned via CSS custom properties set from getBoundingClientRect().
+.popup {
+  position: fixed;
+  top: var(--popup-top);
+  left: var(--popup-left);
+  min-width: var(--popup-width, 220px);
+  max-width: min(300px, calc(100vw - var(--popup-left, 0px) - 16px));
+  max-height: 60vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 9999;
+  background: var(--color-white-primary);
+  background-image: repeating-linear-gradient(
+    135deg,
+    transparent 0px,
+    transparent 4px,
+    var(--color-black-alpha-01) 4px,
+    var(--color-black-alpha-01) 6px
+  );
+  border: 1px solid var(--color-gray-200);
+  box-shadow: 0 4px 20px var(--color-black-alpha-25);
+}
+
+.popupItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-gray-200);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.popupTokenCircle {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(38, 57, 237, 0.2); // design-specific: Figma-exact token border
+  box-shadow: 0 0 6px rgba(38, 57, 237, 0.12); // design-specific: Figma-exact token glow
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  background: var(--color-white-primary);
+}
+
+.popupDomainName {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: #070707; // design-specific: Figma-exact
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+// ── Status cell ───────────────────────────────────────────────────────────────
+
+.statusCell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.statusDot {
+  width: 15px; // design-specific: Figma-exact status indicator size
+  height: 15px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+  border: 3px solid var(--color-black-primary);
+}
+
+.dot_complete {
+  background: #39ff14; // design-specific: Figma neon green active/complete
+}
+
+.dot_processing {
+  background: #2bb3ff; // design-specific: Figma processing blue
+}
+
+.dot_cancel {
+  background: var(--color-error);
+}
+
+.dot_pending {
+  background: var(--color-gray-primary);
+}
+
+.statusText {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: #070707; // design-specific: Figma-exact
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+// ── Explore / wallet address box ──────────────────────────────────────────────
+
+.walletBox {
+  display: flex;
+  align-items: center;
+  width: 164px; // design-specific: Figma-exact wallet pill width
+  height: 27px; // design-specific: Figma-exact wallet pill height
+  flex-shrink: 0;
+  overflow: hidden;
+  padding: 0 var(--space-2);
+  box-sizing: border-box;
+}
+
+.walletBoxBlack {
+  background: #000000; // design-specific: Figma-exact black explore box for non-completed orders
+
+  .walletText {
+    color: #ffffff; // nested for guaranteed override over any table-level cascade
+  }
+}
+
+.walletBoxBlue {
+  background: var(--color-blue-primary);
+  box-shadow: inset 0 0 17.4px 0 rgba(255, 255, 255, 0.3); // design-specific: Figma blue box inner glow
+
+  .walletText {
+    color: #ffffff; // nested for guaranteed override over any table-level cascade
+  }
+}
+
+.walletText {
+  display: block; // must be block for text-overflow to work
+  width: 100%;
+  min-width: 0; // prevents flex item overflow beyond container
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13); // bumped from 12px — 12px anti-aliases to near-invisible on black
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.36px; // design-specific: Figma-exact address tracking
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+// ── Transaction date cell ─────────────────────────────────────────────────────
+
+.dateText {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: #070707; // design-specific: Figma-exact
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+// ── Total amount cell ─────────────────────────────────────────────────────────
+
+.amountCell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.amountText {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: #070707; // design-specific: Figma-exact
+  text-transform: capitalize;
+}
+
+.paymentRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.paymentLabel {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-medium);
+  color: #4a4a4a; // design-specific: Figma-exact payment label gray
+  white-space: nowrap;
+}
+
+.cryptoIconWrap {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-full);
+  border: 0.565px solid rgba(38, 57, 237, 0.36); // design-specific: Figma-exact
+  box-shadow: 0 0.565px 6.048px rgba(38, 57, 237, 0.2); // design-specific: Figma-exact
+  background: var(--color-white-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.cryptoIcon {
+  width: 17px;
+  height: 9px;
+  object-fit: contain;
+}
+
+// ── Mobile: card layout ───────────────────────────────────────────────────────
+// The table display model is reset in OrdersTable.module.scss on mobile.
+// Here each <tr>.row becomes a white card via CSS grid.
+
+@include mobile {
+
+  // ── Main order card ─────────────────────────────────────────────────────────
+  .row {
+    display: grid;
+    // minmax(0,1fr) instead of 1fr: overrides the implicit min-width:auto on the
+    // track so the domain column can shrink below its content size. Without this,
+    // the "+5 / View All Domain" card forces column-1 wider than the card, pushing
+    // status, amount, and action rows off the right edge.
+    grid-template-columns: minmax(0, 1fr) auto;
+    background-color: var(--color-white-primary);
+    background-image: none;
+    // border is replaced by filter drop-shadow — clip-path clips normal CSS borders
+    // (including diagonal cut edges), but filter is applied to the already-composited
+    // clipped shape so the shadow traces all edges including the diagonal cuts.
+    // Four 1px 0-blur cardinal shadows combine into a crisp 1px border on every edge.
+    border: none;
+    filter:
+      drop-shadow(1px 0 0 var(--color-gray-200))
+      drop-shadow(-1px 0 0 var(--color-gray-200))
+      drop-shadow(0 1px 0 var(--color-gray-200))
+      drop-shadow(0 -1px 0 var(--color-gray-200));
+    clip-path: polygon(20px 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%, 0 20px); // design-specific: Figma-exact cut-corner card shape
+    overflow: hidden;
+    width: 100%;
+
+    &:hover {
+      background-color: var(--color-white-primary);
+      background-image: none;
+    }
+
+    // Explore (wallet box) — hidden on mobile
+    > td:nth-child(3) {
+      display: none;
+    }
+
+    // Transaction date — hidden on mobile
+    > td:nth-child(4) {
+      display: none;
+    }
+
+    // Domain name cell — top-left
+    > td:nth-child(1) {
+      grid-column: 1;
+      grid-row: 1;
+      border-right: none;
+      padding: var(--space-4) var(--space-4) var(--space-2);
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    // Status cell — top-right
+    > td:nth-child(2) {
+      grid-column: 2;
+      grid-row: 1;
+      border-right: none;
+      padding: var(--space-4) var(--space-4) var(--space-2);
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-end;
+    }
+
+    // Total amount cell — second row, full width
+    > td:nth-child(5) {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      border-right: none;
+      border-top: 1px solid var(--color-gray-200);
+      padding: var(--space-3) var(--space-4);
+
+      // "Total Amount" label injected via CSS — no JSX change needed
+      &::before {
+        content: 'Total Amount';
+        display: block;
+        font-family: var(--font-satoshi);
+        font-size: var(--text-small-12);
+        font-weight: var(--font-weight-regular);
+        color: var(--color-gray-dark);
+        margin-bottom: var(--space-1);
+        text-transform: capitalize;
+      }
+    }
+
+    // Action cell — third row, full width
+    .tdAction {
+      grid-column: 1 / -1;
+      grid-row: 3;
+      border-right: none;
+      border-top: 1px solid var(--color-gray-200);
+      padding: var(--space-3) var(--space-4);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+
+      // Make the PrimaryButton fill the available width on mobile
+      > * {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
+
+  // ── View All Domain button: remove desktop indent on mobile ──────────────────
+  .viewAllBtn {
+    padding: 0 var(--space-3); // override desktop var(--space-9) — no indent needed in card layout
+  }
+
+  // ── Amount cell layout adjustments ──────────────────────────────────────────
+  .amountCell {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+
+  .amountText {
+    font-size: var(--text-body-small); // slightly larger on card
+  }
+}
+
+// ── Tablet: popup stays absolute but compact ──────────────────────────────────
+
+@include tablet-down {
+  .popup {
+    min-width: 190px;
+  }
+
+  .popupItem {
+    padding: var(--space-2-5) var(--space-3);
+  }
+
+  .popupTokenCircle {
+    width: 30px;
+    height: 30px;
+  }
+
+  .popupDomainName {
+    font-size: var(--text-small-13);
   }
 }

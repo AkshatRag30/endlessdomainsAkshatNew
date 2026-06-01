@@ -12,30 +12,31 @@ interface OrdersTableProps {
 
 const OrdersTable: React.FC<OrdersTableProps> = ({ orders, onView }) => (
   <div className={styles.tableWrapper}>
+    <div className={styles.tableWrap}>
     <table className={styles.table}>
       <thead>
-        <tr>
-          <th>S. No.</th>
-          <th>Order ID</th>
-          <th>Status</th>
-          <th>Transaction Date</th>
-          <th>Amount</th>
-          <th>Registration Fees</th>
-          <th>Action</th>
+        <tr className={styles.headerRow}>
+          <th scope="col" className={styles.th}>Domain Name</th>
+          <th scope="col" className={`${styles.th} ${styles.thDivider}`}>Status</th>
+          <th scope="col" className={`${styles.th} ${styles.thDivider}`}>Explore</th>
+          <th scope="col" className={`${styles.th} ${styles.thDivider}`}>Transaction Date</th>
+          <th scope="col" className={`${styles.th} ${styles.thDivider}`}>Total Amount</th>
+          <th scope="col" className={`${styles.th} ${styles.thDivider}`}>Action</th>
         </tr>
       </thead>
       <tbody>
         {orders.length > 0 ? (
-          orders.map((order, i) => (
-            <OrderItem key={order.id} order={order} sno={i} onView={onView} />
+          orders.map(order => (
+            <OrderItem key={order.id} order={order} onView={onView} />
           ))
         ) : (
           <tr className={styles.emptyRow}>
-            <td colSpan={7}>No Orders Found!</td>
+            <td colSpan={6}>No Orders Found!</td>
           </tr>
         )}
       </tbody>
     </table>
+    </div>
   </div>
 )
 

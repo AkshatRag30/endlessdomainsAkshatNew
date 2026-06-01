@@ -105,20 +105,38 @@
   }
 }
 
-// ── Separator ─────────────────────────────────────────────────────────────────
+// ── Separator — base ──────────────────────────────────────────────────────────
 
 .separator {
   height: 11px; // design-specific: Figma-exact separator height
   flex-shrink: 0;
-  background-color: #aeaeae; // design-specific: Figma-exact separator gray
   background-image: repeating-linear-gradient(
     135deg,
     transparent 0px,
     transparent 4px,
-    var(--color-black-alpha-01) 4px,
-    var(--color-black-alpha-01) 6px
+    rgba(255, 255, 255, 0.08) 4px,
+    rgba(255, 255, 255, 0.08) 6px
   );
-  box-shadow: inset 0 0 9.8px white; // design-specific: Figma-exact inner white glow
+  box-shadow: inset 0 0 9.8px rgba(255, 255, 255, 0.4); // design-specific: Figma-exact inner glow
+}
+
+// ── Separator — per-variant color ─────────────────────────────────────────────
+
+.separatorPending {
+  background-color: #aeaeae; // design-specific: Figma-exact pending separator gray
+}
+
+.separatorProcessing {
+  background-color: var(--color-blue-primary); // Figma processing blue
+}
+
+.separatorCompleted {
+  background-color: #39ff14; // design-specific: Figma neon green complete
+  box-shadow: inset 0 0 9.8px rgba(255, 255, 255, 0.3), 0 0 8px rgba(57, 255, 20, 0.4);
+}
+
+.separatorCancelled {
+  background-color: var(--color-error); // Figma error red for cancelled
 }
 
 .separatorLine {
@@ -186,10 +204,6 @@
     border-left: 1px solid var(--color-gray-200);
     white-space: nowrap;
   }
-
-  &:last-child {
-    border-bottom: 1px solid var(--color-gray-200);
-  }
 }
 
 tbody tr:last-child .td {
@@ -200,6 +214,7 @@ tbody tr:last-child .td {
   display: flex;
   align-items: center;
   gap: var(--space-2-5);
+  min-width: 0;
 }
 
 .tokenCircle {
@@ -224,7 +239,40 @@ tbody tr:last-child .td {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  flex-shrink: 1;
+  min-width: 0;
 }
+
+// ── Manage link — Completed variant only ──────────────────────────────────────
+
+.manageLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  flex-shrink: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: opacity 0.15s ease;
+
+  &:hover {
+    opacity: 0.75;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.manageLinkIcon {
+  font-size: var(--text-nav);
+  flex-shrink: 0;
+}
+
+// ── Empty state ───────────────────────────────────────────────────────────────
 
 .emptyRow td {
   text-align: center;
@@ -263,7 +311,7 @@ tbody tr:last-child .td {
   letter-spacing: -0.05em; // design-specific: Figma-exact negative tracking on total
 }
 
-// ── Footer: actions ───────────────────────────────────────────────────────────
+// ── Footer: pending buttons ───────────────────────────────────────────────────
 
 .footer {
   display: flex;
@@ -274,4 +322,137 @@ tbody tr:last-child .td {
   padding: 0 var(--space-5);
   background: #f6f6f6; // design-specific: Figma-exact footer bg
   flex-shrink: 0;
+}
+
+// ── Contact support — all non-pending variants ────────────────────────────────
+
+.contactSupportRow {
+  display: flex;
+  align-items: center;
+  height: 52px;
+  padding: 0 var(--space-5);
+  background: var(--color-white-primary);
+  flex-shrink: 0;
+  border-top: 1px solid var(--color-gray-200);
+}
+
+.contactSupportLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-gray-dark);
+  text-decoration: none;
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: var(--color-black-primary);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.contactSupportIcon {
+  font-size: var(--text-body-small);
+  flex-shrink: 0;
+}
+
+// ── Responsive modal ──────────────────────────────────────────────────────────
+
+@include tablet-down {
+  .modal {
+    max-width: 520px;
+  }
+
+  .closeBtn {
+    width: 72px; // design-specific: narrower close area on tablet
+  }
+}
+
+@include mobile {
+  .overlay {
+    padding: var(--space-3);
+    align-items: center;
+  }
+
+  .modal {
+    max-width: 100%;
+    max-height: 92vh;
+  }
+
+  .modalTop {
+    min-height: 76px;
+  }
+
+  .headerContent {
+    padding: var(--space-3) var(--space-4);
+    gap: var(--space-1-5);
+  }
+
+  .title {
+    font-size: var(--text-body-small);
+  }
+
+  .subtitle {
+    font-size: var(--text-small-12);
+  }
+
+  .closeBtn {
+    width: 56px; // design-specific: compact close on mobile
+    font-size: 18px;
+  }
+
+  .th {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-small-12);
+  }
+
+  .td {
+    padding: 0 var(--space-3);
+    height: 40px;
+  }
+
+  .tokenCircle {
+    width: 22px;
+    height: 22px;
+  }
+
+  .domainName {
+    font-size: var(--text-nav);
+    max-width: 120px;
+  }
+
+  .grandTotal {
+    height: 52px;
+    padding: 0 var(--space-4);
+  }
+
+  .grandTotalLabel,
+  .grandTotalAmount {
+    font-size: var(--text-nav);
+  }
+
+  .footer {
+    height: auto;
+    padding: var(--space-3) var(--space-4);
+    gap: var(--space-3);
+    flex-direction: row;
+
+    > button {
+      flex: 1;
+      min-width: 0;
+      font-size: var(--text-small-12);
+      padding-top: var(--space-2);
+      padding-bottom: var(--space-2);
+    }
+  }
+
+  .contactSupportRow {
+    padding: var(--space-3) var(--space-4);
+    height: auto;
+  }
 }

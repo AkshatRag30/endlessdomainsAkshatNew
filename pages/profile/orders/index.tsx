@@ -21,9 +21,7 @@ const OrdersPage: React.FC = () => (
           <h1 className={styles.pageTitle}>My Orders</h1>
           <p className={styles.pageSubtitle}>List of all your orders.</p>
         </header>
-        <div className={styles.ordersCard}>
-          <OrdersList />
-        </div>
+        <OrdersList />
       </div>
     </main>
     <SiteFooter />

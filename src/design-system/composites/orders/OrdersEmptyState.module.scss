@@ -1,0 +1,148 @@
+@import '_mixins.scss';
+
+// ── Outer wrap — full width, stacks line / card / line vertically ─────────────
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+// ── Horizontal decorative lines (top + bottom) ────────────────────────────────
+
+.hLine {
+  width: 100%;
+  height: 1px;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0px,
+    transparent 3px,
+    var(--color-gray-200) 3px,
+    var(--color-gray-200) 6px
+  );
+  flex-shrink: 0;
+}
+
+// ── Card ──────────────────────────────────────────────────────────────────────
+
+.card {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  max-width: 749px; // design-specific: Figma-exact card width
+  min-height: 393px; // design-specific: Figma-exact card height
+  background-color: var(--color-white-primary);
+  background-image: repeating-linear-gradient(
+    135deg,
+    transparent 0px,
+    transparent 4px,
+    var(--color-black-alpha-01) 4px,
+    var(--color-black-alpha-01) 6px
+  );
+}
+
+// ── Side barcode strip (left + right decorative accent) ───────────────────────
+
+.sideBar {
+  flex-shrink: 0;
+  width: 14px; // design-specific: Figma-exact side accent width
+  align-self: stretch;
+  background: repeating-linear-gradient(
+    180deg,
+    var(--color-gray-200) 0px,
+    var(--color-gray-200) 1px,
+    transparent 1px,
+    transparent 5px
+  );
+  opacity: 0.6;
+}
+
+// ── Center content ────────────────────────────────────────────────────────────
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-8);
+  padding: var(--space-10) var(--space-6);
+}
+
+// ── Text group ────────────────────────────────────────────────────────────────
+
+.textGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  width: 100%;
+  max-width: 556px; // design-specific: Figma-exact content width
+}
+
+.title {
+  font-family: var(--font-satoshi);
+  font-size: 30px; // design-specific: Figma-exact — no matching token
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  text-transform: capitalize;
+  letter-spacing: -1.356px; // design-specific: Figma-exact tracking
+  line-height: 1.2;
+  text-align: center;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.subtitle {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-body-small); // 17px — Figma-exact
+  font-weight: var(--font-weight-regular);
+  color: #474747; // design-specific: Figma-exact subtitle gray
+  line-height: 1.3;
+  text-align: center;
+  margin: 0;
+  max-width: 520px;
+}
+
+// ── Responsive ────────────────────────────────────────────────────────────────
+
+@include tablet-down {
+  .card {
+    max-width: 100%;
+    min-height: 340px;
+  }
+
+  .title {
+    font-size: var(--text-h2);
+    white-space: normal;
+  }
+}
+
+@include mobile {
+  .card {
+    min-height: 280px;
+  }
+
+  .sideBar {
+    width: 8px;
+  }
+
+  .content {
+    padding: var(--space-8) var(--space-5);
+    gap: var(--space-6);
+  }
+
+  .textGroup {
+    gap: var(--space-4);
+  }
+
+  .title {
+    font-size: var(--text-h3);
+    letter-spacing: -0.8px;
+  }
+
+  .subtitle {
+    font-size: var(--text-nav);
+  }
+}

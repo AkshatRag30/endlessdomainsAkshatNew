@@ -1,31 +1,48 @@
 @import '_mixins.scss';
 
+// ── Tab section ───────────────────────────────────────────────────────────────
+
+.tabSection {
+  padding-bottom: var(--space-5);
+
+  @include tablet-down {
+    display: flex;
+    justify-content: center;
+  }
+
+  @include mobile {
+    padding-bottom: var(--space-4);
+  }
+}
+
+// ── Table section ─────────────────────────────────────────────────────────────
+
+.tableSection {
+  // no background — sits directly on page gray bg
+}
+
 // ── Filter tab group ──────────────────────────────────────────────────────────
 
 .tabGroup {
   display: flex;
+  align-items: center;
+  gap: 5.321px; // design-specific: Figma-exact gap between tabs
   width: fit-content;
-  border: 1px solid var(--color-gray-300);
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-  margin-bottom: var(--space-7);
 }
 
 .tabBtn {
+  height: 28px; // design-specific: Figma-exact tab height ~27.79px
+  width: 96px; // design-specific: Figma-exact tab width ~95.786px
   background: var(--color-white-primary);
   border: none;
-  border-right: 1px solid var(--color-gray-300);
-  color: var(--color-gray-dark);
+  color: #676767; // design-specific: Figma-exact inactive tab text
   font-family: var(--font-satoshi);
-  font-size: var(--text-nav);
+  font-size: var(--text-small-13);
   font-weight: var(--font-weight-regular);
-  padding: var(--space-2) var(--space-5);
   cursor: pointer;
+  text-transform: capitalize;
   transition: background-color 0.15s ease, color 0.15s ease;
-
-  &:last-child {
-    border-right: none;
-  }
+  overflow: hidden;
 
   &:hover {
     background: var(--color-gray-light);
@@ -37,11 +54,136 @@
 }
 
 .tabBtnActive {
-  background: var(--color-blue-primary);
+  background: linear-gradient(to bottom, #404040, #1a1a1a); // design-specific: Figma-exact dark gradient active tab
   color: var(--color-white-primary);
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--font-weight-medium);
+  // design-specific: Figma-exact tab shadows — outer drop + inner top highlight
+  box-shadow: 1.774px 1.774px 1.774px rgba(0, 0, 0, 0.15), inset 0 0.591px 0.591px rgba(255, 255, 255, 0.25);
 
   &:hover {
-    background: var(--color-blue-dark);
+    background: linear-gradient(to bottom, #505050, #2a2a2a);
   }
+}
+
+// ── Pagination mobile ─────────────────────────────────────────────────────────
+
+@include mobile {
+  .pagination {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    justify-content: flex-start;
+    padding-bottom: var(--space-2);
+  }
+
+  .paginationGroup {
+    flex-shrink: 0;
+  }
+}
+
+// ── Pagination ────────────────────────────────────────────────────────────────
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--space-5);
+}
+
+.paginationGroup {
+  display: flex;
+  align-items: stretch;
+  background: var(--color-white-primary);
+  border: 1px solid var(--color-gray-200);
+  overflow: hidden;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.pageDivider {
+  width: 1px;
+  background: var(--color-gray-200);
+  flex-shrink: 0;
+  align-self: stretch;
+}
+
+.pageNavBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 38px; // design-specific: Figma-exact pagination button height
+  padding: 0 var(--space-3);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-dark);
+  letter-spacing: 0.07px;
+  white-space: nowrap;
+  transition: background-color 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background: var(--color-gray-light);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.pageNavChevron {
+  font-size: var(--text-button); // 18px — slightly larger for « »
+  color: var(--color-gray-dark-hover);
+  line-height: 1;
+}
+
+.pageNum {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px; // design-specific: Figma-exact page number cell size
+  height: 38px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-dark);
+  letter-spacing: 0.07px;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background: var(--color-gray-light);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.pageNumActive {
+  background: var(--color-gray-200); // design-specific: Figma-exact active page bg #e5e7eb ≈ --color-gray-200
+  color: var(--color-gray-dark);
+
+  &:hover {
+    background: var(--color-gray-light-active);
+  }
+}
+
+.pageDots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  font-size: var(--text-small-12);
+  color: var(--color-gray-dark);
+  letter-spacing: 0.06px;
+  cursor: default;
+  user-select: none;
 }
