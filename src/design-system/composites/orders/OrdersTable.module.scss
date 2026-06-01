@@ -11,7 +11,7 @@
 // ── Rounded clip wrapper ──────────────────────────────────────────────────────
 
 .tableWrap {
-  border-radius: var(--radius-lg);
+  // border-radius: var(--radius-lg);
   overflow: hidden;
   min-width: fit-content; // lets tableWrapper scroll rather than clip when table exceeds viewport
 }
@@ -50,7 +50,7 @@
   text-transform: capitalize;
   vertical-align: middle;
   background-color: var(--color-white-primary);
-  background-image: repeating-linear-gradient(135deg, transparent 0px, transparent 4px, var(--color-black-alpha-01) 4px, var(--color-black-alpha-01) 6px);
+  // background-image: repeating-linear-gradient(135deg, transparent 0px, transparent 4px, var(--color-black-alpha-01) 4px, var(--color-black-alpha-01) 6px);
   border-bottom: 1px solid var(--color-gray-200);
   border-right: 1px solid var(--color-gray-200);
 
