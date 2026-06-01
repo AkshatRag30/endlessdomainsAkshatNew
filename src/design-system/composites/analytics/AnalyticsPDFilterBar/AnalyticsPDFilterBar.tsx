@@ -1,6 +1,7 @@
 ﻿import React, { useCallback } from 'react'
 import styles from '../Analytics.module.scss'
 import MiniCalendar from '@/design-system/primitives/MiniCalendar'
+import FilterDropdown from '../FilterDropdown/FilterDropdown'
 import type { PDFilterState } from '../data/mockAnalyticsData'
 import { DEFAULT_PD_FILTER_STATE } from '../data/mockAnalyticsData'
 
@@ -45,33 +46,23 @@ const AnalyticsPDFilterBar: React.FC<Props> = ({ value, onChange }) => {
       {/* nth-child(3) → row 3 col 1 */}
       <div className={styles.filterGroup}>
         <label className={styles.filterLabel} htmlFor="pd-order-status">Order Status</label>
-        <select
+        <FilterDropdown
           id="pd-order-status"
-          className={styles.filterSelect}
           value={value.orderStatus}
-          onChange={e => set({ orderStatus: e.target.value as PDFilterState['orderStatus'] })}
-        >
-          <option value="All Status">All Status</option>
-          <option value="Active">Active</option>
-          <option value="Expired">Expired</option>
-          <option value="Pending">Pending</option>
-        </select>
+          options={['All Status', 'Active', 'Expired', 'Pending']}
+          onChange={v => set({ orderStatus: v as PDFilterState['orderStatus'] })}
+        />
       </div>
 
       {/* nth-child(4) → row 3 col 2 */}
       <div className={styles.filterGroup}>
         <label className={styles.filterLabel} htmlFor="pd-time-period">Time Period</label>
-        <select
+        <FilterDropdown
           id="pd-time-period"
-          className={styles.filterSelect}
           value={value.timePeriod}
-          onChange={e => set({ timePeriod: e.target.value as PDFilterState['timePeriod'] })}
-        >
-          <option value="All Time">All Time</option>
-          <option value="This Week">This Week</option>
-          <option value="This Month">This Month</option>
-          <option value="This Year">This Year</option>
-        </select>
+          options={['All Time', 'This Week', 'This Month', 'This Year']}
+          onChange={v => set({ timePeriod: v as PDFilterState['timePeriod'] })}
+        />
       </div>
 
       <div className={styles.filterDivider} aria-hidden="true" />

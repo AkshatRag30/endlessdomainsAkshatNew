@@ -1,5 +1,6 @@
 ﻿import React, { useCallback } from 'react'
 import styles from '../Analytics.module.scss'
+import FilterDropdown from '../FilterDropdown/FilterDropdown'
 import {
   TLD_OPTIONS,
   PROVIDER_OPTIONS,
@@ -28,39 +29,27 @@ const AnalyticsFilterBar: React.FC<Props> = ({ value, onChange }) => {
     <div className={styles.filterBar} role="search" aria-label="Analytics filters">
       <div className={styles.filterGroup}>
         <label className={styles.filterLabel} htmlFor="filter-tld">TLD</label>
-        <select id="filter-tld" className={styles.filterSelect} value={value.tld} onChange={e => set({ tld: e.target.value as TLDFilter })}>
-          {TLD_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-        </select>
+        <FilterDropdown id="filter-tld" value={value.tld} options={TLD_OPTIONS} onChange={v => set({ tld: v as TLDFilter })} />
       </div>
       <div className={styles.filterGroup}>
         <label className={styles.filterLabel} htmlFor="filter-provider">Provider</label>
-        <select id="filter-provider" className={styles.filterSelect} value={value.provider} onChange={e => set({ provider: e.target.value as ProviderFilter })}>
-          {PROVIDER_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-        </select>
+        <FilterDropdown id="filter-provider" value={value.provider} options={PROVIDER_OPTIONS} onChange={v => set({ provider: v as ProviderFilter })} />
       </div>
       <div className={styles.filterGroup}>
         <label className={styles.filterLabel} htmlFor="filter-expiry">Expiry</label>
-        <select id="filter-expiry" className={styles.filterSelect} value={value.expiry} onChange={e => set({ expiry: e.target.value as ExpiryFilter })}>
-          {EXPIRY_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-        </select>
+        <FilterDropdown id="filter-expiry" value={value.expiry} options={EXPIRY_OPTIONS} onChange={v => set({ expiry: v as ExpiryFilter })} />
       </div>
       <div className={styles.filterGroup}>
         <label className={styles.filterLabel} htmlFor="filter-renewal">Renewal Type</label>
-        <select id="filter-renewal" className={styles.filterSelect} value={value.renewalType} onChange={e => set({ renewalType: e.target.value as RenewalTypeFilter })}>
-          {RENEWAL_TYPE_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-        </select>
+        <FilterDropdown id="filter-renewal" value={value.renewalType} options={RENEWAL_TYPE_OPTIONS} onChange={v => set({ renewalType: v as RenewalTypeFilter })} />
       </div>
       <div className={styles.filterGroup}>
         <label className={styles.filterLabel} htmlFor="filter-domain-type">Domain Type</label>
-        <select id="filter-domain-type" className={styles.filterSelect} value={value.domainType} onChange={e => set({ domainType: e.target.value as DomainTypeFilter })}>
-          {DOMAIN_TYPE_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-        </select>
+        <FilterDropdown id="filter-domain-type" value={value.domainType} options={DOMAIN_TYPE_OPTIONS} onChange={v => set({ domainType: v as DomainTypeFilter })} />
       </div>
       <div className={styles.filterGroup}>
         <label className={styles.filterLabel} htmlFor="filter-listing">Domain Listing</label>
-        <select id="filter-listing" className={styles.filterSelect} value={value.domainListing} onChange={e => set({ domainListing: e.target.value as DomainListingFilter })}>
-          {DOMAIN_LISTING_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-        </select>
+        <FilterDropdown id="filter-listing" value={value.domainListing} options={DOMAIN_LISTING_OPTIONS} onChange={v => set({ domainListing: v as DomainListingFilter })} />
       </div>
 
       <div className={styles.filterDivider} aria-hidden="true" />

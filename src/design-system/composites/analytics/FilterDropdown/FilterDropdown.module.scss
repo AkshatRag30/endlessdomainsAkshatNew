@@ -1,0 +1,135 @@
+@import '_mixins.scss';
+
+// ── Wrapper ───────────────────────────────────────────────────────────────────
+
+.wrap {
+  position: relative;
+  min-width: 120px;
+
+  @include tablet-down {
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+// ── Closed trigger button ─────────────────────────────────────────────────────
+
+.trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  width: 100%;
+  height: 36px;
+  padding: 0 var(--space-3);
+  background: var(--color-white-primary);
+  border: 1px solid rgba(148, 87, 246, 0.35); // design-specific: purple-primary at 35% opacity
+  border-radius: 0;
+  cursor: pointer;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-black-primary);
+  text-align: left;
+  transition: border-color 0.15s ease;
+
+  &:hover {
+    border-color: var(--color-gray-dark);
+  }
+
+  &[aria-expanded='true'] {
+    border-color: var(--color-blue-primary);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  @include tablet-down {
+    height: 32px;
+    font-size: var(--text-small-12);
+    padding: 0 var(--space-2);
+  }
+}
+
+.triggerText {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+}
+
+.chevron {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: var(--color-gray-dark);
+  transition: transform 0.15s ease;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+// ── Open panel ────────────────────────────────────────────────────────────────
+
+.panel {
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0;
+  min-width: 100%;
+  z-index: 200;
+  list-style: none;
+  margin: 0;
+  // padding creates the gaps between option boxes, revealing the diagonal bg beneath
+  padding: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1-5);
+  background-color: var(--color-white-primary);
+  background-image: repeating-linear-gradient(
+    135deg,
+    transparent 0px,
+    transparent 4px,
+    var(--color-black-alpha-01) 4px,
+    var(--color-black-alpha-01) 6px
+  );
+  border: 1px solid rgba(148, 87, 246, 0.35); // design-specific: purple-primary at 35% opacity
+  box-shadow: 0 4px 12px var(--color-black-alpha-10);
+}
+
+// ── Option rows — each sits in its own white box ──────────────────────────────
+
+.option {
+  display: block;
+  width: 100%;
+  padding: var(--space-2) var(--space-4);
+  background: transparent;
+  border: 1px solid rgba(148, 87, 246, 0.35); // design-specific: purple-primary at 35% opacity
+  cursor: pointer;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-black-primary);
+  text-align: left;
+  white-space: nowrap;
+  transition: background 0.1s ease;
+
+  &:hover {
+    background: var(--color-purple-light);
+  }
+}
+
+.optionSelected {
+  background: var(--color-blue-primary);
+  border-color: var(--color-blue-primary);
+  color: var(--color-white-primary);
+  font-weight: var(--font-weight-medium);
+  // design-specific: white inset glow matching reference image selected state
+  box-shadow: inset 0 0 14px rgba(255, 255, 255, 0.35);
+
+  &:hover {
+    background: var(--color-blue-primary);
+  }
+}
