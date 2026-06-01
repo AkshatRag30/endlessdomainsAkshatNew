@@ -17,10 +17,6 @@ const OrdersPage: React.FC = () => (
     <DashboardTabBar />
     <main className={styles.mainArea}>
       <div className={styles.page}>
-        <header className={styles.pageHeader}>
-          <h1 className={styles.pageTitle}>My Orders</h1>
-          <p className={styles.pageSubtitle}>List of all your orders.</p>
-        </header>
         <OrdersList />
       </div>
     </main>
