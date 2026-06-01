@@ -190,12 +190,12 @@
     var(--color-black-alpha-01) 4px,
     var(--color-black-alpha-01) 6px
   );
-  border-bottom: 1px solid var(--color-gray-200);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   white-space: nowrap;
 
   &.thAmount {
     text-align: right;
-    border-left: 1px solid var(--color-gray-200);
+    border-left: 1px solid rgba(0, 0, 0, 0.05);
   }
 }
 
@@ -207,11 +207,11 @@
   font-size: var(--text-body-small); // 17px — Figma-exact
   font-weight: var(--font-weight-medium);
   color: #070707; // design-specific: Figma-exact
-  border-bottom: 1px solid var(--color-gray-200);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 
   &.tdAmount {
     text-align: right;
-    border-left: 1px solid var(--color-gray-200);
+    border-left: 1px solid rgba(0, 0, 0, 0.05);
     white-space: nowrap;
   }
 }
@@ -331,7 +331,7 @@ tbody tr:last-child .td {
   height: 63px; // design-specific: Figma-exact footer row height
   padding: 0 var(--space-5);
   background: transparent;
-  border-top: 1px solid var(--color-gray-200);
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
   flex-shrink: 0;
 }
 
@@ -351,7 +351,7 @@ tbody tr:last-child .td {
     var(--color-black-alpha-01) 6px
   );
   flex-shrink: 0;
-  border-top: 1px solid var(--color-gray-200);
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .contactSupportLink {

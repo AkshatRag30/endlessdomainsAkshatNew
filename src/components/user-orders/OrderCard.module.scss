@@ -1,0 +1,253 @@
+@import '_mixins.scss';
+
+// ── Card shell ────────────────────────────────────────────────────────────────
+
+.card {
+  width: 100%;
+  background-color: var(--color-white-primary);
+  background-image: repeating-linear-gradient(
+    135deg,
+    transparent 0px,
+    transparent 4px,
+    var(--color-black-alpha-01) 4px,
+    var(--color-black-alpha-01) 6px
+  );
+  // drop-shadow traces the composited shape after clip-path — produces visible
+  // border on all edges including the diagonal cuts
+  filter:
+    drop-shadow(1px 0 0 var(--color-gray-200))
+    drop-shadow(-1px 0 0 var(--color-gray-200))
+    drop-shadow(0 1px 0 var(--color-gray-200))
+    drop-shadow(0 -1px 0 var(--color-gray-200));
+  clip-path: polygon(20px 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%, 0 20px); // design-specific: Figma-exact cut-corner card shape
+  overflow: hidden;
+}
+
+// ── Shared row ────────────────────────────────────────────────────────────────
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+// ── Shared cell ───────────────────────────────────────────────────────────────
+
+.cell {
+  padding: var(--space-3) var(--space-4);
+  min-width: 0;
+
+  &:first-child {
+    border-right: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  &:last-child {
+    text-align: right;
+  }
+}
+
+// ── Cell label (Explore, Transaction Date, Total Amount) ──────────────────────
+
+.cellLabel {
+  display: block;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-gray-dark);
+  margin-bottom: var(--space-3);
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+// ── Row 1 — Domain + Status ───────────────────────────────────────────────────
+
+.domainRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2-5);
+  min-width: 0;
+}
+
+.tokenCircle {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-full);
+  border: 0.565px solid rgba(38, 57, 237, 0.36); // design-specific: Figma-exact token border
+  box-shadow: 0 0.565px 3.024px rgba(38, 57, 237, 0.2); // design-specific: Figma-exact token glow
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  background: var(--color-gray-dark);
+}
+
+.domainName {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: #070707; // design-specific: Figma-exact
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.statusRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  justify-content: flex-end;
+}
+
+.statusDot {
+  width: 13px;
+  height: 13px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+  border: 2.5px solid var(--color-black-primary);
+}
+
+.dot_complete  { background: #2EC013; }
+.dot_processing { background: #2bb3ff; } // design-specific: Figma processing blue
+.dot_cancel    { background: var(--color-error); }
+.dot_pending   { background: var(--color-gray-primary); }
+
+.statusText {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: #070707; // design-specific: Figma-exact
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+// ── Row 2 — Explore + Transaction Date ───────────────────────────────────────
+
+.walletBox {
+  display: flex;
+  align-items: center;
+  height: 27px; // design-specific: Figma-exact wallet pill height
+  overflow: hidden;
+  padding: 0 var(--space-2);
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.walletBoxBlack {
+  background: #000000; // design-specific: Figma-exact black explore box
+}
+
+.walletBoxBlue {
+  background: var(--color-blue-primary);
+  box-shadow: inset 0 0 17.4px 0 rgba(255, 255, 255, 0.3); // design-specific: Figma inner glow
+}
+
+.walletText {
+  display: block;
+  width: 100%;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-medium);
+  color: #ffffff;
+  letter-spacing: 0.36px; // design-specific: Figma-exact address tracking
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+.dateText {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  color: #070707; // design-specific: Figma-exact
+  white-space: nowrap;
+  display: block;
+  text-align: right;
+}
+
+// ── Row 3 — Total Amount + Crypto Payments ────────────────────────────────────
+
+.amountText {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-bold);
+  color: #070707; // design-specific: Figma-exact
+}
+
+.paymentRow {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  height: 100%;
+}
+
+.paymentLabel {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-medium);
+  color: #4a4a4a; // design-specific: Figma-exact payment label gray
+  white-space: nowrap;
+}
+
+.cryptoIconWrap {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-full);
+  border: 0.565px solid rgba(38, 57, 237, 0.36); // design-specific: Figma-exact
+  box-shadow: 0 0.565px 6.048px rgba(38, 57, 237, 0.2); // design-specific: Figma-exact
+  background: var(--color-white-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.cryptoIcon {
+  width: 17px;
+  height: 9px;
+  object-fit: contain;
+}
+
+// ── Row 4 — View button ───────────────────────────────────────────────────────
+
+.actionRow {
+  padding: var(--space-3) var(--space-4) var(--space-4);
+}
+
+.viewBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-5);
+  background: linear-gradient(135deg, #5c6ef0 0%, #2639ed 50%, #1e2dca 100%); // design-specific: blue gradient matching reference image
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-white-primary);
+  letter-spacing: 0.02em;
+  clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px); // design-specific: all-corner cut shape from reference image
+  transition: opacity 0.15s ease;
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.viewBtnIcon {
+  font-size: var(--text-nav);
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+}

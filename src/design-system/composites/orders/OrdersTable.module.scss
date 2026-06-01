@@ -71,32 +71,32 @@
   background: var(--color-white-primary);
 }
 
-// ── Tablet + Mobile: disable table layout so rows can render as cards ────────
+// ── Card list — tablet + mobile only ─────────────────────────────────────────
+
+.cardList {
+  display: none; // hidden on desktop — table takes over
+}
+
+.cardListEmpty {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  color: var(--color-gray-dark);
+  text-align: center;
+  padding: var(--space-8) 0;
+  margin: 0;
+  font-style: italic;
+}
+
+// ── Tablet + Mobile: hide table, show card list ───────────────────────────────
 
 @include tablet-down {
   .tableWrapper {
-    overflow-x: visible;
+    display: none;
   }
 
-  .tableWrap {
-    border-radius: 0;
-    overflow: visible;
-  }
-
-  .table {
-    display: block;
-    min-width: 0;
-    border-spacing: 0;
-    background: transparent;
-
-    thead {
-      display: none;
-    }
-
-    tbody {
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-3);
-    }
+  .cardList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
   }
 }
