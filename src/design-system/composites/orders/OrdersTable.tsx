@@ -1,8 +1,8 @@
 import React from 'react'
 
-import OrderCard from '@/components/user-orders/OrderCard'
-import OrderItem from '@/components/user-orders/OrderItem'
-import { type OrderEntry } from '@/components/user-orders/ordersData'
+import OrderCard from './OrderCard'
+import OrderItem from './OrderItem'
+import { type OrderEntry } from './ordersData'
 
 import styles from './OrdersTable.module.scss'
 

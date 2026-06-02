@@ -6,7 +6,7 @@ import { AiOutlineInfoCircle } from 'react-icons/ai'
 import { getProviderLogo, type DomainProviderKey } from '@helpers/chaincurrency/chaincurrency'
 import { PrimaryButton } from '@/design-system/primitives/button/PrimaryButton'
 import { SecondaryButton } from '@/design-system/primitives/secondary-button/SecondaryButton'
-import { type OrderEntry, type OrderStatus } from '@/components/user-orders/ordersData'
+import { type OrderEntry, type OrderStatus } from '../ordersData'
 
 import styles from './OrderModal.module.scss'
 

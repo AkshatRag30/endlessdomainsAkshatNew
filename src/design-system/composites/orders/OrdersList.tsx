@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react'
 
-import { filterOrders, ORDERS_DATA, type OrderEntry, type OrderTab } from '@/components/user-orders/ordersData'
+import { filterOrders, ORDERS_DATA, type OrderEntry, type OrderTab } from './ordersData'
 
 import OrderModal from './OrderModal'
 import OrdersEmptyState from './OrdersEmptyState'
