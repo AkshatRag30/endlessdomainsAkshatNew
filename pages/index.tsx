@@ -1,17 +1,14 @@
 import type { NextPage } from 'next'
+import dynamic from 'next/dynamic'
+import HowItWorksNew from '../_saved-sections/banner-endless-works'
+
+const Roadmap = dynamic(() => import('../_saved-sections/roadmap'), { ssr: false })
 
 const Home: NextPage = () => {
   return (
-    <main
-      style={{
-        display: 'flex',
-        minHeight: '100vh',
-        justifyContent: 'center',
-        alignItems: 'center',
-        fontFamily: 'system-ui, sans-serif',
-      }}
-    >
-      <h1>Hello World</h1>
+    <main>
+      <HowItWorksNew />
+      <Roadmap />
     </main>
   )
 }

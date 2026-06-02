@@ -1,0 +1,695 @@
+@import '@newstyles/_mixins.scss';
+
+// ─── Section wrapper ─────────────────────────────────────────────────────────
+
+.section {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  padding: var(--section-spacing) 0;
+}
+
+// ─── Header outer ─────────────────────────────────────────────────────────────
+
+.headerOuter {
+  width: 100%;
+  background: var(--color-white-primary);
+}
+
+// ─── Header ───────────────────────────────────────────────────────────────────
+
+.header {
+  position: relative;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  gap: 0;
+  padding: var(--space-7) var(--container-padding-x);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='2'%3E%3Cline x1='0' y1='1' x2='100%25' y2='1' stroke='%23ebebeb' stroke-width='2' stroke-dasharray='12 8' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: top;
+    background-size: 100% 1px;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='2'%3E%3Cline x1='0' y1='1' x2='100%25' y2='1' stroke='%23ebebeb' stroke-width='2' stroke-dasharray='12 8' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: bottom;
+    background-size: 100% 1px;
+  }
+
+  @include mobile-up {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--gap-section);
+    padding: 0 var(--container-padding-x);
+  }
+
+  @include desktop {
+    grid-template-columns: 480px 1fr 1fr;
+    gap: 0;
+  }
+}
+
+// ─── Header left ──────────────────────────────────────────────────────────────
+
+.headerLeft {
+  border-right: 1px solid var(--color-gray-light);
+  padding: var(--space-7) 0;
+}
+
+.headerCenter {
+  border-right: 1px solid var(--color-gray-light);
+}
+
+// ─── Label ("LET'S KNOW") ─────────────────────────────────────────────────────
+
+.label {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2) var(--space-5);
+  margin-bottom: var(--space-4);
+
+  h4 {
+    color: var(--color-gray-primary);
+    font-family: var(--font-satoshi);
+    font-size: var(--text-nav);
+    font-weight: var(--font-weight-medium);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-nav);
+    position: relative;
+    z-index: 1;
+  }
+
+  &::before,
+  &::after,
+  span::before,
+  span::after {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border: 1px solid var(--color-purple-primary);
+    transition: all 0.3s ease;
+  }
+
+  &::before { top: 0; left: 0; border-right: none; border-bottom: none; }
+  &::after  { top: 0; right: 0; border-left: none; border-bottom: none; }
+
+  span {
+    position: absolute;
+    inset: 0;
+    &::before { bottom: 0; left: 0; border-top: none; border-right: none; }
+    &::after  { bottom: 0; right: 0; border-top: none; border-left: none; }
+  }
+}
+
+// ─── Heading ──────────────────────────────────────────────────────────────────
+
+.heading {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-h1);
+  color: var(--color-black-primary);
+  margin: 0;
+  text-transform: capitalize;
+}
+
+.headingGray {
+  color: var(--color-gray-primary);
+}
+
+// ─── Center decorative ────────────────────────────────────────────────────────
+
+.headerCenter {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+
+  @include desktop {
+    display: flex;
+  }
+}
+
+.decorImage {
+  max-width: 330px;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+// ─── Header right ─────────────────────────────────────────────────────────────
+
+.headerRight {
+  margin-left: var(--space-7);
+  position: relative;
+  padding: var(--space-6);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 10px; height: 10px;
+    border-top: 1px solid var(--color-purple-primary);
+    border-left: 1px solid var(--color-purple-primary);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0; right: 0;
+    width: 10px; height: 10px;
+    border-bottom: 1px solid var(--color-purple-primary);
+    border-right: 1px solid var(--color-purple-primary);
+  }
+
+  @include desktop {
+    padding-left: 0;
+  }
+}
+
+.sectionDesc {
+  color: var(--color-gray-dark-active);
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--leading-normal);
+  margin: 0;
+}
+
+// ─── Slider section ───────────────────────────────────────────────────────────
+
+.bg_stripes {
+  width: 80px;
+  height: 45vh;
+  background-image: url(/new-assets/how-it-works/stripes.png);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  z-index: 10;
+  pointer-events: none;
+  opacity: 0.1;
+}
+
+.sliderSection {
+  display: flex;
+  margin: 0 auto;
+  padding: var(--space-2) 0;
+  background-color: var(--color-gray-light);
+}
+
+.sliderViewport {
+  overflow: hidden;
+}
+
+.sliderTrack {
+  --card-width: calc(100vw - var(--container-padding-x) - 40px);
+  --card-gap: 16px;
+
+  display: flex;
+  gap: var(--card-gap);
+  transition: transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transform: translateX(calc(-1 * var(--hiw-index, 0) * (var(--card-width) + var(--card-gap))));
+
+  @include mobile-up {
+    --card-width: 460px;
+    --card-gap: 20px;
+  }
+
+  @include desktop {
+    --card-width: 592px;
+    --card-gap: 31px;
+  }
+}
+
+// ─── Card wrapper ─────────────────────────────────────────────────────────────
+
+.cardWrapper {
+  position: relative;
+  flex-shrink: 0;
+  width: var(--card-width);
+  height: 320px;
+
+  @include mobile-up {
+    height: 350px;
+  }
+}
+
+// ─── Card shell ───────────────────────────────────────────────────────────────
+
+.card {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--color-white-primary);
+  clip-path: polygon(
+    35px 0,
+    100% 0,
+    100% calc(100% - 47px),
+    calc(100% - 49px) 100%,
+    0 100%,
+    0 33px
+  );
+}
+
+// ─── Background decoration — soft blue blurred squares ────────────────────────
+
+.cardBg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+
+  // top-left square
+  &::before {
+    content: '';
+    position: absolute;
+    top: -16px;
+    left: -16px;
+    width: 110px;
+    height: 90px;
+    background: rgba(91, 107, 236, 0.14);
+    border-radius: 12px;
+    filter: blur(22px);
+  }
+
+  // bottom-right square
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -20px;
+    right: -20px;
+    width: 110px;
+    height: 90px;
+    background: rgba(91, 107, 236, 0.14);
+    border-radius: 12px;
+    filter: blur(22px);
+  }
+}
+
+// ─── Illustration container ───────────────────────────────────────────────────
+
+.cardIllus {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+}
+
+// Card 1 type: text top → illustration anchored to bottom center
+.cardIllusBottom {
+  bottom: 0;
+  width: 72%;
+  height: 58%;
+}
+
+// Card 2 type: text bottom → illustration anchored to top center
+.cardIllusTop {
+  top: 0;
+  width: 90%;
+  height: 60%;
+}
+
+// Card 2 (Connect Your Wallets) — full-width illustration + separator
+.c1Illus {
+  width: 100%;
+  height: 68%;
+
+  // thin separator between text block and illustration
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: var(--space-6);
+    right: var(--space-6);
+    height: 1px;
+    background: rgba(0, 0, 0, 0.07);
+  }
+
+  img {
+    transform: scale(1.2);
+    transform-origin: center top;
+  }
+}
+
+// ─── Text block ───────────────────────────────────────────────────────────────
+
+.cardText {
+  position: absolute;
+  left: var(--space-6);
+  right: var(--space-6);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-inline);
+}
+
+.cardTextTop    { top: var(--space-6); }
+.cardTextBottom { bottom: var(--space-6); }
+
+.cardTitle {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h3);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--leading-snug);
+  margin: 0;
+  color: var(--color-blue-primary);
+}
+
+.cardDesc {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--leading-normal);
+  margin: 0;
+  color: var(--color-gray-dark);
+  max-width: 420px;
+}
+
+// ─── Corner fold triangles ────────────────────────────────────────────────────
+
+.foldTopLeft {
+  position: absolute;
+  top: 0; left: 0;
+  width: 0; height: 0;
+  border-style: solid;
+  border-width: 33px 35px 0 0;
+  border-color: var(--color-gray-light) transparent transparent transparent;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.foldBottomRight {
+  position: absolute;
+  bottom: 0; right: 0;
+  width: 0; height: 0;
+  border-style: solid;
+  border-width: 0 0 47px 49px;
+  border-color: transparent transparent var(--color-gray-light) transparent;
+  pointer-events: none;
+  z-index: 1;
+}
+
+// ─── Navigation outer ─────────────────────────────────────────────────────────
+
+.navOuter {
+  width: 100%;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 1px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='2'%3E%3Cline x1='0' y1='1' x2='100%25' y2='1' stroke='%23ebebeb' stroke-width='2' stroke-dasharray='12 8' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: top;
+    background-size: 100% 1px;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%; height: 1px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='2'%3E%3Cline x1='0' y1='1' x2='100%25' y2='1' stroke='%23ebebeb' stroke-width='2' stroke-dasharray='12 8' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: bottom;
+    background-size: 100% 1px;
+  }
+}
+
+.navigation {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: var(--space-2) var(--container-padding-x);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+// ─── Arrow buttons ────────────────────────────────────────────────────────────
+
+.navArrows {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.arrowBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 45px;
+  height: 45px;
+  border: none;
+  background: transparent;
+  color: var(--color-black-primary);
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background 0.2s ease, color 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: var(--color-black-light);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  &:disabled {
+    color: var(--color-gray-medium);
+    cursor: not-allowed;
+  }
+}
+
+// ─── Pagination bars ──────────────────────────────────────────────────────────
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-inline-sm);
+}
+
+.pagBar {
+  height: 4px;
+  width: 41px;
+  border-radius: 2px;
+  border: none;
+  padding: 0;
+  background: var(--color-black-light);
+  cursor: pointer;
+  transition: width 0.3s ease, background 0.3s ease;
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.pagBarActive {
+  width: 67px;
+  background: var(--color-black-primary);
+}
+
+// ─── Card 4 — Claim Your Identity ────────────────────────────────────────────
+
+// Outer wrap: fills top 62% of card (textPosition: bottom)
+.c4Wrap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 62%;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// Column: top-line → row → bottom-line
+.c4Content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+// Top vertical connector with horizontal T-cap
+.c4VTop {
+  position: relative;
+  width: 1.5px;
+  height: 28px;
+  background: linear-gradient(to top, rgba(91, 107, 236, 0.75), rgba(91, 107, 236, 0.08));
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 28px;
+    height: 1.5px;
+    background: rgba(91, 107, 236, 0.38);
+  }
+}
+
+// Row: left SVG — icon box — right SVG
+.c4Row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+// Left side SVG fills all space to the left of the icon
+.c4SideLeft {
+  flex: 1;
+  min-width: 0;
+  height: auto;
+  display: block;
+  opacity: 0.45;
+}
+
+// Right side SVG fills all space to the right of the icon
+.c4SideRight {
+  flex: 1;
+  min-width: 0;
+  height: auto;
+  display: block;
+  opacity: 0.45;
+}
+
+// Rounded app-icon box — sits between the two SVGs
+.c4IconBox {
+  flex-shrink: 0;
+  width: 88px;
+  height: 88px;
+  border-radius: 18px;
+  background: linear-gradient(145deg, #ffffff 0%, #eceef8 100%);
+  border: 1.5px solid rgba(180, 185, 220, 0.55);
+  box-shadow:
+    0 0 0 10px rgba(91, 107, 236, 0.07),
+    0 8px 32px rgba(91, 107, 236, 0.16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.c4Icon {
+  font-size: 44px;
+  color: var(--color-blue-primary);
+}
+
+// Bottom vertical connector
+.c4VBottom {
+  width: 1.5px;
+  height: 28px;
+  background: linear-gradient(to bottom, rgba(91, 107, 236, 0.75), rgba(91, 107, 236, 0.08));
+}
+
+// ─── Card 3 — Build Your Reputation ─────────────────────────────────────────
+
+// Outer container: fills the bottom illustration area (same height as cardIllusBottom)
+.c3Wrap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 62%;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: var(--space-4);
+}
+
+// card3.svg curved lines — full bleed behind everything
+.c3Curves {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  pointer-events: none;
+}
+
+// Sphere avatar circle
+.c3Avatar {
+  position: relative;
+  z-index: 2;
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  // radial gradient gives the 3D sphere look from the design
+  background: radial-gradient(circle at 38% 32%, #ffffff 0%, #dde0f5 60%, #c8cde8 100%);
+  border: 1.5px solid rgba(180, 185, 220, 0.7);
+  box-shadow:
+    0 0 0 6px rgba(91, 107, 236, 0.08),
+    0 8px 28px rgba(91, 107, 236, 0.14);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: var(--space-3);
+  gap: var(--space-1);
+}
+
+// Three stars above the person icon
+.c3Stars {
+  position: absolute;
+  top: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+}
+
+// Flanking stars — smaller, slightly lower
+.c3StarSm {
+  font-size: 13px;
+  color: var(--color-blue-primary);
+  opacity: 0.75;
+  margin-bottom: 1px;
+}
+
+// Center star — slightly larger and raised
+.c3StarLg {
+  font-size: 17px;
+  color: var(--color-blue-primary);
+  margin-bottom: 3px;
+}
+
+// Person / user icon
+.c3UserIcon {
+  font-size: 38px;
+  color: var(--color-blue-primary);
+  position: absolute;
+  bottom: 18px;
+}

@@ -1,0 +1,454 @@
+@import '@newstyles/_mixins.scss';
+
+// ─── Section ─────────────────────────────────────────────────────────────────
+
+.section {
+  width: 100%;
+  background: var(--color-white-primary);
+  padding: var(--section-spacing) 0;
+  overflow: hidden;
+}
+
+// ─── Header ──────────────────────────────────────────────────────────────────
+
+.header {
+  text-align: center;
+  max-width: 810px;
+  margin: 0 auto var(--space-3);
+  padding: 0 var(--container-padding-x);
+}
+
+.journeyLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-gray-primary);
+  margin-bottom: var(--space-4);
+}
+
+.bracket {
+  color: var(--color-gray-medium);
+  font-weight: var(--font-weight-regular);
+}
+
+.heading {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--leading-tight);
+  color: var(--color-black-primary);
+  margin: 0 0 var(--space-4);
+}
+
+.headingBlue {
+  color: var(--color-blue-primary);
+}
+
+.subtext {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--leading-normal);
+  color: var(--color-gray-dark);
+  margin: 0;
+}
+
+// ─── Snake container ──────────────────────────────────────────────────────────
+// Height is set by the SVG's intrinsic viewBox aspect ratio (100 : 198.8 = 1 : 1.988).
+// Checkpoint top-% values map directly to SVG y-coordinates: top = (py/2578)*100%.
+
+.snakeWrap {
+  position: relative;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+// Block SVG — width:100% + height:auto lets the viewBox aspect ratio size the container
+.snake {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+// ─── Checkpoint blocks ────────────────────────────────────────────────────────
+
+.checkpoint {
+  position: absolute;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-width: 42%;
+  transform: translateY(-50%);
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  // design-specific: frosted-glass backdrop so checkpoint text stays readable over the path
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow:
+    0 0 0 4px rgba(210, 234, 255, 0.25),
+    0 0 20px 6px rgba(210, 234, 255, 0.3),
+    0 4px 24px rgba(255, 255, 255, 0.5);
+}
+
+.cpLeft {
+  left: 1%;
+}
+
+.cpRight {
+  right: 1%;
+  align-items: flex-end;
+  text-align: right;
+}
+
+// Content wrapper — keeps title + desc + tags as one flex unit
+.cpContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+// Mirror right-alignment into the content wrapper so mobile/tablet are unaffected
+.cpRight .cpContent {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.cpRight .milestoneTitle {
+  text-align: right;
+}
+
+// ─── Year badge ───────────────────────────────────────────────────────────────
+
+.yearBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  // design-specific: fixed width so every label ("2020" through "Q4 2026") uses the same box
+  width: 106px;
+  padding: var(--space-2) 0;
+  background: linear-gradient(160deg, var(--color-slider-card-from), var(--color-blue-primary));
+  color: var(--color-white-primary);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.02em;
+  border-radius: 0;
+  border: 1px solid var(--color-blue-light);
+  // design-specific: Figma-exact shadow — inset light-blue glow + layered outer blue drop shadow + border rings
+  box-shadow:
+    0 0.602px 10.843px 1.205px #D2EAFF inset,
+    0 0.602px 2.41px 1.205px #D2EAFF inset,
+    0 25.301px 64.458px 0 rgba(87, 177, 255, 0.34),
+    0 14.892px 19.432px 0 rgba(87, 177, 255, 0.19),
+    0 6.185px 8.071px 0 rgba(87, 177, 255, 0.22),
+    0 2.237px 2.919px 0 rgba(87, 177, 255, 0.15),
+    0 0 0 2.41px #E0E9F2,
+    0 0 0 3.012px #FFF;
+}
+
+// ─── Milestone text ───────────────────────────────────────────────────────────
+
+.milestoneTitle {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h3);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--leading-snug);
+  color: var(--color-blue-primary);
+  margin: 0;
+  // design-specific: layered white text-shadow creates a white halo so the title
+  // stays readable when the animated path line passes through the checkpoint area
+  text-shadow:
+    0 0 4px #fff,
+    0 0 10px #fff,
+    0 0 18px #fff,
+    0 0 28px rgba(255, 255, 255, 0.85);
+}
+
+.milestoneDesc {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--leading-normal);
+  color: var(--color-black-primary);
+  margin: 0;
+}
+
+// ─── Tag pills ────────────────────────────────────────────────────────────────
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: var(--space-2);
+  row-gap: var(--space-2);
+
+  .cpRight & {
+    justify-content: flex-end;
+  }
+}
+
+.tag {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--tracking-nav);
+  color: var(--color-white-primary);
+  // design-specific: Figma-exact gradient — #2639ED top to semi-transparent bottom
+  background: linear-gradient(180deg, #2639ED 0%, rgba(38, 57, 237, 0.47) 100%);
+  // design-specific: solid light gray border
+  border: 1.5px solid #E0E9F2;
+  border-radius: var(--radius-full);
+  padding: var(--space-2) var(--space-4);
+  white-space: nowrap;
+  // design-specific: Figma-exact shadow — inset light-blue glow + layered outer blue drop shadow
+  box-shadow:
+    0 0.602px 10.843px 1.205px #D2EAFF inset,
+    0 0.602px 2.41px 1.205px #D2EAFF inset,
+    0 25.301px 64.458px 0 rgba(87, 177, 255, 0.34),
+    0 14.892px 19.432px 0 rgba(87, 177, 255, 0.19),
+    0 6.185px 8.071px 0 rgba(87, 177, 255, 0.22),
+    0 2.237px 2.919px 0 rgba(87, 177, 255, 0.15);
+}
+
+// ─── Checkpoint divider ───────────────────────────────────────────────────────
+// Hidden on mobile/tablet — desktop only (see min-width: 1025px block below)
+
+.divider {
+  display: none;
+}
+
+// .mobileList / .mobileItem kept hidden — snake is shown on all breakpoints
+.mobileList {
+  display: none;
+}
+
+// ─── Tablet (769px – 1024px) ─────────────────────────────────────────────────
+
+@media (max-width: 1024px) {
+  .checkpoint {
+    max-width: 36%;
+    gap: var(--space-1-5);
+
+  }
+
+  .cpContent {
+    gap: var(--space-1-5);
+  }
+
+  .milestoneTitle {
+    font-size: var(--text-display-sm); // 28px
+  }
+
+  .milestoneDesc {
+    font-size: var(--text-small-15);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .yearBadge {
+    width: auto;
+    padding: var(--space-1-5) var(--space-3);
+    font-size: var(--text-small-13);
+  }
+
+  .tag {
+    font-size: var(--text-small-12);
+    padding: var(--space-1) var(--space-3);
+  }
+}
+
+// ─── Mobile (≤ 768px) ────────────────────────────────────────────────────────
+// Snake stays — checkpoints shrink to badge + title only so they fit the narrow space.
+
+@media (max-width: 768px) {
+  .section {
+    // design-specific: extra bottom space so the page is tall enough for the
+    // last-checkpoint scroll trigger to fire on tall mobile viewports (e.g. 375×812)
+    padding-bottom: var(--space-15);
+  }
+
+  .header {
+    margin-bottom: var(--space-5);
+  }
+
+  .cpLeft {
+    left: var(--space-3);
+  }
+
+  .cpRight {
+    right: var(--space-3);
+  }
+
+  .checkpoint {
+    max-width: 44%;
+    gap: var(--space-1);
+
+  }
+
+  .yearBadge {
+    width: auto;
+    align-self: flex-start;
+    padding: var(--space-1) var(--space-2);
+    font-size: var(--text-small-10);
+    border-radius: 0;
+  }
+
+  .milestoneTitle {
+    font-size: var(--text-small-13);
+    line-height: var(--leading-snug);
+  }
+
+  .milestoneDesc {
+    font-size: var(--text-small-10);
+    line-height: var(--leading-normal);
+  }
+
+  .cpContent {
+    gap: var(--space-1);
+  }
+
+  .tags {
+    gap: var(--space-1);
+  }
+
+  .tag {
+    font-size: var(--text-small-10);
+    padding: 1px var(--space-1);
+    white-space: normal;
+    border-radius: var(--radius-sm);
+  }
+}
+
+// ─── Desktop: row layout with vertical divider (> 1024px only) ───────────────
+
+@media (min-width: 1025px) {
+  // Switch checkpoint to horizontal row: [badge] [|] [content]
+  .checkpoint {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--space-4);
+    max-width: 46%;
+  }
+
+  // Badge holds its fixed width, doesn't shrink
+  .yearBadge {
+    flex-shrink: 0;
+  }
+
+  // Vertical divider line
+  .divider {
+    display: block;
+    width: 1px;
+    align-self: stretch;
+    min-height: 60px;
+    flex-shrink: 0;
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      var(--color-blue-light-active) 25%,
+      var(--color-blue-primary-alpha-25) 50%,
+      var(--color-blue-light-active) 75%,
+      transparent 100%
+    );
+    box-shadow: 0 0 4px 1px var(--color-blue-primary-alpha-13);
+    border-radius: var(--radius-full);
+  }
+
+  // Content column fills remaining space
+  .cpContent {
+    flex: 1;
+    gap: var(--space-2);
+  }
+
+  // Right checkpoints: [content] [|] [badge] — content is left-aligned in its column
+  .cpRight {
+    align-items: flex-start;
+    text-align: left;
+
+    .cpContent {
+      order: 1;
+      text-align: left;
+      align-items: flex-start;
+    }
+
+    .divider { order: 2; }
+
+    .yearBadge { order: 3; }
+
+    .tags {
+      justify-content: flex-start;
+    }
+  }
+}
+
+// ─── Desktop: stagger checkpoints off the path line (> 1024px only) ──────────
+// Left checkpoints (snakeWrap children 2,4,6,8) shift UP into the white space
+// above their peak; right checkpoints (3,5,7) shift DOWN below their peak.
+// translateY(-50%) is the base vertical-centering from the .checkpoint rule.
+
+@media (min-width: 1025px) {
+  // cp7 (2027) shifts down to clear its path end point
+  .snakeWrap > :nth-child(8) {
+    transform: translateY(calc(-50% + 80px));
+  }
+
+  // cp5 (Q3 2026) shifts down to clear its path peak
+  .snakeWrap > :nth-child(6) {
+    transform: translateY(calc(-50% + 180px));
+  }
+
+  // cp1 (2020) shifts down slightly to avoid overlapping the section header
+  .snakeWrap > :nth-child(2) {
+    transform: translateY(calc(-50% + 60px));
+  }
+
+  // cp3 (2024) shifts down instead of up to clear its path peak
+  .snakeWrap > :nth-child(4) {
+    transform: translateY(calc(-50% + 180px));
+  }
+
+  // cp2 (2022) needs a larger downward shift to clear its path peak
+  .snakeWrap > :nth-child(3) {
+    transform: translateY(calc(-50% + 150px));
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  .snakeWrap > :nth-child(3) .milestoneTitle {
+    text-align: right;
+  }
+
+  // cp6 (Q4 2026) shifts down to clear its path peak
+  .snakeWrap > :nth-child(7) {
+    transform: translateY(calc(-50% + 190px));
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  .snakeWrap > :nth-child(7) .milestoneTitle {
+    text-align: right;
+  }
+
+  // cp4 (Q2 2026) shifts further down to clear its path peak
+  .snakeWrap > :nth-child(5) {
+    transform: translateY(calc(-50% + 280px));
+    right: 3%;
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  .snakeWrap > :nth-child(5) .milestoneTitle {
+    text-align: right;
+  }
+}
