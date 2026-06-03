@@ -26,8 +26,8 @@ gsap.registerPlugin(ScrollTrigger)
 const PATH =
   'M 10 10.02 ' +
   'C 10 21.38 90 21.38 90 32.74 ' +
-  'C 90 42.29 10 42.28 10 51.83 ' +
-  'C 10 63.16 90 63.16 90 74.49 ' +
+  'C 90 45.50 10 39.00 10 51.83 ' +
+  'C 10 67.00 90 58.80 90 74.49 ' +
   'C 90 96.64 10 96.63 10 118.78 ' +
   'C 10 130.69 90 130.68 90 142.59 ' +
   'C 90 154.98 10 154.98 10 167.37'
@@ -140,7 +140,7 @@ export default function RoadmapPath({ sectionRef }: Props) {
         stroke="url(#rm_fade)"
         strokeWidth="1"
         strokeLinecap="round"
-        opacity="0.55"
+        opacity="0.35"
       />
 
     </svg>

@@ -1,0 +1,139 @@
+@import '@newstyles/_mixins.scss';
+
+// Hidden on tablet/desktop — shown only on mobile via @include mobile below
+
+.wrap {
+  display: none;
+}
+
+// design-specific: subtle glow pulse for the checkpoint dots on the vertical path
+@keyframes rmv-dot-pulse {
+  0%, 100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 2px rgba(101, 115, 255, 0.9));
+  }
+  50% {
+    opacity: 0.45;
+    filter: drop-shadow(0 0 5px rgba(101, 115, 255, 0.3));
+  }
+}
+
+.pathDot {
+  position: absolute;
+  // design-specific: line centre is at (container-padding + 10px) from wrap left,
+  // item left edge is at (container-padding + 28px) → centre-to-centre offset = 18px,
+  // subtract half dot width (4px) so left edge lands at -22px
+  left: -22px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--color-blue-primary);
+  // design-specific: soft glow matching path colour
+  box-shadow: 0 0 6px 3px rgba(101, 115, 255, 0.5);
+  animation: rmv-dot-pulse 2.4s ease-in-out infinite;
+}
+
+@include mobile {
+  .wrap {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    // design-specific: 28px left pad = 20px line SVG width + 8px gap to card content
+    padding: var(--space-9) var(--container-padding-x) var(--space-5) calc(var(--container-padding-x) + 28px);
+    gap: var(--space-7);
+  }
+
+  // Absolute column holding the SVG — sits flush at left: container-padding-x
+  .lineWrap {
+    position: absolute;
+    left: var(--container-padding-x);
+    top: 0;
+    bottom: 0;
+    width: 20px;
+    pointer-events: none;
+    overflow: visible;
+  }
+
+  .lineSvg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  // Glass-morphism card — identical appearance to .checkpoint on desktop
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-5);
+    border-radius: var(--radius-lg);
+    min-height: 180px;
+    // design-specific: frosted-glass backdrop matching desktop checkpoint card
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow:
+      0 0 0 4px rgba(210, 234, 255, 0.25),
+      0 0 20px 6px rgba(210, 234, 255, 0.3),
+      0 4px 24px rgba(255, 255, 255, 0.5);
+  }
+
+  // ── Text elements — standalone classes so mobile token overrides in Roadmap.module.scss
+  //    don't cascade in and shrink these back down
+
+  .title {
+    font-family: var(--font-satoshi);
+    font-size: var(--text-small-15);
+    font-weight: var(--font-weight-medium);
+    line-height: var(--leading-snug);
+    color: var(--color-blue-primary);
+    margin: 0;
+    // design-specific: white halo so title stays readable over the path line
+    text-shadow:
+      0 0 4px #fff,
+      0 0 10px #fff,
+      0 0 18px #fff,
+      0 0 28px rgba(255, 255, 255, 0.85);
+  }
+
+  .desc {
+    font-family: var(--font-space-grotesk);
+    font-size: var(--text-small-13);
+    font-weight: var(--font-weight-regular);
+    line-height: var(--leading-normal);
+    color: var(--color-black-primary);
+    margin: 0;
+  }
+
+  .tag {
+    font-family: var(--font-space-grotesk);
+    font-size: var(--text-small-12);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: var(--tracking-nav);
+    color: var(--color-white-primary);
+    // design-specific: Figma-exact gradient matching desktop tag
+    background: linear-gradient(180deg, #2639ED 0%, rgba(38, 57, 237, 0.47) 100%);
+    border: 1.5px solid #E0E9F2;
+    border-radius: var(--radius-full);
+    padding: var(--space-2) var(--space-4);
+    white-space: nowrap;
+    // design-specific: Figma-exact shadow matching desktop tag
+    box-shadow:
+      0 0.602px 10.843px 1.205px #D2EAFF inset,
+      0 0.602px 2.41px 1.205px #D2EAFF inset,
+      0 25.301px 64.458px 0 rgba(87, 177, 255, 0.34),
+      0 14.892px 19.432px 0 rgba(87, 177, 255, 0.19),
+      0 6.185px 8.071px 0 rgba(87, 177, 255, 0.22),
+      0 2.237px 2.919px 0 rgba(87, 177, 255, 0.15);
+  }
+}

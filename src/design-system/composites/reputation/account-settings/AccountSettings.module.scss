@@ -1,0 +1,213 @@
+@import '_mixins.scss';
+
+// ── Card shell ─────────────────────────────────────────────────────────────────
+
+.card {
+  background-color: var(--color-white-primary);
+  @include stripe-bg;
+  padding: var(--space-7);
+
+  @include tablet-down {
+    padding: var(--space-5);
+  }
+}
+
+// ── Two-column grid ────────────────────────────────────────────────────────────
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-7) var(--space-11);
+  align-items: start;
+
+  @include tablet-down {
+    grid-template-columns: 1fr;
+    gap: var(--space-7);
+  }
+}
+
+// ── Section ────────────────────────────────────────────────────────────────────
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+// ── Section label ──────────────────────────────────────────────────────────────
+
+.sectionLabel {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: -0.28px;
+  color: rgba(0, 0, 0, 0.75);
+  text-transform: uppercase;
+  margin: 0;
+}
+
+// ── Field row — the gray input-style row ───────────────────────────────────────
+
+.fieldRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  height: 45px;
+  padding: 0 var(--space-4);
+  // design-specific: Figma input bg #f2f2f2 with border #e2e2e2
+  background-color: #f2f2f2;
+  @include stripe-bg;
+  border: 1px solid #e2e2e2;
+}
+
+// ── Domain display (avatar + name + badge) ─────────────────────────────────────
+
+.domainDisplay {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2-5);
+  min-width: 0;
+}
+
+.domainName {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+  white-space: nowrap;
+}
+
+.primaryBadge {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-10);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+  // design-specific: Figma badge — light blue bg + blue border
+  background: rgba(38, 57, 237, 0.08);
+  border: 1px solid rgba(38, 57, 237, 0.41);
+  border-radius: var(--radius-sm);
+  padding: 2px var(--space-2);
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+
+// ── Change button ──────────────────────────────────────────────────────────────
+
+.changeBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  padding: 0;
+
+  &:hover {
+    opacity: 0.75;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// ── Tracking label ─────────────────────────────────────────────────────────────
+
+.trackingLabel {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: #070707;
+  white-space: nowrap;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// ── Toggle ─────────────────────────────────────────────────────────────────────
+
+.toggleGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.toggleHint {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-medium);
+  color: #6b7280;
+  letter-spacing: 0.06px;
+}
+
+.toggle {
+  position: relative;
+  width: 49px;
+  height: 20px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  // design-specific: OFF state uses #aaa bg
+  background: #aaaaaa;
+  box-shadow: 0 0 0 2.796px rgba(38, 57, 237, 0.14);
+  transition: background 0.22s ease;
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.toggleOn {
+  // design-specific: ON state uses black bg matching Figma
+  background: #000000;
+}
+
+.toggleThumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: var(--color-white-primary);
+  box-shadow: 0 0.7px 0.7px rgba(0, 0, 0, 0.15);
+  transition: transform 0.22s ease;
+
+  .toggleOn & {
+    transform: translateX(29px);
+  }
+}
+
+// ── Warning row ────────────────────────────────────────────────────────────────
+
+.warningRow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-1);
+}
+
+.warningIcon {
+  flex-shrink: 0;
+  margin-top: 1px;
+  font-size: 15px;
+  color: #6b7280;
+}
+
+.warningText {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-regular);
+  line-height: 1.2;
+  color: #6b7280;
+  letter-spacing: 0.06px;
+  margin: 0;
+}

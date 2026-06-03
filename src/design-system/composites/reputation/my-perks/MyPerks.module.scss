@@ -1,0 +1,265 @@
+@import '_mixins.scss';
+
+// ── Root ──────────────────────────────────────────────────────────────────────
+
+.root {
+  background-color: #f5f5f5;
+  @include stripe-bg;
+  padding: var(--space-7);
+}
+
+// ── 3-column grid ─────────────────────────────────────────────────────────────
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-7) 18px;
+
+  @include tablet-down {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ── Perk card ─────────────────────────────────────────────────────────────────
+
+.card {
+  position: relative;
+  height: 237px;
+  background-color: var(--color-white-primary);
+  @include stripe-bg;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+// ── Header (top ~80px) ────────────────────────────────────────────────────────
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
+  height: 80px;
+  flex-shrink: 0;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.headerText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.perkTitle {
+  font-family: var(--font-satoshi);
+  font-size: 20px;
+  font-weight: var(--font-weight-medium);
+  color: #070707;
+  margin: 0;
+  line-height: normal;
+  white-space: nowrap;
+}
+
+.perkMeta {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-medium);
+  color: #6b7280;
+  text-transform: capitalize;
+  margin: 0;
+  line-height: normal;
+}
+
+// ── Type badge ────────────────────────────────────────────────────────────────
+
+.badge {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2-5) var(--space-4);
+  // design-specific: Figma dark pill badge — gradient from #2c2c2c to #201f1b
+  background: linear-gradient(to bottom, #2c2c2c, #201f1b);
+  border: 0.763px solid var(--color-black-primary);
+  border-radius: 53.4px;
+  box-shadow: 1.526px 2.29px 3.053px rgba(0, 0, 0, 0.25);
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: #f5f1ee;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+// ── Dashed separator ──────────────────────────────────────────────────────────
+
+.sep {
+  width: 100%;
+  flex-shrink: 0;
+  // design-specific: Figma horizontal dashed separator at y=80px dividing header from content
+  border-top: 1.5px dashed rgba(38, 57, 237, 0.18);
+}
+
+// ── Content (below separator) ─────────────────────────────────────────────────
+
+.cardContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-4) var(--space-5) var(--space-5);
+  justify-content: center;
+}
+
+// ── Value field (promo code or link) ──────────────────────────────────────────
+
+.valueField {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 45px;
+  padding: 0 var(--space-3);
+  // design-specific: Figma input bg #f2f2f2, border #e2e2e2
+  background-color: #f2f2f2;
+  @include stripe-bg;
+  border: 1px solid #e2e2e2;
+}
+
+.valueText {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: #070707;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  flex: 1;
+}
+
+.copyBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  color: #6b7280;
+  border-radius: var(--radius-sm);
+  transition: color 0.18s ease;
+
+  &:hover {
+    color: var(--color-blue-primary);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.copyIcon {
+  font-size: 18px;
+}
+
+// ── CTA button ────────────────────────────────────────────────────────────────
+
+.ctaBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  width: 100%;
+  height: 50px;
+  border: none;
+  border-radius: 4.672px;
+  cursor: pointer;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-white-primary);
+  // design-specific: Figma blue gradient button matching imgVector99
+  background: linear-gradient(135deg, #3a4ff0 0%, #2639ed 50%, #1e2fd4 100%);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.25),
+    0 2px 8px rgba(38, 57, 237, 0.35);
+  transition: opacity 0.18s ease;
+
+  &:hover {
+    opacity: 0.88;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// ── Perk icon circle ──────────────────────────────────────────────────────────
+
+.iconWrap {
+  flex-shrink: 0;
+  width: 45px;
+  height: 45px;
+  border-radius: 85.7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  // design-specific: outer ring with low-opacity red — matching Figma rgba(239,68,68,0.26)
+  background: rgba(239, 68, 68, 0.26);
+  position: relative;
+}
+
+// Inner colored circle inside the outer ring
+.iconWrap::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: 95.8px;
+}
+
+.iconSvg {
+  font-size: 20px;
+  color: var(--color-white-primary);
+  position: relative;
+  z-index: 1;
+}
+
+// ── Icon variants ─────────────────────────────────────────────────────────────
+
+.iconGreen::before {
+  // design-specific: Figma green gradient #27ff00 → #179900
+  background: linear-gradient(to bottom, #27ff00, #179900);
+}
+
+.iconBlue::before {
+  // design-specific: Figma blue gradient for protocol icon
+  background: linear-gradient(134.6deg, rgba(38, 57, 237, 0.7) 10%, #2639ed 60%, rgba(38, 57, 237, 0.5) 99%);
+}
+
+.iconBlack::before {
+  background: var(--color-black-primary);
+  // design-specific: inner white glow on black icon
+  box-shadow: inset 0 0 9.4px white;
+}
+
+// ── SVG icons sit above the ::before circle ───────────────────────────────────
+
+.iconGreen .iconSvg,
+.iconBlue .iconSvg,
+.iconBlack .iconSvg {
+  position: relative;
+  z-index: 1;
+}

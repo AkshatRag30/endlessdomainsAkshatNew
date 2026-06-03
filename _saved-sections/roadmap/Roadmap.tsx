@@ -2,8 +2,8 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useLayoutEffect, useRef } from 'react'
 import RoadmapCheckpoints, { MILESTONES } from './RoadmapCheckpoints'
-import RoadmapMobileList from './RoadmapMobileList'
 import RoadmapPath from './RoadmapPath'
+import RoadmapVertical from './RoadmapVertical'
 import styles from './Roadmap.module.scss'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -73,8 +73,8 @@ export default function Roadmap() {
         <RoadmapCheckpoints onRef={(el, i) => { checkRefs.current[i] = el }} />
       </div>
 
-      {/* ── Mobile: vertical timeline list ────────────────────────────── */}
-      <RoadmapMobileList />
+      {/* ── Mobile: vertical straight-path timeline ───────────────────── */}
+      <RoadmapVertical sectionRef={sectionRef} />
 
     </section>
   )

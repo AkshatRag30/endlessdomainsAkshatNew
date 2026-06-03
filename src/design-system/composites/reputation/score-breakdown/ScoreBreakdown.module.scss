@@ -1,0 +1,498 @@
+@import '_mixins.scss';
+
+// ── Root ──────────────────────────────────────────────────────────────────────
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+// ─── Section 1: Score card + Breakdown ───────────────────────────────────────
+
+.topSection {
+  display: flex;
+  gap: 0;
+  background: var(--color-white-primary);
+
+  @include tablet-down {
+    flex-direction: column;
+  }
+}
+
+// ── Left: Score medal card ────────────────────────────────────────────────────
+
+.scoreCard {
+  flex-shrink: 0;
+  width: 346px;
+  min-height: 337px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-white-primary);
+  @include stripe-bg;
+  border-right: 6px solid #f5f5f5;
+
+  @include tablet-down {
+    width: 100%;
+    border-right: none;
+    border-bottom: 6px solid #f5f5f5;
+  }
+}
+
+.medalWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  padding: var(--space-7) var(--space-5);
+}
+
+.medalOuter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.medalInner {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.wingLeft,
+.wingRight {
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.hexagonWrap {
+  flex-shrink: 0;
+  // design-specific: subtle bottom glow matching the Figma silver medal
+  filter: drop-shadow(0 8px 20px rgba(180, 190, 210, 0.55));
+}
+
+// ── Tier badge ─────────────────────────────────────────────────────────────────
+
+.tierBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 31px;
+  padding: 0 var(--space-5);
+  // design-specific: Figma silver gradient badge
+  background: linear-gradient(157deg, #7a96ac 2%, #eaeff3 20%, #c2d4e1 33%, #ffffff 50%, #d4dee5 62%, #abbcc8 79%, #bccad7 95%);
+  border: 0.5px solid rgba(255, 255, 255, 0.5);
+  box-shadow:
+    0 6px 3px rgba(227, 201, 228, 0.4),
+    0 2px 0 #e3c9e4,
+    inset 0 0 10px rgba(227, 201, 228, 0.7);
+}
+
+.tierText {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  color: #1e1e1e;
+  text-transform: capitalize;
+  letter-spacing: 0.02em;
+}
+
+// ── Progress to next tier ─────────────────────────────────────────────────────
+
+.tierProgress {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  width: 238px;
+}
+
+.tierProgressTrack {
+  position: relative;
+  width: 100%;
+  height: 5.5px;
+  background: rgba(0, 0, 0, 0.22);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.tierProgressFill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  // design-specific: silver gradient fill matching the Figma progress bar
+  background: linear-gradient(177deg, #7a96ac 2%, #eaeff3 20%, #c2d4e1 33%, #ffffff 50%, #d4dee5 62%, #abbcc8 79%, #bccad7 95%);
+  border: 0.5px solid rgba(255, 255, 255, 0.5);
+}
+
+.tierProgressLabel {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  margin: 0;
+}
+
+// ── Right: Breakdown bars ─────────────────────────────────────────────────────
+
+.breakdownCard {
+  flex: 1;
+  min-height: 337px;
+  background: var(--color-white-primary);
+  padding: var(--space-6) var(--space-7);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  position: relative;
+}
+
+.breakdownTitle {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-blue-primary);
+  letter-spacing: 2.7px;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.barsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-7);
+  flex: 1;
+}
+
+.barRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.barLabel {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-regular);
+  color: #909098;
+  width: 130px;
+  flex-shrink: 0;
+}
+
+.barTrackWrap {
+  flex: 1;
+}
+
+.barTrack {
+  position: relative;
+  width: 100%;
+  height: 13px;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 7.33px;
+  overflow: hidden;
+}
+
+.barFill {
+  height: 100%;
+  border-radius: 7.33px;
+  // design-specific: inset white glow on each bar matching Figma
+  box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.6);
+  transition: width 0.6s ease;
+}
+
+.barValue {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+  width: 80px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.breakdownFooter {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2-5);
+  margin-top: auto;
+}
+
+.footerIcon {
+  flex-shrink: 0;
+  font-size: 15px;
+  color: #6b7280;
+}
+
+.footerText {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-regular);
+  color: #6b7280;
+  letter-spacing: 0.07px;
+  text-transform: capitalize;
+}
+
+// ─── Section 2: Score History Chart ──────────────────────────────────────────
+
+.historySection {
+  background-color: #f5f5f5;
+  @include stripe-bg;
+  padding: var(--space-7);
+}
+
+.sectionTitle {
+  font-family: var(--font-satoshi);
+  font-size: 25px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  letter-spacing: 0.25px;
+  text-transform: capitalize;
+  margin: 0 0 var(--space-5);
+}
+
+.historyCard {
+  background: var(--color-white-primary);
+  border: 6px solid #f5f5f5;
+  padding: var(--space-5) var(--space-5) var(--space-4);
+  overflow: hidden;
+}
+
+.chartWrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.chartSvg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+// ── Chart legend ──────────────────────────────────────────────────────────────
+
+.chartLegend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-5);
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.legendDot {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-sm);
+  border: 4px solid var(--color-white-primary);
+  flex-shrink: 0;
+  // design-specific: shadow matching Figma legend selector
+  box-shadow:
+    0 2.667px 2.667px rgba(50, 50, 71, 0.06),
+    0 2.667px 5.333px rgba(50, 50, 71, 0.06);
+}
+
+.legendDotGold   { background: #fdc651; }
+.legendDotPurple { background: rgba(66, 47, 138, 0.87); }
+
+.legendLabel {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: #6c6c6c;
+  text-transform: capitalize;
+}
+
+// ─── Section 3: Boost Your Score ─────────────────────────────────────────────
+
+.boostSection {
+  background-color: #f5f5f5;
+  @include stripe-bg;
+  padding: var(--space-7);
+}
+
+.boostHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2-5);
+  margin-bottom: var(--space-7);
+}
+
+.boostTitle {
+  font-family: var(--font-satoshi);
+  font-size: 22px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  margin: 0;
+  text-transform: capitalize;
+}
+
+.boostSubtitle {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-regular);
+  color: #474747;
+  margin: 0;
+  line-height: 1.3;
+}
+
+// ── Boost cards grid ──────────────────────────────────────────────────────────
+
+.boostGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+
+  @include tablet-down {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ── Individual boost card ─────────────────────────────────────────────────────
+
+.boostCard {
+  position: relative;
+  background: var(--color-white-primary);
+  height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-7);
+  overflow: hidden;
+}
+
+.boostCardBorder {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  // design-specific: Figma blue glow border matching row_0 style
+  border: 1.606px solid rgba(38, 57, 237, 0.19);
+}
+
+.boostCardLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  flex: 1;
+  min-width: 0;
+}
+
+.boostCardText {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.boostCardTitle {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-bold);
+  color: #1a1c26;
+  margin: 0;
+}
+
+.boostCardSubtitle {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-regular);
+  color: #8c91a6;
+  margin: 0;
+}
+
+.boostCardProgress {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+// ── Mini progress bar ─────────────────────────────────────────────────────────
+
+.miniBarTrack {
+  position: relative;
+  width: 143px;
+  height: 7px;
+  background: #e8e9ed;
+  border-radius: 3.6px;
+  overflow: visible;
+  flex-shrink: 0;
+}
+
+.miniBarFill {
+  height: 7.5px;
+  border-radius: 3.6px;
+  background: var(--color-blue-primary);
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.boostStatus {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+  white-space: nowrap;
+}
+
+.boostStatusGreen {
+  // design-specific: active/complete status shown in green
+  color: #27ff00;
+}
+
+// ── CTA buttons ───────────────────────────────────────────────────────────────
+
+.boostBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  height: 50px;
+  padding: 0 var(--space-5);
+  border: none;
+  border-radius: 4.7px;
+  cursor: pointer;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-white-primary);
+  flex-shrink: 0;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 0.88;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// design-specific: Figma button gradient variants
+.boostBtn_blue {
+  background: linear-gradient(135deg, #3a4ff0 0%, #2639ed 50%, #1e2fd4 100%);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.25),
+    0 2px 8px rgba(38, 57, 237, 0.35);
+}
+
+.boostBtn_green {
+  background: linear-gradient(135deg, #1ae87a 0%, #00d97e 50%, #00c070 100%);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.25),
+    0 2px 8px rgba(0, 217, 126, 0.35);
+}
+
+.boostBtn_dark {
+  background: linear-gradient(135deg, #2a2a2a 0%, #111111 100%);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.12),
+    0 2px 6px rgba(0, 0, 0, 0.3);
+}

@@ -126,6 +126,10 @@
   text-align: right;
 }
 
+.cpRight .milestoneDesc {
+  text-align: right;
+}
+
 // ─── Year badge ───────────────────────────────────────────────────────────────
 
 .yearBadge {
@@ -272,6 +276,10 @@
 // Snake stays — checkpoints shrink to badge + title only so they fit the narrow space.
 
 @media (max-width: 768px) {
+  .snakeWrap {
+    display: none;
+  }
+
   .section {
     // design-specific: extra bottom space so the page is tall enough for the
     // last-checkpoint scroll trigger to fire on tall mobile viewports (e.g. 375×812)
@@ -340,7 +348,7 @@
   // Switch checkpoint to horizontal row: [badge] [|] [content]
   .checkpoint {
     flex-direction: row;
-    align-items: flex-start;
+    align-items: center;
     gap: var(--space-4);
     max-width: 46%;
   }
@@ -383,7 +391,7 @@
     .cpContent {
       order: 1;
       text-align: left;
-      align-items: flex-start;
+      align-items: flex-end;
     }
 
     .divider { order: 2; }
@@ -391,7 +399,7 @@
     .yearBadge { order: 3; }
 
     .tags {
-      justify-content: flex-start;
+      justify-content: flex-end;
     }
   }
 }
@@ -425,7 +433,7 @@
   // cp2 (2022) needs a larger downward shift to clear its path peak
   .snakeWrap > :nth-child(3) {
     transform: translateY(calc(-50% + 150px));
-    align-items: flex-end;
+    align-items: center;
     text-align: right;
   }
 
@@ -436,7 +444,7 @@
   // cp6 (Q4 2026) shifts down to clear its path peak
   .snakeWrap > :nth-child(7) {
     transform: translateY(calc(-50% + 190px));
-    align-items: flex-end;
+    align-items: center;
     text-align: right;
   }
 
@@ -448,7 +456,7 @@
   .snakeWrap > :nth-child(5) {
     transform: translateY(calc(-50% + 280px));
     right: 3%;
-    align-items: flex-end;
+    align-items: center;
     text-align: right;
   }
 
