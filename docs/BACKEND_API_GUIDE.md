@@ -177,6 +177,44 @@ getTldsContent(url, tld): Promise<any>              // Fetch TLD-specific conten
 getCryptoAddress(url, domainName): Promise<any>     // UD crypto address lookup
 CheckCouponType(url, couponName): Promise<any>      // Validate coupon type
 postRedirect(redirectDto): Promise<any>             // Auth redirect flow
+
+// Events
+getAllEventsList(params?: { page?, limit?, search?, location?, status?, dateFrom?, dateTo?, type? }): Promise<{ success, data, pagination, message }>
+// GET /events — paginated event list
+getEventHighlights(): Promise<{ success, images }>
+// GET /events/get-highlights-events
+getcommunityEvents(): Promise<{ success, data }>
+// GET /events/get-community-events
+
+// Analytics
+fetchUserDomainPieChart(filters: { startDate?, endDate?, orderStatus?, monthsFilter? }): Promise<any>
+// GET /domain/order/pie-chart-data — order breakdown for charts (also in affiliate.service.ts)
+fetchUserDomainAnalytics(filters: { search?, tlds?, blockchains?, expiredStatus?, evmType?, listedDomains?, renewalType? }): Promise<any>
+// GET /domain/detail/user-analytic — full domain list with filters (also in affiliate.service.ts)
+
+// User stats
+getUserStats(userId: string): Promise<any>
+// GET /domain/detail/user/user-stats/{userId} — total domains, chains, spend summary
+
+// NFTs
+getUserNFTs(walletAddress: string, chain?, page?, limit?): Promise<{ success, data, error? }>
+// GET /domain/detail/user-nfts/{walletAddress}
+
+// IPFS / GigaPub
+createGigapubProject(domainName: string): Promise<number>  // returns projectId
+// POST /ipfs/management/gigapub/project/create
+
+// Freename DNS records
+fetchDomainRecords(orderId: string): Promise<any>
+// GET /internal/freename/get-minted-single/{orderId}
+createDomainRecord(domainId: string, recordId: string, form: { type, name, value, ttl }): Promise<any>
+// POST /internal/freename/domain/{domainId}/records/{recordId}
+updateDomainRecord(recordUuid: string, form: { name, value, ttl }): Promise<any>
+// PUT /internal/freename/records/{recordUuid}
+fetchDomainTokens(zoneUuid: string): Promise<any>
+// GET /internal/freename/domain/tokens/{zoneUuid}
+createDomainTokens(zoneUuid: string, tokens: any[]): Promise<any>
+// POST /internal/freename/domain/tokens/{zoneUuid}
 ```
 
 ---
@@ -288,6 +326,47 @@ postRedirect(redirectDto): Promise<any>             // Auth redirect flow
 
 ---
 
+### analytics.service (in api.service.ts + affiliate.service.ts)
+
+These functions exist in **both** `api.service.ts` and `affiliate.service.ts` — import from either. Prefer `api.service.ts` for new pages.
+
+| Function | Method | Endpoint | What it does |
+|---|---|---|---|
+| `fetchUserDomainPieChart(filters)` | GET | `/domain/order/pie-chart-data` | Order breakdown by status/date for pie chart |
+| `fetchUserDomainAnalytics(filters)` | GET | `/domain/detail/user-analytic` | Full domain list with search, TLD, chain, expiry filters |
+| `getUserStats(userId)` | GET | `/domain/detail/user/user-stats/{userId}` | Summary stats: total domains, chains, spend |
+| `getUserNFTs(walletAddress, chain?, page?, limit?)` | GET | `/domain/detail/user-nfts/{walletAddress}` | NFTs owned by a wallet, paginated |
+
+**`fetchUserDomainPieChart` filter params**: `startDate`, `endDate`, `orderStatus`, `monthsFilter`
+
+**`fetchUserDomainAnalytics` filter params**: `search`, `tlds[]`, `blockchains[]`, `expiredStatus` (`Expired`|`Non-Expired`|`All`), `evmType` (`EVM`|`Non-EVM`|`All`), `listedDomains` (`All`|`Listed`), `renewalType` (`Renewal`|`Non-Renewal`|`All`)
+
+---
+
+### events (in api.service.ts)
+
+| Function | Method | Endpoint | What it does |
+|---|---|---|---|
+| `getAllEventsList(params?)` | GET | `/events` | Paginated event list — params: `page`, `limit`, `search`, `location`, `status`, `dateFrom`, `dateTo`, `type` |
+| `getEventHighlights()` | GET | `/events/get-highlights-events` | Hero image highlights for events page |
+| `getcommunityEvents()` | GET | `/events/get-community-events` | Community events list |
+
+---
+
+### freename (in api.service.ts)
+
+DNS record management for Freename domains. All functions require a valid `ACCESS_TOKEN` cookie.
+
+| Function | Method | Endpoint | What it does |
+|---|---|---|---|
+| `fetchDomainRecords(orderId)` | GET | `/internal/freename/get-minted-single/{orderId}` | Get all DNS records for a minted Freename domain |
+| `createDomainRecord(domainId, recordId, form)` | POST | `/internal/freename/domain/{domainId}/records/{recordId}` | Add a new DNS record — `form: { type, name, value, ttl }` |
+| `updateDomainRecord(recordUuid, form)` | PUT | `/internal/freename/records/{recordUuid}` | Update an existing DNS record — `form: { name, value, ttl }` |
+| `fetchDomainTokens(zoneUuid)` | GET | `/internal/freename/domain/tokens/{zoneUuid}` | Get token mappings for a zone |
+| `createDomainTokens(zoneUuid, tokens)` | POST | `/internal/freename/domain/tokens/{zoneUuid}` | Create multiple token mappings for a zone |
+
+---
+
 ### affiliate.service.ts
 `src/core/services/affiliate.service.ts`
 
@@ -325,6 +404,7 @@ All constants live in `src/core/enum/api-endpoint.enum.ts`. The base URL is prep
 | Constant | Path | Used In |
 |---|---|---|
 | `LOGIN_API` | `/auth/login` | Login page |
+| `GOOGLE_AUTH_API` | `/google-auth` | Google OAuth login |
 | `REGISTER_API` | `/auth/register` | Register page |
 | `REFRESH_TOKEN_API` | `/auth/refresh-token` | error.service.ts auto-refresh |
 | `FORGOT_PASSWORD_API` | `/auth/forgot-password` | auth.service |
@@ -361,6 +441,7 @@ All constants live in `src/core/enum/api-endpoint.enum.ts`. The base URL is prep
 | `USER_NFTS_API` | `/domain/detail/user-nfts/{walletAddress}` |
 | `REFRESH_MY_DOMAINS` | `/domain/detail/refresh_domain` |
 | `USER_DOMAIN_ANALYTIC_API` | `/domain/detail/user-analytic` |
+| `USER_DOMAIN_PIE_CHART` | `/domain/order/pie-chart-data` |
 | `FAVOURITE_API` | `/domain/favorite` |
 
 ### Cart & Orders
@@ -430,6 +511,29 @@ All constants live in `src/core/enum/api-endpoint.enum.ts`. The base URL is prep
 | `EVENTS_API` | `/events` |
 | `EVENT_HIGHLIGHTS` | `/events/get-highlights-events` |
 | `COMMUNITY_EVENTS` | `/events/get-community-events` |
+
+### Activity Logging
+
+| Constant | Path |
+|---|---|
+| `ACTIVITY_EXISTS` | `/activity/activity-exists` |
+| `LOG_ACTIVITY` | `/activity` |
+
+### Freename DNS (no dedicated enum constants — use direct URL strings in api.service.ts)
+
+| Description | Path |
+|---|---|
+| Get minted domain records | `/internal/freename/get-minted-single/{orderId}` |
+| Create DNS record | `/internal/freename/domain/{domainId}/records/{recordId}` |
+| Update DNS record | `/internal/freename/records/{recordUuid}` |
+| Get zone tokens | `/internal/freename/domain/tokens/{zoneUuid}` |
+| Create zone tokens | `/internal/freename/domain/tokens/{zoneUuid}` |
+
+### User Stats
+
+| Description | Path |
+|---|---|
+| Per-user domain stats | `/domain/detail/user/user-stats/{userId}` |
 
 ### AI Features
 
@@ -1039,6 +1143,15 @@ import { getFAQS, getTestimonials, getCountAnalytics } from '@/core/services/hom
 // IPFS / Parked domains
 import { getIpfsMetadata, uploadIpfsContent } from '@/core/services/ipfs.service'
 
+// Analytics & user stats
+import { fetchUserDomainPieChart, fetchUserDomainAnalytics, getUserStats, getUserNFTs } from '@/core/services/api.service'
+
+// Events
+import { getAllEventsList, getEventHighlights, getcommunityEvents } from '@/core/services/api.service'
+
+// Freename DNS management
+import { fetchDomainRecords, createDomainRecord, updateDomainRecord, fetchDomainTokens, createDomainTokens } from '@/core/services/api.service'
+
 // Wallet auth
 import { getNonce, connectWallet } from '@/core/services/wallet.service'
 
@@ -1087,6 +1200,17 @@ import { setSync } from '@/core/redux/slices/sync'
 | Fetch all events | `getAllEventsList(params)` |
 | Connect EVM wallet | `getNonce` → sign → `connectWallet` → store cookies → dispatch |
 | Upload content to IPFS | `createGigapubProject(domain)` → `uploadIpfsContent(domain, formData, projectId)` |
+| Get domain pie chart data | `fetchUserDomainPieChart(filters)` (import from `api.service` or `affiliate.service`) |
+| Get full domain analytics list | `fetchUserDomainAnalytics(filters)` (import from `api.service` or `affiliate.service`) |
+| Get user summary stats (total domains, spend) | `getUserStats(userId)` from `api.service` |
+| Get NFTs for a wallet | `getUserNFTs(walletAddress, chain?, page?, limit?)` from `api.service` |
+| List all events | `getAllEventsList(params?)` from `api.service` |
+| Get event highlights | `getEventHighlights()` from `api.service` |
+| Get community events | `getcommunityEvents()` from `api.service` |
+| Read Freename DNS records | `fetchDomainRecords(orderId)` from `api.service` |
+| Add Freename DNS record | `createDomainRecord(domainId, recordId, form)` from `api.service` |
+| Update Freename DNS record | `updateDomainRecord(recordUuid, form)` from `api.service` |
+| Read/write Freename zone tokens | `fetchDomainTokens(zoneUuid)` / `createDomainTokens(zoneUuid, tokens)` from `api.service` |
 
 ---
 
