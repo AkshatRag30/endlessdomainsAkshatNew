@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { FaStar, FaUser } from 'react-icons/fa'
 import { BsPersonBadgeFill } from 'react-icons/bs'
 import styles from './HowItWorksNew.module.scss'
@@ -78,14 +78,26 @@ const Card3Illus = () => (
   </div>
 )
 
-const VISIBLE_CARDS = 2
-const MAX_INDEX = CARDS.length - VISIBLE_CARDS
+const VISIBLE_CARDS_DESKTOP = 2
 
 const HowItWorksNew = () => {
   const [activeIndex, setActiveIndex] = useState(0)
+  const [maxIndex, setMaxIndex] = useState(CARDS.length - VISIBLE_CARDS_DESKTOP)
+
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1025px)')
+    const update = (e: MediaQueryListEvent | MediaQueryList) => {
+      const next = CARDS.length - (e.matches ? VISIBLE_CARDS_DESKTOP : 1)
+      setMaxIndex(next)
+      setActiveIndex(i => Math.min(i, next))
+    }
+    update(mq)
+    mq.addEventListener('change', update)
+    return () => mq.removeEventListener('change', update)
+  }, [])
 
   const prev = useCallback(() => setActiveIndex(i => Math.max(0, i - 1)), [])
-  const next = useCallback(() => setActiveIndex(i => Math.min(MAX_INDEX, i + 1)), [])
+  const next = useCallback(() => setActiveIndex(i => Math.min(maxIndex, i + 1)), [maxIndex])
 
   return (
     <section className={styles.section}>
@@ -173,13 +185,13 @@ const HowItWorksNew = () => {
             <button className={styles.arrowBtn} onClick={prev} disabled={activeIndex === 0} aria-label="Previous slide">
               <ChevronLeft />
             </button>
-            <button className={styles.arrowBtn} onClick={next} disabled={activeIndex === MAX_INDEX} aria-label="Next slide">
+            <button className={styles.arrowBtn} onClick={next} disabled={activeIndex === maxIndex} aria-label="Next slide">
               <ChevronRight />
             </button>
           </div>
 
           <div className={styles.pagination} role="group" aria-label="Slide position">
-            {Array.from({ length: MAX_INDEX + 1 }).map((_, i) => (
+            {Array.from({ length: maxIndex + 1 }).map((_, i) => (
               <button
                 key={i}
                 aria-label={`Go to slide group ${i + 1}`}

@@ -291,9 +291,9 @@
   }
 
   .checkpoint {
-    max-width: 44%;
+    max-width: 40%;
     gap: var(--space-1);
-
+    padding: var(--space-2);
   }
 
   .yearBadge {
@@ -305,13 +305,17 @@
   }
 
   .milestoneTitle {
-    font-size: var(--text-small-13);
+    font-size: var(--text-small-10);
     line-height: var(--leading-snug);
   }
 
   .milestoneDesc {
     font-size: var(--text-small-10);
     line-height: var(--leading-normal);
+    display: block;
+    overflow: visible;
+    -webkit-line-clamp: unset;
+    line-clamp: unset;
   }
 
   .cpContent {
@@ -323,7 +327,7 @@
   }
 
   .tag {
-    font-size: var(--text-small-10);
+    font-size: var(--text-small-9);
     padding: 1px var(--space-1);
     white-space: normal;
     border-radius: var(--radius-sm);

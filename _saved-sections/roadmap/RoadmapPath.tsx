@@ -140,7 +140,7 @@ export default function RoadmapPath({ sectionRef }: Props) {
         stroke="url(#rm_fade)"
         strokeWidth="1"
         strokeLinecap="round"
-        opacity="0.35"
+        opacity="0.55"
       />
 
     </svg>
