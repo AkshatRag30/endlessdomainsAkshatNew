@@ -1,0 +1,304 @@
+@import '_mixins.scss';
+
+// design-specific: octagon clip-path from PrimaryButton primitive
+$clip: polygon(
+  7px 0px,
+  calc(100% - 15px) 0px,
+  100% 18px,
+  100% calc(100% - 7px),
+  calc(100% - 7.5px) 100%,
+  5px 100%,
+  0px calc(100% - 7px),
+  0px 9px
+);
+
+// design-specific: octagon cut for the modal card (same as ReputationModal step 3)
+$card-clip: polygon(
+  14px 0,
+  calc(100% - 14px) 0,
+  100% 14px,
+  100% calc(100% - 14px),
+  calc(100% - 14px) 100%,
+  14px 100%,
+  0 calc(100% - 14px),
+  0 14px
+);
+
+// ── Overlay ────────────────────────────────────────────────────────────────────
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--color-black-alpha-60);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+}
+
+// ── Modal card ─────────────────────────────────────────────────────────────────
+
+.card {
+  position: relative;
+  background: var(--color-white-primary);
+  @include stripe-bg;
+  width: 100%;
+  max-width: 444px;
+  padding: var(--space-9) var(--space-7) var(--space-7);
+  overflow: hidden;
+
+  @include mobile {
+    padding: var(--space-7) var(--space-5) var(--space-5);
+  }
+}
+
+// ── Corner marks ───────────────────────────────────────────────────────────────
+
+.cornerTL,
+.cornerTR,
+.cornerBL,
+.cornerBR {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.cornerTL {
+  top: 0;
+  left: 0;
+  border-top: 14px solid var(--color-gray-300);
+  border-right: 14px solid transparent;
+}
+
+.cornerTR {
+  top: 0;
+  right: 0;
+  border-top: 14px solid var(--color-gray-300);
+  border-left: 14px solid transparent;
+}
+
+.cornerBL {
+  bottom: 0;
+  left: 0;
+  border-bottom: 14px solid var(--color-gray-300);
+  border-right: 14px solid transparent;
+}
+
+.cornerBR {
+  bottom: 0;
+  right: 0;
+  border-bottom: 14px solid var(--color-gray-300);
+  border-left: 14px solid transparent;
+}
+
+// ── Decorative dot pattern ─────────────────────────────────────────────────────
+
+.dotPattern {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 228px;
+  height: 100px;
+  // design-specific: faint radial grid of dots fading in from top — Figma taiko-grid pattern
+  background: radial-gradient(circle at 50% 0%, rgba(38, 57, 237, 0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+// ── Close button ───────────────────────────────────────────────────────────────
+
+.closeBtn {
+  position: absolute;
+  top: var(--space-5);
+  right: var(--space-5);
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-black-primary);
+  border-radius: var(--radius-sm);
+  z-index: 2;
+  transition: opacity 0.18s ease;
+
+  &:hover {
+    opacity: 0.6;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// ── Body ───────────────────────────────────────────────────────────────────────
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  align-items: center;
+}
+
+// ── Title group ────────────────────────────────────────────────────────────────
+
+.titleGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2-5);
+  align-items: center;
+}
+
+.title {
+  font-family: var(--font-satoshi);
+  font-size: 22px;
+  font-weight: var(--font-weight-medium);
+  // design-specific: Figma red #ff0808 for destructive action title
+  color: #ff0808;
+  text-align: center;
+  text-transform: capitalize;
+  margin: 0;
+}
+
+.subtitle {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-regular);
+  // design-specific: Figma gray #5d5d5d for modal subtitle
+  color: #5d5d5d;
+  text-align: center;
+  max-width: 277px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+// ── Info box ───────────────────────────────────────────────────────────────────
+
+.infoBox {
+  width: 100%;
+  background: var(--color-white-primary);
+  border: 1px solid rgba(107, 114, 128, 0.23);
+  border-radius: var(--radius-sm);
+  padding: var(--space-4) var(--space-5) var(--space-4) var(--space-5);
+  min-height: 75px;
+  display: flex;
+  align-items: center;
+}
+
+.checkList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.checkItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-satoshi);
+  font-size: 11px;
+  font-weight: var(--font-weight-regular);
+  // design-specific: Figma green #33cc66 for reassurance checklist
+  color: #33cc66;
+  line-height: 1.4;
+}
+
+.checkMark {
+  flex-shrink: 0;
+  font-weight: var(--font-weight-bold);
+}
+
+// ── Action buttons ─────────────────────────────────────────────────────────────
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  width: 100%;
+}
+
+// base button — shared octagon design
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  height: var(--button-height-mobile);
+  padding: 0 var(--space-6);
+  border: none;
+  clip-path: #{$clip};
+  overflow: hidden;
+  cursor: pointer;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-bold);
+  text-transform: capitalize;
+  letter-spacing: 0.3px;
+  transition: opacity 0.2s ease;
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 1.2px;
+    clip-path: #{$clip};
+    z-index: 0;
+    transition: all 0.2s ease;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// "Disable" — equal width with Cancel
+.disableBtn {
+  flex: 1;
+}
+
+// "Cancel" — blue filled, white text
+.cancelBtn {
+  flex: 1;
+  background: var(--color-gray-300);
+  color: var(--color-white-primary);
+
+  &::before {
+    background: linear-gradient(
+      181deg,
+      var(--color-blue-primary) 15.43%,
+      var(--color-blue-primary-alpha-30) 133.94%
+    );
+    box-shadow: inset 0 0 20px 0 var(--color-white-alpha-40);
+  }
+
+  &:hover::before {
+    background: linear-gradient(
+      180deg,
+      var(--color-blue-primary) 0%,
+      var(--color-blue-primary-alpha-50) 140%
+    );
+    box-shadow:
+      0 0 16px var(--color-blue-primary-alpha-70),
+      inset 0 0 12px var(--color-white-alpha-40);
+  }
+
+  &:active::before {
+    background: var(--color-blue-dark);
+    box-shadow:
+      inset 0 2px 4px var(--color-black-alpha-55),
+      inset 0 0 6px var(--color-white-alpha-30);
+  }
+}

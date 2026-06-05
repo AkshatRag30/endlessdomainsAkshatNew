@@ -1,5 +1,9 @@
 @import '_mixins.scss';
 
+// design-specific: octagon clip-path from PrimaryButton primitive
+$clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px), calc(100% - 7.5px) 100%, 5px 100%, 0px calc(100% - 7px), 0px 9px);
+$clip-sm: polygon(5px 0px, calc(100% - 10px) 0px, 100% 12px, 100% calc(100% - 5px), calc(100% - 5px) 100%, 3px 100%, 0px calc(100% - 5px), 0px 6px);
+
 // ── Root ──────────────────────────────────────────────────────────────────────
 
 .root {
@@ -13,7 +17,19 @@
 .statsSection {
   background-color: #f5f5f5;
   @include stripe-bg;
-  padding: var(--space-7) var(--space-7) 0;
+  padding: var(--space-7);
+
+  @include mobile {
+    background-image: none;
+  }
+
+  @include tablet-down {
+    padding: var(--space-5);
+  }
+
+  @include mobile {
+    padding: var(--space-4);
+  }
 }
 
 .statsGrid {
@@ -25,6 +41,12 @@
   @include tablet-down {
     grid-template-columns: 1fr;
     gap: var(--space-4);
+    margin-bottom: var(--space-5);
+  }
+
+  @include mobile {
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
   }
 }
 
@@ -32,6 +54,7 @@
 
 .statCard {
   position: relative;
+  isolation: isolate;
   background-color: var(--color-white-primary);
   @include stripe-bg;
   height: 126px;
@@ -39,6 +62,21 @@
   display: flex;
   align-items: center;
   padding: 0 var(--space-7);
+
+  &:first-child {
+    @include bottom-rise-lines;
+    @include vertical-light-lines;
+  }
+
+  @include tablet-down {
+    height: 100px;
+    padding: 0 var(--space-5);
+  }
+
+  @include mobile {
+    height: 86px;
+    padding: 0 var(--space-4);
+  }
 }
 
 .statCardOrange {
@@ -59,17 +97,26 @@
 
 .statValue {
   font-family: var(--font-satoshi);
+  // design-specific: 50px Figma — scale down for tablet/mobile single-column cards
   font-size: 50px;
   font-weight: var(--font-weight-bold);
   line-height: 1.2;
   color: var(--color-blue-primary);
+
+  @include tablet-down {
+    font-size: 36px;
+  }
+
+  @include mobile {
+    font-size: 28px;
+  }
 }
 
 .statLabel {
   font-family: var(--font-satoshi);
   font-size: var(--text-body-small);
   font-weight: var(--font-weight-regular);
-  color: #6b7280;
+  color: var(--color-gray-dark);
   white-space: nowrap;
 }
 
@@ -78,14 +125,21 @@
   right: var(--space-7);
   top: 50%;
   transform: translateY(-50%);
+
+  @include tablet-down {
+    right: var(--space-5);
+  }
+
+  @include mobile {
+    right: var(--space-4);
+  }
 }
 
 .fireIcon {
   // design-specific: flame icon sized to match Figma illustration
-  font-size: 64px;
-  color: #f35d08;
+  width: 50px;
+  height: 67px;
   filter: drop-shadow(0 4px 12px rgba(243, 93, 8, 0.35));
-  opacity: 0.9;
 }
 
 .sparkline {
@@ -103,11 +157,12 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-1);
-  // design-specific: Figma — vibrant blue-purple gradient matching screenshot
-  background: linear-gradient(135deg, #4b3cdd 0%, #2639ed 40%, #6b3fe8 75%, #4b2cd0 100%);
-  border: 1.606px solid rgba(38, 57, 237, 0.19);
-  // design-specific: white inset top glow
-  box-shadow: inset 0 1px 25.7px 0 white;
+  // design-specific: Figma — horizontal blue-to-purple sweep matching screenshot
+  background: linear-gradient(90deg, #2639ed 0%, #3535e0 30%, #6640e8 65%, #7d3fe4 100%);
+  // border: 1.606px solid rgba(38, 57, 237, 0.19);
+  // design-specific: subtle top-edge highlight
+  // box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  box-shadow: 0 1px 25.7px 0 #ffffff91 inset;
 }
 
 .gmBannerTitle {
@@ -119,19 +174,27 @@
 }
 
 .gmBannerCta {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
   background: transparent;
   border: none;
   cursor: pointer;
-  padding: 0;
+  padding: var(--space-1) var(--space-3);
+  clip-path: #{$clip-sm};
+  overflow: hidden;
   font-family: var(--font-satoshi);
   font-size: var(--text-small-12);
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--color-white-primary);
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
 
   &:hover {
     opacity: 0.85;
@@ -146,9 +209,8 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  border-radius: inherit;
-  // design-specific: subtle inner glow on banner
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25);
+  // design-specific: radial glow centred left-of-centre matching Figma screenshot brightness
+  background: radial-gradient(ellipse 55% 90% at 28% 50%, rgba(255, 255, 255, 0.22) 0%, transparent 100%);
 }
 
 // ── Section 2: Calendar Heatmap ───────────────────────────────────────────────
@@ -157,23 +219,55 @@
   background-color: #f5f5f5;
   @include stripe-bg;
   padding: var(--space-7);
+
+  @include mobile {
+    background-image: none;
+  }
+
+  @include tablet-down {
+    padding: var(--space-5);
+  }
+
+  @include mobile {
+    padding: var(--space-4);
+  }
 }
 
 .sectionTitle {
   font-family: var(--font-satoshi);
+  // design-specific: 25px Figma — scale down proportionally for tablet/mobile
   font-size: 25px;
   font-weight: var(--font-weight-medium);
   color: var(--color-black-primary);
   letter-spacing: 0.25px;
   text-transform: capitalize;
   margin: 0 0 var(--space-5);
+
+  @include tablet-down {
+    font-size: 20px;
+  }
+
+  @include mobile {
+    font-size: 16px;
+    margin-bottom: var(--space-4);
+  }
+}
+
+.heatmapContent {
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto;
+  overflow-x: auto;
+  scrollbar-width: thin;
+
+  @include tablet-down {
+    display: none;
+  }
 }
 
 .heatmapOuter {
   display: flex;
   gap: var(--space-3);
-  overflow-x: auto;
-  scrollbar-width: thin;
 }
 
 .dayLabels {
@@ -248,7 +342,6 @@
 
 // Cell color variants
 .cell_empty {
-  border: 1.29px solid #f8f9fb;
   background: transparent;
 }
 
@@ -257,15 +350,15 @@
 }
 
 .cell_purple {
-  background: #9457f6;
+  background: var(--Colors-Purple-100, #EBE9FE);
 }
 
 .cell_blue {
-  background: #2639ed;
+  background: var(--Colors-Purple-400, #9B8AFB);
 }
 
 .cell_gold {
-  background: #fdc651;
+  background: var(--Colors-Purple-900, #3E1C96);
 }
 
 // Heatmap footer
@@ -280,7 +373,7 @@
 
 .footerNote {
   font-family: var(--font-satoshi);
-  font-size: 20px;
+  font-size: var(--text-body-small);
   font-weight: var(--font-weight-medium);
   color: var(--color-black-primary);
 }
@@ -293,7 +386,7 @@
 
 .legendText {
   font-family: var(--font-satoshi);
-  font-size: 20px;
+  font-size: var(--text-body-small);
   font-weight: var(--font-weight-medium);
   color: var(--color-black-primary);
 }
@@ -306,8 +399,147 @@
   flex-shrink: 0;
 
   &.cell_empty {
-    border: 1px solid #dfdfdf;
+    background: transparent;
   }
+}
+
+// ── Alt heatmap (mobile / tablet) ────────────────────────────────────────────
+
+.heatmapContentAlt {
+  display: none;
+
+  @include tablet-down {
+    display: block;
+  }
+}
+
+.altSectionTitle {
+  font-family: var(--font-satoshi);
+  // design-specific: Figma 17px for the alternate heatmap title on mobile
+  font-size: 17px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  letter-spacing: 0.17px;
+  text-transform: capitalize;
+  text-align: center;
+  margin: 0 0 var(--space-5);
+
+  @include mobile {
+    font-size: 16px;
+    margin-bottom: var(--space-4);
+  }
+}
+
+.altHeatmapWrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 100%;
+  // design-specific: Figma frame is ~310px; 400px cap gives comfortable tablet display while keeping blocks readable
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+// Shared layout: header row + each month data row
+.altHeaderRow,
+.altMonthRow {
+  display: flex;
+  align-items: center;
+  // design-specific: ~15.951px Figma gap between month label and blocks
+  gap: var(--space-4);
+  width: 100%;
+}
+
+// Invisible placeholder that occupies the month-label column in the header
+.altLabelPlaceholder {
+  // design-specific: 29.529px Figma month label width
+  width: 30px;
+  flex-shrink: 0;
+}
+
+.altMonthLabel {
+  // design-specific: 29.529px Figma month label width
+  width: 30px;
+  flex-shrink: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-9);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-gray-dark);
+  line-height: 1.2;
+}
+
+// Flex container shared by both the day-label header and block rows
+.altCellRow {
+  display: flex;
+  flex: 1;
+  // design-specific: ~3.988px Figma col gap
+  gap: var(--space-1);
+}
+
+.altDayLabel {
+  flex: 1;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-10);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-dark);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  line-height: 1.2;
+  padding: var(--space-1) 0;
+}
+
+.altBlock {
+  flex: 1;
+  // design-specific: Figma block ratio 34.45 × 19.686 ≈ 7 / 4
+  aspect-ratio: 7 / 4;
+  // design-specific: Figma border-radius 2.461px
+  border-radius: 2.5px;
+  min-width: 0;
+}
+
+.altFooter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  // design-specific: extra breathing room before footer matching Figma layout
+  margin-top: var(--space-4);
+}
+
+.altLegend {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+// design-specific: Figma legend cell 25.773px × 25.773px, radius 5.155px
+.altLegendCell {
+  width: 26px;
+  height: 26px;
+  border-radius: 5px;
+  flex-shrink: 0;
+}
+
+.altLegendEmpty {
+  // design-specific: Figma-exact L0 legend cell — light gray fill + subtle border
+  background: #f8f9fb;
+  border: 1px solid #dfdfdf;
+}
+
+.altLegendL1 {
+  // var(--color-purple-primary) = #9457f6 — matches Figma legend L1
+  background: var(--color-purple-primary);
+}
+
+.altLegendL2 {
+  // var(--color-blue-primary) = #2639ed — matches Figma legend L2
+  background: var(--color-blue-primary);
+}
+
+.altLegendL3 {
+  // var(--color-amber) = #fdc651 — matches Figma legend L3
+  background: var(--color-amber);
 }
 
 // ── Section 3: Check-in History Table ────────────────────────────────────────
@@ -316,13 +548,25 @@
   background-color: #f5f5f5;
   @include stripe-bg;
   padding: var(--space-7);
+
+  @include mobile {
+    background-image: none;
+  }
+
+  @include tablet-down {
+    padding: var(--space-5);
+  }
+
+  @include mobile {
+    padding: var(--space-4);
+  }
 }
 
 .historyHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--space-7);
+  margin-bottom: var(--space-3);
 }
 
 // ── Filter button ─────────────────────────────────────────────────────────────
@@ -332,22 +576,44 @@
 }
 
 .filterBtn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
   height: 28px;
   padding: 0 var(--space-4);
-  // design-specific: dark gradient matching Figma active-tab / button style
-  background: linear-gradient(to bottom, #404040, #1a1a1a);
+  // outer border strip — same pattern as PrimaryButton primitive
+  background: var(--color-gray-300);
   border: none;
   cursor: pointer;
+  // clip-path: #{$clip-sm};
+  overflow: hidden;
   font-family: var(--font-satoshi);
   font-size: var(--text-nav);
   font-weight: var(--font-weight-medium);
   color: var(--color-white-primary);
-  box-shadow:
-    3px 3px 1.5px rgba(0, 0, 0, 0.15),
-    inset 0 1px 1px rgba(255, 255, 255, 0.25);
+  transition: opacity 0.2s ease;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 1.2px;
+    // clip-path: #{$clip-sm};
+    // design-specific: dark gradient matching Figma active-tab / button style
+    background: linear-gradient(to bottom, #404040, #1a1a1a);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25);
+    z-index: 0;
+    transition: all 0.2s ease;
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  &:hover::before {
+    opacity: 0.85;
+  }
 
   &:focus-visible {
     @include focus-ring;
@@ -391,6 +657,10 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-2-5);
+
+  @include mobile {
+    display: none;
+  }
 }
 
 .tableRow {
@@ -401,12 +671,20 @@
   background: var(--color-white-primary);
   min-height: 57px;
   overflow: hidden;
+
+  @include tablet-down {
+    min-height: 50px;
+  }
 }
 
 .tableHead {
   min-height: 57px;
   background-color: var(--color-white-primary);
   @include stripe-bg;
+
+  @include tablet-down {
+    min-height: 44px;
+  }
 }
 
 .colDate,
@@ -416,6 +694,10 @@
   height: 100%;
   display: flex;
   align-items: center;
+
+  @include tablet-down {
+    padding: 0 var(--space-3);
+  }
 }
 
 // Vertical dividers between columns
@@ -436,7 +718,7 @@
   font-size: var(--text-body-small);
   font-weight: var(--font-weight-bold);
   color: #070707;
-  text-transform: uppercase;
+  text-transform: capitalize;
   letter-spacing: 0.03em;
 }
 
@@ -452,6 +734,19 @@
   font-weight: var(--font-weight-medium);
   color: #070707;
   white-space: nowrap;
+}
+
+.chainIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  object-fit: contain;
+  flex-shrink: 0;
+
+  @include tablet-down {
+    width: 28px;
+    height: 28px;
+  }
 }
 
 .chainName {
@@ -476,4 +771,93 @@
   &:focus-visible {
     @include focus-ring;
   }
+}
+
+// ── Mobile card list (check-in history) ──────────────────────────────────────
+
+.historyCardList {
+  display: none;
+
+  @include mobile {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+}
+
+.historyCard {
+  background-color: var(--color-white-primary);
+  @include stripe-bg;
+  overflow: hidden;
+}
+
+.historyCardTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  // design-specific: Figma card top padding 16px, horizontal 11px
+  padding: var(--space-4) 11px var(--space-3);
+}
+
+.historyCardField {
+  display: flex;
+  flex-direction: column;
+  // design-specific: 8px gap between label and content in Figma
+  gap: var(--space-2);
+}
+
+.historyCardLabel {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  // var(--color-gray-primary) = #7C7C7C — matches Figma label color
+  color: var(--color-gray-primary);
+  text-transform: capitalize;
+  line-height: 1;
+}
+
+.historyCardChainInfo {
+  display: flex;
+  align-items: center;
+  // design-specific: 7px gap between chain icon and name from Figma
+  gap: 7px;
+}
+
+.chainIconSm {
+  // design-specific: Figma card chain icon 25px × 25px
+  width: 25px;
+  height: 25px;
+  border-radius: var(--radius-full);
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.historyCardChainName {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  // design-specific: #070707 — matches Figma chain name color, same as table
+  color: #070707;
+}
+
+.historyCardDivider {
+  height: 1px;
+  // design-specific: #e8e8e8 — matches existing table column divider color
+  background: #e8e8e8;
+  // design-specific: 11px margin matches card horizontal padding
+  margin: 0 11px;
+}
+
+.historyCardBottom {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  // design-specific: padding mirrors top section
+  padding: var(--space-3) 11px var(--space-4);
+}
+
+.txLinkCard {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

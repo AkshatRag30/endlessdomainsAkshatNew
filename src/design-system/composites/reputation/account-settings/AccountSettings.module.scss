@@ -1,14 +1,39 @@
 @import '_mixins.scss';
 
-// ── Card shell ─────────────────────────────────────────────────────────────────
+// design-specific: octagon clip-path from PrimaryButton primitive (sm scale)
+$clip-sm: polygon(5px 0px, calc(100% - 10px) 0px, 100% 12px, 100% calc(100% - 5px), calc(100% - 5px) 100%, 3px 100%, 0px calc(100% - 5px), 0px 6px);
 
-.card {
+// ── Root wrapper — gray diagonal-stripe background, cards stack inside ─────────
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  width: 100%;
+  // design-specific: #f5f5f5 gray page bg with stripe overlay matching Figma container
+  background-color: #f5f5f5;
+  @include stripe-bg;
+  padding: var(--space-5);
+
+  @include small-mobile {
+    padding: var(--space-3);
+    gap: var(--space-4);
+  }
+}
+
+// ── Top card shell ─────────────────────────────────────────────────────────────
+
+.topCard {
   background-color: var(--color-white-primary);
   @include stripe-bg;
   padding: var(--space-7);
 
   @include tablet-down {
     padding: var(--space-5);
+  }
+
+  @include small-mobile {
+    padding: var(--space-4);
   }
 }
 
@@ -59,15 +84,36 @@
   background-color: #f2f2f2;
   @include stripe-bg;
   border: 1px solid #e2e2e2;
+
+  @include mobile {
+    height: auto;
+    min-height: 45px;
+    padding: var(--space-2) var(--space-3);
+    gap: var(--space-2);
+  }
 }
 
 // ── Domain display (avatar + name + badge) ─────────────────────────────────────
+
+.domainProviderIcon {
+  flex-shrink: 0;
+  width: 29px;
+  height: 29px;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  // design-specific: UD brand color — matches provider circle in ReputationModal
+  background: #7e45e5;
+}
 
 .domainDisplay {
   display: flex;
   align-items: center;
   gap: var(--space-2-5);
   min-width: 0;
+  overflow: hidden;
 }
 
 .domainName {
@@ -76,6 +122,10 @@
   font-weight: var(--font-weight-medium);
   color: var(--color-blue-primary);
   white-space: nowrap;
+
+  @include mobile {
+    font-size: var(--text-small-12);
+  }
 }
 
 .primaryBadge {
@@ -95,19 +145,45 @@
 // ── Change button ──────────────────────────────────────────────────────────────
 
 .changeBtn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
+  height: 32px;
+  padding: 0 var(--space-3);
+
+  @include mobile {
+    height: 26px;
+    padding: 0 var(--space-2);
+    font-size: var(--text-small-10);
+  }
   font-family: var(--font-satoshi);
   font-size: var(--text-small-12);
   font-weight: var(--font-weight-medium);
   color: var(--color-blue-primary);
-  background: transparent;
+  background: var(--color-gray-300);
   border: none;
   cursor: pointer;
   white-space: nowrap;
   flex-shrink: 0;
-  padding: 0;
+  clip-path: #{$clip-sm};
+  overflow: hidden;
+  transition: opacity 0.2s ease;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 1.2px;
+    clip-path: #{$clip-sm};
+    background: var(--color-white-primary);
+    z-index: 0;
+    transition: all 0.2s ease;
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
 
   &:hover {
     opacity: 0.75;
@@ -129,6 +205,12 @@
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
+
+  @include mobile {
+    white-space: normal;
+    font-size: var(--text-small-12);
+    flex: 1;
+  }
 }
 
 // ── Toggle ─────────────────────────────────────────────────────────────────────
@@ -150,16 +232,22 @@
 
 .toggle {
   position: relative;
-  width: 49px;
-  height: 20px;
-  border-radius: 999px;
+  width: 64px;
+  height: 30px;
+  border-radius: var(--radius-full);
   border: none;
   cursor: pointer;
-  padding: 2px;
-  // design-specific: OFF state uses #aaa bg
-  background: #aaaaaa;
+  padding: 0;
+  // design-specific: OFF state uses black bg
+  background: var(--color-black-primary);
   box-shadow: 0 0 0 2.796px rgba(38, 57, 237, 0.14);
   transition: background 0.22s ease;
+
+  @include small-mobile {
+    width: 49px;
+    height: 22px;
+    box-shadow: 0 0 0 2px rgba(38, 57, 237, 0.14);
+  }
 
   &:focus-visible {
     @include focus-ring;
@@ -167,23 +255,68 @@
 }
 
 .toggleOn {
-  // design-specific: ON state uses black bg matching Figma
-  background: #000000;
+  background: var(--color-blue-primary);
+}
+
+// X icon — sits in the left zone; thumb covers it when toggle is OFF
+.toggleIconX {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  color: var(--color-white-alpha-70);
+  z-index: 0;
+  pointer-events: none;
+
+  @include small-mobile {
+    font-size: 10px;
+    left: 6px;
+  }
+}
+
+// Check icon — sits in the right zone; thumb covers it when toggle is ON
+.toggleIconCheck {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  color: var(--color-white-alpha-70);
+  z-index: 0;
+  pointer-events: none;
+
+  @include small-mobile {
+    font-size: 10px;
+    right: 6px;
+  }
 }
 
 .toggleThumb {
   position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 16px;
-  height: 16px;
-  border-radius: 999px;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-full);
   background: var(--color-white-primary);
   box-shadow: 0 0.7px 0.7px rgba(0, 0, 0, 0.15);
   transition: transform 0.22s ease;
+  z-index: 1;
 
   .toggleOn & {
-    transform: translateX(29px);
+    // 64 - 3 (left offset) - 3 (right gap) - 24 (thumb width) = 34px
+    transform: translateX(34px);
+  }
+
+  @include small-mobile {
+    width: 16px;
+    height: 16px;
+
+    .toggleOn & {
+      // 49 - 3 (left offset) - 3 (right gap) - 16 (thumb width) = 27px
+      transform: translateX(27px);
+    }
   }
 }
 
@@ -210,4 +343,224 @@
   color: #6b7280;
   letter-spacing: 0.06px;
   margin: 0;
+}
+
+// ── Wallets card ───────────────────────────────────────────────────────────────
+
+.walletsCard {
+  background-color: var(--color-white-primary);
+  @include stripe-bg;
+  // design-specific: Figma content at top:40px left:19px → var(--space-8) var(--space-5)
+  padding: var(--space-8) var(--space-7);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-7);
+
+  @include tablet-down {
+    padding: var(--space-6) var(--space-5);
+    gap: var(--space-6);
+  }
+
+  @include small-mobile {
+    padding: var(--space-5) var(--space-4);
+    gap: var(--space-5);
+  }
+}
+
+.walletsHead {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.walletsTitle {
+  font-family: var(--font-satoshi);
+  // design-specific: Figma shows 22px for "Wallets" heading
+  font-size: var(--text-body);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+  margin: 0;
+}
+
+.walletsSubtitle {
+  font-family: var(--font-satoshi);
+  // design-specific: Figma shows 17px for subtitle
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-regular);
+  // design-specific: Figma exact subtitle color #5d5d5d
+  color: #5d5d5d;
+  margin: 0;
+
+  @include mobile {
+    font-size: var(--text-nav);
+  }
+}
+
+// ── Individual wallet block ─────────────────────────────────────────────────────
+
+.walletBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.walletBlockHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.walletChainIcon {
+  // design-specific: Figma shows 22px chain icon circles
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+
+  &[data-chain='evm'] {
+    // design-specific: dark ellipse backing the ETH diamond icon
+    background: #1a1a1a;
+  }
+
+  &[data-chain='solana'] {
+    background: transparent;
+  }
+}
+
+.walletBlockTitle {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black-primary);
+
+  @include mobile {
+    font-size: var(--text-small-13);
+  }
+}
+
+// ── Wallet row (address display or input) ──────────────────────────────────────
+
+.walletRow {
+  display: flex;
+  align-items: center;
+  // design-specific: Figma wallet row height 40px, border #e0e5f2, no gray bg
+  height: 40px;
+  padding: 0 var(--space-3);
+  border: 1px solid #e0e5f2;
+  background: transparent;
+
+  @include small-mobile {
+    height: auto;
+    min-height: 40px;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    align-items: center;
+  }
+}
+
+.walletAddress {
+  flex: 1;
+  font-family: var(--font-space-grotesk);
+  // design-specific: Figma 13px, letter-spacing -0.26px
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-blue-primary);
+  letter-spacing: -0.26px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.copyBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-gray-dark);
+  // design-specific: Figma copy icon is ~20px, no border/bg
+  font-size: var(--text-normal);
+  padding: 0;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: var(--color-blue-primary);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.walletInput {
+  flex: 1;
+  height: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: var(--font-space-grotesk);
+  // design-specific: Figma 13px, letter-spacing -0.26px
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black-primary);
+  min-width: 0;
+
+  @include small-mobile {
+    flex: 1 1 140px;
+    height: 28px;
+  }
+
+  &::placeholder {
+    // design-specific: Figma placeholder #aeaeae, bold SpaceGrotesk
+    color: #aeaeae;
+    font-weight: var(--font-weight-bold);
+    letter-spacing: -0.26px;
+  }
+}
+
+.addWalletBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  // design-specific: Figma 27px height, black bg with white inset glow
+  height: 27px;
+  padding: 0 var(--space-4);
+  flex-shrink: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white-primary);
+  background: var(--color-black-primary);
+  // design-specific: Figma outer ring + inset glow on dark button
+  border: 1px solid rgba(255, 255, 255, 0.56);
+  box-shadow: 0 0 0 1.3px rgba(255, 255, 255, 0.24), inset 0 0 12px 0 rgba(255, 255, 255, 0.18);
+  letter-spacing: 0.36px;
+  cursor: pointer;
+  white-space: nowrap;
+  text-transform: capitalize;
+  transition: opacity 0.2s ease;
+
+  @include small-mobile {
+    flex: 1 1 auto;
+    width: 100%;
+    height: 30px;
+    padding: 0 var(--space-3);
+  }
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
 }

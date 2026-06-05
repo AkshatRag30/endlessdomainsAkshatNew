@@ -1,0 +1,586 @@
+@import '_mixins.scss';
+
+// ── PrimaryButton octagon clip-path (copied from primitive) ────────────────────
+$clip: polygon(
+  7px 0px,
+  calc(100% - 15px) 0px,
+  100% 18px,
+  100% calc(100% - 7px),
+  calc(100% - 7.5px) 100%,
+  5px 100%,
+  0px calc(100% - 7px),
+  0px 9px
+);
+
+// design-specific: larger octagon cut for the modal card in step 3
+$card-clip: polygon(
+  14px 0,
+  calc(100% - 14px) 0,
+  100% 14px,
+  100% calc(100% - 14px),
+  calc(100% - 14px) 100%,
+  14px 100%,
+  0 calc(100% - 14px),
+  0 14px
+);
+
+// ── Overlay ────────────────────────────────────────────────────────────────────
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--color-black-alpha-60);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+}
+
+// ── Modal card ─────────────────────────────────────────────────────────────────
+
+.card {
+  position: relative;
+  background: var(--color-white-primary);
+  @include stripe-bg;
+  width: 100%;
+  max-width: 462px;
+  padding: var(--space-7) var(--space-7) var(--space-7);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+
+  @include mobile {
+    padding: var(--space-5) var(--space-5);
+  }
+}
+
+// ── Corner decorations (step 3 only) ──────────────────────────────────────────
+
+// design-specific: small right-triangle marks at card corners — visible because
+// the card's clip-path exposes the overlay bg. These ::after divs reinforce the
+// cut-corner aesthetic with a light gray triangle over each exposed corner.
+// .cornerTL,
+// .cornerTR,
+// .cornerBL,
+// .cornerBR {
+//   position: absolute;
+//   width: 20px;
+//   height: 20px;
+//   pointer-events: none;
+// }
+
+// .cornerTL {
+//   top: 0;
+//   left: 0;
+//   // design-specific: triangle pointing inward — top-left cut
+//   border-top: 14px solid var(--color-gray-300);
+//   border-right: 14px solid transparent;
+// }
+
+// .cornerTR {
+//   top: 0;
+//   right: 0;
+//   border-top: 14px solid var(--color-gray-300);
+//   border-left: 14px solid transparent;
+// }
+
+// .cornerBL {
+//   bottom: 0;
+//   left: 0;
+//   border-bottom: 14px solid var(--color-gray-300);
+//   border-right: 14px solid transparent;
+// }
+
+// .cornerBR {
+//   bottom: 0;
+//   right: 0;
+//   border-bottom: 14px solid var(--color-gray-300);
+//   border-left: 14px solid transparent;
+// }
+
+// ── Close button ───────────────────────────────────────────────────────────────
+
+.closeBtn {
+  position: absolute;
+  top: var(--space-5);
+  right: var(--space-5);
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-black-primary);
+  border-radius: var(--radius-sm);
+  transition: opacity 0.18s ease;
+
+  &:hover {
+    opacity: 0.6;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// ── Headings ───────────────────────────────────────────────────────────────────
+
+.title {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h3);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black-primary);
+  text-align: center;
+  margin: 0;
+  padding-right: var(--space-7); // prevent overlap with close btn
+  padding-left: var(--space-7);
+  line-height: 1.2;
+}
+
+.subtitle {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-gray-dark);
+  text-align: center;
+  margin: calc(var(--space-5) * -1) 0 0;
+}
+
+// ── Primary CTA button (full PrimaryButton octagon design) ─────────────────────
+
+.primaryBtn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  width: 100%;
+  height: var(--button-height-mobile);
+  padding: 0 var(--space-6);
+  border: none;
+  background: var(--color-gray-300);
+  clip-path: #{$clip};
+  overflow: hidden;
+  cursor: pointer;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-button);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white-primary);
+  letter-spacing: 0.3px;
+  transition: opacity 0.2s ease;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 1.2px;
+    clip-path: #{$clip};
+    background: linear-gradient(
+      181deg,
+      var(--color-blue-primary) 15.43%,
+      var(--color-blue-primary-alpha-30) 133.94%
+    );
+    box-shadow: inset 0 0 20px 0 var(--color-white-alpha-40);
+    z-index: 0;
+    transition: all 0.3s ease;
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  &:hover::before {
+    background: linear-gradient(
+      180deg,
+      var(--color-blue-primary) 0%,
+      var(--color-blue-primary-alpha-50) 140%
+    );
+    box-shadow:
+      0 0 16px var(--color-blue-primary-alpha-70),
+      inset 0 0 12px var(--color-white-alpha-40);
+  }
+
+  &:active::before {
+    background: var(--color-blue-dark);
+    box-shadow:
+      inset 0 2px 4px var(--color-black-alpha-55),
+      inset 0 0 6px var(--color-white-alpha-30);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// Cancel — secondary button design (corner-marks style)
+$corner-size: 18px;
+$corner-clip: path("M5 2 H14 C15 2 15.5 3.2 14.7 3.8 C11 7 7 11 3.8 14.7 C3.2 15.5 2 15 2 14 V5 C2 3.3 3.3 2 5 2 Z");
+
+%cancel-corner {
+  content: '';
+  position: absolute;
+  width: $corner-size;
+  height: $corner-size;
+  background: var(--color-gray-primary);
+  clip-path: $corner-clip;
+  transition: background 0.3s ease;
+}
+
+.cancelBtn {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: var(--button-height-mobile);
+  background: var(--color-white-primary);
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-button);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-primary);
+  letter-spacing: 0.3px;
+  transition: color 0.3s ease;
+
+  &::before {
+    @extend %cancel-corner;
+    top: 0;
+    left: 0;
+  }
+
+  &::after {
+    @extend %cancel-corner;
+    top: 0;
+    right: 0;
+    transform: rotate(90deg);
+  }
+
+  &:hover:not(:disabled) {
+    color: var(--color-blue-primary);
+
+    &::before,
+    &::after {
+      background: var(--color-blue-primary);
+    }
+
+    .corner::before,
+    .corner::after {
+      background: var(--color-blue-primary);
+    }
+  }
+
+  &:active:not(:disabled) {
+    color: var(--color-blue-dark);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+    color: var(--color-blue-primary);
+
+    &::before,
+    &::after {
+      background: var(--color-blue-primary);
+    }
+
+    .corner::before,
+    .corner::after {
+      background: var(--color-blue-primary);
+    }
+  }
+}
+
+.cancelLabel {
+  position: relative;
+  z-index: 2;
+}
+
+.corner {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  &::before {
+    @extend %cancel-corner;
+    bottom: 0;
+    left: 0;
+    transform: rotate(-90deg);
+  }
+
+  &::after {
+    @extend %cancel-corner;
+    bottom: 0;
+    right: 0;
+    transform: rotate(180deg);
+  }
+}
+
+// ── Step 1: dropdown ───────────────────────────────────────────────────────────
+
+.step1Body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.step1Hint {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-gray-primary);
+  text-align: center;
+  margin: 0;
+}
+
+.dropdownWrap {
+  position: relative;
+}
+
+.dropdownTrigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  padding: 0 var(--space-4);
+  // design-specific: Figma input bg #f2f2f2 with border #e2e2e2
+  background: #f2f2f2;
+  border: 1px solid #e2e2e2;
+  cursor: pointer;
+  color: var(--color-gray-primary);
+  transition: border-color 0.18s ease;
+
+  &:hover {
+    border-color: var(--color-blue-primary-alpha-30);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.dropdownLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.dropdownDomainName {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+}
+
+.dropdownList {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--color-white-primary);
+  border: 1px solid #e2e2e2;
+  list-style: none;
+  margin: 0;
+  padding: var(--space-1) 0;
+  z-index: 10;
+  box-shadow: 0 4px 16px var(--color-black-alpha-10);
+}
+
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  height: 44px;
+  padding: 0 var(--space-4);
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: #f5f5f5;
+  }
+}
+
+.dropdownItemActive {
+  background: var(--color-blue-primary-alpha-07);
+}
+
+.dropdownItemName {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+}
+
+// ── Provider icon circle ───────────────────────────────────────────────────────
+
+.providerCircle {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  // design-specific: provider brand colors used as circle bg
+  &[data-provider="UD"]                { background: #7e45e5; }
+  &[data-provider="ENS"]               { background: #60aaf5; }
+  &[data-provider="Arbitrum"]          { background: #1a71b1; }
+  &[data-provider="BinanceSmartChain"] { background: #ffc300; }
+  &[data-provider="Bonfida"]           { background: #000000; }
+  &[data-provider="Tezos"]             { background: #14216a; }
+  &[data-provider="Aptos"]             { background: #000000; }
+  &[data-provider="Ton"]               { background: #0098ea; }
+  &[data-provider="Box"]               { background: #000000; }
+  &[data-provider="Starknet"]          { background: #19aa6e; }
+  &[data-provider="Freename"]          { background: #4144c0; }
+}
+
+// ── Step 2: domain radio list ──────────────────────────────────────────────────
+
+.domainList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.domainRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  height: 56px;
+  padding: 0 var(--space-5);
+  // design-specific: Figma domain row bg #f5f5f5
+  background: #f5f5f5;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: #ececec;
+  }
+}
+
+.domainRowSelected {
+  background: var(--color-blue-primary-alpha-07);
+
+  &:hover {
+    background: var(--color-blue-primary-alpha-13);
+  }
+}
+
+.radioCircle {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  border: 2px solid #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s ease;
+}
+
+.radioCircleSelected {
+  border-color: var(--color-black-primary);
+  background: var(--color-black-primary);
+}
+
+.radioDot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--color-white-primary);
+}
+
+.domainRowName {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+}
+
+// ── Step 3: feature highlights ─────────────────────────────────────────────────
+
+.featuresBox {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-3);
+  padding: var(--space-5) var(--space-4);
+  // design-specific: light blue-tinted bg matching Figma feature highlight area
+  background: rgba(38, 57, 237, 0.04);
+  border: 1.5px solid rgba(38, 57, 237, 0.12);
+  // border-radius: var(--radius-sm);
+
+  @include mobile {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.featureItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.featureEmoji {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.featureLabel {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  text-align: center;
+  text-transform: capitalize;
+}
+
+// ── Step 3: privacy list ───────────────────────────────────────────────────────
+
+.privacyList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.privacyItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2-5);
+
+  &[data-color="green"] .privacyText { color: #16a34a; }
+  &[data-color="orange"] .privacyText { color: #ea580c; }
+  &[data-color="blue"] .privacyText { color: var(--color-blue-primary); }
+}
+
+.privacyIcon {
+  flex-shrink: 0;
+  font-size: 14px;
+  width: 18px;
+  text-align: center;
+}
+
+.privacyText {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+}
+
+// ── Step 3: action row ─────────────────────────────────────────────────────────
+
+.actionRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}

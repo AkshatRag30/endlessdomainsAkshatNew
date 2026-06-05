@@ -73,3 +73,7 @@ function FreenameManagePage() {
 }
 
 export default dynamic(() => Promise.resolve(FreenameManagePage), { ssr: false })
+
+export function getServerSideProps() {
+  return { props: {} }
+}

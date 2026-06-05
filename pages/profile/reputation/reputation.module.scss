@@ -32,21 +32,7 @@
 
 // ── Page header ───────────────────────────────────────────────────────────────
 
-.pageHeader {
-  margin-bottom: var(--space-6);
-}
-
-.pageTitle {
-  font-family: var(--font-satoshi);
-  font-size: var(--text-display-sm);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-black-primary);
-  margin: 0 0 var(--space-1);
-
-  @include mobile {
-    font-size: var(--text-h3);
-  }
-}
+// 
 
 .pageSubtitle {
   font-family: var(--font-satoshi);
@@ -68,11 +54,14 @@
 // ── Section 1: sub-tab bar ────────────────────────────────────────────────────
 
 .tabSection {
-  background: var(--color-white-primary);
   overflow-x: auto;
 }
 
 // ── Section 2: main content ───────────────────────────────────────────────────
+
+.emptyStateWrap {
+  background: var(--color-white-primary);
+}
 
 .contentSection {
   background: transparent;

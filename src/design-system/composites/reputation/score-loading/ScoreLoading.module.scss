@@ -1,0 +1,274 @@
+@import '_mixins.scss';
+
+// ── Root ──────────────────────────────────────────────────────────────────────
+
+.root {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: var(--space-7);
+}
+
+// ── Centered card ─────────────────────────────────────────────────────────────
+
+.card {
+  background: var(--color-white-primary);
+  @include stripe-bg;
+  width: 100%;
+  max-width: 749px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  padding: var(--space-8);
+
+  @include mobile {
+    padding: var(--space-6) var(--space-5);
+  }
+}
+
+// ── Illustration wrapper ───────────────────────────────────────────────────────
+
+.illustrationWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  // design-specific: Figma gap 2.706px between ring and shadow
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+// design-specific: Figma outer ring 92px, rgba(239,68,68,0.26), glow
+.outerRing {
+  width: 92px;
+  height: 92px;
+  border-radius: var(--radius-full);
+  background: rgba(239, 68, 68, 0.26);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1.5px 14.9px 0 var(--color-white-primary);
+}
+
+// design-specific: Figma inner circle 83.191px, blue gradient
+.innerCircle {
+  width: 83px;
+  height: 83px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(134.58deg, rgba(38, 57, 237, 0.7) 10.17%, #2639ed 59.57%, rgba(38, 57, 237, 0.5) 98.68%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+// ── SVG wave loader ───────────────────────────────────────────────────────────
+
+.waveSvg {
+  // design-specific: Figma loader inner area ~64.941px
+  width: 65px;
+  height: 65px;
+  display: block;
+}
+
+.waveBack {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: wave-move-back 5s linear infinite;
+}
+
+.waveFront {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: wave-move-front 3s linear infinite;
+}
+
+@keyframes wave-move-front {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-33px); }
+}
+
+@keyframes wave-move-back {
+  from { transform: translateX(-33px); }
+  to   { transform: translateX(0); }
+}
+
+// ── Shadow ellipse ────────────────────────────────────────────────────────────
+
+.shadowEllipse {
+  width: 70px;
+  height: 4px;
+  border-radius: var(--radius-full);
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.18) 0%, transparent 75%);
+}
+
+// ── Text block ────────────────────────────────────────────────────────────────
+
+.textBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.heading {
+  font-family: var(--font-satoshi);
+  // design-specific: Figma 30px, tracking-[-1.356px]
+  font-size: var(--text-h3);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  text-align: center;
+  letter-spacing: -0.045em;
+  text-transform: capitalize;
+  line-height: 1.2;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.subtitle {
+  font-family: var(--font-space-grotesk);
+  // design-specific: Figma 17px, color #474747
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-regular);
+  color: #474747;
+  text-align: center;
+  line-height: 1.3;
+  margin: 0;
+}
+
+// ── Progress bar ──────────────────────────────────────────────────────────────
+
+.progressTrack {
+  width: 100%;
+  height: 8px;
+  border-radius: var(--radius-full);
+  // design-specific: light gray track
+  background: rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  // design-specific: blue gradient fill matching the image
+  background: linear-gradient(90deg, var(--color-blue-primary) 0%, rgba(38, 57, 237, 0.75) 100%);
+  // animates from 0 to ~80% over 8s to simulate API loading
+  animation: progress-load 8s ease-out forwards;
+}
+
+@keyframes progress-load {
+  0%   { width: 0%; }
+  60%  { width: 65%; }
+  90%  { width: 78%; }
+  100% { width: 82%; }
+}
+
+// ── Did you know card ─────────────────────────────────────────────────────────
+
+.factCard {
+  width: 100%;
+  // design-specific: Figma lavender-blue tinted card bg + rounded corners + border
+  background: rgba(38, 57, 237, 0.07);
+  border: 1px solid rgba(38, 57, 237, 0.15);
+  border-radius: 16px;
+  padding: var(--space-6) var(--space-7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  min-height: 160px;
+  justify-content: center;
+
+  @include mobile {
+    padding: var(--space-5);
+  }
+}
+
+.factBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-1) var(--space-4);
+  // design-specific: white pill with blue text and blue border matching the image
+  background: var(--color-white-primary);
+  border: 1px solid rgba(38, 57, 237, 0.3);
+  border-radius: var(--radius-full);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.factText {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-black-primary);
+  text-align: center;
+  line-height: 1.55;
+  margin: 0;
+}
+
+// ── Slider navigation ─────────────────────────────────────────────────────────
+
+.factNav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+.navArrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-black-primary);
+  padding: var(--space-1);
+  transition: opacity 0.2s ease;
+  border-radius: var(--radius-sm);
+
+  &:hover {
+    opacity: 0.5;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.dots {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  // design-specific: inactive dots are light gray
+  background: rgba(0, 0, 0, 0.18);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.35);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.dotActive {
+  // design-specific: active dot is blue-primary, slightly larger
+  background: var(--color-blue-primary);
+  transform: scale(1.25);
+}

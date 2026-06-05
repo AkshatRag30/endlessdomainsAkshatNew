@@ -1,36 +1,79 @@
 @import '_mixins.scss';
 
+// design-specific: octagon clip-path from PrimaryButton primitive
+$clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px), calc(100% - 7.5px) 100%, 5px 100%, 0px calc(100% - 7px), 0px 9px);
+
 // ── Root ──────────────────────────────────────────────────────────────────────
 
 .root {
   background-color: #f5f5f5;
   @include stripe-bg;
   padding: var(--space-7);
+
+  @include tablet-down {
+    padding: var(--space-6);
+  }
+
+  @include mobile {
+    padding: var(--space-4);
+  }
 }
 
 // ── 3-column grid ─────────────────────────────────────────────────────────────
+// 3-col only at 1440px+ (Figma desktop spec). Tablet landscape (1024px, 1194px)
+// and smaller desktops use 2-col — 3-col at those widths leaves cards ~290-370px
+// wide which is too narrow for the badge + icon + title row at desktop sizes.
 
 .grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--space-7) 18px;
 
-  @include tablet-down {
+  // everything below proper desktop — tablet landscape through portrait
+  @media (max-width: 1439px) {
     grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-6) 16px;
   }
 
   @include mobile {
     grid-template-columns: 1fr;
+    gap: var(--space-5);
   }
 }
 
-// ── Perk card ─────────────────────────────────────────────────────────────────
+// ── Perk card — domain card shell ─────────────────────────────────────────────
+
+// filter must live on a parent — clip-path clips filter on the same element
+.cardOuter {
+  min-width: 0; // prevent grid blowout — keeps item within its 1fr column
+  transition: filter 0.25s ease;
+
+  &:hover {
+    filter:
+      drop-shadow(2px 0 0 var(--color-blue-primary))
+      drop-shadow(-2px 0 0 var(--color-blue-primary))
+      drop-shadow(0 2px 0 var(--color-blue-primary))
+      drop-shadow(0 -2px 0 var(--color-blue-primary));
+  }
+}
+
+.cardWrap {
+  // design-specific: domain card clip-path — diagonal cuts on top-left and top-right only
+  clip-path: polygon(
+    20px 0,
+    calc(100% - 20px) 0,
+    100% 20px,
+    100% 100%,
+    0 100%,
+    0 20px
+  );
+  padding: 2px;
+  background: var(--color-white-primary);
+}
 
 .card {
-  position: relative;
-  height: 237px;
   background-color: var(--color-white-primary);
-  @include stripe-bg;
+  // @include stripe-bg;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -40,23 +83,66 @@
 
 .cardHeader {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: space-between;
-  padding: var(--space-4) var(--space-5);
   height: 80px;
   flex-shrink: 0;
+
+  .headerLeft {
+    padding: var(--space-4) var(--space-5);
+    flex: 1;
+    min-width: 0;
+    border-right: 1px solid var(--color-gray-200);
+  }
+
+  .badge {
+    align-self: center;
+    margin: 0 var(--space-7);
+  }
+
+  @include tablet-down {
+    height: 68px;
+
+    .headerLeft {
+      padding: var(--space-3) var(--space-4);
+    }
+
+    .badge {
+      margin: 0 var(--space-4);
+    }
+  }
+
+  @include mobile {
+    height: 56px;
+
+    .headerLeft {
+      padding: var(--space-3);
+    }
+
+    .badge {
+      margin: 0 var(--space-3);
+    }
+  }
 }
 
 .headerLeft {
   display: flex;
   align-items: center;
   gap: var(--space-4);
+  overflow: hidden;
+
+  @include tablet-down {
+    gap: var(--space-3);
+  }
 }
 
 .headerText {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .perkTitle {
@@ -67,6 +153,16 @@
   margin: 0;
   line-height: normal;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  @include tablet-down {
+    font-size: 16px;
+  }
+
+  @include mobile {
+    font-size: 14px;
+  }
 }
 
 .perkMeta {
@@ -77,6 +173,13 @@
   text-transform: capitalize;
   margin: 0;
   line-height: normal;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  @include mobile {
+    font-size: var(--text-small-10);
+  }
 }
 
 // ── Type badge ────────────────────────────────────────────────────────────────
@@ -86,7 +189,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-2-5) var(--space-4);
+  padding: var(--space-2-5) var(--space-6);
   // design-specific: Figma dark pill badge — gradient from #2c2c2c to #201f1b
   background: linear-gradient(to bottom, #2c2c2c, #201f1b);
   border: 0.763px solid var(--color-black-primary);
@@ -98,15 +201,24 @@
   color: #f5f1ee;
   text-transform: capitalize;
   white-space: nowrap;
+
+  @include tablet-down {
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--text-small-12);
+  }
+
+  @include mobile {
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--text-small-10);
+  }
 }
 
-// ── Dashed separator ──────────────────────────────────────────────────────────
+// ── Divider — matches DomainCardGrid solid 1px style ──────────────────────────
 
-.sep {
-  width: 100%;
+.cardDivider {
+  height: 1px;
+  background: var(--color-gray-200);
   flex-shrink: 0;
-  // design-specific: Figma horizontal dashed separator at y=80px dividing header from content
-  border-top: 1.5px dashed rgba(38, 57, 237, 0.18);
 }
 
 // ── Content (below separator) ─────────────────────────────────────────────────
@@ -118,6 +230,16 @@
   gap: var(--space-5);
   padding: var(--space-4) var(--space-5) var(--space-5);
   justify-content: center;
+
+  @include tablet-down {
+    gap: var(--space-4);
+    padding: var(--space-4);
+  }
+
+  @include mobile {
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-3) var(--space-4);
+  }
 }
 
 // ── Value field (promo code or link) ──────────────────────────────────────────
@@ -132,6 +254,11 @@
   background-color: #f2f2f2;
   @include stripe-bg;
   border: 1px solid #e2e2e2;
+
+  @include mobile {
+    height: 36px;
+    padding: 0 var(--space-2);
+  }
 }
 
 .valueText {
@@ -176,6 +303,7 @@
 // ── CTA button ────────────────────────────────────────────────────────────────
 
 .ctaBtn {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -185,18 +313,38 @@
   border: none;
   border-radius: 4.672px;
   cursor: pointer;
+  // outer border strip — same pattern as PrimaryButton primitive
+  background: var(--color-gray-300);
+  clip-path: #{$clip};
+  overflow: hidden;
   font-family: var(--font-satoshi);
   font-size: var(--text-small-12);
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--color-white-primary);
-  // design-specific: Figma blue gradient button matching imgVector99
-  background: linear-gradient(135deg, #3a4ff0 0%, #2639ed 50%, #1e2fd4 100%);
-  box-shadow:
-    inset 0 1px 1px rgba(255, 255, 255, 0.25),
-    0 2px 8px rgba(38, 57, 237, 0.35);
   transition: opacity 0.18s ease;
+
+  @include mobile {
+    height: 42px;
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 1.2px;
+    clip-path: #{$clip};
+    // design-specific: Figma blue gradient button matching imgVector99
+    background: linear-gradient(135deg, #3a4ff0 0%, #2639ed 50%, #1e2fd4 100%);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25);
+    z-index: 0;
+    transition: all 0.18s ease;
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
 
   &:hover {
     opacity: 0.88;
@@ -220,6 +368,16 @@
   // design-specific: outer ring with low-opacity red — matching Figma rgba(239,68,68,0.26)
   background: rgba(239, 68, 68, 0.26);
   position: relative;
+
+  @include tablet-down {
+    width: 38px;
+    height: 38px;
+  }
+
+  @include mobile {
+    width: 35px;
+    height: 35px;
+  }
 }
 
 // Inner colored circle inside the outer ring
@@ -235,6 +393,14 @@
   color: var(--color-white-primary);
   position: relative;
   z-index: 1;
+
+  @include tablet-down {
+    font-size: 16px;
+  }
+
+  @include mobile {
+    font-size: 14px;
+  }
 }
 
 // ── Icon variants ─────────────────────────────────────────────────────────────

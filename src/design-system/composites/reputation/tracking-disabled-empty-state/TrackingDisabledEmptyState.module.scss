@@ -1,0 +1,145 @@
+@import '_mixins.scss';
+
+// design-specific: octagon clip-path from PrimaryButton primitive
+$clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px), calc(100% - 7.5px) 100%, 5px 100%, 0px calc(100% - 7px), 0px 9px);
+
+// ── Root — fills the content area ─────────────────────────────────────────────
+
+.root {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 393px;
+  padding: var(--space-7);
+}
+
+// ── Centered card ─────────────────────────────────────────────────────────────
+
+.card {
+  background: var(--color-white-primary);
+  @include stripe-bg;
+  width: 100%;
+  max-width: 749px;
+  min-height: 393px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-7);
+  padding: var(--space-9) var(--space-8);
+}
+
+// ── Illustration — large toggle icon ──────────────────────────────────────────
+
+.illustration {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.toggleIcon {
+  // design-specific: Figma toggle illustration 98px, gradient via inline SVG linearGradient
+  display: block;
+  box-shadow: 0px 1.48485px 14.8856px #ffffff;
+  border-radius: 38.295px;
+}
+
+// ── Text block ────────────────────────────────────────────────────────────────
+
+.textBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.heading {
+  font-family: var(--font-satoshi);
+  // design-specific: Figma 30px, tracking-[-1.356px]
+  font-size: var(--text-h3);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  text-align: center;
+  letter-spacing: -0.045em;
+  text-transform: capitalize;
+  line-height: 1.2;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.subtitle {
+  font-family: var(--font-space-grotesk);
+  // design-specific: Figma 17px, color #474747
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-regular);
+  color: #474747;
+  text-align: center;
+  line-height: 1.3;
+  margin: 0;
+}
+
+// ── CTA button — PrimaryButton style ─────────────────────────────────────────
+
+.ctaBtn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  // design-specific: Figma button 403px × 50px
+  width: 403px;
+  height: var(--button-height-mobile);
+  max-width: 100%;
+  border: none;
+  background: var(--color-gray-300);
+  clip-path: #{$clip};
+  overflow: hidden;
+  cursor: pointer;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-button);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white-primary);
+  letter-spacing: 0.3px;
+  text-transform: capitalize;
+  transition: opacity 0.2s ease;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 1.2px;
+    clip-path: #{$clip};
+    background: linear-gradient(181deg, var(--color-blue-primary) 15.43%, var(--color-blue-primary-alpha-30) 133.94%);
+    box-shadow: inset 0 0 20px 0 var(--color-white-alpha-40);
+    z-index: 0;
+    transition: all 0.3s ease;
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  &:hover::before {
+    background: linear-gradient(180deg, var(--color-blue-primary) 0%, var(--color-blue-primary-alpha-50) 140%);
+    box-shadow:
+      0 0 16px var(--color-blue-primary-alpha-70),
+      inset 0 0 12px var(--color-white-alpha-40);
+  }
+
+  &:active::before {
+    background: var(--color-blue-dark);
+    box-shadow:
+      inset 0 2px 4px var(--color-black-alpha-55),
+      inset 0 0 6px var(--color-white-alpha-30);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  @include mobile {
+    width: 100%;
+  }
+}

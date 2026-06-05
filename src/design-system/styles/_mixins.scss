@@ -145,3 +145,52 @@ $breakpoint-wide: 1440px;
     var(--color-black-alpha-01) 6px
   );
 }
+
+// ─── Vertical Light Lines ─────────────────────────────────────────────────────
+// design-specific: repeating vertical columns with a soft gradient peak,
+// creating the shimmer-line texture visible on the stat cards.
+
+@mixin vertical-light-lines {
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+    background-image: repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 9px,
+      rgba(255, 255, 255, 0) 9px,
+      rgba(255, 255, 255, 0.55) 11px,
+      rgba(255, 255, 255, 0) 13px,
+      transparent 13px
+    );
+  }
+}
+
+// ─── Bottom-Rise Vertical Lines ───────────────────────────────────────────────
+// design-specific: translucent orange-tinted vertical lines that emerge from
+// the card bottom and dissolve at mid-height via mask-image fade.
+
+@mixin bottom-rise-lines {
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+    // design-specific: orange lines — 11px cycle (8px gap + ~2px line)
+    background-image: repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 8px,
+      rgba(243, 93, 8, 0.18) 8px,
+      rgba(243, 93, 8, 0.18) 10px,
+      transparent 10px
+    );
+    // design-specific: lines rise from bottom, dissolve at 52% height
+    mask-image: linear-gradient(to top, black 0%, transparent 52%);
+    -webkit-mask-image: linear-gradient(to top, black 0%, transparent 52%);
+  }
+}

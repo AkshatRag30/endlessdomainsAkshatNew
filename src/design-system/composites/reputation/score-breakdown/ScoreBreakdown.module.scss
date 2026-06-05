@@ -1,5 +1,8 @@
 @import '_mixins.scss';
 
+// design-specific: octagon clip-path from PrimaryButton primitive
+$clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px), calc(100% - 7.5px) 100%, 5px 100%, 0px calc(100% - 7px), 0px 9px);
+
 // ── Root ──────────────────────────────────────────────────────────────────────
 
 .root {
@@ -12,9 +15,10 @@
 
 .topSection {
   display: flex;
-  gap: 0;
-  background: var(--color-white-primary);
-
+  gap: var(--space-5);
+  background-color: #f5f5f5;
+    background-image: repeating-linear-gradient(135deg, transparent 0px, transparent 4px, var(--color-black-alpha-01) 4px, var(--color-black-alpha-01) 6px);
+    padding: var(--space-7);
   @include tablet-down {
     flex-direction: column;
   }
@@ -23,6 +27,7 @@
 // ── Left: Score medal card ────────────────────────────────────────────────────
 
 .scoreCard {
+  position: relative;
   flex-shrink: 0;
   width: 346px;
   min-height: 337px;
@@ -31,17 +36,14 @@
   align-items: center;
   justify-content: center;
   background-color: var(--color-white-primary);
-  @include stripe-bg;
-  border-right: 6px solid #f5f5f5;
 
   @include tablet-down {
     width: 100%;
-    border-right: none;
-    border-bottom: 6px solid #f5f5f5;
   }
 }
 
 .medalWrap {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -53,25 +55,191 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-3);
 }
 
-.medalInner {
+// ── Tier polygon decorations — top & bottom ───────────────────────────────────
+// Positioned relative to .scoreCard (position:relative, overflow:hidden).
+// Top polygon: notch points down. Bottom polygon: y-coords flipped, notch up.
+
+.medalBg {
+  position: absolute;
+  top: -50px;
+  left: -15%;
+  right: -15%;
+  height: 155px;
+  pointer-events: none;
+  clip-path: polygon(0 34%, 100% 34%, 100% 100%, 74% 100%, 69% 72%, 32% 71%, 27% 100%, 0 100%);
+}
+
+.medalBgBottom {
+  position: absolute;
+  bottom: -100px;
+  left: -15%;
+  right: -15%;
+  height: 185px;
+  pointer-events: none;
+  clip-path: polygon(0 0, 23% 0, 32% 28%, 69% 29%, 79% 0, 100% 0, 100% 100%, 0 100%);
+}
+
+// ── Bronze ────────────────────────────────────────────────────────────────────
+
+.scoreCard[data-tier="bronze"] .medalBg {
+  background: linear-gradient(180deg, rgba(255, 183, 121, 0.75) 0%, rgba(255, 183, 121, 0.4) 60%, rgba(255, 183, 121, 0) 100%);
+  // design-specific: drop-shadow follows clip-path, creates bronze border along all polygon edges
+  filter: drop-shadow(0 0 2.5px rgba(210, 100, 30, 0.7));
+}
+
+.scoreCard[data-tier="bronze"] .medalBgBottom {
+  background: linear-gradient(0deg, rgba(255, 183, 121, 0.75) 0%, rgba(255, 183, 121, 0.4) 60%, rgba(255, 183, 121, 0) 100%);
+  filter: drop-shadow(0 0 2.5px rgba(210, 100, 30, 0.7));
+}
+
+.medalWrap[data-tier="bronze"] .tierBadge {
+  background: #ffb779;
+  box-shadow:
+    0 4.36px 2.18px rgba(255, 192, 125, 0.4),
+    0 1.45px 0 #dcc9a4,
+    inset 0 0 7.26px rgba(255, 255, 255, 0.7);
+}
+
+.medalWrap[data-tier="bronze"] .tierProgressFill {
+  background: linear-gradient(177deg, #ffb779 0%, #ffcf9e 30%, #ffffff 50%, #ffc07d 70%, #e8935a 100%);
+}
+
+// ── Silver ────────────────────────────────────────────────────────────────────
+
+.scoreCard[data-tier="silver"] .medalBg {
+  background: linear-gradient(180deg, rgba(175, 195, 225, 0.5) 0%, rgba(175, 195, 225, 0.25) 60%, rgba(175, 195, 225, 0) 100%);
+  // design-specific: drop-shadow follows clip-path, creates silver border along all polygon edges
+  filter: drop-shadow(0 0 2.5px rgba(130, 160, 200, 0.8));
+}
+
+.scoreCard[data-tier="silver"] .medalBgBottom {
+  background: linear-gradient(0deg, rgba(175, 195, 225, 0.5) 0%, rgba(175, 195, 225, 0.25) 60%, rgba(175, 195, 225, 0) 100%);
+  filter: drop-shadow(0 0 2.5px rgba(130, 160, 200, 0.8));
+}
+
+// Silver tierBadge and tierProgressFill use the default silver styles below.
+
+// ── Gold ──────────────────────────────────────────────────────────────────────
+
+.scoreCard[data-tier="gold"] .medalBg {
+  // design-specific: Figma Gold — warm golden-cream matching the screenshot
+  background: linear-gradient(180deg, rgba(230, 195, 80, 0.55) 0%, rgba(230, 195, 80, 0.25) 60%, rgba(230, 195, 80, 0) 100%);
+  // design-specific: drop-shadow follows clip-path, creates gold border along all polygon edges
+  filter: drop-shadow(0 0 2.5px rgba(190, 140, 20, 0.8));
+}
+
+.scoreCard[data-tier="gold"] .medalBgBottom {
+  background: linear-gradient(0deg, rgba(230, 195, 80, 0.55) 0%, rgba(230, 195, 80, 0.25) 60%, rgba(230, 195, 80, 0) 100%);
+  filter: drop-shadow(0 0 2.5px rgba(190, 140, 20, 0.8));
+}
+
+.medalWrap[data-tier="gold"] .tierBadge {
+  // design-specific: Figma Gold badge — metallic gold gradient
+  background: linear-gradient(157deg, #b58a30 2%, #f5d080 20%, #d4a832 33%, #fff5d0 50%, #d4a832 62%, #b58a30 79%, #c9a140 95%);
+  box-shadow:
+    0 6px 3px rgba(200, 160, 50, 0.4),
+    0 2px 0 #c9a140,
+    inset 0 0 10px rgba(255, 240, 180, 0.7);
+}
+
+.medalWrap[data-tier="gold"] .tierProgressFill {
+  // design-specific: gold metallic gradient matching the Gold Figma bar
+  background: linear-gradient(177deg, #b58a30 2%, #f5d080 20%, #d4a832 33%, #fff5d0 50%, #d4a832 62%, #b58a30 79%, #c9a140 95%);
+}
+
+// ── Platinum ──────────────────────────────────────────────────────────────────
+
+.scoreCard[data-tier="platinum"] .medalBg {
+  // design-specific: platinum — cool blue-white glow fading to transparent
+  background: linear-gradient(180deg, rgba(200, 215, 255, 0.65) 0%, rgba(200, 215, 255, 0.3) 60%, rgba(200, 215, 255, 0) 100%);
+  filter: drop-shadow(0 0 2.5px rgba(150, 170, 240, 0.85));
+}
+
+.scoreCard[data-tier="platinum"] .medalBgBottom {
+  background: linear-gradient(0deg, rgba(200, 215, 255, 0.65) 0%, rgba(200, 215, 255, 0.3) 60%, rgba(200, 215, 255, 0) 100%);
+  filter: drop-shadow(0 0 2.5px rgba(150, 170, 240, 0.85));
+}
+
+.medalWrap[data-tier="platinum"] .tierBadge {
+  // design-specific: platinum badge — luminous white-lavender metallic matching the image
+  background: linear-gradient(157deg, #b0b8d8 2%, #f2f4ff 20%, #dce0f8 33%, #ffffff 50%, #eaecff 62%, #c2caec 79%, #d2daee 95%);
+  border: 0.5px solid rgba(255, 255, 255, 0.6);
+  box-shadow:
+    0 6px 3px rgba(180, 190, 255, 0.35),
+    0 2px 0 #c2caec,
+    inset 0 0 10px rgba(210, 218, 255, 0.7);
+}
+
+.medalWrap[data-tier="platinum"] .tierProgressFill {
+  // design-specific: platinum progress fill — white-lavender metallic gradient
+  background: linear-gradient(177deg, #b0b8d8 2%, #f2f4ff 20%, #dce0f8 33%, #ffffff 50%, #eaecff 62%, #c2caec 79%, #d2daee 95%);
+  border: 0.5px solid rgba(255, 255, 255, 0.5);
+}
+
+// ── Tier badge image + score overlay ─────────────────────────────────────────
+
+.badgeImgWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.scoreOverlay {
+  position: absolute;
+  left: 50%;
+  // design-specific: silver hexagon center at 44% height of the SVG viewport
+  top: 44%;
+  transform: translate(-50%, -50%);
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0;
+  gap: 2px;
+  pointer-events: none;
 }
 
-.wingLeft,
-.wingRight {
-  flex-shrink: 0;
-  opacity: 0.7;
+// design-specific: gold hexagon center sits at 50% height of goldtier.svg
+.badgeImgWrap[data-tier="gold"] .scoreOverlay {
+  top: 50%;
 }
 
-.hexagonWrap {
-  flex-shrink: 0;
-  // design-specific: subtle bottom glow matching the Figma silver medal
-  filter: drop-shadow(0 8px 20px rgba(180, 190, 210, 0.55));
+// design-specific: bronze hexagon center at 45% height of bronzetier.svg
+.badgeImgWrap[data-tier="bronze"] .scoreOverlay {
+  top: 45%;
+}
+
+// design-specific: platinum circle center at cy=73.46 / 138px height = 53.2% of platinumtier.svg
+.badgeImgWrap[data-tier="platinum"] .scoreOverlay {
+  top: 53%;
+}
+
+// design-specific: platinum score number — brighter white-blue metallic vs silver
+.badgeImgWrap[data-tier="platinum"] .scoreNumber {
+  background: linear-gradient(to bottom, #a8b8d8 0%, #f0f4ff 30%, #ffffff 50%, #e0e8ff 70%, #b0c0e0 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.scoreNumber {
+  font-family: var(--font-satoshi);
+  font-size: 32px;
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+  // design-specific: metallic silver gradient matching the original Figma SVG fill
+  background: linear-gradient(to bottom, #7a96ac 0%, #eaeff3 30%, #ffffff 50%, #d4dee5 70%, #abbcc8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.scoreMax {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-regular);
+  color: rgba(255, 255, 255, 0.85);
 }
 
 // ── Tier badge ─────────────────────────────────────────────────────────────────
@@ -146,6 +314,15 @@
   flex-direction: column;
   gap: var(--space-5);
   position: relative;
+
+  @include tablet-down {
+    min-height: 0;
+    padding: var(--space-5);
+  }
+
+  @include mobile {
+    padding: var(--space-4);
+  }
 }
 
 .breakdownTitle {
@@ -163,12 +340,27 @@
   flex-direction: column;
   gap: var(--space-7);
   flex: 1;
+
+  @include tablet-down {
+    gap: var(--space-5);
+  }
+
+  @include mobile {
+    gap: 18px;
+  }
 }
 
 .barRow {
   display: flex;
   align-items: center;
   gap: var(--space-4);
+
+  @include mobile {
+    flex-wrap: wrap;
+    row-gap: var(--space-2);
+    column-gap: 0;
+    align-items: flex-start;
+  }
 }
 
 .barLabel {
@@ -178,10 +370,21 @@
   color: #909098;
   width: 130px;
   flex-shrink: 0;
+
+  @include mobile {
+    width: auto;
+    flex: 1;
+    font-size: 14px;
+  }
 }
 
 .barTrackWrap {
   flex: 1;
+
+  @include mobile {
+    flex: 0 0 100%;
+    order: 3;
+  }
 }
 
 .barTrack {
@@ -191,6 +394,11 @@
   background: rgba(0, 0, 0, 0.15);
   border-radius: 7.33px;
   overflow: hidden;
+
+  @include mobile {
+    height: 9px;
+    border-radius: 4.584px;
+  }
 }
 
 .barFill {
@@ -199,6 +407,10 @@
   // design-specific: inset white glow on each bar matching Figma
   box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.6);
   transition: width 0.6s ease;
+
+  @include mobile {
+    border-radius: 4.584px;
+  }
 }
 
 .barValue {
@@ -209,6 +421,12 @@
   width: 80px;
   text-align: right;
   flex-shrink: 0;
+
+  @include mobile {
+    width: auto;
+    font-size: 14px;
+    order: 2;
+  }
 }
 
 .breakdownFooter {
@@ -239,16 +457,34 @@
   background-color: #f5f5f5;
   @include stripe-bg;
   padding: var(--space-7);
+
+  @include tablet-down {
+    padding: var(--space-5);
+  }
+
+  @include mobile {
+    padding: var(--space-4);
+  }
 }
 
 .sectionTitle {
   font-family: var(--font-satoshi);
+  // design-specific: 25px Figma — scale down proportionally for tablet/mobile
   font-size: 25px;
   font-weight: var(--font-weight-medium);
   color: var(--color-black-primary);
   letter-spacing: 0.25px;
   text-transform: capitalize;
   margin: 0 0 var(--space-5);
+
+  @include tablet-down {
+    font-size: 20px;
+  }
+
+  @include mobile {
+    font-size: 16px;
+    margin-bottom: var(--space-4);
+  }
 }
 
 .historyCard {
@@ -262,6 +498,14 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
+
+  svg:focus,
+  svg:focus-visible,
+  :global(.recharts-wrapper):focus,
+  :global(.recharts-surface):focus,
+  :global(.recharts-wrapper) *:focus {
+    outline: none;
+  }
 }
 
 .chartSvg {
@@ -289,7 +533,7 @@
 .legendDot {
   width: 20px;
   height: 20px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-full);
   border: 4px solid var(--color-white-primary);
   flex-shrink: 0;
   // design-specific: shadow matching Figma legend selector
@@ -315,6 +559,14 @@
   background-color: #f5f5f5;
   @include stripe-bg;
   padding: var(--space-7);
+
+  @include tablet-down {
+    padding: var(--space-5);
+  }
+
+  @include mobile {
+    padding: var(--space-4);
+  }
 }
 
 .boostHeader {
@@ -366,6 +618,18 @@
   justify-content: space-between;
   padding: 0 var(--space-7);
   overflow: hidden;
+
+  @include tablet-down {
+    height: 92px;
+    padding: 0 var(--space-5);
+  }
+
+  @include mobile {
+    height: auto;
+    min-height: 80px;
+    padding: var(--space-4);
+    gap: var(--space-3);
+  }
 }
 
 .boostCardBorder {
@@ -388,6 +652,14 @@
   display: flex;
   flex-direction: column;
   gap: 3px;
+
+  @include tablet-down {
+    text-align: center;
+  }
+
+  @include mobile {
+    text-align: center;
+  }
 }
 
 .boostCardTitle {
@@ -396,6 +668,10 @@
   font-weight: var(--font-weight-bold);
   color: #1a1c26;
   margin: 0;
+
+  @include mobile {
+    font-size: var(--text-small-13);
+  }
 }
 
 .boostCardSubtitle {
@@ -404,12 +680,22 @@
   font-weight: var(--font-weight-regular);
   color: #8c91a6;
   margin: 0;
+
+  @include tablet-down {
+    text-align: center;
+  }
+
+  @include mobile {
+    font-size: var(--text-small-12);
+    text-align: center;
+  }
 }
 
 .boostCardProgress {
   display: flex;
   align-items: center;
   gap: var(--space-4);
+  margin-top: 8px;
 }
 
 // ── Mini progress bar ─────────────────────────────────────────────────────────
@@ -422,6 +708,10 @@
   border-radius: 3.6px;
   overflow: visible;
   flex-shrink: 0;
+
+  @include mobile {
+    width: 90px;
+  }
 }
 
 .miniBarFill {
@@ -449,6 +739,7 @@
 // ── CTA buttons ───────────────────────────────────────────────────────────────
 
 .boostBtn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
@@ -456,7 +747,11 @@
   padding: 0 var(--space-5);
   border: none;
   border-radius: 4.7px;
+  // outer border strip — same pattern as PrimaryButton primitive
+  background: var(--color-gray-300);
   cursor: pointer;
+  clip-path: #{$clip};
+  overflow: hidden;
   font-family: var(--font-satoshi);
   font-size: var(--text-small-12);
   font-weight: 900;
@@ -465,6 +760,17 @@
   color: var(--color-white-primary);
   flex-shrink: 0;
   transition: opacity 0.2s ease;
+
+  @include mobile {
+    height: 42px;
+    padding: 0 var(--space-4);
+    margin-left: var(--space-3);
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
 
   &:hover {
     opacity: 0.88;
@@ -475,24 +781,44 @@
   }
 }
 
-// design-specific: Figma button gradient variants
+// design-specific: Figma button gradient variants — fill lives in ::before, keeping original colors
 .boostBtn_blue {
-  background: linear-gradient(135deg, #3a4ff0 0%, #2639ed 50%, #1e2fd4 100%);
-  box-shadow:
-    inset 0 1px 1px rgba(255, 255, 255, 0.25),
-    0 2px 8px rgba(38, 57, 237, 0.35);
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 1.2px;
+    clip-path: #{$clip};
+    background: linear-gradient(135deg, #3a4ff0 0%, #2639ed 50%, #1e2fd4 100%);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25);
+    z-index: 0;
+    transition: all 0.2s ease;
+  }
 }
 
 .boostBtn_green {
-  background: linear-gradient(135deg, #1ae87a 0%, #00d97e 50%, #00c070 100%);
-  box-shadow:
-    inset 0 1px 1px rgba(255, 255, 255, 0.25),
-    0 2px 8px rgba(0, 217, 126, 0.35);
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 1.2px;
+    clip-path: #{$clip};
+    background-color: #59C926;
+    // background: linear-gradient(135deg, #1ae87a 0%, #00d97e 50%, #00c070 100%);
+    // box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25);
+    box-shadow: 0 0 23.1px 0 #FFF inset;
+    z-index: 0;
+    transition: all 0.2s ease;
+  }
 }
 
 .boostBtn_dark {
-  background: linear-gradient(135deg, #2a2a2a 0%, #111111 100%);
-  box-shadow:
-    inset 0 1px 1px rgba(255, 255, 255, 0.12),
-    0 2px 6px rgba(0, 0, 0, 0.3);
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 1.2px;
+    clip-path: #{$clip};
+    background: linear-gradient(135deg, #2a2a2a 0%, #111111 100%);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.12);
+    z-index: 0;
+    transition: all 0.2s ease;
+  }
 }

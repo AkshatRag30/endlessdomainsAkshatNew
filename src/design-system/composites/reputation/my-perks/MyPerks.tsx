@@ -113,51 +113,53 @@ const PerkCard = ({ perk }: { perk: Perk }) => {
   }, [perk.value])
 
   return (
-    <article className={styles.card} aria-label={perk.title}>
+    <div className={styles.cardOuter}>
+      <div className={styles.cardWrap}>
+        <article className={styles.card} aria-label={perk.title}>
 
-      {/* ── Header ─────────────────────────────────────────────────────── */}
-      <div className={styles.cardHeader}>
-        <div className={styles.headerLeft}>
-          <PerkIcon variant={perk.icon} />
-          <div className={styles.headerText}>
-            <p className={styles.perkTitle}>{perk.title}</p>
-            <p className={styles.perkMeta}>by {perk.partner} · {perk.date}</p>
+          {/* ── Header ───────────────────────────────────────────────── */}
+          <div className={styles.cardHeader}>
+            <div className={styles.headerLeft}>
+              <PerkIcon variant={perk.icon} />
+              <div className={styles.headerText}>
+                <p className={styles.perkTitle}>{perk.title}</p>
+                <p className={styles.perkMeta}>by {perk.partner} · {perk.date}</p>
+              </div>
+            </div>
+            <span className={styles.badge} aria-label={`Type: ${perk.badge}`}>
+              {perk.badge}
+            </span>
           </div>
-        </div>
-        <span className={styles.badge} aria-label={`Type: ${perk.badge}`}>
-          {perk.badge}
-        </span>
+
+          {/* ── Divider ──────────────────────────────────────────────── */}
+          <div className={styles.cardDivider} aria-hidden="true" />
+
+          {/* ── Content ──────────────────────────────────────────────── */}
+          <div className={styles.cardContent}>
+            <div className={styles.valueField}>
+              <span className={styles.valueText}>{perk.value}</span>
+              <button
+                type="button"
+                className={styles.copyBtn}
+                onClick={handleCopy}
+                aria-label={copied ? 'Copied' : `Copy ${perk.type === 'promo-code' ? 'code' : 'link'}`}
+              >
+                {copied
+                  ? <MdCheck className={styles.copyIcon} aria-hidden="true" />
+                  : <MdContentCopy className={styles.copyIcon} aria-hidden="true" />
+                }
+              </button>
+            </div>
+
+            <button type="button" className={styles.ctaBtn} aria-label={perk.cta}>
+              <span>{perk.cta}</span>
+              <ArrowRight />
+            </button>
+          </div>
+
+        </article>
       </div>
-
-      {/* ── Separator ──────────────────────────────────────────────────── */}
-      <div className={styles.sep} aria-hidden="true" />
-
-      {/* ── Content ────────────────────────────────────────────────────── */}
-      <div className={styles.cardContent}>
-        {/* Value field (code or link) */}
-        <div className={styles.valueField}>
-          <span className={styles.valueText}>{perk.value}</span>
-          <button
-            type="button"
-            className={styles.copyBtn}
-            onClick={handleCopy}
-            aria-label={copied ? 'Copied' : `Copy ${perk.type === 'promo-code' ? 'code' : 'link'}`}
-          >
-            {copied
-              ? <MdCheck className={styles.copyIcon} aria-hidden="true" />
-              : <MdContentCopy className={styles.copyIcon} aria-hidden="true" />
-            }
-          </button>
-        </div>
-
-        {/* CTA button */}
-        <button type="button" className={styles.ctaBtn} aria-label={perk.cta}>
-          <span>{perk.cta}</span>
-          <ArrowRight />
-        </button>
-      </div>
-
-    </article>
+    </div>
   )
 }
 

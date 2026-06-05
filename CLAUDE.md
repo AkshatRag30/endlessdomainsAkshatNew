@@ -452,3 +452,97 @@ Check every interactive element added or modified:
 | `<img>` / `<Image>` meaningful | Descriptive `alt` text |
 | Any hover animation (scramble, color change) | Mirror in `onFocus`/`onBlur` so keyboard users trigger it |
 | All interactive elements | `:focus-visible` style defined in SCSS — use `@include focus-ring` |
+
+---
+
+## 12. Next.js Tags, Images, SEO, and JSX Element Rules
+
+### 12.1 Always Use Next.js Built-in Tags
+
+**Rule**: Never use native HTML `<a>` or `<img>` tags in new or migrated code. Always use the Next.js equivalents.
+
+```tsx
+// BAD
+import { someImage } from '/public/images/some-image.png'
+<a href="/about">About</a>
+<img src="/images/logo.png" alt="Logo" />
+
+// GOOD
+import Link from 'next/link'
+import Image from 'next/image'
+import logoImage from '@/public/images/logo.png'   // or a relative path to public/
+
+<Link href="/about">About</Link>
+<Image src={logoImage} alt="Logo" width={120} height={40} />
+```
+
+Always import image files as ES module imports at the top of the file and pass the imported reference as the `src` prop. Never pass raw string paths like `src="/images/logo.png"` — imported references let Next.js compute width/height automatically and enable static optimization.
+
+---
+
+### 12.2 SEO-Friendly Semantic HTML
+
+**Rule**: Use the correct semantic element for the content. Do not reach for `<div>` or `<span>` when a more meaningful element exists.
+
+| Content type | Correct element |
+|---|---|
+| Page title | `<h1>` — one per page |
+| Section headings | `<h2>`, `<h3>`, `<h4>` in strict hierarchy |
+| Standalone paragraph of text | `<p>` |
+| Navigation links | `<nav>` wrapping `<ul>` + `<li>` + `<Link>` |
+| Article / blog post body | `<article>` |
+| Complementary sidebar content | `<aside>` |
+| Page-level grouping with a heading | `<section>` |
+| Footer content | `<footer>` |
+| Header / site banner | `<header>` |
+| Emphasized text (meaning) | `<strong>` or `<em>` |
+| Generic block container | `<div>` — only when no semantic element fits |
+| Generic inline container | `<span>` — only when no semantic element fits AND the content is truly inline |
+
+Heading hierarchy must never skip levels (e.g., do not jump from `<h2>` to `<h4>`). Every page must have exactly one `<h1>`.
+
+---
+
+### 12.3 Use `<span>` Only When Necessary
+
+**Rule**: `<span>` is for inline styling or inline grouping of text only. Do not use it as a substitute for block-level layout, and do not use it when a semantic inline element (`<strong>`, `<em>`, `<time>`, `<abbr>`, `<code>`) would be more appropriate.
+
+```tsx
+// BAD — span used for layout (should be a div or section)
+<span className={styles.card}>...</span>
+
+// BAD — span when semantic element exists
+<span className={styles.bold}>Important</span>
+
+// GOOD — span for inline text decoration only
+<p>Price: <span className={styles.price_highlight}>$9.99</span></p>
+
+// GOOD — semantic inline element
+<p><strong>Important</strong> notice</p>
+```
+
+---
+
+### 12.4 No React Fragment Tags When Mapping — Use `<div>` Instead
+
+**Rule**: When rendering a list with `.map()`, do not use `<React.Fragment key={...}>` or `<>...</>` as the wrapper. Wrap each item in a `<div>` (or the semantically appropriate block element) with a `key` prop instead.
+
+```tsx
+// BAD — fragment wrapper in a map
+items.map(item => (
+  <React.Fragment key={item.id}>
+    <dt>{item.label}</dt>
+    <dd>{item.value}</dd>
+  </React.Fragment>
+))
+
+// GOOD — div wrapper in a map
+items.map(item => (
+  <div key={item.id} className={styles.item}>
+    <dt>{item.label}</dt>
+    <dd>{item.value}</dd>
+  </div>
+))
+```
+
+The only exception is a definition list (`<dl>`) where `<dt>` and `<dd>` must be direct children — in that specific case a fragment is structurally required. Document it with a comment when you use it.

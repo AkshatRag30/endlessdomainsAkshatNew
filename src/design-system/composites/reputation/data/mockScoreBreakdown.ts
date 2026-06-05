@@ -8,8 +8,8 @@ import type { ReputationScore, ScoreHistoryResponse } from './types'
 
 export const MOCK_REPUTATION_SCORE: ReputationScore = {
   primaryDomainName: 'myname.og',
-  totalScore: 312,
-  tier: 'SILVER',
+  totalScore: 812,
+  tier: 'PLATINUM',
   breakdown: {
     evmActivityScore:  120,   // max 250
     gmStreakScore:     80,    // max 200
