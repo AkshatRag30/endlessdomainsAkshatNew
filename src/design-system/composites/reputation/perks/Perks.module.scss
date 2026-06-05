@@ -6,6 +6,198 @@ $clip-btn: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7
 // design-specific: diagonal corner cuts for the card wrapper (same as DomainCard)
 $clip-card: polygon(20px 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%, 0 20px);
 
+// ── Perks nav bar ──────────────────────────────────────────────────────────────
+
+// design-specific: same asymmetric octagon as PrimaryButton primitive — large diagonal cut at top-right only
+$clip-btn-nav: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px), calc(100% - 7.5px) 100%, 5px 100%, 0px calc(100% - 7px), 0px 9px);
+
+.perksNav {
+  width: 100%;
+  background-color: var(--color-white-primary);
+  border-bottom: 1px solid var(--color-gray-200);
+  flex-shrink: 0;
+}
+
+.perksNavInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100px;
+  padding: 0 var(--space-8);
+  max-width: 1512px;
+  margin: 0 auto;
+  gap: var(--space-6);
+
+  @include tablet-down {
+    height: 72px;
+    padding: 0 var(--space-5);
+    gap: var(--space-4);
+  }
+
+  @include mobile {
+    height: 60px;
+    padding: 0 var(--space-3);
+    gap: var(--space-3);
+  }
+}
+
+.perksNavLogo {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  text-decoration: none;
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.perksNavLinks {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+  justify-content: center;
+
+  @include tablet-down {
+    display: none;
+  }
+}
+
+.perksNavLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  text-decoration: none;
+  color: var(--color-gray-dark);
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: var(--color-black-primary);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.perksNavBracket {
+  font-family: var(--font-ibm-plex-mono);
+  font-size: 17px;
+  letter-spacing: 2.5px;
+  color: var(--color-gray-300);
+  line-height: 1;
+}
+
+.perksNavLinkText {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+}
+
+// ── Right actions ─────────────────────────────────────────────────────────────
+
+.perksNavActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+// design-specific: Gold counter — same octagon shape + ::before inset stroke as PrimaryButton,
+// warm orange/gold gradient instead of blue.
+.perksNavGold {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--button-height);
+  padding: 0 var(--space-6);
+  border: none;
+  cursor: default;
+  clip-path: #{$clip-btn-nav};
+  // design-specific: Figma gold stroke outer shell — amber tone matching the fill
+  // background: #c97f10;
+  background-image: linear-gradient(102deg, rgba(255, 250, 144, 0.39) -18.6%, rgba(254, 241, 131, 0.39) 10.22%, rgba(253, 224, 106, 0.39) 50.8%, rgba(250, 219, 100, 0.39) 62.31%, rgba(241, 204, 83, 0.39) 77.91%, rgba(227, 180, 54, 0.39) 95.84%, rgba(201, 137, 4, 0.39) 120.2%);
+  overflow: hidden;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-button);
+  font-weight: var(--font-weight-medium);
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 1.2px;
+    clip-path: #{$clip-btn-nav};
+    // design-specific: Figma warm gold gradient fill matching the navbar Gold counter
+    background: linear-gradient(181deg, #f5c84a 0%, #e07a10 100%);
+    box-shadow: inset 0 0 20px 0 var(--color-white-alpha-40);
+    z-index: 0;
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  img {
+    mix-blend-mode: multiply;
+  }
+
+  @include mobile {
+    height: var(--button-height-sm);
+    padding: 0 var(--space-4);
+  }
+}
+
+.perksNavGoldNum {
+  // design-specific: Figma orange-to-light gradient text on Gold counter
+  background: linear-gradient(180deg, #fff7e0 0%, #ffd080 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-button);
+  font-weight: var(--font-weight-medium);
+  line-height: 1;
+}
+
+.perksNavGoldLabel {
+  @extend .perksNavGoldNum;
+  text-transform: capitalize;
+}
+
+.perksNavCart {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 50px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-black-primary);
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: var(--color-blue-primary);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.perksNavCartIcon {
+  width: 22px;
+  height: 22px;
+}
+
 // ── Page root ──────────────────────────────────────────────────────────────────
 
 .root {
@@ -342,6 +534,10 @@ $clip-card: polygon(20px 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%, 0
   display: flex;
   align-items: center;
   justify-content: center;
+  // design-specific: same polygon as scoreCard .medalBg (tier modal decoration) — 0 34% → 0 0 because
+  // medalBg sits at top:-50px so needs 34% offset; the card header starts at 0 so no offset needed.
+  // Bottom notch coordinates (74%/69%/32%/27% x, 72%/71% y) are taken directly from medalBg polygon.
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 74% 100%, 69% 72%, 32% 71%, 27% 100%, 0 100%);
 
   @include tablet-down {
     height: 110px;
@@ -377,18 +573,6 @@ $clip-card: polygon(20px 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%, 0
 // design-specific: locked/neutral card header — light gray (logo is hidden behind lock)
 .header_locked {
   background: linear-gradient(180deg, #e8eef2 0%, #f5f7f9 100%);
-}
-
-// ── Inner decorative frame SVG ─────────────────────────────────────────────────
-
-.frameSvg {
-  position: absolute;
-  // design-specific: Figma inner frame inset 5px from card edges
-  inset: 4px 5px 0 5px;
-  width: calc(100% - 10px);
-  height: calc(100% - 4px);
-  pointer-events: none;
-  overflow: visible;
 }
 
 // ── Partner logo ───────────────────────────────────────────────────────────────
@@ -466,60 +650,6 @@ $clip-card: polygon(20px 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%, 0
   gap: var(--space-2);
 }
 
-// ── Tier pill badge ────────────────────────────────────────────────────────────
-
-.tierBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  height: 25px;
-  padding: 0 var(--space-3);
-  // design-specific: 0.5px border with white half-opacity (Figma _badge-and-tag)
-  border: 0.5px solid rgba(255, 255, 255, 0.5);
-  font-family: var(--font-space-grotesk);
-  font-size: var(--text-small-12);
-  font-weight: var(--font-weight-medium);
-  white-space: nowrap;
-  // design-specific: Figma inset white glow on tier badge
-  box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.7);
-}
-
-// design-specific: Figma bronze tier badge — #ffb779 warm orange with amber shadow
-.tier_bronze {
-  background: #ffb779;
-  box-shadow: 0px 6px 3px 0px rgba(255, 192, 125, 0.4), 0px 2px 0px 0px #dcc9a4, inset 0 0 10px rgba(255, 255, 255, 0.7);
-  color: var(--color-white-primary);
-}
-
-// design-specific: Figma silver tier badge — metallic silver gradient
-.tier_silver {
-  background: linear-gradient(160deg, #7a96ac 2.28%, #eaeff3 19.8%, #c2d4e1 32.9%, #fff 50.17%, #d4dee5 62.15%, #abbdc8 78.69%, #bccad7 95.24%);
-  box-shadow: 0px 6px 3px 0px rgba(227, 201, 228, 0.4), 0px 2px 0px 0px #e3c9e4, inset 0 0 10px rgba(227, 201, 228, 0.7);
-  color: var(--color-black-primary);
-}
-
-// design-specific: gold tier badge — warm gold tones
-.tier_gold {
-  background: linear-gradient(160deg, #c8a850, #f5d880, #ffe8a0, #f5d060);
-  box-shadow: 0px 6px 3px 0px rgba(200, 168, 80, 0.4), 0px 2px 0px 0px #c8a850, inset 0 0 10px rgba(255, 255, 255, 0.5);
-  color: var(--color-black-primary);
-}
-
-// design-specific: platinum tier badge — icy/cool tones
-.tier_platinum {
-  background: linear-gradient(160deg, #8ba0b0, #c8d8e5, #e8f0f5, #c8d8e5);
-  box-shadow: 0px 6px 3px 0px rgba(139, 160, 176, 0.4), 0px 2px 0px 0px #8ba0b0, inset 0 0 10px rgba(255, 255, 255, 0.7);
-  color: var(--color-black-primary);
-}
-
-.tierDot {
-  display: block;
-  width: 6px;
-  height: 6px;
-  border-radius: var(--radius-full);
-  flex-shrink: 0;
-  background: currentColor;
-}
 
 // ── Type badge (NFT, Whitelist, etc.) ─────────────────────────────────────────
 
@@ -777,30 +907,6 @@ $clip-card: polygon(20px 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%, 0
   }
 }
 
-// design-specific: Figma silver tier pill — 31px tall, 17px Space Grotesk, same gradient as .tier_silver card badge
-.tierCurrentBadge {
-  display: inline-flex;
-  align-items: center;
-  height: 31px;
-  padding: 0 var(--space-4);
-  background: linear-gradient(160deg, #7a96ac 2.28%, #eaeff3 19.8%, #c2d4e1 32.9%, #fff 50.17%, #d4dee5 62.15%, #abbdc8 78.69%, #bccad7 95.24%);
-  border: 0.5px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0px 6px 3px 0px rgba(227, 201, 228, 0.4), 0px 2px 0px 0px #e3c9e4, inset 0 0 10px rgba(227, 201, 228, 0.7);
-  font-family: var(--font-space-grotesk);
-  // design-specific: Figma 17px tier label — larger than card badge 12px
-  font-size: 17px;
-  font-weight: var(--font-weight-medium);
-  color: #1e1e1e;
-  text-transform: capitalize;
-  white-space: nowrap;
-  flex-shrink: 0;
-
-  @include mobile {
-    height: 26px;
-    padding: 0 var(--space-3);
-    font-size: var(--text-nav);
-  }
-}
 
 .tierPoints {
   display: flex;
@@ -888,30 +994,3 @@ $clip-card: polygon(20px 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%, 0
   pointer-events: none;
 }
 
-// ── Next tier badge (right side) ────────────────────────────────────────────────
-
-// design-specific: Figma gold gradient pill — same gold as card header, 17px Space Grotesk
-.tierNextBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  height: 31px;
-  padding: 0 var(--space-4);
-  flex-shrink: 0;
-  background: linear-gradient(170.93deg, #8c421d 39.37%, #fbe67b 9.38%, #fcfbe7 40.88%, #f7d14e 76.02%, #d4a041 110.5%);
-  border: 0.5px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0px 6px 3px 0px rgba(255, 192, 125, 0.4), 0px 2px 0px 0px #dcc9a4, inset 0 0 10px rgba(255, 255, 255, 0.7);
-  font-family: var(--font-space-grotesk);
-  font-size: 17px;
-  font-weight: var(--font-weight-medium);
-  color: var(--color-black-primary);
-  text-transform: capitalize;
-  white-space: nowrap;
-
-  @include mobile {
-    height: 26px;
-    padding: 0 var(--space-3);
-    font-size: var(--text-nav);
-    gap: var(--space-1);
-  }
-}

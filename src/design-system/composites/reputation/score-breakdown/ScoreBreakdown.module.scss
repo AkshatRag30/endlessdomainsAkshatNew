@@ -94,14 +94,6 @@ $clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px),
   filter: drop-shadow(0 0 2.5px rgba(210, 100, 30, 0.7));
 }
 
-.medalWrap[data-tier="bronze"] .tierBadge {
-  background: #ffb779;
-  box-shadow:
-    0 4.36px 2.18px rgba(255, 192, 125, 0.4),
-    0 1.45px 0 #dcc9a4,
-    inset 0 0 7.26px rgba(255, 255, 255, 0.7);
-}
-
 .medalWrap[data-tier="bronze"] .tierProgressFill {
   background: linear-gradient(177deg, #ffb779 0%, #ffcf9e 30%, #ffffff 50%, #ffc07d 70%, #e8935a 100%);
 }
@@ -119,8 +111,6 @@ $clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px),
   filter: drop-shadow(0 0 2.5px rgba(130, 160, 200, 0.8));
 }
 
-// Silver tierBadge and tierProgressFill use the default silver styles below.
-
 // ── Gold ──────────────────────────────────────────────────────────────────────
 
 .scoreCard[data-tier="gold"] .medalBg {
@@ -133,15 +123,6 @@ $clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px),
 .scoreCard[data-tier="gold"] .medalBgBottom {
   background: linear-gradient(0deg, rgba(230, 195, 80, 0.55) 0%, rgba(230, 195, 80, 0.25) 60%, rgba(230, 195, 80, 0) 100%);
   filter: drop-shadow(0 0 2.5px rgba(190, 140, 20, 0.8));
-}
-
-.medalWrap[data-tier="gold"] .tierBadge {
-  // design-specific: Figma Gold badge — metallic gold gradient
-  background: linear-gradient(157deg, #b58a30 2%, #f5d080 20%, #d4a832 33%, #fff5d0 50%, #d4a832 62%, #b58a30 79%, #c9a140 95%);
-  box-shadow:
-    0 6px 3px rgba(200, 160, 50, 0.4),
-    0 2px 0 #c9a140,
-    inset 0 0 10px rgba(255, 240, 180, 0.7);
 }
 
 .medalWrap[data-tier="gold"] .tierProgressFill {
@@ -160,16 +141,6 @@ $clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px),
 .scoreCard[data-tier="platinum"] .medalBgBottom {
   background: linear-gradient(0deg, rgba(200, 215, 255, 0.65) 0%, rgba(200, 215, 255, 0.3) 60%, rgba(200, 215, 255, 0) 100%);
   filter: drop-shadow(0 0 2.5px rgba(150, 170, 240, 0.85));
-}
-
-.medalWrap[data-tier="platinum"] .tierBadge {
-  // design-specific: platinum badge — luminous white-lavender metallic matching the image
-  background: linear-gradient(157deg, #b0b8d8 2%, #f2f4ff 20%, #dce0f8 33%, #ffffff 50%, #eaecff 62%, #c2caec 79%, #d2daee 95%);
-  border: 0.5px solid rgba(255, 255, 255, 0.6);
-  box-shadow:
-    0 6px 3px rgba(180, 190, 255, 0.35),
-    0 2px 0 #c2caec,
-    inset 0 0 10px rgba(210, 218, 255, 0.7);
 }
 
 .medalWrap[data-tier="platinum"] .tierProgressFill {
@@ -240,32 +211,6 @@ $clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px),
   font-size: var(--text-small-12);
   font-weight: var(--font-weight-regular);
   color: rgba(255, 255, 255, 0.85);
-}
-
-// ── Tier badge ─────────────────────────────────────────────────────────────────
-
-.tierBadge {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 31px;
-  padding: 0 var(--space-5);
-  // design-specific: Figma silver gradient badge
-  background: linear-gradient(157deg, #7a96ac 2%, #eaeff3 20%, #c2d4e1 33%, #ffffff 50%, #d4dee5 62%, #abbcc8 79%, #bccad7 95%);
-  border: 0.5px solid rgba(255, 255, 255, 0.5);
-  box-shadow:
-    0 6px 3px rgba(227, 201, 228, 0.4),
-    0 2px 0 #e3c9e4,
-    inset 0 0 10px rgba(227, 201, 228, 0.7);
-}
-
-.tierText {
-  font-family: var(--font-space-grotesk);
-  font-size: var(--text-body-small);
-  font-weight: var(--font-weight-medium);
-  color: #1e1e1e;
-  text-transform: capitalize;
-  letter-spacing: 0.02em;
 }
 
 // ── Progress to next tier ─────────────────────────────────────────────────────

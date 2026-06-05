@@ -1,6 +1,7 @@
 import NextImage from 'next/image'
 import dynamic from 'next/dynamic'
 import { BsExclamationCircle } from 'react-icons/bs'
+import { TierBadge, type TierBadgeTier } from '@/design-system/composites/reputation/TierBadge'
 import { MOCK_REPUTATION_SCORE } from '../data/mockScoreBreakdown'
 import styles from './ScoreBreakdown.module.scss'
 
@@ -108,9 +109,7 @@ const ScoreMedal = () => {
         </div>
 
         {/* Tier label badge */}
-        <div className={styles.tierBadge} aria-label={`Current tier: ${TIER}`}>
-          <span className={styles.tierText}>{TIER}</span>
-        </div>
+        <TierBadge tier={TIER.toLowerCase() as TierBadgeTier} aria-label={`Current tier: ${TIER}`} />
       </div>
 
       {/* Progress to next tier */}

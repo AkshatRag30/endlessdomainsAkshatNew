@@ -1,9 +1,14 @@
 import { useCallback, useState } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { MdLockOutline } from 'react-icons/md'
+import { HiOutlineShoppingCart } from 'react-icons/hi'
+import { PrimaryButton } from '@/design-system/primitives/button/PrimaryButton'
+import { TierBadge } from '@/design-system/composites/reputation/TierBadge'
 import endlessLogo from '../../../../../public/user-profile/endlessnewlogo.svg'
 import silverTierIcon from '../../../../../public/reputation/silvertier.svg'
 import goldTierIcon from '../../../../../public/reputation/goldtier.svg'
+import fireGif from '../../../../../public/reputation/fire.gif'
 import styles from './Perks.module.scss'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -104,30 +109,143 @@ const MOCK_PERKS: PerkItem[] = [
     claimedCount: 14,
     totalCount: 50,
   },
+  {
+    id: '7',
+    status: 'claimable',
+    tier: 'gold',
+    type: 'Discount',
+    title: 'Lorem Ipsum',
+    description: 'here are many variations of passages of Lorem Ipsum available, but the majority here are many variations of passages of Lorem Ipsum available, but the majority here are many variations of',
+    partnerName: 'Endless Domains',
+    partnerLogo: endlessLogo as unknown as string,
+    claimedCount: 7,
+    totalCount: 30,
+  },
+  {
+    id: '8',
+    status: 'available',
+    tier: 'gold',
+    type: 'Whitelist',
+    title: 'Lorem Ipsum',
+    description: 'here are many variations of passages of Lorem Ipsum available, but the majority here are many variations of passages of Lorem Ipsum available, but the majority',
+    partnerName: 'Endless Domains',
+    partnerLogo: endlessLogo as unknown as string,
+    claimedCount: 3,
+    totalCount: 20,
+  },
+  {
+    id: '9',
+    status: 'locked',
+    tier: 'gold',
+    type: 'NFT',
+    title: 'Lorem Ipsum',
+    description: 'here are many variations of passages of Lorem Ipsum available, but the majority here are many variations of passages of Lorem Ipsum available, but the majority',
+    partnerName: 'Endless Domains',
+    partnerLogo: endlessLogo as unknown as string,
+    claimedCount: 0,
+    totalCount: 25,
+    pointsRequired: 750,
+    currentPoints: 312,
+  },
+  {
+    id: '10',
+    status: 'claimable',
+    tier: 'platinum',
+    type: 'Access',
+    title: 'Lorem Ipsum',
+    description: 'here are many variations of passages of Lorem Ipsum available, but the majority here are many variations of passages of Lorem Ipsum available, but the majority here are many variations of',
+    partnerName: 'Endless Domains',
+    partnerLogo: endlessLogo as unknown as string,
+    claimedCount: 2,
+    totalCount: 10,
+  },
+  {
+    id: '11',
+    status: 'locked',
+    tier: 'platinum',
+    type: 'NFT',
+    title: 'Lorem Ipsum',
+    description: 'here are many variations of passages of Lorem Ipsum available, but the majority here are many variations of passages of Lorem Ipsum available, but the majority',
+    partnerName: 'Endless Domains',
+    partnerLogo: endlessLogo as unknown as string,
+    claimedCount: 0,
+    totalCount: 5,
+    pointsRequired: 1000,
+    currentPoints: 312,
+  },
 ]
 
 const FILTER_TIERS: FilterTier[] = ['all', 'bronze', 'silver', 'gold', 'platinum']
 
-// ── Inner decorative frame (notch SVG border) ──────────────────────────────────
-// design-specific: Figma Content Container with boolean-op notch at top-center.
-// viewBox 0 0 429 128 matches inner frame proportions (449px card - 10px inset, ~128px tall).
-// vectorEffect non-scaling-stroke keeps 1px line regardless of scale.
+// ── Nav bar ────────────────────────────────────────────────────────────────────
 
-const CardFrame = ({ muted }: { muted: boolean }) => (
-  <svg
-    className={styles.frameSvg}
-    viewBox="0 0 429 128"
-    preserveAspectRatio="none"
-    aria-hidden="true"
-  >
-    <path
-      d="M 272.5 0 L 429 0 L 429 128 L 0 128 L 0 0 L 156.5 0 L 167 22 L 262 22 L 272.5 0 Z"
-      fill="none"
-      stroke={muted ? 'rgba(0,0,0,0.07)' : 'rgba(38,57,237,0.18)'}
-      strokeWidth="1"
-      vectorEffect="non-scaling-stroke"
-    />
+const NAV_LINKS = [
+  { label: 'Marketplace', href: '/' },
+  { label: 'Blogs', href: '/blogs' },
+  { label: 'Perks Catalog', href: '#' },
+  { label: 'Parked Domains', href: '/parked-domains' },
+]
+
+const ArrowUpRight = () => (
+  <svg width="8" height="8" viewBox="0 0 8 8" fill="none" aria-hidden="true">
+    <path d="M1.5 6.5L6.5 1.5M6.5 1.5H2.5M6.5 1.5V5.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
+)
+
+const HamburgerIcon = () => (
+  <svg width="20" height="16" viewBox="0 0 20 16" fill="none" aria-hidden="true">
+    <rect y="0" width="20" height="2" rx="1" fill="white" />
+    <rect y="7" width="20" height="2" rx="1" fill="white" />
+    <rect y="14" width="20" height="2" rx="1" fill="white" />
+  </svg>
+)
+
+const PerksNavBar = () => (
+  <nav className={styles.perksNav} aria-label="Perks page navigation">
+    <div className={styles.perksNavInner}>
+
+      {/* Logo */}
+      <Link href="/" className={styles.perksNavLogo} aria-label="Endless Domains home">
+        <Image src={endlessLogo} alt="Endless Domains" width={112} height={40} />
+      </Link>
+
+      {/* Nav links */}
+      <ul className={styles.perksNavLinks} role="list">
+        {NAV_LINKS.map(link => (
+          <li key={link.label}>
+            <Link href={link.href} className={styles.perksNavLink}>
+              <span className={styles.perksNavBracket} aria-hidden="true">[</span>
+              <span className={styles.perksNavLinkText}>{link.label}</span>
+              <ArrowUpRight />
+              <span className={styles.perksNavBracket} aria-hidden="true">]</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+
+      {/* Right actions */}
+      <div className={styles.perksNavActions}>
+
+        {/* Gold counter */}
+        <div className={styles.perksNavGold} aria-label="12 Gold">
+          <Image src={fireGif} alt="" width={24} height={24} aria-hidden="true" unoptimized />
+          <span className={styles.perksNavGoldNum}>12</span>
+          <span className={styles.perksNavGoldLabel}>Gold</span>
+        </div>
+
+        {/* Menu button */}
+        <PrimaryButton variant="dark" icon={<HamburgerIcon />} iconPosition="right" aria-label="Open menu">
+          Menu
+        </PrimaryButton>
+
+        {/* Cart */}
+        <button type="button" className={styles.perksNavCart} aria-label="Open cart">
+          <HiOutlineShoppingCart className={styles.perksNavCartIcon} />
+        </button>
+
+      </div>
+    </div>
+  </nav>
 )
 
 // ── Progress segments (locked state) ───────────────────────────────────────────
@@ -166,7 +284,7 @@ const TierProgressHeader = () => (
         height={43}
         className={styles.tierIcon}
       />
-      <div className={styles.tierCurrentBadge}>Silver</div>
+      <TierBadge tier="silver" />
       <div className={styles.tierPoints}>
         <span className={styles.tierPointsValue}>12</span>
         <span className={styles.tierPointsLabel}>/pts</span>
@@ -187,7 +305,7 @@ const TierProgressHeader = () => (
     </div>
 
     {/* Right: gold tier badge with icon + "188 to gold" */}
-    <div className={styles.tierNextBadge}>
+    <TierBadge tier="gold">
       <Image
         src={goldTierIcon}
         alt=""
@@ -196,7 +314,7 @@ const TierProgressHeader = () => (
         aria-hidden="true"
       />
       <span>188 to gold</span>
-    </div>
+    </TierBadge>
 
   </header>
 )
@@ -208,7 +326,6 @@ const PerkCard = ({ perk }: { perk: PerkItem }) => {
 
   const isBlurred = status === 'sold-out' || status === 'expired'
   const isLocked = status === 'locked'
-  const isMuted = isBlurred || isLocked
   const headerClass = isLocked ? styles.header_locked : styles[`header_${tier}`]
 
   const pointsNeeded = (pointsRequired ?? 0) - (currentPoints ?? 0)
@@ -234,8 +351,6 @@ const PerkCard = ({ perk }: { perk: PerkItem }) => {
 
           {/* ── Image / logo header ─────────────────────────────────────── */}
           <div className={`${styles.cardHeader} ${headerClass}`}>
-            <CardFrame muted={isMuted} />
-
             <Image
               src={partnerLogo}
               alt={partnerName}
@@ -254,10 +369,7 @@ const PerkCard = ({ perk }: { perk: PerkItem }) => {
           {/* ── Tier / type / claimed row ───────────────────────────────── */}
           <div className={styles.badgeRow}>
             <div className={styles.tierBadgesGroup}>
-              <div className={`${styles.tierBadge} ${styles[`tier_${tier}`]}`} aria-label={`${tier} tier`}>
-                <span className={styles.tierDot} aria-hidden="true" />
-                {tier.charAt(0).toUpperCase() + tier.slice(1)}
-              </div>
+              <TierBadge tier={tier} size="sm" showDot />
               <div className={styles.typeBadge}>
                 <span className={styles.typeDot} aria-hidden="true" />
                 {type}
@@ -316,6 +428,9 @@ export default function Perks() {
 
   return (
     <section className={styles.root} aria-label="Perks Catalog">
+
+      {/* ── Page navigation ──────────────────────────────────────────────── */}
+      <PerksNavBar />
 
       {/* ── Tier progress header ─────────────────────────────────────────── */}
       <TierProgressHeader />

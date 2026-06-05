@@ -1,0 +1,94 @@
+@import '_mixins.scss';
+
+// ── Base badge shell ────────────────────────────────────────────────────────────
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border: 0.5px solid rgba(255, 255, 255, 0.5);
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+  text-transform: capitalize;
+  flex-shrink: 0;
+}
+
+// ── Size variants ───────────────────────────────────────────────────────────────
+
+// sm: perk card row badge — 25px height, 12px font, tight padding
+.sm {
+  height: 25px;
+  padding: 0 var(--space-3);
+  font-size: var(--text-small-12);
+  gap: var(--space-1);
+}
+
+// md: header / score card badge — 31px height, 17px font
+.md {
+  height: 31px;
+  padding: 0 var(--space-4);
+  // design-specific: Figma tier header badge 17px Space Grotesk
+  font-size: 17px;
+  gap: var(--space-2);
+
+  @include mobile {
+    height: 26px;
+    padding: 0 var(--space-3);
+    font-size: var(--text-nav);
+    gap: var(--space-1);
+  }
+}
+
+// ── Status dot (shown in sm badges with showDot=true) ───────────────────────────
+
+.dot {
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+  background: currentColor;
+}
+
+// ── Tier color variants ─────────────────────────────────────────────────────────
+
+// design-specific: bronze — warm orange solid, amber bottom shadow
+.bronze {
+  background: #ffb779;
+  box-shadow:
+    0px 6px 3px 0px rgba(255, 192, 125, 0.4),
+    0px 2px 0px 0px #dcc9a4,
+    inset 0 0 10px rgba(255, 255, 255, 0.7);
+  color: var(--color-white-primary);
+}
+
+// design-specific: silver — multi-stop cool metallic gradient, pink-tinted shadow
+.silver {
+  background: linear-gradient(160deg, #7a96ac 2.28%, #eaeff3 19.8%, #c2d4e1 32.9%, #fff 50.17%, #d4dee5 62.15%, #abbdc8 78.69%, #bccad7 95.24%);
+  box-shadow:
+    0px 6px 3px 0px rgba(227, 201, 228, 0.4),
+    0px 2px 0px 0px #e3c9e4,
+    inset 0 0 10px rgba(227, 201, 228, 0.7);
+  color: #1e1e1e;
+}
+
+// design-specific: gold — rich multi-stop metallic gold gradient
+.gold {
+  background: linear-gradient(157deg, #b58a30 2%, #f5d080 20%, #d4a832 33%, #fff5d0 50%, #d4a832 62%, #b58a30 79%, #c9a140 95%);
+  box-shadow:
+    0px 6px 3px 0px rgba(200, 160, 50, 0.4),
+    0px 2px 0px 0px rgba(180, 140, 30, 0.8),
+    inset 0 0 10px rgba(255, 255, 255, 0.5);
+  color: #1e1e1e;
+}
+
+// design-specific: platinum — cool blue-white multi-stop metallic gradient
+.platinum {
+  background: linear-gradient(157deg, #b0b8d8 2%, #f2f4ff 20%, #dce0f8 33%, #ffffff 50%, #eaecff 62%, #c2caec 79%, #d2daee 95%);
+  border: 0.5px solid rgba(255, 255, 255, 0.6);
+  box-shadow:
+    0px 6px 3px 0px rgba(140, 150, 200, 0.4),
+    0px 2px 0px 0px rgba(100, 110, 180, 0.6),
+    inset 0 0 10px rgba(255, 255, 255, 0.7);
+  color: #1e1e1e;
+}
