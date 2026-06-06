@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import { FiCheck } from 'react-icons/fi'
+import { TbCircleDot } from 'react-icons/tb'
 import fireGif from '../../../../../public/reputation/fire.gif'
 import styles from './GoldButton.module.scss'
 
@@ -18,15 +19,6 @@ export interface GoldButtonProps {
   className?: string
   'aria-label'?: string
 }
-
-// ── Sub-icons ─────────────────────────────────────────────────────────────────
-
-const EnableRepIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-    <circle cx="10" cy="10" r="8" stroke="currentColor" strokeWidth="2" />
-    <circle cx="10" cy="10" r="3.5" fill="currentColor" />
-  </svg>
-)
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
@@ -73,7 +65,7 @@ export function GoldButton({
       {/* Concentric ring icon — enable-rep only */}
       {variant === 'enable-rep' && (
         <span className={styles.enableIcon}>
-          <EnableRepIcon />
+          <TbCircleDot size={20} aria-hidden="true" />
         </span>
       )}
 

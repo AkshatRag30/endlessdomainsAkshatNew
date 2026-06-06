@@ -25,7 +25,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border-radius: var(--radius-sm);
+  border-radius: 0;
 }
 
 // ── Header ────────────────────────────────────────────────────────────────────
@@ -86,6 +86,7 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   border-left: 1px solid var(--color-gray-200);
+  border-top: 1px solid var(--color-gray-200);
   overflow-y: auto;
   flex: 1;
   scrollbar-width: thin;
@@ -104,6 +105,7 @@
 // ── Chain card ────────────────────────────────────────────────────────────────
 
 .chainCard {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -118,12 +120,11 @@
   text-align: center;
   transition: background 0.15s ease;
   min-height: 160px;
-  // Explicit color on the button element — browser defaults for <button> color vary
   color: var(--color-black-primary);
 
   &:hover:not(.chainCardSelected) {
-    // design-specific: hover tint — blue at 3% opacity
-    background: rgba(38, 57, 237, 0.03);
+    // design-specific: hover tint — blue at 4% opacity
+    background: rgba(38, 57, 237, 0.04);
   }
 
   &:focus-visible {
@@ -132,13 +133,18 @@
   }
 }
 
-// design-specific: selected state — light blue tint + blue inset outline
+// design-specific: selected state — light lavender fill + rounded inset border via ::after
 .chainCardSelected {
-  background: rgba(38, 57, 237, 0.06);
-  outline: 2px solid var(--color-blue-primary);
-  outline-offset: -2px;
-  position: relative;
-  z-index: 1;
+  background: rgba(100, 115, 237, 0.08);
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 4px; // design-specific: 4px inset from card edges — Figma spec
+    border: 2px solid rgba(60, 85, 220, 0.45);
+    border-radius: 0;
+    pointer-events: none;
+  }
 }
 
 // ── Chain icon circle ─────────────────────────────────────────────────────────

@@ -30,8 +30,8 @@ $clip-btn-nav: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100%
 
   @include mobile {
     height: 60px;
-    padding: 0 var(--space-3);
-    gap: var(--space-3);
+    padding: 0 var(--space-4);
+    gap: var(--space-2);
   }
 }
 
@@ -48,7 +48,26 @@ $clip-btn-nav: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100%
   }
 }
 
-// ── Nav links ──────────────────────────────────────────────────────────────────
+// Responsive wrapper lets CSS control the logo dimensions at each breakpoint
+// Next.js Image with fill prop sizes itself to the wrapper — no !important needed
+.perksNavLogoWrap {
+  position: relative;
+  width: 112px;
+  height: 40px;
+  flex-shrink: 0;
+
+  @include tablet-down {
+    width: 90px;
+    height: 32px;
+  }
+
+  @include mobile {
+    width: 76px;
+    height: 27px;
+  }
+}
+
+// ── Nav links — hidden on tablet and below ─────────────────────────────────────
 
 .perksNavLinks {
   display: flex;
@@ -129,6 +148,10 @@ $clip-btn-nav: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100%
   align-items: center;
   gap: var(--space-2);
   flex-shrink: 0;
+
+  @include mobile {
+    gap: var(--space-1);
+  }
 }
 
 // design-specific: warm gold gradient octagon button — Figma Gold counter
@@ -168,9 +191,14 @@ $clip-btn-nav: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100%
     mix-blend-mode: multiply;
   }
 
-  @include mobile {
+  @include tablet-down {
     height: var(--button-height-sm);
     padding: 0 var(--space-4);
+  }
+
+  @include mobile {
+    padding: 0 var(--space-3);
+    gap: var(--space-1);
   }
 }
 
@@ -189,6 +217,145 @@ $clip-btn-nav: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100%
 .perksNavGoldLabel {
   @extend .perksNavGoldNum;
   text-transform: capitalize;
+
+  // Hide "Gold" label text on small mobile to save space — number + fire gif is enough
+  @include mobile {
+    display: none;
+  }
+}
+
+// ── Enable Rep. button — reputation not yet enabled ────────────────────────────
+
+// design-specific: orange enable-rep button — octagon shape matching PrimaryButton, orange fill + dashed border
+.perksNavEnableRep {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--button-height);
+  padding: 0 var(--space-5);
+  border: 1.5px dashed #e8944a; // design-specific: Figma dashed orange border
+  clip-path: #{$clip-btn-nav}; // octagon shape matching PrimaryButton
+  background: rgba(220, 100, 30, 0.07); // design-specific: Figma light peach fill
+  cursor: pointer;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-button);
+  font-weight: var(--font-weight-medium);
+  color: #d96020; // design-specific: Figma orange text
+  white-space: nowrap;
+  transition: background 0.15s ease, border-color 0.15s ease;
+
+  &:hover {
+    background: rgba(220, 100, 30, 0.12);
+    border-color: #d47a38;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  @include tablet-down {
+    height: var(--button-height-sm);
+    padding: 0 var(--space-3);
+  }
+}
+
+// ── Connect Wallet button — wallet not connected ────────────────────────────────
+
+// design-specific: Figma light grey solid border, off-white fill — not the octagon variant
+.perksNavConnectWallet {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--button-height);
+  padding: 0 var(--space-5);
+  border: 1px solid #e0e0e0; // design-specific: Figma light grey border
+  border-radius: 10px; // design-specific: Figma rounded rect — not octagon clip-path
+  background: #f5f5f5; // design-specific: Figma off-white fill
+  cursor: pointer;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-button);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  white-space: nowrap;
+  transition: background 0.15s ease, border-color 0.15s ease;
+
+  &:hover {
+    background: #ebebeb;
+    border-color: #c8c8c8;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  @include tablet-down {
+    height: var(--button-height-sm);
+    padding: 0 var(--space-3);
+  }
+}
+
+// Fire gif inside connect-wallet button — multiply blends out the white gif background
+.connectWalletFire {
+  mix-blend-mode: screen;
+}
+
+// Connect Wallet — gray fill override on the transparent PrimaryButton variant
+// Double class selector to beat the variant's specificity on hover
+.connectWalletBtn.connectWalletBtn {
+  &::before,
+  &:not(:disabled):hover::before,
+  &:hover::before {
+    background: #9a9a9a; // design-specific: Figma connect wallet gray fill
+  }
+}
+
+// Button label text — hidden on mobile for enable-rep and connect-wallet to keep header compact
+.perksNavBtnLabel {
+  @include mobile {
+    display: none;
+  }
+}
+
+// ── Menu button — desktop vs tablet/mobile ─────────────────────────────────────
+
+// Desktop: dark PrimaryButton with "Menu" text — hidden on tablet and below
+.menuDesktop {
+  @include tablet-down {
+    display: none;
+  }
+}
+
+// Tablet + mobile: icon-only blue square button — hidden on desktop
+.menuMobile {
+  display: none;
+
+  @include tablet-down {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: var(--color-blue-primary);
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    color: var(--color-white-primary);
+    flex-shrink: 0;
+    transition: background 0.15s ease;
+
+    &:hover {
+      background: var(--color-black-hover);
+    }
+
+    &:focus-visible {
+      @include focus-ring;
+    }
+  }
+
+  @include mobile {
+    width: 38px;
+    height: 38px;
+  }
 }
 
 // ── Cart button ────────────────────────────────────────────────────────────────
@@ -212,9 +379,19 @@ $clip-btn-nav: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100%
   &:focus-visible {
     @include focus-ring;
   }
+
+  @include mobile {
+    width: 36px;
+    height: 38px;
+  }
 }
 
 .perksNavCartIcon {
   width: 22px;
   height: 22px;
+
+  @include mobile {
+    width: 20px;
+    height: 20px;
+  }
 }

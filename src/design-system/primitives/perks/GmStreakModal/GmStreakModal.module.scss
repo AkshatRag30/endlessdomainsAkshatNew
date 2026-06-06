@@ -48,12 +48,12 @@ $clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px),
   z-index: 0;
 }
 
-// ── Close button — right: -2px, top: -1px (hangs just outside modal, Figma spec) ─
+// ── Close button — inside modal, top-right corner ─────────────────────────────
 
 .closeBtn {
   position: absolute;
-  right: -2px;
-  top: -1px;
+  right: 16px;
+  top: 16px;
   width: 31px;
   height: 31px;
   background: var(--color-white-primary);

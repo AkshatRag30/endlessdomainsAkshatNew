@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { FiArrowRight, FiX } from 'react-icons/fi'
 import styles from './GmModal.module.scss'
 import { ChooseChainModal } from '@/design-system/primitives/perks/ChooseChainModal'
 import { GmPendingModal } from '@/design-system/primitives/perks/GmPendingModal'
@@ -13,6 +14,7 @@ export interface GmModalProps {
   username?: string
   streakDays?: number
   onGm?: (chain: string) => void
+  initialStatus?: 'idle' | 'pending' | 'failed'
 }
 
 // ── Static data ───────────────────────────────────────────────────────────────
@@ -45,34 +47,17 @@ const CHAIN_LABELS: Record<string, string> = {
 
 // ── Icon sub-components ───────────────────────────────────────────────────────
 
-const CloseIcon = () => (
-  <svg width="18.6" height="18.6" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-  </svg>
-)
-
 // Chain icon — colored circle with brand-approximate color + initial letter
 // TODO: replace with actual chain brand SVG assets from public/
+// data-driven background color is unavoidable here — each chain has a unique brand color
 const ChainCircle = ({ id }: { id: string }) => (
-  <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
-    <circle cx="10" cy="10" r="10" fill={CHAIN_COLORS[id] ?? '#888888'} />
-    <text x="10" y="14" textAnchor="middle" fill="white" fontSize="8" fontWeight="700" fontFamily="sans-serif">
-      {CHAIN_LABELS[id] ?? id[0].toUpperCase()}
-    </text>
-  </svg>
-)
-
-// Arrow icons — gray for regular chains, blue for highlighted
-const ArrowRight = ({ highlight }: { highlight?: boolean }) => (
-  <svg width="18" height="14" viewBox="0 0 18 14" fill="none" aria-hidden="true">
-    <path
-      d="M11 1l6 6-6 6M1 7h16"
-      stroke={highlight ? '#2639ed' : '#c0c0c0'}
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
+  <div
+    className={styles.chainCircle}
+    style={{ background: CHAIN_COLORS[id] ?? '#888888' }}
+    aria-hidden="true"
+  >
+    {CHAIN_LABELS[id] ?? id[0].toUpperCase()}
+  </div>
 )
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -83,12 +68,13 @@ export function GmModal({
   username = 'myname.og',
   streakDays = 12,
   onGm,
+  initialStatus = 'idle',
 }: GmModalProps) {
 
   const [showChainPicker, setShowChainPicker] = useState(false)
   const [selectedChain, setSelectedChain] = useState<DomainProviderKey | undefined>(undefined)
   // 'idle' = GM modal visible | 'pending' = loading modal | 'failed' = error modal
-  const [gmStatus, setGmStatus] = useState<'idle' | 'pending' | 'failed'>('idle')
+  const [gmStatus, setGmStatus] = useState<'idle' | 'pending' | 'failed'>(initialStatus)
 
   // Escape key closes the modal (only when chain picker and result modals are not open)
   const handleKey = useCallback((e: KeyboardEvent) => {
@@ -185,7 +171,7 @@ export function GmModal({
           onClick={onClose}
           aria-label="Close GM modal"
         >
-          <CloseIcon />
+          <FiX size={18} aria-hidden="true" />
         </button>
 
         {/* Modal panel */}
@@ -281,7 +267,11 @@ export function GmModal({
                       <span className={styles.chainGas}>{chain.gasEst} · {chain.balance}</span>
                     </div>
                   </div>
-                  <ArrowRight highlight={chain.highlighted} />
+                  <FiArrowRight
+                    size={18}
+                    aria-hidden="true"
+                    className={chain.highlighted ? styles.arrowHighlight : styles.arrowDefault}
+                  />
                 </button>
               ))}
 

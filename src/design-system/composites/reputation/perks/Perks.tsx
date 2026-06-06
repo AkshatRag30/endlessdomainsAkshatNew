@@ -2,8 +2,9 @@ import { useCallback, useState } from 'react'
 import { GmModal } from '@/design-system/primitives/perks/GmModal'
 import { GmStreakModal } from '@/design-system/primitives/perks/GmStreakModal'
 import { MOCK_PERKS, FILTER_TIERS } from './perks.data'
-import type { FilterTier } from './perks.data'
+import type { FilterTier, PerkStatus } from './perks.data'
 import { PerksNavBar } from './PerksNavBar'
+import type { GoldButtonVariant } from './PerksNavBar'
 import { TierProgressHeader } from './TierProgressHeader'
 import { PerkCard } from './PerkCard'
 import styles from './Perks.module.scss'
@@ -16,6 +17,12 @@ export default function Perks() {
   const [showGmModal, setShowGmModal] = useState(false)
   const [showStreakModal, setShowStreakModal] = useState(false)
 
+  // TODO: replace with real wallet/reputation checks from API/redux
+  // 'gold' = wallet connected + reputation enabled (default)
+  // 'enable-rep' = wallet connected but reputation NOT enabled
+  // 'connect-wallet' = wallet not connected
+  const [goldButtonVariant, setGoldButtonVariant] = useState<GoldButtonVariant>('gold')
+
   // TODO: replace with real "has user already GM'd today?" check from API/redux
   const alreadyGmd = true
 
@@ -24,24 +31,48 @@ export default function Perks() {
   const handleAvailableToggle = useCallback(() => setShowAvailableOnly(prev => !prev), [])
 
   const handleGoldClick = useCallback(() => {
+    if (goldButtonVariant !== 'gold') return
     if (alreadyGmd) setShowStreakModal(true)
     else setShowGmModal(true)
-  }, [alreadyGmd])
+  }, [goldButtonVariant, alreadyGmd])
 
   const handleGmModalClose = useCallback(() => setShowGmModal(false), [])
   const handleStreakModalClose = useCallback(() => setShowStreakModal(false), [])
 
-  const displayedPerks = MOCK_PERKS.filter(p => {
-    const tierMatch = activeFilter === 'all' || p.tier === activeFilter
-    const availableMatch = !showAvailableOnly || p.status === 'available' || p.status === 'claimable'
-    return tierMatch && availableMatch
-  })
+  // Dev preview — state declared unconditionally (React hook rule); panel only renders in development
+  const [devPanelOpen, setDevPanelOpen] = useState(true)
+  const [devGmStatus, setDevGmStatus] = useState<'idle' | 'pending' | 'failed'>('idle')
+  const [devStreakTier, setDevStreakTier] = useState<'bronze' | 'silver' | 'gold' | 'platinum'>('bronze')
+  const [devCardState, setDevCardState] = useState<PerkStatus | null>(null)
+
+  const handleDevOpenGm = useCallback((status: 'idle' | 'pending' | 'failed') => {
+    setDevGmStatus(status)
+    setShowGmModal(true)
+  }, [])
+
+  const handleDevOpenStreak = useCallback((tier: 'bronze' | 'silver' | 'gold' | 'platinum') => {
+    setDevStreakTier(tier)
+    setShowStreakModal(true)
+  }, [])
+
+  const AUTH_GATED_IDS = ['12', '13', '14']
+  const displayedPerks = MOCK_PERKS
+    .filter(p => {
+      if (AUTH_GATED_IDS.includes(p.id)) return devCardState !== null
+      const tierMatch = activeFilter === 'all' || p.tier === activeFilter
+      const availableMatch = !showAvailableOnly || p.status === 'available' || p.status === 'claimable'
+      return tierMatch && availableMatch
+    })
+    .map(p => {
+      if (AUTH_GATED_IDS.includes(p.id) && devCardState !== null) return { ...p, status: devCardState }
+      return p
+    })
 
   return (
     <section className={styles.root} aria-label="Perks Catalog">
 
       {/* ── Navigation ──────────────────────────────────────────────────── */}
-      <PerksNavBar onGoldClick={handleGoldClick} />
+      <PerksNavBar onGoldClick={handleGoldClick} goldButtonVariant={goldButtonVariant} />
 
       {/* ── Tier progress bar ────────────────────────────────────────────── */}
       <TierProgressHeader />
@@ -99,8 +130,86 @@ export default function Perks() {
       </div>
 
       {/* ── Modals ──────────────────────────────────────────────────────── */}
-      <GmModal isOpen={showGmModal} onClose={handleGmModalClose} />
-      <GmStreakModal isOpen={showStreakModal} onClose={handleStreakModalClose} />
+      <GmModal key={devGmStatus} isOpen={showGmModal} onClose={handleGmModalClose} initialStatus={devGmStatus} />
+      <GmStreakModal isOpen={showStreakModal} onClose={handleStreakModalClose} tier={devStreakTier} />
+
+      {/* ── Dev preview panel — bottom-right fixed, development only ─────── */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className={`${styles.devPanel} ${devPanelOpen ? '' : styles.devPanelCollapsed}`} aria-label="Dev modal preview panel">
+          <button
+            type="button"
+            className={styles.devPanelTitle}
+            onClick={() => setDevPanelOpen(prev => !prev)}
+            aria-expanded={devPanelOpen}
+          >
+            <span>Dev Preview</span>
+            <span className={styles.devPanelChevron} aria-hidden="true">{devPanelOpen ? '▲' : '▼'}</span>
+          </button>
+
+          {devPanelOpen && (
+            <>
+              <div className={styles.devPanelGroup}>
+                <span className={styles.devPanelGroupLabel}>GM Modal</span>
+                <div className={styles.devPanelBtns}>
+                  <button type="button" className={styles.devPanelBtn} onClick={() => handleDevOpenGm('idle')}>GM</button>
+                  <button type="button" className={styles.devPanelBtn} onClick={() => handleDevOpenGm('pending')}>Pending</button>
+                  <button type="button" className={styles.devPanelBtn} onClick={() => handleDevOpenGm('failed')}>Failed</button>
+                </div>
+              </div>
+
+              <div className={styles.devPanelGroup}>
+                <span className={styles.devPanelGroupLabel}>Streak Modal</span>
+                <div className={styles.devPanelBtns}>
+                  {(['bronze', 'silver', 'gold', 'platinum'] as const).map(tier => (
+                    <button key={tier} type="button" className={styles.devPanelBtn} onClick={() => handleDevOpenStreak(tier)}>
+                      {tier}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className={styles.devPanelGroup}>
+                <span className={styles.devPanelGroupLabel}>Gold Button</span>
+                <div className={styles.devPanelBtns}>
+                  {(['gold', 'enable-rep', 'connect-wallet'] as const).map(v => (
+                    <button
+                      key={v}
+                      type="button"
+                      className={`${styles.devPanelBtn} ${goldButtonVariant === v ? styles.devPanelBtnActive : ''}`}
+                      onClick={() => setGoldButtonVariant(v)}
+                    >
+                      {v}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className={styles.devPanelGroup}>
+                <span className={styles.devPanelGroupLabel}>Card State</span>
+                <div className={styles.devPanelBtns}>
+                  {(['login', 'get-domain', 'enable-rep'] as const).map(s => (
+                    <button
+                      key={s}
+                      type="button"
+                      className={`${styles.devPanelBtn} ${devCardState === s ? styles.devPanelBtnActive : ''}`}
+                      onClick={() => setDevCardState(prev => prev === s ? null : s)}
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className={styles.devPanelGroup}>
+                <span className={styles.devPanelGroupLabel}>Claim Modals</span>
+                <div className={styles.devPanelBtns}>
+                  <span className={styles.devPanelGroupLabel}>Click any Claim card ↑</span>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      )}
 
     </section>
   )

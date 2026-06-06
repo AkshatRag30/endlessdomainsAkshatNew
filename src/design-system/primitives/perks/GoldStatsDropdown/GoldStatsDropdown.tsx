@@ -1,3 +1,4 @@
+import { FiX } from 'react-icons/fi'
 import styles from './GoldStatsDropdown.module.scss'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -10,14 +11,6 @@ export interface GoldStatsDropdownProps {
   onViewStats?: () => void
   className?: string
 }
-
-// ── Icons ─────────────────────────────────────────────────────────────────────
-
-const CloseIcon = () => (
-  <svg width="18.6" height="18.6" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-  </svg>
-)
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
@@ -42,7 +35,7 @@ export function GoldStatsDropdown({
         onClick={onClose}
         aria-label="Close stats panel"
       >
-        <CloseIcon />
+        <FiX size={18} aria-hidden="true" />
       </button>
 
       {/* Content body */}

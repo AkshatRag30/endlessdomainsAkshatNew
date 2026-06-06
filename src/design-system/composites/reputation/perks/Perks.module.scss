@@ -195,6 +195,110 @@
 
 // ── Perks grid ─────────────────────────────────────────────────────────────────
 
+// ── Dev preview panel — fixed bottom-right, development only ──────────────────
+
+.devPanel {
+  position: fixed;
+  bottom: var(--space-5);
+  right: var(--space-5);
+  z-index: 9999;
+  background: #1a1a1a; // design-specific: dev tool — intentional hardcoded dark bg
+  border: 1px solid #333;
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 190px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+.devPanelCollapsed {
+  gap: 0;
+  padding-bottom: var(--space-3);
+}
+
+.devPanelTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: var(--font-ibm-plex-mono);
+  font-size: var(--text-small-10);
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid #2a2a2a;
+  margin: 0;
+
+  &:hover {
+    color: #aaa;
+  }
+}
+
+.devPanelChevron {
+  font-size: 8px;
+  line-height: 1;
+  color: #555;
+}
+
+.devPanelGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.devPanelGroupLabel {
+  font-family: var(--font-ibm-plex-mono);
+  font-size: var(--text-small-10);
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.devPanelBtns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.devPanelBtn {
+  padding: 3px var(--space-2); // design-specific: compact dev tool button
+  border-radius: var(--radius-sm);
+  border: 1px solid #3a3a3a;
+  background: #242424;
+  color: #bbb;
+  font-family: var(--font-ibm-plex-mono);
+  font-size: var(--text-small-12);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+
+  &:hover {
+    background: #333;
+    border-color: #555;
+    color: #fff;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.devPanelBtnActive {
+  background: var(--color-blue-primary);
+  border-color: var(--color-blue-primary);
+  color: var(--color-white-primary);
+}
+
+// ── Perks grid ─────────────────────────────────────────────────────────────────
+
 .grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

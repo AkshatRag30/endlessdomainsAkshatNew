@@ -2,7 +2,7 @@ import endlessLogo from '../../../../../public/user-profile/endlessnewlogo.svg'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-export type PerkStatus = 'claimable' | 'available' | 'locked' | 'sold-out' | 'expired'
+export type PerkStatus = 'claimable' | 'available' | 'locked' | 'sold-out' | 'expired' | 'login' | 'get-domain' | 'enable-rep'
 export type PerkTier = 'bronze' | 'silver' | 'gold' | 'platinum'
 export type FilterTier = 'all' | PerkTier
 
@@ -54,4 +54,7 @@ export const MOCK_PERKS: PerkItem[] = [
   { id: '9', status: 'locked', tier: 'gold', type: 'NFT', title: 'Lorem Ipsum', description: LOREM_MED, partnerName: 'Endless Domains', partnerLogo: logo, claimedCount: 0, totalCount: 25, pointsRequired: 750, currentPoints: 312 },
   { id: '10', status: 'claimable', tier: 'platinum', type: 'Access', title: 'Lorem Ipsum', description: LOREM_LONG, partnerName: 'Endless Domains', partnerLogo: logo, claimedCount: 2, totalCount: 10 },
   { id: '11', status: 'locked', tier: 'platinum', type: 'NFT', title: 'Lorem Ipsum', description: LOREM_MED, partnerName: 'Endless Domains', partnerLogo: logo, claimedCount: 0, totalCount: 5, pointsRequired: 1000, currentPoints: 312 },
+  { id: '12', status: 'login', tier: 'bronze', type: 'NFT', title: 'Lorem Ipsum', description: LOREM_LONG, partnerName: 'Endless Domains', partnerLogo: logo, claimedCount: 14, totalCount: 50 },
+  { id: '13', status: 'get-domain', tier: 'bronze', type: 'NFT', title: 'Lorem Ipsum', description: LOREM_LONG, partnerName: 'Endless Domains', partnerLogo: logo, claimedCount: 14, totalCount: 50 },
+  { id: '14', status: 'enable-rep', tier: 'bronze', type: 'NFT', title: 'Lorem Ipsum', description: LOREM_LONG, partnerName: 'Endless Domains', partnerLogo: logo, claimedCount: 14, totalCount: 50 },
 ]

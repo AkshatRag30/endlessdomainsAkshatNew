@@ -1,4 +1,5 @@
 import { useCallback, useEffect } from 'react'
+import { FiX } from 'react-icons/fi'
 import { SecondaryButton } from '@/design-system/primitives/secondary-button'
 import styles from './GmPendingModal.module.scss'
 
@@ -9,14 +10,6 @@ export interface GmPendingModalProps {
   onClose: () => void
   onCheckStatus?: () => void
 }
-
-// ── Icon sub-components ───────────────────────────────────────────────────────
-
-const CloseIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-  </svg>
-)
 
 // Wave loader SVG — same visual as ScoreLoading, sized to fit modal
 const WaveLoader = () => (
@@ -82,7 +75,7 @@ export function GmPendingModal({ isOpen, onClose, onCheckStatus }: GmPendingModa
           onClick={onClose}
           aria-label="Close"
         >
-          <CloseIcon />
+          <FiX size={16} aria-hidden="true" />
         </button>
 
         {/* Icon + text */}

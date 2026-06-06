@@ -115,21 +115,18 @@ $clip-card: polygon(20px 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%, 0
 
 .cardHeader {
   position: relative;
-  height: 133px;
+  height: 88px;
   overflow: hidden;
   flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   // design-specific: bottom notch polygon matching Figma medalBg shape
   clip-path: polygon(0 0, 100% 0, 100% 100%, 74% 100%, 69% 72%, 32% 71%, 27% 100%, 0 100%);
 
   @include tablet-down {
-    height: 110px;
+    height: 76px;
   }
 
   @include mobile {
-    height: 100px;
+    height: 66px;
   }
 }
 
@@ -155,22 +152,32 @@ $clip-card: polygon(20px 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%, 0
   background: linear-gradient(180deg, #e8eef2 0%, #f5f7f9 100%);
 }
 
-// ── Partner logo ───────────────────────────────────────────────────────────────
+// ── Partner logo — between header polygon and badge row ───────────────────────
+
+// design-specific: logo sits in a negative-margin wrapper that overlaps the notch
+// so it appears to float between the polygon bottom and the badge row
+.logoWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3) var(--space-4) var(--space-2);
+  background-color: var(--color-white-primary);
+}
 
 .logo {
-  position: relative;
-  z-index: 1;
-  width: 146px;
+  width: 110px;
   height: auto;
   object-fit: contain;
+  display: block;
   transition: filter 0.2s ease;
 
   @include tablet-down {
-    width: 120px;
+    width: 90px;
   }
 
   @include mobile {
-    width: 100px;
+    width: 76px;
   }
 }
 
@@ -377,6 +384,18 @@ $clip-card: polygon(20px 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%, 0
 
   &:focus-visible {
     @include focus-ring;
+  }
+}
+
+// Enable Reputation CTA — dark/black variant
+.ctaBtnDark {
+  &::before {
+    background: var(--color-surface-dark);
+    box-shadow: none;
+  }
+
+  &:hover {
+    opacity: 0.88;
   }
 }
 

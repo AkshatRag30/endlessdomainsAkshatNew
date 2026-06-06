@@ -47,12 +47,12 @@ $clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px),
   z-index: 0;
 }
 
-// ── Close button — right: -2px, top: -1px (hangs just outside modal, Figma spec) ─
+// ── Close button — inside modal, top-right corner ─────────────────────────────
 
 .closeBtn {
   position: absolute;
-  right: -2px;
-  top: -1px;
+  right: 16px;
+  top: 16px;
   width: 31px;
   height: 31px;
   background: var(--color-white-primary);
@@ -361,4 +361,28 @@ $clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px),
   font-weight: var(--font-weight-regular);
   color: #445; // design-specific: Figma shorthand = #444455, no token match
   line-height: 1.2;
+}
+
+// Chain circle — replaces inline SVG; background color set via inline style (data-driven brand color)
+.chainCircle {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-space-grotesk);
+  font-size: 8px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white-primary);
+  flex-shrink: 0;
+}
+
+// Arrow color variants — replaces inline stroke prop on SVG
+.arrowHighlight {
+  color: var(--color-blue-primary);
+}
+
+.arrowDefault {
+  color: var(--color-gray-300);
 }

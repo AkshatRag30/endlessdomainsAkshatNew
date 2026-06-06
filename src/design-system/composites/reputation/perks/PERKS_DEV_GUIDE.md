@@ -12,7 +12,7 @@ src/design-system/composites/reputation/perks/
 ├── Perks.tsx                        ← Page orchestrator. Holds all state and
 │                                       renders the top-level layout. This is
 │                                       the only file you touch to switch between
-│                                       modal triggers.
+│                                       modal triggers and gold button variants.
 │
 ├── Perks.module.scss                ← Page-level styles only: root background,
 │                                       filter bar, perks grid.
@@ -22,11 +22,12 @@ src/design-system/composites/reputation/perks/
 │                                       Edit mock cards here.
 │
 ├── PerksNavBar/
-│   ├── PerksNavBar.tsx              ← Logo, nav links, gold button, menu, cart.
-│   │                                   Gold button label/number live here.
-│   ├── PerksNavBar.module.scss      ← All nav styles including the octagon gold
-│   │                                   button gradient and dropdown hover logic.
-│   └── index.ts
+│   ├── PerksNavBar.tsx              ← Logo, nav links, gold button (all 3 variants),
+│   │                                   menu, cart. Exports GoldButtonVariant type.
+│   ├── PerksNavBar.module.scss      ← All nav styles: octagon gold gradient,
+│   │                                   enable-rep dashed orange, connect-wallet grey,
+│   │                                   and GoldStatsDropdown hover logic.
+│   └── index.ts                     ← Re-exports PerksNavBar + GoldButtonVariant type.
 │
 ├── TierProgressHeader/
 │   ├── TierProgressHeader.tsx       ← The 79px stripe bar (silver → gold progress).
@@ -84,10 +85,15 @@ Open `http://localhost:3000` and navigate to the Perks page.
 
 **What it is:** Opens when a user clicks the gold button and has NOT yet GM'd today.
 
-**File to edit:** `Perks.tsx` — line 20
+**Prerequisites:** The gold button variant must be `'gold'` (line 24) — GmModal only opens when reputation is enabled and a wallet is connected. Then set `alreadyGmd` to `false`.
+
+**File to edit:** `Perks.tsx` — lines 24 and 27
 
 ```ts
-// Line 20 — change true → false
+// Line 24 — must be 'gold' for any modal to open
+const goldButtonVariant: GoldButtonVariant = 'gold'
+
+// Line 27 — change true → false
 const alreadyGmd = false   // ← false = user hasn't GM'd yet → GmModal opens
 ```
 
@@ -95,6 +101,7 @@ Then click the gold button in the top nav bar. The GmModal appears.
 
 **To restore after previewing:**
 ```ts
+const goldButtonVariant: GoldButtonVariant = 'gold'
 const alreadyGmd = true
 ```
 
@@ -104,19 +111,22 @@ const alreadyGmd = true
 
 **What it is:** Opens when a user clicks the gold button and HAS already GM'd today. Shows the user's streak, tier emblem, wallet address, and share/view TX actions.
 
-**File to edit:** `Perks.tsx` — lines 20 and 103
+**File to edit:** `Perks.tsx` — lines 24, 27, and 111
 
-### Step 1 — Make sure the streak modal is the one that opens (line 20)
+### Step 1 — Make sure the streak modal is the one that opens (lines 24 + 27)
 
 ```ts
-// Line 20
+// Line 24
+const goldButtonVariant: GoldButtonVariant = 'gold'   // ← must be 'gold'
+
+// Line 27
 const alreadyGmd = true   // ← true = user already GM'd → GmStreakModal opens
 ```
 
-### Step 2 — Choose the tier variant (line 103)
+### Step 2 — Choose the tier variant (line 111)
 
 ```tsx
-// Line 103 — change the tier prop
+// Line 111 — change the tier prop
 <GmStreakModal isOpen={showStreakModal} onClose={handleStreakModalClose} tier="bronze" />
 ```
 
@@ -131,7 +141,7 @@ Each value swaps the emblem illustration and the tier badge simultaneously. No o
 
 ### Full prop reference for GmStreakModal
 
-All props are optional — defaults are shown below. Edit them directly on line 103 in `Perks.tsx` to preview different data states:
+All props are optional — defaults are shown below. Edit them directly on line 111 in `Perks.tsx` to preview different data states:
 
 ```tsx
 <GmStreakModal
@@ -149,7 +159,53 @@ All props are optional — defaults are shown below. Edit them directly on line 
 
 ---
 
-## 5. Modal 3 — PerkClaimConfirmModal (Claim confirmation)
+## 5. Modal — GmPendingModal + GmTransactionFailedModal
+
+These two modals live inside `GmModal` and are controlled by its internal `gmStatus` state. There is no UI path that sets `gmStatus` to `'failed'` yet. To force-preview either screen you need **two changes** — one to open the modal, one to set the status.
+
+**Important:** GmModal has `if (!isOpen) return null` at the top. Changing `gmStatus` alone does nothing if the modal is not open. Always set `showGmModal` to `true` first.
+
+### Step 1 — Force GmModal open on page load
+
+**File:** `Perks.tsx` — line 17
+
+```ts
+// Line 17 — change false → true
+const [showGmModal, setShowGmModal] = useState(true)
+```
+
+### Step 2 — Choose which inner screen to show
+
+**File:** `src/design-system/primitives/perks/GmModal/GmModal.tsx` — line 91
+
+#### GmPendingModal (transaction in progress)
+
+```ts
+// GmModal.tsx line 91 — change 'idle' → 'pending'
+const [gmStatus, setGmStatus] = useState<'idle' | 'pending' | 'failed'>('pending')
+```
+
+#### GmTransactionFailedModal (transaction failed)
+
+```ts
+// GmModal.tsx line 91 — change 'idle' → 'failed'
+const [gmStatus, setGmStatus] = useState<'idle' | 'pending' | 'failed'>('failed')
+```
+
+The modal appears immediately on page load with no button click needed.
+
+**Revert both after reviewing:**
+```ts
+// Perks.tsx line 17
+const [showGmModal, setShowGmModal] = useState(false)
+
+// GmModal.tsx line 91
+const [gmStatus, setGmStatus] = useState<'idle' | 'pending' | 'failed'>('idle')
+```
+
+---
+
+## 6. Modal 3 — PerkClaimConfirmModal (Claim confirmation)
 
 **What it is:** Opens when a user clicks the "Claim" CTA on an available perk card.
 
@@ -193,27 +249,41 @@ Remember to revert to `false` after reviewing.
 
 ## 7. Gold Button Variants
 
-The gold button in the nav bar is the octagon button labelled "12 Gold" with the fire gif. It has two visual concerns: the number/label content, and which modal it triggers on click.
+There are three distinct gold button states, each rendering a completely different visual. All three are controlled by a single variable in `Perks.tsx`.
 
-### Which modal it triggers
-
-Controlled by `alreadyGmd` in `Perks.tsx` line 20:
+**File to edit:** `Perks.tsx` — line 24
 
 ```ts
-const alreadyGmd = false   // → click opens GmModal
-const alreadyGmd = true    // → click opens GmStreakModal
+const goldButtonVariant: GoldButtonVariant = 'gold'
 ```
 
-### The gold number displayed on the button
+| Value | When it shows | Visual |
+|---|---|---|
+| `'gold'` | Wallet connected + reputation enabled | Warm gold octagon with fire gif, number, "Gold" label. Hover shows GoldStatsDropdown. Click opens GmModal or GmStreakModal. |
+| `'enable-rep'` | Wallet connected, reputation NOT enabled | Light peach rounded rect, dashed orange border, orange donut icon, "Enable Rep." in orange. Click does nothing until wired to enable-rep flow. |
+| `'connect-wallet'` | Wallet NOT connected | Light grey rounded rect, thin grey border, fire gif icon, "Connect Wallet" in dark. Click does nothing until wired to wallet connect flow. |
 
-**File:** `PerksNavBar/PerksNavBar.tsx` — line 72
+### The gold number displayed on the button (gold variant only)
+
+**File:** `PerksNavBar/PerksNavBar.tsx` — line 83
 
 ```tsx
-// Line 72 — change "12" to any number to preview different gold counts
+// Line 83 — change "12" to any number to preview different gold counts
 <span className={styles.perksNavGoldNum}>12</span>
 ```
 
-### The hover dropdown (GoldStatsDropdown)
+### Which modal the gold button triggers (gold variant only)
+
+Controlled by `alreadyGmd` in `Perks.tsx` line 27:
+
+```ts
+const alreadyGmd = false   // → click opens GmModal (first GM of the day)
+const alreadyGmd = true    // → click opens GmStreakModal (already GM'd today)
+```
+
+Note: when `goldButtonVariant` is `'enable-rep'` or `'connect-wallet'`, clicking the button does nothing regardless of `alreadyGmd`. The guard lives in `handleGoldClick` (line 33–37).
+
+### The hover dropdown (GoldStatsDropdown) — gold variant only
 
 Hover over the gold button — the `GoldStatsDropdown` appears automatically via CSS `:hover` on `.goldHoverWrap`. No code change needed. Its data and layout live in:
 
@@ -221,21 +291,28 @@ Hover over the gold button — the `GoldStatsDropdown` appears automatically via
 src/design-system/primitives/perks/GoldStatsDropdown/
 ```
 
+The dropdown does NOT appear for `'enable-rep'` or `'connect-wallet'` — those variants do not wrap in `.goldHoverWrap`.
+
 ---
 
 ## 8. Quick-Reference Cheat Sheet
 
 | What to preview | File | Line | Change |
 |---|---|---|---|
-| GmModal (first GM) | `Perks.tsx` | 20 | `alreadyGmd = false` |
-| GmStreakModal (already GM'd) | `Perks.tsx` | 20 | `alreadyGmd = true` |
-| GmStreakModal — bronze tier | `Perks.tsx` | 103 | `tier="bronze"` |
-| GmStreakModal — silver tier | `Perks.tsx` | 103 | `tier="silver"` |
-| GmStreakModal — gold tier | `Perks.tsx` | 103 | `tier="gold"` |
-| GmStreakModal — platinum tier | `Perks.tsx` | 103 | `tier="platinum"` |
+| Gold button — normal state | `Perks.tsx` | 24 | `goldButtonVariant = 'gold'` |
+| Gold button — Enable Rep. state | `Perks.tsx` | 24 | `goldButtonVariant = 'enable-rep'` |
+| Gold button — Connect Wallet state | `Perks.tsx` | 24 | `goldButtonVariant = 'connect-wallet'` |
+| GmModal (first GM) | `Perks.tsx` | 27 | `alreadyGmd = false` (+ variant must be `'gold'`) |
+| GmStreakModal (already GM'd) | `Perks.tsx` | 27 | `alreadyGmd = true` (+ variant must be `'gold'`) |
+| GmStreakModal — bronze tier | `Perks.tsx` | 111 | `tier="bronze"` |
+| GmStreakModal — silver tier | `Perks.tsx` | 111 | `tier="silver"` |
+| GmStreakModal — gold tier | `Perks.tsx` | 111 | `tier="gold"` |
+| GmStreakModal — platinum tier | `Perks.tsx` | 111 | `tier="platinum"` |
+| GmPendingModal (isolated) | `Perks.tsx` + `GmModal/GmModal.tsx` | 17 + 91 | `useState(true)` then `useState<...>('pending')` |
+| GmTransactionFailedModal (isolated) | `Perks.tsx` + `GmModal/GmModal.tsx` | 17 + 91 | `useState(true)` then `useState<...>('failed')` |
 | PerkClaimConfirmModal (isolated) | `PerkCard/PerkCard.tsx` | 42 | `useState(true)` |
 | PerkClaimSuccessModal (isolated) | `PerkCard/PerkCard.tsx` | 43 | `useState(true)` |
-| Gold button number | `PerksNavBar/PerksNavBar.tsx` | 72 | Change `12` to any value |
+| Gold button number | `PerksNavBar/PerksNavBar.tsx` | 83 | Change `12` to any value |
 
 ---
 
@@ -243,7 +320,10 @@ src/design-system/primitives/perks/GoldStatsDropdown/
 
 After previewing, always revert these values before committing:
 
-- [ ] `Perks.tsx` line 20 → `const alreadyGmd = true`
-- [ ] `Perks.tsx` line 103 → remove any hardcoded `tier` prop (or set back to `"bronze"`)
+- [ ] `Perks.tsx` line 24 → `const goldButtonVariant: GoldButtonVariant = 'gold'`
+- [ ] `Perks.tsx` line 27 → `const alreadyGmd = true`
+- [ ] `Perks.tsx` line 111 → remove any hardcoded `tier` prop (or set back to `"bronze"`)
+- [ ] `Perks.tsx` line 17 → `useState(false)`
+- [ ] `GmModal/GmModal.tsx` line 91 → `useState<'idle' | 'pending' | 'failed'>('idle')`
 - [ ] `PerkCard/PerkCard.tsx` line 42 → `useState(false)`
 - [ ] `PerkCard/PerkCard.tsx` line 43 → `useState(false)`

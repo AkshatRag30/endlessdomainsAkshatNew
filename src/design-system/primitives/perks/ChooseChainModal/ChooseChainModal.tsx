@@ -1,5 +1,6 @@
 import { useCallback, useEffect } from 'react'
 import Image from 'next/image'
+import { FiX } from 'react-icons/fi'
 import { DOMAIN_PROVIDERS } from '@/helpers/chaincurrency/chaincurrency'
 import type { DomainProviderKey } from '@/helpers/chaincurrency/chaincurrency'
 import styles from './ChooseChainModal.module.scss'
@@ -12,14 +13,6 @@ export interface ChooseChainModalProps {
   selectedChain?: DomainProviderKey
   onChainSelect?: (chain: DomainProviderKey) => void
 }
-
-// ── Icon sub-components ───────────────────────────────────────────────────────
-
-const CloseIcon = () => (
-  <svg width="18.6" height="18.6" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-  </svg>
-)
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
@@ -61,7 +54,7 @@ export function ChooseChainModal({ isOpen, onClose, selectedChain, onChainSelect
             onClick={onClose}
             aria-label="Close chain selector"
           >
-            <CloseIcon />
+            <FiX size={18} aria-hidden="true" />
           </button>
         </header>
 
