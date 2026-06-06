@@ -1,0 +1,175 @@
+@import '_mixins.scss';
+
+// ── Root container ────────────────────────────────────────────────────────────
+
+// design-specific: Figma Stats Dropdown node 41:3433 — 278px wide
+// (left padding 15px + line width 248px + right padding 15px = 278px)
+.root {
+  position: relative;
+  width: 278px;
+  background: var(--color-white-primary);
+  // design-specific: Figma border rgba(212,212,212,0.39)
+  border: 1px solid rgba(212, 212, 212, 0.39);
+  // design-specific: Figma drop shadow 0px 0px 45.1px 0px rgba(0,0,0,0.1)
+  box-shadow: 0 0 45.1px 0 rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+// design-specific: 5% opacity diagonal stripe overlay — same pattern as .root and .badgeRow in Perks
+.stripe {
+  position: absolute;
+  inset: 0;
+  @include stripe-bg;
+  opacity: 0.05;
+  pointer-events: none;
+  z-index: 0;
+}
+
+// ── Close button ─────────────────────────────────────────────────────────────
+
+// design-specific: Figma "Button - Clear" node 41:3447 — 31×31px, right: 1px, top: 0
+.closeBtn {
+  position: absolute;
+  top: 0;
+  right: 1px;
+  width: 31px;
+  height: 31px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  color: var(--color-black-primary);
+  z-index: 2;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: var(--color-gray-200);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// ── Content body ─────────────────────────────────────────────────────────────
+
+// design-specific: top-padding 49px positions "Current Streak" center at ~57.5px from container top, matching Figma node 41:3433
+.content {
+  position: relative;
+  z-index: 1;
+  padding: 49px var(--space-4) 0;
+}
+
+// ── Streak header row ─────────────────────────────────────────────────────────
+
+// design-specific: margin-bottom 9px creates the 9px gap from streak row bottom (~66px) to divider at 75px
+.streakRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 9px;
+}
+
+// design-specific: orange gradient text — Figma gradient-to-left from #d46605 to #ffab61, Space Grotesk Medium 14px
+.streakLabel,
+.streakValue {
+  background: linear-gradient(to left, #d46605, #ffab61);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-nav); // 14px
+  font-weight: var(--font-weight-medium);
+  line-height: 1;
+  text-transform: capitalize;
+}
+
+// ── Divider ───────────────────────────────────────────────────────────────────
+
+// design-specific: Figma horizontal rule lines (Line nodes at y=75, 113, 151, 195)
+.divider {
+  height: 1px;
+  background: var(--color-gray-200);
+}
+
+// ── Stat rows ─────────────────────────────────────────────────────────────────
+
+// design-specific: padding-top 12px = gap from divider to label (e.g. divider at y=75, label at y=87 → 12px)
+// design-specific: padding-bottom 13px = gap from label bottom to next divider (label ~13px tall, divider at label_top+13+13 = next divider)
+.statRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 12px;
+  padding-bottom: 13px;
+}
+
+// design-specific: Figma label color #9999a6 — Satoshi Regular 13px
+.statLabel {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13); // 13px
+  font-weight: var(--font-weight-regular);
+  // design-specific: Figma stat label color #9999a6 — muted gray, no exact token match
+  color: #9999a6;
+}
+
+// design-specific: Figma stat value — Space Grotesk Medium 13px, black
+.statValue {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-13); // 13px
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+}
+
+// ── Countdown bar ─────────────────────────────────────────────────────────────
+
+// design-specific: Figma Countdown BG node 41:3443 — #eeeeee, height 36px, margin 4px top/bottom
+// places top at y=155 (divider y=151 + 4px margin) and bottom at y=191 (top 155 + 36)
+.countdown {
+  height: 36px;
+  margin: 4px 0;
+  // design-specific: Figma countdown background #eeeeee
+  background: #eeeeee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// design-specific: Figma countdown text — 11px (≈ var(--text-small-12) 12px, nearest token); Inter Regular in Figma → Space Grotesk here
+.countdownText {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-12); // 12px ≈ 11px Figma value, nearest token
+  font-weight: var(--font-weight-regular);
+  color: var(--color-black-primary);
+  white-space: nowrap;
+}
+
+// ── View full stats ───────────────────────────────────────────────────────────
+
+// design-specific: padding-top 15px places text at y≈210px (divider y=195 + 15px gap ≈ Figma y=209.5px)
+.viewStats {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 15px 0 12px;
+  // design-specific: Figma "View full stats" orange color #fa7317
+  color: #fa7317;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-12); // 12px
+  font-weight: var(--font-weight-medium);
+  transition: opacity 0.15s ease;
+
+  &:hover {
+    opacity: 0.72;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}

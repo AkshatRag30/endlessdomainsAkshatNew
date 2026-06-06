@@ -1,0 +1,236 @@
+@import '_mixins.scss';
+
+// design-specific: asymmetric octagon — same shape as PrimaryButton / GmModal gmBtn
+$clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px), calc(100% - 7.5px) 100%, 5px 100%, 0px calc(100% - 7px), 0px 9px);
+
+// ── Overlay ───────────────────────────────────────────────────────────────────
+
+// design-specific: z-index 200 — GmModal is unmounted when this renders, no conflict
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+}
+
+// ── Modal panel ───────────────────────────────────────────────────────────────
+
+// design-specific: 476px wide, same border/shadow as GmModal
+.modal {
+  position: relative;
+  width: 476px;
+  background: var(--color-white-primary);
+  border: 2px solid rgba(153, 27, 27, 0.2);
+  box-shadow: 0 0 16.15px rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+// ── Close button ──────────────────────────────────────────────────────────────
+
+.closeBtn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-black-primary);
+  transition: background 0.15s ease;
+  z-index: 1;
+
+  &:hover {
+    background: var(--color-gray-200);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// ── Icon + text ───────────────────────────────────────────────────────────────
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 44px 40px 32px;
+}
+
+// design-specific: icon stack — matches ScoreLoading illustrationWrap proportions
+.iconWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+// design-specific: 92px outer ring — same rgba(239,68,68,0.26) as ScoreLoading's outerRing
+.outerRing {
+  width: 92px;
+  height: 92px;
+  border-radius: var(--radius-full);
+  background: rgba(239, 68, 68, 0.26);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1.5px 14.9px 0 var(--color-white-primary);
+}
+
+// design-specific: 83px inner circle — same blue gradient as ScoreLoading's innerCircle
+.innerCircle {
+  width: 83px;
+  height: 83px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(134.58deg, rgba(38, 57, 237, 0.7) 10.17%, #2639ed 59.57%, rgba(38, 57, 237, 0.5) 98.68%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.shadowEllipse {
+  width: 70px;
+  height: 4px;
+  border-radius: var(--radius-full);
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.18) 0%, transparent 75%);
+}
+
+// ── Wave loader SVG — same as ScoreLoading ────────────────────────────────────
+
+.waveSvg {
+  // design-specific: scaled to 65px — same as ScoreLoading waveSvg
+  width: 65px;
+  height: 65px;
+  display: block;
+}
+
+.waveBack {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: gm-wave-move-back 5s linear infinite;
+}
+
+.waveFront {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: gm-wave-move-front 3s linear infinite;
+}
+
+@keyframes gm-wave-move-front {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-33px); }
+}
+
+@keyframes gm-wave-move-back {
+  from { transform: translateX(-33px); }
+  to   { transform: translateX(0); }
+}
+
+// ── Text ──────────────────────────────────────────────────────────────────────
+
+.textBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  text-align: center;
+}
+
+// design-specific: Satoshi Bold 22px
+.title {
+  font-family: var(--font-satoshi);
+  font-size: 22px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black-primary);
+  margin: 0;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+// design-specific: Space Grotesk Regular — muted gray
+.subtitle {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-regular);
+  color: #474747; // design-specific: Figma muted near-black, no exact token
+  line-height: 1.5;
+  margin: 0;
+  text-align: center;
+}
+
+// ── Footer action bar ─────────────────────────────────────────────────────────
+
+.footer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  height: 64px;
+  background: rgba(0, 0, 0, 0.05);
+  flex-shrink: 0;
+}
+
+// ── Primary (octagon) button ──────────────────────────────────────────────────
+
+.primaryBtn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 42px;
+  min-width: 160px;
+  border: none;
+  cursor: pointer;
+  clip-path: #{$clip};
+  background: var(--color-gray-300); // outer stroke layer
+  overflow: hidden;
+  padding: 0 20px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 1.2px;
+    clip-path: #{$clip};
+    background: linear-gradient(135deg, #3a4ff0 0%, var(--color-blue-primary) 50%, #1e2fd4 100%);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2);
+    z-index: 0;
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  &:hover {
+    opacity: 0.88;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// design-specific: Satoshi Bold uppercase — matches GmModal gmBtnText style
+.primaryBtnText {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}

@@ -1,0 +1,220 @@
+@import '_mixins.scss';
+
+// design-specific: same asymmetric octagon as PrimaryButton primitive
+$clip-btn-nav: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px), calc(100% - 7.5px) 100%, 5px 100%, 0px calc(100% - 7px), 0px 9px);
+
+// ── Nav shell ──────────────────────────────────────────────────────────────────
+
+.perksNav {
+  width: 100%;
+  background-color: var(--color-white-primary);
+  border-bottom: 1px solid var(--color-gray-200);
+  flex-shrink: 0;
+}
+
+.perksNavInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100px;
+  padding: 0 var(--space-8);
+  max-width: 1512px;
+  margin: 0 auto;
+  gap: var(--space-6);
+
+  @include tablet-down {
+    height: 72px;
+    padding: 0 var(--space-5);
+    gap: var(--space-4);
+  }
+
+  @include mobile {
+    height: 60px;
+    padding: 0 var(--space-3);
+    gap: var(--space-3);
+  }
+}
+
+// ── Logo ───────────────────────────────────────────────────────────────────────
+
+.perksNavLogo {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  text-decoration: none;
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// ── Nav links ──────────────────────────────────────────────────────────────────
+
+.perksNavLinks {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+  justify-content: center;
+
+  @include tablet-down {
+    display: none;
+  }
+}
+
+.perksNavLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  text-decoration: none;
+  color: var(--color-gray-dark);
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: var(--color-black-primary);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.perksNavBracket {
+  font-family: var(--font-ibm-plex-mono);
+  font-size: 17px;
+  letter-spacing: 2.5px;
+  color: var(--color-gray-300);
+  line-height: 1;
+}
+
+.perksNavLinkText {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+}
+
+// ── Gold counter + dropdown ────────────────────────────────────────────────────
+
+.goldHoverWrap {
+  position: relative;
+}
+
+.goldDropdown {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-6px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  z-index: 50;
+}
+
+.goldHoverWrap:hover .goldDropdown,
+.goldHoverWrap:focus-within .goldDropdown {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+// ── Right actions ──────────────────────────────────────────────────────────────
+
+.perksNavActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+// design-specific: warm gold gradient octagon button — Figma Gold counter
+.perksNavGold {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--button-height);
+  padding: 0 var(--space-6);
+  border: none;
+  cursor: pointer;
+  clip-path: #{$clip-btn-nav};
+  background-image: linear-gradient(102deg, rgba(255, 250, 144, 0.39) -18.6%, rgba(254, 241, 131, 0.39) 10.22%, rgba(253, 224, 106, 0.39) 50.8%, rgba(250, 219, 100, 0.39) 62.31%, rgba(241, 204, 83, 0.39) 77.91%, rgba(227, 180, 54, 0.39) 95.84%, rgba(201, 137, 4, 0.39) 120.2%);
+  overflow: hidden;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-button);
+  font-weight: var(--font-weight-medium);
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 1.2px;
+    clip-path: #{$clip-btn-nav};
+    // design-specific: Figma warm gold gradient fill
+    background: linear-gradient(181deg, #f5c84a 0%, #e07a10 100%);
+    box-shadow: inset 0 0 20px 0 var(--color-white-alpha-40);
+    z-index: 0;
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  img {
+    mix-blend-mode: multiply;
+  }
+
+  @include mobile {
+    height: var(--button-height-sm);
+    padding: 0 var(--space-4);
+  }
+}
+
+// design-specific: gradient text inside gold counter — warm white-to-gold
+.perksNavGoldNum {
+  background: linear-gradient(180deg, #fff7e0 0%, #ffd080 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-button);
+  font-weight: var(--font-weight-medium);
+  line-height: 1;
+}
+
+.perksNavGoldLabel {
+  @extend .perksNavGoldNum;
+  text-transform: capitalize;
+}
+
+// ── Cart button ────────────────────────────────────────────────────────────────
+
+.perksNavCart {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 50px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-black-primary);
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: var(--color-blue-primary);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.perksNavCartIcon {
+  width: 22px;
+  height: 22px;
+}

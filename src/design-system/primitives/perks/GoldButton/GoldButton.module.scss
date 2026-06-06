@@ -1,0 +1,163 @@
+@import '_mixins.scss';
+
+// design-specific: same asymmetric octagon as PrimaryButton primitive and perksNavGold in Perks.module.scss
+$clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px), calc(100% - 7.5px) 100%, 5px 100%, 0px calc(100% - 7px), 0px 9px);
+
+// ── Base ─────────────────────────────────────────────────────────────────────
+
+.goldBtn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--button-height);
+  padding: 0 var(--space-6);
+  border: none;
+  cursor: pointer;
+  clip-path: #{$clip};
+  overflow: hidden;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-button);
+  font-weight: var(--font-weight-medium);
+  transition: opacity 0.15s ease;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 1.2px;
+    clip-path: #{$clip};
+    z-index: 0;
+    box-shadow: inset 0 0 20px 0 var(--color-white-alpha-40);
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  &:hover {
+    opacity: 0.88;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  @include mobile {
+    height: var(--button-height-sm);
+    padding: 0 var(--space-4);
+  }
+}
+
+// ── Fire GIF (used in default, gmed, connect-wallet) ─────────────────────────
+
+.fireImg {
+  flex-shrink: 0;
+  // multiply removes GIF white background on any non-white parent fill
+  mix-blend-mode: multiply;
+}
+
+// ── Enable rep icon wrapper ───────────────────────────────────────────────────
+
+.enableIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+// ── Gold text (shared by default + gmed) ─────────────────────────────────────
+
+.goldNum {
+  // design-specific: same gradient text as perksNavGoldNum — warm white-to-amber
+  background: linear-gradient(180deg, #fff7e0 0%, #ffd080 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-button);
+  font-weight: var(--font-weight-medium);
+  line-height: 1;
+}
+
+.goldText {
+  @extend .goldNum;
+  text-transform: capitalize;
+}
+
+// ── Checkmark (gmed only) ─────────────────────────────────────────────────────
+
+.checkIcon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  // design-specific: green tick confirming GM completed — matches --color-status-available
+  color: var(--color-status-available);
+}
+
+// ── Action text (enable-rep + connect-wallet) — color overridden per variant ──
+
+.actionText {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-button);
+  font-weight: var(--font-weight-medium);
+  line-height: 1;
+}
+
+// ── Variant: default — gold gradient, no tick ─────────────────────────────────
+
+.goldBtn_default {
+  // design-specific: Figma gold stroke outer shell — amber translucent gradient
+  background-image: linear-gradient(102deg, rgba(255, 250, 144, 0.39) -18.6%, rgba(254, 241, 131, 0.39) 10.22%, rgba(253, 224, 106, 0.39) 50.8%, rgba(250, 219, 100, 0.39) 62.31%, rgba(241, 204, 83, 0.39) 77.91%, rgba(227, 180, 54, 0.39) 95.84%, rgba(201, 137, 4, 0.39) 120.2%);
+
+  &::before {
+    // design-specific: Figma warm gold fill — same as perksNavGold ::before
+    background: linear-gradient(181deg, #f5c84a 0%, #e07a10 100%);
+  }
+}
+
+// ── Variant: gmed — gold gradient + checkmark ────────────────────────────────
+
+.goldBtn_gmed {
+  // design-specific: identical outer shell to default — only difference is checkmark rendered in TSX
+  background-image: linear-gradient(102deg, rgba(255, 250, 144, 0.39) -18.6%, rgba(254, 241, 131, 0.39) 10.22%, rgba(253, 224, 106, 0.39) 50.8%, rgba(250, 219, 100, 0.39) 62.31%, rgba(241, 204, 83, 0.39) 77.91%, rgba(227, 180, 54, 0.39) 95.84%, rgba(201, 137, 4, 0.39) 120.2%);
+
+  &::before {
+    background: linear-gradient(181deg, #f5c84a 0%, #e07a10 100%);
+  }
+}
+
+// ── Variant: enable-rep — salmon-orange gradient ──────────────────────────────
+
+.goldBtn_enable_rep {
+  // design-specific: Figma salmon-peach outer shell for reputation-not-enabled state
+  background: rgba(230, 110, 60, 0.32);
+
+  &::before {
+    // design-specific: warm salmon-orange fill gradient
+    background: linear-gradient(135deg, #f8b090 0%, #e87040 100%);
+  }
+
+  // icon and text in dark reddish-orange for contrast on orange fill
+  .enableIcon,
+  .actionText {
+    // design-specific: Figma dark orange-red icon + label color on salmon button
+    color: #7a2a08;
+  }
+}
+
+// ── Variant: connect-wallet — light gray / white ──────────────────────────────
+
+.goldBtn_connect_wallet {
+  // design-specific: Figma light gray outer stroke shell for disconnected-wallet state
+  background: var(--color-gray-300);
+
+  &::before {
+    // design-specific: white fill — creating the appearance of a thin gray border
+    background: var(--color-white-primary);
+  }
+
+  .actionText {
+    color: var(--color-black-primary);
+  }
+}

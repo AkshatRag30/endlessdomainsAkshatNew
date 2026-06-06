@@ -1,0 +1,219 @@
+@import '_mixins.scss';
+
+// ── Overlay ───────────────────────────────────────────────────────────────────
+
+// design-specific: z-index 201 — one above GmModal (200) so it layers on top
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 201;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+}
+
+// ── Modal panel ───────────────────────────────────────────────────────────────
+
+.modal {
+  width: 580px;
+  max-height: 85vh;
+  background: var(--color-white-primary);
+  border: 1px solid var(--color-gray-200);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.14);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28px 32px 24px;
+  flex-shrink: 0;
+}
+
+.title {
+  font-family: var(--font-satoshi);
+  // design-specific: Figma "Choose a Chain" heading — 26px, no exact token (nearest --text-heading-2 ≈ 28px)
+  font-size: 26px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.closeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  border-radius: var(--radius-full);
+  color: var(--color-black-primary);
+  transition: background 0.15s ease;
+  flex-shrink: 0;
+
+  &:hover {
+    background: var(--color-gray-200);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// ── Divider ───────────────────────────────────────────────────────────────────
+
+.divider {
+  height: 1px;
+  background: var(--color-gray-200);
+  flex-shrink: 0;
+}
+
+// ── 3-column grid ─────────────────────────────────────────────────────────────
+
+// Grid-line pattern: grid has outer left+top border, each card has right+bottom border
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-left: 1px solid var(--color-gray-200);
+  overflow-y: auto;
+  flex: 1;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-gray-300) transparent;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-gray-300);
+    border-radius: var(--radius-full);
+  }
+}
+
+// ── Chain card ────────────────────────────────────────────────────────────────
+
+.chainCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: 24px 16px 20px;
+  background: transparent;
+  border: none;
+  border-right: 1px solid var(--color-gray-200);
+  border-bottom: 1px solid var(--color-gray-200);
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.15s ease;
+  min-height: 160px;
+  // Explicit color on the button element — browser defaults for <button> color vary
+  color: var(--color-black-primary);
+
+  &:hover:not(.chainCardSelected) {
+    // design-specific: hover tint — blue at 3% opacity
+    background: rgba(38, 57, 237, 0.03);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+    outline-offset: -3px;
+  }
+}
+
+// design-specific: selected state — light blue tint + blue inset outline
+.chainCardSelected {
+  background: rgba(38, 57, 237, 0.06);
+  outline: 2px solid var(--color-blue-primary);
+  outline-offset: -2px;
+  position: relative;
+  z-index: 1;
+}
+
+// ── Chain icon circle ─────────────────────────────────────────────────────────
+
+.chainIconWrap {
+  width: 54px;
+  height: 54px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+  // default fallback bg
+  background: var(--color-gray-300);
+
+  // design-specific: chain brand background colors from DOMAIN_PROVIDERS in chaincurrency.tsx
+  &[data-provider='UD'] { background: #7e45e5; }
+  &[data-provider='ENS'] { background: #60aaf5; }
+  &[data-provider='Arbitrum'] { background: #1a71b1; }
+  &[data-provider='BinanceSmartChain'] { background: #ffc300; }
+  &[data-provider='Bonfida'] { background: #333333; }
+  &[data-provider='Tezos'] { background: #14216a; }
+  &[data-provider='Aptos'] { background: #2a2a2a; }
+  &[data-provider='Ton'] { background: #0098ea; }
+  &[data-provider='Box'] { background: #2a2a2a; }
+  &[data-provider='Starknet'] { background: #19aa6e; }
+  &[data-provider='Freename'] { background: #4144c0; }
+}
+
+.chainLogo {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  // invert to white so dark logos show up on colored backgrounds
+  filter: brightness(0) invert(1);
+}
+
+// ── Chain text ────────────────────────────────────────────────────────────────
+
+// display: block + width: 100% gives each text span a concrete width in the flex column,
+// preventing the collapsed-span bug where overflow:hidden on an inline flex item
+// with align-items:center can shrink paint width to zero.
+.chainName {
+  display: block;
+  width: 100%;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav); // 14px
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  line-height: 1.3;
+  text-align: center;
+  word-break: break-word;
+}
+
+// design-specific: balance/ETH text — gray, smaller
+.chainBalance {
+  display: block;
+  width: 100%;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-gray-dark);
+  line-height: 1.3;
+  text-align: center;
+}
+
+// design-specific: gas estimate — blue accent text
+.chainGasEst {
+  display: block;
+  width: 100%;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-blue-primary);
+  line-height: 1.3;
+  text-align: center;
+}

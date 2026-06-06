@@ -1,0 +1,425 @@
+@import '_mixins.scss';
+
+// design-specific: octagon clip-path for the CTA button
+$clip-btn: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px), calc(100% - 7.5px) 100%, 5px 100%, 0px calc(100% - 7px), 0px 9px);
+
+// design-specific: diagonal corner cuts for the card wrapper
+$clip-card: polygon(20px 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%, 0 20px);
+
+// ── Card outer (hover drop-shadow + badge host) ────────────────────────────────
+
+.cardOuter {
+  position: relative;
+  min-width: 0;
+  transition: filter 0.25s ease;
+
+  &:hover {
+    filter:
+      drop-shadow(2px 0 0 var(--color-blue-primary))
+      drop-shadow(-2px 0 0 var(--color-blue-primary))
+      drop-shadow(0 2px 0 var(--color-blue-primary))
+      drop-shadow(0 -2px 0 var(--color-blue-primary));
+  }
+}
+
+// ── Status badge (top-right corner, absolute) ──────────────────────────────────
+
+.statusBadge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  border-radius: 40px;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+  text-transform: capitalize;
+
+  @include mobile {
+    font-size: var(--text-small-12);
+    padding: var(--space-1) var(--space-2);
+  }
+}
+
+.badgeStatusDot {
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+// design-specific: lime-green "Claim" badge
+.badge_claimable {
+  background: linear-gradient(179.5deg, #e7ff7a 1.01%, #d8ff00 105.12%);
+  border: 1px solid #ceeb2e;
+  color: #0a4100;
+
+  .badgeStatusDot {
+    background: #0a4100;
+  }
+}
+
+// design-specific: dark "Available" badge
+.badge_available {
+  background: linear-gradient(to bottom, var(--color-surface-card-dark), var(--color-surface-warm-dark));
+  border: 0.763px solid var(--color-black-primary);
+  box-shadow: 1.526px 2.29px 3.053px var(--color-black-alpha-25);
+  color: var(--color-warm-off-white);
+
+  .badgeStatusDot {
+    background: var(--color-status-available);
+  }
+}
+
+// design-specific: "Sold Out" badge
+.badge_sold_out {
+  background: var(--color-white-primary);
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  color: var(--color-black-primary);
+}
+
+// design-specific: "EXPIRED" badge — coral gradient
+.badge_expired {
+  background: linear-gradient(180deg, #ff7070 0%, #e04040 100%);
+  color: var(--color-white-primary);
+  text-transform: uppercase;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.04em;
+}
+
+// ── Card wrap (outer border with diagonal corner cuts) ─────────────────────────
+
+.cardWrap {
+  clip-path: $clip-card;
+  padding: 1.5px;
+  background: rgba(38, 57, 237, 0.2); // design-specific: thin blue-tinted card border
+}
+
+// ── Card shell ─────────────────────────────────────────────────────────────────
+
+.card {
+  clip-path: $clip-card;
+  background-color: var(--color-white-primary);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+// ── Card header — partner logo image area ──────────────────────────────────────
+
+.cardHeader {
+  position: relative;
+  height: 133px;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  // design-specific: bottom notch polygon matching Figma medalBg shape
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 74% 100%, 69% 72%, 32% 71%, 27% 100%, 0 100%);
+
+  @include tablet-down {
+    height: 110px;
+  }
+
+  @include mobile {
+    height: 100px;
+  }
+}
+
+// Header background variants per tier
+
+.header_bronze {
+  background: linear-gradient(180deg, #ffb779 0%, #ffd9b0 70%, #f5e6d5 100%);
+}
+
+.header_silver {
+  background: linear-gradient(160deg, #8caab9 0%, #dde8ef 18%, #c2d4e1 33%, #ffffff 50%, #d4dee5 62%, #abbdc8 78%, #bccad7 100%);
+}
+
+.header_gold {
+  background: linear-gradient(160deg, #c8a850 0%, #f5d880 30%, #ffe8a0 50%, #f5d060 70%, #b89040 100%);
+}
+
+.header_platinum {
+  background: linear-gradient(160deg, #8ba0b0 0%, #c8d8e5 25%, #e8f0f5 50%, #c8d8e5 75%, #8ba0b0 100%);
+}
+
+.header_locked {
+  background: linear-gradient(180deg, #e8eef2 0%, #f5f7f9 100%);
+}
+
+// ── Partner logo ───────────────────────────────────────────────────────────────
+
+.logo {
+  position: relative;
+  z-index: 1;
+  width: 146px;
+  height: auto;
+  object-fit: contain;
+  transition: filter 0.2s ease;
+
+  @include tablet-down {
+    width: 120px;
+  }
+
+  @include mobile {
+    width: 100px;
+  }
+}
+
+.logoBlurred {
+  filter: blur(2.5px) grayscale(0.6) opacity(0.75);
+}
+
+// ── Lock circle (locked state only) ───────────────────────────────────────────
+
+.lockCircle {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 49px;
+  height: 49px;
+  border-radius: var(--radius-full);
+  background: var(--color-white-primary);
+  box-shadow: 0 2px 12px var(--color-black-alpha-14), 0 0 0 1px var(--color-gray-200);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lockIcon {
+  font-size: 22px;
+  color: var(--color-black-primary);
+}
+
+// ── Badge / tier row ───────────────────────────────────────────────────────────
+
+.badgeRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 38px;
+  padding: 0 var(--space-4);
+  background-color: var(--color-white-primary);
+  @include stripe-bg;
+  border-top: 1px solid var(--color-gray-200);
+  border-bottom: 1px solid var(--color-gray-200);
+  flex-shrink: 0;
+
+  @include mobile {
+    padding: 0 var(--space-3);
+  }
+}
+
+.tierBadgesGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+// ── Type badge (NFT, Whitelist, etc.) ─────────────────────────────────────────
+
+.typeBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 25px;
+  padding: 0 var(--space-3);
+  background: var(--color-white-primary);
+  border: 1px solid #c2c2c2;
+  box-shadow: 0px 1px 0px 0px #c2c2c2, 0px 2px 15px 0px rgba(255, 255, 255, 0.4), 0px 6px 3px 0px rgba(255, 234, 211, 0.2);
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+}
+
+.typeDot {
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+  background: #7c5ce1; // design-specific: Figma NFT tag dot — purple-blue
+}
+
+// ── Claimed count pill ─────────────────────────────────────────────────────────
+
+.claimedPill {
+  background: #f2f2f2;
+  border: 1px solid var(--color-black-alpha-01);
+  border-radius: 30px;
+  height: 23px;
+  padding: 0 var(--space-3);
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-regular);
+  color: #606060;
+  white-space: nowrap;
+  text-transform: capitalize;
+}
+
+// ── Card body (title + description) ───────────────────────────────────────────
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-5) var(--space-4) var(--space-4);
+  flex: 1;
+
+  @include tablet-down {
+    padding: var(--space-4) var(--space-4) var(--space-3);
+  }
+
+  @include mobile {
+    padding: var(--space-3) var(--space-3) var(--space-3);
+  }
+}
+
+.cardTitle {
+  font-family: var(--font-satoshi);
+  font-size: 20px; // design-specific: Figma exact 20px
+  font-weight: var(--font-weight-medium);
+  color: rgba(33, 37, 41, 0.7); // design-specific: Figma title color
+  margin: 0;
+  line-height: 1.2;
+
+  @include tablet-down {
+    font-size: var(--text-normal);
+  }
+
+  @include mobile {
+    font-size: var(--text-nav);
+  }
+}
+
+.cardDesc {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-body);
+  margin: 0;
+  line-height: var(--leading-normal);
+
+  @include mobile {
+    font-size: var(--text-small-12);
+  }
+}
+
+// ── Card footer (button or locked progress) ────────────────────────────────────
+
+.cardFooter {
+  flex-shrink: 0;
+  padding: 0 var(--space-4) var(--space-4);
+
+  @include mobile {
+    padding: 0 var(--space-3) var(--space-3);
+  }
+}
+
+// ── CTA button ─────────────────────────────────────────────────────────────────
+
+.ctaBtn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 50px;
+  border: none;
+  cursor: pointer;
+  background: var(--color-gray-300);
+  clip-path: $clip-btn;
+  overflow: hidden;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: 900;
+  text-transform: capitalize;
+  letter-spacing: 0.04em;
+  color: var(--color-white-primary);
+  transition: opacity 0.18s ease;
+
+  @include mobile {
+    height: 42px;
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 1.2px;
+    clip-path: $clip-btn;
+    background: linear-gradient(135deg, #3a4ff0 0%, var(--color-blue-primary) 50%, #1e2fd4 100%);
+    box-shadow: inset 0 1px 1px var(--color-white-alpha-25);
+    z-index: 0;
+    transition: all 0.18s ease;
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  &:hover {
+    opacity: 0.88;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// ── Locked footer (need more pts + progress segments) ─────────────────────────
+
+.lockedFooter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-bottom: var(--space-2);
+}
+
+.lockedText {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-9);
+  font-weight: var(--font-weight-medium);
+  color: #8572d7; // design-specific: Figma "Need X more pts" purple-blue
+  letter-spacing: 0.8px;
+  margin: 0;
+}
+
+.progressSegs {
+  display: flex;
+  align-items: center;
+  gap: 2.318px;
+  width: 100%;
+}
+
+.segment {
+  height: 7.727px; // design-specific: Figma segment height
+  border-radius: 10.045px;
+  flex: 1;
+  transition: background 0.2s ease;
+}
+
+.segmentFull {
+  background: var(--color-blue-primary);
+}
+
+.segmentPartial {
+  background: var(--color-blue-primary-alpha-70);
+}
+
+.segmentEmpty {
+  background: var(--color-blue-primary-alpha-50);
+}

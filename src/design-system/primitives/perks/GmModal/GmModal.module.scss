@@ -1,0 +1,364 @@
+@import '_mixins.scss';
+
+// design-specific: asymmetric octagon clip-path — matches PrimaryButton / GoldButton shape
+$clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px), calc(100% - 7.5px) 100%, 5px 100%, 0px calc(100% - 7px), 0px 9px);
+
+// ── Overlay ───────────────────────────────────────────────────────────────────
+
+// design-specific: Figma modal backdrop — semi-transparent black overlay
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// ── Modal wrapper — holds close button (which hangs outside modal) ─────────────
+
+.modalWrap {
+  position: relative;
+}
+
+// ── Modal panel ───────────────────────────────────────────────────────────────
+
+// design-specific: Figma node 41:4824 — 476px wide (13px + 450px content + 13px)
+// border: 2px solid rgba(153,27,27,0.2) — dark burgundy at 20% opacity
+// shadow: 0px 0px 16.15px rgba(0,0,0,0.1)
+.modal {
+  position: relative;
+  width: 476px;
+  background: var(--color-white-primary);
+  border: 2px solid rgba(153, 27, 27, 0.2);
+  box-shadow: 0 0 16.15px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+// ── Stripe overlay (5% opacity diagonal pattern) ──────────────────────────────
+
+.stripe {
+  position: absolute;
+  inset: 0;
+  @include stripe-bg;
+  opacity: 0.05;
+  pointer-events: none;
+  z-index: 0;
+}
+
+// ── Close button — right: -2px, top: -1px (hangs just outside modal, Figma spec) ─
+
+.closeBtn {
+  position: absolute;
+  right: -2px;
+  top: -1px;
+  width: 31px;
+  height: 31px;
+  background: var(--color-white-primary);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-black-primary);
+  z-index: 10;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: var(--color-gray-200);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// ── Header — top 6px, left/right 18px ────────────────────────────────────────
+
+.header {
+  position: relative;
+  z-index: 1;
+  padding: 6px 18px 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+// design-specific: Figma "Say GM ☀️" — Satoshi Medium, 22px
+.title {
+  font-family: var(--font-satoshi);
+  font-size: 22px; // design-specific: Figma exact 22px, no token match (nearest --text-heading-3 is 20px)
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  margin: 0;
+  line-height: 1.2;
+}
+
+// design-specific: subtitle — Satoshi Regular, 12px, Figma color #667 (muted gray-blue, no exact token)
+.subtitle {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-regular);
+  color: #667; // design-specific: Figma shorthand = #666677, muted gray-blue, no token match
+  margin: 0;
+  line-height: 1.3;
+}
+
+// ── Main section — left/right 13px, margin-top 22px (positions content at Figma top: 74px) ──
+
+.mainSection {
+  position: relative;
+  z-index: 1;
+  padding: 0 13px;
+  margin-top: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-bottom: 24px;
+}
+
+// ── Transaction container (flex-col, gap 7px) ─────────────────────────────────
+
+.txContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+// ── Transaction info stack (flex-col, gap 9px) ────────────────────────────────
+
+.txInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+// ── Transaction Details — black bg, orange border, inner white glow ───────────
+
+// design-specific: height 48px, border 1.5px solid rgba(249,115,22,0.6), inner glow inset 0 0 17.2px white
+.txDetails {
+  height: 48px;
+  background: var(--color-black-primary);
+  border: 1.5px solid rgba(249, 115, 22, 0.6);
+  box-shadow: inset 0 0 17.2px 0 rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-sm);
+}
+
+.txMessage {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.txBolt {
+  font-size: var(--text-small-13);
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+// design-specific: Figma "Sending GM on Polygon..." — Inter Regular 14px in Figma → Space Grotesk here
+.txText {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-nav); // 14px
+  font-weight: var(--font-weight-regular);
+  color: var(--color-white-primary);
+  white-space: nowrap;
+}
+
+// design-specific: POLYGON chip — white bg, blue border rgba(38,57,237,0.23), 9px Inter Semi Bold, letter-spacing 1px
+.chainTag {
+  background: var(--color-white-primary);
+  border: 1px solid rgba(38, 57, 237, 0.23);
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+  font-family: var(--font-space-grotesk);
+  font-size: 9px; // design-specific: Figma exact 9px for the chain chip label
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-blue-primary);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+// ── Transaction Summary — light gray bg, 32px ─────────────────────────────────
+
+// design-specific: background rgba(232,232,232,0.45) — light gray at 45% opacity
+.txSummary {
+  height: 32px;
+  background: rgba(232, 232, 232, 0.45);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-4);
+}
+
+// design-specific: Space Grotesk Regular 12px, color #667 (muted gray-blue)
+.txMeta {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-regular);
+  color: #667; // design-specific: Figma shorthand = #666677, no token match
+}
+
+// ── GM Sign button — blue gradient octagon, full width, 50px ─────────────────
+
+.gmBtn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 50px;
+  border: none;
+  cursor: pointer;
+  clip-path: #{$clip};
+  background: var(--color-gray-300); // outer stroke layer
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 1.2px;
+    clip-path: #{$clip};
+    // design-specific: same blue gradient as PrimaryButton
+    background: linear-gradient(135deg, #3a4ff0 0%, var(--color-blue-primary) 50%, #1e2fd4 100%);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2);
+    z-index: 0;
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  &:hover {
+    opacity: 0.88;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// design-specific: Satoshi Black 12px, white, uppercase — "👋  Sign & GM on Polygon  →"
+.gmBtnText {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+// ── "or switch chain" button ───────────────────────────────────────────────────
+
+// design-specific: Satoshi Regular 12px, color #445 (dark gray-blue, no token match)
+// Rendered as <button> so users can click to open the chain picker
+.switchChainLabel {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-regular);
+  color: #445; // design-specific: Figma shorthand = #444455, no token match
+  text-align: center;
+  margin: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  padding: 2px 0;
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: var(--color-blue-primary);
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// ── Chain selector (flex-col, no gap — spacing handled per-row) ───────────────
+
+.chainSelector {
+  display: flex;
+  flex-direction: column;
+}
+
+// ── Chain row base — both highlighted and regular ─────────────────────────────
+
+.chainRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 10px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s ease;
+  min-height: 36px;
+
+  &:hover {
+    background: var(--color-gray-100);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// design-specific: Arbitrum highlighted row — background rgba(0,0,0,0.11), Figma spec
+.chainRowHighlight {
+  background: rgba(0, 0, 0, 0.11);
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.16);
+  }
+}
+
+// Chain info: icon + text stack
+.chainInfo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.chainText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+}
+
+// design-specific: chain name — Satoshi Medium 13px, black by default
+.chainName {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  line-height: 1.2;
+}
+
+// design-specific: highlighted chain name (Arbitrum) — blue #2639ed
+.chainNameHighlight {
+  color: var(--color-blue-primary);
+}
+
+// design-specific: gas estimate — 9px, color #445 (dark gray-blue)
+.chainGas {
+  font-family: var(--font-space-grotesk);
+  font-size: 9px; // design-specific: Figma exact 9px for chain gas label
+  font-weight: var(--font-weight-regular);
+  color: #445; // design-specific: Figma shorthand = #444455, no token match
+  line-height: 1.2;
+}

@@ -1,0 +1,207 @@
+@import '_mixins.scss';
+
+// design-specific: asymmetric octagon — same shape as PrimaryButton / GmModal gmBtn
+$clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px), calc(100% - 7.5px) 100%, 5px 100%, 0px calc(100% - 7px), 0px 9px);
+
+// ── Overlay ───────────────────────────────────────────────────────────────────
+
+// design-specific: z-index 200 — same layer as GmModal (GmModal is unmounted when this renders)
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+}
+
+// ── Modal panel ───────────────────────────────────────────────────────────────
+
+// design-specific: 476px wide, same border/shadow as GmModal for visual family consistency
+.modal {
+  position: relative;
+  width: 476px;
+  background: var(--color-white-primary);
+  border: 2px solid rgba(153, 27, 27, 0.2);
+  box-shadow: 0 0 16.15px rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+// ── Close button ──────────────────────────────────────────────────────────────
+
+.closeBtn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-black-primary);
+  transition: background 0.15s ease;
+  z-index: 1;
+
+  &:hover {
+    background: var(--color-gray-200);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// ── Icon + text ───────────────────────────────────────────────────────────────
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 44px 40px 32px;
+}
+
+// design-specific: icon stack — outer ring > inner circle > icon + shadow ellipse below
+.iconWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+// design-specific: 92px outer ring — red at 26% opacity, white glow shadow (matches ScoreLoading pattern)
+.outerRing {
+  width: 92px;
+  height: 92px;
+  border-radius: var(--radius-full);
+  background: rgba(239, 68, 68, 0.26);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1.5px 14.9px 0 var(--color-white-primary);
+}
+
+// design-specific: 83px inner circle — red gradient for failed state
+.innerCircle {
+  width: 83px;
+  height: 83px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(134.58deg, rgba(220, 38, 38, 0.75) 10%, #dc2626 55%, rgba(220, 38, 38, 0.55) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.shadowEllipse {
+  width: 70px;
+  height: 4px;
+  border-radius: var(--radius-full);
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.18) 0%, transparent 75%);
+}
+
+// ── Text ──────────────────────────────────────────────────────────────────────
+
+.textBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  text-align: center;
+}
+
+// design-specific: Satoshi Medium ~22px — no exact token match (nearest heading tokens are 20px or 28px)
+.title {
+  font-family: var(--font-satoshi);
+  font-size: 22px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black-primary);
+  margin: 0;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+// design-specific: Space Grotesk Regular — muted gray body text
+.subtitle {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-regular);
+  color: #474747; // design-specific: Figma muted near-black, no exact token
+  line-height: 1.5;
+  margin: 0;
+  max-width: 300px;
+  text-align: center;
+}
+
+// ── Footer action bar ─────────────────────────────────────────────────────────
+
+// design-specific: light gray strip matching GmModal txSummary aesthetic
+.footer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  height: 64px;
+  background: rgba(0, 0, 0, 0.05);
+  flex-shrink: 0;
+}
+
+// ── Primary (octagon) button ──────────────────────────────────────────────────
+
+.primaryBtn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 42px;
+  // design-specific: min-width so text fits comfortably inside the octagon shape
+  min-width: 180px;
+  border: none;
+  cursor: pointer;
+  clip-path: #{$clip};
+  background: var(--color-gray-300); // outer stroke layer
+  overflow: hidden;
+  padding: 0 20px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 1.2px;
+    clip-path: #{$clip};
+    background: linear-gradient(135deg, #3a4ff0 0%, var(--color-blue-primary) 50%, #1e2fd4 100%);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2);
+    z-index: 0;
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  &:hover {
+    opacity: 0.88;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// design-specific: Satoshi Bold uppercase — matches GmModal gmBtnText
+.primaryBtnText {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}

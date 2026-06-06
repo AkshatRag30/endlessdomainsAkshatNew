@@ -1,0 +1,181 @@
+@import '_mixins.scss';
+
+// ── Overlay ───────────────────────────────────────────────────────────────────
+
+// design-specific: frosted glass — matches UDReverseNew success modal overlay
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--space-4);
+}
+
+// ── Modal panel ───────────────────────────────────────────────────────────────
+
+// design-specific: green border — matches UDReverseNew success modal Figma spec
+.modal {
+  position: relative;
+  background: var(--color-white-primary);
+  border: 1px solid rgba(110, 218, 0, 0.28);
+  box-shadow: 0 0 54px rgba(0, 0, 0, 0.15);
+  width: 458px;
+  max-width: 100%;
+  min-height: 269px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-8) var(--space-6) var(--space-6);
+
+  @include mobile {
+    padding: var(--space-6) var(--space-4);
+    width: 100%;
+  }
+}
+
+// ── Close button ──────────────────────────────────────────────────────────────
+
+.closeBtn {
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-full);
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-gray-primary);
+  transition: color 0.15s ease;
+
+  &:hover { color: var(--color-black-primary); }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// ── Green check icon — same structure as UDReverseNew.module.scss ─────────────
+
+.iconWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+// design-specific: 68px pale green outer ring — matches UDReverseNew iconOuter
+.iconOuter {
+  width: 68px;
+  height: 68px;
+  border-radius: var(--radius-full);
+  background: rgba(108, 215, 0, 0.26);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// design-specific: 61.49px green gradient inner circle — matches UDReverseNew iconInner
+.iconInner {
+  width: 61.49px;
+  height: 61.49px;
+  border-radius: 144.824px;
+  background: linear-gradient(134.58deg, #5ebd00 10.17%, #73e500 59.57%, #5ebd00 98.68%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.checkIcon {
+  color: var(--color-white-primary);
+  width: 30px;
+  height: 30px;
+}
+
+// design-specific: soft drop shadow ellipse below icon circle
+.iconShadow {
+  width: 52px;
+  height: 3px;
+  border-radius: var(--radius-full);
+  background: rgba(0, 0, 0, 0.12);
+  filter: blur(2px);
+}
+
+// ── Title + subtitle ──────────────────────────────────────────────────────────
+
+.textBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  text-align: center;
+}
+
+.title {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-heading-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-black-primary);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.subtitle {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  color: var(--color-gray-darker);
+  margin: 0;
+  line-height: 1.4;
+}
+
+// ── Promo code bar ────────────────────────────────────────────────────────────
+
+// design-specific: black bar with green monospace code + copy icon, matches Figma spec
+.promoRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: var(--color-black-primary);
+  padding: var(--space-3) var(--space-4);
+  gap: var(--space-3);
+}
+
+// design-specific: green monospace promo code text on black bar
+.promoCode {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-semibold);
+  // design-specific: neon green on black — no exact token match
+  color: #6eda00;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  word-break: break-all;
+}
+
+.copyBtn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-white-primary);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  padding: var(--space-1);
+  border-radius: var(--radius-sm);
+  transition: opacity 0.15s ease;
+
+  &:hover { opacity: 0.7; }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}

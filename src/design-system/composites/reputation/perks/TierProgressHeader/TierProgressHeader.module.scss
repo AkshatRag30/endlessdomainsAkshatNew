@@ -1,0 +1,135 @@
+@import '_mixins.scss';
+
+// ── Tier progress bar shell ────────────────────────────────────────────────────
+
+// design-specific: Figma 79px white stripe bar above the filter bar
+.tierProgressBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  padding: 0 var(--space-8);
+  height: 79px;
+  background-color: var(--color-white-primary);
+  @include stripe-bg;
+  border-bottom: 1px solid var(--color-gray-200);
+  flex-shrink: 0;
+
+  @include tablet-down {
+    padding: 0 var(--space-5);
+    gap: var(--space-4);
+  }
+
+  @include mobile {
+    padding: 0 var(--space-3);
+    gap: var(--space-3);
+    height: auto;
+    min-height: 60px;
+  }
+}
+
+// ── Left: tier icon + badge + pts ──────────────────────────────────────────────
+
+.tierLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-shrink: 0;
+}
+
+.tierIcon {
+  width: 43px;
+  height: auto;
+  object-fit: contain;
+  flex-shrink: 0;
+
+  @include mobile {
+    width: 30px;
+  }
+}
+
+.tierPoints {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-1);
+  flex-shrink: 0;
+
+  @include mobile {
+    display: none;
+  }
+}
+
+// design-specific: Figma 30px pts value — Space Grotesk Medium, near-black
+.tierPointsValue {
+  font-family: var(--font-space-grotesk);
+  font-size: 30px;
+  font-weight: var(--font-weight-medium);
+  color: #1e1e1e;
+  line-height: 1;
+}
+
+// design-specific: Figma "/pts" label — Space Grotesk weight 300, gray
+.tierPointsLabel {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-nav);
+  font-weight: 300;
+  color: #6b7280;
+}
+
+// ── Center: segmented progress bar ────────────────────────────────────────────
+
+.tierProgressCenter {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  max-width: 560px;
+  margin: 0 auto;
+
+  @include mobile {
+    display: none;
+  }
+}
+
+.tierSegs {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  width: 100%;
+}
+
+// design-specific: Figma tier progress segment — 10px height, 13px radius
+.tierSeg {
+  height: 10px;
+  border-radius: 13px;
+  flex: 1;
+}
+
+.tierSegFull {
+  background: var(--color-blue-primary);
+}
+
+.tierSegPartial {
+  background: var(--color-blue-primary-alpha-70);
+}
+
+.tierSegEmpty {
+  background: var(--color-blue-primary-alpha-50);
+}
+
+// design-specific: small blue diamond at current progress position
+// left: 67% = 4 filled / 6 total segments (matches Figma mock)
+.tierDiamond {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: var(--color-blue-primary);
+  border: 2.5px solid var(--color-white-primary);
+  border-radius: 3px;
+  transform: translateX(-50%) rotate(45deg);
+  box-shadow: 0 0 0 1.5px var(--color-blue-primary);
+  left: 67%;
+  z-index: 1;
+  pointer-events: none;
+}
