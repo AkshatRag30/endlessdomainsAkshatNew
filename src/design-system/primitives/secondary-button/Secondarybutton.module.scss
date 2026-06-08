@@ -106,6 +106,9 @@ $corner-clip: path("M5 2 H14 C15 2 15.5 3.2 14.7 3.8 C11 7 7 11 3.8 14.7 C3.2 15
 
 .transparent {
   background: transparent;
+}
+
+.transparent:not(.danger) {
   color: var(--color-white-primary);
 
   &:hover:not(:disabled) {

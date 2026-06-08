@@ -117,17 +117,18 @@ export function GmStreakModal({
           {/* ── "GM" gradient text ─────────────────────────────────────── */}
           <p className={styles.gmText} id="gm-streak-title" aria-label="GM">GM</p>
 
-          {/* ── User row: avatar + username + tier badge ───────────────── */}
-          <div className={styles.userRow}>
-            <div className={styles.avatarRing}>
-              <div className={styles.avatarInner} aria-hidden="true" />
-            </div>
-            <span className={styles.username}>{username}</span>
-            <TierBadge tier={tier} size="md" />
-          </div>
-
           {/* ── Streak section ─────────────────────────────────────────── */}
           <div className={styles.streakSection}>
+
+            {/* ── User row: avatar + username + tier badge ─────────────── */}
+            <div className={styles.userRow}>
+              <div className={styles.avatarRing}>
+                <div className={styles.avatarInner} aria-hidden="true" />
+              </div>
+              <span className={styles.username}>{username}</span>
+              <TierBadge tier={tier} size="md" />
+            </div>
+
             <div className={styles.streakNumRow}>
               <span className={styles.streakNum}>{streakDays}</span>
               <span className={styles.streakLabel}>Day Streak</span>

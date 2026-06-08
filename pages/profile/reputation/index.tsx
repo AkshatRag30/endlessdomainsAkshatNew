@@ -63,7 +63,7 @@ export default function ReputationPage() {
               ) : (
                 <>
                   {activeTab === 'score-breakdown'  && <ScoreBreakdown />}
-                  {activeTab === 'gm-streak'        && <GmStreak sectionRef={sectionRef} />}
+                  {activeTab === 'gm-streak'        && <GmStreak />}
                   {activeTab === 'my-perks'         && <MyPerks />}
                   {activeTab === 'account-settings' && <AccountSettings />}
                 </>

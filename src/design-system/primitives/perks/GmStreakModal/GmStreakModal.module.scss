@@ -117,6 +117,10 @@ $clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px),
   margin-top: 28px;
   position: relative;
   z-index: 2;
+
+  @include mobile {
+    margin-top: 20px;
+  }
 }
 
 // design-specific: HTML/CSS golden ring that wraps the bronze emblem SVG
@@ -132,35 +136,53 @@ $clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px),
     0 0 30px rgba(200, 140, 20, 0.16);
   background: transparent;
   overflow: visible;
+
+  @include mobile {
+    width: 110px;
+    height: 110px;
+  }
 }
 
-// Bronze emblem SVG — centered horizontally, aligned top so tail hangs below ring
-// At 132px wide (scale 1.33×): inner circle center ≈ y 72px from SVG top
+// Emblem SVG — centered horizontally, constrained to ring height so tall emblems
+// (bronze/silver viewBox 99×123) don't overflow. width: auto preserves aspect ratio.
 .emblemSvg {
   position: absolute;
-  width: 132px;
-  height: auto;
+  width: auto;
+  height: 152px; // design-specific: matches ring height so emblem never overflows
+  max-width: 140px; // design-specific: cap width for wide emblems (gold/platinum)
   top: 0;
   left: 50%;
   transform: translateX(-50%);
   z-index: 1;
   pointer-events: none;
+
+  @include mobile {
+    height: 110px; // design-specific: matches mobile ring height
+    max-width: 104px;
+  }
 }
 
 // Fire gif — centered inside the SVG's inner warm circle
-// Inner circle center at scale 1.33: cx≈65px (= ring center), cy≈72px from SVG top (= ring top + 72)
-// Fire is 52px tall → top = 72 - 26 = 46px
+// With height:152px on bronze/silver (123px tall): circle center y = 152×(72/123) ≈ 89px
+// Fire 52px → top = 89 - 26 = 63px
+// Mobile height:110px: circle center y = 110×(72/123) ≈ 64px → fire 38px → top = 64 - 19 = 45px
 .emblemFire {
   position: absolute;
   width: 52px;
   height: 52px;
-  top: 46px;
+  top: 44px;
   left: 50%;
   transform: translateX(-50%);
   object-fit: contain;
   z-index: 3;
   pointer-events: none;
   mix-blend-mode: multiply;
+
+  @include mobile {
+    width: 38px;
+    height: 38px;
+    top: 30px;
+  }
 }
 
 // ── "GM" gradient text ────────────────────────────────────────────────────────
@@ -180,6 +202,11 @@ $clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px),
   margin: 0;
   padding-top: 40px; // design-specific: extra top gap to clear the emblem tail hanging below ring
   letter-spacing: -0.5px;
+
+  @include mobile {
+    font-size: 22px;
+    padding-top: 28px;
+  }
 }
 
 // ── User row: avatar + username + tier badge ──────────────────────────────────
@@ -192,7 +219,6 @@ $clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px),
   justify-content: center;
   gap: 8px;
   padding: 0 var(--space-4);
-  margin-top: 6px;
 }
 
 // design-specific: 32.913px circle, blue border rgba(38,57,237,0.36), shadow
@@ -227,6 +253,11 @@ $clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px),
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 160px;
+
+  @include mobile {
+    font-size: 16px;
+    max-width: 120px;
+  }
 }
 
 // ── Streak section ────────────────────────────────────────────────────────────
@@ -241,8 +272,8 @@ $clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px),
   gap: 4px;
   margin: 10px 16px 0;
   padding: 14px 24px 16px;
-  background: #f7f7f7; // design-specific: light gray card, no token match
-  border: 1px solid #eeeeee; // design-specific: subtle card border, no token match
+  border-top: 1px solid #eeeeee;
+  border-bottom: 1px solid #eeeeee;
   border-radius: 14px; // design-specific: Figma rounded card, no token match
 }
 
@@ -260,13 +291,21 @@ $clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px),
   font-size: 71px; // design-specific: Figma exact 71.186px, no token match
   font-weight: var(--font-weight-bold);
   line-height: 1;
-  background: linear-gradient(132.39deg, #2639ed 78.694%, #bccad7 95.241%);
+  background: linear-gradient(160deg, #a8b4f8 0%, #7b8ff5 40%, #5a6fe8 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  // design-specific: 3D extrusion — 2-step downward stack
+  filter:
+    drop-shadow(0px 2px 0px #7b8ce0)
+    drop-shadow(0px 4px 0px #5b6cc0);
+
+  @include mobile {
+    font-size: 52px;
+  }
 
   @include small-mobile {
-    font-size: 54px;
+    font-size: 44px;
   }
 }
 
@@ -277,6 +316,10 @@ $clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px),
   font-weight: var(--font-weight-medium);
   color: #404040; // design-specific: dark gray, Figma spec, no token match
   line-height: 1;
+
+  @include mobile {
+    font-size: 15px;
+  }
 }
 
 // design-specific: Space Grotesk Regular 13px, color #918686 — pts to next tier
@@ -378,6 +421,10 @@ $clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px),
   text-overflow: ellipsis;
   flex: 1;
   min-width: 0;
+
+  @include mobile {
+    font-size: 13px;
+  }
 }
 
 // design-specific: transparent icon button — copy wallet address

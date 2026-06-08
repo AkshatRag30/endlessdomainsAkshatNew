@@ -57,7 +57,7 @@ export function PerkCard({ perk }: PerkCardProps) {
 
   return (
     <>
-      <div className={styles.cardOuter}>
+      <div className={`${styles.cardOuter} ${status === 'expired' ? styles.cardOuter_expired : ''}`}>
 
         {/* Status badge — top-right, outside the clip-path so it's not cut */}
         {status !== 'locked' && !isAuthGated && (
@@ -74,14 +74,6 @@ export function PerkCard({ perk }: PerkCardProps) {
 
         <div className={styles.cardWrap}>
           <article className={styles.card} aria-label={title}>
-
-            {/* ── Expired date overlay — slides up on hover ───────────────── */}
-            {status === 'expired' && expiredAt && (
-              <div className={styles.expiredOverlay} aria-hidden="true">
-                <span className={styles.expiredOverlayLabel}>Expired on</span>
-                <span className={styles.expiredOverlayDate}>{expiredAt}</span>
-              </div>
-            )}
 
             {/* ── Polygon header ──────────────────────────────────────────── */}
             <div className={`${styles.cardHeader} ${headerClass}`} />
@@ -118,7 +110,12 @@ export function PerkCard({ perk }: PerkCardProps) {
 
             {/* ── Text content ────────────────────────────────────────────── */}
             <div className={styles.cardBody}>
-              <h3 className={styles.cardTitle}>{title}</h3>
+              <div className={styles.cardTitleRow}>
+                <h3 className={styles.cardTitle}>{title}</h3>
+                {status === 'expired' && expiredAt && (
+                  <span className={styles.expiredDatePill}>{expiredAt}</span>
+                )}
+              </div>
               <p className={styles.cardDesc}>{description}</p>
             </div>
 

@@ -97,7 +97,9 @@ export function GmPendingModal({ isOpen, onClose, onCheckStatus }: GmPendingModa
 
         {/* Footer action bar */}
         <div className={styles.footer}>
-          <SecondaryButton onClick={onClose}>Close</SecondaryButton>
+          <div className={styles.secondaryBtnWrap}>
+            <SecondaryButton onClick={onClose} transparent danger>Close</SecondaryButton>
+          </div>
 
           <button
             type="button"

@@ -85,7 +85,9 @@ export function GmTransactionFailedModal({
 
         {/* Footer action bar */}
         <div className={styles.footer}>
-          <SecondaryButton onClick={handleTryAgain}>Try Again ↗</SecondaryButton>
+          <div className={styles.secondaryBtnWrap}>
+            <SecondaryButton onClick={handleTryAgain} transparent danger>Try Again ↗</SecondaryButton>
+          </div>
 
           <button
             type="button"
