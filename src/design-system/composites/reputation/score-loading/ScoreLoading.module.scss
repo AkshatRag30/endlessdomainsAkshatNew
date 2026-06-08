@@ -73,25 +73,21 @@
 }
 
 .waveBack {
-  transform-box: fill-box;
-  transform-origin: center;
   animation: wave-move-back 5s linear infinite;
 }
 
 .waveFront {
-  transform-box: fill-box;
-  transform-origin: center;
   animation: wave-move-front 3s linear infinite;
 }
 
 @keyframes wave-move-front {
   from { transform: translateX(0); }
-  to   { transform: translateX(-33px); }
+  to   { transform: translateX(-22px); }
 }
 
 @keyframes wave-move-back {
-  from { transform: translateX(-33px); }
-  to   { transform: translateX(0); }
+  from { transform: translateX(0); }
+  to   { transform: translateX(-22px); }
 }
 
 // ── Shadow ellipse ────────────────────────────────────────────────────────────
@@ -124,6 +120,11 @@
   line-height: 1.2;
   margin: 0;
   white-space: nowrap;
+
+  @include mobile {
+    white-space: normal;
+    font-size: var(--text-display-sm);
+  }
 }
 
 .subtitle {

@@ -67,6 +67,11 @@ $clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px),
   line-height: 1.2;
   margin: 0;
   white-space: nowrap;
+
+  @include mobile {
+    white-space: normal;
+    font-size: var(--text-display-sm);
+  }
 }
 
 .subtitle {
