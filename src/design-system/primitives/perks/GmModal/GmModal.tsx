@@ -19,16 +19,21 @@ export interface GmModalProps {
 
 // ── Static data ───────────────────────────────────────────────────────────────
 
-// Active chain shown in the transaction details section
-const ACTIVE_CHAIN = { id: 'polygon', label: 'POLYGON', name: 'Polygon' }
+const DEFAULT_CHAIN = { id: 'polygon', label: 'POLYGON', name: 'Polygon' }
 
 // Chain selector list (switch chain options)
 const SWITCH_CHAINS = [
-  { id: 'arbitrum', name: 'Arbitrum', gasEst: '~$0.01', balance: '0.12 ETH', highlighted: true },
+  { id: 'arbitrum', name: 'Arbitrum', gasEst: '~$0.01', balance: '0.12 ETH' },
   { id: 'base', name: 'Base', gasEst: '~$0.005', balance: '0.05 ETH' },
   { id: 'optimism', name: 'Optimism', gasEst: '~$0.005', balance: '0.08 ETH' },
   { id: 'ethereum', name: 'Ethereum', gasEst: '~$0.08', balance: '0.42 ETH' },
 ]
+
+// Lookup name by id across all known chains
+const ALL_CHAIN_NAMES: Record<string, string> = {
+  [DEFAULT_CHAIN.id]: DEFAULT_CHAIN.name,
+  ...Object.fromEntries(SWITCH_CHAINS.map(c => [c.id, c.name])),
+}
 
 // design-specific: approximate brand colors for chain icons — replace with actual assets
 const CHAIN_COLORS: Record<string, string> = {
@@ -73,6 +78,7 @@ export function GmModal({
 
   const [showChainPicker, setShowChainPicker] = useState(false)
   const [selectedChain, setSelectedChain] = useState<DomainProviderKey | undefined>(undefined)
+  const [activeChainId, setActiveChainId] = useState(DEFAULT_CHAIN.id)
   // 'idle' = GM modal visible | 'pending' = loading modal | 'failed' = error modal
   const [gmStatus, setGmStatus] = useState<'idle' | 'pending' | 'failed'>(initialStatus)
 
@@ -94,8 +100,8 @@ export function GmModal({
 
   const handleGm = useCallback(() => {
     setGmStatus('pending')
-    onGm?.(ACTIVE_CHAIN.id)
-  }, [onGm])
+    onGm?.(activeChainId)
+  }, [onGm, activeChainId])
 
   const handlePendingClose = useCallback(() => {
     setGmStatus('idle')
@@ -112,6 +118,7 @@ export function GmModal({
   }, [])
 
   const handleChainSwitch = useCallback((chainId: string) => {
+    setActiveChainId(chainId)
     onGm?.(chainId)
   }, [onGm])
 
@@ -120,8 +127,12 @@ export function GmModal({
 
   const handleChainSelect = useCallback((chain: DomainProviderKey) => {
     setSelectedChain(chain)
+    setActiveChainId(chain as string)
     setShowChainPicker(false)
   }, [])
+
+  const activeChainName = ALL_CHAIN_NAMES[activeChainId] ?? activeChainId
+  const activeChainLabel = activeChainName.toUpperCase()
 
   if (!isOpen) return null
 
@@ -145,7 +156,7 @@ export function GmModal({
         <GmTransactionFailedModal
           isOpen
           onClose={() => { setGmStatus('idle'); onClose() }}
-          chainName={ACTIVE_CHAIN.name}
+          chainName={activeChainName}
           onTryAgain={handleFailedTryAgain}
           onPickChain={handleFailedPickChain}
         />
@@ -204,10 +215,10 @@ export function GmModal({
                 <div className={styles.txDetails}>
                   <div className={styles.txMessage}>
                     <span className={styles.txBolt}>⚡</span>
-                    <span className={styles.txText}>Sending GM on {ACTIVE_CHAIN.name}...</span>
+                    <span className={styles.txText}>Sending GM on {activeChainName}...</span>
                   </div>
-                  <div className={styles.chainTag} aria-label={`Chain: ${ACTIVE_CHAIN.label}`}>
-                    {ACTIVE_CHAIN.label}
+                  <div className={styles.chainTag} aria-label={`Chain: ${activeChainLabel}`}>
+                    {activeChainLabel}
                   </div>
                 </div>
 
@@ -222,9 +233,9 @@ export function GmModal({
                   type="button"
                   className={styles.gmBtn}
                   onClick={handleGm}
-                  aria-label={`Sign and GM on ${ACTIVE_CHAIN.name}`}
+                  aria-label={`Sign and GM on ${activeChainName}`}
                 >
-                  <span className={styles.gmBtnText}>👋&nbsp;&nbsp;Sign &amp; GM on {ACTIVE_CHAIN.name}&nbsp;&nbsp;→</span>
+                  <span className={styles.gmBtnText}>👋&nbsp;&nbsp;Sign &amp; GM on {activeChainName}&nbsp;&nbsp;→</span>
                 </button>
 
               </div>
@@ -244,36 +255,39 @@ export function GmModal({
             {/* Chain selector */}
             <div className={styles.chainSelector}>
 
-              {SWITCH_CHAINS.map(chain => (
-                <button
-                  key={chain.id}
-                  type="button"
-                  className={[
-                    styles.chainRow,
-                    chain.highlighted ? styles.chainRowHighlight : '',
-                  ].filter(Boolean).join(' ')}
-                  onClick={() => handleChainSwitch(chain.id)}
-                  aria-label={`Switch to ${chain.name} — ${chain.gasEst} gas, ${chain.balance}`}
-                >
-                  <div className={styles.chainInfo}>
-                    <ChainCircle id={chain.id} />
-                    <div className={styles.chainText}>
-                      <span className={[
-                        styles.chainName,
-                        chain.highlighted ? styles.chainNameHighlight : '',
-                      ].filter(Boolean).join(' ')}>
-                        {chain.name}
-                      </span>
-                      <span className={styles.chainGas}>{chain.gasEst} · {chain.balance}</span>
+              {SWITCH_CHAINS.map(chain => {
+                const isActive = chain.id === activeChainId
+                return (
+                  <button
+                    key={chain.id}
+                    type="button"
+                    className={[
+                      styles.chainRow,
+                      isActive ? styles.chainRowHighlight : '',
+                    ].filter(Boolean).join(' ')}
+                    onClick={() => handleChainSwitch(chain.id)}
+                    aria-label={`Switch to ${chain.name} — ${chain.gasEst} gas, ${chain.balance}`}
+                  >
+                    <div className={styles.chainInfo}>
+                      <ChainCircle id={chain.id} />
+                      <div className={styles.chainText}>
+                        <span className={[
+                          styles.chainName,
+                          isActive ? styles.chainNameHighlight : '',
+                        ].filter(Boolean).join(' ')}>
+                          {chain.name}
+                        </span>
+                        <span className={styles.chainGas}>{chain.gasEst} · {chain.balance}</span>
+                      </div>
                     </div>
-                  </div>
-                  <FiArrowRight
-                    size={18}
-                    aria-hidden="true"
-                    className={chain.highlighted ? styles.arrowHighlight : styles.arrowDefault}
-                  />
-                </button>
-              ))}
+                    <FiArrowRight
+                      size={18}
+                      aria-hidden="true"
+                      className={isActive ? styles.arrowHighlight : styles.arrowDefault}
+                    />
+                  </button>
+                )
+              })}
 
             </div>
           </div>

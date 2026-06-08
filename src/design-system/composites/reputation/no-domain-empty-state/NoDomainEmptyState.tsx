@@ -19,13 +19,16 @@ export default function NoDomainEmptyState() {
         </div>
 
         <div className={styles.textBlock}>
-          <h2 className={styles.heading}>Get a .og domain to start building reputation</h2>
+          <h2 className={styles.heading}>Get a .og identity to start building reputation</h2>
+          <p className={styles.subtitle}>You need a .og identity to access Identity OS features including your reputation score, GM streak, perks, and on-chain credentials. One transaction. Permanent ownership. No renewals.</p>
         </div>
 
-        <button type="button" className={styles.ctaBtn} aria-label="Search Domains">
-          <span>Search Domains</span>
+        <button type="button" className={styles.ctaBtn} aria-label="Claim your .og">
+          <span>Claim your .og</span>
           <ArrowRight />
         </button>
+
+        <p className={styles.disclaimer}>Identity OS features unlock the moment you claim your .og</p>
 
       </div>
     </div>

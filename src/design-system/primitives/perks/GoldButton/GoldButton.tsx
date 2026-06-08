@@ -30,7 +30,7 @@ export function GoldButton({
   'aria-label': ariaLabel,
 }: GoldButtonProps) {
   const isGold = variant === 'default' || variant === 'gmed'
-  const showFire = isGold || variant === 'connect-wallet'
+  const showFire = isGold
 
   const variantKey = variant.replace(/-/g, '_')
   const variantClass = styles[`goldBtn_${variantKey}` as keyof typeof styles]

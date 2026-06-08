@@ -37,7 +37,7 @@ export function PerkCard({ perk }: PerkCardProps) {
   const {
     status, tier, type, title, description,
     partnerName, partnerLogo, claimedCount, totalCount,
-    pointsRequired, currentPoints,
+    pointsRequired, currentPoints, expiredAt,
   } = perk
 
   const [showConfirm, setShowConfirm] = useState(false)
@@ -74,6 +74,14 @@ export function PerkCard({ perk }: PerkCardProps) {
 
         <div className={styles.cardWrap}>
           <article className={styles.card} aria-label={title}>
+
+            {/* ── Expired date overlay — slides up on hover ───────────────── */}
+            {status === 'expired' && expiredAt && (
+              <div className={styles.expiredOverlay} aria-hidden="true">
+                <span className={styles.expiredOverlayLabel}>Expired on</span>
+                <span className={styles.expiredOverlayDate}>{expiredAt}</span>
+              </div>
+            )}
 
             {/* ── Polygon header ──────────────────────────────────────────── */}
             <div className={`${styles.cardHeader} ${headerClass}`} />

@@ -93,9 +93,61 @@ $clip-card: polygon(20px 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%, 0
   letter-spacing: 0.04em;
 }
 
+// ── Expired date hover overlay ────────────────────────────────────────────────
+
+.expiredOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  background: rgba(20, 20, 20, 0.82);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  transform: translateY(100%);
+  opacity: 0;
+  transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.22s ease;
+  pointer-events: none;
+}
+
+.cardOuter:hover .expiredOverlay {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.expiredOverlayLabel {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-regular);
+  color: rgba(255, 255, 255, 0.65);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.expiredOverlayDate {
+  font-family: var(--font-satoshi);
+  font-size: 22px; // design-specific: large date display, no exact token match
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white-primary);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+
+  @include tablet-down {
+    font-size: var(--text-normal);
+  }
+
+  @include mobile {
+    font-size: var(--text-nav);
+  }
+}
+
 // ── Card wrap (outer border with diagonal corner cuts) ─────────────────────────
 
 .cardWrap {
+  position: relative;
   clip-path: $clip-card;
   padding: 1.5px;
   background: rgba(38, 57, 237, 0.2); // design-specific: thin blue-tinted card border

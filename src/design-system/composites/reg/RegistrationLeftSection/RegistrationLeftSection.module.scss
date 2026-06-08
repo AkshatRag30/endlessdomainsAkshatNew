@@ -1,0 +1,279 @@
+@import '@newstyles/_mixins.scss';
+
+.leftColCard {
+  background-color: var(--color-white-primary);
+  border: 1px solid var(--color-gray-200);
+  padding: var(--space-7);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-7);
+
+  @include tablet-down {
+    gap: var(--space-6);
+    padding: var(--space-6);
+  }
+
+  @include mobile {
+    padding: var(--space-5) var(--space-4);
+    gap: var(--space-5);
+  }
+}
+
+// ─── Section Heading ──────────────────────────────────────────────────────────
+
+.sectionHeading {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-body-small);
+  color: var(--color-black-primary);
+  opacity: 0.7;
+  text-transform: capitalize;
+  margin: 0 0 var(--space-4);
+  line-height: var(--leading-snug);
+}
+
+// ─── Registering On ───────────────────────────────────────────────────────────
+
+.registeringOn {
+  display: flex;
+  flex-direction: column;
+}
+
+.chainCard {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-6) var(--space-7);
+  background-color: var(--color-blue-primary);
+  border-radius: var(--radius-sm);
+  border: 0.53px solid var(--color-blue-primary); // design-specific: Figma-exact fractional border
+  box-shadow:
+    // design-specific: Figma-exact fractional shadow stack for chain card depth effect
+    0 0.53px 1.58px 0 rgba(177, 183, 192, 0.24),
+    0 0 0 4.74px #fcfcfc,
+    0 0 0 5.26px rgba(211, 214, 222, 0.5),
+    0 5.26px 1.58px 0 rgba(127, 137, 163, 0.23);
+  position: relative;
+  overflow: hidden;
+  width: fit-content;
+
+  @include tablet-down {
+    width: 100%;
+    padding: var(--space-5) var(--space-6);
+  }
+
+  @include mobile {
+    padding: var(--space-4) var(--space-5);
+  }
+
+  // grainy noise texture overlay
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    // SVG feTurbulence noise filter rendered as inline data URI
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+    background-size: 150px 150px; // design-specific: noise tile size for grain density
+    opacity: 0.18;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    z-index: 1;
+  }
+
+  // inset glow
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -0.27px;
+    border-radius: inherit;
+    box-shadow: inset 0 0 22.43px 0 #fff, inset 0 -3.16px 0 0 rgba(230, 232, 237, 0.7);
+    pointer-events: none;
+    z-index: 2;
+  }
+}
+
+// ── Corner dots (ported from WaitlistHero) ────────────────────────────────────
+
+.dot {
+  position: absolute;
+  width: 10px; // design-specific: Figma-exact dot diameter
+  height: 10px;
+  border-radius: var(--radius-full);
+  background: var(--color-white-primary);
+  box-shadow: 0 0.3px 0.4px var(--color-black-alpha-31); // design-specific: Figma-exact dot shadow
+  z-index: 4;
+  pointer-events: none;
+
+  // gray ring
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0.8px; // design-specific: Figma-exact ring inset
+    border-radius: var(--radius-full);
+    background: var(--color-gray-300);
+  }
+
+  // inner core
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 1.6px; // design-specific: Figma-exact inner dot inset
+    border-radius: var(--radius-full);
+    background: var(--color-gray-medium);
+  }
+}
+
+.dotTopLeft     { top: 8px;    left: 10px;    }
+.dotTopRight    { top: 8px;    right: 10px;   }
+.dotBottomLeft  { bottom: 8px; left: 10px;    }
+.dotBottomRight { bottom: 8px; right: 10px;   }
+
+.chainCardLogoRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  position: relative;
+  z-index: 3;
+}
+
+.chainIcon {
+  width: 44px; // design-specific: chain icon mark width in card
+  height: auto;
+  flex-shrink: 0;
+
+  @include mobile {
+    width: 32px;
+  }
+}
+
+.chainName {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--text-display-md); // ~48px — large chain name text
+  color: var(--color-white-primary);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-h2);
+  line-height: 1;
+
+  @include tablet-down {
+    font-size: var(--text-h3);
+  }
+
+  @include mobile {
+    font-size: var(--text-display-sm);
+  }
+}
+
+.chainPaymentLabel {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-body-small);
+  color: var(--color-white-primary);
+  text-transform: capitalize;
+  line-height: var(--leading-snug);
+  margin: 0;
+  text-align: left;
+  position: relative;
+  z-index: 3;
+}
+
+// ─── What Happens Next ────────────────────────────────────────────────────────
+
+.whatNext {
+  display: flex;
+  flex-direction: column;
+}
+
+.stepsList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.stepItem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.stepIcon {
+  flex-shrink: 0;
+  width: 39px; // design-specific icon container size from Figma
+  height: 39px;
+  border-radius: 12.62px; // design-specific Figma radius
+  background: linear-gradient(180deg, var(--color-blue-primary) 0%, rgba(38, 57, 237, 0.47) 100%);
+  box-shadow:
+    // design-specific: Figma-exact fractional shadow stack for step icon glow
+    0 13.52px 34.44px 0 rgba(87, 177, 255, 0.34),
+    0 7.96px 10.38px 0 rgba(87, 177, 255, 0.19),
+    0 3.3px 4.31px 0 rgba(87, 177, 255, 0.22),
+    0 1.2px 1.56px 0 rgba(87, 177, 255, 0.15),
+    0 0 0 1.29px #e0e9f2,
+    0 0 0 1.61px #fff,
+    inset 0 0.32px 5.79px 0.64px #d2eaff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-white-primary);
+  font-size: var(--text-small-15);
+}
+
+.stepContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.stepTitle {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-body-small);
+  color: var(--color-black-primary);
+  text-transform: capitalize;
+  margin: 0;
+  line-height: var(--leading-snug);
+}
+
+.stepDesc {
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-small-13);
+  color: var(--color-gray-dark-hover);
+  line-height: var(--leading-normal);
+  margin: 0;
+}
+
+// ─── Warning Banner ───────────────────────────────────────────────────────────
+
+.warningBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background-color: #fef9c3; // design-specific: Figma yellow-50 warning bg
+  background-image: repeating-linear-gradient(135deg, transparent, transparent 7px, var(--color-black-alpha-03) 2px, var(--color-black-alpha-03) 8px);
+  border: 1px solid #fef08a; // design-specific: Figma yellow-200 warning border
+}
+
+.warningIcon {
+  flex-shrink: 0;
+  font-size: var(--text-small-15);
+  color: var(--color-gray-dark);
+  margin-top: 1px;
+}
+
+.warningText {
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-small-12);
+  color: var(--color-gray-dark);
+  line-height: var(--leading-normal);
+  letter-spacing: 0.06px;
+  margin: 0;
+}

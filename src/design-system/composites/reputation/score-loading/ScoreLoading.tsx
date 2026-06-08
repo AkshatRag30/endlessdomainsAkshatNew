@@ -65,7 +65,7 @@ export default function ScoreLoading() {
         {/* Heading + subtitle */}
         <div className={styles.textBlock}>
           <h2 className={styles.heading}>Calculating your score...</h2>
-          <p className={styles.subtitle}>Your score is ready. Loading your profile.</p>
+          <p className={styles.subtitle}>Reading your on-chain history. Usually around 30 seconds.</p>
         </div>
 
         {/* Progress bar */}

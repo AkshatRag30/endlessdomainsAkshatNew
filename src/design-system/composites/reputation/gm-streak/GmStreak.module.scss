@@ -250,6 +250,8 @@ $clip-sm: polygon(5px 0px, calc(100% - 10px) 0px, 100% 12px, 100% calc(100% - 5p
   @include mobile {
     font-size: 16px;
     margin-bottom: var(--space-4);
+
+  
   }
 }
 
@@ -424,6 +426,12 @@ $clip-sm: polygon(5px 0px, calc(100% - 10px) 0px, 100% 12px, 100% calc(100% - 5p
   text-align: center;
   margin: 0 0 var(--space-5);
 
+  @include tablet {
+    font-size: 20px;
+    text-align: left;
+    margin-bottom: var(--space-6);
+  }
+
   @include mobile {
     font-size: 16px;
     margin-bottom: var(--space-4);
@@ -435,9 +443,14 @@ $clip-sm: polygon(5px 0px, calc(100% - 10px) 0px, 100% 12px, 100% calc(100% - 5p
   flex-direction: column;
   gap: var(--space-1);
   width: 100%;
-  // design-specific: Figma frame is ~310px; 400px cap gives comfortable tablet display while keeping blocks readable
+  // design-specific: Figma frame is ~310px; uncapped on tablet so it fills available width
   max-width: 400px;
   margin: 0 auto;
+
+  @include tablet {
+    max-width: 100%;
+    gap: var(--space-2);
+  }
 }
 
 // Shared layout: header row + each month data row
@@ -448,6 +461,10 @@ $clip-sm: polygon(5px 0px, calc(100% - 10px) 0px, 100% 12px, 100% calc(100% - 5p
   // design-specific: ~15.951px Figma gap between month label and blocks
   gap: var(--space-4);
   width: 100%;
+
+  @include tablet {
+    gap: var(--space-5);
+  }
 }
 
 // Invisible placeholder that occupies the month-label column in the header
@@ -455,6 +472,10 @@ $clip-sm: polygon(5px 0px, calc(100% - 10px) 0px, 100% 12px, 100% calc(100% - 5p
   // design-specific: 29.529px Figma month label width
   width: 30px;
   flex-shrink: 0;
+
+  @include tablet {
+    width: 36px;
+  }
 }
 
 .altMonthLabel {
@@ -466,6 +487,11 @@ $clip-sm: polygon(5px 0px, calc(100% - 10px) 0px, 100% 12px, 100% calc(100% - 5p
   font-weight: var(--font-weight-regular);
   color: var(--color-gray-dark);
   line-height: 1.2;
+
+  @include tablet {
+    font-size: var(--text-small-12);
+    width: 36px;
+  }
 }
 
 // Flex container shared by both the day-label header and block rows
@@ -474,6 +500,10 @@ $clip-sm: polygon(5px 0px, calc(100% - 10px) 0px, 100% 12px, 100% calc(100% - 5p
   flex: 1;
   // design-specific: ~3.988px Figma col gap
   gap: var(--space-1);
+
+  @include tablet {
+    gap: var(--space-2);
+  }
 }
 
 .altDayLabel {
@@ -487,6 +517,11 @@ $clip-sm: polygon(5px 0px, calc(100% - 10px) 0px, 100% 12px, 100% calc(100% - 5p
   overflow: hidden;
   line-height: 1.2;
   padding: var(--space-1) 0;
+
+  @include tablet {
+    font-size: var(--text-small-12);
+    padding: var(--space-2) 0;
+  }
 }
 
 .altBlock {
@@ -496,6 +531,10 @@ $clip-sm: polygon(5px 0px, calc(100% - 10px) 0px, 100% 12px, 100% calc(100% - 5p
   // design-specific: Figma border-radius 2.461px
   border-radius: 2.5px;
   min-width: 0;
+
+  @include tablet {
+    border-radius: 4px;
+  }
 }
 
 .altFooter {
@@ -519,6 +558,11 @@ $clip-sm: polygon(5px 0px, calc(100% - 10px) 0px, 100% 12px, 100% calc(100% - 5p
   height: 26px;
   border-radius: 5px;
   flex-shrink: 0;
+
+  @include tablet {
+    width: 32px;
+    height: 32px;
+  }
 }
 
 .altLegendEmpty {
@@ -566,7 +610,10 @@ $clip-sm: polygon(5px 0px, calc(100% - 10px) 0px, 100% 12px, 100% calc(100% - 5p
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--space-3);
+  margin-bottom: var(--space-7);
+
+  p{
+    margin-bottom: 0;}
 }
 
 // ── Filter button ─────────────────────────────────────────────────────────────
@@ -793,10 +840,20 @@ $clip-sm: polygon(5px 0px, calc(100% - 10px) 0px, 100% 12px, 100% calc(100% - 5p
 
 .historyCardTop {
   display: flex;
-  align-items: flex-start;
+  align-items: stretch;
   justify-content: space-between;
-  // design-specific: Figma card top padding 16px, horizontal 11px
-  padding: var(--space-4) 11px var(--space-3);
+  gap: 0;
+
+  > .historyCardField:first-child {
+    flex: 1;
+    padding: var(--space-4) 11px var(--space-3);
+    border-right: 1px solid #e8e8e8;
+  }
+
+  > .historyCardField:last-child {
+    flex: 1;
+    padding: var(--space-4) 11px var(--space-3);
+  }
 }
 
 .historyCardField {

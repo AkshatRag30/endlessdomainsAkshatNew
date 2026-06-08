@@ -42,8 +42,8 @@ export default function ScoreHistoryChart() {
             contentStyle={{ background: '#fff', border: 'none', borderRadius: 6, boxShadow: '0 4px 12px rgba(50,50,71,0.12)', fontSize: 13, fontFamily: 'Satoshi, sans-serif' }}
             labelFormatter={i => `Day ${i}`}
           />
-          <Area type="monotone" dataKey="activity" stroke="#fdc651" strokeWidth={2} fill="none" strokeOpacity={0.5} dot={false} />
-          <Area type="monotone" dataKey="score"    stroke="#422f8a" strokeWidth={2.5} fill="url(#scoreAreaGrad)" dot={false} />
+          <Area type="monotone" dataKey="activity" stroke="#fdc651" strokeWidth={1} fill="none" strokeOpacity={0.5} dot={false} />
+          <Area type="monotone" dataKey="score"    stroke="#422f8a" strokeWidth={1.5} fill="url(#scoreAreaGrad)" dot={false} />
         </AreaChart>
       </ResponsiveContainer>
 

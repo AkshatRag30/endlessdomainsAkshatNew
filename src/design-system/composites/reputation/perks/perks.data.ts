@@ -19,6 +19,7 @@ export interface PerkItem {
   totalCount: number
   pointsRequired?: number
   currentPoints?: number
+  expiredAt?: string
 }
 
 // ── Nav links ─────────────────────────────────────────────────────────────────
@@ -47,8 +48,8 @@ export const MOCK_PERKS: PerkItem[] = [
   { id: '2', status: 'available', tier: 'silver', type: 'NFT', title: 'Lorem Ipsum', description: LOREM_MED, partnerName: 'Endless Domains', partnerLogo: logo, claimedCount: 14, totalCount: 50 },
   { id: '3', status: 'locked', tier: 'silver', type: 'NFT', title: 'Lorem Ipsum', description: LOREM_MED, partnerName: 'Endless Domains', partnerLogo: logo, claimedCount: 14, totalCount: 50, pointsRequired: 500, currentPoints: 312 },
   { id: '4', status: 'sold-out', tier: 'bronze', type: 'NFT', title: 'Lorem Ipsum', description: LOREM_LONG, partnerName: 'Endless Domains', partnerLogo: logo, claimedCount: 14, totalCount: 50 },
-  { id: '5', status: 'expired', tier: 'bronze', type: 'NFT', title: 'Lorem Ipsum', description: LOREM_LONG, partnerName: 'Endless Domains', partnerLogo: logo, claimedCount: 14, totalCount: 50 },
-  { id: '6', status: 'expired', tier: 'bronze', type: 'NFT', title: 'Lorem Ipsum', description: LOREM_LONG, partnerName: 'Endless Domains', partnerLogo: logo, claimedCount: 14, totalCount: 50 },
+  { id: '5', status: 'expired', tier: 'bronze', type: 'NFT', title: 'Lorem Ipsum', description: LOREM_LONG, partnerName: 'Endless Domains', partnerLogo: logo, claimedCount: 14, totalCount: 50, expiredAt: 'Mar 15, 2025' },
+  { id: '6', status: 'expired', tier: 'bronze', type: 'NFT', title: 'Lorem Ipsum', description: LOREM_LONG, partnerName: 'Endless Domains', partnerLogo: logo, claimedCount: 14, totalCount: 50, expiredAt: 'Apr 2, 2025' },
   { id: '7', status: 'claimable', tier: 'gold', type: 'Discount', title: 'Lorem Ipsum', description: LOREM_LONG, partnerName: 'Endless Domains', partnerLogo: logo, claimedCount: 7, totalCount: 30 },
   { id: '8', status: 'available', tier: 'gold', type: 'Whitelist', title: 'Lorem Ipsum', description: LOREM_MED, partnerName: 'Endless Domains', partnerLogo: logo, claimedCount: 3, totalCount: 20 },
   { id: '9', status: 'locked', tier: 'gold', type: 'NFT', title: 'Lorem Ipsum', description: LOREM_MED, partnerName: 'Endless Domains', partnerLogo: logo, claimedCount: 0, totalCount: 25, pointsRequired: 750, currentPoints: 312 },

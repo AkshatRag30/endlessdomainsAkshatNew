@@ -189,7 +189,7 @@ $clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px),
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-2-5) var(--space-6);
+  padding: var(--space-1-5) var(--space-3);
   // design-specific: Figma dark pill badge — gradient from #2c2c2c to #201f1b
   background: linear-gradient(to bottom, #2c2c2c, #201f1b);
   border: 0.763px solid var(--color-black-primary);

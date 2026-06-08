@@ -18,7 +18,7 @@
 
 .page {
   min-height: 100vh;
-  background: var(--color-gray-light-bg);
+  background: var(--color-white-primary);
   padding: var(--space-7) var(--container-padding-x);
 
   @include tablet-down {

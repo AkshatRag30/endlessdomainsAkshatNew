@@ -34,14 +34,16 @@ export default function TrackingDisabledEmptyState({ onEnableClick }: TrackingDi
         </div>
 
         <div className={styles.textBlock}>
-          <h2 className={styles.heading}>Enable Reputation Tracking</h2>
-          <p className={styles.subtitle}>See your score, tiers, and earn perks</p>
+          <h2 className={styles.heading}>You have your .og. Now make it work for you.</h2>
+          <p className={styles.subtitle}>Your identity is live on-chain. Enable reputation tracking and the OS starts reading your history, building your score, and unlocking everything your .og can become.</p>
         </div>
 
         <button type="button" className={styles.ctaBtn} onClick={onEnableClick} aria-label="Enable Now">
           <span>Enable Now</span>
           <ArrowRight />
         </button>
+
+        <p className={styles.disclaimer}>Your data stays on-chain. The OS reads your history. You own the record.</p>
 
       </div>
     </div>

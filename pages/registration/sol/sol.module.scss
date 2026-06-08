@@ -1,0 +1,397 @@
+@import '@newstyles/_mixins.scss';
+
+// ─── Page Shell ───────────────────────────────────────────────────────────────
+
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+// ─── Main Section ─────────────────────────────────────────────────────────────
+
+.mainSection {
+  flex: 1;
+  background-color: var(--color-white-light-hover);
+  padding: var(--space-8) 0 120px; // design-specific: 120px bottom clears the fixed bottom bar on mobile
+
+  @include tablet-up {
+    padding-bottom: var(--space-12);
+  }
+}
+
+.container {
+  max-width: 1100px; // design-specific: two-column registration layout max-width
+  margin: 0 auto;
+  padding: 0 var(--space-7);
+  display: flex;
+  gap: var(--space-7);
+  align-items: flex-start;
+
+  @include tablet-down {
+    flex-direction: column;
+    gap: var(--space-6);
+    padding: 0 var(--space-5);
+  }
+
+  @include mobile {
+    padding: 0 var(--space-4);
+    gap: var(--space-5);
+  }
+}
+
+// ─── Left Column ──────────────────────────────────────────────────────────────
+
+.leftCol {
+  flex: 1;
+  min-width: 0;
+
+  @include tablet-down {
+    width: 100%;
+  }
+}
+
+// ─── Right Column ─────────────────────────────────────────────────────────────
+
+.rightCol {
+  width: 360px; // design-specific: order summary panel width from Figma
+  flex-shrink: 0;
+  position: sticky;
+  top: var(--space-7);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+
+  @include tablet-down {
+    width: 100%;
+    position: static;
+  }
+}
+
+// ─── Panel (shared shell for Order Reviews + Billing Summary) ─────────────────
+
+.panel {
+  background-color: var(--color-white-primary);
+  border: 1px solid var(--color-gray-200);
+  overflow: hidden;
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+
+  &:focus-visible {
+    outline: 2px solid var(--color-blue-primary);
+    outline-offset: -2px;
+  }
+}
+
+.panelHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.panelHeaderIcon {
+  font-size: var(--text-button);
+  color: var(--color-black-primary);
+  flex-shrink: 0;
+}
+
+.panelHeaderTitle {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-body-small);
+  color: var(--color-black-primary);
+  line-height: 1;
+}
+
+.panelChevron {
+  font-size: var(--text-nav);
+  color: var(--color-black-primary);
+  transition: transform 200ms ease;
+  flex-shrink: 0;
+}
+
+.panelChevronOpen {
+  transform: rotate(180deg);
+}
+
+.panelDivider {
+  height: 1px;
+  background-color: var(--color-gray-200);
+  margin: 0 var(--space-5);
+}
+
+// ─── Domain List (Order Reviews) ─────────────────────────────────────────────
+
+.domainList {
+  list-style: none;
+  margin: 0;
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.domainRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.domainAvatar {
+  width: 44px; // design-specific: domain avatar circle size
+  height: 44px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--color-blue-primary) 0%, var(--color-blue-light-active) 100%);
+  border: 2px solid var(--color-blue-light);
+  box-shadow: 0 0 0 1px var(--color-blue-primary-alpha-13);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.domainAvatarLetter {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--text-button);
+  color: var(--color-white-primary);
+  text-transform: uppercase;
+}
+
+.domainName {
+  flex: 1;
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-small-13);
+  color: var(--color-black-primary);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.domainPrice {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-small-13);
+  color: var(--color-black-primary);
+  flex-shrink: 0;
+}
+
+// ─── Billing Summary Body ─────────────────────────────────────────────────────
+
+.billingBody {
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.discountRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.discountToggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-small-13);
+  color: var(--color-blue-primary);
+  text-transform: capitalize;
+
+  &:focus-visible {
+    outline: 2px solid var(--color-blue-primary);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+}
+
+.discountTagIcon {
+  font-size: var(--text-small-15);
+}
+
+.discountInputWrap {
+  display: flex;
+  border: 1px solid var(--color-blue-primary);
+  overflow: hidden;
+}
+
+.discountInput {
+  flex: 1;
+  padding: var(--space-3) var(--space-4);
+  border: none;
+  outline: none;
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-small-13);
+  color: var(--color-black-primary);
+  background: var(--color-white-primary);
+
+  &::placeholder {
+    color: var(--color-gray-primary);
+  }
+}
+
+.discountApplyBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  background-color: var(--color-black-primary);
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-small-13);
+  color: var(--color-white-primary);
+  flex-shrink: 0;
+
+  &:focus-visible {
+    outline: 2px solid var(--color-blue-primary);
+    outline-offset: -2px;
+  }
+}
+
+.discountClearIcon {
+  font-size: var(--text-small-12);
+  cursor: pointer;
+}
+
+.billingDivider {
+  height: 1px;
+  background-color: var(--color-gray-200);
+}
+
+.billingRows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.billingRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.billingRowLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-small-13);
+  color: var(--color-gray-dark);
+}
+
+.billingRowLabelIcon {
+  display: flex;
+  align-items: center;
+  font-size: var(--text-small-15);
+  color: var(--color-gray-dark);
+}
+
+.billingRowValue {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-small-13);
+  color: var(--color-black-primary);
+}
+
+.billingTotalDivider {
+  height: 1px;
+  background-color: var(--color-black-primary);
+}
+
+.grandTotalRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.grandTotalLabel {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--text-body-small);
+  color: var(--color-black-primary);
+}
+
+.grandTotalValue {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--text-body-small);
+  color: var(--color-black-primary);
+}
+
+.exploreMore {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-small-13);
+  color: var(--color-gray-dark);
+
+  &:focus-visible {
+    outline: 2px solid var(--color-blue-primary);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+}
+
+.exploreMoreChevron {
+  font-size: var(--text-body-small);
+  line-height: 1;
+}
+
+// ─── Mobile Bottom Bar ────────────────────────────────────────────────────────
+
+.mobileBottomBar {
+  display: none;
+
+  @include tablet-down {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: var(--space-4) var(--space-5);
+    background-color: var(--color-white-primary);
+    background-image: repeating-linear-gradient(135deg, transparent, transparent 7px, var(--color-black-alpha-05) 2px, var(--color-black-alpha-05) 8px);
+    border-top: 1px solid var(--color-gray-200);
+    z-index: 50;
+  }
+
+  @include mobile {
+    padding: var(--space-3) var(--space-4);
+  }
+}

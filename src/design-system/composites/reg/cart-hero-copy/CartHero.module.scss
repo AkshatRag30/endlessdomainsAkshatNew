@@ -1,0 +1,511 @@
+@import '@newstyles/_mixins.scss';
+
+// ─── Root ─────────────────────────────────────────────────────────────────────
+
+.cart_hero {
+    width: 100%;
+    position: relative;
+    margin-top: var(--space-8);
+}
+
+// ─── Progress Strip ───────────────────────────────────────────────────────────
+
+.progress_strip {
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+  background: var(--color-gray-light-bg);
+  background-image: repeating-linear-gradient(135deg, transparent, transparent 7px, var(--color-black-alpha-05) 2px, var(--color-black-alpha-05) 8px);
+
+    // Subtle fade at left edge — 107px is a design-specific fade gradient width
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 107px; // design-specific: width of the edge fade overlay
+        height: 100%;
+        background: linear-gradient(90deg, var(--color-white-alpha-70) 0%, transparent 100%);
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    // Subtle fade at right edge — mirrors left fade
+    &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 107px; // design-specific: matches left fade width
+        height: 100%;
+        background: linear-gradient(270deg, var(--color-gray-light-bg-85) 0%, transparent 100%);
+        pointer-events: none;
+        z-index: 1;
+    }
+}
+
+// design-specific heights for the barcode progress strip — tuned to house the step pills and tracks
+.progress_inner {
+    display: flex;
+    align-items: center;
+    height: 74px;  // desktop barcode strip height
+    padding: 0 var(--space-4);
+
+    @include tablet-down {
+        height: 56px; // tablet
+        padding: 0 var(--space-3);
+    }
+
+    @include mobile {
+        height: 44px; // mobile
+        padding: 0 var(--space-2);
+    }
+}
+
+// ─── Barcode Track ────────────────────────────────────────────────────────────
+// design-specific track heights — sized to align with the step pill height
+
+.track {
+    height: 23px; // barcode track height (desktop)
+    flex-shrink: 0;
+
+    @include tablet-down {
+        height: 20px; // barcode track height (tablet/mobile)
+    }
+
+    @include mobile {
+        height: 20px;
+    }
+}
+
+/* first connector */
+.progress_inner>.track:nth-child(2) {
+    width: 8%;
+}
+
+/* middle connectors */
+.progress_inner>.track:nth-child(4),
+.progress_inner>.track:nth-child(6) {
+    flex: 1;
+    min-width: 0;
+}
+
+/* last connector */
+.progress_inner>.track:nth-child(8) {
+    width: 8%;
+}
+
+.track_active {
+    background-image: repeating-linear-gradient(90deg,
+            var(--color-blue-primary) 0px,
+            var(--color-blue-primary) 6.8px,
+            transparent 6.8px,
+            transparent 10.8px);
+}
+
+.track_inactive {
+    background-image: repeating-linear-gradient(90deg,
+            var(--color-gray-200) 0px,
+            var(--color-gray-200) 6.8px,
+            transparent 6.8px,
+            transparent 10.8px);
+}
+
+// ─── LED End Markers ──────────────────────────────────────────────────────────
+// design-specific LED marker dimensions and fractional box-shadow glow values —
+// all sizes/shadows are Figma-exact for the LED bulb effect; do not round
+
+.bar_marker {
+    width: 16px;  // design-specific LED marker size (desktop)
+    height: 16px;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+    box-shadow: inset 0 0 4.9px 0 var(--color-white-primary); // design-specific glow
+
+    @include mobile {
+        width: 10px;  // design-specific LED marker size (mobile)
+        height: 10px;
+    }
+}
+
+.bar_marker_inner {
+    position: absolute;
+    width: 88%;   // design-specific: percentage fills inner glow area
+    height: 85%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -47%); // design-specific: slight optical upward offset for glow centering
+    background: var(--color-white-primary);
+    box-shadow: inset 0 1.668px 7.84px 0 var(--color-white-primary); // design-specific fractional glow
+}
+
+.bar_marker_active {
+    background: var(--color-blue-primary);
+}
+
+.bar_marker_inactive {
+    background: var(--color-gray-200);
+}
+
+// ─── Step Pills ───────────────────────────────────────────────────────────────
+// design-specific pill dimensions and fractional box-shadow glow values —
+// all sizes/shadows are Figma-exact for the barcode step indicator; do not round
+
+.step_pill {
+    position: relative;
+    width: 126px; // design-specific pill width (desktop)
+    height: 35px; // design-specific pill height (desktop)
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+
+    @include tablet-down {
+        width: 84px;  // design-specific pill width (tablet)
+        height: 28px; // design-specific pill height (tablet)
+    }
+
+    @include mobile {
+        width: 56px;  // design-specific pill width (mobile)
+        height: 22px; // design-specific pill height (mobile)
+    }
+}
+
+.step_pill_inner {
+    position: absolute;
+    width: 91.5%; // design-specific: inset gloss layer proportions
+    height: 70%;
+    background: var(--color-white-primary);
+}
+
+.step_pill_active {
+    background: var(--color-blue-primary);
+    box-shadow: inset 0 0 4.9px 0 var(--color-white-primary); // design-specific glow
+
+    .step_pill_inner {
+        box-shadow: inset 0 3.656px 17.181px 0 var(--color-white-primary); // design-specific fractional glow
+    }
+}
+
+.step_pill_inactive {
+    background: var(--color-gray-200);
+    box-shadow: inset 0 5.195px 24.415px 0 var(--color-white-primary); // design-specific fractional glow
+
+    .step_pill_inner {
+        box-shadow: inset 0 3.656px 17.181px 0 var(--color-white-primary); // design-specific fractional glow
+    }
+}
+
+.step_label {
+    position: relative;
+    z-index: 1;
+    font-family: var(--font-space-grotesk);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--text-button);
+    color: var(--color-gray-dark-hover);
+    text-transform: capitalize;
+
+    @include tablet-down {
+        font-size: var(--text-nav);
+    }
+
+    @include mobile {
+        font-size: var(--text-small-10);
+    }
+}
+
+// ─── Blue Accent Line ─────────────────────────────────────────────────────────
+
+// design-specific accent dimensions — height and shadow are Figma-exact for the LED bar effect
+.accent_line {
+    height: 11px; // design-specific: thin LED-style accent bar
+    width: 100%;
+    background: var(--color-blue-primary);
+    box-shadow: inset 0 0 19.878px 0 var(--color-white-primary); // design-specific fractional glow
+    position: relative;
+
+    &::after {
+        content: '';
+        position: absolute;
+        bottom: -4px; // design-specific: drop shadow bleeds below the bar
+        left: 0;
+        right: 0;
+        height: 4px; // design-specific: shadow fade height
+        background: linear-gradient(180deg, var(--color-blue-primary-alpha-25) 0%, transparent 100%);
+    }
+}
+
+// ─── Hero Section ─────────────────────────────────────────────────────────────
+.hero {
+  width: 100%;
+  background-color: var(--color-white-primary);
+  padding: var(--space-8) 0;
+
+  @include mobile {
+    padding: var(--space-6) 0;
+  }
+}
+
+.heroWrapper {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* dashed bottom border only */
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      var(--color-border-muted) 0px,
+      var(--color-border-muted) 10px,
+      transparent 10px,
+      transparent 16px
+    );
+
+  background-size: 100% 1px;
+
+  background-position: bottom left;
+
+  background-repeat: no-repeat;
+}
+
+.hero_content {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+
+  max-width: 585px; // design-specific hero content column width from Figma
+  width: 100%;
+
+  text-align: center;
+
+  padding: var(--space-7);
+
+  /* left + right dashed borders only */
+  background-image:
+    /* left */
+    repeating-linear-gradient(
+      0deg,
+      var(--color-border-muted) 0px,
+      var(--color-border-muted) 10px,
+      transparent 10px,
+      transparent 16px
+    ),
+
+    /* right */
+    repeating-linear-gradient(
+      0deg,
+      var(--color-border-muted) 0px,
+      var(--color-border-muted) 10px,
+      transparent 10px,
+      transparent 16px
+    );
+
+  background-size:
+    1px 100%,
+    1px 100%;
+
+  background-position:
+    left top,
+    right top;
+
+  background-repeat: no-repeat;
+
+  @include small-mobile {
+  margin: 0 var(--space-7);
+
+  }
+
+}
+
+// ─── Count Badge (corner brackets) ───────────────────────────────────────────
+
+.count_badge {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-1) var(--space-5);
+
+    // Top-left bracket corner — 9px is design-specific bracket arm length
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 9px;  // design-specific bracket arm size
+        height: 9px;
+        border-top: 1.5px solid var(--color-blue-primary);
+        border-left: 1.5px solid var(--color-blue-primary);
+    }
+
+    // Top-right bracket corner
+    &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 9px;
+        height: 9px;
+        border-top: 1.5px solid var(--color-blue-primary);
+        border-right: 1.5px solid var(--color-blue-primary);
+    }
+}
+
+// Holds the bottom two bracket corners via its own pseudo-elements
+.badge_corners {
+    position: absolute;
+    inset: 0;
+
+    &::before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 9px;
+        height: 9px;
+        border-bottom: 1.5px solid var(--color-blue-primary);
+        border-left: 1.5px solid var(--color-blue-primary);
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 9px;
+        height: 9px;
+        border-bottom: 1.5px solid var(--color-blue-primary);
+        border-right: 1.5px solid var(--color-blue-primary);
+    }
+}
+
+.count_text {
+    font-family: var(--font-satoshi);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--text-body-small);
+    color: var(--color-gray-dark-hover);
+    line-height: 1;
+}
+
+// ─── Hero Typography ──────────────────────────────────────────────────────────
+
+.hero_title {
+    font-family: var(--font-satoshi);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--text-h3);
+    color: var(--color-black-primary);
+    letter-spacing: var(--tracking-cart-title);
+    line-height: var(--leading-snug);
+    text-transform: capitalize;
+    margin: 0;
+
+    @include mobile {
+        font-size: var(--text-display-sm);
+    }
+}
+
+.hero_subtitle {
+    font-family: var(--font-space-grotesk);
+    font-weight: var(--font-weight-regular);
+    font-size: var(--text-body-small);
+    color: var(--color-gray-dark-hover);
+    line-height: var(--leading-normal);
+    margin: 0;
+
+    @include mobile {
+        font-size: var(--text-nav);
+    }
+}
+
+// design-specific top_shape height and slant offsets — 25px strip with wings
+// that bleed 120px inward from each edge; clip-path defines the angled cut
+.top_shape {
+    position: relative;
+    width: 100%;
+    height: 25px; // design-specific: decorative strip height
+      background: var(--color-gray-light-bg);
+    background-image: repeating-linear-gradient(135deg, transparent, transparent 7px, var(--color-black-alpha-05) 2px, var(--color-black-alpha-05) 8px);
+    overflow: hidden;
+    @include mobile {
+       background: transparent;
+       background-image: none;
+    }
+}
+
+/* left slant shape — 120px inset from left edge, clip-path creates the angled wing */
+.top_shape::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 120px; // design-specific: inset distance positions the slanted wing
+    width: 35%;
+    height: 100%;
+    background: var(--color-white-primary);
+   clip-path: polygon(0 0, 100% 0, 90% 100%, 9% 100%);
+}
+
+/* right slant shape — mirrors left at 120px from right edge */
+.top_shape::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 120px; // design-specific: mirrors left slant wing
+    width: 35%;
+    height: 100%;
+    background: var(--color-white-primary);
+    clip-path: polygon(0 0, 100% 0, 90% 100%, 9% 100%);
+}
+
+// design-specific trapezoid dimensions — 240×28px fits the "select your provider" label
+.trapezoid_wrapper {
+  position: relative;
+  width: 240px; // design-specific: trapezoid container width
+  height: 28px; // design-specific: trapezoid container height
+  margin: 0 auto;
+}
+
+/* center glow — design-specific glow spread sized to bleed beyond the trapezoid edges */
+.trapezoid_wrapper::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 111px;  // design-specific glow spread width
+  height: 75px; // design-specific glow spread height
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+
+  background: linear-gradient(
+    to bottom,
+    var(--color-white-alpha-70),
+    var(--color-white-alpha-08)
+  );
+
+  clip-path: polygon(16% 0%, 84% 0%, 100% 100%, 0% 100%);
+
+  filter: blur(10px);
+  opacity: 0.9;
+}
+
+.trapezoid {
+  position: relative;
+  z-index: 2;
+
+  width: 100%;
+  height: 100%;
+
+  clip-path: polygon(16% 0%, 84% 0%, 100% 100%, 0% 100%);
+
+  background-color: var(--color-blue-primary);
+
+  box-shadow:
+    0 0 19.878px var(--color-white-alpha-90) inset,
+    0 0 20px var(--color-white-alpha-25);
+}

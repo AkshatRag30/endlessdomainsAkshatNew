@@ -3,6 +3,19 @@
 // design-specific: asymmetric octagon — same shape as PrimaryButton / GmModal gmBtn
 $clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px), calc(100% - 7.5px) 100%, 5px 100%, 0px calc(100% - 7px), 0px 9px);
 
+// ── Mobile slide-up animation ─────────────────────────────────────────────────
+
+@keyframes gm-failed-slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 // ── Overlay ───────────────────────────────────────────────────────────────────
 
 // design-specific: z-index 200 — same layer as GmModal (GmModal is unmounted when this renders)
@@ -15,6 +28,11 @@ $clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px),
   align-items: center;
   justify-content: center;
   padding: var(--space-4);
+
+  @include mobile {
+    align-items: flex-end;
+    padding: 0;
+  }
 }
 
 // ── Modal panel ───────────────────────────────────────────────────────────────
@@ -23,11 +41,19 @@ $clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px),
 .modal {
   position: relative;
   width: 476px;
+  max-width: 100%;
   background: var(--color-white-primary);
   border: 2px solid rgba(153, 27, 27, 0.2);
   box-shadow: 0 0 16.15px rgba(0, 0, 0, 0.1);
-  border-radius: var(--radius-sm);
   overflow: hidden;
+
+  @include mobile {
+    width: 100%;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    animation: gm-failed-slide-up 0.32s cubic-bezier(0.32, 0.72, 0, 1) both;
+  }
 }
 
 // ── Close button ──────────────────────────────────────────────────────────────
@@ -66,6 +92,11 @@ $clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px),
   align-items: center;
   gap: 20px;
   padding: 44px 40px 32px;
+
+  @include mobile {
+    padding: var(--space-8) var(--space-5) var(--space-6);
+    gap: var(--space-5);
+  }
 }
 
 // design-specific: icon stack — outer ring > inner circle > icon + shadow ellipse below
@@ -152,6 +183,14 @@ $clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px),
   height: 64px;
   background: rgba(0, 0, 0, 0.05);
   flex-shrink: 0;
+
+  @include mobile {
+    flex-direction: column;
+    height: auto;
+    padding: var(--space-4) var(--space-5);
+    gap: var(--space-3);
+    align-items: stretch;
+  }
 }
 
 // ── Primary (octagon) button ──────────────────────────────────────────────────
@@ -192,6 +231,12 @@ $clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px),
 
   &:focus-visible {
     @include focus-ring;
+  }
+
+  @include mobile {
+    width: 100%;
+    min-width: unset;
+    height: 46px;
   }
 }
 

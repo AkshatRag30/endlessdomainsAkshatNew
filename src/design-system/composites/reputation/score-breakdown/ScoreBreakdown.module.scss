@@ -616,6 +616,7 @@ $clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px),
 
   @include mobile {
     font-size: var(--text-small-13);
+    text-align: left;
   }
 }
 
@@ -632,15 +633,16 @@ $clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px),
 
   @include mobile {
     font-size: var(--text-small-12);
-    text-align: center;
+    text-align: left;
   }
 }
 
 .boostCardProgress {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--space-4);
   margin-top: 8px;
+  flex-direction: column
 }
 
 // ── Mini progress bar ─────────────────────────────────────────────────────────

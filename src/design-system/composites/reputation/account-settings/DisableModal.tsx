@@ -24,10 +24,10 @@ export default function DisableModal({ onConfirm, onClose }: DisableModalProps) 
     >
       <div className={styles.card}>
         {/* decorative corner marks — same as Step 3 of ReputationModal */}
-        <div className={styles.cornerTL} aria-hidden="true" />
-        <div className={styles.cornerTR} aria-hidden="true" />
-        <div className={styles.cornerBL} aria-hidden="true" />
-        <div className={styles.cornerBR} aria-hidden="true" />
+        {/* <div className={styles.cornerTL} aria-hidden="true" />
+        <div className={styles.cornerTR} aria-hidden="true" /> */}
+        {/* <div className={styles.cornerBL} aria-hidden="true" /> */}
+        {/* <div className={styles.cornerBR} aria-hidden="true" /> */}
 
         {/* decorative dot pattern at top */}
         <div className={styles.dotPattern} aria-hidden="true" />

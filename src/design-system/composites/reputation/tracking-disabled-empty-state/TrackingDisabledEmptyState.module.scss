@@ -143,3 +143,13 @@ $clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px),
     width: 100%;
   }
 }
+
+.disclaimer {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-gray-primary);
+  text-align: center;
+  line-height: var(--leading-normal);
+  margin: 0;
+}

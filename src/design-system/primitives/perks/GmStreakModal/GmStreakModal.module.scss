@@ -3,6 +3,19 @@
 // design-specific: asymmetric octagon clip-path — matches PrimaryButton / GmModal shape
 $clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px), calc(100% - 7.5px) 100%, 5px 100%, 0px calc(100% - 7px), 0px 9px);
 
+// ── Mobile slide-up animation ─────────────────────────────────────────────────
+
+@keyframes gm-streak-slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 // ── Overlay ───────────────────────────────────────────────────────────────────
 
 .overlay {
@@ -13,12 +26,24 @@ $clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px),
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: var(--space-4);
+
+  @include mobile {
+    align-items: flex-end;
+    padding: 0;
+  }
 }
 
 // ── Modal wrapper — holds close button (which hangs outside modal) ─────────────
 
 .modalWrap {
   position: relative;
+  width: 100%;
+  max-width: 490px;
+
+  @include mobile {
+    max-width: 100%;
+  }
 }
 
 // ── Modal panel ───────────────────────────────────────────────────────────────
@@ -27,14 +52,21 @@ $clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px),
 // shadow: 0px 0px 0px 4px rgba(0,0,0,0.04), 0px 0px 32.3px rgba(0,0,0,0.1)
 .modal {
   position: relative;
-  width: 490px;
-  max-width: 98vw;
-  max-height: 92vh;
+  width: 100%;
+  max-height: 92dvh;
   overflow-y: auto;
   background: var(--color-white-primary);
   border: 2px solid rgba(153, 27, 27, 0.2);
   box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.04), 0 0 32.3px rgba(0, 0, 0, 0.1);
   padding-bottom: 28px;
+
+  @include mobile {
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    padding-bottom: var(--space-8);
+    animation: gm-streak-slide-up 0.32s cubic-bezier(0.32, 0.72, 0, 1) both;
+  }
 }
 
 // ── Stripe overlay ────────────────────────────────────────────────────────────
@@ -232,6 +264,10 @@ $clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px),
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+
+  @include small-mobile {
+    font-size: 54px;
+  }
 }
 
 // design-specific: Satoshi Medium ~20px, color #404040 — "Day Streak" label
@@ -376,6 +412,10 @@ $clip: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px),
   align-items: center;
   gap: 17px;
   padding: 24px 16px 0;
+
+  @include mobile {
+    padding: var(--space-5) var(--space-4) 0;
+  }
 }
 
 // design-specific: 55px circle, blue gradient bg, inset shadow — Figma spec
