@@ -109,37 +109,37 @@ $corner-clip: path("M5 2 H14 C15 2 15.5 3.2 14.7 3.8 C11 7 7 11 3.8 14.7 C3.2 15
 }
 
 .transparent:not(.danger) {
-  color: var(--color-white-primary);
+  color: var(--color-gray-medium);
 
   &:hover:not(:disabled) {
-    color: var(--color-white-primary);
+    color: var(--color-gray-medium);
 
     .corner::before,
     .corner::after {
-      background: var(--color-white-primary);
+      background: var(--color-gray-medium);
     }
 
     &::before,
     &::after {
-      background: var(--color-white-primary);
+      background: var(--color-gray-medium);
     }
   }
 
   &:active:not(:disabled) {
-    color: var(--color-white-dark);
+    color: var(--color-gray-300);
   }
 
   &:focus-visible {
-    color: var(--color-white-primary);
+    color: var(--color-gray-medium);
 
     .corner::before,
     .corner::after {
-      background: var(--color-white-primary);
+      background: var(--color-gray-medium);
     }
 
     &::before,
     &::after {
-      background: var(--color-white-primary);
+      background: var(--color-gray-medium);
     }
   }
 }

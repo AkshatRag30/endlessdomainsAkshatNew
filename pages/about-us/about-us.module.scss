@@ -1,0 +1,47 @@
+@import '_mixins.scss';
+
+// ── Page shell ────────────────────────────────────────────────────────────────
+
+.shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-white-primary);
+}
+
+.mainArea {
+  flex: 1;
+  background: var(--color-white-primary);
+  display: flex;
+  flex-direction: column;
+  // no gap — sticky parallax needs sections flush so about slides over hero
+}
+
+// Parallax wrapper — GPU layer, no layout impact
+.parallaxLayer {
+  position: relative;
+  will-change: transform;
+}
+
+// About section slides over the sticky hero
+.parallaxAbove {
+  position: relative;
+  z-index: 1;
+  background: var(--color-white-primary);
+}
+
+// ── Page content ──────────────────────────────────────────────────────────────
+
+.page {
+  min-height: 100vh;
+  background: var(--color-white-primary);
+  padding: var(--space-7) var(--container-padding-x);
+
+  @include tablet-down {
+    padding: var(--space-6) var(--space-5);
+  }
+
+  @include mobile {
+    padding: var(--space-4) var(--space-4);
+  }
+}

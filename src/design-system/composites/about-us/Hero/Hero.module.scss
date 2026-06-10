@@ -1,0 +1,571 @@
+@import '_mixins.scss';
+
+// ── Hero shell ────────────────────────────────────────────────────────────────
+
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-white-primary);
+  overflow: hidden;
+  padding-bottom: var(--space-15); // push content above visual center
+}
+
+// ── Grid overlay — construction lines ─────────────────────────────────────────
+
+.gridOverlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hLine {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.06);
+
+  &[data-pos='top'] { top: 15%; }
+  &[data-pos='bottom'] { top: 75%; }
+}
+
+.vLine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(0, 0, 0, 0.05);
+
+  &[data-pos='left'] { left: calc(50% - 620px); }
+  &[data-pos='right'] { left: calc(50% + 620px); }
+}
+
+// ── Dot texture ───────────────────────────────────────────────────────────────
+
+.dotTexture {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 920px;
+  height: 640px;
+  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.08) 1px, transparent 1px);
+  background-size: 8px 8px;
+  opacity: 0.18;
+  pointer-events: none;
+  z-index: 1;
+}
+
+// ── Side arc decorations ──────────────────────────────────────────────────────
+// Large concentric circles anchored to the viewport edges, vertically centred
+// on the 50% mark so they visually sit inside the 30%–70% horizontal band.
+
+.arcLeft,
+.arcRight {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.arcLeft {
+  left: 0;
+  width: 1px; // zero-width anchor — circles extend leftward out of viewport
+
+  .arc {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid rgba(90, 120, 255, 0.15);
+
+    &:nth-child(1) {
+      width: 320px;
+      height: 320px;
+      top: 45%;
+      left: 0;
+      transform: translate(-62%, -50%);
+    }
+
+    &:nth-child(2) {
+      width: 560px;
+      height: 560px;
+      top: 45%;
+      left: 0;
+      transform: translate(-62%, -50%);
+    }
+  }
+}
+
+.arcRight {
+  right: 0;
+  width: 1px; // zero-width anchor — circles extend rightward out of viewport
+
+  .arc {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid rgba(90, 120, 255, 0.15);
+
+    &:nth-child(1) {
+      width: 320px;
+      height: 320px;
+      top: 45%;
+      right: 0;
+      transform: translate(62%, -50%);
+    }
+
+    &:nth-child(2) {
+      width: 560px;
+      height: 560px;
+      top: 45%;
+      right: 0;
+      transform: translate(62%, -50%);
+    }
+  }
+}
+
+// ── Bottom mountain glow — 5 overlapping blurred polygons ────────────────────
+// Each poly uses clip-path on the element itself. blur() on a clip-path element
+// clips before blurring so the blur is intentionally inside the shape boundary,
+// creating a soft diffused glow that builds up through stacking.
+
+// Outer shell — GSAP animates this. No filter so transforms are GPU-composited.
+.mountainAnimator {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  margin-left: -750px; // half of 1500px, replaces translateX(-50%)
+  width: 1500px;
+  height: 420px;
+  pointer-events: none;
+  z-index: 1;
+  transform-origin: center bottom;
+  will-change: transform;
+}
+
+// Inner shell — holds blur only, never animated by GSAP.
+// blur() on a parent forces repaint every frame; keeping it here isolates the cost.
+.mountainWrap {
+  position: absolute;
+  inset: 0;
+  filter: blur(32px);
+}
+
+// design-specific: Figma polygon shape shared across all 5 layers
+$poly: polygon(49% 30%, 61% 58%, 115% 100%, -15% 100%, 35% 61%);
+
+.poly {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  clip-path: $poly;
+}
+
+// Layer 1 — deep blue outer ring, full shape base
+.poly1 {
+  background: radial-gradient(
+    ellipse 90% 80% at 50% 80%,
+    #2639ed 0%,
+    #2639ed 30%,
+    transparent 75%
+  );
+  filter: blur(24px);
+  opacity: 0.9;
+}
+
+// Layer 2 — purple mid tone over the base
+.poly2 {
+  background: radial-gradient(
+    ellipse 80% 75% at 50% 75%,
+    #9457f6 0%,
+    #7c45e8 35%,
+    transparent 70%
+  );
+  filter: blur(20px);
+  opacity: 0.85;
+}
+
+// Layer 3 — lighter purple moving toward center
+.poly3 {
+  background: radial-gradient(
+    ellipse 65% 65% at 50% 70%,
+    #b882ff 0%,
+    #9457f6 40%,
+    transparent 70%
+  );
+  filter: blur(18px);
+  opacity: 0.75;
+}
+
+// Layer 4 — bright white-lavender core glow
+.poly4 {
+  background: radial-gradient(
+    ellipse 45% 50% at 50% 65%,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(220, 200, 255, 0.7) 35%,
+    rgba(160, 120, 255, 0.3) 65%,
+    transparent 85%
+  );
+  filter: blur(16px);
+  opacity: 0.9;
+}
+
+// Layer 5 — wide soft ambient bleed to soften all edges
+.poly5 {
+  background: radial-gradient(
+    ellipse 100% 90% at 50% 85%,
+    rgba(148, 87, 246, 0.5) 0%,
+    rgba(38, 57, 237, 0.35) 45%,
+    transparent 75%
+  );
+  filter: blur(36px);
+  opacity: 0.7;
+}
+
+// ── Content container ─────────────────────────────────────────────────────────
+
+.content {
+  position: relative;
+  z-index: 2;
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 0 var(--space-7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0;
+}
+
+// ── Eyebrow badge ─────────────────────────────────────────────────────────────
+
+.eyebrow {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 44px;
+  margin-bottom: var(--space-7);
+  opacity: 0; // GSAP sets to 1 on entrance
+}
+
+.eyebrowText {
+  font-family: var(--font-ibm-plex-mono);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #4f5fff; // design-specific: Figma eyebrow blue — between --color-blue-primary (#2639ED) and a lighter indigo
+  line-height: 1;
+}
+
+// Corner bracket marks — top-left, top-right, bottom-left, bottom-right
+%bracket-base {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-color: rgba(143, 115, 255, 0.65);
+  border-style: solid;
+}
+
+.eyebrowBracketTL {
+  @extend %bracket-base;
+  top: 0;
+  left: 0;
+  border-width: 1px 0 0 1px;
+}
+
+.eyebrowBracketTR {
+  @extend %bracket-base;
+  top: 0;
+  right: 0;
+  border-width: 1px 1px 0 0;
+}
+
+.eyebrowBracketBL {
+  @extend %bracket-base;
+  bottom: 0;
+  left: 0;
+  border-width: 0 0 1px 1px;
+}
+
+.eyebrowBracketBR {
+  @extend %bracket-base;
+  bottom: 0;
+  right: 0;
+  border-width: 0 1px 1px 0;
+}
+
+// ── Main heading ──────────────────────────────────────────────────────────────
+
+.heading {
+  max-width: 1100px;
+  margin: 0 0 var(--space-7) 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  opacity: 0; // GSAP sets to 1 on entrance
+}
+
+.headingLine1 {
+  display: block;
+  font-family: var(--font-satoshi);
+  font-size: 84px; // design-specific: Figma-exact hero heading size
+  font-weight: var(--font-weight-medium);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  color: var(--color-black-primary);
+  white-space: nowrap;
+}
+
+.headingLine2 {
+  display: block;
+  font-family: var(--font-satoshi);
+  font-size: 84px; // design-specific: Figma-exact hero heading size
+  font-weight: var(--font-weight-medium);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+  // design-specific: Figma blue gradient on second heading line
+  background: linear-gradient(180deg, #5673ff 0%, #304dff 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+// ── Description ───────────────────────────────────────────────────────────────
+
+.description {
+  max-width: 860px;
+  font-family: var(--font-satoshi);
+  font-size: 24px; // design-specific: Figma-exact description size
+  font-weight: var(--font-weight-regular);
+  line-height: 1.55;
+  color: #575757; // design-specific: Figma-exact description gray — nearest token is --color-text-body (#474747), Figma is lighter
+  margin: 0 0 28px 0;
+  opacity: 0; // GSAP sets to 1 on entrance
+}
+
+// ── CTA row ───────────────────────────────────────────────────────────────────
+
+.ctaRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gap-inline);
+  opacity: 0; // GSAP sets to 1 on entrance
+
+  // Override button heights to match screenshot ~56px
+  :global(.button),
+  & > * {
+    min-height: 56px; // design-specific: Figma-exact CTA button height in hero
+    min-width: 240px; // design-specific: Figma-exact CTA button min-width
+  }
+}
+
+// ── Responsive — Large Desktop (≤1600px) ─────────────────────────────────────
+
+@include max-width(1600px) {
+  .headingLine1,
+  .headingLine2 { font-size: 80px; }
+
+  .arcLeft .arc,
+  .arcRight .arc {
+    &:nth-child(1) { width: 300px; height: 300px; }
+    &:nth-child(2) { width: 520px; height: 520px; }
+  }
+
+  .mountainAnimator { width: 1400px; margin-left: -700px; height: 390px; }
+
+  .vLine {
+    &[data-pos='left'] { left: calc(50% - 580px); }
+    &[data-pos='right'] { left: calc(50% + 580px); }
+  }
+}
+
+// ── Responsive — Standard Desktop (≤1440px) ──────────────────────────────────
+
+@include max-width(1440px) {
+  .headingLine1,
+  .headingLine2 { font-size: 74px; }
+
+  .description { font-size: 22px; max-width: 640px; }
+
+  .arcLeft .arc,
+  .arcRight .arc {
+    &:nth-child(1) { width: 270px; height: 270px; }
+    &:nth-child(2) { width: 470px; height: 470px; }
+  }
+
+  .mountainAnimator { width: 1260px; margin-left: -630px; height: 352px; }
+
+  .dotTexture { width: 840px; height: 580px; }
+
+  .vLine {
+    &[data-pos='left'] { left: calc(50% - 530px); }
+    &[data-pos='right'] { left: calc(50% + 530px); }
+  }
+}
+
+// ── Responsive — Laptop (≤1366px) ────────────────────────────────────────────
+// Target: looks identical to 1920px monitor — single-line heading, same proportions
+
+@include max-width(1366px) {
+  .hero { padding-bottom: 120px; }
+
+  .headingLine1,
+  .headingLine2 { font-size: 62px; }
+
+  .heading { margin: 0 0 var(--space-6) 0; }
+
+  .description { font-size: 19px; max-width: 560px; margin: 0 0 40px 0; }
+
+  .content { max-width: 760px; padding: 0 var(--space-6); }
+
+  .eyebrow { padding: 10px 36px; margin-bottom: var(--space-6); }
+
+  .ctaRow {
+    :global(.button),
+    & > * { min-width: 210px; min-height: 52px; }
+  }
+
+  .arcLeft .arc,
+  .arcRight .arc {
+    &:nth-child(1) { width: 220px; height: 220px; }
+    &:nth-child(2) { width: 390px; height: 390px; }
+  }
+
+  .mountainAnimator { width: 1100px; margin-left: -550px; height: 308px; }
+
+  .dotTexture { width: 700px; height: 490px; }
+
+  .vLine {
+    &[data-pos='left'] { left: calc(50% - 450px); }
+    &[data-pos='right'] { left: calc(50% + 450px); }
+  }
+
+  .hLine {
+    &[data-pos='top'] { top: 15%; }
+    &[data-pos='bottom'] { top: 75%; }
+  }
+}
+
+// ── Responsive — Small Laptop (≤1280px) ──────────────────────────────────────
+
+@include max-width(1280px) {
+  .hero { padding-bottom: 110px; }
+
+  .headingLine1,
+  .headingLine2 { font-size: 56px; }
+
+  .description { font-size: 18px; max-width: 520px; margin: 0 0 36px 0; }
+
+  .content { max-width: 700px; }
+
+  .arcLeft .arc,
+  .arcRight .arc {
+    &:nth-child(1) { width: 190px; height: 190px; }
+    &:nth-child(2) { width: 340px; height: 340px; }
+  }
+
+  .mountainAnimator { width: 980px; margin-left: -490px; height: 274px; }
+
+  .dotTexture { width: 620px; height: 430px; }
+
+  .vLine {
+    &[data-pos='left'] { left: calc(50% - 400px); }
+    &[data-pos='right'] { left: calc(50% + 400px); }
+  }
+}
+
+// ── Responsive — Tablet Landscape (≤1024px) ──────────────────────────────────
+
+@include max-width(1024px) {
+  .hero { padding-bottom: 100px; }
+
+  .headingLine1,
+  .headingLine2 { font-size: 48px; }
+
+  .description { font-size: 17px; max-width: 480px; margin: 0 0 32px 0; }
+
+  .content { max-width: 620px; padding: 0 var(--space-6); }
+
+  .eyebrow { padding: 8px 28px; margin-bottom: var(--space-5); }
+
+  .eyebrowText { font-size: 12px; }
+
+  .ctaRow {
+    :global(.button),
+    & > * { min-width: 185px; min-height: 50px; }
+  }
+
+  .arcLeft .arc,
+  .arcRight .arc {
+    &:nth-child(1) { width: 160px; height: 160px; }
+    &:nth-child(2) { width: 285px; height: 285px; }
+  }
+
+  .mountainAnimator { width: 820px; margin-left: -410px; height: 230px; }
+
+  .dotTexture { width: 500px; height: 350px; }
+
+  .vLine {
+    &[data-pos='left'] { left: calc(50% - 330px); }
+    &[data-pos='right'] { left: calc(50% + 330px); }
+  }
+
+  .hLine {
+    &[data-pos='top'] { top: 16%; }
+    &[data-pos='bottom'] { top: 76%; }
+  }
+}
+
+// ── Responsive — Tablet Portrait (≤768px) ────────────────────────────────────
+
+@include tablet-down {
+  .hero { padding-bottom: 90px; }
+
+  .headingLine1,
+  .headingLine2 { font-size: 40px; }
+
+  .description { font-size: 16px; max-width: 440px; margin: 0 0 28px 0; }
+
+  .content { max-width: 540px; padding: 0 var(--space-5); }
+
+  .eyebrow { padding: 8px 20px; margin-bottom: var(--space-5); }
+
+  .eyebrowText { font-size: 11px; letter-spacing: 0.09em; }
+
+  .ctaRow {
+    gap: var(--space-3);
+    :global(.button),
+    & > * { min-width: 160px; min-height: 48px; }
+  }
+
+  .arcLeft .arc,
+  .arcRight .arc {
+    &:nth-child(1) { width: 130px; height: 130px; }
+    &:nth-child(2) { width: 230px; height: 230px; }
+  }
+
+  .mountainAnimator { width: 640px; margin-left: -320px; height: 180px; }
+
+  .dotTexture { width: 380px; height: 260px; }
+
+  .vLine {
+    &[data-pos='left'] { left: calc(50% - 260px); }
+    &[data-pos='right'] { left: calc(50% + 260px); }
+  }
+
+  .hLine {
+    &[data-pos='top'] { top: 17%; }
+    &[data-pos='bottom'] { top: 78%; }
+  }
+}

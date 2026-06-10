@@ -1,0 +1,416 @@
+@import '_mixins.scss';
+
+// ── Section shell ─────────────────────────────────────────────────────────────
+
+.section {
+  width: 100%;
+  background: var(--color-white-primary);
+  padding: var(--space-14) var(--container-padding-x); // 120px top/bottom
+  display: flex;
+  flex-direction: column;
+  gap: 56px; // design-specific: Figma gap between top row and cards
+
+  @include max-width(1280px) {
+    padding: var(--space-12) var(--container-padding-x);
+    gap: 44px;
+  }
+
+  @include tablet-down {
+    padding: var(--space-9) var(--space-7);
+    gap: 36px;
+  }
+
+  @include mobile {
+    padding: var(--space-8) var(--space-5);
+    gap: var(--space-7);
+  }
+}
+
+// ── Top text row ──────────────────────────────────────────────────────────────
+
+.topRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 172px; // design-specific: Figma exact gap between heading and description
+  padding-bottom: 48px;
+  border-bottom: 1px dashed var(--color-gray-200);
+
+  @include max-width(1280px) {
+    gap: 80px;
+  }
+
+  @include tablet-down {
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+}
+
+.topLeft {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  flex-shrink: 0;
+}
+
+// ── Eyebrow ───────────────────────────────────────────────────────────────────
+
+.eyebrow {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 40px;
+}
+
+.eyebrowText {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small); // 17px
+  font-weight: var(--font-weight-medium);
+  color: var(--color-faq-bracket);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+// design-specific: 4 corner purple brackets — same pattern as hero eyebrow
+%eyebrow-bracket {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-color: rgba(143, 115, 255, 0.65);
+  border-style: solid;
+}
+
+.eyebrowBracketTL {
+  @extend %eyebrow-bracket;
+  top: 0; left: 0;
+  border-width: 1.5px 0 0 1.5px;
+}
+.eyebrowBracketTR {
+  @extend %eyebrow-bracket;
+  top: 0; right: 0;
+  border-width: 1.5px 1.5px 0 0;
+}
+.eyebrowBracketBL {
+  @extend %eyebrow-bracket;
+  bottom: 0; left: 0;
+  border-width: 0 0 1.5px 1.5px;
+}
+.eyebrowBracketBR {
+  @extend %eyebrow-bracket;
+  bottom: 0; right: 0;
+  border-width: 0 1.5px 1.5px 0;
+}
+
+// ── Heading ───────────────────────────────────────────────────────────────────
+
+.heading {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.headingBlack {
+  display: block;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2); // 55px
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  white-space: nowrap;
+
+  @include max-width(1280px) {
+    font-size: 46px;
+    white-space: normal;
+  }
+
+  @include tablet-down {
+    font-size: 36px;
+  }
+
+  @include mobile {
+    font-size: 28px;
+  }
+}
+
+// design-specific: Figma blue gradient on second heading line
+.headingBlue {
+  display: block;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2); // 55px
+  font-weight: var(--font-weight-regular);
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  white-space: nowrap;
+  background: linear-gradient(135deg, var(--color-blue-primary) 70%, var(--color-blue-primary-faded) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-transform: capitalize;
+
+  @include max-width(1280px) {
+    font-size: 46px;
+    white-space: normal;
+  }
+
+  @include tablet-down {
+    font-size: 36px;
+  }
+
+  @include mobile {
+    font-size: 28px;
+  }
+}
+
+// ── Top right description ─────────────────────────────────────────────────────
+
+.topDesc {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-body); // 22px
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-body); // #474747
+  line-height: var(--leading-normal);
+  text-align: justify;
+  max-width: 461px;
+  padding-top: 32px; // design-specific: visually align with heading top
+
+  @include max-width(1280px) {
+    font-size: 18px;
+    max-width: 380px;
+    padding-top: 24px;
+  }
+
+  @include tablet-down {
+    max-width: 100%;
+    padding-top: 0;
+    font-size: 16px;
+    text-align: left;
+  }
+}
+
+// ── Cards row ─────────────────────────────────────────────────────────────────
+
+.cardsRow {
+  display: flex;
+  gap: 29px; // design-specific: Figma exact gap between cards
+  margin-top: -268px; // pull up by the clipped top portion (654px × 41%)
+
+  @include tablet-down {
+    gap: var(--space-5);
+    margin-top: -236px; // 576px × 41%
+  }
+
+  @include mobile {
+    flex-direction: column;
+    margin-top: 0;
+  }
+}
+
+// ── Card outer — filter lives here, separate from clip-path ───────────────────
+
+.cardOuter {
+  flex: 1;
+  transition: filter 0.25s ease;
+
+  &:hover {
+    filter: drop-shadow(0 8px 32px var(--color-blue-primary-alpha-18));
+  }
+}
+
+// ── Card wrap — clip-path polygon shape from DomainCard ───────────────────────
+
+// design-specific: same cut-corner polygon used in domain cards
+$card-clip: polygon(7% 41%, 100% 40%, 100% 93%, 94% 100%, 0 100%, 0 51%);
+
+.cardWrap {
+  clip-path: $card-clip;
+  padding: 1.5px; // design-specific: border trick — gap shows wrapper bg as border
+  display: block;
+}
+
+// Dark card — solid blue border color
+.cardWrapDark {
+  background: var(--color-blue-primary);
+}
+
+// Light card — subtle gray border
+.cardWrapLight {
+  background: var(--color-gray-200);
+  position: relative;
+  overflow: hidden;
+}
+
+// Translucent background photo inside card 2
+.card2BgImg {
+  object-fit: cover;
+  object-position: center;
+  opacity: 0.13;
+  pointer-events: none;
+}
+
+// ── Card inner ────────────────────────────────────────────────────────────────
+
+.card {
+  width: 100%;
+  padding: var(--space-9) var(--space-8) var(--space-9) 64px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-5);
+  min-height: 654px;
+  // shift content into the visible lower portion of the polygon
+  padding-top: calc(41% + var(--space-7));
+
+  @include max-width(1280px) {
+    min-height: 576px;
+    padding: calc(41% + var(--space-6)) var(--space-7) var(--space-8) var(--space-7);
+  }
+
+  @include tablet-down {
+    padding: var(--space-8) var(--space-6);
+    min-height: auto;
+  }
+}
+
+// design-specific: Figma left card — flat deep blue by default, radial glow on hover
+.cardDark {
+  background: linear-gradient(135deg, #3b52f5 0%, #2639ed 40%, #1e2fbf 100%);
+  position: relative;
+  overflow: hidden;
+  transition: background 0.4s ease, box-shadow 0.4s ease;
+
+  &:hover {
+    box-shadow: inset 0 0 60px rgba(255, 255, 255, 0.06), inset 0 0 20px rgba(255, 255, 255, 0.04);
+  }
+
+  // design-specific: radial glow overlay fades in on hover via opacity transition
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      ellipse 75% 65% at 50% 50%,
+      #4a60f8 0%,
+      #3244ee 35%,
+      #2a3be0 60%,
+      #3448e8 85%,
+      #4055ee 100%
+    );
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  &:hover::before {
+    opacity: 1;
+  }
+}
+
+// design-specific: Figma right card — off-white / very light gray fill
+.cardLight {
+  background: #f4f4f6;
+}
+
+// ── Card content ──────────────────────────────────────────────────────────────
+
+.cardEyebrow {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small); // 17px
+  font-weight: var(--font-weight-regular);
+  color: rgba(255, 255, 255, 0.75);
+  letter-spacing: -0.025em;
+  text-transform: capitalize;
+  line-height: 1.2;
+  position: relative;
+  z-index: 2;
+}
+
+.cardEyebrowDark {
+  color: var(--color-black-alpha-60);
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 18px; // design-specific: Figma gap between heading and description inside card
+  position: relative;
+  z-index: 2;
+}
+
+// Card 1 heading — white
+.cardHeadingLight {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h3); // 30px
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white-primary);
+  line-height: 1.2;
+  max-width: 502px;
+
+  @include max-width(1280px) {
+    font-size: 24px;
+  }
+
+  @include tablet-down {
+    font-size: 20px;
+  }
+}
+
+// Card 2 heading — blue gradient
+.cardHeadingBlue {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h3); // 30px
+  font-weight: var(--font-weight-bold);
+  line-height: 1.2;
+  max-width: 502px;
+  background: linear-gradient(90deg, var(--color-blue-primary) 0%, var(--color-blue-primary-alpha-50) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  @include max-width(1280px) {
+    font-size: 24px;
+  }
+
+  @include tablet-down {
+    font-size: 20px;
+  }
+}
+
+// Card 1 description — light white
+.cardDescLight {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-body-small); // 17px
+  font-weight: var(--font-weight-regular);
+  color: rgba(255, 255, 255, 0.8);
+  line-height: var(--leading-normal);
+  max-width: 546px;
+
+  @include tablet-down {
+    font-size: 14px;
+  }
+}
+
+// Card 2 description — dark text
+.cardDescDark {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-body-small); // 17px
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-body); // #474747
+  line-height: var(--leading-normal);
+  max-width: 580px;
+
+  @include tablet-down {
+    font-size: 14px;
+  }
+}
