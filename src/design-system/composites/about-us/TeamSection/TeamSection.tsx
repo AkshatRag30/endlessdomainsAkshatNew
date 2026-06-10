@@ -90,20 +90,20 @@ const FOUNDERS = [
 // ── Core team cards ───────────────────────────────────────────────────────────
 
 const CORE_TEAM = [
-  { id: 'shivam',   name: 'Shivam Arora',    title: 'Growth Head',             imageUrl: '/about-us/himanshu.jpg', linkedin: 'https://www.linkedin.com/in/shivamendlessdomains/' },
-  { id: 'pallavi',  name: 'Pallavi Patodia', title: 'Digital Media Manager',   imageUrl: '/about-us/pallavi.jpg',  linkedin: 'https://www.linkedin.com/in/pallavi-patodia-6764a51ba/' },
+  { id: 'himanshu', name: 'Himanshu Sachan', title: 'Web3 Marketing',           imageUrl: '/about-us/himanshu.jpg', linkedin: 'https://www.linkedin.com/in/sachanh/' },
+  { id: 'pallavi',  name: 'Pallavi Patodia', title: 'Head Of Ecosystem Partnerships', imageUrl: '/about-us/pallavi.jpg',  linkedin: 'https://www.linkedin.com/in/pallavi-patodia-6764a51ba/' },
   { id: 'mohit',    name: 'Mohit Agarwal',   title: 'Project Manager',         imageUrl: '/about-us/mohit.jpg',    linkedin: 'https://www.linkedin.com/in/moagrw/' },
 ]
 
 // ── Team member cards ─────────────────────────────────────────────────────────
 
 const TEAM_MEMBERS = [
-  { id: 'himanshu', name: 'Himanshu Sachan',    title: 'Web3 Marketing',            imageUrl: '/about-us/himanshu.jpg',  linkedin: 'https://www.linkedin.com/in/sachanh/' },
-  { id: 'rahul',    name: 'Rahul Sodhi',        title: 'Social Media Manager',      imageUrl: '/about-us/rahul.jpg',     linkedin: 'https://www.linkedin.com/in/rahul-sodhi-performance-marketer/' },
-  { id: 'smriti',   name: 'Smriti Singh',       title: 'Developer',                 imageUrl: '/about-us/smriti.jpg',    linkedin: 'https://www.linkedin.com/in/smriti-singh0710/' },
+  { id: 'smriti',   name: 'Smriti Singh',       title: 'Frontend Developer',        imageUrl: '/about-us/smriti.jpg',    linkedin: 'https://www.linkedin.com/in/smriti-singh0710/' },
+  { id: 'akshat',   name: 'Akshat Rag',         title: 'Junior Frontend Developer', imageUrl: '/about-us/akshat.jpg',    linkedin: '' },
   { id: 'jay',      name: 'Khamgoulun Haokip',  title: 'UI/UX Designer',            imageUrl: '/about-us/jay.jpg',       linkedin: 'https://www.linkedin.com/in/khamgoulun-haokip' },
-  { id: 'bhavuk',   name: 'Bhavuk Kathuria',    title: 'Graphic Designer',          imageUrl: '/about-us/bhavuk.jpg',    linkedin: 'https://www.linkedin.com/in/bhavuk-kathuria-0a1512291/' },
+  { id: 'bhavuk',   name: 'Bhavuk Kathuria',    title: 'Graphics Designer',         imageUrl: '/about-us/bhavuk.jpg',    linkedin: 'https://www.linkedin.com/in/bhavuk-kathuria-0a1512291/' },
   { id: 'shresth',  name: 'Shresth Singh',      title: 'Video Editor',              imageUrl: '/about-us/shresth.jpg',   linkedin: 'https://www.linkedin.com/in/shresth-singh-2abbb4249/' },
+  { id: 'rahul',    name: 'Rahul Sodhi',        title: 'Social Media Manager',      imageUrl: '/about-us/rahul.jpg',     linkedin: 'https://www.linkedin.com/in/rahul-sodhi-performance-marketer/' },
 ]
 
 // ── Component ─────────────────────────────────────────────────────────────────

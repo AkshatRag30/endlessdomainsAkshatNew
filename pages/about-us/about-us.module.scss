@@ -23,11 +23,17 @@
   will-change: transform;
 }
 
-// About section slides over the sticky hero
+// About section slides over the sticky hero.
+// Top 220px fades from transparent → white so the hero polygon bleeds through
+// as the user begins scrolling, then white takes over seamlessly.
 .parallaxAbove {
   position: relative;
   z-index: 1;
-  background: var(--color-white-primary);
+  background: linear-gradient(
+    to bottom,
+    transparent 0px,
+    var(--color-white-primary) 220px
+  );
 }
 
 // ── Page content ──────────────────────────────────────────────────────────────

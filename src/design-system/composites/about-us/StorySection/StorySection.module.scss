@@ -30,10 +30,11 @@
 // ── Left column — sticky heading ──────────────────────────────────────────────
 
 .leftCol {
-  // design-specific: wide enough for "It Started With a Bitcoin" on one line at 38px
   flex: 0 0 58%;
   max-width: 640px;
   padding-right: var(--space-9);
+  // overflow: clip confines the sticky child — once leftCol ends, sticky stops
+  overflow: clip;
 
   @include max-width(1280px) {
     flex: 0 0 55%;
@@ -45,12 +46,15 @@
     flex: none;
     max-width: 100%;
     padding-right: 0;
+    overflow: visible;
   }
 }
 
+// leftCol height is half the right col via JS — stickyLeft pins at top: 80px
+// and stops when leftCol's bottom is reached (the midpoint of the section)
 .stickyLeft {
   position: sticky;
-  top: 80px; // below navbar
+  top: 80px;
   display: flex;
   flex-direction: column;
   gap: var(--space-4);

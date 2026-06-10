@@ -414,3 +414,26 @@ $card-clip: polygon(7% 41%, 100% 40%, 100% 93%, 94% 100%, 0 100%, 0 51%);
     font-size: 14px;
   }
 }
+
+// ── Mobile — simplified card clip and tighter padding ─────────────────────────
+
+@include mobile {
+  // design-specific: replace the dramatic 41% diagonal cut with a simple corner polygon on mobile
+  // The large cut looks intentional only when cards overlap the section above (desktop)
+  .cardWrap {
+    clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px);
+  }
+
+  .card {
+    padding: var(--space-6) var(--space-5);
+  }
+
+  .cardsRow {
+    gap: var(--space-4);
+  }
+
+  .cardHeadingLight,
+  .cardHeadingBlue {
+    font-size: 18px;
+  }
+}

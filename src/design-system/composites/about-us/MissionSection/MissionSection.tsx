@@ -1,5 +1,4 @@
 import { useRef } from 'react'
-import Image from 'next/image'
 import { useEntranceAnimation } from '../useEntranceAnimation'
 import styles from './MissionSection.module.scss'
 
@@ -67,15 +66,6 @@ export default function MissionSection() {
         {/* Card 2 — Vision (light) */}
         <div className={styles.cardOuter} ref={card2Ref}>
           <div className={`${styles.cardWrap} ${styles.cardWrapLight}`}>
-            <Image
-              src="/about-us/endlesscard.jpg"
-              alt=""
-              fill
-              className={styles.card2BgImg}
-              aria-hidden="true"
-              sizes="50vw"
-              unoptimized
-            />
             <article className={`${styles.card} ${styles.cardLight}`} aria-label="Vision — The Standard">
               <p className={`${styles.cardEyebrow} ${styles.cardEyebrowDark}`}>Vision · The Standard</p>
               <div className={styles.cardBody}>

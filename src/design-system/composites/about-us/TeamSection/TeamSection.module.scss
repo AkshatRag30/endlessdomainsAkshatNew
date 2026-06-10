@@ -472,10 +472,6 @@
   cursor: pointer;
   transition: filter 0.35s ease;
 
-  &:hover {
-    filter: drop-shadow(0 0 18px rgba(38, 57, 237, 0.55));
-  }
-
   // light up corner brackets on hover
   &:hover .cardBracketTL,
   &:hover .cardBracketTR,
@@ -570,4 +566,88 @@
   color: var(--color-white-alpha-70);
   line-height: 1.2;
   white-space: nowrap;
+}
+
+// ── Mobile — 2-column team grid, scaled cards and tabs ────────────────────────
+
+@include mobile {
+  // Bottom polygon: reduce height and inset on small screens
+  .bottomPolygon {
+    height: 50px;
+  }
+
+  .bottomPolygonInner {
+    // design-specific: reduce angled inset from 80px to 40px on mobile
+    clip-path: polygon(40px 0, calc(100% - 40px) 0, 100% 100%, 0 100%);
+  }
+
+  // Tabs: scale down to fit 2 tabs side-by-side on 390px viewport
+  .tabsWrap {
+    padding: 0 var(--space-4);
+  }
+
+  .tab {
+    width: 140px;
+    height: 90px;
+  }
+
+  .tabLabel {
+    font-size: 13px;
+  }
+
+  // Founder photo: smaller on mobile
+  .founderPhotoWrap {
+    width: 160px;
+    height: 143px;
+  }
+
+  // Team grid: 2 columns using CSS grid so cards are neatly paired
+  .teamGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 160px);
+    gap: var(--space-4);
+    justify-content: center;
+    padding: var(--space-7) var(--space-5) 0;
+  }
+
+  .card {
+    width: 160px;
+    height: 129px;
+  }
+
+  // Scale down corner brackets proportionally
+  .cardBracketTL,
+  .cardBracketTR,
+  .cardBracketBL,
+  .cardBracketBR {
+    width: 13px;
+    height: 13px;
+  }
+
+  // Reposition and resize photo inset area
+  .cardPhotoWrap {
+    top: 9px;
+    left: 10px;
+    width: 140px;
+    height: 112px;
+    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  }
+
+  .cardGradient {
+    width: 170px;
+    height: 68px;
+  }
+
+  .cardInfo {
+    left: var(--space-3); // 12px
+    padding-bottom: var(--space-1);
+  }
+
+  .cardName {
+    font-size: 11px;
+  }
+
+  .cardTitle {
+    font-size: 8px;
+  }
 }

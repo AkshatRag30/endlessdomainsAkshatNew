@@ -47,6 +47,7 @@ export default function Hero() {
         arcLeft: arcLeftRef,
         arcRight: arcRightRef,
         glow: glowRef,
+        mountain: mountainAnimatorRef,
       })
     }
 

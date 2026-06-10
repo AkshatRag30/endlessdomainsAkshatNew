@@ -426,4 +426,36 @@
   .moduleNode {
     display: none;
   }
+
+  // Reduce stage horizontal padding so 360px canvas fits on 390px viewport
+  .stage {
+    padding: 0 var(--space-4);
+  }
+
+  // Scale all ring sizes to match the 360px mobile canvas
+  .ring {
+    &:nth-child(1) { width: 360px; height: 360px; }
+    &:nth-child(2) { width: 290px; height: 290px; }
+    &:nth-child(3) { width: 185px; height: 185px; }
+    &:nth-child(4) { width: 96px; height: 96px; }
+  }
+
+  // Dot grid matches ring 3 size
+  .dotGrid {
+    width: 185px;
+    height: 185px;
+  }
+
+  // Mobile module list: reduce name font size for readability in narrow column
+  .mobileModuleName {
+    font-size: 22px;
+  }
+
+  .mobileModuleDesc {
+    font-size: 13px;
+  }
+
+  .mobileModules {
+    padding: var(--space-7) var(--space-5) 0;
+  }
 }

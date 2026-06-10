@@ -51,39 +51,12 @@ export function runGlowPulse(gsap: typeof GsapType, glowEl: HTMLElement | null) 
   })
 }
 
+// All looping polygon animations removed — mouse interaction drives movement instead.
 export function runMountainFlow(
-  gsap: typeof GsapType,
-  animator: HTMLElement | null,
-  polys: (HTMLElement | null)[],
-) {
-  if (!animator) return
-
-  // Animate the filter-free animator element — pure transform, fully GPU-composited
-  const tl = gsap.timeline({ repeat: -1, yoyo: true, ease: 'sine.inOut' })
-  tl.to(animator, { y: -24, duration: 7 }, 0)
-  tl.to(animator, { scaleY: 1.08, duration: 9 }, 0)
-  tl.to(animator, { scaleX: 1.04, duration: 11 }, 0)
-
-  // Each poly opacity cross-fades independently — colour-shift flowing look
-  // opacity is cheap to animate and does not trigger repaint
-  const opacityConfigs = [
-    { from: 0.9,  to: 0.45, duration: 8,  delay: 0   },
-    { from: 0.85, to: 0.35, duration: 10, delay: 1.8 },
-    { from: 0.75, to: 0.3,  duration: 7,  delay: 3.2 },
-    { from: 0.9,  to: 0.4,  duration: 12, delay: 0.6 },
-    { from: 0.7,  to: 0.2,  duration: 9,  delay: 2.5 },
-  ]
-
-  polys.forEach((el, i) => {
-    if (!el) return
-    const c = opacityConfigs[i]
-    gsap.fromTo(
-      el,
-      { opacity: c.from },
-      { opacity: c.to, duration: c.duration, delay: c.delay, repeat: -1, yoyo: true, ease: 'sine.inOut' },
-    )
-  })
-}
+  _gsap: typeof GsapType,
+  _animator: HTMLElement | null,
+  _polys: (HTMLElement | null)[],
+) {}
 
 export function bindParallax(
   gsap: typeof GsapType,
@@ -91,11 +64,13 @@ export function bindParallax(
     arcLeft: RefObject<HTMLElement>
     arcRight: RefObject<HTMLElement>
     glow: RefObject<HTMLElement>
+    mountain?: RefObject<HTMLElement>
   },
 ) {
   const handleMove = (e: MouseEvent) => {
     const cx = window.innerWidth / 2
     const cy = window.innerHeight / 2
+    // -1 to +1 normalised cursor position
     const dx = (e.clientX - cx) / cx
     const dy = (e.clientY - cy) / cy
 
@@ -105,18 +80,34 @@ export function bindParallax(
       duration: 1.2,
       ease: 'power1.out',
     })
+
     gsap.to(refs.arcRight.current, {
       x: dx * 10,
       y: dy * -8,
       duration: 1.2,
       ease: 'power1.out',
     })
+
     gsap.to(refs.glow.current, {
       x: dx * 15,
       y: dy * 10,
       duration: 1.6,
       ease: 'power1.out',
     })
+
+    // Mountain polygon follows cursor:
+    //   x  — peak drifts left/right with the cursor (larger range for dramatic feel)
+    //   y  — peak rises slightly when cursor is high, drops when low
+    //   skewX — shape leans in the direction of horizontal movement
+    if (refs.mountain?.current) {
+      gsap.to(refs.mountain.current, {
+        x: dx * 80,
+        y: dy * 30,
+        skewX: dx * 6,
+        duration: 1.8,
+        ease: 'power2.out',
+      })
+    }
   }
 
   window.addEventListener('mousemove', handleMove)
