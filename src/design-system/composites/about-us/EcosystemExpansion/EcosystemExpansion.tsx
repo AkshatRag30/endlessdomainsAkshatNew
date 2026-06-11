@@ -72,6 +72,7 @@ function getModulePosition(angleDeg: number): { left: string; top: string } {
 
 export function EcosystemExpansion() {
   const orbitRef = useRef<HTMLDivElement>(null)
+  const canvasRef = useRef<HTMLDivElement>(null)
   const glowRef = useRef<HTMLDivElement>(null)
   const ringsRef = useRef<HTMLDivElement>(null)
   const dotGridRef = useRef<HTMLDivElement>(null)
@@ -92,7 +93,7 @@ export function EcosystemExpansion() {
         eyebrow: eyebrowRef as RefObject<HTMLElement>,
         heading: headingRef as RefObject<HTMLElement>,
         description: descriptionRef as RefObject<HTMLElement>,
-        ring: orbitRef as RefObject<HTMLElement>,
+        ring: canvasRef as RefObject<HTMLElement>,
       })
       cleanupParallax = bindEcosystemParallax(gsap, {
         glow: glowRef as RefObject<HTMLElement>,
@@ -108,7 +109,7 @@ export function EcosystemExpansion() {
   return (
     <section className={styles.section} aria-label="Ecosystem Expansion">
       <div className={styles.stage}>
-        <div className={styles.canvas}>
+        <div className={styles.canvas} ref={canvasRef}>
 
           {/* Soft blue radial glow — parallax layer */}
           <div className={styles.glow} ref={glowRef} aria-hidden="true" />
@@ -181,16 +182,16 @@ export function EcosystemExpansion() {
       <nav className={styles.mobileModules} aria-label="Ecosystem apps">
         {MODULES.map(mod => (
           <div key={mod.id} className={styles.mobileModule}>
-            <div className={styles.moduleIcon}>
-              <div className={styles.moduleIconGradient} />
-              <div className={styles.moduleIconInner}>
-                <mod.Icon aria-label={mod.iconLabel} className={styles.moduleIconImg} />
+            <div className={styles.mobileModuleLabelRow}>
+              <div className={styles.moduleIcon}>
+                <div className={styles.moduleIconGradient} />
+                <div className={styles.moduleIconInner}>
+                  <mod.Icon aria-label={mod.iconLabel} className={styles.moduleIconImg} />
+                </div>
               </div>
-            </div>
-            <div className={styles.mobileModuleText}>
               <p className={styles.mobileModuleName}>{mod.name}</p>
-              <p className={styles.mobileModuleDesc}>{mod.description}</p>
             </div>
+            <p className={styles.mobileModuleDesc}>{mod.description}</p>
           </div>
         ))}
       </nav>

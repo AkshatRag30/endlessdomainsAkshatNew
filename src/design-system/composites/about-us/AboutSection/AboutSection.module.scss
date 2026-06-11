@@ -242,7 +242,7 @@
   }
 
   @include mobile {
-    font-size: 26px;
+    font-size: 31px;
   }
 }
 
@@ -266,7 +266,7 @@
   }
 
   @include mobile {
-    font-size: 30px;
+    font-size: 31px;
   }
 }
 
@@ -293,7 +293,7 @@
   }
 
   @include mobile {
-    font-size: 15px;
+    font-size: 14px;
     max-width: 100%;
   }
 }
@@ -361,7 +361,7 @@
   }
 
   @include mobile {
-    flex-direction: column;
+    flex-wrap: wrap;
     border-top: none;
   }
 }
@@ -386,12 +386,8 @@
   }
 
   @include mobile {
-    padding: 28px var(--space-6);
-    border-bottom: 1px dashed var(--color-gray-200);
-
-    &:last-child {
-      border-bottom: none;
-    }
+    flex: 0 0 50%;
+    padding: 24px var(--space-4);
   }
 }
 
@@ -475,7 +471,7 @@ $bracket-color: var(--color-gray-300);
   }
 
   @include mobile {
-    font-size: 44px;
+    font-size: 30px;
   }
 }
 
@@ -488,6 +484,10 @@ $bracket-color: var(--color-gray-300);
   letter-spacing: -0.02em;
   text-transform: capitalize;
   line-height: 1.2;
+
+  @include mobile {
+    font-size: 9px;
+  }
 }
 
 // ── Vertical divider between stat items ───────────────────────────────────────

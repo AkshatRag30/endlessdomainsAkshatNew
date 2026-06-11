@@ -322,7 +322,7 @@
   }
 
   @include mobile {
-    font-size: 26px;
+    font-size: 31px;
     white-space: normal;
   }
 }
@@ -345,7 +345,7 @@
   }
 
   @include mobile {
-    font-size: 22px;
+    font-size: 31px;
     white-space: normal;
   }
 }
@@ -381,7 +381,7 @@
   @include mobile {
     display: flex;
     flex-direction: column;
-    gap: var(--space-5);
+    gap: 47px; // design-specific: Figma-exact gap between module items
     width: 100%;
     padding: var(--space-7) var(--container-padding-x) 0;
   }
@@ -389,8 +389,15 @@
 
 .mobileModule {
   display: flex;
-  align-items: flex-start;
-  gap: var(--space-4);
+  flex-direction: column;
+  align-items: center;
+  gap: 10px; // design-specific: Figma-exact gap between label row and desc
+}
+
+.mobileModuleLabelRow {
+  display: flex;
+  align-items: center;
+  gap: 17px; // design-specific: Figma-exact gap between icon and name
 }
 
 .mobileModuleText {
@@ -402,22 +409,25 @@
 .mobileModuleName {
   margin: 0;
   font-family: var(--font-satoshi);
-  font-size: var(--text-h3); // 30px
+  font-size: 20px; // design-specific: Figma mobile exact
   font-weight: var(--font-weight-bold);
   background: linear-gradient(111deg, var(--color-blue-primary) 70.225%, var(--color-blue-primary-faded) 95.59%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   line-height: 1.2;
+  white-space: nowrap;
 }
 
 .mobileModuleDesc {
   margin: 0;
   font-family: var(--font-space-grotesk);
-  font-size: var(--text-nav);
+  font-size: var(--text-nav); // 14px
   font-weight: var(--font-weight-regular);
   color: var(--color-text-body);
   line-height: var(--leading-normal);
+  text-align: center;
+  max-width: 318px; // design-specific: Figma-exact desc width
 }
 
 // On mobile the circular orbit is still shown but scaled down,
@@ -446,13 +456,8 @@
     height: 185px;
   }
 
-  // Mobile module list: reduce name font size for readability in narrow column
-  .mobileModuleName {
-    font-size: 22px;
-  }
-
-  .mobileModuleDesc {
-    font-size: 13px;
+  .eyebrowText {
+    font-size: 14px;
   }
 
   .mobileModules {

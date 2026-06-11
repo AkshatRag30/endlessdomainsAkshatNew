@@ -44,6 +44,11 @@
     flex-direction: column;
     gap: var(--space-6);
   }
+
+  @include mobile {
+    padding-bottom: var(--space-6);
+    gap: var(--space-5);
+  }
 }
 
 .topLeft {
@@ -133,7 +138,7 @@
   }
 
   @include mobile {
-    font-size: 28px;
+    font-size: 31px;
   }
 }
 
@@ -162,7 +167,7 @@
   }
 
   @include mobile {
-    font-size: 28px;
+    font-size: 31px;
   }
 }
 
@@ -190,6 +195,10 @@
     padding-top: 0;
     font-size: 16px;
     text-align: left;
+  }
+
+  @include mobile {
+    font-size: 14px;
   }
 }
 
@@ -418,6 +427,12 @@ $card-clip: polygon(7% 41%, 100% 40%, 100% 93%, 94% 100%, 0 100%, 0 51%);
 // ── Mobile — simplified card clip and tighter padding ─────────────────────────
 
 @include mobile {
+  // Eyebrow: shrink to content width so right brackets stay next to the text
+  .eyebrow {
+    align-self: flex-start;
+    padding: 10px 16px;
+  }
+
   // design-specific: replace the dramatic 41% diagonal cut with a simple corner polygon on mobile
   // The large cut looks intentional only when cards overlap the section above (desktop)
   .cardWrap {
@@ -432,8 +447,17 @@ $card-clip: polygon(7% 41%, 100% 40%, 100% 93%, 94% 100%, 0 100%, 0 51%);
     gap: var(--space-4);
   }
 
+  .cardEyebrow {
+    font-size: 12px;
+  }
+
   .cardHeadingLight,
   .cardHeadingBlue {
-    font-size: 18px;
+    font-size: 17px;
+  }
+
+  .cardDescLight,
+  .cardDescDark {
+    font-size: 12px;
   }
 }

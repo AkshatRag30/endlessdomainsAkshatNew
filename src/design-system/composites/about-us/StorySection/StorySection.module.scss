@@ -121,7 +121,7 @@
 
   @include max-width(1280px) { font-size: 32px; }
   @include tablet-down { font-size: 28px; white-space: normal; }
-  @include mobile { font-size: 22px; white-space: normal; }
+  @include mobile { font-size: 31px; white-space: normal; text-transform: capitalize; }
 }
 
 // design-specific: Figma blue gradient on "Donation."
@@ -140,7 +140,7 @@
 
   @include max-width(1280px) { font-size: 46px; }
   @include tablet-down { font-size: 38px; }
-  @include mobile { font-size: 30px; }
+  @include mobile { font-size: 31px; }
 }
 
 // ── Vertical dashed divider ───────────────────────────────────────────────────
@@ -218,6 +218,42 @@
   @include tablet-down {
     font-size: 15px;
   }
+
+  @include mobile {
+    font-size: 14px;
+  }
+}
+
+// ── Mobile overrides ──────────────────────────────────────────────────────────
+
+@include mobile {
+  // Eyebrow: shrink to content width so right brackets stay next to the text
+  .eyebrow {
+    align-self: flex-start;
+    padding: 10px 16px;
+  }
+
+  // Paragraphs: justify text to match Figma
+  .para {
+    text-align: justify;
+  }
+
+  // Brackets: on desktop these offset from rightCol's left padding (55px).
+  // On mobile rightCol has no padding so left: 10px bleeds outside the content.
+  // Reset both brackets to sit flush with the content edges.
+  .bracketTL {
+    left: 0;
+  }
+
+  .bracketBR {
+    right: 0;
+  }
+
+  // Push text away from the 28px corner brackets so they don't overlap content
+  .storyContent {
+    padding-top: var(--space-8);
+    padding-bottom: var(--space-8);
+  }
 }
 
 // design-specific: Figma pull-quote — Satoshi Bold 30px blue gradient
@@ -238,6 +274,6 @@
 
     @include max-width(1280px) { font-size: 24px; }
     @include tablet-down { font-size: 20px; }
-    @include mobile { font-size: 18px; }
+    @include mobile { font-size: 17px; }
   }
 }

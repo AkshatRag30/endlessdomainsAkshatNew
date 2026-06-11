@@ -81,6 +81,7 @@ const FOUNDERS = [
     imageUrl: '/about-us/ankit.jpg',
     linkedin: 'https://linkedin.com/in/ankit-agarwal-endless-domains',
     align: 'left' as const,
+    photoTop: true,
     bio: [
       'Digital identity is evolving from usernames into ownership layers. We are building infrastructure where identities become programmable, powering wallets, payments, communities, and digital presence across chains. Endless Domains is not just naming the internet. We are helping shape its next OS.',
     ],
@@ -168,7 +169,18 @@ export default function TeamSection() {
               {/* Text side */}
               <div className={`${styles.founderText} ${founder.align === 'left' ? styles.founderTextLeft : styles.founderTextRight}`}>
                 <div className={styles.founderInfo}>
-                  <p className={styles.founderName}>{founder.name}</p>
+                  <div className={styles.founderNameRow}>
+                    <p className={styles.founderName}>{founder.name}</p>
+                    <a
+                      href={founder.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={styles.founderLinkedin}
+                      aria-label={`${founder.name} on LinkedIn`}
+                    >
+                      <FaLinkedin aria-hidden="true" />
+                    </a>
+                  </div>
                   <p className={styles.founderTitle}>{founder.title}</p>
                 </div>
                 {founder.bio.map((para, i) => (
@@ -183,19 +195,10 @@ export default function TeamSection() {
                   alt={founder.name}
                   width={294}
                   height={261}
-                  className={styles.founderPhoto}
+                  className={`${styles.founderPhoto} ${founder.photoTop ? styles.founderPhotoTop : ''}`}
                   unoptimized
                   priority
                 />
-                <a
-                  href={founder.linkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.linkedinBadge}
-                  aria-label={`${founder.name} on LinkedIn`}
-                >
-                  <FaLinkedin aria-hidden="true" />
-                </a>
               </div>
             </div>
 

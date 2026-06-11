@@ -108,10 +108,35 @@
   flex-direction: column;
   align-items: center;
   gap: var(--space-6);
-  padding: 0 var(--container-padding-x);
+  padding: var(--space-6) var(--container-padding-x);
   width: 100%;
   max-width: 900px;
   text-align: center;
+  position: relative;
+
+  // SVG dashed border — same dash rhythm as the landing page (12 8, round caps)
+  // CSS `border: dashed` renders dots at 1px; SVG stroke-dasharray gives real dashes
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='2'%3E%3Cline x1='0' y1='1' x2='100%25' y2='1' stroke='%23ffffff' stroke-opacity='0.26' stroke-width='2' stroke-dasharray='12 8' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-size: 100% 1px;
+  }
+
+  &::before {
+    top: 0;
+    background-position: top;
+  }
+
+  &::after {
+    bottom: 0;
+    background-position: bottom;
+  }
 }
 
 // ── Eyebrow ───────────────────────────────────────────────────────────────────
@@ -184,10 +209,13 @@
 
 .dashedLine {
   width: 100%;
-  height: 1px;
-  border-top: 1px dashed var(--color-white-alpha-26);
+  height: 2px;
   margin: var(--space-9) 0;
   flex-shrink: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='2'%3E%3Cline x1='0' y1='1' x2='100%25' y2='1' stroke='%23ffffff' stroke-opacity='0.26' stroke-width='2' stroke-dasharray='12 8' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 100% 2px;
+  background-position: center;
 }
 
 // ── Founders area ─────────────────────────────────────────────────────────────
@@ -266,6 +294,12 @@
   align-items: flex-start;
 }
 
+.founderNameRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
 .founderName {
   margin: 0;
   font-family: var(--font-satoshi);
@@ -275,6 +309,29 @@
   line-height: 1.2;
   text-transform: capitalize;
   width: 143px; // design-specific: Figma-exact name width (allows wrap at right word boundary)
+}
+
+.founderLinkedin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-sm);
+  background: rgba(10, 102, 194, 0.85);
+  color: var(--color-white-primary);
+  font-size: 15px; // design-specific: icon size within badge
+  flex-shrink: 0;
+  transition: background 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    background: rgba(10, 102, 194, 1);
+    transform: scale(1.1);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
 }
 
 .founderTitle {
@@ -339,6 +396,15 @@
   position: relative;
   overflow: hidden;
   cursor: pointer;
+  background: transparent;
+  // design-specific: cut top-left and bottom-right corners matching team card polygon
+  clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px);
+
+  // Next.js Image renders an inner span wrapper — strip its background so the dark
+  // section shows through the clipped corners instead of the default white placeholder
+  :global(span) {
+    background: transparent;
+  }
 
   // blue bottom-edge shimmer on hover
   &::after {
@@ -372,9 +438,15 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
   display: block;
+  background: transparent;
   transform: scale(1);
   transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.founderPhotoTop {
+  object-position: center 15%;
 }
 
 // ── Tab switcher ──────────────────────────────────────────────────────────────
@@ -581,6 +653,15 @@
     clip-path: polygon(40px 0, calc(100% - 40px) 0, 100% 100%, 0 100%);
   }
 
+  // Header text sizes
+  .heading {
+    font-size: 31px;
+  }
+
+  .desc {
+    font-size: 14px;
+  }
+
   // Tabs: scale down to fit 2 tabs side-by-side on 390px viewport
   .tabsWrap {
     padding: 0 var(--space-4);
@@ -595,10 +676,52 @@
     font-size: 13px;
   }
 
-  // Founder photo: smaller on mobile
+  // Founders: full-width stacked column, centered
+  .founders {
+    padding: 0 var(--space-5);
+  }
+
+  .founderRow,
+  .founderRowLeft {
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-5);
+  }
+
+  // Founder text: center-aligned on mobile regardless of desktop align
+  .founderText,
+  .founderTextRight,
+  .founderTextLeft {
+    align-items: center;
+    text-align: center;
+    width: 100%;
+  }
+
+  // Override the nested .founderRowLeft .founderText rule which has higher specificity
+  .founderRowLeft .founderText {
+    align-items: center;
+    text-align: center;
+  }
+
+  .founderTextRight .founderBio,
+  .founderTextLeft .founderBio,
+  .founderRowLeft .founderText .founderBio {
+    text-align: center;
+  }
+
+  .founderInfo {
+    align-items: center;
+  }
+
+  // Founder photo: wide landscape banner matching Figma mobile (353×154 ratio)
   .founderPhotoWrap {
-    width: 160px;
-    height: 143px;
+    width: 100%;
+    height: 154px;
+    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  }
+
+  .founderBio {
+    font-size: 12px;
   }
 
   // Team grid: 2 columns using CSS grid so cards are neatly paired
@@ -607,7 +730,13 @@
     grid-template-columns: repeat(2, 160px);
     gap: var(--space-4);
     justify-content: center;
+    justify-items: center;
     padding: var(--space-7) var(--space-5) 0;
+
+    // Last card when it's the only item in its row — span both columns and center
+    .card:last-child:nth-child(odd) {
+      grid-column: 1 / -1;
+    }
   }
 
   .card {

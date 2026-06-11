@@ -9,6 +9,7 @@ export function runOrbitRotation(gsap: typeof GsapType, ringEl: HTMLElement | nu
     repeat: -1,
     ease: 'none',
     transformOrigin: '50% 50%',
+    overwrite: false,
   })
 }
 
@@ -75,7 +76,8 @@ export function runEcosystemEntrance(
     ring: RefObject<HTMLElement>
   },
 ) {
-  const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
+  // overwrite: false on defaults so the entrance tween doesn't kill the rotation tween running on the same orbit element
+  const tl = gsap.timeline({ defaults: { ease: 'power3.out', overwrite: false } })
 
   tl.fromTo(refs.ring.current, { opacity: 0, scale: 0.88 }, { opacity: 1, scale: 1, duration: 1.2 }, 0)
     .fromTo(refs.eyebrow.current, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.7 }, 0.3)
