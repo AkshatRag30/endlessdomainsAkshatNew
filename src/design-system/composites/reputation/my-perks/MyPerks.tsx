@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react'
 import { FaTag } from 'react-icons/fa'
 import { BsFileText } from 'react-icons/bs'
 import { MdContentCopy, MdCheck } from 'react-icons/md'
+import EmptyMyPerks from '@/design-system/composites/reputation/empty-my-perks/EmptyMyPerks'
 import styles from './MyPerks.module.scss'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -166,6 +167,10 @@ const PerkCard = ({ perk }: { perk: Perk }) => {
 // ── MyPerks main component ─────────────────────────────────────────────────────
 
 export default function MyPerks() {
+  if (DEMO_PERKS.length === 0) {
+    return <EmptyMyPerks />
+  }
+
   return (
     <div className={styles.root}>
       <div className={styles.grid}>
