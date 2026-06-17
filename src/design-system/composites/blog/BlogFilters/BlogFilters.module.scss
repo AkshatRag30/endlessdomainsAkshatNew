@@ -1,0 +1,374 @@
+@import '@newstyles/_mixins.scss';
+
+.wrapper {
+  background: var(--color-white-primary);
+  border-bottom: 1px solid var(--color-border-black-subtle);
+}
+
+.inner {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: var(--space-3) 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+
+  @include tablet-down {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-3);
+  }
+
+  @include mobile {
+    padding: var(--space-3) 16px;
+    gap: var(--space-3);
+  }
+}
+
+// ── Left: label + category pills ──────────────────────────────────────
+.leftGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  flex: 1;
+  min-width: 0; // allows flex child to shrink below content size and not overflow
+  overflow: hidden;
+
+  @include mobile {
+    overflow: visible;
+    padding-bottom: var(--space-3);
+  }
+}
+
+.filterLabel {
+  font-family: var(--font-satoshi);
+  font-size: 11px; // design-specific: smaller label sitting above the category tabs
+  font-weight: var(--font-weight-regular);
+  color: var(--color-gray-dark);
+  white-space: nowrap;
+  flex-shrink: 0;
+  letter-spacing: 0.01em;
+}
+
+.tabs {
+  overflow: hidden;
+  flex: 1;
+  min-width: 0; // critical — without this, tabs ignore parent overflow constraint
+  width: 100%;
+
+  @include mobile {
+    overflow: visible; // allow wrapped rows to show fully
+  }
+}
+
+.tabList {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  @include mobile {
+    flex-wrap: wrap;
+    overflow-x: visible;
+    gap: var(--space-2);
+  }
+}
+
+.tabItem {
+  flex-shrink: 0;
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 var(--space-3);
+  font-family: var(--font-satoshi);
+  font-size: 12px; // design-specific: compact to fit all 10 tabs in one row
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-dark);
+  background-color: transparent;
+  background-image: repeating-linear-gradient(135deg, transparent 0px, transparent 4px, var(--color-black-alpha-01) 4px, var(--color-black-alpha-01) 6px);
+  border: 1px solid var(--color-border-black-subtle);
+  border-right: none;
+  border-radius: 0;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s ease, background-color 0.15s ease;
+
+  &:last-child {
+    border-right: 1px solid var(--color-border-black-subtle);
+  }
+
+  @include mobile {
+    border-right: 1px solid var(--color-border-black-subtle);
+    margin-bottom: 0;
+  }
+
+  &:hover {
+    color: var(--color-black-primary);
+    background-color: var(--color-gray-light);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  &[data-active='true'] {
+    color: var(--color-white-primary);
+    background-color: var(--color-blue-primary);
+    border-color: var(--color-blue-primary);
+    border-right: 1px solid var(--color-blue-primary);
+    z-index: 1;
+  }
+}
+
+// ── Right: search form + sort ──────────────────────────────────────────
+.rightGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-shrink: 0;
+
+  @include tablet-down {
+    width: 100%;
+  }
+
+  @include mobile {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: var(--space-2);
+    width: 100%;
+  }
+}
+
+// Copied from DomainSearchBar — reduced width for blog context
+.formWrap {
+  display: flex;
+  align-items: center;
+  width: 320px; // narrower than MyDomains (flex: 1) — fixed width for filter bar
+  height: 42px; // slightly shorter than MyDomains 48px to match filter bar height
+  background: var(--color-filter-input-bg);
+  border: 1px solid var(--color-border-black-subtle);
+  box-shadow:
+    0.287px 0.287px 0.287px 0px var(--color-filter-shadow-primary),
+    0px 0px 0.287px 0px var(--color-filter-shadow-subtle);
+  overflow: hidden;
+  flex-shrink: 0;
+
+  @include tablet-down {
+    flex: 1;
+    width: auto;
+  }
+
+  @include mobile {
+    flex: 1;
+    width: auto;
+    min-width: 0;
+  }
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 var(--space-3) 0 var(--space-4);
+  background: transparent;
+  border: none;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  outline: none;
+
+  &::placeholder {
+    color: rgba(69, 69, 69, 0.63); // design-specific: Figma-exact placeholder — no token match
+  }
+}
+
+.formRight {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  flex-shrink: 0;
+}
+
+.clearArea {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 31px;
+  height: 34px;
+  border-right: 1px solid #ededee; // design-specific: Figma-exact divider — no token match
+}
+
+.clearBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background: none;
+  border: none;
+  border-radius: var(--radius-full);
+  padding: 0;
+  font-size: var(--text-nav);
+  color: var(--color-gray-primary);
+  cursor: pointer;
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: var(--color-black-primary);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.searchBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  height: 36px; // design-specific: inner button inset from 42px container
+  padding: 0 var(--space-4);
+  margin: 0 var(--space-1);
+  background: linear-gradient(to bottom, var(--color-surface-mid), var(--color-surface-hover));
+  box-shadow:
+    3px 3px 3px 0px var(--color-black-alpha-15),
+    inset 0px 1px 1px 0px var(--color-white-alpha-25);
+  border: none;
+  border-radius: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-white-primary);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  letter-spacing: 0.447px; // design-specific: Figma-exact letter-spacing — no token match
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  @include small-mobile {
+    padding: 0 var(--space-3);
+
+    span {
+      display: none;
+    }
+  }
+}
+
+.searchIcon {
+  flex-shrink: 0;
+}
+
+// ── Sort dropdown ──────────────────────────────────────────────────────
+.sortWrap {
+  position: relative;
+  flex-shrink: 0;
+
+  @include mobile {
+    flex-shrink: 0;
+  }
+}
+
+.sortTrigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 42px;
+  padding: 0 var(--space-4);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-white-primary);
+  background: linear-gradient(to bottom, var(--color-surface-mid), var(--color-surface-hover));
+  box-shadow:
+    3px 3px 3px 0px var(--color-black-alpha-15),
+    inset 0px 1px 1px 0px var(--color-white-alpha-25);
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+  white-space: nowrap;
+  letter-spacing: 0.447px;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.sortChevron {
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+
+  [aria-expanded='true'] & {
+    transform: rotate(180deg);
+  }
+}
+
+.sortPanel {
+  position: absolute;
+  top: calc(100% + 2px);
+  right: 0;
+  min-width: 100%;
+  background: var(--color-surface-hover);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0;
+  box-shadow: 3px 3px 3px 0px var(--color-black-alpha-15); // design-specific: matches trigger shadow
+  list-style: none;
+  margin: 0;
+  padding: var(--space-1) 0;
+  z-index: 20;
+}
+
+.sortOption {
+  display: flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 var(--space-4);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-white-primary);
+  cursor: pointer;
+  letter-spacing: 0.447px;
+  transition: background 0.1s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  &[data-selected='true'] {
+    color: var(--color-white-primary);
+    background: rgba(255, 255, 255, 0.15);
+    font-weight: var(--font-weight-medium);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}

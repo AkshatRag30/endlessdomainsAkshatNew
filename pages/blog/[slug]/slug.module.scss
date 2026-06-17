@@ -1,0 +1,186 @@
+@import '@newstyles/_mixins.scss';
+
+.page {
+  min-height: 100vh;
+  background: var(--color-white-primary);
+}
+
+// ── Related articles ──────────────────────────────────────────────────────
+.related {
+  border-top: 1px solid var(--color-border-black-subtle);
+  padding: var(--space-10) 0 var(--space-14);
+  background: var(--color-white-primary);
+
+  @include tablet-down {
+    padding: var(--space-8) 0 var(--space-10);
+  }
+
+  @include mobile {
+    padding: var(--space-6) 0 var(--space-9);
+  }
+}
+
+.relatedInner {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 var(--container-padding-x);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-7);
+
+  @include mobile {
+    padding: 0 16px;
+    gap: var(--space-5);
+  }
+}
+
+.relatedHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.relatedTitle {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h3);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black-primary);
+  letter-spacing: var(--tracking-h3);
+  margin: 0;
+
+  @include mobile {
+    font-size: var(--text-display-sm);
+  }
+}
+
+.relatedViewAll {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: gap 0.15s ease;
+
+  &:hover {
+    gap: var(--space-3);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-blue-primary);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+}
+
+// ── Dark footer CTA banner ────────────────────────────────────────────────
+.footerBanner {
+  background: var(--color-black-primary);
+  padding: var(--space-12) 0;
+  position: relative;
+  overflow: hidden;
+
+  @include mobile {
+    padding: var(--space-9) 0;
+  }
+}
+
+.footerBannerBg {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    135deg,
+    transparent 0px,
+    transparent 4px,
+    rgba(255, 255, 255, 0.015) 4px,
+    rgba(255, 255, 255, 0.015) 6px
+  ); // design-specific: subtle diagonal texture
+  pointer-events: none;
+}
+
+.footerBannerInner {
+  position: relative;
+  z-index: 1;
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 var(--container-padding-x);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+
+  @include tablet-down {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-6);
+  }
+
+  @include mobile {
+    padding: 0 16px;
+  }
+}
+
+.footerBannerText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.footerBannerEyebrow {
+  font-family: var(--font-ibm-plex-mono);
+  font-size: 11px;
+  font-weight: var(--font-weight-regular);
+  color: rgba(255, 255, 255, 0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 0;
+}
+
+.footerBannerTitle {
+  font-family: var(--font-satoshi);
+  font-size: 36px; // design-specific: large CTA heading in footer banner
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white-primary);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin: 0;
+  max-width: 520px;
+
+  @include tablet-down {
+    font-size: 28px;
+  }
+
+  @include mobile {
+    font-size: 22px;
+  }
+}
+
+.footerBannerBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+  height: 48px;
+  padding: 0 var(--space-6);
+  background: var(--color-blue-primary);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-white-primary);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 0.88;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}

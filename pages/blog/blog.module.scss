@@ -1,0 +1,698 @@
+@import '@newstyles/_mixins.scss';
+
+.page {
+  min-height: 100vh;
+  background: var(--color-white-primary);
+  --container-padding-x: 40px;
+
+  @include tablet-down {
+    --container-padding-x: 24px;
+  }
+
+  @include mobile {
+    --container-padding-x: 16px;
+  }
+}
+
+// ── Hero ──────────────────────────────────────────────────────────────────
+.hero {
+  position: relative;
+  padding: var(--space-2) 0 var(--space-1);
+  overflow: clip;
+
+  @include tablet-down {
+    padding: var(--space-2) 0 var(--space-1);
+  }
+
+  @include mobile {
+    padding: var(--space-2) 0;
+  }
+}
+
+.heroInner {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 var(--container-padding-x);
+  display: grid;
+  grid-template-columns: 55% 1fr;
+  gap: var(--space-9);
+  align-items: stretch;
+
+  @include tablet-down {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+
+  @include mobile {
+    padding: 0 var(--container-padding-x);
+  }
+}
+
+// ── Left column ───────────────────────────────────────────────────────────
+.heroLeft {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: var(--space-4) 0;
+  margin-right: calc(-1 * var(--space-11)); // extend shapes to touch the right column, cancelling the grid gap
+
+  @include tablet-down {
+    margin-right: 0;
+  }
+
+  @include mobile {
+    padding: var(--space-3) 0;
+  }
+
+  // Top and bottom construction lines extending to viewport edges
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -9999px;
+    right: -9999px;
+    border-top: 1px solid var(--color-border-black-subtle);
+    border-bottom: 1px solid var(--color-border-black-subtle);
+    pointer-events: none;
+    z-index: 2;
+  }
+}
+
+// Wraps the 2nd shapeRow + description + bottom domainShape; anchors the two notch connector lines
+.heroLeftBottom {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  margin-top: auto;
+}
+
+// Left notch connector line — sits at left edge of blue accent (76.38% of shape width)
+.notchLineL {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 76.38%;
+  width: 1px;
+  background: var(--color-blue-primary);
+  opacity: 0.3;
+  pointer-events: none;
+  z-index: 1;
+}
+
+// Right notch connector line — sits at right edge of blue accent (82.93% of shape width)
+.notchLineR {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 82.93%;
+  width: 1px;
+  background: var(--color-blue-primary);
+  opacity: 0.3;
+  pointer-events: none;
+  z-index: 1;
+}
+
+// Each shapeRow: shape keeps its natural aspect-ratio and drives the row height;
+// text is absolutely centred over it so it never shrinks the shape.
+.shapeRow {
+  position: relative;
+  width: 100%;
+  overflow: visible;
+
+  .heroLabel {
+    position: absolute;
+    top: 75%;
+    left: var(--space-4);
+    transform: translateY(-50%);
+    margin: 0;
+  }
+
+  .heroHeading {
+    position: absolute;
+    top: 70%;
+    left: var(--space-4);
+    transform: translateY(-50%);
+    margin: 0;
+  }
+
+}
+
+// domain-shape element — design-specific clip-path from Figma
+.domainShape {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 779 / 91; // shape height is always determined by this ratio
+  background: linear-gradient(
+    90deg,
+    rgba(38, 57, 237, 0.02) 0%,
+    rgba(38, 57, 237, 0.12) 100%
+  ); // design-specific: Figma domain-shape gradient
+  clip-path: polygon(
+    82.93% 0%,
+    100% 0%,
+    100% 43.96%,
+    82.93% 43.96%,
+    76.38% 100%,
+    0% 100%,
+    0% 56.04%,
+    76.38% 56.04%
+  ); // design-specific: Figma-exact clip-path for domain-shape decorative element
+}
+
+.domainShapeAccent {
+  position: absolute;
+  left: 76.38%;
+  top: 0;
+  width: 6.55%;
+  height: 100%;
+  background: var(--color-blue-primary);
+  clip-path: polygon(
+    0 56%,
+    100% 0,
+    100% 44%,
+    0 100%
+  ); // design-specific: Figma-exact accent slash within domain-shape
+}
+
+.heroLabel {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-5);
+  font-family: var(--font-ibm-plex-mono);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+  letter-spacing: 0.12em; // design-specific: wide tracking for uppercase badge label
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+// Eyebrow corner brackets — same pattern as about-us hero
+%blog-bracket {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-color: rgba(143, 115, 255, 0.65);
+  border-style: solid;
+}
+
+.bracketTL {
+  @extend %blog-bracket;
+  top: 0;
+  left: 0;
+  border-width: 1px 0 0 1px;
+}
+
+.bracketTR {
+  @extend %blog-bracket;
+  top: 0;
+  right: 0;
+  border-width: 1px 1px 0 0;
+}
+
+.bracketBL {
+  @extend %blog-bracket;
+  bottom: 0;
+  left: 0;
+  border-width: 0 0 1px 1px;
+}
+
+.bracketBR {
+  @extend %blog-bracket;
+  bottom: 0;
+  right: 0;
+  border-width: 0 1px 1px 0;
+}
+
+.heroHeading {
+  font-family: var(--font-satoshi);
+  font-size: 80px; // design-specific: large "Blog" heading in hero
+  font-weight: var(--font-weight-medium);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  // design-specific: Figma blue gradient on Blog heading — dark left to light lavender right
+  background: linear-gradient(90deg, #2639ed 0%, #8a9ff5 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  padding-bottom: 0.15em; // extends gradient box to cover descenders (g, p, y) hidden by line-height: 1
+
+  @include tablet-down {
+    font-size: 56px;
+  }
+
+  @include mobile {
+    font-size: 36px;
+  }
+
+  @include small-mobile {
+    font-size: 28px;
+  }
+}
+
+.heroDescription {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-gray-dark);
+  line-height: var(--leading-body);
+  margin: var(--space-7) 0 0;
+  max-width: 420px;
+  padding-left: var(--space-4);
+
+  @include mobile {
+    font-size: var(--text-small-13);
+    max-width: 100%;
+  }
+}
+
+// ── Right column — polygon-clipped blog thumbnail + construction lines + diagonal strip ─────────
+.heroRight {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+
+  @include tablet-down {
+    display: none;
+  }
+}
+
+// Wraps thumbnail and diagonal strip; also carries the vertical construction lines on left/right edges
+.heroRightInner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+  max-width: 520px;
+  padding: 0 var(--space-4);
+
+  // Left vertical construction line — extends upward to touch the hero top border
+  &::before {
+    content: '';
+    position: absolute;
+    left: -1px;
+    top: -9999px;
+    bottom: 0;
+    width: 1px;
+    background: var(--color-border-black-subtle);
+    pointer-events: none;
+  }
+
+  // Right vertical construction line — extends upward to touch the hero top border
+  &::after {
+    content: '';
+    position: absolute;
+    right: -1px;
+    top: -9999px;
+    bottom: 0;
+    width: 1px;
+    background: var(--color-border-black-subtle);
+    pointer-events: none;
+  }
+}
+
+.heroImageWrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  clip-path: polygon(
+    20px 0,
+    100% 0,
+    100% calc(100% - 20px),
+    calc(100% - 20px) 100%,
+    0 100%,
+    0 20px
+  ); // design-specific: polygon from about section TeamSection — cut top-left and bottom-right corners
+  overflow: hidden;
+  background: var(--color-gray-light);
+
+  // Top horizontal construction line across the thumbnail width
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 1px;
+    background: var(--color-border-black-subtle);
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  // Bottom horizontal construction line across the thumbnail width
+  &::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 1px;
+    background: var(--color-border-black-subtle);
+    z-index: 1;
+    pointer-events: none;
+  }
+}
+
+.heroImage {
+  object-fit: cover;
+}
+
+// Diagonal lines strip — sits flush below the thumbnail, pure CSS repeating-linear-gradient
+.heroDiagStrip {
+  width: 100%;
+  height: 92px;
+  border-top: 1px solid var(--color-border-black-subtle); // design-specific: Figma-exact height from node 3:662 (679×92)
+  background-image: repeating-linear-gradient(
+    45deg,
+    var(--color-border-black-subtle) 0,
+    var(--color-border-black-subtle) 1px,
+    transparent 1px,
+    transparent 14px
+  ); // design-specific: diagonal hatching pattern matching Figma node 3:662
+  opacity: 0.5;
+}
+
+// ── Featured ──────────────────────────────────────────────────────────────
+.featured {
+  padding: var(--space-9) 0;
+  border-bottom: 1px solid var(--color-border-black-subtle);
+
+  @include mobile {
+    padding: var(--space-6) 0;
+  }
+}
+
+.featuredInner {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 var(--container-padding-x);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+
+  @include mobile {
+    padding: 0 var(--space-4);
+  }
+}
+
+.featuredLabel {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em; // design-specific: slightly looser than hero label
+  margin: 0;
+}
+
+.featuredCard {
+  display: grid;
+  grid-template-columns: 1fr 40%;
+  gap: var(--space-7);
+  padding: var(--space-7);
+  background: var(--color-white-primary);
+  border: 1px solid var(--color-border-black-subtle);
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 12px 40px var(--color-black-alpha-10);
+    transform: translateY(-2px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-blue-primary);
+    outline-offset: 3px;
+    border-radius: var(--radius-lg);
+  }
+
+  @include tablet-down {
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+  }
+}
+
+.featuredCardBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  justify-content: center;
+}
+
+.featuredMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.featuredCategory {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 var(--space-3);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-full);
+  border: 1px solid transparent;
+
+  &[data-category='Identity'],
+  &[data-category='Community'] {
+    color: var(--color-blue-primary);
+    background: var(--color-blue-primary-alpha-07);
+    border-color: var(--color-blue-primary-alpha-18);
+  }
+
+  &[data-category='Tutorials'] {
+    color: var(--color-purple-primary);
+    background: var(--color-purple-glow-08);
+    border-color: var(--color-purple-glow-fade);
+  }
+
+  &[data-category='TON'] {
+    color: var(--color-blue-dark);
+    background: var(--color-blue-light);
+    border-color: var(--color-blue-primary-alpha-13);
+  }
+
+  &[data-category='DeFi'] {
+    color: #b77e00; // design-specific: amber text for DeFi badge
+    background: rgba(253, 198, 81, 0.12);
+    border-color: rgba(253, 198, 81, 0.3);
+  }
+
+  &[data-category='Ecosystem'],
+  &[data-category='Events'],
+  &[data-category='Wallets'],
+  &[data-category='Partnerships'] {
+    color: var(--color-gray-darker);
+    background: var(--color-gray-light);
+    border-color: var(--color-gray-light-hover);
+  }
+}
+
+.featuredMetaSep {
+  font-size: var(--text-small-13);
+  color: var(--color-gray-medium);
+}
+
+.featuredDate,
+.featuredReadTime {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-gray-primary);
+}
+
+.featuredTitle {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h3);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black-primary);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-h3);
+  margin: 0;
+
+  @include mobile {
+    font-size: var(--text-display-sm);
+  }
+}
+
+.featuredExcerpt {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-gray-dark);
+  line-height: var(--leading-body);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.featuredCta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+  margin-top: var(--space-2);
+  transition: gap 0.15s ease;
+
+  .featuredCard:hover & {
+    gap: var(--space-3);
+  }
+}
+
+.featuredCtaArrow {
+  transition: transform 0.15s ease;
+
+  .featuredCard:hover & {
+    transform: translateX(3px);
+  }
+}
+
+.featuredImageWrap {
+  position: relative;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  min-height: 240px;
+  background: var(--color-gray-light);
+
+  @include tablet-down {
+    min-height: 200px;
+  }
+}
+
+.featuredImagePlaceholder {
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  background: linear-gradient(
+    135deg,
+    var(--color-blue-primary-alpha-07) 0%,
+    var(--color-blue-primary-alpha-18) 100%
+  );
+}
+
+// ── Grid section ──────────────────────────────────────────────────────────
+.gridSection {
+  padding: var(--space-9) 0 var(--space-14);
+
+  @include tablet-down {
+    padding: var(--space-7) 0 var(--space-9);
+  }
+
+  @include mobile {
+    padding: var(--space-5) 0 var(--space-8);
+  }
+}
+
+.gridInner {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 var(--container-padding-x);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-9);
+
+  @include tablet-down {
+    gap: var(--space-6);
+  }
+
+  @include mobile {
+    gap: var(--space-5);
+  }
+}
+
+// ── Pagination ────────────────────────────────────────────────────────────
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+
+  @include mobile {
+    gap: var(--space-1);
+  }
+}
+
+.pageBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+
+  @include mobile {
+    width: 34px;
+    height: 34px;
+  }
+  padding: 0;
+  color: var(--color-gray-primary);
+  background: var(--color-white-primary);
+  border: 1px solid var(--color-border-black-subtle);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+
+  &:hover:not(:disabled) {
+    color: var(--color-blue-primary);
+    border-color: var(--color-blue-primary-alpha-18);
+    background: var(--color-blue-primary-alpha-07);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.pageNum {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+
+  @include mobile {
+    width: 34px;
+    height: 34px;
+  }
+  padding: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-primary);
+  background: var(--color-white-primary);
+  border: 1px solid var(--color-border-black-subtle);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+
+  &:hover {
+    color: var(--color-blue-primary);
+    border-color: var(--color-blue-primary-alpha-18);
+    background: var(--color-blue-primary-alpha-07);
+  }
+
+  &[data-active='true'] {
+    color: var(--color-white-primary);
+    background: var(--color-blue-primary);
+    border-color: var(--color-blue-primary);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}

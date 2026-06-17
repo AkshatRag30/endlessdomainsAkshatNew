@@ -1,0 +1,38 @@
+@import '@newstyles/_mixins.scss';
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--gap-card);
+  margin: 0;
+  padding: 0;
+
+  @include tablet-down {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+}
+
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-14) var(--space-4);
+}
+
+.emptyText {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-gray-primary);
+  text-align: center;
+  margin: 0;
+}

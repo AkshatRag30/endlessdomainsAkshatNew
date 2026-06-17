@@ -1,0 +1,84 @@
+@import '@newstyles/_mixins.scss';
+
+.section {
+  background: var(--color-white-primary);
+  padding: var(--space-14) var(--container-padding-x) var(--space-9);
+  text-align: center;
+  border-bottom: 1px solid var(--color-border-black-subtle);
+
+  @include tablet-down {
+    padding: var(--space-12) var(--container-padding-x) var(--space-7);
+  }
+
+  @include mobile {
+    padding: var(--space-9) var(--space-4) var(--space-6);
+  }
+}
+
+.inner {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+.label {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+  letter-spacing: 0.08em; // design-specific: matches phase tag tracking used across the design system
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.heading {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black-primary);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-h2);
+  margin: 0;
+
+  @include tablet-down {
+    font-size: var(--text-display-md);
+  }
+
+  @include mobile {
+    font-size: var(--text-display-sm);
+  }
+}
+
+.accent {
+  background: none;
+  color: var(--color-blue-primary);
+  padding: 0;
+}
+
+.description {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-normal);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-gray-dark);
+  line-height: var(--leading-body);
+  max-width: 620px;
+  margin: 0;
+
+  @include mobile {
+    font-size: var(--text-body-small);
+  }
+}
+
+.count {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-primary);
+  margin: 0;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-border-black-subtle);
+  border-radius: var(--radius-full);
+}
