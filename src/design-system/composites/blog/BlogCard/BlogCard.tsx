@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import React, { useState, useCallback } from 'react'
-import { FiEye, FiClock, FiCalendar, FiMapPin } from 'react-icons/fi'
+import { FiEye, FiClock, FiMapPin } from 'react-icons/fi'
 import styles from './BlogCard.module.scss'
 import type { BlogSummary } from '@/data/blogs'
 import { getAuthorById } from '@/data/authors'
@@ -16,22 +16,20 @@ export function BlogCard({ post }: BlogCardProps) {
   const views = post.views >= 1000 ? `${(post.views / 1000).toFixed(1)}k` : String(post.views)
 
   const [hovered, setHovered] = useState(false)
-  const [overImage, setOverImage] = useState(false)
   const [pos, setPos] = useState({ x: 0, y: 0 })
 
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    setPos({ x: e.clientX, y: e.clientY })
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    setPos({ x: e.clientX - rect.left, y: e.clientY - rect.top })
   }, [])
 
-  const handleMouseEnter = useCallback((e: React.MouseEvent) => {
-    setPos({ x: e.clientX, y: e.clientY })
+  const handleMouseEnter = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    setPos({ x: e.clientX - rect.left, y: e.clientY - rect.top })
     setHovered(true)
   }, [])
 
-  const handleMouseLeave = useCallback(() => {
-    setHovered(false)
-    setOverImage(false)
-  }, [])
+  const handleMouseLeave = useCallback(() => setHovered(false), [])
 
   return (
     <Link
@@ -42,20 +40,18 @@ export function BlogCard({ post }: BlogCardProps) {
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
-      {/* Custom cursor */}
-      <div
-        className={`${styles.cursor} ${hovered ? styles.cursorVisible : ''} ${overImage ? styles.cursorOnImage : ''}`}
-        style={{ '--cx': `${pos.x}px`, '--cy': `${pos.y}px` } as React.CSSProperties}
+      {/* Tooltip — follows cursor */}
+      <span
+        className={`${styles.tooltip} ${hovered ? styles.tooltipVisible : ''}`}
+        style={{ '--tx': `${pos.x}px`, '--ty': `${pos.y}px` } as React.CSSProperties}
         aria-hidden="true"
-      >
-        <span className={styles.cursorText}>CLICK</span>
-      </div>
+      >Read whole blog</span>
 
       {/* Outer card polygon border */}
       <div className={styles.cardInner}>
 
         {/* Image polygon */}
-        <div className={styles.imagePolygon} onMouseEnter={() => setOverImage(true)} onMouseLeave={() => setOverImage(false)}>
+        <div className={styles.imagePolygon}>
           <Image
             src={post.image}
             alt=""
@@ -90,16 +86,9 @@ export function BlogCard({ post }: BlogCardProps) {
             <div className={styles.footer}>
               <div className={styles.footerLeft}>
                 <span className={styles.footerItem}>
-                  <FiCalendar size={14} />
-                  {formatDate(post.publishedAt)}
+                  <FiMapPin size={14} />
+                  {post.location ?? 'Global'}
                 </span>
-                <span className={styles.footerSep} aria-hidden="true" />
-                {post.location && (
-                  <span className={styles.footerItem}>
-                    <FiMapPin size={15} />
-                    {post.location}
-                  </span>
-                )}
               </div>
               <div className={styles.authorGroup}>
                 {author?.avatar && (

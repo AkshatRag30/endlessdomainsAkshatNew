@@ -8,7 +8,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: var(--section-spacing) 0;
+  padding: calc(var(--section-spacing) + var(--space-10)) 0 var(--section-spacing);
   position: relative;
   overflow: hidden;
 }

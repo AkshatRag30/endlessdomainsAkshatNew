@@ -122,15 +122,21 @@
 
 // ── Sidebar ────────────────────────────────────────────────────────────────
 .sidebar {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
   position: sticky;
   top: calc(var(--header-height) + var(--space-5));
 
   @include tablet-down {
     position: static;
   }
+}
+
+.sidebarInner {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--color-border-black-subtle);
+  background-color: var(--color-gray-light-hover);
+  background-image: repeating-linear-gradient(135deg, transparent 0px, transparent 4px, var(--color-black-alpha-01) 4px, var(--color-black-alpha-01) 6px);
 }
 
 // ── Shared card label ──────────────────────────────────────────────────────
@@ -148,6 +154,7 @@
 .ctaCard {
   background: linear-gradient(to top right, var(--color-blue-darker) 0%, var(--color-blue-primary) 55%, #6674F6 100%); // design-specific: Figma-exact diagonal gradient bottom-left dark to top-right bright
   padding: var(--space-7) var(--space-6);
+  margin-bottom: var(--space-3);
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
@@ -199,9 +206,10 @@
 // ── Table of contents card ─────────────────────────────────────────────────
 .tocCard {
   background: var(--color-white-primary);
-  border: 1px solid var(--color-border-black-subtle);
-  border-radius: var(--radius-lg);
+  border-top: 1px solid var(--color-border-black-subtle);
   padding: var(--space-5) var(--space-5) var(--space-4);
+  margin: var(--space-3);
+  margin-top: 0;
 }
 
 .tocList {
@@ -215,13 +223,6 @@
   padding-top: var(--space-2);
 }
 
-.tocItem {
-  border-bottom: 1px solid var(--color-border-black-subtle);
-
-  &:last-child {
-    border-bottom: none;
-  }
-}
 
 .tocLink {
   display: flex;
@@ -279,9 +280,10 @@
 // ── Popular this week card ─────────────────────────────────────────────────
 .popularCard {
   background: var(--color-white-primary);
-  border: 1px solid var(--color-border-black-subtle);
-  border-radius: var(--radius-lg);
+  border-top: 1px solid var(--color-border-black-subtle);
   padding: var(--space-5) var(--space-5) var(--space-4);
+  margin: var(--space-3);
+  margin-top: 0;
 }
 
 .popularList {

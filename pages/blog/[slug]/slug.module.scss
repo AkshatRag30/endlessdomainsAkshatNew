@@ -3,42 +3,123 @@
 .page {
   min-height: 100vh;
   background: var(--color-white-primary);
+  --container-padding-x: 40px;
+
+  @include tablet-down {
+    --container-padding-x: 24px;
+  }
+
+  @include mobile {
+    --container-padding-x: 16px;
+  }
 }
 
 // ── Related articles ──────────────────────────────────────────────────────
 .related {
-  border-top: 1px solid var(--color-border-black-subtle);
-  padding: var(--space-10) 0 var(--space-14);
   background: var(--color-white-primary);
+  padding-bottom: var(--space-14);
 
   @include tablet-down {
-    padding: var(--space-8) 0 var(--space-10);
+    padding-bottom: var(--space-10);
   }
 
   @include mobile {
-    padding: var(--space-6) 0 var(--space-9);
+    padding-bottom: var(--space-9);
   }
 }
 
 .relatedInner {
   max-width: var(--container-max-width);
   margin: 0 auto;
-  padding: 0 var(--container-padding-x);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-7);
-
-  @include mobile {
-    padding: 0 16px;
-    gap: var(--space-5);
-  }
-}
-
-.relatedHeader {
+  padding: var(--space-10) var(--space-6) var(--space-7);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
+
+  @include tablet-down {
+    padding: var(--space-8) var(--space-6) var(--space-6);
+  }
+
+  @include mobile {
+    padding: var(--space-6) var(--space-4) var(--space-5);
+  }
+}
+
+.sliderBtns {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-shrink: 0;
+}
+
+.sliderProgress {
+  position: relative;
+  width: 80px;
+  height: 2px;
+  // three equal dashes with gaps between
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--color-border-black-subtle) 0px,
+    var(--color-border-black-subtle) 22px,
+    transparent 22px,
+    transparent 28px,
+    var(--color-border-black-subtle) 28px,
+    var(--color-border-black-subtle) 50px,
+    transparent 50px,
+    transparent 56px,
+    var(--color-border-black-subtle) 56px,
+    var(--color-border-black-subtle) 80px
+  ); // design-specific: exactly three dashes
+}
+
+.sliderProgressFill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background: var(--color-black-primary);
+  transition: width 0.3s ease;
+  min-width: 0;
+}
+
+.sliderBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: var(--color-white-primary);
+  border: none;
+  color: var(--color-black-primary);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+
+
+  &:hover:not(:disabled) {
+    background: var(--color-black-primary);
+    color: var(--color-white-primary);
+  }
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+
+.relatedGridWrap {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+
+  @include mobile {
+    padding: 0 var(--space-4);
+  }
 }
 
 .relatedTitle {
@@ -54,27 +135,11 @@
   }
 }
 
-.relatedViewAll {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-family: var(--font-satoshi);
-  font-size: var(--text-small-13);
-  font-weight: var(--font-weight-medium);
-  color: var(--color-blue-primary);
-  text-decoration: none;
-  flex-shrink: 0;
-  transition: gap 0.15s ease;
-
-  &:hover {
-    gap: var(--space-3);
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--color-blue-primary);
-    outline-offset: 2px;
-    border-radius: 2px;
-  }
+// Full-width border strip above and below the grid — extends to viewport edges
+.relatedBorder {
+  width: 100%;
+  height: 1px;
+  background: var(--color-border-black-subtle);
 }
 
 // ── Dark footer CTA banner ────────────────────────────────────────────────

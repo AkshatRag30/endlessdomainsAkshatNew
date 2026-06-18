@@ -4,13 +4,11 @@ import { useRouter } from 'next/router'
 import { FiEye, FiClock } from 'react-icons/fi'
 import { PrimaryButton } from '@/design-system/primitives/button/PrimaryButton'
 import styles from './BlogPostBody.module.scss'
-import type { Author } from '@/data/authors'
 import type { BlogSummary } from '@/data/blogs'
 import type { TocItem } from '@/pages/blog/[slug]'
 
 export interface BlogPostBodyProps {
   content: string
-  author: Author
   toc: TocItem[]
   popularPosts: BlogSummary[]
   formatDate: (date: string) => string
@@ -29,6 +27,7 @@ export function BlogPostBody({ content, toc, popularPosts, formatDate }: BlogPos
 
       {/* Sidebar */}
       <aside className={styles.sidebar} aria-label="Sidebar">
+        <div className={styles.sidebarInner}>
 
         {/* Blue CTA card */}
         <div className={styles.ctaCard}>
@@ -90,6 +89,7 @@ export function BlogPostBody({ content, toc, popularPosts, formatDate }: BlogPos
           </div>
         )}
 
+        </div>
       </aside>
     </div>
   )

@@ -1,17 +1,18 @@
-import React from 'react'
+import React, { useRef, useState, useCallback, useEffect } from 'react'
 import type { NextPage, GetStaticProps, GetStaticPaths } from 'next'
 import Head from 'next/head'
 import Link from 'next/link'
+import { FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 import { BLOGS } from '@/data/blogs'
 import { BLOG_DETAILS } from '@/data/blogDetails'
-import { AUTHORS, getAuthorById } from '@/data/authors'
+import { getAuthorById } from '@/data/authors'
+import type { Author } from '@/data/authors'
 import { getBlogBySlug, paginateBlogs, getAllBlogs, formatDate } from '@/lib/blog-utils'
 import { BlogPostHeader } from '@/design-system/composites/blog/BlogPostHeader'
 import { BlogPostBody } from '@/design-system/composites/blog/BlogPostBody'
 import { BlogGrid } from '@/design-system/composites/blog/BlogGrid'
 import type { BlogSummary } from '@/data/blogs'
 import type { BlogDetail } from '@/data/blogDetails'
-import type { Author } from '@/data/authors'
 import styles from './slug.module.scss'
 
 export interface TocItem {
@@ -48,6 +49,36 @@ function injectHeadingIds(html: string, toc: TocItem[]): string {
 
 const BlogPostPage: NextPage<BlogPostPageProps> = ({ post, detail, author, relatedPosts, toc = [], popularPosts = [] }) => {
   const contentWithIds = injectHeadingIds(detail.content, toc)
+  const gridRef = useRef<HTMLUListElement>(null)
+  const [canPrev, setCanPrev] = useState(false)
+  const [canNext, setCanNext] = useState(relatedPosts.length > 3)
+  const [scrollProgress, setScrollProgress] = useState(0)
+
+  const updateArrows = useCallback(() => {
+    const el = gridRef.current
+    if (!el) return
+    setCanPrev(el.scrollLeft > 4)
+    setCanNext(el.scrollLeft < el.scrollWidth - el.clientWidth - 4)
+    const max = el.scrollWidth - el.clientWidth
+    setScrollProgress(max > 0 ? el.scrollLeft / max : 0)
+  }, [])
+
+  useEffect(() => {
+    // Run once immediately and once after paint so CSS grid percentages have resolved
+    updateArrows()
+    const id = setTimeout(updateArrows, 100)
+    return () => clearTimeout(id)
+  }, [updateArrows])
+
+  const slide = useCallback((dir: 'prev' | 'next') => {
+    const el = gridRef.current
+    if (!el) return
+    const card = el.querySelector('li') as HTMLElement
+    const cardWidth = card ? card.getBoundingClientRect().width : el.clientWidth / 3
+    const target = el.scrollLeft + (dir === 'next' ? cardWidth : -cardWidth)
+    el.scrollTo({ left: target, behavior: 'smooth' })
+    setTimeout(updateArrows, 400)
+  }, [updateArrows])
 
   return (
     <>
@@ -72,7 +103,6 @@ const BlogPostPage: NextPage<BlogPostPageProps> = ({ post, detail, author, relat
         <BlogPostHeader post={post} author={author} />
         <BlogPostBody
           content={contentWithIds}
-          author={author}
           toc={toc}
           popularPosts={popularPosts}
           formatDate={formatDate}
@@ -81,15 +111,24 @@ const BlogPostPage: NextPage<BlogPostPageProps> = ({ post, detail, author, relat
         {relatedPosts.length > 0 && (
           <section className={styles.related} aria-labelledby="related-heading">
             <div className={styles.relatedInner}>
-              <div className={styles.relatedHeader}>
-                <h2 id="related-heading" className={styles.relatedTitle}>More Articles</h2>
-                <Link href="/blog" className={styles.relatedViewAll}>
-                  View all
-                  <span aria-hidden="true">→</span>
-                </Link>
+              <h2 id="related-heading" className={styles.relatedTitle}>More Articles</h2>
+              <div className={styles.sliderBtns}>
+                <button className={styles.sliderBtn} onClick={() => slide('prev')} disabled={!canPrev} aria-label="Previous articles">
+                  <FiChevronLeft size={18} aria-hidden="true" />
+                </button>
+                <div className={styles.sliderProgress} aria-hidden="true">
+                  <div className={styles.sliderProgressFill} style={{ width: `${scrollProgress * 100}%` }} />
+                </div>
+                <button className={styles.sliderBtn} onClick={() => slide('next')} disabled={!canNext} aria-label="Next articles">
+                  <FiChevronRight size={18} aria-hidden="true" />
+                </button>
               </div>
-              <BlogGrid posts={relatedPosts} />
             </div>
+            <div className={styles.relatedBorder} aria-hidden="true" />
+            <div className={styles.relatedGridWrap}>
+              <BlogGrid posts={relatedPosts} gridRef={gridRef} onScroll={updateArrows} scrollable />
+            </div>
+            <div className={styles.relatedBorder} aria-hidden="true" />
           </section>
         )}
 
@@ -126,13 +165,14 @@ export const getStaticProps: GetStaticProps<BlogPostPageProps> = async ({ params
 
   if (!post || !detail) return { notFound: true }
 
-  const author = getAuthorById(post.authorId) ?? AUTHORS[5]
+  const author = getAuthorById(post.authorId)
+  if (!author) return { notFound: true }
   const allBlogs = getAllBlogs()
 
   const sameCategory = allBlogs.filter(b => b.category === post.category && b.slug !== slug)
   const relatedPosts = sameCategory.length >= 3
-    ? sameCategory.slice(0, 3)
-    : paginateBlogs(allBlogs.filter(b => b.slug !== slug), 1, 3).items
+    ? sameCategory.slice(0, 6)
+    : paginateBlogs(allBlogs.filter(b => b.slug !== slug), 1, 6).items
 
   const toc = extractToc(detail.content)
   const popularPosts = [...allBlogs]

@@ -30,6 +30,7 @@
 }
 
 .heroInner {
+  position: relative;
   max-width: var(--container-max-width);
   margin: 0 auto;
   padding: 0 var(--container-padding-x);
@@ -37,6 +38,23 @@
   grid-template-columns: 55% 1fr;
   gap: var(--space-9);
   align-items: stretch;
+
+  // Connects the diagonal tip on the left to the right edge — spans from 82.93% of 55% col to 100%
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: calc(55% * 0.8293 + var(--space-9));
+    right: 0;
+    height: 1px;
+    background: var(--color-border-black-subtle);
+    pointer-events: none;
+    z-index: 100;
+
+    @include tablet-down {
+      display: none;
+    }
+  }
 
   @include tablet-down {
     grid-template-columns: 1fr;
@@ -55,7 +73,7 @@
   flex-direction: column;
   gap: 0;
   padding: var(--space-4) 0;
-  margin-right: calc(-1 * var(--space-11)); // extend shapes to touch the right column, cancelling the grid gap
+  margin-right: calc(-1 * var(--space-9)); // match the grid gap so shapes reach but don't cross into the right column
 
   @include tablet-down {
     margin-right: 0;
@@ -65,18 +83,59 @@
     padding: var(--space-3) 0;
   }
 
-  // Top and bottom construction lines extending to viewport edges
+  // Bottom border extending to viewport edges
   &::before {
     content: '';
     position: absolute;
-    top: 0;
     bottom: 0;
     left: -9999px;
     right: -9999px;
-    border-top: 1px solid var(--color-border-black-subtle);
-    border-bottom: 1px solid var(--color-border-black-subtle);
+    height: 1px;
+    background: var(--color-border-black-subtle);
     pointer-events: none;
     z-index: 2;
+  }
+
+}
+
+// Angled top border — same diagonal angle as domainShape (76.38% bottom → 82.93% top)
+// ::before = horizontal bottom line, ::after = diagonal section rendered as a thin filled strip
+.angledBorderTop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 52px; // design-specific: height sets the steepness of the diagonal
+  pointer-events: none;
+  z-index: 100;
+
+  @include tablet-down {
+    display: none;
+  }
+
+  // Horizontal line across the bottom
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 76.38%;
+    height: 1px;
+    background: var(--color-border-black-subtle);
+  }
+
+  // Diagonal line — a 1px-wide strip rotated to match domainShape angle
+  // Connects bottom at 76.38% to top at 82.93%
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 76.38%;
+    // width = distance between the two x points, height = full 52px span
+    width: calc(82.93% - 76.38%); // design-specific: matches domainShape diagonal x-delta
+    height: 100%;
+    background: var(--color-border-black-subtle);
+    clip-path: polygon(100% 0%, 100% 2px, 2px 100%, 0% 100%);
   }
 }
 
@@ -174,6 +233,13 @@
     100% 44%,
     0 100%
   ); // design-specific: Figma-exact accent slash within domain-shape
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0) 75%);
+  }
 }
 
 .heroLabel {
@@ -272,6 +338,7 @@
 
 // ── Right column — polygon-clipped blog thumbnail + construction lines + diagonal strip ─────────
 .heroRight {
+  position: relative;
   display: flex;
   align-items: flex-end;
   justify-content: flex-end;
@@ -317,9 +384,11 @@
 }
 
 .heroImageWrap {
+  display: block;
   position: relative;
   width: 100%;
   aspect-ratio: 2 / 1;
+  cursor: pointer;
   clip-path: polygon(
     20px 0,
     100% 0,
@@ -356,6 +425,148 @@
 
 .heroImage {
   object-fit: cover;
+  transition: transform 0.35s ease;
+
+  .heroImageWrap:hover & {
+    transform: scale(1.03);
+  }
+}
+
+// Tooltip — follows cursor inside heroImageWrap
+.heroTooltip {
+  position: absolute;
+  left: var(--tx, 0px);
+  top: var(--ty, 0px);
+  transform: translate(-50%, calc(-100% - 12px));
+  z-index: 10;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  white-space: nowrap;
+  font-family: var(--font-ibm-plex-mono);
+  font-size: 10px;
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-white-primary);
+  background: var(--color-black-primary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 0 14px 0 rgba(38, 57, 237, 0.2);
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 8px;
+    height: 5px;
+    background: var(--color-black-primary);
+    clip-path: polygon(0 0, 100% 0, 50% 100%); // design-specific: downward caret arrow
+  }
+}
+
+.heroTooltipVisible {
+  opacity: 1;
+}
+
+// Frosted glass pills — same pattern as BlogCard
+.heroCategoryBadge {
+  position: absolute;
+  top: var(--space-3);
+  left: var(--space-3);
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  font-family: var(--font-satoshi);
+  font-size: 11px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-white-primary);
+  text-transform: capitalize;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+}
+
+.heroMetaBadge {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  font-family: var(--font-satoshi);
+  font-size: 11px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-white-primary);
+  line-height: 1.2;
+}
+
+.heroMetaItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.heroMetaDivider {
+  width: 1px;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.4);
+}
+
+// Bottom pill — author avatar + name + location
+.heroBottomPill {
+  position: absolute;
+  bottom: var(--space-3);
+  left: var(--space-3);
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 7px 16px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--color-white-primary);
+  white-space: nowrap;
+}
+
+.heroAuthorAvatar {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.heroAuthorAvatarImg {
+  object-fit: cover;
+}
+
+.heroBottomPillText {
+  font-family: var(--font-satoshi);
+  font-size: 11px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-white-primary);
+  line-height: 1.2;
 }
 
 // Diagonal lines strip — sits flush below the thumbnail, pure CSS repeating-linear-gradient
@@ -597,7 +808,11 @@
 .gridInner {
   max-width: var(--container-max-width);
   margin: 0 auto;
-  padding: 0 var(--container-padding-x);
+  padding: 0 var(--space-6);
+
+  @include mobile {
+    padding: 0 var(--space-4);
+  }
   display: flex;
   flex-direction: column;
   gap: var(--space-9);

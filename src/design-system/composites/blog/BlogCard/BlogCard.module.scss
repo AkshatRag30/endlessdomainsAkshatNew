@@ -1,71 +1,56 @@
 @import '@newstyles/_mixins.scss';
 
-// Custom animated cursor — fixed position so clip-path on card never clips it
-.cursor {
-  position: fixed;
-  top: var(--cy);
-  left: var(--cx);
-  transform: translate(-50%, -50%);
+// Tooltip — fixed offset above cursor, follows mouse via CSS custom properties
+.tooltip {
+  position: absolute;
+  left: var(--tx, 0px);
+  top: var(--ty, 0px);
+  transform: translate(-50%, calc(-100% - 12px));
+  z-index: 10;
   pointer-events: none;
-  z-index: 9999;
   opacity: 0;
-  scale: 0.6;
-  transition: opacity 0.2s ease, scale 0.2s ease;
-}
-
-.cursorVisible {
-  opacity: 1;
-  scale: 1;
-}
-
-.cursorOnImage .cursorText {
-  background: var(--color-white-primary);
-  color: var(--color-black-primary);
-}
-
-.cursorText {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: var(--color-black-primary);
-  font-family: var(--font-satoshi);
-  font-size: 11px; // design-specific: compact label inside circle cursor
-  font-weight: var(--font-weight-bold);
-  color: var(--color-white-primary);
-  transition: background 0.35s ease, color 0.35s ease;
+  transition: opacity 0.15s ease;
+  white-space: nowrap;
+  font-family: var(--font-ibm-plex-mono);
+  font-size: 10px;
+  font-weight: var(--font-weight-medium);
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  white-space: normal;
-  text-align: center;
-  line-height: 1.3;
-  padding: var(--space-2);
-  animation: cursorPulse 2s ease-in-out infinite;
+  color: var(--color-white-primary);
+  background: var(--color-black-primary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 0 14px 0 rgba(38, 57, 237, 0.2);
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 8px;
+    height: 5px;
+    background: var(--color-black-primary);
+    clip-path: polygon(0 0, 100% 0, 50% 100%); // design-specific: small downward arrow caret
+  }
 }
 
-@keyframes cursorPulse {
-  0%, 100% { scale: 1; }
-  50% { scale: 1.06; }
+.tooltipVisible {
+  opacity: 1;
 }
 
-// Outer card — polygon border layer; background reveals as 1px border through cardInner margin
+// Outer card — border layer; background reveals as 1px border through cardInner margin
 .card {
-  display: block;
+  position: relative;
+  display: flex;
+  flex-direction: column;
   text-decoration: none;
   color: inherit;
   width: 100%;
-  cursor: none; // hide default cursor — replaced by custom cursor on hover
+  height: 100%;
+  cursor: pointer;
   background: var(--color-border-black-subtle); // default: gray border
-  clip-path: polygon(
-    20px 0,
-    100% 0,
-    100% calc(100% - 20px),
-    calc(100% - 20px) 100%,
-    0 100%,
-    0 20px
-  );
   transition: background 0.25s ease;
 
   &:hover {
@@ -81,19 +66,12 @@
   position: relative;
   display: flex;
   flex-direction: column;
+  flex: 1;
   gap: var(--space-3);
-  padding: var(--space-3);
-  margin: 1px; // reveals .card background as a 1px border along the polygon edges
-  background-color: var(--color-gray-light-hover); // default: slightly darker gray fill
+  padding: var(--space-2);
+  margin: 1px; // reveals .card background as a 1px border
+  background-color: var(--color-gray-light-hover);
   background-image: repeating-linear-gradient(135deg, transparent 0px, transparent 4px, var(--color-black-alpha-01) 4px, var(--color-black-alpha-01) 6px);
-  clip-path: polygon(
-    20px 0,
-    100% 0,
-    100% calc(100% - 20px),
-    calc(100% - 20px) 100%,
-    0 100%,
-    0 20px
-  ); // design-specific: outer card polygon — cut top-left and bottom-right corners
   transition: background-color 0.25s ease;
 
   .card:hover & {
@@ -128,6 +106,10 @@
     transform: scale(1.04);
     filter: grayscale(0%);
   }
+
+  @include tablet-down {
+    filter: grayscale(0%);
+  }
 }
 
 // Category badge — top left of image — frosted glass pill
@@ -151,6 +133,11 @@
   color: var(--color-white-primary);
   text-transform: capitalize;
   letter-spacing: 0.04em;
+
+  @include mobile {
+    padding: 4px 8px;
+    font-size: 9px;
+  }
 }
 
 // Meta badge — top right of image — frosted glass pill
@@ -173,12 +160,22 @@
   font-weight: var(--font-weight-medium);
   color: var(--color-white-primary);
   line-height: 1.2;
+
+  @include mobile {
+    padding: 4px 8px;
+    font-size: 9px;
+    gap: 4px;
+  }
 }
 
 .metaItem {
   display: inline-flex;
   align-items: center;
   gap: 4px;
+
+  @include mobile {
+    gap: 3px;
+  }
 }
 
 .metaDivider {
@@ -190,6 +187,9 @@
 // Content polygon — bottom section, cut bottom-left corner
 .contentPolygon {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
   width: 100%;
   clip-path: polygon(
     0 0,
@@ -204,6 +204,7 @@
 .contentInner {
   display: flex;
   flex-direction: column;
+  flex: 1;
   gap: var(--space-4);
   padding: var(--space-4) var(--space-4) var(--space-6);
 
@@ -216,6 +217,7 @@
 .textGroup {
   display: flex;
   flex-direction: column;
+  flex: 1;
   gap: var(--space-2);
 }
 

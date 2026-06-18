@@ -64,7 +64,7 @@ const FOUNDERS = [
   {
     id: 'vicky',
     name: 'Vicky Hissaria',
-    title: 'CO-FOUNDER AND CEO',
+    title: 'FOUNDER AND CEO',
     imageUrl: '/about-us/vicky.jpg',
     linkedin: 'https://linkedin.com/in/vicky-hissaria-02517a93',
     align: 'right' as const,
@@ -100,7 +100,7 @@ const CORE_TEAM = [
 
 const TEAM_MEMBERS = [
   { id: 'smriti',   name: 'Smriti Singh',       title: 'Frontend Developer',        imageUrl: '/about-us/smriti.jpg',    linkedin: 'https://www.linkedin.com/in/smriti-singh0710/' },
-  { id: 'akshat',   name: 'Akshat Rag',         title: 'Junior Frontend Developer', imageUrl: '/about-us/akshat.jpg',    linkedin: '' },
+  { id: 'akshat',   name: 'Akshat Rag',         title: 'Junior Frontend Developer', imageUrl: '/about-us/akshat.jpg',    linkedin: 'https://www.linkedin.com/in/akshatrag/' },
   { id: 'jay',      name: 'Khamgoulun Haokip',  title: 'UI/UX Designer',            imageUrl: '/about-us/jay.jpg',       linkedin: 'https://www.linkedin.com/in/khamgoulun-haokip' },
   { id: 'bhavuk',   name: 'Bhavuk Kathuria',    title: 'Graphics Designer',         imageUrl: '/about-us/bhavuk.jpg',    linkedin: 'https://www.linkedin.com/in/bhavuk-kathuria-0a1512291/' },
   { id: 'shresth',  name: 'Shresth Singh',      title: 'Video Editor',              imageUrl: '/about-us/shresth.jpg',   linkedin: 'https://www.linkedin.com/in/shresth-singh-2abbb4249/' },
@@ -126,9 +126,9 @@ export default function TeamSection() {
   return (
     <section className={styles.section} aria-labelledby="team-heading">
 
-      {/* ── Top SVG trapezoid decoration ── */}
+      {/* ── Top trapezoid decoration — short edge outward (top), long edge inward (bottom) ── */}
       <div className={styles.topPolygon} aria-hidden="true">
-        <TrapezoidSVG />
+        <div className={styles.topPolygonInner} />
       </div>
 
       {/* ── Section header ── */}

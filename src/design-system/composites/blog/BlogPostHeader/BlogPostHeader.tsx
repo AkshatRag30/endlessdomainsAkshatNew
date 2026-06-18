@@ -1,7 +1,7 @@
 import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { FiCalendar, FiMapPin, FiClock, FiEye } from 'react-icons/fi'
+import { FiCalendar, FiMapPin } from 'react-icons/fi'
 import { PiArrowBendUpLeft } from 'react-icons/pi'
 import styles from './BlogPostHeader.module.scss'
 import type { BlogSummary } from '@/data/blogs'
@@ -14,7 +14,6 @@ export interface BlogPostHeaderProps {
 }
 
 export function BlogPostHeader({ post, author }: BlogPostHeaderProps) {
-  const views = post.views >= 1000 ? `${(post.views / 1000).toFixed(1)}k` : String(post.views)
 
   return (
     <header className={styles.header}>
@@ -34,44 +33,38 @@ export function BlogPostHeader({ post, author }: BlogPostHeaderProps) {
             <span className={styles.categoryBadge} data-category={post.category}>
               {post.category}
             </span>
-            <div className={styles.metaPill}>
-              <FiCalendar size={11} aria-hidden="true" />
-              <time dateTime={post.publishedAt}>{formatDate(post.publishedAt)}</time>
-            </div>
-            {post.location && (
+            <div className={styles.metaGroup}>
               <div className={styles.metaPill}>
-                <FiMapPin size={11} aria-hidden="true" />
-                <span>{post.location}</span>
+                <FiCalendar size={16} aria-hidden="true" />
+                <time dateTime={post.publishedAt}>{formatDate(post.publishedAt)}</time>
               </div>
-            )}
-            <div className={styles.metaPill}>
-              <FiEye size={11} aria-hidden="true" />
-              <span>{views} views</span>
+              <span className={styles.metaDivider} aria-hidden="true" />
+              <div className={styles.metaPill}>
+                <div className={styles.avatarWrap}>
+                  <Image src={author.avatar} alt={author.name} fill className={styles.avatar} />
+                </div>
+                <span className={styles.authorName}>{author.name}</span>
+              </div>
+              <span className={styles.metaDivider} aria-hidden="true" />
+              <div className={styles.metaPill}>
+                <FiMapPin size={16} aria-hidden="true" />
+                <span>{post.location ?? 'Global'}</span>
+              </div>
             </div>
           </div>
 
-          {/* Title */}
-          <h1 className={styles.title}>{post.title}</h1>
+          {/* Title — first line black, rest gradient per Figma */}
+          <h1 className={styles.title}>
+            {post.title.includes(':')
+              ? <>
+                  {post.title.split(':')[0]}:<br />
+                  <span className={styles.titleGradient}>{post.title.split(':').slice(1).join(':').trim()}</span>
+                </>
+              : <span className={styles.titleGradient}>{post.title}</span>
+            }
+          </h1>
 
-          {/* Author row */}
-          <div className={styles.authorRow}>
-            <div className={styles.avatarWrap}>
-              <Image
-                src={author.avatar}
-                alt={author.name}
-                fill
-                className={styles.avatar}
-              />
-            </div>
-            <div className={styles.authorInfo}>
-              <span className={styles.authorName}>{author.name}</span>
-              <span className={styles.authorRole}>{author.role}</span>
-            </div>
-            <div className={styles.readTime}>
-              <FiClock size={11} aria-hidden="true" />
-              <span>{post.readingTime} min read</span>
-            </div>
-          </div>
+
         </div>
 
         {/* Right column — polygon-clipped image */}
