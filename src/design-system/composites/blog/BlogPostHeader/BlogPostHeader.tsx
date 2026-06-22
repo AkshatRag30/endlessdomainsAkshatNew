@@ -41,7 +41,7 @@ export function BlogPostHeader({ post, author }: BlogPostHeaderProps) {
               <span className={styles.metaDivider} aria-hidden="true" />
               <div className={styles.metaPill}>
                 <div className={styles.avatarWrap}>
-                  <Image src={author.avatar} alt={author.name} fill className={styles.avatar} />
+                  <Image src={author.avatar} alt={author.name} width={16} height={16} className={styles.avatar} />
                 </div>
                 <span className={styles.authorName}>{author.name}</span>
               </div>

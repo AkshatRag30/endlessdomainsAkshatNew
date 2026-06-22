@@ -6,7 +6,7 @@ import type { BlogSummary } from '@/data/blogs'
 export interface BlogGridProps {
   posts: BlogSummary[]
   emptyMessage?: string
-  gridRef?: React.RefObject<HTMLUListElement>
+  gridRef?: React.RefObject<HTMLUListElement> | ((el: HTMLUListElement | null) => void)
   onScroll?: () => void
   scrollable?: boolean
 }
@@ -21,7 +21,14 @@ export function BlogGrid({ posts, emptyMessage = 'No articles found.', gridRef, 
   }
 
   return (
-    <ul className={styles.grid} aria-label="Blog articles" ref={gridRef} onScroll={onScroll} data-scrollable={scrollable ? 'true' : undefined}>
+    <ul
+      className={styles.grid}
+      aria-label="Blog articles"
+      ref={gridRef}
+      onScroll={onScroll}
+      data-scrollable={scrollable ? 'true' : undefined}
+      style={scrollable ? ({ '--post-count': posts.length } as React.CSSProperties) : undefined}
+    >
       {posts.map(post => (
         <li key={post.id} className={`${styles.item}${scrollable ? ` ${styles.itemSnap}` : ''}`}>
           <BlogCard post={post} />

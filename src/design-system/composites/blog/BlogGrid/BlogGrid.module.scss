@@ -19,7 +19,7 @@
   }
 
   &[data-scrollable='true'] {
-    grid-template-columns: repeat(6, calc(100% / 3));
+    grid-template-columns: repeat(var(--post-count, 6), calc(100% / 3));
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     scrollbar-width: none;
@@ -27,11 +27,11 @@
     &::-webkit-scrollbar { display: none; }
 
     @include tablet-down {
-      grid-template-columns: repeat(6, calc(100% / 2));
+      grid-template-columns: repeat(var(--post-count, 6), calc(100% / 2));
     }
 
     @include mobile {
-      grid-template-columns: repeat(6, 85%);
+      grid-template-columns: repeat(var(--post-count, 6), 85%);
     }
   }
 }

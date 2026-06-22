@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import React, { useState, useCallback } from 'react'
-import { FiEye, FiClock, FiMapPin } from 'react-icons/fi'
+import { FiEye, FiClock } from 'react-icons/fi'
 import styles from './BlogCard.module.scss'
 import type { BlogSummary } from '@/data/blogs'
 import { getAuthorById } from '@/data/authors'
@@ -64,13 +64,8 @@ export function BlogCard({ post }: BlogCardProps) {
           </span>
           <div className={styles.metaBadge} aria-hidden="true">
             <span className={styles.metaItem}>
-              <FiEye size={9} />
-              {views}
-            </span>
-            <span className={styles.metaDivider} />
-            <span className={styles.metaItem}>
               <FiClock size={9} />
-              {formatDate(post.publishedAt)} · {post.readingTime} Min
+              {post.readingTime} Min
             </span>
           </div>
         </div>
@@ -86,8 +81,12 @@ export function BlogCard({ post }: BlogCardProps) {
             <div className={styles.footer}>
               <div className={styles.footerLeft}>
                 <span className={styles.footerItem}>
-                  <FiMapPin size={14} />
-                  {post.location ?? 'Global'}
+                  {formatDate(post.publishedAt)}
+                </span>
+                <span className={styles.footerSep} aria-hidden="true" />
+                <span className={styles.footerItem}>
+                  <FiEye size={11} />
+                  {views}
                 </span>
               </div>
               <div className={styles.authorGroup}>
@@ -96,7 +95,8 @@ export function BlogCard({ post }: BlogCardProps) {
                     <Image
                       src={author.avatar}
                       alt={author.name}
-                      fill
+                      width={18}
+                      height={18}
                       className={styles.avatar}
                     />
                   </div>
@@ -108,6 +108,13 @@ export function BlogCard({ post }: BlogCardProps) {
         </div>
 
       </div>
+
+      {/* Tooltip — last child so it paints above cardInner siblings */}
+      <span
+        className={`${styles.tooltip} ${hovered ? styles.tooltipVisible : ''}`}
+        style={{ '--tx': `${pos.x}px`, '--ty': `${pos.y}px` } as React.CSSProperties}
+        aria-hidden="true"
+      >Read whole blog</span>
     </Link>
   )
 }

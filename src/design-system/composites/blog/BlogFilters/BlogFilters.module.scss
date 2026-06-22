@@ -38,7 +38,54 @@
 
   @include mobile {
     overflow: visible;
-    padding-bottom: var(--space-3);
+    padding-bottom: 0;
+    gap: 0;
+  }
+}
+
+// Mobile-only toggle button — shown only on mobile
+.catToggle {
+  display: none;
+
+  @include mobile {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    height: 42px;
+    padding: 0 var(--space-4);
+    font-family: var(--font-satoshi);
+    font-size: var(--text-nav);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-white-primary);
+    background: linear-gradient(to bottom, var(--color-surface-mid), var(--color-surface-hover));
+    box-shadow:
+      3px 3px 3px 0px var(--color-black-alpha-15),
+      inset 0px 1px 1px 0px var(--color-white-alpha-25);
+    border: none;
+    border-radius: 0;
+    cursor: pointer;
+    white-space: nowrap;
+    letter-spacing: 0.447px;
+    width: 100%;
+    justify-content: space-between;
+    transition: opacity 0.2s ease;
+
+    &:hover {
+      opacity: 0.9;
+    }
+
+    &:focus-visible {
+      @include focus-ring;
+    }
+  }
+}
+
+.catChevron {
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+
+  [aria-expanded='true'] & {
+    transform: rotate(180deg);
   }
 }
 
@@ -50,6 +97,10 @@
   white-space: nowrap;
   flex-shrink: 0;
   letter-spacing: 0.01em;
+
+  @include mobile {
+    display: none; // toggle button replaces this label on mobile
+  }
 }
 
 .tabs {
@@ -59,7 +110,15 @@
   width: 100%;
 
   @include mobile {
-    overflow: visible; // allow wrapped rows to show fully
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.25s ease, padding 0.25s ease;
+    padding-top: 0;
+
+    &[data-open='true'] {
+      max-height: 300px; // large enough for all wrapped rows
+      padding-top: var(--space-3);
+    }
   }
 }
 

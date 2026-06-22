@@ -16,252 +16,74 @@
 
 // ── Hero ──────────────────────────────────────────────────────────────────
 .hero {
-  position: relative;
-  padding: var(--space-2) 0 var(--space-1);
+  padding: var(--space-8) 0 0;
   overflow: clip;
 
-  @include tablet-down {
-    padding: var(--space-2) 0 var(--space-1);
+  @include tablet {
+    padding: var(--space-6) 0 0;
   }
 
   @include mobile {
-    padding: var(--space-2) 0;
+    padding: var(--space-5) 0 0;
   }
 }
 
 .heroInner {
-  position: relative;
   max-width: var(--container-max-width);
   margin: 0 auto;
   padding: 0 var(--container-padding-x);
   display: grid;
-  grid-template-columns: 55% 1fr;
-  gap: var(--space-9);
-  align-items: stretch;
-
-  // Connects the diagonal tip on the left to the right edge — spans from 82.93% of 55% col to 100%
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: calc(55% * 0.8293 + var(--space-9));
-    right: 0;
-    height: 1px;
-    background: var(--color-border-black-subtle);
-    pointer-events: none;
-    z-index: 100;
-
-    @include tablet-down {
-      display: none;
-    }
-  }
+  grid-template-columns: 34% 1fr;
+  gap: var(--space-8);
+  align-items: center;
 
   @include tablet-down {
     grid-template-columns: 1fr;
-    gap: var(--space-6);
+    gap: var(--space-5);
   }
 
   @include mobile {
-    padding: 0 var(--container-padding-x);
+    gap: var(--space-4);
   }
 }
 
-// ── Left column ───────────────────────────────────────────────────────────
+// ── Hero left ─────────────────────────────────────────────────────────────
 .heroLeft {
-  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 0;
-  padding: var(--space-4) 0;
-  margin-right: calc(-1 * var(--space-9)); // match the grid gap so shapes reach but don't cross into the right column
-
-  @include tablet-down {
-    margin-right: 0;
-  }
+  gap: var(--space-5);
 
   @include mobile {
-    padding: var(--space-3) 0;
-  }
-
-  // Bottom border extending to viewport edges
-  &::before {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: -9999px;
-    right: -9999px;
-    height: 1px;
-    background: var(--color-border-black-subtle);
-    pointer-events: none;
-    z-index: 2;
-  }
-
-}
-
-// Angled top border — same diagonal angle as domainShape (76.38% bottom → 82.93% top)
-// ::before = horizontal bottom line, ::after = diagonal section rendered as a thin filled strip
-.angledBorderTop {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 52px; // design-specific: height sets the steepness of the diagonal
-  pointer-events: none;
-  z-index: 100;
-
-  @include tablet-down {
-    display: none;
-  }
-
-  // Horizontal line across the bottom
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 76.38%;
-    height: 1px;
-    background: var(--color-border-black-subtle);
-  }
-
-  // Diagonal line — a 1px-wide strip rotated to match domainShape angle
-  // Connects bottom at 76.38% to top at 82.93%
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 76.38%;
-    // width = distance between the two x points, height = full 52px span
-    width: calc(82.93% - 76.38%); // design-specific: matches domainShape diagonal x-delta
-    height: 100%;
-    background: var(--color-border-black-subtle);
-    clip-path: polygon(100% 0%, 100% 2px, 2px 100%, 0% 100%);
+    gap: var(--space-4);
   }
 }
 
-// Wraps the 2nd shapeRow + description + bottom domainShape; anchors the two notch connector lines
-.heroLeftBottom {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  margin-top: auto;
-}
-
-// Left notch connector line — sits at left edge of blue accent (76.38% of shape width)
-.notchLineL {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 76.38%;
-  width: 1px;
-  background: var(--color-blue-primary);
-  opacity: 0.3;
-  pointer-events: none;
-  z-index: 1;
-}
-
-// Right notch connector line — sits at right edge of blue accent (82.93% of shape width)
-.notchLineR {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 82.93%;
-  width: 1px;
-  background: var(--color-blue-primary);
-  opacity: 0.3;
-  pointer-events: none;
-  z-index: 1;
-}
-
-// Each shapeRow: shape keeps its natural aspect-ratio and drives the row height;
-// text is absolutely centred over it so it never shrinks the shape.
-.shapeRow {
-  position: relative;
-  width: 100%;
-  overflow: visible;
-
-  .heroLabel {
-    position: absolute;
-    top: 75%;
-    left: var(--space-4);
-    transform: translateY(-50%);
-    margin: 0;
-  }
-
-  .heroHeading {
-    position: absolute;
-    top: 70%;
-    left: var(--space-4);
-    transform: translateY(-50%);
-    margin: 0;
-  }
-
-}
-
-// domain-shape element — design-specific clip-path from Figma
-.domainShape {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 779 / 91; // shape height is always determined by this ratio
-  background: linear-gradient(
-    90deg,
-    rgba(38, 57, 237, 0.02) 0%,
-    rgba(38, 57, 237, 0.12) 100%
-  ); // design-specific: Figma domain-shape gradient
-  clip-path: polygon(
-    82.93% 0%,
-    100% 0%,
-    100% 43.96%,
-    82.93% 43.96%,
-    76.38% 100%,
-    0% 100%,
-    0% 56.04%,
-    76.38% 56.04%
-  ); // design-specific: Figma-exact clip-path for domain-shape decorative element
-}
-
-.domainShapeAccent {
-  position: absolute;
-  left: 76.38%;
-  top: 0;
-  width: 6.55%;
-  height: 100%;
-  background: var(--color-blue-primary);
-  clip-path: polygon(
-    0 56%,
-    100% 0,
-    100% 44%,
-    0 100%
-  ); // design-specific: Figma-exact accent slash within domain-shape
-
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0) 75%);
-  }
-}
-
+// "NEWS FEED" corner bracket label
 .heroLabel {
   position: relative;
   display: inline-flex;
   align-items: center;
-  padding: var(--space-2) var(--space-5);
+  align-self: flex-start;
+  padding: var(--space-2) var(--space-4);
   font-family: var(--font-ibm-plex-mono);
   font-size: var(--text-small-13);
   font-weight: var(--font-weight-medium);
   color: var(--color-blue-primary);
-  letter-spacing: 0.12em; // design-specific: wide tracking for uppercase badge label
+  letter-spacing: 0.12em; // design-specific: wide tracking for uppercase mono label
   text-transform: uppercase;
   line-height: 1;
+
+  @include mobile {
+    font-size: 11px;
+    padding: var(--space-1) var(--space-3);
+  }
 }
 
-// Eyebrow corner brackets — same pattern as about-us hero
 %blog-bracket {
   content: '';
   position: absolute;
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   border-color: rgba(143, 115, 255, 0.65);
   border-style: solid;
 }
@@ -296,149 +118,56 @@
 
 .heroHeading {
   font-family: var(--font-satoshi);
-  font-size: 80px; // design-specific: large "Blog" heading in hero
+  font-size: 65px; // design-specific: Figma-exact 65px heading
   font-weight: var(--font-weight-medium);
-  line-height: 1;
-  letter-spacing: -0.02em;
-  // design-specific: Figma blue gradient on Blog heading — dark left to light lavender right
-  background: linear-gradient(90deg, #2639ed 0%, #8a9ff5 100%);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  margin: 0;
+  text-transform: capitalize;
+  // design-specific: Figma gradient — dark blue 70% → faded blue 96%
+  background: linear-gradient(107deg, #2639ed 70%, rgba(38, 57, 237, 0.28) 96%);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  padding-bottom: 0.15em; // extends gradient box to cover descenders (g, p, y) hidden by line-height: 1
+  padding-bottom: 0.1em; // prevents gradient box clipping descenders
 
   @include tablet-down {
-    font-size: 56px;
+    font-size: 52px;
   }
 
   @include mobile {
-    font-size: 36px;
+    font-size: 40px;
   }
 
   @include small-mobile {
-    font-size: 28px;
+    font-size: 32px;
   }
 }
 
 .heroDescription {
-  font-family: var(--font-satoshi);
-  font-size: var(--text-body);
+  font-family: var(--font-space-grotesk); // design-specific: Figma uses Space Grotesk Regular
+  font-size: 22px; // design-specific: Figma-exact 22px
   font-weight: var(--font-weight-regular);
-  color: var(--color-gray-dark);
-  line-height: var(--leading-body);
-  margin: var(--space-7) 0 0;
-  max-width: 420px;
-  padding-left: var(--space-4);
-
-  @include mobile {
-    font-size: var(--text-small-13);
-    max-width: 100%;
-  }
-}
-
-// ── Right column — polygon-clipped blog thumbnail + construction lines + diagonal strip ─────────
-.heroRight {
-  position: relative;
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-end;
+  color: #474747; // design-specific: Figma-exact description color
+  line-height: 1.2; // design-specific: Figma-exact line-height
+  margin: 0;
 
   @include tablet-down {
-    display: none;
+    font-size: 18px;
+  }
+
+  @include mobile {
+    font-size: 16px;
   }
 }
 
-// Wraps thumbnail and diagonal strip; also carries the vertical construction lines on left/right edges
-.heroRightInner {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  width: 100%;
-  max-width: 520px;
-  padding: 0 var(--space-4);
-
-  // Left vertical construction line — extends upward to touch the hero top border
-  &::before {
-    content: '';
-    position: absolute;
-    left: -1px;
-    top: -9999px;
-    bottom: 0;
-    width: 1px;
-    background: var(--color-border-black-subtle);
-    pointer-events: none;
-  }
-
-  // Right vertical construction line — extends upward to touch the hero top border
-  &::after {
-    content: '';
-    position: absolute;
-    right: -1px;
-    top: -9999px;
-    bottom: 0;
-    width: 1px;
-    background: var(--color-border-black-subtle);
-    pointer-events: none;
-  }
-}
-
-.heroImageWrap {
-  display: block;
-  position: relative;
-  width: 100%;
-  aspect-ratio: 2 / 1;
-  cursor: pointer;
-  clip-path: polygon(
-    20px 0,
-    100% 0,
-    100% calc(100% - 20px),
-    calc(100% - 20px) 100%,
-    0 100%,
-    0 20px
-  ); // design-specific: polygon from about section TeamSection — cut top-left and bottom-right corners
-  overflow: hidden;
-  background: var(--color-gray-light);
-
-  // Top horizontal construction line across the thumbnail width
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0 0 auto 0;
-    height: 1px;
-    background: var(--color-border-black-subtle);
-    z-index: 1;
-    pointer-events: none;
-  }
-
-  // Bottom horizontal construction line across the thumbnail width
-  &::after {
-    content: '';
-    position: absolute;
-    inset: auto 0 0 0;
-    height: 1px;
-    background: var(--color-border-black-subtle);
-    z-index: 1;
-    pointer-events: none;
-  }
-}
-
-.heroImage {
-  object-fit: cover;
-  transition: transform 0.35s ease;
-
-  .heroImageWrap:hover & {
-    transform: scale(1.03);
-  }
-}
-
-// Tooltip — follows cursor inside heroImageWrap
-.heroTooltip {
+// ── Featured slide cursor-follower tooltip ────────────────────────────────
+.slideTooltip {
   position: absolute;
   left: var(--tx, 0px);
   top: var(--ty, 0px);
   transform: translate(-50%, calc(-100% - 12px));
-  z-index: 10;
+  z-index: 20;
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.15s ease;
@@ -453,7 +182,7 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 6px 14px;
   border-radius: var(--radius-sm);
-  box-shadow: 0 0 14px 0 rgba(38, 57, 237, 0.2);
+  box-shadow: 0 0 14px 0 rgba(38, 57, 237, 0.2); // design-specific: blue glow matches BlogCard tooltip
 
   &::after {
     content: '';
@@ -464,332 +193,392 @@
     width: 8px;
     height: 5px;
     background: var(--color-black-primary);
-    clip-path: polygon(0 0, 100% 0, 50% 100%); // design-specific: downward caret arrow
+    clip-path: polygon(0 0, 100% 0, 50% 100%); // design-specific: downward arrow caret
   }
 }
 
-.heroTooltipVisible {
+.slideTooltipVisible {
   opacity: 1;
 }
 
-// Frosted glass pills — same pattern as BlogCard
-.heroCategoryBadge {
-  position: absolute;
-  top: var(--space-3);
-  left: var(--space-3);
-  z-index: 2;
-  display: inline-flex;
-  align-items: center;
-  padding: 7px 14px;
-  border-radius: 999px;
-  background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  font-family: var(--font-satoshi);
-  font-size: 11px;
-  font-weight: var(--font-weight-medium);
-  color: var(--color-white-primary);
-  text-transform: capitalize;
-  letter-spacing: 0.04em;
-  line-height: 1.2;
-}
+// ── Hero right — featured slider ───────────────────────────────────────────
+// No order override — DOM order (left text, right slider) is natural on all sizes.
+// On tablet-down the grid collapses to 1 col so left appears first automatically.
+.heroRight {}
 
-.heroMetaBadge {
-  position: absolute;
-  top: var(--space-3);
-  right: var(--space-3);
-  z-index: 2;
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: 7px 14px;
-  border-radius: 999px;
-  background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  font-family: var(--font-satoshi);
-  font-size: 11px;
-  font-weight: var(--font-weight-medium);
-  color: var(--color-white-primary);
-  line-height: 1.2;
-}
-
-.heroMetaItem {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.heroMetaDivider {
-  width: 1px;
-  height: 10px;
-  background: rgba(255, 255, 255, 0.4);
-}
-
-// Bottom pill — author avatar + name + location
-.heroBottomPill {
-  position: absolute;
-  bottom: var(--space-3);
-  left: var(--space-3);
-  z-index: 2;
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: 7px 16px;
-  border-radius: 999px;
-  background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: var(--color-white-primary);
-  white-space: nowrap;
-}
-
-.heroAuthorAvatar {
+.featuredSlider {
   position: relative;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  overflow: hidden;
-  flex-shrink: 0;
-  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-.heroAuthorAvatarImg {
-  object-fit: cover;
-}
-
-.heroBottomPillText {
-  font-family: var(--font-satoshi);
-  font-size: 11px;
-  font-weight: var(--font-weight-medium);
-  color: var(--color-white-primary);
-  line-height: 1.2;
-}
-
-// Diagonal lines strip — sits flush below the thumbnail, pure CSS repeating-linear-gradient
-.heroDiagStrip {
+.featuredSlide {
+  position: relative;
+  display: block;
   width: 100%;
-  height: 92px;
-  border-top: 1px solid var(--color-border-black-subtle); // design-specific: Figma-exact height from node 3:662 (679×92)
-  background-image: repeating-linear-gradient(
-    45deg,
-    var(--color-border-black-subtle) 0,
-    var(--color-border-black-subtle) 1px,
-    transparent 1px,
-    transparent 14px
-  ); // design-specific: diagonal hatching pattern matching Figma node 3:662
-  opacity: 0.5;
-}
-
-// ── Featured ──────────────────────────────────────────────────────────────
-.featured {
-  padding: var(--space-9) 0;
-  border-bottom: 1px solid var(--color-border-black-subtle);
-
-  @include mobile {
-    padding: var(--space-6) 0;
-  }
-}
-
-.featuredInner {
-  max-width: var(--container-max-width);
-  margin: 0 auto;
-  padding: 0 var(--container-padding-x);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-5);
-
-  @include mobile {
-    padding: 0 var(--space-4);
-  }
-}
-
-.featuredLabel {
-  font-family: var(--font-satoshi);
-  font-size: var(--text-small-13);
-  font-weight: var(--font-weight-medium);
-  color: var(--color-gray-primary);
-  text-transform: uppercase;
-  letter-spacing: 0.06em; // design-specific: slightly looser than hero label
-  margin: 0;
-}
-
-.featuredCard {
-  display: grid;
-  grid-template-columns: 1fr 40%;
-  gap: var(--space-7);
-  padding: var(--space-7);
-  background: var(--color-white-primary);
-  border: 1px solid var(--color-border-black-subtle);
-  border-radius: var(--radius-lg);
+  aspect-ratio: 16 / 8; // design-specific: wider ratio keeps card height proportionate on large right column
+  max-height: 380px; // design-specific: cap height so it never feels oversized
+  clip-path: polygon(6% 0, 100% 0, 100% 83%, 64% 84%, 56% 100%, 0 100%, 0 11%); // design-specific: blog card polygon shape from Figma
+  overflow: hidden;
+  background: var(--color-gray-light);
   text-decoration: none;
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  color: inherit;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
 
   &:hover {
-    box-shadow: 0 12px 40px var(--color-black-alpha-10);
-    transform: translateY(-2px);
+    opacity: 0.95;
   }
 
   &:focus-visible {
     outline: 2px solid var(--color-blue-primary);
     outline-offset: 3px;
-    border-radius: var(--radius-lg);
   }
 
-  @include tablet-down {
-    grid-template-columns: 1fr;
-    gap: var(--space-5);
+  @include tablet {
+    aspect-ratio: 16 / 7;
+    max-height: 320px;
   }
-}
-
-.featuredCardBody {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  justify-content: center;
-}
-
-.featuredMeta {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  flex-wrap: wrap;
-}
-
-.featuredCategory {
-  display: inline-flex;
-  align-items: center;
-  height: 28px;
-  padding: 0 var(--space-3);
-  font-family: var(--font-satoshi);
-  font-size: var(--text-small-13);
-  font-weight: var(--font-weight-medium);
-  border-radius: var(--radius-full);
-  border: 1px solid transparent;
-
-  &[data-category='Identity'],
-  &[data-category='Community'] {
-    color: var(--color-blue-primary);
-    background: var(--color-blue-primary-alpha-07);
-    border-color: var(--color-blue-primary-alpha-18);
-  }
-
-  &[data-category='Tutorials'] {
-    color: var(--color-purple-primary);
-    background: var(--color-purple-glow-08);
-    border-color: var(--color-purple-glow-fade);
-  }
-
-  &[data-category='TON'] {
-    color: var(--color-blue-dark);
-    background: var(--color-blue-light);
-    border-color: var(--color-blue-primary-alpha-13);
-  }
-
-  &[data-category='DeFi'] {
-    color: #b77e00; // design-specific: amber text for DeFi badge
-    background: rgba(253, 198, 81, 0.12);
-    border-color: rgba(253, 198, 81, 0.3);
-  }
-
-  &[data-category='Ecosystem'],
-  &[data-category='Events'],
-  &[data-category='Wallets'],
-  &[data-category='Partnerships'] {
-    color: var(--color-gray-darker);
-    background: var(--color-gray-light);
-    border-color: var(--color-gray-light-hover);
-  }
-}
-
-.featuredMetaSep {
-  font-size: var(--text-small-13);
-  color: var(--color-gray-medium);
-}
-
-.featuredDate,
-.featuredReadTime {
-  font-family: var(--font-satoshi);
-  font-size: var(--text-small-13);
-  font-weight: var(--font-weight-regular);
-  color: var(--color-gray-primary);
-}
-
-.featuredTitle {
-  font-family: var(--font-satoshi);
-  font-size: var(--text-h3);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-black-primary);
-  line-height: var(--leading-snug);
-  letter-spacing: var(--tracking-h3);
-  margin: 0;
 
   @include mobile {
-    font-size: var(--text-display-sm);
+    aspect-ratio: 4 / 3;
+    max-height: 280px;
+  }
+
+  @include small-mobile {
+    aspect-ratio: 3 / 2;
+    max-height: 240px;
   }
 }
 
-.featuredExcerpt {
-  font-family: var(--font-satoshi);
-  font-size: var(--text-nav);
-  font-weight: var(--font-weight-regular);
-  color: var(--color-gray-dark);
-  line-height: var(--leading-body);
-  margin: 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+.featuredSlideImg {
+  object-fit: cover;
+  transition: transform 0.5s ease;
+
+  .featuredSlide:hover & {
+    transform: scale(1.03);
+  }
 }
 
-.featuredCta {
+// Top-left "Latest" badge — left nudged past the 6% diagonal clip edge
+// Using 8% keeps it clear of the cut at all viewport widths (6% cut + 2% buffer)
+.featuredBadgeLatest {
+  position: absolute;
+  top: var(--space-4);
+  left: 8%; // design-specific: clears the 6% polygon diagonal at all viewport sizes
+  z-index: 2;
   display: inline-flex;
   align-items: center;
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  font-family: var(--font-satoshi);
+  font-size: 11px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-white-primary);
+  letter-spacing: 0.04em;
+  line-height: 1;
+
+  @include mobile {
+    padding: 5px 10px;
+    font-size: 10px;
+  }
+}
+
+// Top-right reading time badge
+.featuredBadgeMeta {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px; // design-specific: 5px icon-to-text gap in meta pill
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  font-family: var(--font-satoshi);
+  font-size: 11px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-white-primary);
+  line-height: 1;
+
+  @include mobile {
+    padding: 5px 10px;
+    font-size: 10px;
+    right: var(--space-3);
+  }
+}
+
+// Bottom gradient overlay with title/excerpt/meta
+.featuredOverlay {
+  position: absolute;
+  inset: 20% 0 0 0;
+  z-index: 2;
+  padding: var(--space-8) var(--space-5) var(--space-5);
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0.98) 30%,
+    rgba(0, 0, 0, 0.85) 55%,
+    rgba(0, 0, 0, 0.5) 75%,
+    rgba(0, 0, 0, 0) 100%
+  ); // design-specific: solid black base so all text is fully legible
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
   gap: var(--space-2);
+
+  @include tablet {
+    padding: var(--space-6) var(--space-4) var(--space-4);
+  }
+
+  @include mobile {
+    padding: var(--space-5) var(--space-4) var(--space-3);
+    gap: var(--space-1);
+  }
+
+  @include small-mobile {
+    padding: var(--space-4) var(--space-3) var(--space-3);
+  }
+}
+
+.featuredOverlayCat {
+  font-family: var(--font-ibm-plex-mono);
+  font-size: 10px;
+  font-weight: var(--font-weight-medium);
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 0;
+  line-height: 1;
+}
+
+.featuredOverlayTitle {
+  font-family: var(--font-satoshi);
+  font-size: 17px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-white-primary);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+
+  @include mobile {
+    font-size: 15px;
+  }
+}
+
+.featuredOverlayExcerpt {
   font-family: var(--font-satoshi);
   font-size: var(--text-small-13);
-  font-weight: var(--font-weight-medium);
-  color: var(--color-blue-primary);
-  margin-top: var(--space-2);
-  transition: gap 0.15s ease;
-
-  .featuredCard:hover & {
-    gap: var(--space-3);
-  }
-}
-
-.featuredCtaArrow {
-  transition: transform 0.15s ease;
-
-  .featuredCard:hover & {
-    transform: translateX(3px);
-  }
-}
-
-.featuredImageWrap {
-  position: relative;
-  border-radius: var(--radius-md);
+  font-weight: var(--font-weight-regular);
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.4;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  min-height: 240px;
-  background: var(--color-gray-light);
 
-  @include tablet-down {
-    min-height: 200px;
+  @include mobile {
+    display: none; // hide on small screens to save space
   }
 }
 
-.featuredImagePlaceholder {
+.featuredOverlayMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-top: var(--space-1);
+
+  @include mobile {
+    gap: var(--space-2);
+    margin-top: 0;
+  }
+}
+
+.featuredOverlayMetaItem {
+  font-family: var(--font-ibm-plex-mono);
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1;
+}
+
+.featuredOverlayMetaDot {
+  width: 3px;
+  height: 3px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.4);
+  flex-shrink: 0;
+}
+
+.featuredOverlayAuthor {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-left: auto;
+
+  @include small-mobile {
+    display: none; // too little horizontal room on very narrow screens
+  }
+}
+
+.featuredOverlayAvatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: var(--color-black-primary);
+  padding: 4px;
+}
+
+.featuredOverlayAvatarImg {
+  object-fit: contain;
   width: 100%;
   height: 100%;
-  min-height: inherit;
-  background: linear-gradient(
-    135deg,
-    var(--color-blue-primary-alpha-07) 0%,
-    var(--color-blue-primary-alpha-18) 100%
-  );
+}
+
+.featuredOverlayAuthorName {
+  font-family: var(--font-ibm-plex-mono);
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.75);
+  white-space: nowrap;
+  line-height: 1;
+}
+
+// ── Slider controls — sit in the clipped bottom-right white space ─────────
+// The clip-path leaves a triangular gap from (64%,84%) → (56%,100%) → (100%,100%) → (100%,83%).
+// Controls are absolutely positioned into that gap; compact sizing keeps them inside the triangle.
+.sliderControls {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-2) var(--space-1) var(--space-4); // design-specific: fits inside the clipped triangle
+
+  @include tablet {
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-2) var(--space-1) var(--space-3);
+  }
+
+  @include mobile {
+    position: static;
+    padding: var(--space-3) 0 0;
+    justify-content: center;
+    gap: var(--space-2);
+  }
+}
+
+// Compact square buttons — sized to sit inside the polygon clip triangle
+.sliderBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--color-white-primary);
+  border: none;
+  color: var(--color-black-primary);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background: var(--color-black-primary);
+    color: var(--color-white-primary);
+  }
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  @include mobile {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+// Identical to .sliderProgress in slug.module.scss — three dashed segments
+.sliderProgress {
+  position: relative;
+  width: 160px;
+  height: 2px;
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--color-border-black-subtle) 0px,
+    var(--color-border-black-subtle) 46px,
+    transparent 46px,
+    transparent 52px,
+    var(--color-border-black-subtle) 52px,
+    var(--color-border-black-subtle) 104px,
+    transparent 104px,
+    transparent 110px,
+    var(--color-border-black-subtle) 110px,
+    var(--color-border-black-subtle) 160px
+  ); // design-specific: three dashes scaled to 160px width
+
+  @include mobile {
+    width: 120px;
+    background-image: repeating-linear-gradient(
+      90deg,
+      var(--color-border-black-subtle) 0px,
+      var(--color-border-black-subtle) 34px,
+      transparent 34px,
+      transparent 39px,
+      var(--color-border-black-subtle) 39px,
+      var(--color-border-black-subtle) 78px,
+      transparent 78px,
+      transparent 83px,
+      var(--color-border-black-subtle) 83px,
+      var(--color-border-black-subtle) 120px
+    ); // design-specific: three dashes rescaled to 120px for mobile
+  }
+
+  @include small-mobile {
+    width: 90px;
+    background-image: repeating-linear-gradient(
+      90deg,
+      var(--color-border-black-subtle) 0px,
+      var(--color-border-black-subtle) 25px,
+      transparent 25px,
+      transparent 30px,
+      var(--color-border-black-subtle) 30px,
+      var(--color-border-black-subtle) 60px,
+      transparent 60px,
+      transparent 65px,
+      var(--color-border-black-subtle) 65px,
+      var(--color-border-black-subtle) 90px
+    ); // design-specific: three dashes rescaled to 90px for small-mobile
+  }
+}
+
+.sliderProgressFill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background: var(--color-black-primary);
+  transition: width 0.3s ease;
+  min-width: 0;
 }
 
 // ── Grid section ──────────────────────────────────────────────────────────
@@ -809,10 +598,6 @@
   max-width: var(--container-max-width);
   margin: 0 auto;
   padding: 0 var(--space-6);
-
-  @include mobile {
-    padding: 0 var(--space-4);
-  }
   display: flex;
   flex-direction: column;
   gap: var(--space-9);
@@ -822,92 +607,7 @@
   }
 
   @include mobile {
+    padding: 0 var(--space-4);
     gap: var(--space-5);
-  }
-}
-
-// ── Pagination ────────────────────────────────────────────────────────────
-.pagination {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-
-  @include mobile {
-    gap: var(--space-1);
-  }
-}
-
-.pageBtn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-
-  @include mobile {
-    width: 34px;
-    height: 34px;
-  }
-  padding: 0;
-  color: var(--color-gray-primary);
-  background: var(--color-white-primary);
-  border: 1px solid var(--color-border-black-subtle);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
-
-  &:hover:not(:disabled) {
-    color: var(--color-blue-primary);
-    border-color: var(--color-blue-primary-alpha-18);
-    background: var(--color-blue-primary-alpha-07);
-  }
-
-  &:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
-
-  &:focus-visible {
-    @include focus-ring;
-  }
-}
-
-.pageNum {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-
-  @include mobile {
-    width: 34px;
-    height: 34px;
-  }
-  padding: 0;
-  font-family: var(--font-satoshi);
-  font-size: var(--text-small-13);
-  font-weight: var(--font-weight-medium);
-  color: var(--color-gray-primary);
-  background: var(--color-white-primary);
-  border: 1px solid var(--color-border-black-subtle);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
-
-  &:hover {
-    color: var(--color-blue-primary);
-    border-color: var(--color-blue-primary-alpha-18);
-    background: var(--color-blue-primary-alpha-07);
-  }
-
-  &[data-active='true'] {
-    color: var(--color-white-primary);
-    background: var(--color-blue-primary);
-    border-color: var(--color-blue-primary);
-  }
-
-  &:focus-visible {
-    @include focus-ring;
   }
 }

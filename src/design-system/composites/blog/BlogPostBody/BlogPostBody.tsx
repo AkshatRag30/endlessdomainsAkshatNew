@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { FiEye, FiClock } from 'react-icons/fi'
@@ -17,6 +17,40 @@ export interface BlogPostBodyProps {
 export function BlogPostBody({ content, toc, popularPosts, formatDate }: BlogPostBodyProps) {
   const router = useRouter()
   const views = (v: number) => v >= 1000 ? `${(v / 1000).toFixed(1)}k` : String(v)
+  const [activeId, setActiveId] = useState<string>(toc[0]?.id ?? '')
+
+  useEffect(() => {
+    if (!toc.length) return
+    // Small delay so the injected heading IDs are in the DOM before we query them
+    const init = setTimeout(() => {
+      const headings = toc.map(item => document.getElementById(item.id)).filter(Boolean) as HTMLElement[]
+      if (!headings.length) return
+
+      const observer = new IntersectionObserver(
+        entries => {
+          // Find the topmost heading that is intersecting
+          const visible = entries
+            .filter(e => e.isIntersecting)
+            .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
+          if (visible.length > 0) setActiveId(visible[0].target.id)
+        },
+        {
+          // Trigger when heading enters the top 20% of the viewport
+          rootMargin: '0px 0px -75% 0px',
+          threshold: 0,
+        }
+      )
+
+      headings.forEach(h => observer.observe(h))
+      return () => observer.disconnect()
+    }, 150)
+
+    return () => clearTimeout(init)
+  }, [toc])
+
+  const handleTocClick = useCallback((id: string) => {
+    setActiveId(id)
+  }, [])
 
   return (
     <div className={styles.layout}>
@@ -48,8 +82,8 @@ export function BlogPostBody({ content, toc, popularPosts, formatDate }: BlogPos
             <p className={styles.cardLabel}>In this article</p>
             <ol className={styles.tocList}>
               {toc.map((item, i) => (
-                <li key={item.id} className={styles.tocItem}>
-                  <a href={`#${item.id}`} className={styles.tocLink}>
+                <li key={item.id} className={`${styles.tocItem}${activeId === item.id ? ` ${styles.tocItemActive}` : ''}`}>
+                  <a href={`#${item.id}`} className={styles.tocLink} onClick={() => handleTocClick(item.id)}>
                     <span className={styles.tocNum}>{String(i + 1).padStart(2, '0')}</span>
                     <span className={styles.tocText}>{item.text}</span>
                   </a>

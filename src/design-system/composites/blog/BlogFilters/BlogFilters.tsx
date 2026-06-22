@@ -1,5 +1,6 @@
 import React, { useCallback, useState, useRef, useEffect } from 'react'
 import { IoClose } from 'react-icons/io5'
+import { FiChevronDown } from 'react-icons/fi'
 import styles from './BlogFilters.module.scss'
 import type { Category } from '@/data/categories'
 
@@ -31,6 +32,7 @@ export function BlogFilters({
   const inputRef = useRef<HTMLInputElement>(null)
   const [sortOpen, setSortOpen] = useState(false)
   const sortRef = useRef<HTMLDivElement>(null)
+  const [catOpen, setCatOpen] = useState(true)
 
   const handleSearchChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => onSearchChange(e.target.value),
@@ -67,6 +69,7 @@ export function BlogFilters({
   }, [sortOpen])
 
   const activeSortLabel = SORT_OPTIONS.find(o => o.value === sortBy)?.label ?? 'Newest Feeds'
+  const activeCatLabel = categories.find(c => c.slug === activeCategory)?.name ?? 'All'
 
   return (
     <div className={styles.wrapper} role="search" aria-label="Filter and search blog posts">
@@ -74,8 +77,21 @@ export function BlogFilters({
 
         {/* Left — category label + sharp pills */}
         <div className={styles.leftGroup}>
+          {/* Mobile-only toggle button — same style as sort trigger */}
+          <button
+            type="button"
+            className={styles.catToggle}
+            aria-expanded={catOpen}
+            onClick={() => setCatOpen(v => !v)}
+          >
+            <span>Category: {activeCatLabel}</span>
+            <FiChevronDown className={styles.catChevron} size={13} aria-hidden="true" />
+          </button>
+
+          {/* Label visible on desktop, hidden on mobile */}
           <span className={styles.filterLabel}>Filter by category:</span>
-          <nav className={styles.tabs} aria-label="Blog categories">
+
+          <nav className={styles.tabs} aria-label="Blog categories" data-open={catOpen}>
             <ul className={styles.tabList}>
               {categories.map(cat => (
                 <li key={cat.id} className={styles.tabItem}>
@@ -84,7 +100,7 @@ export function BlogFilters({
                     className={styles.tab}
                     aria-pressed={activeCategory === cat.slug}
                     data-active={activeCategory === cat.slug}
-                    onClick={() => onCategoryChange(cat.slug)}
+                    onClick={() => { onCategoryChange(cat.slug); setCatOpen(false) }}
                   >
                     {cat.name}
                   </button>
