@@ -1,84 +1,73 @@
 import { useEffect } from 'react'
 import type { RefObject } from 'react'
 
+// Injected once globally — avoids duplicating the style block per hook instance
+let styleInjected = false
+function injectStyle() {
+  if (styleInjected || typeof document === 'undefined') return
+  styleInjected = true
+  const s = document.createElement('style')
+  s.textContent = `
+    .entrance-hidden {
+      opacity: 0;
+      transform: translateY(32px);
+    }
+    .entrance-visible {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+  `
+  document.head.appendChild(s)
+}
+
+// Shared observer instance across all hook calls — one observer for the whole page
+let sharedObserver: IntersectionObserver | null = null
+const observedEls = new WeakMap<HTMLElement, number>() // el → stagger index
+
+function getObserver(): IntersectionObserver {
+  if (sharedObserver) return sharedObserver
+  sharedObserver = new IntersectionObserver(
+    entries => {
+      entries.forEach(entry => {
+        const el = entry.target as HTMLElement
+        if (entry.isIntersecting) {
+          const delay = (observedEls.get(el) ?? 0) * 0.1
+          el.style.transitionDelay = `${delay}s`
+          el.classList.remove('entrance-hidden')
+          el.classList.add('entrance-visible')
+          sharedObserver!.unobserve(el)
+        }
+      })
+    },
+    { threshold: 0.08, rootMargin: '0px 0px -40px 0px' },
+  )
+  return sharedObserver
+}
+
 export function useEntranceAnimation(elements: RefObject<HTMLElement>[]) {
   useEffect(() => {
-    // Track which elements have entered at least once
-    const entered = new Set<HTMLElement>()
-    let rafId: number
-    let gsap: typeof import('gsap').gsap | null = null
+    if (typeof window === 'undefined') return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
-    // Hide everything before paint
+    injectStyle()
+    const observer = getObserver()
+
     elements.forEach((ref, i) => {
-      if (ref.current) {
-        ref.current.style.opacity = '0'
-        ref.current.style.transform = 'translateY(40px)'
-        ref.current.dataset.staggerIndex = String(i)
-      }
-    })
-
-    // ── Entrance: IntersectionObserver fires once when element scrolls in ──────
-    const entranceObserver = new IntersectionObserver(
-      entries => {
-        entries.forEach(entry => {
-          if (!entry.isIntersecting || !gsap) return
-          const el = entry.target as HTMLElement
-          if (entered.has(el)) return
-          entered.add(el)
-          entranceObserver.unobserve(el)
-          const delay = Number(el.dataset.staggerIndex ?? 0) * 0.12
-          gsap.to(el, { opacity: 1, y: 0, duration: 1.0, delay, ease: 'power3.out', clearProps: 'transform' })
-        })
-      },
-      { threshold: 0.08, rootMargin: '0px 0px -40px 0px' },
-    )
-
-    // ── Exit: rAF loop continuously maps scroll position to opacity/y ─────────
-    // fadeZone: how many px from the top edge of the viewport the fade covers
-    const FADE_ZONE = 260
-
-    const tick = () => {
-      if (gsap) {
-        const vh = window.innerHeight
-
-        elements.forEach(ref => {
-          const el = ref.current
-          if (!el || !entered.has(el)) return
-
-          const rect = el.getBoundingClientRect()
-          const bottom = rect.bottom
-
-          if (bottom > FADE_ZONE) {
-            // Fully visible — no-op (entrance tween handles bringing it in)
-          } else if (bottom > 0) {
-            // Partially exiting upward — lerp opacity and y based on how far it's gone
-            const progress = 1 - bottom / FADE_ZONE
-            gsap!.set(el, { opacity: 1 - progress, y: -30 * progress })
-          } else if (rect.top > vh) {
-            // Element is below viewport (user scrolled back up past it) — reset to entrance state
-            gsap!.set(el, { opacity: 0, y: 40 })
-            entered.delete(el)
-            // Re-observe so entrance fires again on scroll down
-            entranceObserver.observe(el)
-          }
-        })
-      }
-
-      rafId = requestAnimationFrame(tick)
-    }
-
-    // Load GSAP once, then start observing and the rAF loop
-    import('gsap').then(mod => {
-      gsap = mod.gsap
-      elements.forEach(ref => {
-        if (ref.current) entranceObserver.observe(ref.current)
-      })
-      rafId = requestAnimationFrame(tick)
+      const el = ref.current
+      if (!el) return
+      el.classList.add('entrance-hidden')
+      observedEls.set(el, i)
+      observer.observe(el)
     })
 
     return () => {
-      entranceObserver.disconnect()
-      cancelAnimationFrame(rafId)
+      elements.forEach(ref => {
+        const el = ref.current
+        if (!el) return
+        observer.unobserve(el)
+        observedEls.delete(el)
+      })
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 }

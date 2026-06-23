@@ -1,0 +1,384 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Section ───────────────────────────────────────────────────────────────────
+
+.section {
+  width: 100%;
+  background: var(--color-white-primary);
+  padding: var(--section-spacing) var(--container-padding-x);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-10);
+
+  @include tablet-down {
+    padding: var(--space-12) var(--space-6);
+    gap: var(--space-8);
+  }
+
+  @include mobile {
+    padding: var(--space-9) var(--space-4);
+    gap: var(--space-7);
+  }
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  text-align: center;
+  max-width: 800px;
+  width: 100%;
+}
+
+// ── Eyebrow ───────────────────────────────────────────────────────────────────
+
+.eyebrow {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2) var(--space-8);
+}
+
+.eyebrowText {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-faq-bracket);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+%bracket-corner {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-color: var(--color-gray-300);
+  border-style: solid;
+}
+
+.bracketTL { @extend %bracket-corner; top: 0; left: 0; border-width: 1.5px 0 0 1.5px; }
+.bracketTR { @extend %bracket-corner; top: 0; right: 0; border-width: 1.5px 1.5px 0 0; }
+.bracketBL { @extend %bracket-corner; bottom: 0; left: 0; border-width: 0 0 1.5px 1.5px; }
+.bracketBR { @extend %bracket-corner; bottom: 0; right: 0; border-width: 0 1.5px 1.5px 0; }
+
+// ── Heading ───────────────────────────────────────────────────────────────────
+
+.heading {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2);
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  text-align: center;
+  text-transform: capitalize;
+  display: inline;
+
+  @include tablet-down { font-size: 40px; }
+  @include mobile { font-size: 32px; }
+}
+
+.headingBlack,
+.headingBlue { display: inline; }
+
+.headingBlack {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+}
+
+.headingBlue {
+  font-weight: var(--font-weight-regular);
+  background: linear-gradient(126deg, var(--color-blue-primary) 70%, var(--color-blue-primary-faded) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+// ── Description ───────────────────────────────────────────────────────────────
+
+.description {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-body);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-body);
+  line-height: var(--leading-normal);
+  text-align: center;
+  max-width: 785px;
+
+  @include tablet-down { font-size: 18px; }
+  @include mobile { font-size: 16px; }
+}
+
+// ── Cards row ─────────────────────────────────────────────────────────────────
+
+.cardsRow {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  gap: var(--space-5);
+
+  @include mobile {
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+}
+
+.cardOuter {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: stretch;
+  position: relative;
+}
+
+// vertical dashed separator between cards
+.divider {
+  position: absolute;
+  left: calc(-1 * var(--space-2-5));
+  top: 5%;
+  height: 90%;
+  width: 1px;
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--color-blue-primary-alpha-18) 0px,
+    var(--color-blue-primary-alpha-18) 5px,
+    transparent 5px,
+    transparent 10px
+  );
+  z-index: 1;
+
+  @include mobile { display: none; }
+}
+
+// ── Outer card — border layer ─────────────────────────────────────────────────
+
+.card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  cursor: default;
+  transition: background 0.25s ease;
+  background: var(--color-blue-primary-alpha-13); // default: subtle border
+}
+
+.accentBlue   { &:hover { background: var(--color-blue-primary-alpha-50); } }
+.accentPurple { &:hover { background: var(--color-purple-primary); } }
+.accentOrange { &:hover { background: rgba(245, 133, 36, 0.6); } } // design-specific: orange accent hover
+
+// ── Card inner — diagonal grid bg, 1px margin = border trick ─────────────────
+
+.cardInner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: var(--space-3);
+  margin: 1px;
+  background-color: var(--color-gray-light-hover);
+  background-image: repeating-linear-gradient(
+    135deg,
+    transparent 0px,
+    transparent 4px,
+    var(--color-black-alpha-01) 4px,
+    var(--color-black-alpha-01) 6px
+  );
+  transition: background-color 0.25s ease;
+
+  .accentBlue:hover &   { background-color: var(--color-blue-primary-alpha-07); }
+  .accentPurple:hover & { background-color: var(--color-purple-glow-08); }
+  .accentOrange:hover & { background-color: rgba(245, 133, 36, 0.07); } // design-specific: orange tint
+}
+
+// ── Image polygon ─────────────────────────────────────────────────────────────
+
+.imagePolygon {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  // design-specific: corner-notch on image matching BlogCard pattern
+  clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);
+  background: var(--color-gray-light);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.image {
+  object-fit: contain;
+  object-position: center;
+}
+
+// ── Badge overlay on image ────────────────────────────────────────────────────
+
+.badgeWrap {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  padding: 5px 14px;
+  border-radius: var(--radius-sm);
+  // design-specific: Figma badge shadow
+  box-shadow:
+    0px 8.2px 20.9px rgba(87, 177, 255, 0.34),
+    0px 4.8px 6.3px rgba(87, 177, 255, 0.19),
+    0px 2px 2.6px rgba(87, 177, 255, 0.22),
+    0px 0.7px 0.9px rgba(87, 177, 255, 0.15),
+    0 0 0 0.8px #e0e9f2,
+    0 0 0 1px var(--color-white-primary);
+}
+
+.badge_accentBlue   { background: linear-gradient(to bottom, var(--color-blue-primary), rgba(38, 57, 237, 0.47)); }
+.badge_accentPurple { background: linear-gradient(to bottom, var(--color-purple-primary), rgba(148, 87, 246, 0.47)); }
+.badge_accentOrange { background: linear-gradient(to bottom, #ff7700, rgba(255, 119, 0, 0.47)); } // design-specific: orange badge
+
+.badgeText {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-white-primary);
+  white-space: nowrap;
+}
+
+// ── Content polygon ───────────────────────────────────────────────────────────
+
+.contentPolygon {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  // design-specific: cut bottom-right corner matching BlogCard
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%);
+  background: var(--color-white-primary);
+}
+
+.contentInner {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-4) var(--space-6);
+
+  @include mobile {
+    padding: var(--space-3) var(--space-3) var(--space-5);
+  }
+}
+
+// ── Title ─────────────────────────────────────────────────────────────────────
+
+.title {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: 20px;
+  font-weight: var(--font-weight-bold);
+  line-height: 1.2;
+}
+
+.title_accentBlue {
+  background: linear-gradient(152deg, var(--color-blue-primary) 70%, var(--color-blue-primary-faded) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.title_accentPurple {
+  color: var(--color-purple-primary);
+  -webkit-text-fill-color: var(--color-purple-primary);
+}
+
+.title_accentOrange {
+  color: #ec8f3c; // design-specific: Figma orange title
+  -webkit-text-fill-color: #ec8f3c;
+}
+
+// ── Dashed separator ─────────────────────────────────────────────────────────
+
+.sep {
+  width: 100%;
+  height: 1px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--color-gray-300) 0px,
+    var(--color-gray-300) 5px,
+    transparent 5px,
+    transparent 10px
+  );
+}
+
+// ── Text group ────────────────────────────────────────────────────────────────
+
+.textGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.subtitle {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  line-height: 1.6;
+}
+
+.desc {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-body);
+  line-height: var(--leading-normal);
+}
+
+// ── Feature list ──────────────────────────────────────────────────────────────
+
+.features {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.featureItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-black-primary);
+  text-transform: capitalize;
+  line-height: 1.2;
+}
+
+// ── Feature dots ─────────────────────────────────────────────────────────────
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+.dotFilled_accentBlue   { background: var(--color-blue-primary); }
+.dotFilled_accentPurple { background: var(--color-purple-primary); }
+.dotFilled_accentOrange { background: #ff7700; } // design-specific: orange dot
+
+.dotOutline_accentBlue   { border: 1px solid var(--color-blue-primary-alpha-50); background: transparent; }
+.dotOutline_accentPurple { border: 1px solid rgba(148, 87, 246, 0.5); background: transparent; }
+.dotOutline_accentOrange { border: 1px solid rgba(255, 119, 0, 0.5); background: transparent; } // design-specific: orange outline dot
+
+// ── Mobile ────────────────────────────────────────────────────────────────────
+
+@include mobile {
+  .cardOuter { width: 100%; }
+}

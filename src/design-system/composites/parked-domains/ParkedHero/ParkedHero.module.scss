@@ -1,0 +1,356 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Section shell ─────────────────────────────────────────────────────────────
+
+.section {
+  position: relative;
+  background: var(--color-white-primary);
+  padding: var(--space-9) var(--container-padding-x) var(--space-10);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 100px); // 100px = navbar height on desktop
+
+  @include tablet-down {
+    padding: var(--space-7) var(--space-6) var(--space-9);
+    min-height: calc(100vh - 72px); // 72px = navbar height on tablet
+  }
+
+  @include mobile {
+    padding: var(--space-6) var(--space-4) var(--space-8);
+    min-height: calc(100vh - 60px); // 60px = navbar height on mobile
+  }
+}
+
+// ── Inner content block ────────────────────────────────────────────────────────
+
+.inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 800px;
+  width: 100%;
+  gap: var(--space-5); // 20px between each vertical element
+
+  @include mobile {
+    gap: var(--space-4);
+  }
+}
+
+// ── Grid zone — eyebrow + heading only ────────────────────────────────────────
+// Grid is scoped to this wrapper so it never bleeds into the body copy or CTA row.
+
+.gridZone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -60px; // bleed so the radial fade starts outside the text edges
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      linear-gradient(var(--color-blue-primary-alpha-07) 1px, transparent 1px),
+      linear-gradient(90deg, var(--color-blue-primary-alpha-07) 1px, transparent 1px);
+    background-size: 40px 40px; // design-specific: 40px grid cell matching Figma
+    mask-image: radial-gradient(ellipse 75% 70% at 50% 50%, black 25%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 75% 70% at 50% 50%, black 25%, transparent 100%);
+  }
+}
+
+// ── Eyebrow reticle label ─────────────────────────────────────────────────────
+// design-specific: camera-focus bracket corners — thin L-shaped lines at each corner
+
+.eyebrowWrap {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-2) var(--space-5); // 8px 20px
+  position: relative;
+
+  // top-left L corner
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 10px;
+    height: 10px;
+    border-top: 1.5px solid var(--color-blue-primary);
+    border-left: 1.5px solid var(--color-blue-primary);
+    pointer-events: none;
+  }
+
+  // bottom-right L corner
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
+    border-bottom: 1.5px solid var(--color-blue-primary);
+    border-right: 1.5px solid var(--color-blue-primary);
+    pointer-events: none;
+  }
+}
+
+// top-right and bottom-left via child spans
+.reticleCorner {
+  display: block;
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  position: absolute;
+
+  // top-right L
+  &:first-child {
+    top: 0;
+    right: 0;
+    border-top: 1.5px solid var(--color-blue-primary);
+    border-right: 1.5px solid var(--color-blue-primary);
+  }
+
+  // bottom-left L
+  &.reticleCornerRight {
+    bottom: 0;
+    left: 0;
+    border-bottom: 1.5px solid var(--color-blue-primary);
+    border-left: 1.5px solid var(--color-blue-primary);
+  }
+}
+
+.eyebrow {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+  letter-spacing: 0.1em; // design-specific: Figma-exact eyebrow tracking — uppercase spaced
+  text-transform: uppercase;
+  margin: 0;
+  white-space: nowrap;
+}
+
+// ── Display heading ────────────────────────────────────────────────────────────
+
+.heading {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h1); // 65px
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-h1);
+  margin: 0;
+  white-space: nowrap;
+
+  @include tablet-down {
+    font-size: var(--text-h2); // 55px
+  }
+
+  @include mobile {
+    font-size: var(--text-display-md); // 48px
+    white-space: normal; // allow wrap on mobile to prevent overflow
+  }
+
+  @include small-mobile {
+    font-size: var(--text-display-sm); // 28px — but token is only 28px; bump slightly
+    font-size: 32px; // design-specific: minimum readable size at 375px
+    white-space: normal;
+  }
+}
+
+.headingAccent {
+  background: none;
+  color: var(--color-blue-primary);
+  padding: 0;
+}
+
+// ── Body copy ─────────────────────────────────────────────────────────────────
+
+.body {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body); // 22px
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-body); // #474747 neutral dark grey
+  line-height: var(--leading-body);
+  margin: 0;
+  max-width: 780px;
+  text-align: center;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+
+  @include mobile {
+    font-size: var(--text-normal); // 20px
+    max-width: 100%;
+  }
+
+  @include small-mobile {
+    font-size: var(--text-body-small); // 17px
+  }
+}
+
+// ── CTA frame + decorative lines ─────────────────────────────────────────────
+// design-specific: Figma-exact frame element — corner fills + diagonal slash lines
+// flanking the button row. Ported directly from provided CSS.
+
+.ctaFrame {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 100px; // design-specific: space for the diagonal line elements to show outside the buttons
+
+  @include mobile {
+    width: 100%;
+    padding: 0 var(--space-4);
+    flex-direction: column; // stack ctaRow above mobileLines
+    align-items: center;
+    gap: 0;
+  }
+}
+
+.cornerFill {
+  position: absolute;
+  bottom: 2px;
+  width: 38px;
+  height: 36px;
+  pointer-events: none;
+
+  @include mobile {
+    display: none;
+  }
+}
+
+.cornerFillLeft {
+  left: 0;
+  background: linear-gradient(to bottom, rgba(38, 57, 237, 0.06), rgba(38, 57, 237, 0));
+  clip-path: polygon(0 0, 13px 0, 38px 25px, 38px 100%, 0 100%); // design-specific: Figma-exact left corner fill polygon
+}
+
+.cornerFillRight {
+  right: 0;
+  background: linear-gradient(to bottom, rgba(38, 57, 237, 0.06), rgba(38, 57, 237, 0));
+  clip-path: polygon(25px 0, 100% 0, 100% 100%, 0 100%, 0 25px); // design-specific: Figma-exact right corner fill polygon
+}
+
+.line {
+  position: absolute;
+  background: linear-gradient(
+    to bottom,
+    rgba(38, 57, 237, 0),
+    var(--color-blue-primary) 55%,
+    rgba(38, 57, 237, 0)
+  );
+  pointer-events: none;
+}
+
+.leftV {
+  left: 14px;
+  top: 0;
+  width: 1px;
+  height: 30px; // design-specific: Figma-exact vertical segment length
+}
+
+.leftD {
+  left: 14px;
+  top: 29px;
+  width: 37px;
+  height: 1px;
+  transform-origin: left center;
+  transform: rotate(45deg); // design-specific: Figma-exact 45° diagonal from bottom of vertical
+}
+
+.rightV {
+  right: 14px;
+  top: 0;
+  width: 1px;
+  height: 30px; // design-specific: Figma-exact vertical segment length
+}
+
+.rightD {
+  right: 14px;
+  top: 29px;
+  width: 37px;
+  height: 1px;
+  transform-origin: right center;
+  transform: rotate(-45deg); // design-specific: Figma-exact -45° diagonal from bottom of vertical
+}
+
+.parkBtn {
+  width: 260px;
+  white-space: nowrap;
+
+  @include mobile {
+    width: auto;
+  }
+}
+
+// ── CTA row ───────────────────────────────────────────────────────────────────
+
+.ctaRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gap-inline); // 16px
+  flex-wrap: wrap;
+
+  @include mobile {
+    flex-direction: row;
+    gap: var(--space-2);
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+// ── Mobile-only button sizing ─────────────────────────────────────────────────
+// Shrink both buttons on mobile so they sit side-by-side comfortably
+
+@include mobile {
+  .ctaRow > * {
+    font-size: var(--text-small-13) !important;
+    padding: 8px 14px !important;
+    min-width: 0 !important;
+    white-space: nowrap;
+  }
+}
+
+// ── Desktop lines — hidden on mobile (shown inside ctaFrame flanking buttons) ─
+
+.desktopLine {
+  @include mobile {
+    display: none;
+  }
+}
+
+// ── Mobile lines — below buttons, hidden on desktop ──────────────────────────
+// design-specific: diagonal line decoration from Figma hero — sits below CTA row on mobile
+
+.mobileLines {
+  display: none; // hidden on desktop
+
+  @include mobile {
+    display: block;
+    position: relative;
+    width: 100%;
+    height: 36px;
+    margin-top: var(--space-10);
+    pointer-events: none;
+
+    // reposition the line elements to span left↔right edges of the frame
+    .leftV  { left: 14px; }
+    .leftD  { left: 14px; }
+    .rightV { right: 14px; }
+    .rightD { right: 14px; }
+  }
+}

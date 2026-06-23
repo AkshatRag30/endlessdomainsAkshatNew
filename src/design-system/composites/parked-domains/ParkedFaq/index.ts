@@ -1,0 +1,1 @@
+export { ParkedFaq } from './ParkedFaq'

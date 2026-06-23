@@ -1,0 +1,523 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Section ───────────────────────────────────────────────────────────────────
+
+.section {
+  position: relative;
+  background: var(--color-white-primary);
+  // height set dynamically via JS
+}
+
+.sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  @include mobile {
+    position: relative;
+    height: auto;
+    overflow: visible;
+  }
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
+
+.header {
+  height: 35vh;
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-start;
+  padding: var(--space-9) var(--container-padding-x) 0 var(--container-padding-x);
+  position: relative;
+
+  @include mobile {
+    height: auto;
+    flex-direction: column;
+    padding: var(--space-9) var(--space-6) var(--space-7);
+    gap: var(--space-5);
+  }
+}
+
+.headerLeft {
+  flex: 0 0 50%;
+  padding-right: var(--space-9);
+
+  @include mobile {
+    flex: none;
+    width: 100%;
+    padding-right: 0;
+  }
+}
+
+.headerRight {
+  flex: 0 0 50%;
+  padding-top: var(--space-1-5);
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  flex-direction: column;
+
+  @include mobile {
+    flex: none;
+    width: 100%;
+    align-items: flex-start;
+  }
+}
+
+// ── Eyebrow ───────────────────────────────────────────────────────────────────
+
+.eyebrowWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-1-5) var(--space-4);
+  margin-bottom: var(--space-4);
+  align-self: flex-start;
+}
+
+.eyebrowText {
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-small-12);
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--color-black-alpha-55);
+  white-space: nowrap;
+}
+
+%bracket-base {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  display: block;
+  border-color: var(--color-blue-primary-alpha-50);
+  border-style: solid;
+}
+
+.bracketTl { @extend %bracket-base; top: 0; left: 0; border-width: 1.5px 0 0 1.5px; }
+.bracketTr { @extend %bracket-base; top: 0; right: 0; border-width: 1.5px 1.5px 0 0; }
+.bracketBl { @extend %bracket-base; bottom: 0; left: 0; border-width: 0 0 1.5px 1.5px; }
+.bracketBr { @extend %bracket-base; bottom: 0; right: 0; border-width: 0 1.5px 1.5px 0; }
+
+// ── Description wrap — hugs subtitle width so brackets sit flush ───────────────
+
+.descWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.bracketDescTL {
+  display: block;
+  width: 10px;
+  height: 10px;
+  border-top: 1.5px solid var(--color-blue-primary-alpha-50);
+  border-left: 1.5px solid var(--color-blue-primary-alpha-50);
+  margin-bottom: 4px;
+  align-self: flex-start;
+
+  @include mobile { display: none; }
+}
+
+.bracketDescBR {
+  display: block;
+  width: 10px;
+  height: 10px;
+  border-bottom: 1.5px solid var(--color-blue-primary-alpha-50);
+  border-right: 1.5px solid var(--color-blue-primary-alpha-50);
+  align-self: flex-end;
+  margin-top: 4px;
+
+  @include mobile { display: none; }
+}
+
+// ── Heading ───────────────────────────────────────────────────────────────────
+
+.mainTitle {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.titleLine1 {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--text-h2);
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  color: var(--color-black-primary);
+
+  @include tablet-down { font-size: 40px; }
+  @include mobile { font-size: 32px; }
+}
+
+.titleLine2 {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-h2);
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  background: linear-gradient(116deg, var(--color-blue-primary) 70%, var(--color-blue-primary-faded) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  @include tablet-down { font-size: 40px; }
+  @include mobile { font-size: 32px; }
+}
+
+.headerSubtitle {
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-small-15);
+  line-height: var(--leading-body);
+  color: var(--color-text-body);
+  max-width: 340px;
+  margin: 0;
+
+  @include mobile { max-width: 100%; }
+}
+
+// ── Divider ───────────────────────────────────────────────────────────────────
+
+.sectionDivider {
+  width: 100%;
+  height: 1px;
+  border-top: 1px dashed var(--color-blue-primary-alpha-13);
+  flex-shrink: 0;
+}
+
+// ── Mobile layout — vertical axis left + steps right ─────────────────────────
+// Shown only on mobile; desktop track is hidden on mobile via .trackWrap
+
+.mobileLayout {
+  display: none; // hidden on desktop
+
+  @include mobile {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    padding: var(--space-4) var(--space-4) var(--space-8);
+    gap: 0;
+  }
+}
+
+// design-specific: 40px axis column — holds the vertical animated SVG ruler
+.mobileAxisCol {
+  flex: 0 0 40px;
+  width: 40px;
+  align-self: stretch; // stretches to full height of the mobileLayout flex row
+  position: relative;
+  // SVG is injected by JS — ResizeObserver fires once offsetHeight > 0
+}
+
+.mobileStepsList {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.mobileStep {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-5) 0 var(--space-5) var(--space-2);
+  border-bottom: 1px dashed var(--color-blue-primary-alpha-13);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+// Badge sits beside the axis — aligned to match axis tick position
+.mobileStepBadgeWrap {
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-start;
+  padding-top: 2px;
+}
+
+// Inherits .stepBadge styles — just overriding size for mobile
+.mobileStepBadge {
+  width: 40px;
+  height: 38px;
+  border-radius: 3.3px;
+  flex-shrink: 0;
+  background: linear-gradient(to bottom, var(--color-blue-primary), var(--color-blue-primary-alpha-50));
+  // design-specific: same Figma badge shadow as desktop
+  box-shadow:
+    0px 16px 40px rgba(87, 177, 255, 0.34),
+    0px 9px 12px rgba(87, 177, 255, 0.19),
+    0px 4px 5px rgba(87, 177, 255, 0.22),
+    0px 1.5px 2px rgba(87, 177, 255, 0.15),
+    0 0 0 2px #e0e9f2,
+    0 0 0 2.5px var(--color-white-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 3.3px;
+    box-shadow:
+      inset 0px 0.6px 10px 1px #d2eaff,
+      inset 0px 0.6px 2px 1px #d2eaff;
+    pointer-events: none;
+  }
+}
+
+.mobileStepContent {
+  flex: 1;
+  min-width: 0;
+}
+
+// ── Desktop track ─────────────────────────────────────────────────────────────
+
+.trackWrap {
+  flex: 1 1 auto;
+  position: relative;
+  overflow: hidden;
+
+  @include mobile {
+    display: none; // desktop track hidden on mobile — mobileLayout takes over
+  }
+}
+
+.track {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  display: flex;
+  align-items: stretch;
+  will-change: transform;
+}
+
+// ── Step card ─────────────────────────────────────────────────────────────────
+
+.step {
+  position: relative;
+  flex: 0 0 640px;
+  width: 640px;
+  height: 100%;
+}
+
+.stepInner {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.stepAbove .stepInner {
+  top: 0;
+  height: 50%;
+  justify-content: flex-start;
+  padding: var(--space-7) var(--space-9) 0 var(--space-11);
+}
+
+.stepBelow .stepInner {
+  top: 50%;
+  height: 50%;
+  justify-content: flex-end;
+  padding: 0 var(--space-9) var(--space-7) var(--space-11);
+}
+
+// ── Step content ──────────────────────────────────────────────────────────────
+
+.stepContent {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--space-4-5);
+}
+
+// ── Badge ─────────────────────────────────────────────────────────────────────
+
+.badgeWrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.badgeGlow {
+  position: absolute;
+  width: 110px;
+  height: 110px;
+  border-radius: var(--radius-full);
+  background: radial-gradient(circle, var(--color-blue-primary-alpha-30) 0%, transparent 65%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+// design-specific: Figma badge shadow — no token equivalent
+.stepBadge {
+  position: relative;
+  z-index: 1;
+  width: 52px;
+  height: 50px;
+  border-radius: 3.3px;
+  flex-shrink: 0;
+  background: linear-gradient(to bottom, var(--color-blue-primary), var(--color-blue-primary-alpha-50));
+  box-shadow:
+    0px 25.3px 64.5px rgba(87, 177, 255, 0.34),
+    0px 14.9px 19.4px rgba(87, 177, 255, 0.19),
+    0px 6.2px 8.1px rgba(87, 177, 255, 0.22),
+    0px 2.2px 2.9px rgba(87, 177, 255, 0.15),
+    0 0 0 2.41px #e0e9f2,
+    0 0 0 3px var(--color-white-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  // design-specific: inset glow on badge face
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 3.3px;
+    box-shadow:
+      inset 0px 0.6px 10.8px 1.2px #d2eaff,
+      inset 0px 0.6px 2.4px 1.2px #d2eaff;
+    pointer-events: none;
+  }
+}
+
+.stepNum {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-body-small);
+  color: var(--color-white-primary);
+  text-shadow: 0 1px 1.5px var(--color-black-alpha-25);
+  line-height: 1;
+}
+
+.stepSepLine {
+  width: 1px;
+  align-self: stretch;
+  background: var(--color-blue-primary-alpha-50);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.stepText {
+  flex: 1;
+  min-width: 0;
+}
+
+.stepTitle {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-bold);
+  font-size: 26px;
+  line-height: 1.2;
+  background: linear-gradient(125deg, var(--color-blue-dark) 0%, var(--color-blue-primary) 60%, #3d52f0 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  max-width: 300px;
+  margin-bottom: var(--space-2);
+}
+
+.stepNote {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-small-13);
+  background: none;
+  -webkit-text-fill-color: var(--color-black-primary);
+  color: var(--color-black-primary);
+}
+
+.stepDesc {
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-small-13);
+  line-height: var(--leading-small);
+  color: var(--color-black-hover);
+  max-width: 290px;
+  margin: 0;
+}
+
+// ── Connector ─────────────────────────────────────────────────────────────────
+
+.connectorLine {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  pointer-events: none;
+  z-index: 5;
+  background: var(--color-blue-primary-alpha-30);
+
+  .stepAbove & { top: 160px; bottom: 50%; }
+  .stepBelow & { top: 50%; bottom: 160px; }
+
+  @include mobile { display: none; }
+}
+
+.connectorDot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  border: 1.5px solid var(--color-blue-primary-alpha-50);
+  background: var(--color-white-primary);
+  z-index: 25;
+
+  &::before {
+    content: '';
+    position: absolute;
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-full);
+    background: radial-gradient(circle, var(--color-blue-primary-alpha-18) 0%, transparent 70%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  @include mobile { display: none; }
+}
+
+
+
+// ── Mobile ────────────────────────────────────────────────────────────────────
+
+@include mobile {
+  .section { height: auto !important; }
+
+  .sticky {
+    position: relative;
+    height: auto;
+    overflow: visible;
+  }
+
+  // Mobile step text sizes
+  .mobileStepContent .stepTitle { font-size: 17px; max-width: 100%; margin-bottom: var(--space-1-5); }
+  .mobileStepContent .stepDesc  { font-size: 13px; max-width: 100%; }
+  .mobileStepContent .stepNote  { font-size: 12px; }
+}
+
+// ── Reduced motion ────────────────────────────────────────────────────────────
+
+@media (prefers-reduced-motion: reduce) {
+  .track { transform: none !important; }
+}
