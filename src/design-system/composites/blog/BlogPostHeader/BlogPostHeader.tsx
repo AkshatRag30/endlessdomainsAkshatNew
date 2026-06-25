@@ -1,7 +1,7 @@
 import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { FiCalendar, FiMapPin } from 'react-icons/fi'
+import { FiCalendar, FiClock } from 'react-icons/fi'
 import { PiArrowBendUpLeft } from 'react-icons/pi'
 import styles from './BlogPostHeader.module.scss'
 import type { BlogSummary } from '@/data/blogs'
@@ -47,8 +47,8 @@ export function BlogPostHeader({ post, author }: BlogPostHeaderProps) {
               </div>
               <span className={styles.metaDivider} aria-hidden="true" />
               <div className={styles.metaPill}>
-                <FiMapPin size={16} aria-hidden="true" />
-                <span>{post.location ?? 'Global'}</span>
+                <FiClock size={16} aria-hidden="true" />
+                <span>{post.readingTime} min read</span>
               </div>
             </div>
           </div>

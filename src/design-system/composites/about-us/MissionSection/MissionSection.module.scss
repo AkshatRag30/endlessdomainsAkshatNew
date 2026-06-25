@@ -286,18 +286,14 @@ $card-clip: polygon(7% 41%, 100% 40%, 100% 93%, 94% 100%, 0 100%, 0 51%);
   }
 }
 
-// design-specific: Figma left card — flat deep blue by default, radial glow on hover
+// design-specific: Figma left card — bg image with blue overlay, radial glow on hover
 .cardDark {
-  background: linear-gradient(135deg, #3b52f5 0%, #2639ed 40%, #1e2fbf 100%);
+  background: url('/about-us/missioncard1bg.jpg') center / cover no-repeat;
   position: relative;
   overflow: hidden;
   transition: background 0.4s ease, box-shadow 0.4s ease;
 
-  &:hover {
-    box-shadow: inset 0 0 60px rgba(255, 255, 255, 0.06), inset 0 0 20px rgba(255, 255, 255, 0.04);
-  }
-
-  // design-specific: radial glow overlay fades in on hover via opacity transition
+  // design-specific: blue overlay keeps text readable over the bg image; brightens on hover
   &::before {
     content: '';
     position: absolute;
@@ -310,14 +306,14 @@ $card-clip: polygon(7% 41%, 100% 40%, 100% 93%, 94% 100%, 0 100%, 0 51%);
       #3448e8 85%,
       #4055ee 100%
     );
-    opacity: 0;
+    opacity: 0.45;
     transition: opacity 0.4s ease;
     pointer-events: none;
     z-index: 0;
   }
 
   &:hover::before {
-    opacity: 1;
+    opacity: 0.55;
   }
 }
 

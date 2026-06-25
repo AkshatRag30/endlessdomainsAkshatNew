@@ -5,8 +5,8 @@ import styles from './ParkedStats.module.scss'
 const STATS = [
   { value: '10M+', label: 'Web3 Domains Registered Globally' },
   { value: '94%',  label: 'Currently Idle And Earning Nothing' },
-  { value: '3 steps', label: 'From Idle Domain To Earning' },
-  { value: '10+',  label: 'Blockchains Supported' },
+  { value: '7 steps', label: 'From Idle Domain To Earning' },
+  { value: '10+',  label: 'Providers Supported' },
 ]
 
 export function ParkedStats() {

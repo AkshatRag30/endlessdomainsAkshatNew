@@ -210,6 +210,10 @@
   padding: var(--space-5) var(--space-5) var(--space-4);
   margin: var(--space-3);
   margin-top: 0;
+
+  @include mobile {
+    display: none;
+  }
 }
 
 .tocList {

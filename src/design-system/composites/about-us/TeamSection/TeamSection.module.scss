@@ -30,15 +30,16 @@
   position: relative;
   flex-shrink: 0;
   margin-top: calc(-80px - var(--space-10));
-  margin-bottom: var(--space-10);
   z-index: 1;
 }
 
 .topPolygonInner {
   position: absolute;
-  inset: 0;
-  background: #0a0f2e; // design-specific: matches section top gradient color
-  // short edge at top (outward), long edge at bottom (inward into section)
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: -40px; // extend below container so the bottom edge is never visible
+  background: #0a0f2e;
   clip-path: polygon(80px 0, calc(100% - 80px) 0, 100% 100%, 0 100%);
 }
 
@@ -49,47 +50,23 @@
   display: flex;
   justify-content: center;
   flex-shrink: 0;
-  margin: var(--space-5) 0;
+  margin: var(--space-5) 0 0;
   padding: 0 var(--container-padding-x);
-}
-
-@keyframes barBlink {
-  0%, 100% { opacity: 0.15; }
-  50%       { opacity: 1; }
 }
 
 .trapezoidWrap {
   width: 100%;
   max-width: 763px;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 0;
+  justify-content: center;
 }
 
 .trapezoidImg {
   width: 100%;
   height: auto;
   display: block;
-}
-
-.trapezoidBar {
-  display: block;
-  pointer-events: none;
-}
-
-.trapezoidBarWhite {
-  width: 94%;
-  height: auto;
-  margin-top: -44px;
-  animation: barBlink 2.4s ease-in-out infinite;
-}
-
-.trapezoidBarBlue {
-  width: 75%;
-  height: auto;
-  animation: barBlink 2.4s ease-in-out infinite;
-  animation-delay: 0.4s;
+  transform: scaleY(-1);
 }
 
 // ── Bottom polygon decoration ─────────────────────────────────────────────────
@@ -114,12 +91,24 @@
 
 // ── Section header ────────────────────────────────────────────────────────────
 
+.headerGroupSvg {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 600px;
+  height: auto;
+  display: block;
+  z-index: 2;
+}
+
 .header {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--space-6);
-  padding: var(--space-6) var(--container-padding-x);
+  padding: var(--space-12) var(--container-padding-x) var(--space-6);
   width: 100%;
   max-width: 900px;
   text-align: center;
@@ -481,13 +470,13 @@
   align-items: center;
   justify-content: center;
   width: 180px;
-  height: 110px;
+  height: 52px;
   padding: 0;
   background: transparent;
   border: none;
   cursor: pointer;
-  // design-specific: Figma polygon shape, scaled to show more of the button body
-  clip-path: polygon(6% 55%, 100% 55%, 100% 93%, 95% 100%, 0 100%, 0 62%);
+  // design-specific: trapezoid — wider at top, narrower at bottom-right corner cut
+  clip-path: polygon(5% 0%, 100% 0%, 100% 80%, 95% 100%, 0 100%, 0 8%);
   transition: background 0.25s ease, box-shadow 0.25s ease;
 
   &:hover:not([aria-selected='true']) {
@@ -509,8 +498,7 @@
 
 .tabLabel {
   position: absolute;
-  // design-specific: visible slice is 55%–100% of 110px (≈60px–110px), midpoint ≈ 85px = 77% of 110px
-  top: 77%;
+  top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 1;
@@ -686,7 +674,7 @@
 
   .tab {
     width: 140px;
-    height: 90px;
+    height: 44px;
   }
 
   .tabLabel {

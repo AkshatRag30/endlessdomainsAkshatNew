@@ -8,12 +8,22 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: calc(var(--section-spacing) + var(--space-10)) 0 var(--section-spacing);
+  padding: calc(var(--section-spacing) + var(--space-10)) var(--container-padding-x) var(--section-spacing);
   position: relative;
   overflow: hidden;
+
+  @include tablet-down {
+    padding-left: var(--space-7);
+    padding-right: var(--space-7);
+  }
+
+  @include mobile {
+    padding-left: var(--space-5);
+    padding-right: var(--space-5);
+  }
 }
 
-// ── Outer stage: contains everything, centers the circular layout ─────────────
+// ── Outer stage: two-column layout — text left, orbit right ──────────────────
 
 .stage {
   position: relative;
@@ -21,27 +31,63 @@
   max-width: 1440px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 0 var(--container-padding-x);
+  justify-content: flex-start;
+  gap: var(--space-14);
+
+  @include max-width(1280px) {
+    gap: var(--space-8);
+  }
+
+  @include max-width(1100px) {
+    gap: var(--space-6);
+  }
+
+  @include tablet-down {
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-8);
+  }
 }
 
-// ── Visual canvas: fixed-size circle that holds all rings + orbit ─────────────
+// ── Left column: eyebrow + heading + description ──────────────────────────────
+
+.textCol {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-6);
+
+  @include tablet-down {
+    flex: none;
+    width: 100%;
+    align-items: center;
+    text-align: center;
+  }
+}
+
+// ── Right column: wraps the canvas ────────────────────────────────────────────
+
+.orbitCol {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-right: var(--container-padding-x);
+
+  @include tablet-down {
+    padding-right: 0;
+  }
+}
+
+// ── Visual canvas: size is set via inline style from JS (getCanvasSize) ──────
+// Rings and dotGrid use % sizing so they scale automatically with the canvas.
 
 .canvas {
   position: relative;
-  width: 860px;
-  height: 860px;
   flex-shrink: 0;
-
-  @include tablet-down {
-    width: 640px;
-    height: 640px;
-  }
-
-  @include mobile {
-    width: 360px;
-    height: 360px;
-  }
+  overflow: visible;
 }
 
 // ── Soft blue radial glow behind everything ───────────────────────────────────
@@ -71,7 +117,7 @@
   will-change: transform;
 }
 
-// design-specific: each ring is a circle outline, sizes match Figma exactly
+// design-specific: rings scale as % of canvas so they stay proportional at all sizes
 .ring {
   position: absolute;
   border-radius: var(--radius-full);
@@ -80,28 +126,10 @@
   transform: translate(-50%, -50%);
   border: 1px solid rgba(38, 57, 237, 0.1);
 
-  &:nth-child(1) {
-    width: 860px;
-    height: 860px;
-  }
-
-  &:nth-child(2) {
-    width: 690px;
-    height: 690px;
-    border-color: rgba(38, 57, 237, 0.09);
-  }
-
-  &:nth-child(3) {
-    width: 440px;
-    height: 440px;
-    border-color: rgba(38, 57, 237, 0.08);
-  }
-
-  &:nth-child(4) {
-    width: 230px;
-    height: 230px;
-    border-color: rgba(38, 57, 237, 0.07);
-  }
+  &:nth-child(1) { width: 100%; height: 100%; }
+  &:nth-child(2) { width: 80%; height: 80%; border-color: rgba(38, 57, 237, 0.09); }
+  &:nth-child(3) { width: 52%; height: 52%; border-color: rgba(38, 57, 237, 0.08); }
+  &:nth-child(4) { width: 27%; height: 27%; border-color: rgba(38, 57, 237, 0.07); }
 }
 
 // ── Dot-grid in the centre ────────────────────────────────────────────────────
@@ -110,8 +138,8 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 440px;
-  height: 440px;
+  width: 52%;
+  height: 52%;
   transform: translate(-50%, -50%);
   pointer-events: none;
   will-change: transform;
@@ -150,10 +178,9 @@
 
 // The icon container — blue gradient pill with glow shadow
 .moduleIcon {
-  // design-specific: 34×34 blue icon tile, border-radius 11px
-  width: 34px;
-  height: 34px;
-  border-radius: 11px; // design-specific: Figma-exact 11px radius
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
   position: relative;
   flex-shrink: 0;
   // design-specific: blue glow multi-layer box-shadow
@@ -169,7 +196,7 @@
     content: '';
     position: absolute;
     inset: 0;
-    border-radius: 11px;
+    border-radius: 8px;
     box-shadow: inset 0px 0.281px 5.05px 0.561px #d2eaff, inset 0px 0.281px 1.122px 0.561px #d2eaff;
     pointer-events: none;
   }
@@ -178,7 +205,7 @@
 .moduleIconGradient {
   position: absolute;
   inset: 0;
-  border-radius: 11px; // design-specific
+  border-radius: 8px;
   background: linear-gradient(180deg, var(--color-blue-primary) 0%, rgba(38, 57, 237, 0.47) 100%);
 }
 
@@ -192,8 +219,8 @@
 
 .moduleIconImg {
   display: block;
-  width: 20px;
-  height: 20px;
+  width: 14px;
+  height: 14px;
   flex-shrink: 0;
   color: var(--color-white-primary);
 }
@@ -211,7 +238,7 @@
 .moduleName {
   margin: 0;
   font-family: var(--font-satoshi);
-  font-size: 30px; // design-specific: Figma-exact name size
+  font-size: 18px;
   font-weight: var(--font-weight-bold);
   // design-specific: blue gradient text matching Figma
   background: linear-gradient(111deg, var(--color-blue-primary) 70.225%, var(--color-blue-primary-faded) 95.59%);
@@ -225,47 +252,13 @@
 .moduleDesc {
   margin: 0;
   font-family: var(--font-space-grotesk);
-  font-size: var(--text-nav); // 14px
+  font-size: 11px;
   font-weight: var(--font-weight-regular);
-  color: var(--color-text-body); // #474747
-  line-height: var(--leading-normal); // 1.3
-  max-width: 200px;
+  color: var(--color-text-body);
+  line-height: var(--leading-normal);
+  max-width: 130px;
   white-space: normal;
   text-align: center;
-}
-
-// ── Center text block (never rotates) ────────────────────────────────────────
-
-.center {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-7);
-  width: 600px;
-  text-align: center;
-  z-index: 2;
-  pointer-events: none;
-
-  @include tablet-down {
-    width: 460px;
-    gap: var(--space-5);
-  }
-
-  @include mobile {
-    width: 290px;
-    gap: var(--space-4);
-  }
-}
-
-.centerContent {
-  display: flex;
-  flex-direction: column;
-  gap: 15px; // design-specific: Figma-exact 15px gap between eyebrow and heading
-  align-items: center;
 }
 
 // ── Eyebrow badge ─────────────────────────────────────────────────────────────
@@ -275,7 +268,6 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  // design-specific: match eyebrow width from Figma subtitle vector container 189px gap
   padding: 10px 40px;
 }
 
@@ -313,17 +305,16 @@
   color: var(--color-black-primary);
   letter-spacing: -0.03em;
   line-height: 1.2;
-  text-align: center;
   text-shadow: 0px 1px 1.3px var(--color-black-alpha-25);
   white-space: nowrap;
 
   @include tablet-down {
     font-size: 34px;
+    white-space: normal;
   }
 
   @include mobile {
     font-size: 31px;
-    white-space: normal;
   }
 }
 
@@ -342,11 +333,11 @@
 
   @include tablet-down {
     font-size: 34px;
+    white-space: normal;
   }
 
   @include mobile {
     font-size: 31px;
-    white-space: normal;
   }
 }
 
@@ -359,108 +350,59 @@
   font-weight: var(--font-weight-regular);
   color: rgba(0, 0, 0, 0.7);
   line-height: var(--leading-normal); // 1.3
-  text-align: center;
-  width: 650px; // wide enough to fit in ~3 lines at 22px
+  max-width: 540px;
 
   @include tablet-down {
     font-size: var(--text-body-small);
-    width: 440px;
+    max-width: 100%;
   }
 
   @include mobile {
     font-size: var(--text-nav);
-    width: 100%;
   }
 }
 
-// ── Mobile stacked layout: modules listed below circular visual ───────────────
+// ── Mobile stacked cards (shown only on mobile) ───────────────────────────────
 
-.mobileModules {
-  display: none;
+.mobileCards {
+  display: none; // hidden on desktop/tablet — orbit is shown instead
+}
 
-  @include mobile {
+// Rings and dotGrid are now %-based — no per-breakpoint px overrides needed.
+// Only typography scales down at smaller canvas sizes.
+
+@include tablet-down {
+  .moduleName { font-size: 22px; }
+  .moduleDesc { font-size: 12px; max-width: 150px; }
+}
+
+@include mobile {
+  .stage { gap: var(--space-6); }
+  .eyebrowText { font-size: 14px; }
+
+  // Hide the orbit column entirely on mobile
+  .orbitCol { display: none; }
+
+  // Show stacked cards
+  .mobileCards {
     display: flex;
     flex-direction: column;
-    gap: 47px; // design-specific: Figma-exact gap between module items
+    align-items: center;
+    gap: var(--space-4);
     width: 100%;
-    padding: var(--space-7) var(--container-padding-x) 0;
-  }
-}
-
-.mobileModule {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px; // design-specific: Figma-exact gap between label row and desc
-}
-
-.mobileModuleLabelRow {
-  display: flex;
-  align-items: center;
-  gap: 17px; // design-specific: Figma-exact gap between icon and name
-}
-
-.mobileModuleText {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-
-.mobileModuleName {
-  margin: 0;
-  font-family: var(--font-satoshi);
-  font-size: 20px; // design-specific: Figma mobile exact
-  font-weight: var(--font-weight-bold);
-  background: linear-gradient(111deg, var(--color-blue-primary) 70.225%, var(--color-blue-primary-faded) 95.59%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  line-height: 1.2;
-  white-space: nowrap;
-}
-
-.mobileModuleDesc {
-  margin: 0;
-  font-family: var(--font-space-grotesk);
-  font-size: var(--text-nav); // 14px
-  font-weight: var(--font-weight-regular);
-  color: var(--color-text-body);
-  line-height: var(--leading-normal);
-  text-align: center;
-  max-width: 318px; // design-specific: Figma-exact desc width
-}
-
-// On mobile the circular orbit is still shown but scaled down,
-// module nodes on the orbit are hidden (mobileModules list takes over)
-@include mobile {
-  .moduleNode {
-    display: none;
   }
 
-  // Reduce stage horizontal padding so 360px canvas fits on 390px viewport
-  .stage {
-    padding: 0 var(--space-4);
-  }
+  .mobileCard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+    text-align: center;
+    padding: var(--space-5) var(--space-6);
+    width: 100%;
+    max-width: 320px;
 
-  // Scale all ring sizes to match the 360px mobile canvas
-  .ring {
-    &:nth-child(1) { width: 360px; height: 360px; }
-    &:nth-child(2) { width: 290px; height: 290px; }
-    &:nth-child(3) { width: 185px; height: 185px; }
-    &:nth-child(4) { width: 96px; height: 96px; }
-  }
-
-  // Dot grid matches ring 3 size
-  .dotGrid {
-    width: 185px;
-    height: 185px;
-  }
-
-  .eyebrowText {
-    font-size: 14px;
-  }
-
-  .mobileModules {
-    padding: var(--space-7) var(--space-5) 0;
+    .moduleName { font-size: 18px; }
+    .moduleDesc { font-size: 13px; max-width: 100%; }
   }
 }

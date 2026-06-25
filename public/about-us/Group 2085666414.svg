@@ -30,11 +30,6 @@
     <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
     <feGaussianBlur stdDeviation="0" result="effect1_foregroundBlur_10_179"/>
   </filter>
-  <!-- glow sweep filter -->
-  <filter id="glowBlur" x="-50%" y="-100%" width="200%" height="300%">
-    <feGaussianBlur stdDeviation="18" />
-  </filter>
-
   <linearGradient id="paint0_linear_10_179" x1="381.5" y1="17" x2="381.5" y2="113" gradientUnits="userSpaceOnUse">
     <stop offset="0.387027" stop-color="white" stop-opacity="0"/>
     <stop offset="1" stop-color="white"/>
@@ -66,26 +61,6 @@
     <stop offset="0.939617" stop-color="#2639ED" stop-opacity="0"/>
   </linearGradient>
 
-  <!-- sweeping glow gradient: a narrow bright band that travels left→right -->
-  <linearGradient id="sweepGrad" x1="0" y1="0" x2="1" y2="0" gradientUnits="objectBoundingBox">
-    <stop offset="0"    stop-color="white" stop-opacity="0"/>
-    <stop offset="0.4"  stop-color="white" stop-opacity="0"/>
-    <stop offset="0.5"  stop-color="white" stop-opacity="0.9"/>
-    <stop offset="0.6"  stop-color="white" stop-opacity="0"/>
-    <stop offset="1"    stop-color="white" stop-opacity="0"/>
-    <animateTransform attributeName="gradientTransform" type="translate" from="-1 0" to="1 0" dur="3s" repeatCount="indefinite" />
-  </linearGradient>
-
-  <!-- blue sweeping glow for the inner blue trapezoid -->
-  <linearGradient id="sweepBlue" x1="0" y1="0" x2="1" y2="0" gradientUnits="objectBoundingBox">
-    <stop offset="0"    stop-color="#2639ED" stop-opacity="0"/>
-    <stop offset="0.4"  stop-color="#2639ED" stop-opacity="0"/>
-    <stop offset="0.5"  stop-color="#6b7fff"  stop-opacity="1"/>
-    <stop offset="0.6"  stop-color="#2639ED" stop-opacity="0"/>
-    <stop offset="1"    stop-color="#2639ED" stop-opacity="0"/>
-    <animateTransform attributeName="gradientTransform" type="translate" from="-1 0" to="1 0" dur="3s" repeatCount="indefinite" />
-  </linearGradient>
-
   <!-- clip paths matching each trapezoid shape so the glow stays inside -->
   <clipPath id="clip_outer1">
     <path d="M54.9775 29.25H708.022C730.701 29.25 743.804 54.9771 730.468 73.3193L694.113 123.319C688.892 130.501 680.548 134.75 671.669 134.75H91.3311C82.4517 134.75 74.1085 130.501 68.8867 123.319L32.5322 73.3193C19.1959 54.9771 32.2994 29.25 54.9775 29.25Z"/>
@@ -105,11 +80,6 @@
 </g>
 <path d="M620.967 61.2512L638.995 36.3435C642.849 31.018 649.732 28.8379 655.95 30.973C665.433 34.2292 669.08 45.7169 663.212 53.847L644.442 79.8549C640.013 85.9913 632.937 89.622 625.406 89.622H137.594C130.063 89.622 122.987 85.9913 118.558 79.8549L99.7875 53.847C93.9199 45.7169 97.5673 34.2292 107.05 30.973C113.268 28.8379 120.151 31.018 124.005 36.3436L142.033 61.2512C146.464 67.3723 153.531 70.9922 161.05 70.9922H601.95C609.469 70.9922 616.536 67.3723 620.967 61.2512Z" fill="url(#paint5_linear_10_179)" fill-opacity="0.07"/>
 
-<!-- animated glow sweep on outer trapezoid (white) -->
-<rect x="0" y="0" width="763" height="174" fill="url(#sweepGrad)" clip-path="url(#clip_outer1)" opacity="0.35" filter="url(#glowBlur)"/>
-
-<!-- animated glow sweep on inner blue trapezoid -->
-<rect x="0" y="0" width="763" height="174" fill="url(#sweepBlue)" clip-path="url(#clip_inner)" opacity="0.6" filter="url(#glowBlur)"/>
 
 <g filter="url(#filter1_f_10_179)">
   <path d="M358 131H405L435 135H328L358 131Z" fill="#D9D9D9"/>

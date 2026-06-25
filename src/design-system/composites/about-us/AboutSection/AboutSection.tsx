@@ -4,8 +4,9 @@ import styles from './AboutSection.module.scss'
 
 const STATS = [
   { value: '2020', label: 'Founded' },
-  { value: '450+', label: 'Integrations' },
-  { value: '4K+', label: '.og Mints' },
+  { value: '10+', label: 'Providers Integration' },
+  { value: '650+', label: 'Wallets Supported' },
+  { value: '4K+', label: '.OG Mints' },
 ]
 
 export default function AboutSection() {

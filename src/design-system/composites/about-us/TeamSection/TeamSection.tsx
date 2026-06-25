@@ -4,56 +4,10 @@ import { FaLinkedin } from 'react-icons/fa'
 import { useEntranceAnimation } from '../useEntranceAnimation'
 import styles from './TeamSection.module.scss'
 
-// Base SVG as <Image> + two bar SVGs inlined so CSS animation works
 function TrapezoidSVG() {
   return (
     <div className={styles.trapezoidWrap} aria-hidden="true">
-      {/* Vector 6 — blue inner bar, top */}
-      <svg className={`${styles.trapezoidBar} ${styles.trapezoidBarBlue}`} width="570" height="60" viewBox="0 0 570 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M524.012 31.0892L542.04 6.18155C545.895 0.85603 552.777 -1.3241 558.995 0.810979C568.478 4.06723 572.125 15.555 566.258 23.685L547.487 49.6929C543.058 55.8293 535.982 59.46 528.451 59.46H40.6391C33.1081 59.46 26.0319 55.8293 21.6031 49.6929L2.83265 23.685C-3.03499 15.5549 0.612378 4.06723 10.0952 0.810972C16.3129 -1.32411 23.1957 0.856041 27.0503 6.18157L45.0782 31.0892C49.5086 37.2103 56.5756 40.8302 64.0953 40.8302H504.995C512.515 40.8302 519.582 37.2103 524.012 31.0892Z" fill="url(#v6_grad_top)" fillOpacity="0.07"/>
-        <defs>
-          <linearGradient id="v6_grad_top" x1="-8.955" y1="28.34" x2="578.045" y2="28.34" gradientUnits="userSpaceOnUse">
-            <stop offset="0.073" stopColor="#2639ED" stopOpacity="0"/>
-            <stop offset="0.21" stopColor="#2639ED"/>
-            <stop offset="0.805" stopColor="#2639ED"/>
-            <stop offset="0.94" stopColor="#2639ED" stopOpacity="0"/>
-          </linearGradient>
-        </defs>
-      </svg>
-      {/* Vector 5 — white glowing bar, bottom */}
-      <svg className={`${styles.trapezoidBar} ${styles.trapezoidBarWhite}`} width="718" height="112" viewBox="0 0 718 112" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <g filter="url(#v5_filter)" style={{ mixBlendMode: 'plus-lighter' }}>
-          <path d="M643.714 57.1381L665.191 27.6848C669.765 21.412 677.888 18.8446 685.236 21.3493C696.538 25.2016 700.877 38.8985 693.855 48.5562L671.642 79.1073C666.373 86.3538 657.955 90.6413 648.995 90.6413H68.6579C59.6984 90.6413 51.28 86.3538 46.0112 79.1073L23.798 48.5561C16.7761 38.8985 21.1155 25.2016 32.4175 21.3493C39.7657 18.8446 47.8887 21.412 52.4626 27.6848L73.9389 57.1381C79.2097 64.3666 87.6171 68.6413 96.5631 68.6413H621.09C630.036 68.6413 638.444 64.3666 643.714 57.1381Z" fill="url(#v5_grad)" fillOpacity="0.2"/>
-        </g>
-        <defs>
-          <filter id="v5_filter" x="0" y="0" width="717.653" height="111.041" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
-            <feFlood floodOpacity="0" result="BackgroundImageFix"/>
-            <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
-            <feGaussianBlur stdDeviation="10.2" result="blur"/>
-            <feTurbulence type="fractalNoise" baseFrequency="0.27027 0.43478" stitchTiles="stitch" numOctaves="3" result="noise" seed="4246"/>
-            <feComponentTransfer in="noise" result="coloredNoise">
-              <feFuncR type="linear" slope="2" intercept="-0.5"/>
-              <feFuncG type="linear" slope="2" intercept="-0.5"/>
-              <feFuncB type="linear" slope="2" intercept="-0.5"/>
-              <feFuncA type="discrete" tableValues="0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"/>
-            </feComponentTransfer>
-            <feComposite operator="in" in2="blur" in="coloredNoise" result="noiseClipped"/>
-            <feComponentTransfer in="noiseClipped" result="color1">
-              <feFuncA type="table" tableValues="0 0.23"/>
-            </feComponentTransfer>
-            <feMerge>
-              <feMergeNode in="blur"/>
-              <feMergeNode in="color1"/>
-            </feMerge>
-          </filter>
-          <linearGradient id="v5_grad" x1="9.657" y1="53.89" x2="707.996" y2="53.89" gradientUnits="userSpaceOnUse">
-            <stop offset="0.073" stopColor="white" stopOpacity="0"/>
-            <stop offset="0.21" stopColor="white"/>
-            <stop offset="0.805" stopColor="white"/>
-            <stop offset="0.94" stopColor="white" stopOpacity="0"/>
-          </linearGradient>
-        </defs>
-      </svg>
+      <Image src="/about-us/Group 2085666414.svg" alt="" width={763} height={200} className={styles.trapezoidImg} />
     </div>
   )
 }
@@ -83,7 +37,7 @@ const FOUNDERS = [
     align: 'left' as const,
     photoTop: true,
     bio: [
-      'Digital identity is evolving from usernames into ownership layers. We are building infrastructure where identities become programmable, powering wallets, payments, communities, and digital presence across chains. Endless Domains is not just naming the internet. We are helping shape its next OS.',
+      'Digital identity is evolving beyond usernames and social profiles into true ownership layers. We are building the infrastructure that enables domains to become programmable identities powering wallets, payments, reputation, communities, and digital experiences across multiple blockchains. As the internet shifts toward user ownership and interoperability, domains will serve as the foundation connecting people, applications, and assets in a seamless way. Endless Domains is not simply naming the next generation of the internet—we are building the identity layer that helps power its operating system, making Web3 more accessible, connected, and scalable for everyone.',
     ],
   },
 ]
@@ -126,9 +80,10 @@ export default function TeamSection() {
   return (
     <section className={styles.section} aria-labelledby="team-heading">
 
-      {/* ── Top trapezoid decoration — short edge outward (top), long edge inward (bottom) ── */}
+      {/* ── Top trapezoid decoration with group SVG stuck to top ── */}
       <div className={styles.topPolygon} aria-hidden="true">
         <div className={styles.topPolygonInner} />
+        <Image src="/about-us/Group 2085666414.svg" alt="" width={763} height={200} className={styles.headerGroupSvg} />
       </div>
 
       {/* ── Section header ── */}

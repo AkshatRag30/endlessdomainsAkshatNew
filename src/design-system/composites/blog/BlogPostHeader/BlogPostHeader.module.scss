@@ -4,6 +4,8 @@
   background: var(--color-white-primary);
   border-bottom: 1px solid var(--color-border-black-subtle);
   box-shadow: 0 5px 0 0 var(--color-white-primary), 0 6px 0 0 var(--color-border-black-subtle);
+  overflow-x: hidden;
+  width: 100%;
 }
 
 .inner {
@@ -14,6 +16,7 @@
   grid-template-columns: 1fr 45%;
   gap: var(--space-9);
   align-items: center;
+  overflow: hidden;
 
   @include tablet-down {
     grid-template-columns: 1fr;
@@ -22,7 +25,7 @@
   }
 
   @include mobile {
-    padding: var(--space-5) 16px;
+    padding: var(--space-5) var(--space-4);
     gap: var(--space-5);
   }
 }
@@ -32,6 +35,8 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
+  min-width: 0;
+  overflow: hidden;
 }
 
 .backLink {
@@ -61,6 +66,7 @@
   align-items: center;
   gap: 13px; // design-specific: Figma 13px gap between badge and meta group
   flex-wrap: wrap;
+  min-width: 0;
 }
 
 .categoryBadge {
@@ -84,6 +90,12 @@
   display: inline-flex;
   align-items: center;
   gap: 13px; // design-specific: Figma 13px gap between date and location
+  flex-wrap: wrap;
+  min-width: 0;
+
+  @include mobile {
+    gap: var(--space-2);
+  }
 }
 
 .metaPill {
@@ -157,6 +169,11 @@
 }
 
 // ── Right column — polygon image ───────────────────────────────────────────
+
+.right {
+  min-width: 0;
+  width: 100%;
+}
 
 .imagePolygon {
   position: relative;
