@@ -1,0 +1,530 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Section ───────────────────────────────────────────────────────────────────
+
+.section {
+  background: var(--color-white-primary);
+  padding: var(--space-14) var(--container-padding-x);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-12);
+
+  @include tablet-down {
+    padding: var(--space-12) var(--space-6);
+    gap: var(--space-10);
+  }
+
+  @include mobile {
+    padding: var(--space-9) var(--space-4);
+    gap: var(--space-7);
+  }
+
+  @include small-mobile {
+    padding: var(--space-8) var(--space-3);
+    gap: var(--space-6);
+  }
+}
+
+// ── Header — centered ─────────────────────────────────────────────────────────
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  text-align: center;
+  max-width: 700px;
+  width: 100%;
+}
+
+// ── Eyebrow reticle ───────────────────────────────────────────────────────────
+
+.eyebrowWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-5);
+}
+
+.reticleTL {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  border-top: 1.5px solid var(--color-blue-primary);
+  border-left: 1.5px solid var(--color-blue-primary);
+  pointer-events: none;
+}
+
+.reticleTR {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  border-top: 1.5px solid var(--color-blue-primary);
+  border-right: 1.5px solid var(--color-blue-primary);
+  pointer-events: none;
+}
+
+.reticleBL {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  border-bottom: 1.5px solid var(--color-blue-primary);
+  border-left: 1.5px solid var(--color-blue-primary);
+  pointer-events: none;
+}
+
+.reticleBR {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  border-bottom: 1.5px solid var(--color-blue-primary);
+  border-right: 1.5px solid var(--color-blue-primary);
+  pointer-events: none;
+}
+
+.eyebrow {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-dark);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 0;
+  white-space: nowrap;
+}
+
+// ── Heading ───────────────────────────────────────────────────────────────────
+
+.heading {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-h1);
+  margin: 0;
+}
+
+.headingLine1 {
+  display: block;
+  font-size: 45px; // design-specific: Figma-exact 45px for first line
+
+  @include tablet-down {
+    font-size: 34px;
+  }
+
+  @include mobile {
+    font-size: 26px;
+  }
+}
+
+.headingAccent {
+  background: none;
+  background: linear-gradient(117deg, var(--color-blue-primary) 70%, var(--color-blue-primary-faded) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: var(--text-h2); // 55px
+  font-weight: var(--font-weight-regular);
+  font-style: normal;
+  display: block;
+
+  @include tablet-down {
+    font-size: 38px;
+  }
+
+  @include mobile {
+    font-size: 30px;
+  }
+}
+
+.subheading {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-body); // 22px
+  font-weight: var(--font-weight-regular);
+  color: var(--color-black-alpha-55);
+  line-height: var(--leading-normal);
+  margin: 0;
+  max-width: 603px; // design-specific: Figma-exact max-width
+
+  @include tablet-down {
+    font-size: var(--text-normal);
+    max-width: 100%;
+  }
+
+  @include mobile {
+    font-size: var(--text-body-small);
+  }
+}
+
+// ── Grid wrapper — holds the 4 outer corner brackets via pseudo-elements ─────
+
+.gridWrap {
+  position: relative;
+  width: 100%;
+  max-width: 1340px;
+
+  // top-left bracket
+  &::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    width: 22px;
+    height: 22px;
+    border-top: 2px solid var(--color-gray-300);
+    border-left: 2px solid var(--color-gray-300);
+    pointer-events: none;
+    z-index: 1;
+    transition: border-color 0.25s ease;
+
+    @include mobile {
+      display: none;
+    }
+  }
+
+  // top-right bracket
+  &::after {
+    content: '';
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 22px;
+    height: 22px;
+    border-top: 2px solid var(--color-gray-300);
+    border-right: 2px solid var(--color-gray-300);
+    pointer-events: none;
+    z-index: 1;
+    transition: border-color 0.25s ease;
+
+    @include mobile {
+      display: none;
+    }
+  }
+}
+
+// ── Provider card grid — 3-col desktop, 2-col tablet, 1-col mobile ────────────
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0; // separators are borders — no gap needed
+  width: 100%;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+
+  // bottom-left bracket
+  &::before {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: -10px;
+    width: 22px;
+    height: 22px;
+    border-bottom: 2px solid var(--color-gray-300);
+    border-left: 2px solid var(--color-gray-300);
+    pointer-events: none;
+    z-index: 1;
+
+    @include mobile {
+      display: none;
+    }
+  }
+
+  // bottom-right bracket
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    right: -10px;
+    width: 22px;
+    height: 22px;
+    border-bottom: 2px solid var(--color-gray-300);
+    border-right: 2px solid var(--color-gray-300);
+    pointer-events: none;
+    z-index: 1;
+
+    @include mobile {
+      display: none;
+    }
+  }
+
+  @include tablet-down {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ── Card ──────────────────────────────────────────────────────────────────────
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 289px; // design-specific: Figma-exact card height 289px
+  background: var(--color-white-primary);
+  transition: box-shadow 0.25s ease;
+  overflow: visible;
+
+  @include mobile {
+    min-height: auto;
+  }
+
+  // column dividers — right border on cols 1 and 2 (not col 3)
+  &:nth-child(3n+1),
+  &:nth-child(3n+2) {
+    border-right: 1px solid var(--color-gray-300);
+  }
+
+  // row divider — bottom border on all cards in the first row
+  &:nth-child(-n+3) {
+    border-bottom: 1px solid var(--color-gray-300);
+  }
+
+  @include tablet-down {
+    // 2-col layout: col divider on odd cards only, reset 3-col rules
+    &:nth-child(3n+1),
+    &:nth-child(3n+2) {
+      border-right: none;
+    }
+
+    &:nth-child(odd) {
+      border-right: 1px solid var(--color-gray-300);
+    }
+
+    // row divider on all cards except the last 2 (last row)
+    &:nth-child(-n+3) {
+      border-bottom: none;
+    }
+
+    &:not(:nth-last-child(-n+2)) {
+      border-bottom: 1px solid var(--color-gray-300);
+    }
+  }
+
+  @include mobile {
+    // 1-col layout: no column dividers, bottom border on all except last
+    &:nth-child(3n+1),
+    &:nth-child(3n+2),
+    &:nth-child(2n+1) {
+      border-right: none;
+    }
+
+    &:not(:last-child) {
+      border-bottom: 1px solid var(--color-gray-300);
+    }
+  }
+
+  &:hover {
+    box-shadow: 0 4px 24px var(--color-blue-primary-alpha-13);
+
+    .providerName {
+      background: linear-gradient(135deg, var(--color-blue-primary) 60%, var(--color-blue-primary-faded) 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .tlds {
+      color: var(--color-blue-primary);
+    }
+
+    .logo {
+      filter: grayscale(0);
+    }
+  }
+
+}
+
+
+// ── Card inner layout ─────────────────────────────────────────────────────────
+
+.cardInner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-7) var(--space-6);
+  flex: 1;
+
+  @include mobile {
+    padding: var(--space-5) var(--space-4);
+    gap: var(--space-3);
+  }
+}
+
+// ── Icon box — 56×56, blue gradient, rounded 18px ─────────────────────────────
+
+.iconBox {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px; // design-specific: Figma-exact icon box size
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: 18px; // design-specific: Figma-exact radius scaled up from About's 12.6px
+  background: linear-gradient(180deg, var(--color-blue-primary) 0%, rgba(38, 57, 237, 0.47) 100%);
+  box-shadow:
+    0px 13.5px 34.4px 0px rgba(87, 177, 255, 0.34),
+    0px 7.96px 10.38px 0px rgba(87, 177, 255, 0.19),
+    0px 3.3px 4.31px 0px rgba(87, 177, 255, 0.22),
+    0px 1.2px 1.56px 0px rgba(87, 177, 255, 0.15),
+    0px 0px 0px 1.3px #e0e9f2,
+    0px 0px 0px 1.6px var(--color-white-primary),
+    inset 0px 0.32px 5.79px 0.64px #d2eaff,
+    inset 0px 0.32px 1.29px 0.64px #d2eaff;
+  overflow: hidden;
+  filter: grayscale(1);
+  transition: filter 0.25s ease;
+
+  .card:hover & {
+    filter: grayscale(0);
+  }
+}
+
+.logo {
+  width: 36px; // design-specific: Figma-exact logo size inside icon box
+  height: 36px;
+  object-fit: contain;
+  filter: grayscale(1) brightness(2); // gray on cards, reveal on hover via .card:hover .logo
+  transition: filter 0.25s ease;
+}
+
+// ── Text content ──────────────────────────────────────────────────────────────
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  flex: 1;
+}
+
+.providerName {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h3); // 30px
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  line-height: var(--leading-snug);
+  margin: 0;
+  transition: color 0.25s ease;
+
+  @include tablet-down {
+    font-size: var(--text-display-sm); // 28px
+  }
+
+  @include mobile {
+    font-size: var(--text-normal); // 20px
+  }
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  flex: 1;
+}
+
+.tlds {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-nav); // 14px
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-dark);
+  line-height: var(--leading-normal);
+  margin: 0;
+  transition: color 0.25s ease;
+}
+
+.desc {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-nav); // 14px
+  font-weight: var(--font-weight-regular);
+  color: var(--color-color-text-body, var(--color-gray-dark));
+  line-height: var(--leading-body);
+  margin: 0;
+}
+
+// ── Load More wrap — mobile SecondaryButton ───────────────────────────────────
+
+.loadMoreWrap {
+  display: none;
+
+  @include mobile {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    padding-top: var(--space-2);
+  }
+}
+
+// ── Load more ─────────────────────────────────────────────────────────────────
+
+.loadMore {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3) var(--space-7);
+  margin-top: var(--space-4);
+}
+
+// small bracket corners around the Load More button
+.loadMoreBracketTL {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 14px;
+  height: 14px;
+  border-top: 1.5px solid var(--color-gray-dark);
+  border-left: 1.5px solid var(--color-gray-dark);
+  pointer-events: none;
+}
+
+.loadMoreBracketBR {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 14px;
+  height: 14px;
+  border-bottom: 1.5px solid var(--color-gray-dark);
+  border-right: 1.5px solid var(--color-gray-dark);
+  pointer-events: none;
+}
+
+.loadMoreBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-normal); // 20px
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  cursor: pointer;
+  letter-spacing: var(--tracking-btn);
+  transition: color 0.2s ease;
+
+  @include mobile {
+    font-size: var(--text-body-small);
+  }
+
+  &:hover {
+    color: var(--color-blue-primary);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+    border-radius: var(--radius-sm);
+  }
+}

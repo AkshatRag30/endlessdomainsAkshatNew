@@ -1,0 +1,7 @@
+export { FreenameHero } from './FreenameHero'
+export type { FreenameHeroProps } from './FreenameHero'
+export { FreenameBanner } from './FreenameBanner'
+export { FreenameAbout } from './FreenameAbout'
+export { FreenameTlds } from './FreenameTlds'
+export { FreenameCompare } from './FreenameCompare'
+export { FreenameFaq } from './FreenameFaq'

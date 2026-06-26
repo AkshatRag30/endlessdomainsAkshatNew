@@ -1,4 +1,5 @@
 import React, { useRef } from 'react'
+import Image from 'next/image'
 import { PrimaryButton } from '@/design-system/primitives/button/PrimaryButton'
 import { SecondaryButton } from '@/design-system/primitives/secondary-button/SecondaryButton'
 import { useEntranceAnimation } from '@/design-system/composites/about-us/useEntranceAnimation'
@@ -19,6 +20,15 @@ export function ParkedHero({ onParkNow, onSeeHowItWorks }: ParkedHeroProps) {
 
   return (
     <section className={styles.section} aria-labelledby="parked-hero-heading">
+      <Image
+        src="/parked-domains/hero.gif"
+        alt=""
+        className={styles.heroBg}
+        aria-hidden="true"
+        unoptimized
+        fill
+        priority
+      />
       <div className={styles.inner}>
         <div className={styles.gridZone}>
           <div className={styles.eyebrowWrap} ref={eyebrowRef}>

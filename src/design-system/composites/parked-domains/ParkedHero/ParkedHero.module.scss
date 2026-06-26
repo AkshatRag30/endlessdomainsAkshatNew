@@ -23,6 +23,24 @@
   }
 }
 
+// ── Hero GIF background — desktop/laptop only ─────────────────────────────────
+
+.heroBg {
+  display: none; // hidden on mobile by default
+
+  @include tablet-up {
+    display: block;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center bottom;
+    z-index: 0;
+    pointer-events: none;
+  }
+}
+
 // ── Inner content block ────────────────────────────────────────────────────────
 
 .inner {
@@ -144,7 +162,7 @@
 
 .heading {
   font-family: var(--font-satoshi);
-  font-size: var(--text-h1); // 65px
+  font-size: var(--text-h2); // 55px
   font-weight: var(--font-weight-medium);
   color: var(--color-black-primary);
   line-height: var(--leading-tight);
@@ -171,6 +189,7 @@
 .headingAccent {
   background: none;
   color: var(--color-blue-primary);
+  font-weight: var(--font-weight-regular);
   padding: 0;
 }
 
@@ -178,7 +197,7 @@
 
 .body {
   font-family: var(--font-satoshi);
-  font-size: var(--text-body); // 22px
+  font-size: var(--text-normal); // 20px
   font-weight: var(--font-weight-regular);
   color: var(--color-text-body); // #474747 neutral dark grey
   line-height: var(--leading-body);

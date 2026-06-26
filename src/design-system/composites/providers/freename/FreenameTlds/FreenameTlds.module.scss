@@ -1,0 +1,358 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Section ───────────────────────────────────────────────────────────────────
+
+.section {
+  background: var(--color-white-primary);
+  padding: var(--space-14) var(--container-padding-x);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-12);
+
+  @include tablet-down {
+    padding: var(--space-12) var(--space-6);
+    gap: var(--space-10);
+  }
+
+  @include mobile {
+    padding: var(--space-9) var(--space-4);
+    gap: var(--space-7);
+  }
+
+  @include small-mobile {
+    padding: var(--space-8) var(--space-3);
+    gap: var(--space-6);
+  }
+}
+
+// ── Header — left heading + right descriptor, side by side ───────────────────
+
+.header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-11);
+  width: 100%;
+
+  @include tablet-down {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-5);
+  }
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  flex-shrink: 0;
+}
+
+// ── Eyebrow reticle ───────────────────────────────────────────────────────────
+
+.eyebrowWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  padding: var(--space-2) var(--space-5);
+}
+
+.reticleTL {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  border-top: 1.5px solid var(--color-blue-primary);
+  border-left: 1.5px solid var(--color-blue-primary);
+  pointer-events: none;
+}
+
+.reticleTR {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  border-top: 1.5px solid var(--color-blue-primary);
+  border-right: 1.5px solid var(--color-blue-primary);
+  pointer-events: none;
+}
+
+.reticleBL {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  border-bottom: 1.5px solid var(--color-blue-primary);
+  border-left: 1.5px solid var(--color-blue-primary);
+  pointer-events: none;
+}
+
+.reticleBR {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  border-bottom: 1.5px solid var(--color-blue-primary);
+  border-right: 1.5px solid var(--color-blue-primary);
+  pointer-events: none;
+}
+
+.eyebrow {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-dark);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 0;
+  white-space: nowrap;
+}
+
+// ── Heading ───────────────────────────────────────────────────────────────────
+
+.heading {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2); // 55px
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-h1);
+  margin: 0;
+
+  @include tablet-down {
+    font-size: 38px;
+  }
+
+  @include mobile {
+    font-size: 30px;
+  }
+
+  @include small-mobile {
+    font-size: 26px;
+  }
+}
+
+.headingAccent {
+  background: none;
+  background: linear-gradient(117deg, var(--color-blue-primary) 70%, rgba(38, 57, 237, 0.28) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: var(--font-weight-regular);
+  font-style: normal;
+}
+
+// ── Header descriptor ─────────────────────────────────────────────────────────
+
+.headerDesc {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-body); // 22px
+  font-weight: var(--font-weight-regular);
+  color: #474747; // design-specific: Figma-exact dark gray
+  line-height: var(--leading-normal);
+  margin: 0;
+  max-width: 461px;
+  text-align: right;
+
+  @include tablet-down {
+    text-align: left;
+    max-width: 100%;
+    font-size: var(--text-normal);
+  }
+
+  @include mobile {
+    font-size: var(--text-body-small);
+  }
+}
+
+// ── Load More — mobile only ───────────────────────────────────────────────────
+
+.loadMoreWrap {
+  display: none;
+
+  @include mobile {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    padding-top: var(--space-2);
+  }
+}
+
+// ── Card grid — 3 columns desktop, 2 tablet, 1 mobile ────────────────────────
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-8);
+  width: 100%;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  @include tablet-down {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-6);
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+  }
+}
+
+// ── Card outer — chamfered shape + border via inset shadow ───────────────────
+// design-specific: top-left + bottom-right corners cut — matches Figma polygon shape
+// border is rendered as an inset box-shadow so it follows the clip-path edge exactly
+
+.cardOuter {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  clip-path: polygon(
+    20px 0%,
+    100% 0%,
+    100% calc(100% - 20px),
+    calc(100% - 20px) 100%,
+    0% 100%,
+    0% 20px
+  );
+  background: var(--color-white-primary);
+  box-shadow: inset 0 0 0 1px var(--color-gray-300);
+  transition: box-shadow 0.25s ease;
+
+  &:hover {
+    box-shadow: inset 0 0 0 1px rgba(38, 57, 237, 0.3);
+  }
+}
+
+// ── Card inner — 1px inset reveals cardOuter border ───────────────────────────
+
+.cardInner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  margin: 1px; // design-specific: reveals .cardOuter as 1px border
+  // design-specific: clip-path must match outer but inset by 1px on chamfer edges
+  clip-path: polygon(
+    19px 0%,
+    100% 0%,
+    100% calc(100% - 19px),
+    calc(100% - 19px) 100%,
+    0% 100%,
+    0% 19px
+  );
+  overflow: hidden;
+  background: var(--color-gray-light);
+  background-image: repeating-linear-gradient(
+    135deg,
+    transparent 0px,
+    transparent 4px,
+    rgba(0, 0, 0, 0.01) 4px,
+    rgba(0, 0, 0, 0.01) 6px
+  );
+  transition: background-color 0.25s ease;
+
+  .cardOuter:hover & {
+    background-color: rgba(38, 57, 237, 0.07);
+  }
+}
+
+// ── Content polygon — white area with content ─────────────────────────────────
+
+.contentPolygon {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  // design-specific: inner white block, also clip to match card shape (inset 8px)
+  clip-path: polygon(
+    12px 0%,
+    100% 0%,
+    100% calc(100% - 12px),
+    calc(100% - 12px) 100%,
+    0% 100%,
+    0% 12px
+  );
+  margin: var(--space-2);
+  background: var(--color-white-primary);
+}
+
+.contentInner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-4) var(--space-6);
+  flex: 1;
+
+  @include mobile {
+    padding: var(--space-3) var(--space-3) var(--space-5);
+    gap: var(--space-3);
+  }
+}
+
+// ── TLD name — large blue gradient bold ───────────────────────────────────────
+
+.tldName {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h3); // 30px
+  font-weight: var(--font-weight-bold);
+  line-height: var(--leading-snug);
+  margin: 0;
+  background: linear-gradient(154deg, var(--color-blue-primary) 70%, rgba(38, 57, 237, 0.28) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-transform: lowercase;
+
+  @include tablet-down {
+    font-size: var(--text-display-sm); // 28px
+  }
+
+  @include mobile {
+    font-size: var(--text-normal); // 20px
+  }
+}
+
+// ── Meta block — price, chain badge, description ──────────────────────────────
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  flex: 1;
+}
+
+.price {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-normal); // 20px
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  text-transform: uppercase;
+  line-height: var(--leading-snug);
+  margin: 0;
+}
+
+.chain {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-nav); // 14px
+  font-weight: var(--font-weight-regular);
+  color: var(--color-blue-primary);
+  line-height: var(--leading-normal);
+  margin: 0;
+}
+
+.desc {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-nav); // 14px
+  font-weight: var(--font-weight-regular);
+  color: #474747; // design-specific: Figma-exact dark gray
+  line-height: var(--leading-normal);
+  margin: 0;
+}
