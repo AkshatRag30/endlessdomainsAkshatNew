@@ -26,7 +26,7 @@
   }
 }
 
-// ── Header — centered ─────────────────────────────────────────────────────────
+// ── Header ────────────────────────────────────────────────────────────────────
 
 .header {
   display: flex;
@@ -172,12 +172,12 @@
   max-width: 1340px;
 }
 
-// ── Provider card grid — 3-col desktop, 2-col tablet, 1-col mobile ────────────
+// ── Grid ──────────────────────────────────────────────────────────────────────
 
 .grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0; // separators are borders — no gap needed
+  gap: 0;
   width: 100%;
   list-style: none;
   margin: 0;
@@ -207,19 +207,16 @@
     min-height: auto;
   }
 
-  // column dividers — right border on cols 1 and 2 (not col 3)
   &:nth-child(3n+1),
   &:nth-child(3n+2) {
     border-right: 1px solid var(--color-gray-300);
   }
 
-  // row divider — bottom border on all cards in the first row
   &:nth-child(-n+3) {
     border-bottom: 1px solid var(--color-gray-300);
   }
 
   @include tablet-down {
-    // 2-col layout: col divider on odd cards only, reset 3-col rules
     &:nth-child(3n+1),
     &:nth-child(3n+2) {
       border-right: none;
@@ -229,7 +226,6 @@
       border-right: 1px solid var(--color-gray-300);
     }
 
-    // row divider on all cards except the last 2 (last row)
     &:nth-child(-n+3) {
       border-bottom: none;
     }
@@ -240,7 +236,6 @@
   }
 
   @include mobile {
-    // 1-col layout: no column dividers, bottom border on all except last
     &:nth-child(3n+1),
     &:nth-child(3n+2),
     &:nth-child(2n+1) {
@@ -266,9 +261,7 @@
       color: var(--color-blue-primary);
     }
   }
-
 }
-
 
 // ── Card bracket corners ──────────────────────────────────────────────────────
 
@@ -296,7 +289,7 @@
   z-index: 1;
 }
 
-// ── Card inner layout ─────────────────────────────────────────────────────────
+// ── Card inner ────────────────────────────────────────────────────────────────
 
 .cardInner {
   display: flex;
@@ -311,17 +304,17 @@
   }
 }
 
-// ── Icon box — 56×56, blue gradient, rounded 18px ─────────────────────────────
+// ── Icon box ──────────────────────────────────────────────────────────────────
 
 .iconBox {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 56px; // design-specific: Figma-exact icon box size
+  width: 56px;
   height: 56px;
   flex-shrink: 0;
-  border-radius: 18px; // design-specific: Figma-exact radius scaled up from About's 12.6px
+  border-radius: 18px; // design-specific: Figma-exact radius
   background: linear-gradient(180deg, var(--color-blue-primary) 0%, rgba(38, 57, 237, 0.47) 100%);
   box-shadow:
     0px 13.5px 34.4px 0px rgba(87, 177, 255, 0.34),
@@ -342,7 +335,7 @@
 }
 
 .logo {
-  width: 36px; // design-specific: Figma-exact logo size inside icon box
+  width: 36px;
   height: 36px;
   object-fit: contain;
   // filter intentionally omitted — parent .iconBox applies grayscale/color toggle,
@@ -368,11 +361,11 @@
   transition: color 0.25s ease;
 
   @include tablet-down {
-    font-size: var(--text-display-sm); // 28px
+    font-size: var(--text-display-sm);
   }
 
   @include mobile {
-    font-size: var(--text-normal); // 20px
+    font-size: var(--text-normal);
   }
 }
 
@@ -385,7 +378,7 @@
 
 .tlds {
   font-family: var(--font-space-grotesk);
-  font-size: var(--text-nav); // 14px
+  font-size: var(--text-nav);
   font-weight: var(--font-weight-medium);
   color: var(--color-gray-dark);
   line-height: var(--leading-normal);
@@ -395,7 +388,7 @@
 
 .desc {
   font-family: var(--font-space-grotesk);
-  font-size: var(--text-nav); // 14px
+  font-size: var(--text-nav);
   font-weight: var(--font-weight-regular);
   color: var(--color-color-text-body, var(--color-gray-dark));
   line-height: var(--leading-body);
@@ -411,8 +404,7 @@
   padding-top: var(--space-2);
 }
 
-// ── Load more ─────────────────────────────────────────────────────────────────
-
+// desktop bracket button — shown on desktop, hidden on mobile
 .loadMore {
   position: relative;
   display: inline-flex;
@@ -420,9 +412,12 @@
   justify-content: center;
   padding: var(--space-3) var(--space-7);
   margin-top: var(--space-4);
+
+  @include mobile {
+    display: none;
+  }
 }
 
-// small bracket corners around the Load More button
 .loadMoreBracketTL {
   position: absolute;
   top: 0;
@@ -450,7 +445,7 @@
   border: none;
   padding: 0;
   font-family: var(--font-satoshi);
-  font-size: var(--text-normal); // 20px
+  font-size: var(--text-normal);
   font-weight: var(--font-weight-medium);
   color: var(--color-black-primary);
   cursor: pointer;

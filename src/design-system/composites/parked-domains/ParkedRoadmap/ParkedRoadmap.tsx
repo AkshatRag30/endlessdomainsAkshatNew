@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react'
+import { useEntranceAnimation } from '@/design-system/composites/about-us/useEntranceAnimation'
 import styles from './ParkedRoadmap.module.scss'
 
 const STEPS = [
@@ -33,6 +34,8 @@ export function ParkedRoadmap() {
 
   const headerLeftRef  = useRef<HTMLDivElement>(null)
   const headerRightRef = useRef<HTMLDivElement>(null)
+
+  useEntranceAnimation([headerLeftRef, headerRightRef])
 
   // mobile vertical axis SVG
   const mobileAxisRef      = useRef<SVGSVGElement | null>(null)
@@ -177,13 +180,11 @@ export function ParkedRoadmap() {
     // ScrollTrigger scrub + scrollerProxy caused progress inconsistencies on reverse.
     // Reading directly from Lenis scroll position gives exact 1:1 tracking both ways.
     import('gsap').then(({ gsap }) => {
-      const section     = sectionRef.current!
-      const trackWrap   = trackWrapRef.current!
-      const track       = trackRef.current!
-      const headerLeft  = headerLeftRef.current!
-      const headerRight = headerRightRef.current!
+      const section   = sectionRef.current!
+      const trackWrap = trackWrapRef.current!
+      const track     = trackRef.current!
 
-      const INTRO_DISTANCE = window.innerHeight * 0.6
+      const INTRO_DISTANCE = window.innerHeight * 0.15
 
       function scrollDist() {
         return Math.max(0, TRACK_PAD + 7 * STEP_SLOT - window.innerWidth)
@@ -259,11 +260,9 @@ export function ParkedRoadmap() {
         track.style.width        = `${STEP_SLOT * 7 + TRACK_PAD * 2}px`
         track.style.paddingLeft  = `${TRACK_PAD}px`
         track.style.paddingRight = `${TRACK_PAD}px`
-        section.style.height     = `${window.innerHeight + cTotal}px`
-        gsap.set(track,       { x: cVW })
-        gsap.set(trackWrap,   { opacity: 0 })
-        gsap.set(headerLeft,  { opacity: 0, y: 60 })
-        gsap.set(headerRight, { opacity: 0, y: 60 })
+        section.style.height = `${window.innerHeight + cTotal}px`
+        gsap.set(track,     { x: cVW })
+        gsap.set(trackWrap, { opacity: 0 })
         buildRuler()
         cacheSectionTop()
       }
@@ -276,24 +275,14 @@ export function ParkedRoadmap() {
         const vw  = cVW
         const sd  = cSD
 
-        // Header left — rises in over first 40% of scroll
-        const hlt    = Math.max(0, Math.min(1, p / 0.4))
-        const hlE    = 1 - Math.pow(1 - hlt, 3)
-        gsap.set(headerLeft,  { opacity: hlE, y: 60 * (1 - hlE) })
-
-        // Header right — same, offset by 5%
-        const hrt    = Math.max(0, Math.min(1, (p - 0.05) / 0.4))
-        const hrE    = 1 - Math.pow(1 - hrt, 3)
-        gsap.set(headerRight, { opacity: hrE, y: 60 * (1 - hrE) })
-
-        // Track slides in from right: p 0.1→0.5 (slideT 0→1)
-        const slideT = Math.max(0, Math.min(1, (p - 0.1) / 0.4))
+        // Track slides in from right: p 0→0.2 (completes quickly)
+        const slideT = Math.max(0, Math.min(1, p / 0.2))
         const slideE = 1 - Math.pow(1 - slideT, 3)
 
-        // Track scrolls left: p 0.5→1.0 (scrollT 0→1)
-        const scrollT = Math.max(0, Math.min(1, (p - 0.5) / 0.5))
+        // Track scrolls left: p 0.2→1.0 (scrollT 0→1)
+        const scrollT = Math.max(0, Math.min(1, (p - 0.2) / 0.8))
 
-        // Single x value — both motions summed, no phase boundary
+        // Single x value — slide in then pan left
         gsap.set(track,     { x: vw * (1 - slideE) - scrollT * sd })
         gsap.set(trackWrap, { opacity: slideE })
         updateRuler(scrollT)

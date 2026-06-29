@@ -1,0 +1,390 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Section shell ─────────────────────────────────────────────────────────────
+
+.section {
+  position: relative;
+  background: var(--color-white-primary);
+  padding: var(--space-9) var(--container-padding-x) var(--space-14);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 100px);
+
+  @include tablet-down {
+    padding: var(--space-7) var(--space-6) var(--space-12);
+    min-height: calc(100vh - 72px);
+  }
+
+  @include mobile {
+    padding: var(--space-14) var(--space-4) var(--space-14);
+    min-height: 100svh;
+  }
+}
+
+// ── Inner content block ────────────────────────────────────────────────────────
+
+.inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 1090px;
+  width: 100%;
+  gap: var(--space-6);
+
+  @include mobile {
+    gap: var(--space-5);
+  }
+}
+
+// ── Grid zone — eyebrow + heading ────────────────────────────────────────────
+
+.gridZone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  width: 100%;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -20px -60px; // design-specific: tight vertical, limited horizontal bleed
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      linear-gradient(var(--color-blue-primary-alpha-07) 1px, transparent 1px),
+      linear-gradient(90deg, var(--color-blue-primary-alpha-07) 1px, transparent 1px);
+    background-size: 40px 40px; // design-specific: 40px grid cell matching Figma
+    mask-image: radial-gradient(ellipse 45% 80% at 50% 50%, black 20%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 45% 80% at 50% 50%, black 20%, transparent 100%);
+  }
+}
+
+// ── Eyebrow reticle label ─────────────────────────────────────────────────────
+
+.eyebrowWrap {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-2) var(--space-5);
+  position: relative;
+  z-index: 1;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 10px;
+    height: 10px;
+    border-top: 1.5px solid var(--color-blue-primary);
+    border-left: 1.5px solid var(--color-blue-primary);
+    pointer-events: none;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
+    border-bottom: 1.5px solid var(--color-blue-primary);
+    border-right: 1.5px solid var(--color-blue-primary);
+    pointer-events: none;
+  }
+}
+
+.reticleCorner {
+  display: block;
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  position: absolute;
+
+  &:first-child {
+    top: 0;
+    right: 0;
+    border-top: 1.5px solid var(--color-blue-primary);
+    border-right: 1.5px solid var(--color-blue-primary);
+  }
+
+  &.reticleCornerRight {
+    bottom: 0;
+    left: 0;
+    border-bottom: 1.5px solid var(--color-blue-primary);
+    border-left: 1.5px solid var(--color-blue-primary);
+  }
+}
+
+.eyebrow {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+  letter-spacing: 0.1em; // design-specific: Figma-exact uppercase tracking
+  text-transform: uppercase;
+  margin: 0;
+  white-space: nowrap;
+}
+
+// ── Heading ───────────────────────────────────────────────────────────────────
+
+.heading {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2); // 55px
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-h1);
+  margin: 0;
+  position: relative;
+  z-index: 1;
+
+  @include tablet-down {
+    font-size: 42px; // design-specific: comfortable intermediate for tablet
+  }
+
+  @include mobile {
+    font-size: 32px;
+  }
+
+  @include small-mobile {
+    font-size: 26px;
+  }
+}
+
+.headingAccent {
+  background: none;
+  // design-specific: Figma-exact blue gradient — solid to 28% alpha fade
+  background: linear-gradient(146deg, var(--color-blue-primary) 76%, var(--color-blue-primary-faded) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: var(--font-weight-regular);
+  padding: 0;
+}
+
+// ── Body copy ─────────────────────────────────────────────────────────────────
+
+.body {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-normal); // 20px
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-body);
+  line-height: var(--leading-body);
+  margin: 0;
+  text-align: center;
+
+  @include mobile {
+    font-size: var(--text-body-small); // 17px
+    br { display: none; }
+  }
+}
+
+// ── Stats frame ───────────────────────────────────────────────────────────────
+
+.statsFrame {
+  position: relative;
+  width: 100%;
+}
+
+// ── Corner decorative SVGs ────────────────────────────────────────────────────
+// design-specific: topright.svg + bottomright.svg shared from freename provider
+
+.cornerImg {
+  position: absolute;
+  pointer-events: none;
+  width: 53px;
+  height: 91px;
+
+  @include tablet-down {
+    display: none;
+  }
+
+  @include mobile {
+    display: block;
+    width: 36px; // design-specific: scaled down to fit narrow mobile viewport
+    height: 62px;
+  }
+}
+
+.topRight {
+  top: 18%;
+  right: 22%;
+
+  @include mobile {
+    top: 18%;
+    right: 0;
+  }
+}
+
+.topLeft {
+  top: 18%;
+  left: 22%;
+  transform: scaleX(-1);
+
+  @include mobile {
+    top: 18%;
+    left: 0;
+    transform: scaleX(-1);
+  }
+}
+
+.bottomRight {
+  bottom: 10%;
+  right: 22%;
+
+  @include mobile {
+    bottom: 14%;
+    top: auto;
+    right: 0;
+  }
+}
+
+.bottomLeft {
+  bottom: 10%;
+  left: 22%;
+  transform: scaleX(-1);
+
+  @include mobile {
+    bottom: 14%;
+    top: auto;
+    left: 0;
+    transform: scaleX(-1);
+  }
+}
+
+// ── Stats strip ───────────────────────────────────────────────────────────────
+
+.statsRow {
+  display: flex;
+  align-items: stretch;
+  width: fit-content;
+  margin: 0 auto;
+
+  @include mobile {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+    max-width: 360px;
+  }
+}
+
+// ── Each item slot ────────────────────────────────────────────────────────────
+
+.statItem {
+  flex: 0 0 214px; // design-specific: Figma-exact 214px stat card width
+  display: flex;
+  align-items: stretch;
+
+  @include tablet-down {
+    flex: 0 0 160px;
+  }
+
+  @include mobile {
+    flex: none;
+    &:last-child {
+      grid-column: 1 / -1;
+    }
+  }
+}
+
+// ── Stat card — gray CSS bracket corners ──────────────────────────────────────
+
+.statCard {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5) var(--space-3);
+  position: relative;
+
+  background-image:
+    linear-gradient(var(--color-gray-300), var(--color-gray-300)),
+    linear-gradient(var(--color-gray-300), var(--color-gray-300)),
+    linear-gradient(var(--color-gray-300), var(--color-gray-300)),
+    linear-gradient(var(--color-gray-300), var(--color-gray-300)),
+    linear-gradient(var(--color-gray-300), var(--color-gray-300)),
+    linear-gradient(var(--color-gray-300), var(--color-gray-300)),
+    linear-gradient(var(--color-gray-300), var(--color-gray-300)),
+    linear-gradient(var(--color-gray-300), var(--color-gray-300));
+  background-position:
+    6px 6px,
+    6px 6px,
+    calc(100% - 6px) 6px,
+    calc(100% - 6px) 6px,
+    6px calc(100% - 6px),
+    6px calc(100% - 6px),
+    calc(100% - 6px) calc(100% - 6px),
+    calc(100% - 6px) calc(100% - 6px);
+  background-size:
+    2px 12px,
+    12px 2px,
+    2px 12px,
+    12px 2px,
+    2px 12px,
+    12px 2px,
+    2px 12px,
+    12px 2px;
+  background-repeat: no-repeat;
+
+  @include mobile {
+    padding: var(--space-6) var(--space-3);
+  }
+}
+
+// ── Stat content ──────────────────────────────────────────────────────────────
+
+.statContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  text-align: center;
+}
+
+// ── Stat value ────────────────────────────────────────────────────────────────
+
+.statValue {
+  font-family: var(--font-satoshi);
+  font-size: 40px; // design-specific: Figma-exact 40px stat number
+  font-weight: var(--font-weight-bold);
+  line-height: var(--leading-tight);
+  margin: 0;
+  white-space: nowrap;
+  background: linear-gradient(144deg, var(--color-blue-primary) 70%, var(--color-blue-primary-faded) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0px 0.8px 1px var(--color-black-alpha-25));
+
+  @include tablet-down {
+    font-size: 32px;
+  }
+
+  @include mobile {
+    font-size: 26px;
+  }
+}
+
+// ── Stat label ────────────────────────────────────────────────────────────────
+
+.statLabel {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-alpha-55);
+  line-height: var(--leading-normal);
+  letter-spacing: -0.016em; // design-specific: Figma-exact -0.207px at 13px ≈ -0.016em
+  text-transform: capitalize;
+  text-align: center;
+  margin: 0;
+  max-width: 140px;
+}

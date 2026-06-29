@@ -5,6 +5,7 @@ import { AboutSection } from '@/design-system/composites/about-us/AboutSection'
 import { MissionSection } from '@/design-system/composites/about-us/MissionSection'
 import { StorySection } from '@/design-system/composites/about-us/StorySection'
 import { TeamSection } from '@/design-system/composites/about-us/TeamSection'
+import { ExecutionSection } from '@/design-system/composites/about-us/ExecutionSection'
 import { EcosystemExpansion } from '@/design-system/composites/about-us/EcosystemExpansion'
 import { SiteFooter } from '@/components/userprofile/SiteFooter'
 import { useScrollParallax } from '@/design-system/composites/about-us/useScrollParallax'
@@ -28,6 +29,7 @@ export default function AboutUsPage() {
           <MissionSection />
           <StorySection />
           <TeamSection />
+          <ExecutionSection />
           <EcosystemExpansion />
           <SiteFooter />
         </div>

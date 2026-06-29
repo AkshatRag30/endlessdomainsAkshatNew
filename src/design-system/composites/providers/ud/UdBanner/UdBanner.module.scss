@@ -1,0 +1,209 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Outer section ─────────────────────────────────────────────────────────────
+
+.section {
+  position: relative;
+  background: var(--color-white-primary);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0;
+}
+
+// ── Horizontal rule lines ─────────────────────────────────────────────────────
+
+.lineBottom {
+  width: 100%;
+  height: 1px;
+  // design-specific: Figma-exact fade-in/out rule
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--color-blue-primary) 30%,
+    var(--color-blue-primary) 70%,
+    transparent 100%
+  );
+  opacity: 0.18;
+}
+
+// ── Banner wrapper ─────────────────────────────────────────────────────────────
+
+.bannerWrap {
+  position: relative;
+  width: 100%;
+  height: 125px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+
+  @include wide {
+    height: 140px;
+  }
+
+  @include tablet-down {
+    height: 110px;
+  }
+
+  @include mobile {
+    height: 80px;
+  }
+}
+
+// ── Union SVG ──────────────────────────────────────────────────────────────────
+
+.unionBg {
+  object-fit: fill;
+  object-position: center;
+
+  @include mobile {
+    object-fit: cover;
+    transform: scaleX(1.18); // design-specific: crops side tips while keeping center shape visible
+    transform-origin: center center;
+  }
+}
+
+// ── Stats list ────────────────────────────────────────────────────────────────
+
+.statsList {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  list-style: none;
+  margin: 0;
+  padding: 0 var(--container-padding-x);
+  gap: 0;
+  width: 100%;
+  max-width: var(--container-max-width);
+
+  @include tablet-down {
+    padding: 0 var(--space-6);
+  }
+
+  @include mobile {
+    display: flex;
+    flex-wrap: nowrap;
+    padding: 0 var(--space-3);
+    gap: 0;
+    max-width: 100%;
+    justify-content: center;
+  }
+}
+
+// ── Individual stat item ──────────────────────────────────────────────────────
+
+.statItem {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+
+  @include mobile {
+    flex: 1 1 0;
+    justify-content: center;
+  }
+}
+
+// ── Vertical divider ──────────────────────────────────────────────────────────
+
+.divider {
+  display: block;
+  width: 1px;
+  height: 32px;
+  background: var(--color-white-primary);
+  opacity: 0.25;
+  flex-shrink: 0;
+  margin: 0 var(--space-7);
+
+  @include wide {
+    margin: 0 var(--space-9);
+    height: 36px;
+  }
+
+  @include tablet-down {
+    margin: 0 var(--space-4);
+    height: 28px;
+  }
+
+  @include mobile {
+    display: block;
+    height: 20px;
+    margin: 0 var(--space-2);
+  }
+}
+
+// ── Stat content block ────────────────────────────────────────────────────────
+
+.statContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  text-align: center;
+  width: 100%;
+}
+
+// ── Stat label ────────────────────────────────────────────────────────────────
+
+.statLabel {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-white-primary);
+  opacity: 0.9;
+  line-height: var(--leading-tight);
+  margin: 0;
+  white-space: nowrap;
+
+  @include wide {
+    font-size: var(--text-small-15);
+  }
+
+  @include tablet-down {
+    font-size: var(--text-small-13);
+    white-space: normal;
+    text-align: center;
+    max-width: 100px;
+  }
+
+  @include mobile {
+    font-size: var(--text-small-10);
+    max-width: none;
+    text-align: center;
+    white-space: nowrap;
+  }
+}
+
+// ── Stat value ────────────────────────────────────────────────────────────────
+
+.statValue {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-white-primary);
+  opacity: 0.75;
+  line-height: var(--leading-tight);
+  margin: 0;
+  white-space: nowrap;
+
+  @include wide {
+    font-size: var(--text-nav);
+  }
+
+  @include tablet-down {
+    font-size: var(--text-small-12);
+    white-space: normal;
+    text-align: center;
+    max-width: 100px;
+  }
+
+  @include mobile {
+    font-size: var(--text-small-9);
+    max-width: none;
+    text-align: center;
+    white-space: nowrap;
+  }
+}

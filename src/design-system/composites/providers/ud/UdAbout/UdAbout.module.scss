@@ -1,0 +1,296 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Section ───────────────────────────────────────────────────────────────────
+
+.section {
+  background: var(--color-white-primary);
+  padding: var(--space-14) var(--container-padding-x);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-12);
+
+  @include tablet-down {
+    padding: var(--space-12) var(--space-6);
+    gap: var(--space-10);
+  }
+
+  @include mobile {
+    padding: var(--space-10) var(--space-4);
+    gap: var(--space-8);
+  }
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  text-align: center;
+}
+
+// ── Eyebrow reticle ───────────────────────────────────────────────────────────
+
+.eyebrowWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-5);
+}
+
+.reticleTL {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  border-top: 1.5px solid var(--color-blue-primary);
+  border-left: 1.5px solid var(--color-blue-primary);
+  pointer-events: none;
+}
+
+.reticleTR {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  border-top: 1.5px solid var(--color-blue-primary);
+  border-right: 1.5px solid var(--color-blue-primary);
+  pointer-events: none;
+}
+
+.reticleBL {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  border-bottom: 1.5px solid var(--color-blue-primary);
+  border-left: 1.5px solid var(--color-blue-primary);
+  pointer-events: none;
+}
+
+.reticleBR {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  border-bottom: 1.5px solid var(--color-blue-primary);
+  border-right: 1.5px solid var(--color-blue-primary);
+  pointer-events: none;
+}
+
+.eyebrow {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-dark);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 0;
+  white-space: nowrap;
+}
+
+// ── Heading ───────────────────────────────────────────────────────────────────
+
+.heading {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2); // 55px
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-h1);
+  margin: 0;
+  text-align: center;
+
+  @include tablet-down {
+    font-size: 38px;
+  }
+
+  @include mobile {
+    font-size: 32px;
+  }
+
+  @include small-mobile {
+    font-size: 26px;
+  }
+}
+
+.headingAccent {
+  background: none;
+  background: linear-gradient(119deg, var(--color-blue-primary) 70%, rgba(38, 57, 237, 0.28) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: var(--font-weight-regular);
+  font-style: normal;
+}
+
+// ── Body row: features + card ─────────────────────────────────────────────────
+
+.body {
+  display: flex;
+  align-items: center;
+  gap: var(--space-11); // design-specific: ~118px gap from Figma
+  width: 100%;
+  max-width: 1280px;
+
+  @include tablet-down {
+    flex-direction: column;
+    gap: var(--space-10);
+    align-items: stretch;
+  }
+}
+
+// ── Feature list ──────────────────────────────────────────────────────────────
+
+.featureList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-7);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1 1 0;
+  min-width: 0;
+
+  @include tablet-down {
+    flex: none;
+    gap: var(--space-6);
+  }
+
+  @include mobile {
+    gap: var(--space-5);
+  }
+}
+
+.featureItem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+// ── Icon box ──────────────────────────────────────────────────────────────────
+
+.iconBox {
+  position: relative;
+  width: 39px;
+  height: 39px;
+  flex-shrink: 0;
+  border-radius: 12.6px; // design-specific: Figma-exact radius
+  background: linear-gradient(180deg, var(--color-blue-primary) 0%, rgba(38, 57, 237, 0.47) 100%);
+  box-shadow:
+    0px 13.5px 34.4px 0px rgba(87, 177, 255, 0.34),
+    0px 7.96px 10.38px 0px rgba(87, 177, 255, 0.19),
+    0px 3.3px 4.31px 0px rgba(87, 177, 255, 0.22),
+    0px 1.2px 1.56px 0px rgba(87, 177, 255, 0.15),
+    0px 0px 0px 1.3px #e0e9f2,
+    0px 0px 0px 1.6px var(--color-white-primary),
+    inset 0px 0.32px 5.79px 0.64px #d2eaff,
+    inset 0px 0.32px 1.29px 0.64px #d2eaff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.iconBgTexture {
+  object-fit: cover;
+  mix-blend-mode: plus-lighter;
+  opacity: 0.4;
+}
+
+.iconImg {
+  position: relative;
+  z-index: 1;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+// ── Feature text ──────────────────────────────────────────────────────────────
+
+.featureText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.featureTitle {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h3); // 30px
+  font-weight: var(--font-weight-medium);
+  line-height: var(--leading-snug);
+  margin: 0;
+  background: linear-gradient(148deg, var(--color-blue-primary) 70%, rgba(38, 57, 237, 0.28) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  @include tablet-down {
+    font-size: var(--text-display-sm); // 28px
+  }
+
+  @include mobile {
+    font-size: var(--text-normal); // 20px
+  }
+
+  @include small-mobile {
+    font-size: var(--text-body-small); // 17px
+  }
+}
+
+.featureBody {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-nav); // 14px
+  font-weight: var(--font-weight-regular);
+  color: #474747; // design-specific: Figma-exact dark-gray body text
+  line-height: var(--leading-normal);
+  margin: 0;
+  padding-left: var(--space-2);
+}
+
+// ── Card ──────────────────────────────────────────────────────────────────────
+
+.card {
+  position: relative;
+  flex: 0 0 643px;
+  height: 335px;
+  overflow: hidden;
+  // design-specific: top-left and bottom-right corners are cut (chamfered) — Figma-exact ~30px notch
+  clip-path: polygon(
+    30px 0%,
+    100% 0%,
+    100% calc(100% - 30px),
+    calc(100% - 30px) 100%,
+    0% 100%,
+    0% 30px
+  );
+
+  @include tablet-down {
+    flex: none;
+    width: 100%;
+    height: 280px;
+  }
+
+  @include mobile {
+    height: 220px;
+    clip-path: polygon(
+      20px 0%,
+      100% 0%,
+      100% calc(100% - 20px),
+      calc(100% - 20px) 100%,
+      0% 100%,
+      0% 20px
+    );
+  }
+}
+
+.cardImg {
+  object-fit: cover;
+  object-position: center;
+}

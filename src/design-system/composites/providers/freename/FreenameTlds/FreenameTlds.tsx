@@ -52,9 +52,13 @@ export function FreenameTlds() {
           </h2>
         </div>
 
-        <p className={styles.headerDesc}>
-          8 TLDs available across Web3 culture, ownership, rewards, and digital assets.
-        </p>
+        <div className={styles.headerDescWrap}>
+          <span className={styles.descReticleTL} aria-hidden="true" />
+          <p className={styles.headerDesc}>
+            8 TLDs available across Web3 culture, ownership, rewards, and digital assets.
+          </p>
+          <span className={styles.descReticleBR} aria-hidden="true" />
+        </div>
       </div>
 
       {/* ── Card grid ──────────────────────────────────────────────────────── */}
