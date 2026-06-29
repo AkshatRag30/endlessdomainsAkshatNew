@@ -725,6 +725,16 @@
     clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
   }
 
+  // Vicky's portrait — lower % reveals more of the top so head isn't cut in 154px banner
+  .founderPhoto {
+    object-position: center 40%;
+  }
+
+  // Ankit's portrait in a landscape crop — 40% keeps face above center in the banner
+  .founderPhotoTop {
+    object-position: center 40%;
+  }
+
   .founderBio {
     font-size: 12px;
   }

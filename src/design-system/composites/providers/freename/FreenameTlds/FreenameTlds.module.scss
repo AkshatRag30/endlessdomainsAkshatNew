@@ -204,6 +204,82 @@
   }
 }
 
+// ── Pagination — desktop only ─────────────────────────────────────────────────
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  justify-content: center;
+  width: 100%;
+  padding-top: var(--space-4);
+
+  @include mobile {
+    display: none;
+  }
+}
+
+.paginationBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: none;
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--radius-sm);
+  color: var(--color-black-primary);
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+
+  &:hover:not(:disabled) {
+    border-color: var(--color-blue-primary);
+    color: var(--color-blue-primary);
+    background: rgba(38, 57, 237, 0.05);
+  }
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.paginationDots {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--color-gray-300);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    background: var(--color-blue-primary);
+    transform: scale(1.2);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+    border-radius: var(--radius-full);
+  }
+}
+
+.dotActive {
+  background: var(--color-blue-primary);
+  transform: scale(1.25);
+}
+
 // ── Load More — mobile only ───────────────────────────────────────────────────
 
 .loadMoreWrap {

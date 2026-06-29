@@ -81,14 +81,12 @@ export function ParkedWhy() {
       {/* ── Cards ── */}
       <div className={styles.cardsRow}>
         {CARDS.map((card, i) => (
-          <div key={card.id} className={styles.cardOuter} ref={cardRefs[i]}>
-            <div className={styles.cardWrap}>
-              <article className={styles.card}>
-                <div className={styles.badge}>{card.badge}</div>
-                <h3 className={styles.cardTitle}>{card.title}</h3>
-                <p className={styles.cardDesc}>{card.desc}</p>
-              </article>
-            </div>
+          <div key={card.id} className={styles.cardWrap} ref={cardRefs[i]}>
+            <article className={styles.card}>
+              <div className={styles.badge}>{card.badge}</div>
+              <h3 className={styles.cardTitle}>{card.title}</h3>
+              <p className={styles.cardDesc}>{card.desc}</p>
+            </article>
           </div>
         ))}
       </div>

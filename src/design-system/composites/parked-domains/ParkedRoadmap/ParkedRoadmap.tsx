@@ -365,7 +365,7 @@ export function ParkedRoadmap() {
                 <div className={styles.mobileStepContent}>
                   <h3 className={styles.stepTitle}>
                     {step.title}
-                    {step.note && <span className={styles.stepNote}> {step.note}</span>}
+                    {step.note && <span className={styles.stepNote}>{step.note}</span>}
                   </h3>
                   <p className={styles.stepDesc}>{step.desc}</p>
                 </div>

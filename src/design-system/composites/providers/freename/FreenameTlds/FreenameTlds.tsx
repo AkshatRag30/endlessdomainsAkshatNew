@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { PrimaryButton } from '@/design-system/primitives/button/PrimaryButton'
 import { SecondaryButton } from '@/design-system/primitives/secondary-button/SecondaryButton'
-import { FiArrowRight, FiChevronDown } from 'react-icons/fi'
+import { FiArrowRight, FiChevronDown, FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 import styles from './FreenameTlds.module.scss'
 
 const TLDS = [
@@ -15,9 +15,11 @@ const TLDS = [
   { tld: '.rwa',       price: '$2', chain: 'Multi-chain', desc: 'Built for the future of real-world assets on-chain.' },
 ]
 
+const PAGE_SIZE = 6
 const MOBILE_INITIAL = 4
 
 export function FreenameTlds() {
+  const [page, setPage] = useState(0)
   const [isMobile, setIsMobile] = useState(false)
   const [expanded, setExpanded] = useState(false)
 
@@ -29,8 +31,17 @@ export function FreenameTlds() {
     return () => mq.removeEventListener('change', handler)
   }, [])
 
-  const visibleTlds = isMobile && !expanded ? TLDS.slice(0, MOBILE_INITIAL) : TLDS
+  const totalPages = Math.ceil(TLDS.length / PAGE_SIZE)
+
+  const visibleTlds = isMobile && !expanded
+    ? TLDS.slice(0, MOBILE_INITIAL)
+    : TLDS.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE)
+
+  const showPagination = !isMobile && totalPages > 1
   const showLoadMore = isMobile && !expanded
+
+  const prev = useCallback(() => setPage(p => Math.max(0, p - 1)), [])
+  const next = useCallback(() => setPage(p => Math.min(totalPages - 1, p + 1)), [totalPages])
 
   return (
     <section className={styles.section} aria-labelledby="freename-tlds-heading">
@@ -88,6 +99,41 @@ export function FreenameTlds() {
           </li>
         ))}
       </ul>
+
+      {/* ── Pagination — desktop only ───────────────────────────────────────── */}
+      {showPagination && (
+        <nav className={styles.pagination} aria-label="TLD catalog pages">
+          <button
+            className={styles.paginationBtn}
+            onClick={prev}
+            disabled={page === 0}
+            aria-label="Previous page"
+          >
+            <FiChevronLeft size={18} aria-hidden="true" />
+          </button>
+
+          <div className={styles.paginationDots}>
+            {Array.from({ length: totalPages }, (_, i) => (
+              <button
+                key={i}
+                className={`${styles.dot} ${page === i ? styles.dotActive : ''}`}
+                onClick={() => setPage(i)}
+                aria-label={`Page ${i + 1}`}
+                aria-current={page === i ? 'page' : undefined}
+              />
+            ))}
+          </div>
+
+          <button
+            className={styles.paginationBtn}
+            onClick={next}
+            disabled={page === totalPages - 1}
+            aria-label="Next page"
+          >
+            <FiChevronRight size={18} aria-hidden="true" />
+          </button>
+        </nav>
+      )}
 
       {/* ── Load More — mobile only ─────────────────────────────────────────── */}
       {showLoadMore && (

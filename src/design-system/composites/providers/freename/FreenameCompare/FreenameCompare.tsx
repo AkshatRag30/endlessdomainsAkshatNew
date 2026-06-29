@@ -2,17 +2,25 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { PrimaryButton } from '@/design-system/primitives/button/PrimaryButton'
 import { SecondaryButton } from '@/design-system/primitives/secondary-button/SecondaryButton'
-import { FiArrowRight, FiChevronDown } from 'react-icons/fi'
+import { FiArrowRight, FiChevronDown, FiChevronUp } from 'react-icons/fi'
 import { DOMAIN_PROVIDERS } from '@/helpers/chaincurrency/chaincurrency'
 import styles from './FreenameCompare.module.scss'
 
-const PROVIDERS = [
-  { key: 'UD',                 name: 'Unstoppable Domains', tlds: '55 TLDs',      desc: 'The largest on-chain identity provider with millions of registered identities.' },
-  { key: 'ENS',                name: 'ENS',                 tlds: '1 TLD (.eth)', desc: 'The original Ethereum identity protocol powering millions of .eth names.' },
+const PROVIDERS_INITIAL = [
   { key: 'Freename',           name: 'Freename',            tlds: '8 TLDs',       desc: 'Custom Web3 namespaces with user-owned TLD infrastructure.' },
+  { key: 'ENS',                name: 'ENS',                 tlds: '1 TLD (.eth)', desc: 'The original Ethereum identity protocol powering millions of .eth names.' },
+  { key: 'UD',                 name: 'Unstoppable Domains', tlds: '55 TLDs',      desc: 'The largest on-chain identity provider with millions of registered identities.' },
   { key: 'Bonfida',            name: 'Bonfida',             tlds: '1 TLD (.sol)', desc: 'The leading identity layer for the Solana ecosystem.' },
   { key: 'Arbitrum',           name: 'Arbitrum Names',      tlds: '1 TLD (.arb)', desc: 'Native identity for users and builders across the Arbitrum ecosystem.' },
   { key: 'BinanceSmartChain',  name: 'BNB Chain Names',     tlds: '1 TLD (.bnb)', desc: 'A human-readable identity layer for the BNB Chain ecosystem.' },
+]
+
+const PROVIDERS_EXTRA = [
+  { key: 'Tezos',    name: 'Tezos Domains', tlds: '1 TLD (.tez)',   desc: 'Decentralized identity and wallet resolution for Tezos users.' },
+  { key: 'Aptos',    name: 'Aptos Names',   tlds: '1 TLD (.apt)',   desc: 'Identity infrastructure built for the Aptos ecosystem.' },
+  { key: 'Ton',      name: 'TON DNS',       tlds: '1 TLD (.ton)',   desc: 'Telegram-native identities secured by the TON blockchain.' },
+  { key: 'Starknet', name: 'Starknet ID',   tlds: '1 TLD (.stark)', desc: "Identity infrastructure for Starknet's growing ecosystem." },
+  { key: 'Box',      name: 'Box Domains',   tlds: '1 TLD (.box)',   desc: 'A simple and memorable identity namespace for Web3 users.' },
 ]
 
 const MOBILE_INITIAL = 3
@@ -29,8 +37,9 @@ export function FreenameCompare() {
     return () => mq.removeEventListener('change', handler)
   }, [])
 
-  const visibleProviders = isMobile && !expanded ? PROVIDERS.slice(0, MOBILE_INITIAL) : PROVIDERS
-  const showLoadMore = isMobile && !expanded
+  const allProviders = expanded ? [...PROVIDERS_INITIAL, ...PROVIDERS_EXTRA] : PROVIDERS_INITIAL
+  const visibleProviders = isMobile && !expanded ? PROVIDERS_INITIAL.slice(0, MOBILE_INITIAL) : allProviders
+  const showLoadMore = !expanded
 
   return (
     <section className={styles.section} aria-labelledby="freename-compare-heading">
@@ -99,9 +108,9 @@ export function FreenameCompare() {
         </ul>
       </div>
 
-      {/* ── Load More ──────────────────────────────────────────────────────── */}
-      {showLoadMore && (
-        <div className={styles.loadMoreWrap}>
+      {/* ── Load More / Show Less ──────────────────────────────────────────── */}
+      <div className={styles.loadMoreWrap}>
+        {showLoadMore ? (
           <SecondaryButton
             icon={<FiChevronDown />}
             iconPosition="right"
@@ -109,8 +118,16 @@ export function FreenameCompare() {
           >
             Load More
           </SecondaryButton>
-        </div>
-      )}
+        ) : (
+          <SecondaryButton
+            icon={<FiChevronUp />}
+            iconPosition="right"
+            onClick={() => setExpanded(false)}
+          >
+            Show Less
+          </SecondaryButton>
+        )}
+      </div>
 
     </section>
   )

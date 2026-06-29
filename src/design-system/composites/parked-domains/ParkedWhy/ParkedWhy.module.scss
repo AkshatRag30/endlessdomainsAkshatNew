@@ -207,41 +207,45 @@
   }
 }
 
-// ── Card outer — hover filter ─────────────────────────────────────────────────
-
-.cardOuter {
-  flex: 1;
-  min-width: 0;
-  transition: filter 0.25s ease;
-  background: var(--color-white-primary);
-
-  &:hover {
-    filter: drop-shadow(0 8px 32px var(--color-blue-primary-alpha-18));
-  }
-}
-
-// ── Card wrap — corner-notch clip + border trick ──────────────────────────────
-// design-specific: corner-notch clip matching Figma card shape
+// ── Card outer — clip-path border layer + hover ───────────────────────────────
+// design-specific: 32px corner-notch clip matching Figma card shape.
+// background acts as the 1px border color; padding: 1px exposes it on straight
+// edges. The inner .card uses the same clip on its inset box, which reveals a
+// ~1.4px diagonal border strip at the cut corners.
 
 $card-clip: polygon(32px 0, 100% 0, 100% calc(100% - 32px), calc(100% - 32px) 100%, 0 100%, 0 32px);
 
 .cardWrap {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
   clip-path: $card-clip;
-  padding: 3px;
-  background: var(--color-gray-200);
-  display: block;
-  transition: background 0.3s ease;
+  padding: 4px;
+  background: var(--color-gray-200); // border color
+  transition: background 0.25s ease, filter 0.25s ease;
 
   &:hover {
     background: var(--color-blue-primary-alpha-50);
+    filter: drop-shadow(0 8px 32px var(--color-blue-primary-alpha-18));
   }
 }
 
-// ── Card inner — always white, never changes colour ───────────────────────────
+// ── Card inner — white fill + hatched texture ─────────────────────────────────
 
 .card {
+  flex: 1; // fills full height of cardWrap — makes all cards equal height
   width: 100%;
-  background: var(--color-white-primary);
+  // same clip applied to the 4px-inset box — diagonal border strip becomes visible
+  clip-path: $card-clip;
+  background-color: var(--color-white-primary);
+  background-image: repeating-linear-gradient(
+    135deg,
+    transparent 0px,
+    transparent 4px,
+    var(--color-black-alpha-01) 4px,
+    var(--color-black-alpha-01) 6px
+  );
   padding: var(--space-7) var(--space-6);
   display: flex;
   flex-direction: column;
@@ -319,7 +323,8 @@ $card-clip: polygon(32px 0, 100% 0, 100% calc(100% - 32px), calc(100% - 32px) 10
 // ── Mobile clip ───────────────────────────────────────────────────────────────
 
 @include mobile {
-  .cardWrap {
+  .cardWrap,
+  .card {
     clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);
   }
 }
