@@ -6,28 +6,24 @@ import styles from './FreenameFaq.module.scss'
 
 const FAQS = [
   {
-    q: 'What is Freename and how does it differ from traditional domain registrars?',
-    a: 'Freename is a Web3 domain provider that lets you register and own TLDs (top-level domains) on the blockchain. Unlike traditional registrars where ICANN controls the namespace, Freename domains are permanently owned on-chain — no renewal fees, no central authority, and no possibility of having your domain taken away.',
+    q: 'How many TLDs does Freename offer?',
+    a: 'Freename offers 8 TLDs through Endless Domains, including .metaverse, .hodl, .satoshi, .genesis, .token, .sat, .airdrop, and .rwa.',
   },
   {
-    q: 'Which blockchains does Freename support?',
-    a: 'Freename operates across multiple chains including Ethereum, Polygon, BNB Chain, and others. Your domain is minted as an NFT on your chosen chain, meaning it lives in your wallet and can be transferred, sold, or used as collateral like any other NFT asset.',
+    q: 'Do Freename identities expire?',
+    a: 'No. Freename identities are purchased once and owned permanently. There are no annual renewal fees.',
   },
   {
-    q: 'What TLDs are available through Freename on Endless Domains?',
-    a: 'Through Endless Domains you can register across 8 Freename TLDs: .metaverse, .hodl, .satoshi, .genesis, .token, .sat, .airdrop, and .rwa. Each TLD targets a specific Web3 community and use case, from DeFi to NFT culture to real-world asset tokenisation.',
+    q: 'What makes Freename different?',
+    a: 'Unlike traditional naming providers, Freename enables the creation and ownership of entire TLD namespaces, opening new opportunities for communities and brands.',
   },
   {
-    q: 'Do I pay annual renewal fees for a Freename domain?',
-    a: 'No. Freename domains are a one-time purchase with permanent on-chain ownership. Once you mint the domain it belongs to you indefinitely with no recurring fees. This is one of the key advantages over legacy DNS registrars where annual renewal is mandatory.',
+    q: 'Why register Freename through Endless Domains?',
+    a: 'Endless lets you search, compare, and manage identities from multiple providers through a single unified platform.',
   },
   {
-    q: 'Can I use a Freename domain as a Web3 wallet address?',
-    a: 'Yes. Freename domains can be mapped to any wallet address across supported chains, turning a human-readable name like yourname.metaverse into a payment destination. You can share your domain instead of a long hexadecimal address for easier crypto transfers.',
-  },
-  {
-    q: 'How do I register a Freename domain through Endless Domains?',
-    a: 'Connect your wallet, search for the domain name you want under any of the 8 Freename TLDs, add it to your cart, and complete the purchase. The domain is minted directly to your wallet. Endless Domains handles the Freename integration end-to-end — no need to visit the Freename site separately.',
+    q: 'Can I transfer a Freename identity?',
+    a: 'Yes. Freename identities are blockchain-based assets that can be transferred, traded, or sold directly from your wallet.',
   },
 ]
 

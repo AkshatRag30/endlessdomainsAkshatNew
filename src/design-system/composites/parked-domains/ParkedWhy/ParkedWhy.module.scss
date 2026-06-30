@@ -191,7 +191,7 @@
   display: flex;
   align-items: stretch;
   gap: 18px;
-  padding: var(--space-10) calc(var(--container-padding-x) + 140px);
+  padding: var(--space-10) var(--container-padding-x);
   width: 100%;
   background: var(--color-white-primary);
 
@@ -250,11 +250,11 @@ $card-clip: polygon(32px 0, 100% 0, 100% calc(100% - 32px), calc(100% - 32px) 10
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
-  // design-specific: card min-height matches Figma 361px
-  min-height: 361px;
+  // design-specific: reduced from Figma 361px — wider cards need less height
+  min-height: 260px;
 
   @include tablet-down {
-    min-height: 300px;
+    min-height: 220px;
     padding: var(--space-6) var(--space-5);
   }
 

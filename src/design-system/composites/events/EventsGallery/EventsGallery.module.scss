@@ -1,0 +1,277 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Section ───────────────────────────────────────────────────────────────────
+
+.section {
+  background: var(--color-white-primary);
+  width: 100%;
+  padding: var(--space-14) var(--container-padding-x);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  @include tablet-down {
+    padding: var(--space-12) var(--space-6);
+  }
+
+  @include mobile {
+    padding: var(--space-10) var(--space-4);
+  }
+}
+
+// ── Inner wrapper ─────────────────────────────────────────────────────────────
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-10); // ~56px — matches Figma ~54px between heading/logos/grid
+  width: 100%;
+  max-width: 1253px;
+
+  @include tablet-down {
+    gap: var(--space-9);
+  }
+
+  @include mobile {
+    gap: var(--space-7);
+  }
+}
+
+// ── Heading ───────────────────────────────────────────────────────────────────
+
+.heading {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2); // 55px
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  letter-spacing: var(--tracking-h1);
+  line-height: var(--leading-tight);
+  margin: 0;
+  text-align: center;
+
+  @include tablet-down {
+    font-size: 40px;
+  }
+
+  @include mobile {
+    font-size: 32px;
+  }
+
+  @include small-mobile {
+    font-size: 26px;
+  }
+}
+
+.headingLight {
+  font-weight: var(--font-weight-regular);
+}
+
+// ── Logo strip ────────────────────────────────────────────────────────────────
+
+.logoStrip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-8); // generous gap between logos
+  flex-wrap: wrap;
+  width: 100%;
+
+  @include tablet-down {
+    gap: var(--space-6);
+  }
+
+  @include mobile {
+    gap: var(--space-5);
+  }
+}
+
+.logoItem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+// design-specific: thin vertical divider between logos
+.logoDivider {
+  display: block;
+  width: 1px;
+  height: 36px;
+  background: var(--color-gray-300);
+  flex-shrink: 0;
+
+  @include mobile {
+    display: none;
+  }
+}
+
+// ── Domainer Expo — text logo ─────────────────────────────────────────────────
+// design-specific: Figma uses Inter Black uppercase with orange "EXPO" accent
+
+.domainerExpo {
+  font-family: var(--font-satoshi);
+  font-size: 28px; // design-specific: proportionally scaled from Figma 34px
+  font-weight: var(--font-weight-bold);
+  letter-spacing: -0.025em;
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--color-black-primary);
+  margin: 0;
+  white-space: nowrap;
+
+  @include tablet-down {
+    font-size: 22px;
+  }
+
+  @include mobile {
+    font-size: 18px;
+  }
+}
+
+.domainerExpoAccent {
+  color: #c94a0e; // design-specific: Figma-exact orange-red for "EXPO"
+}
+
+// ── Photo mosaic grid ─────────────────────────────────────────────────────────
+// design-specific: Figma layout —
+//   col 1+2 top   = wide photo
+//   col 3   r1+r2 = tall photo (spans both rows)
+//   col 1   row 2 = small photo 1
+//   col 2   row 2 = small photo 2
+//   (col 3  row 3 via auto = small photo 3, sits below the tall)
+//
+//  ┌─────────────┬─────────────┬───────────┐
+//  │             wide          │           │
+//  │ (col 1-2, row 1)          │   tall    │
+//  ├─────────────┬─────────────┤ (col 3,   │
+//  │   small-1   │   small-2   │  row 1-2) │
+//  │ (col1, r2)  │ (col2, r2)  │           │
+//  └─────────────┴─────────────┴───────────┘
+
+.grid {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: 300px 300px;
+  gap: var(--space-3);
+
+  @include tablet-down {
+    grid-template-rows: 240px 240px;
+    gap: var(--space-2);
+  }
+
+  @include mobile {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 200px);
+    gap: var(--space-2);
+  }
+
+  @include small-mobile {
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(5, 180px);
+    gap: var(--space-2);
+  }
+}
+
+// Wide photo — top-left, spans 2 cols × 1 row
+.photoWide {
+  position: relative;
+  grid-column: 1 / 3;
+  grid-row: 1 / 2;
+  overflow: hidden;
+  border: 3px solid var(--color-blue-primary-alpha-13);
+
+  @include mobile {
+    grid-column: 1 / 3;
+    grid-row: 1 / 2;
+  }
+
+  @include small-mobile {
+    grid-column: 1 / 2;
+    grid-row: auto;
+  }
+}
+
+// Tall photo — right column, spans 2 rows
+.photoTall {
+  position: relative;
+  grid-column: 3 / 4;
+  grid-row: 1 / 3;
+  overflow: hidden;
+  border: 3px solid var(--color-blue-primary-alpha-13);
+
+  @include mobile {
+    grid-column: 1 / 2;
+    grid-row: 2 / 3;
+  }
+
+  @include small-mobile {
+    grid-column: 1 / 2;
+    grid-row: auto;
+  }
+}
+
+// Small photo 1 — col 1, row 2
+.photoSmall1 {
+  position: relative;
+  grid-column: 1 / 2;
+  grid-row: 2 / 3;
+  overflow: hidden;
+  border: 3px solid var(--color-blue-primary-alpha-13);
+
+  @include mobile {
+    grid-column: 2 / 3;
+    grid-row: 2 / 3;
+  }
+
+  @include small-mobile {
+    grid-column: 1 / 2;
+    grid-row: auto;
+  }
+}
+
+// Small photo 2 — col 2, row 2
+.photoSmall2 {
+  position: relative;
+  grid-column: 2 / 3;
+  grid-row: 2 / 3;
+  overflow: hidden;
+  border: 3px solid var(--color-blue-primary-alpha-13);
+
+  @include mobile {
+    grid-column: 1 / 2;
+    grid-row: 3 / 4;
+  }
+
+  @include small-mobile {
+    grid-column: 1 / 2;
+    grid-row: auto;
+  }
+}
+
+// Small photo 3 — col 3, auto row 3 (below photoTall)
+.photoSmall3 {
+  position: relative;
+  grid-column: 3 / 4;
+  grid-row: 3 / 4; // grid auto-creates this row, inheriting the row height
+  overflow: hidden;
+  border: 3px solid var(--color-blue-primary-alpha-13);
+
+  @include mobile {
+    grid-column: 2 / 3;
+    grid-row: 3 / 4;
+  }
+
+  @include small-mobile {
+    grid-column: 1 / 2;
+    grid-row: auto;
+  }
+}
+
+// ── Photo image ───────────────────────────────────────────────────────────────
+
+.photo {
+  object-fit: cover;
+  object-position: center;
+}

@@ -1,0 +1,78 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Outer section ─────────────────────────────────────────────────────────────
+
+.section {
+  position: relative;
+  background: var(--color-black-primary);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0;
+}
+
+// ── Banner wrapper ─────────────────────────────────────────────────────────────
+
+.bannerWrap {
+  position: relative;
+  width: 100%;
+  height: 125px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+
+  @include wide {
+    height: 140px;
+  }
+
+  @include tablet-down {
+    height: 110px;
+  }
+
+  @include mobile {
+    height: 80px;
+  }
+}
+
+// ── Union SVG background ──────────────────────────────────────────────────────
+
+.unionBg {
+  object-fit: fill;
+  object-position: center;
+
+  @include mobile {
+    object-fit: cover;
+    transform: scaleX(1.18); // design-specific: crops side tips while keeping centre shape visible
+    transform-origin: center center;
+  }
+}
+
+// ── Label ─────────────────────────────────────────────────────────────────────
+
+.label {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2); // 55px
+  font-weight: var(--font-weight-medium);
+  color: var(--color-white-primary);
+  letter-spacing: var(--tracking-h2);
+  line-height: 1;
+  margin: 0;
+  white-space: nowrap;
+  text-align: center;
+
+  @include tablet-down {
+    font-size: 38px;
+  }
+
+  @include mobile {
+    font-size: var(--text-h3); // 22px at mobile token
+  }
+
+  @include small-mobile {
+    font-size: var(--text-normal); // 16px
+  }
+}

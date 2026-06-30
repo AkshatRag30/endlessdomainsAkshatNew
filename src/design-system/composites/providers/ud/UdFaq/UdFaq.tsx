@@ -6,28 +6,28 @@ import styles from './UdFaq.module.scss'
 
 const FAQS = [
   {
-    q: 'What is Unstoppable Domains and how does it work?',
-    a: 'Unstoppable Domains is the world\'s largest Web3 domain provider, enabling users to register human-readable identities on the blockchain. Unlike traditional DNS, Unstoppable domains are minted as NFTs — once purchased, you own them permanently with no renewal fees and no central authority that can revoke them.',
+    q: 'What is Unstoppable Domains?',
+    a: 'Unstoppable Domains is the largest on-chain identity provider, offering blockchain-based domain names that replace complex wallet addresses with human-readable identities. Domains are owned directly by users, minted on-chain, and require no annual renewal fees.',
   },
   {
-    q: 'What blockchains does Unstoppable Domains support?',
-    a: 'Unstoppable Domains operates across multiple chains including Ethereum and Polygon. Your domain is minted as an NFT on your chosen chain and lives directly in your wallet, fully transferable and tradeable like any other digital asset.',
+    q: 'How many TLDs does Unstoppable Domains offer?',
+    a: 'Unstoppable Domains offers 55 TLDs, including popular extensions such as .crypto, .nft, .wallet, .dao, .x, .bitcoin, .blockchain, .og, and many community-focused namespaces. It is one of the largest collections of on-chain identities available from a single provider.',
   },
   {
-    q: 'How many TLDs are available through Unstoppable Domains on Endless?',
-    a: 'Through Endless Domains you can register across 55 Unstoppable TLDs including .crypto, .wallet, .blockchain, .bitcoin, .nft, .dao, .x, .888, and many more. Each TLD targets a specific community or use case within the Web3 ecosystem.',
+    q: 'Do Unstoppable Domains names expire?',
+    a: 'No. Unstoppable Domains are purchased once and owned permanently. There are no renewal fees or expiration dates.',
   },
   {
-    q: 'Is there an annual renewal fee for Unstoppable Domains?',
-    a: 'No. Unstoppable Domains are a one-time purchase. Once you mint the domain it belongs to you forever with no recurring fees. This is one of the core advantages over traditional DNS registrars where annual renewal is required to maintain ownership.',
+    q: 'What chains do Unstoppable Domains support?',
+    a: 'Domains are minted on Polygon and resolve across Ethereum, Base, Arbitrum, and other supported EVM networks.',
   },
   {
-    q: 'Can I use an Unstoppable Domain as a wallet address?',
-    a: 'Yes. You can map any Unstoppable domain to your wallet addresses across all supported chains, making it a universal payment handle. Share yourname.crypto instead of a long hex address for easier crypto transfers across the entire Web3 ecosystem.',
+    q: 'Why register Unstoppable Domains through Endless Domains?',
+    a: 'Endless lets you search, compare, and manage identities from multiple providers in one place without switching platforms.',
   },
   {
-    q: 'What is Login With Unstoppable?',
-    a: 'Login With Unstoppable is a Web3 single-sign-on feature that lets you use your Unstoppable domain as a universal login across hundreds of dApps and Web3 platforms. Instead of creating new accounts everywhere, you authenticate once with your domain and wallet.',
+    q: 'Can I transfer an Unstoppable Domains name?',
+    a: 'Yes. Domains are wallet-owned assets and can be transferred, traded, or sold like any other on-chain asset.',
   },
 ]
 
