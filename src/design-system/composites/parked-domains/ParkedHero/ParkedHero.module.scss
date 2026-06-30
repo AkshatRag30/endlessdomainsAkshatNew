@@ -5,7 +5,7 @@
 .section {
   position: relative;
   background: var(--color-white-primary);
-  padding: var(--space-9) var(--container-padding-x) var(--space-10);
+  padding: var(--space-1) var(--container-padding-x) var(--space-10);
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -23,19 +23,19 @@
   }
 }
 
-// ── Hero GIF background — desktop/laptop only ─────────────────────────────────
+// ── Hero video background — desktop/laptop only ───────────────────────────────
 
 .heroBg {
-  display: none; // hidden on mobile by default
+  display: none; // hidden on mobile and tablet
 
-  @include tablet-up {
+  @include desktop {
     display: block;
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: contain;
-    object-position: center top;
+    object-position: center;
     z-index: 0;
     pointer-events: none;
   }
@@ -184,6 +184,9 @@
     font-size: 32px; // design-specific: minimum readable size at 375px
     white-space: normal;
   }
+    @include desktop {
+    font-size: var(--text-display-md); // 55px
+  }
 }
 
 .headingAccent {
@@ -202,7 +205,7 @@
   color: var(--color-text-body); // #474747 neutral dark grey
   line-height: var(--leading-body);
   margin: 0;
-  max-width: 780px;
+  max-width: 680px;
   text-align: center;
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -217,6 +220,10 @@
   @include small-mobile {
     font-size: var(--text-body-small); // 17px
   }
+
+     @include desktop {
+    font-size: var(--text-body-small); // 55px
+  }
 }
 
 // ── CTA frame + decorative lines ─────────────────────────────────────────────
@@ -228,7 +235,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0 100px; // design-specific: space for the diagonal line elements to show outside the buttons
+  padding: 0 60px; // design-specific: space for the diagonal line elements to show outside the buttons
 
   @include mobile {
     width: 100%;
@@ -310,6 +317,10 @@
   width: 260px;
   white-space: nowrap;
 
+  @include desktop {
+    width: 200px;
+  }
+
   @include mobile {
     width: auto;
   }
@@ -321,7 +332,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--gap-inline); // 16px
+  gap: var(--space-2); // 8px
   flex-wrap: wrap;
 
   @include mobile {
@@ -329,6 +340,17 @@
     gap: var(--space-2);
     width: 100%;
     justify-content: center;
+  }
+}
+
+// ── Desktop button sizing — shrink from default 57px height ──────────────────
+
+@include desktop {
+  .ctaRow > * {
+    font-size: var(--text-body-small) !important;
+    height: var(--button-height-sm) !important; // 44px instead of 57px
+    padding: 0 var(--space-5) !important;
+    min-width: 0 !important;
   }
 }
 

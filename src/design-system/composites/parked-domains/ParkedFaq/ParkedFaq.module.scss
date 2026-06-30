@@ -42,22 +42,23 @@
 
 // ── Left column ───────────────────────────────────────────────────────────────
 
+// design-specific: Figma-exact strip height — padding and sticky-top are derived from this
+$diagonal-strip-h: 75px;
+
 .left {
   flex: 0 0 40%;
-  position: sticky;
-  top: 0;
-  align-self: flex-start;
   display: flex;
+  flex-direction: column;
+  justify-content: center;
   align-items: flex-start;
+  position: relative;
   background: var(--color-white-primary);
-  padding: var(--space-12) var(--container-padding-x) var(--space-12) var(--container-padding-x);
+  padding: calc(#{$diagonal-strip-h} + var(--space-4)) var(--container-padding-x);
 
   @include tablet-down {
-    position: relative;
-    top: auto;
-    align-self: auto;
     flex: none;
-    padding: var(--space-10) var(--space-6) var(--space-8);
+    width: 100%;
+    padding: calc(#{$diagonal-strip-h} + var(--space-3)) var(--space-6);
   }
 
   @include mobile {
@@ -65,14 +66,14 @@
   }
 }
 
-// design-specific: diagonal grid strips at top and bottom edges only, matching Figma
+// design-specific: diagonal grid strips at top and bottom edges of left column, matching Figma
 %diagonal-strip {
   position: absolute;
   left: 0;
   right: 0;
   pointer-events: none;
   z-index: 0;
-  height: 75px;
+  height: $diagonal-strip-h;
   background-color: var(--color-gray-light-bg);
   background-image: repeating-linear-gradient(
     135deg,
@@ -81,18 +82,28 @@
     var(--color-black-alpha-05) 4px,
     var(--color-black-alpha-05) 5px
   );
+
+  @include mobile {
+    display: none;
+  }
 }
 
 .diagonalBgTop    { @extend %diagonal-strip; top: 0; }
 .diagonalBgBottom { @extend %diagonal-strip; bottom: 0; }
 
 .leftContent {
-  position: relative;
+  position: sticky;
+  top: calc(#{$diagonal-strip-h} + var(--space-4));
   z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: var(--space-6);
+
+  @include tablet-down {
+    position: relative;
+    top: auto;
+  }
 }
 
 // ── Eyebrow ───────────────────────────────────────────────────────────────────
@@ -184,7 +195,6 @@
   @include tablet-down { font-size: 18px; }
   @include mobile { font-size: 16px; }
 }
-
 
 // ── Right column — accordion ──────────────────────────────────────────────────
 

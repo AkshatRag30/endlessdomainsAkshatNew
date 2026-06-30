@@ -210,6 +210,8 @@
   width: 22px;
   height: 22px;
   object-fit: contain;
+  fill: var(--color-white-primary);
+  color: var(--color-white-primary); // react-icons uses currentColor for stroke-based icons
 }
 
 // ── Feature text ──────────────────────────────────────────────────────────────
