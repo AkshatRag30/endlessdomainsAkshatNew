@@ -1,5 +1,4 @@
 import Image from 'next/image'
-import domainDaysSvg from '/public/events/Frame 2147239463.svg'
 import ibwLogoSvg from '/public/events/Group 2085666495.svg'
 import ibwBadgeSvg from '/public/events/Group 2085666496.svg'
 import token2049Svg from '/public/events/Link - Go to the Homepage.svg'
@@ -13,22 +12,15 @@ import styles from './EventsGallery.module.scss'
 
 export function EventsGallery() {
   return (
-    <section className={styles.section} aria-labelledby="events-gallery-heading">
+    <section className={styles.section} aria-label="Events gallery">
       <div className={styles.inner}>
-
-        {/* ── Heading ── */}
-        <h2 id="events-gallery-heading" className={styles.heading}>
-          Events <span className={styles.headingLight}>we attended</span>
-        </h2>
 
         {/* ── Logo strip ── */}
         <div className={styles.logoStrip}>
 
           <div className={styles.logoItem}>
-            <Image src={domainDaysSvg} alt="Domain Days" height={48} unoptimized />
+            <Image src={ibwBadgeSvg} alt="Domainer Expo" height={48} width={115} unoptimized />
           </div>
-
-          <span className={styles.logoDivider} aria-hidden="true" />
 
           <div className={styles.logoItem}>
             <p className={styles.domainerExpo}>
@@ -36,22 +28,16 @@ export function EventsGallery() {
             </p>
           </div>
 
-          <span className={styles.logoDivider} aria-hidden="true" />
-
           <div className={styles.logoItem}>
-            <Image src={token2049Svg} alt="Token 2049 Dubai" height={46} unoptimized />
+            <Image src={token2049Svg} alt="Token 2049 Dubai" height={46} width={94} unoptimized />
           </div>
 
-          <span className={styles.logoDivider} aria-hidden="true" />
-
           <div className={styles.logoItem}>
-            <Image src={ibwLogoSvg} alt="IBW 2024" height={46} unoptimized />
+            <Image src={ibwLogoSvg} alt="IBW 2024" height={57} width={222} unoptimized />
           </div>
 
-          <span className={styles.logoDivider} aria-hidden="true" />
-
           <div className={styles.logoItem}>
-            <Image src={ethGlobalSvg} alt="ETHGlobal New Delhi" height={86} unoptimized />
+            <Image src={ethGlobalSvg} alt="ETHGlobal New Delhi" height={85} width={228} unoptimized />
           </div>
 
         </div>

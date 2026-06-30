@@ -1,4 +1,6 @@
 export { EventsHero } from './EventsHero'
 export type { EventsHeroProps } from './EventsHero'
-export { EventsBanner } from './EventsBanner'
 export { EventsGallery } from './EventsGallery'
+export { EventCard } from './EventCard'
+export type { EventCardData } from './EventCard'
+export { EventsGrid } from './EventsGrid'

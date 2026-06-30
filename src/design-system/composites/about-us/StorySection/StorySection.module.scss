@@ -71,7 +71,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 10px 40px;
+  align-self: flex-start;
+  padding: 6px 14px;
 }
 
 .eyebrowText {

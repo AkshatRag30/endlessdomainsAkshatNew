@@ -1,4 +1,5 @@
 import React, { useRef } from 'react'
+import Image from 'next/image'
 import { useEntranceAnimation } from '@/design-system/composites/about-us/useEntranceAnimation'
 import styles from './EventsHero.module.scss'
 
@@ -16,6 +17,7 @@ export function EventsHero({ onViewHighlights, onExploreEvents }: EventsHeroProp
   useEntranceAnimation([eyebrowRef, headingRef, bodyRef, ctaRef])
 
   return (
+    <>
     <section className={styles.section} aria-labelledby="events-hero-heading">
       {/* Video background — replaced with real video when available */}
       <video
@@ -98,6 +100,20 @@ export function EventsHero({ onViewHighlights, onExploreEvents }: EventsHeroProp
         </div>
       </div>
     </section>
+
+    {/* Banner — union SVG background with "Events We Attended" label */}
+    <div className={styles.bannerWrap}>
+      <Image
+        src="/providers/freename/union.svg"
+        alt=""
+        aria-hidden="true"
+        fill
+        unoptimized
+        className={styles.unionBg}
+      />
+      <p className={styles.bannerLabel}>Events We Attended</p>
+    </div>
+    </>
   )
 }
 

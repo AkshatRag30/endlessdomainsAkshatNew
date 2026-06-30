@@ -41,7 +41,7 @@
   position: relative;
   display: inline-flex;
   align-items: center;
-  padding: var(--space-2) var(--space-8);
+  padding: 6px 14px;
 }
 
 .reticleTL,
@@ -81,17 +81,16 @@
 }
 
 .headingBlack {
-  font-size: 38px; // design-specific: balanced down from Figma 45px
+  font-size: 46px;
   color: var(--color-black-primary);
 
-  @include tablet-down { font-size: 28px; }
-  @include mobile { font-size: 24px; }
+  @include tablet-down { font-size: 32px; }
+  @include mobile { font-size: 26px; }
 }
 
 .headingBlue {
-  font-size: 46px; // design-specific: balanced down from Figma 55px
+  font-size: 46px;
   font-weight: var(--font-weight-regular);
-  // design-specific: Figma gradient 145deg
   background: linear-gradient(145deg, var(--color-blue-primary) 70%, rgba(38, 57, 237, 0.28) 96%);
   background-clip: text;
   -webkit-background-clip: text;

@@ -5,17 +5,17 @@
 .section {
   background: var(--color-white-primary);
   width: 100%;
-  padding: var(--space-14) var(--container-padding-x);
+  padding: var(--space-6) var(--container-padding-x) var(--space-14);
   display: flex;
   flex-direction: column;
   align-items: center;
 
   @include tablet-down {
-    padding: var(--space-12) var(--space-6);
+    padding: var(--space-5) var(--space-6) var(--space-12);
   }
 
   @include mobile {
-    padding: var(--space-10) var(--space-4);
+    padding: var(--space-4) var(--space-4) var(--space-10);
   }
 }
 
@@ -68,17 +68,25 @@
 }
 
 // ── Logo strip ────────────────────────────────────────────────────────────────
+// design-specific: Figma row width 1253px, gap 79.69px between items
 
 .logoStrip {
   display: flex;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
-  gap: var(--space-8); // generous gap between logos
-  flex-wrap: wrap;
+  gap: 80px; // design-specific: Figma-exact 79.69px
+  flex-wrap: nowrap;
   width: 100%;
+  max-width: 1253px;
+  overflow-x: auto;
+  scrollbar-width: none; // Firefox
+
+  &::-webkit-scrollbar {
+    display: none; // Chrome / Safari
+  }
 
   @include tablet-down {
-    gap: var(--space-6);
+    gap: var(--space-8);
   }
 
   @include mobile {
@@ -93,25 +101,12 @@
   flex-shrink: 0;
 }
 
-// design-specific: thin vertical divider between logos
-.logoDivider {
-  display: block;
-  width: 1px;
-  height: 36px;
-  background: var(--color-gray-300);
-  flex-shrink: 0;
-
-  @include mobile {
-    display: none;
-  }
-}
-
 // ── Domainer Expo — text logo ─────────────────────────────────────────────────
-// design-specific: Figma uses Inter Black uppercase with orange "EXPO" accent
+// design-specific: Figma uses Inter Black 34px uppercase with orange "EXPO" accent
 
 .domainerExpo {
   font-family: var(--font-satoshi);
-  font-size: 28px; // design-specific: proportionally scaled from Figma 34px
+  font-size: 34px; // design-specific: Figma-exact 34.15px
   font-weight: var(--font-weight-bold);
   letter-spacing: -0.025em;
   line-height: 1;
@@ -121,11 +116,11 @@
   white-space: nowrap;
 
   @include tablet-down {
-    font-size: 22px;
+    font-size: 26px;
   }
 
   @include mobile {
-    font-size: 18px;
+    font-size: 20px;
   }
 }
 

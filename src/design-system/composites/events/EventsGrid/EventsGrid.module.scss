@@ -1,0 +1,272 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Section ───────────────────────────────────────────────────────────────────
+
+.section {
+  width: 100%;
+  background: var(--color-white-primary);
+  padding: var(--space-14) var(--container-padding-x);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-10);
+
+  @include tablet-down {
+    padding: var(--space-12) var(--space-6);
+    gap: var(--space-8);
+  }
+
+  @include mobile {
+    padding: var(--space-10) var(--space-4);
+    gap: var(--space-7);
+  }
+}
+
+// ── Section header ────────────────────────────────────────────────────────────
+
+.sectionHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-8);
+
+  @include tablet-down {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-6);
+  }
+}
+
+// ── Header left — eyebrow + heading ───────────────────────────────────────────
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.eyebrowWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-1-5) var(--space-4);
+  align-self: flex-start;
+}
+
+%bracket-corner {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-color: var(--color-blue-primary-alpha-50);
+  border-style: solid;
+}
+
+.bracketTL { @extend %bracket-corner; top: 0; left: 0; border-width: 1.5px 0 0 1.5px; }
+.bracketTR { @extend %bracket-corner; top: 0; right: 0; border-width: 1.5px 1.5px 0 0; }
+.bracketBL { @extend %bracket-corner; bottom: 0; left: 0; border-width: 0 0 1.5px 1.5px; }
+.bracketBR { @extend %bracket-corner; bottom: 0; right: 0; border-width: 0 1.5px 1.5px 0; }
+
+.eyebrow {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  margin: 0;
+  line-height: 1;
+}
+
+.heading {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black-primary);
+  letter-spacing: var(--tracking-h1);
+  line-height: var(--leading-tight);
+  margin: 0;
+
+  @include tablet-down {
+    font-size: 40px;
+  }
+
+  @include mobile {
+    font-size: 32px;
+  }
+}
+
+.headingLight {
+  font-weight: var(--font-weight-regular);
+}
+
+// ── Header right — search + tabs ──────────────────────────────────────────────
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-shrink: 0;
+
+  @include tablet-down {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  @include mobile {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-3);
+  }
+}
+
+// ── Search input ──────────────────────────────────────────────────────────────
+
+.searchWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 280px;
+  flex-shrink: 0;
+
+  @include tablet-down {
+    width: 240px;
+  }
+
+  @include mobile {
+    width: 100%;
+  }
+}
+
+.searchIcon {
+  position: absolute;
+  left: var(--space-4);
+  color: var(--color-gray-dark);
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+.searchInput {
+  width: 100%;
+  height: 48px;
+  padding: 0 var(--space-4) 0 calc(var(--space-4) + 16px + var(--space-2));
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-sm);
+  background: var(--color-white-primary);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-15);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-black-primary);
+  outline: none;
+  transition: border-color 0.2s ease;
+
+  &::placeholder {
+    color: var(--color-gray-dark);
+  }
+
+  &:focus {
+    border-color: var(--color-blue-primary);
+  }
+
+  // remove native search clear button
+  &::-webkit-search-cancel-button { display: none; }
+}
+
+// ── Filter tabs ───────────────────────────────────────────────────────────────
+
+.tabsWrap {
+  flex-shrink: 0;
+}
+
+.tabsBg {
+  display: flex;
+  align-items: center;
+  background: var(--color-gray-light-bg);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-sm);
+  padding: var(--space-1);
+  gap: 2px;
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2) var(--space-5);
+  height: 38px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-15);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-dark);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease;
+
+  &:hover {
+    background: var(--color-white-primary);
+    color: var(--color-black-primary);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.tabActive {
+  background: var(--color-white-primary);
+  color: var(--color-black-primary);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+// ── Full-width dashed divider ─────────────────────────────────────────────────
+
+.fullDivider {
+  width: 100%;
+  height: 1px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--color-blue-primary-alpha-18) 0px,
+    var(--color-blue-primary-alpha-18) 6px,
+    transparent 6px,
+    transparent 12px
+  );
+  flex-shrink: 0;
+}
+
+// ── Card grid ─────────────────────────────────────────────────────────────────
+// design-specific: Figma shows 3 columns with cards 434px wide, gap ~20px
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-7);
+
+  @include tablet-down {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-5);
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+}
+
+.gridItem {
+  display: flex;
+  flex-direction: column;
+}
+
+// ── Empty state ───────────────────────────────────────────────────────────────
+
+.emptyState {
+  grid-column: 1 / -1;
+  text-align: center;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  color: var(--color-gray-dark);
+  padding: var(--space-14) 0;
+  margin: 0;
+}
