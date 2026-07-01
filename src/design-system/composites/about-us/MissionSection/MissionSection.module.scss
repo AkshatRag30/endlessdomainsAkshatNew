@@ -212,7 +212,9 @@
 
   @include tablet-down {
     gap: var(--space-5);
-    margin-top: -236px; // 576px × 41%
+    // design-specific: overlap trick only works when cards are tall enough on desktop.
+    // On tablet cards shrink and the section above is shorter — reset to natural flow.
+    margin-top: 0;
   }
 
   @include mobile {
@@ -418,6 +420,21 @@ $card-clip: polygon(7% 41%, 100% 40%, 100% 93%, 94% 100%, 0 100%, 0 51%);
 
   @include tablet-down {
     font-size: 14px;
+  }
+}
+
+// ── Tablet — simplified card clip (no overlap trick, so 41% cut is not needed) ─
+
+@include tablet {
+  // design-specific: replace the dramatic 41% diagonal cut with a simple corner polygon
+  // The large cut only looks right when the cards physically overlap the section above (desktop only)
+  .cardWrap {
+    clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 16px);
+  }
+
+  .card {
+    padding: var(--space-8) var(--space-6);
+    min-height: auto;
   }
 }
 

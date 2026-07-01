@@ -68,6 +68,19 @@ export function EventCard({ event, onExplore }: EventCardProps) {
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
           <span className={styles.categoryBadge}>{event.category}</span>
+
+          {/* Date + location pinned to bottom of photo */}
+          <div className={styles.footer}>
+            <span className={styles.footerItem}>
+              <FiCalendar size={13} aria-hidden="true" />
+              {event.date}
+            </span>
+            <span className={styles.footerSep} aria-hidden="true" />
+            <span className={styles.footerItem}>
+              <FiMapPin size={13} aria-hidden="true" />
+              {event.location}
+            </span>
+          </div>
         </div>
 
         {/* Content section */}
@@ -76,21 +89,6 @@ export function EventCard({ event, onExplore }: EventCardProps) {
             <div className={styles.textGroup}>
               <h3 className={styles.title}>{event.title}</h3>
               <p className={styles.excerpt}>{event.excerpt}</p>
-            </div>
-
-            <div className={styles.divider} aria-hidden="true" />
-
-            {/* Date + location footer */}
-            <div className={styles.footer}>
-              <span className={styles.footerItem}>
-                <FiCalendar size={13} aria-hidden="true" />
-                {event.date}
-              </span>
-              <span className={styles.footerSep} aria-hidden="true" />
-              <span className={styles.footerItem}>
-                <FiMapPin size={13} aria-hidden="true" />
-                {event.location}
-              </span>
             </div>
 
             {/* Primary CTA */}

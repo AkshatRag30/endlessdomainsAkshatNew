@@ -1,7 +1,7 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import { PerksNavBar } from '@/design-system/composites/reputation/perks/PerksNavBar'
-import { EventsHero, EventsGallery, EventsGrid } from '@/design-system/composites/events'
+import { EventsHero, EventsGallery, EventsGrid, EventsPurpose, EventsNewsletter } from '@/design-system/composites/events'
 import styles from './events.module.scss'
 
 const EventsPage: NextPage = () => {
@@ -17,8 +17,10 @@ const EventsPage: NextPage = () => {
       <PerksNavBar />
       <main className={styles.main}>
         <EventsHero />
-        <EventsGrid />
         <EventsGallery />
+        <EventsGrid />
+        <EventsPurpose />
+        <EventsNewsletter />
       </main>
     </>
   )

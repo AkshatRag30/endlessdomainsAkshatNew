@@ -17,7 +17,9 @@
 
   @include tablet-down {
     flex-direction: column;
-    padding: var(--space-9) var(--space-7);
+    // extra bottom padding absorbs the TeamSection topPolygon (80px trapezoid + space-10 negative margin)
+    // so the dark shape doesn't cover story content — same principle as the desktop calc(76px + space-10)
+    padding: var(--space-9) var(--space-7) calc(80px + var(--space-10) + var(--space-9));
     gap: var(--space-8);
   }
 
@@ -222,6 +224,26 @@
 
   @include mobile {
     font-size: 14px;
+  }
+}
+
+// ── Tablet overrides ──────────────────────────────────────────────────────────
+
+@include tablet {
+  // Brackets: rightCol has no left padding on tablet — left: 10px would bleed.
+  // Reset both to sit flush with the content box.
+  .bracketTL {
+    left: 0;
+  }
+
+  .bracketBR {
+    right: 0;
+  }
+
+  // Only need to clear the 28px bracketTL height — section gap already provides separation above
+  .storyContent {
+    padding-top: 36px;
+    padding-bottom: var(--space-8);
   }
 }
 

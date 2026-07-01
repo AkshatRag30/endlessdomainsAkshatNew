@@ -13,7 +13,7 @@ export default function StorySection() {
     if (!left || !right) return
 
     const sync = () => {
-      if (window.innerWidth <= 767) {
+      if (window.innerWidth <= 991) {
         left.style.height = ''
         return
       }

@@ -1,0 +1,519 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Section ───────────────────────────────────────────────────────────────────
+
+.section {
+  width: 100%;
+  background: var(--color-white-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  overflow: hidden;
+}
+
+// ── Top row ───────────────────────────────────────────────────────────────────
+
+.topRow {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  min-height: 296px;
+  position: relative;
+
+  @include tablet-down {
+    flex-direction: column;
+    min-height: auto;
+  }
+}
+
+// ── Left — eyebrow + heading ──────────────────────────────────────────────────
+
+.topLeft {
+  flex: 0 0 auto;
+  width: 46%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-9) var(--space-11);
+  justify-content: center;
+
+  @include max-width(1280px) {
+    width: 44%;
+    padding: var(--space-9) var(--space-9);
+  }
+
+  @include tablet-down {
+    width: 100%;
+    padding: var(--space-9) var(--space-7);
+  }
+
+  @include mobile {
+    padding: var(--space-8) var(--space-5);
+    gap: var(--space-3);
+  }
+}
+
+// ── Eyebrow ───────────────────────────────────────────────────────────────────
+
+.eyebrow {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-start;
+  padding: 6px 14px;
+}
+
+.eyebrowText {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-dark);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  line-height: 1;
+  margin: 0;
+}
+
+// design-specific: 4 corner brackets — same pattern as other sections
+%eyebrow-bracket {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-color: rgba(143, 115, 255, 0.65);
+  border-style: solid;
+  pointer-events: none;
+}
+
+.eyebrowBracketTL { @extend %eyebrow-bracket; top: 0; left: 0; border-width: 1.5px 0 0 1.5px; }
+.eyebrowBracketTR { @extend %eyebrow-bracket; top: 0; right: 0; border-width: 1.5px 1.5px 0 0; }
+.eyebrowBracketBL { @extend %eyebrow-bracket; bottom: 0; left: 0; border-width: 0 0 1.5px 1.5px; }
+.eyebrowBracketBR { @extend %eyebrow-bracket; bottom: 0; right: 0; border-width: 0 1.5px 1.5px 0; }
+
+// ── Heading ───────────────────────────────────────────────────────────────────
+
+.heading {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.headingBlack {
+  display: block;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2); // 55px
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+
+  @include max-width(1280px) { font-size: 46px; }
+  @include tablet-down { font-size: 38px; }
+  @include mobile { font-size: 30px; }
+}
+
+.headingBlue {
+  display: block;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2); // 55px
+  font-weight: var(--font-weight-regular);
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  text-transform: capitalize;
+  background: linear-gradient(110deg, var(--color-blue-primary) 70%, rgba(38, 57, 237, 0.28) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  @include max-width(1280px) { font-size: 46px; }
+  @include tablet-down { font-size: 38px; }
+  @include mobile { font-size: 30px; }
+}
+
+// ── Centre — hatched column decorations ──────────────────────────────────────
+
+.hatchedCols {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: row;
+  // design-specific: Figma shows 2 narrow hatched strips with a gap, positioned centre
+  gap: 128px;
+  align-items: stretch;
+
+  @include tablet-down {
+    display: none;
+  }
+}
+
+.hatchedCol {
+  width: 63px;
+  align-self: stretch;
+  border-left: 0.5px solid rgba(0, 0, 0, 0.12);
+  border-right: 0.5px solid rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  position: relative;
+
+  // design-specific: diagonal hatched pattern from Figma "about-lines.svg"
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+      135deg,
+      transparent 0px,
+      transparent 6px,
+      rgba(0, 0, 0, 0.06) 6px,
+      rgba(0, 0, 0, 0.06) 7px
+    );
+  }
+}
+
+// ── Right — description ───────────────────────────────────────────────────────
+
+.topRight {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-9) var(--space-11);
+  position: relative;
+
+  @include max-width(1280px) {
+    padding: var(--space-9) var(--space-9);
+  }
+
+  @include tablet-down {
+    padding: 0 var(--space-7) var(--space-9);
+    align-items: flex-start;
+  }
+
+  @include mobile {
+    padding: 0 var(--space-5) var(--space-8);
+  }
+}
+
+// design-specific: small corner brackets on the description box (Figma shows top-left / bottom-right)
+.bracketTL {
+  position: absolute;
+  top: var(--space-6);
+  left: var(--space-9);
+  width: 8px;
+  height: 8px;
+  border-top: 1.5px solid rgba(143, 115, 255, 0.5);
+  border-left: 1.5px solid rgba(143, 115, 255, 0.5);
+  pointer-events: none;
+
+  @include tablet-down { display: none; }
+}
+
+.bracketBR {
+  position: absolute;
+  bottom: var(--space-6);
+  right: var(--space-9);
+  width: 8px;
+  height: 8px;
+  border-bottom: 1.5px solid rgba(143, 115, 255, 0.5);
+  border-right: 1.5px solid rgba(143, 115, 255, 0.5);
+  pointer-events: none;
+
+  @include tablet-down { display: none; }
+}
+
+.desc {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-body); // 22px
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-body, #474747);
+  line-height: var(--leading-normal);
+  text-align: justify;
+  max-width: 560px;
+
+  @include max-width(1280px) {
+    font-size: 18px;
+    max-width: 460px;
+  }
+
+  @include tablet-down {
+    font-size: 16px;
+    max-width: 100%;
+    text-align: left;
+  }
+
+  @include mobile {
+    font-size: 14px;
+  }
+}
+
+// ── Horizontal divider ────────────────────────────────────────────────────────
+
+.divider {
+  width: 100%;
+  height: 1px;
+  // design-specific: Figma dashed horizontal rule between top and bottom rows
+  background: repeating-linear-gradient(
+    90deg,
+    var(--color-gray-200) 0px,
+    var(--color-gray-200) 6px,
+    transparent 6px,
+    transparent 12px
+  );
+  flex-shrink: 0;
+}
+
+// ── Bottom row ────────────────────────────────────────────────────────────────
+
+.bottomRow {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  width: 100%;
+  position: relative;
+  // design-specific: light gray dotted panels fill bottom-left, bottom-right, bottom-centre
+  // implemented via pseudo-elements on the row container
+  overflow: hidden;
+
+  @include tablet-down {
+    flex-wrap: wrap;
+    align-items: stretch;
+  }
+}
+
+// design-specific: Figma has hatched #f8f8f8 panels at bottom of the section:
+//   bottom-left  0–382px wide, 125px tall
+//   bottom-right 773–1123px, 125px tall (centre)
+//   both outer right corners
+// Approximated with 2 pseudo-elements on the row
+.bottomRow::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 25%;
+  height: 125px;
+  background-color: var(--color-gray-light-bg); // #f8f8f8
+  background-image: radial-gradient(circle, rgba(0,0,0,0.06) 1px, transparent 1px);
+  background-size: 5px 5px;
+  pointer-events: none;
+  z-index: 0;
+
+  @include tablet-down { display: none; }
+}
+
+.bottomRow::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 25%;
+  height: 125px;
+  background-color: var(--color-gray-light-bg);
+  background-image: radial-gradient(circle, rgba(0,0,0,0.06) 1px, transparent 1px);
+  background-size: 5px 5px;
+  pointer-events: none;
+  z-index: 0;
+
+  @include tablet-down { display: none; }
+}
+
+// ── Column ────────────────────────────────────────────────────────────────────
+
+.col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding: var(--space-9) var(--space-7) var(--space-14);
+  position: relative;
+  z-index: 1;
+
+  @include max-width(1280px) {
+    padding: var(--space-8) var(--space-6) var(--space-12);
+  }
+
+  @include tablet-down {
+    flex: 0 0 50%;
+    max-width: 50%;
+    padding: var(--space-7) var(--space-6) var(--space-9);
+  }
+
+  @include mobile {
+    flex: 0 0 100%;
+    max-width: 100%;
+    padding: var(--space-6) var(--space-5) var(--space-8);
+  }
+}
+
+// design-specific: even columns (2nd and 4th) pushed down ~62px to create staggered layout
+.colOffset {
+  padding-top: calc(var(--space-9) + 62px);
+
+  @include max-width(1280px) {
+    padding-top: calc(var(--space-8) + 50px);
+  }
+
+  @include tablet-down {
+    padding-top: var(--space-7);
+  }
+}
+
+// ── Column vertical divider ───────────────────────────────────────────────────
+
+// design-specific: dashed vertical line at every column boundary
+// The 2nd and 4th column boundaries also get a wide blue glow beam (58px wide)
+// that rises from the top of the bottom row — this is the "light beam" between sections
+.colDivider {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: repeating-linear-gradient(
+    180deg,
+    var(--color-gray-200) 0px,
+    var(--color-gray-200) 6px,
+    transparent 6px,
+    transparent 12px
+  );
+  pointer-events: none;
+  z-index: 2;
+
+  @include tablet-down { display: none; }
+}
+
+// design-specific: wide blue glow beam on the 2nd column boundary (between col 1 and col 2)
+// and 4th boundary (between col 3 and col 4). Figma shows 58px wide, 156px tall.
+.colDividerGlow {
+  position: absolute;
+  left: -29px;
+  top: 0;
+  width: 58px;
+  height: 156px;
+  pointer-events: none;
+  z-index: 2;
+  background: linear-gradient(
+    180deg,
+    rgba(38, 57, 237, 0) 0%,
+    rgba(38, 57, 237, 0.017) 5%,
+    rgba(38, 57, 237, 0.5) 77%,
+    rgba(38, 57, 237, 0) 100%
+  );
+  // white border + blur on top of glow
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 52px;
+    height: 152px;
+    border: 1px solid rgba(255, 255, 255, 0.85);
+    pointer-events: none;
+  }
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 52px;
+    height: 152px;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    filter: blur(2.25px);
+    mix-blend-mode: plus-lighter;
+    pointer-events: none;
+  }
+
+  @include tablet-down { display: none; }
+}
+
+// ── Icon box ──────────────────────────────────────────────────────────────────
+
+.iconBox {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  flex-shrink: 0;
+  border-radius: 18.77px;
+  background: linear-gradient(180deg, var(--color-blue-primary) 0%, rgba(38, 57, 237, 0.47) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  // design-specific: Figma blue glow shadow on icon box
+  box-shadow:
+    0px 20px 51px 0px rgba(87, 177, 255, 0.34),
+    0px 12px 15px 0px rgba(87, 177, 255, 0.19),
+    0px 5px 6px 0px rgba(87, 177, 255, 0.22),
+    0px 2px 2px 0px rgba(87, 177, 255, 0.15),
+    0px 0px 0px 1.9px #e0e9f2,
+    0px 0px 0px 2.4px var(--color-white-primary),
+    inset 0px 0.5px 8.6px 1px #d2eaff,
+    inset 0px 0.5px 1.9px 1px #d2eaff;
+}
+
+// design-specific: upward blue glow beam above icon box
+// Cols 1 & 3: 114px tall (shorter beam, no column boundary)
+// Cols 2 & 4: beam is part of the colDividerGlow, so icon sits lower, beam from glow strip
+.iconGlow {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 58px;
+  height: 114px;
+  background: linear-gradient(
+    180deg,
+    rgba(38, 57, 237, 0) 0%,
+    rgba(38, 57, 237, 0.017) 5%,
+    rgba(38, 57, 237, 0.45) 77%,
+    rgba(38, 57, 237, 0) 100%
+  );
+  pointer-events: none;
+}
+
+.iconImg {
+  position: relative;
+  z-index: 1;
+  object-fit: contain;
+}
+
+// ── Column text ───────────────────────────────────────────────────────────────
+
+.colText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.colTitle {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h3); // 30px
+  font-weight: var(--font-weight-medium);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-transform: capitalize;
+  background: linear-gradient(137deg, var(--color-blue-primary) 70%, rgba(38, 57, 237, 0.28) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  @include max-width(1280px) { font-size: 24px; }
+  @include tablet-down { font-size: 22px; }
+  @include mobile { font-size: 20px; }
+}
+
+.colDesc {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-body-small); // 17px
+  font-weight: var(--font-weight-regular);
+  color: #474747;
+  line-height: var(--leading-normal);
+  max-width: 273px;
+
+  @include tablet-down { font-size: 15px; max-width: 100%; }
+  @include mobile { font-size: 14px; }
+}
