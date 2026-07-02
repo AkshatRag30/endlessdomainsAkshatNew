@@ -5,33 +5,44 @@ import { FiArrowRight, FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 import styles from './UdTlds.module.scss'
 
 const TLDS = [
-  { tld: '.crypto',    price: '$20', chain: 'Multi-chain', desc: 'The flagship Web3 TLD for crypto natives and DeFi enthusiasts.' },
-  { tld: '.wallet',    price: '$20', chain: 'Multi-chain', desc: 'A universal identity for your digital assets across any chain.' },
-  { tld: '.blockchain', price: '$20', chain: 'Multi-chain', desc: 'Stake your claim on the foundational technology of Web3.' },
-  { tld: '.bitcoin',   price: '$20', chain: 'Multi-chain', desc: 'For maximalists and believers in the original decentralized currency.' },
-  { tld: '.nft',       price: '$20', chain: 'Multi-chain', desc: 'The go-to namespace for digital collectors and NFT creators.' },
-  { tld: '.dao',       price: '$20', chain: 'Multi-chain', desc: 'Built for decentralized organizations and on-chain governance.' },
-  { tld: '.888',       price: '$20', chain: 'Multi-chain', desc: 'A lucky, memorable Web3 identity for global communities.' },
-  { tld: '.x',         price: '$20', chain: 'Multi-chain', desc: 'Short, sharp, and versatile — the minimal Web3 identity.' },
-  { tld: '.polygon',   price: '$5',  chain: 'Polygon',     desc: 'Native identity for the Polygon Layer 2 ecosystem.' },
-  { tld: '.eth',       price: '$5',  chain: 'Ethereum',    desc: 'An ENS-compatible identity for the Ethereum mainnet.' },
-  { tld: '.zil',       price: '$5',  chain: 'Zilliqa',     desc: 'The primary identity layer for the Zilliqa blockchain.' },
-  { tld: '.unstoppable', price: '$20', chain: 'Multi-chain', desc: 'Own the identity that represents decentralized freedom.' },
-  { tld: '.coin',      price: '$20', chain: 'Multi-chain', desc: 'For crypto holders, traders, and digital-asset enthusiasts.' },
-  { tld: '.klever',    price: '$5',  chain: 'Multi-chain', desc: 'Integrated with the Klever ecosystem for seamless Web3 access.' },
-  { tld: '.hi',        price: '$5',  chain: 'Multi-chain', desc: 'A friendly, approachable Web3 identity for everyday use.' },
-  { tld: '.anime',     price: '$5',  chain: 'Multi-chain', desc: 'Celebrate Japanese culture and animation in the Web3 space.' },
-  { tld: '.manga',     price: '$5',  chain: 'Multi-chain', desc: 'For manga artists, fans, and communities in the digital world.' },
-  { tld: '.binanceus', price: '$5',  chain: 'Multi-chain', desc: 'Exclusive identity for the Binance US community.' },
-  { tld: '.kresus',    price: '$5',  chain: 'Multi-chain', desc: 'The home identity for the Kresus smart wallet ecosystem.' },
-  { tld: '.go',        price: '$5',  chain: 'Multi-chain', desc: 'A concise, action-driven Web3 identity for movers and makers.' },
-  { tld: '.meta',      price: '$20', chain: 'Multi-chain', desc: 'Claim your presence in the expanding metaverse landscape.' },
-  { tld: '.altimist',  price: '$5',  chain: 'Multi-chain', desc: 'Built for the long-term thinkers shaping decentralized finance.' },
-  { tld: '.ubu',       price: '$5',  chain: 'Multi-chain', desc: 'Community-first identity for decentralized collaboration.' },
-  { tld: '.pudgy',     price: '$5',  chain: 'Multi-chain', desc: 'The identity home for the Pudgy Penguins NFT community.' },
+  { tld: '.og',          desc: 'Own the original internet identity.' },
+  { tld: '.crypto',      desc: 'The most recognized crypto-native identity.' },
+  { tld: '.nft',         desc: 'Built for creators, collectors, and communities.' },
+  { tld: '.wallet',      desc: 'A human-readable name for every wallet.' },
+  { tld: '.blockchain',  desc: 'For builders shaping the decentralized future.' },
+  { tld: '.bitcoin',     desc: "Show your allegiance to the world's first cryptocurrency." },
+  { tld: '.dao',         desc: 'Designed for decentralized communities and governance.' },
+  { tld: '.zil',         desc: 'The original blockchain domain extension.' },
+  { tld: '.x',           desc: 'Short, premium, and unforgettable.' },
+  { tld: '.polygon',     desc: 'Built for the Polygon ecosystem.' },
+  { tld: '.binanceus',   desc: 'Identity for the Binance US community.' },
+  { tld: '.bitget',      desc: 'Represent your presence across the Bitget ecosystem.' },
+  { tld: '.anime',       desc: 'For anime fans, creators, and collectors.' },
+  { tld: '.manga',       desc: 'A home for manga culture on-chain.' },
+  { tld: '.clay',        desc: 'Shape your digital identity your way.' },
+  { tld: '.witg',        desc: "For communities creating what's next." },
+  { tld: '.wrkx',        desc: 'Built for builders, creators, and innovators.' },
+  { tld: '.austin',      desc: "Represent one of the world's leading tech hubs." },
+  { tld: '.mumu',        desc: 'Playful, memorable, and community-driven.' },
+  { tld: '.bald',        desc: 'A badge of internet culture and conviction.' },
+  { tld: '.chomp',       desc: 'Bold identities for those who move first.' },
+  { tld: '.tball',       desc: 'For players, fans, and sports communities.' },
+  { tld: '.dfz',         desc: 'Unique identities for emerging digital communities.' },
+  { tld: '.secret',      desc: 'Exclusive, private, and unmistakably yours.' },
+  { tld: '.raiin',       desc: 'Built for creators and digital entrepreneurs.' },
+  { tld: '.stepn',       desc: 'For the move-to-earn generation.' },
+  { tld: '.ubu',         desc: 'Simple, unique, and easy to remember.' },
+  { tld: '.pudgy',       desc: "Join one of Web3's most iconic communities." },
+  { tld: '.go',          desc: 'Short, action-oriented, and universally understood.' },
+  { tld: '.smobler',     desc: 'Community-first identity for Web3 natives.' },
+  { tld: '.lfg',         desc: 'For builders ready to ship and win.' },
+  { tld: '.pog',         desc: 'Celebrate every achievement on-chain.' },
+  { tld: '.dream',       desc: 'Turn your vision into a permanent identity.' },
+  { tld: '.propykeys',   desc: 'Built for the future of digital property ownership.' },
+  { tld: '.unstoppable', desc: 'A statement of freedom and self-sovereignty.' },
 ]
 
-const PAGE_SIZE = 9
+const PAGE_SIZE = 12
 
 export function UdTlds() {
   const [page, setPage] = useState(0)
@@ -80,7 +91,8 @@ export function UdTlds() {
         <div className={styles.headerDescWrap}>
           <span className={styles.descReticleTL} aria-hidden="true" />
           <p className={styles.headerDesc}>
-            55 TLDs spanning crypto culture, identity, finance, and community — the largest on-chain namespace catalog.
+            55 TLDs available across identity, payments, communities, brands, and digital ownership.
+
           </p>
           <span className={styles.descReticleBR} aria-hidden="true" />
         </div>
@@ -93,11 +105,7 @@ export function UdTlds() {
               <div className={styles.contentPolygon}>
                 <div className={styles.contentInner}>
                   <h3 className={styles.tldName}>{item.tld}</h3>
-                  <div className={styles.meta}>
-                    <p className={styles.price}>{item.price}</p>
-                    <p className={styles.chain}>{item.chain}</p>
-                    <p className={styles.desc}>{item.desc}</p>
-                  </div>
+                  <p className={styles.desc}>{item.desc}</p>
                   <PrimaryButton
                     size="sm"
                     icon={<FiArrowRight />}

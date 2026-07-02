@@ -5,17 +5,17 @@ import { FiArrowRight, FiChevronDown, FiChevronLeft, FiChevronRight } from 'reac
 import styles from './FreenameTlds.module.scss'
 
 const TLDS = [
-  { tld: '.metaverse', price: '$2', chain: 'Multi-chain', desc: 'Secure your place in the digital worlds of tomorrow.' },
-  { tld: '.hodl',      price: '$2', chain: 'Multi-chain', desc: 'Built for long-term believers in crypto.' },
-  { tld: '.satosh',    price: '$2', chain: 'Multi-chain', desc: 'Inspired by the creator of Bitcoin.' },
-  { tld: '.genesis',   price: '$2', chain: 'Multi-chain', desc: 'The perfect identity for new beginnings.' },
-  { tld: '.token',     price: '$2', chain: 'Multi-chain', desc: 'A Web3-native identity built around digital ownership.' },
-  { tld: '.sat',       price: '$2', chain: 'Multi-chain', desc: 'Short, memorable, and Bitcoin-inspired.' },
-  { tld: '.airdrop',   price: '$2', chain: 'Multi-chain', desc: 'For users at the forefront of Web3 discovery.' },
-  { tld: '.rwa',       price: '$2', chain: 'Multi-chain', desc: 'Built for the future of real-world assets on-chain.' },
+  { tld: '.metaverse', desc: 'Secure your place in the digital worlds of tomorrow.' },
+  { tld: '.hodl',      desc: 'Built for long-term believers in crypto.' },
+  { tld: '.satosh',    desc: 'Inspired by the creator of Bitcoin.' },
+  { tld: '.genesis',   desc: 'The perfect identity for new beginnings.' },
+  { tld: '.token',     desc: 'A Web3-native identity built around digital ownership.' },
+  { tld: '.sat',       desc: 'Short, memorable, and Bitcoin-inspired.' },
+  { tld: '.airdrop',   desc: 'For users at the forefront of Web3 discovery.' },
+  { tld: '.rwa',       desc: 'Built for the future of real-world assets on-chain.' },
 ]
 
-const PAGE_SIZE = 6
+const PAGE_SIZE = 8
 const MOBILE_INITIAL = 4
 
 export function FreenameTlds() {
@@ -80,11 +80,7 @@ export function FreenameTlds() {
               <div className={styles.contentPolygon}>
                 <div className={styles.contentInner}>
                   <h3 className={styles.tldName}>{item.tld}</h3>
-                  <div className={styles.meta}>
-                    <p className={styles.price}>{item.price}</p>
-                    <p className={styles.chain}>{item.chain}</p>
-                    <p className={styles.desc}>{item.desc}</p>
-                  </div>
+                  <p className={styles.desc}>{item.desc}</p>
                   <PrimaryButton
                     size="sm"
                     icon={<FiArrowRight />}

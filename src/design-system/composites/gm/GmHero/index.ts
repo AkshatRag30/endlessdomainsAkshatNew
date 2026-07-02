@@ -1,0 +1,1 @@
+export { GmHero } from './GmHero'

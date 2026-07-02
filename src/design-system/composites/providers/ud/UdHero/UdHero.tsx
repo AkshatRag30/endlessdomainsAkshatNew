@@ -6,7 +6,7 @@ import styles from './UdHero.module.scss'
 const STATS = [
   { value: '55',     label: 'TLDs Available' },
   { value: '4M+',   label: 'Total Registrations' },
-  { value: '$5',    label: 'Starting Price' },
+  { value: '$2',    label: 'Starting Price' },
 ]
 
 export interface UdHeroProps {

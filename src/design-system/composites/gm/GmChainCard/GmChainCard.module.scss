@@ -1,0 +1,156 @@
+@import '@newstyles/_mixins.scss';
+
+.card {
+  background: var(--color-white-primary);
+  border: 2px solid var(--color-gray-200);
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    border-color: rgba(38, 57, 237, 0.3);
+    box-shadow: 0 2px 16px rgba(38, 57, 237, 0.06);
+  }
+
+  &:focus-within {
+    border-color: rgba(38, 57, 237, 0.4);
+  }
+}
+
+.cardDone {
+  border-color: rgba(38, 57, 237, 0.25);
+  background: rgba(38, 57, 237, 0.02);
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--color-gray-200);
+}
+
+.chainInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.logoWrap {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--color-blue-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logoFallback {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-blue-primary);
+  text-transform: uppercase;
+}
+
+.chainName {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  line-height: 1;
+}
+
+.favoriteBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-gray-300);
+  border-radius: var(--radius-sm);
+  transition: color 0.15s ease, background 0.15s ease;
+  padding: 0;
+
+  &:hover {
+    color: var(--color-blue-primary);
+    background: var(--color-blue-light);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.favoriteBtnActive {
+  color: var(--color-blue-primary);
+
+  svg {
+    fill: var(--color-blue-primary);
+  }
+}
+
+// ── Meta rows ─────────────────────────────────────────────────────────────────
+
+.metaRow {
+  display: flex;
+  flex-direction: column;
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+
+  & + & {
+    border-top: 1px solid var(--color-gray-200);
+  }
+}
+
+.metaLabel {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-gray-dark);
+  line-height: 1;
+}
+
+.metaValue {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-ibm-plex-mono);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-blue-primary);
+  line-height: 1;
+}
+
+.metaIcon {
+  flex-shrink: 0;
+  opacity: 0.75;
+}
+
+// ── Say GM button ─────────────────────────────────────────────────────────────
+
+.btnWrap {
+  padding: var(--space-4);
+  border-top: 1px solid var(--color-gray-200);
+}
+
+.btnStar {
+  font-size: 13px;
+  line-height: 1;
+  opacity: 0.9;
+}

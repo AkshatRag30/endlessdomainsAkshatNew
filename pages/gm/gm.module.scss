@@ -1,0 +1,9 @@
+@import '@newstyles/_mixins.scss';
+
+.main {
+  width: 100%;
+  min-height: 100vh;
+  background: var(--color-white-primary);
+  display: flex;
+  flex-direction: column;
+}

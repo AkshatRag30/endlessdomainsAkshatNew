@@ -3,9 +3,9 @@ import styles from './UdBanner.module.scss'
 
 const STATS = [
   { label: 'Founded',          value: '2018' },
-  { label: 'Headquarters',     value: 'San Francisco' },
-  { label: 'Chains Supported', value: 'Multi-chain' },
-  { label: 'Price Range',      value: '$5 to $100+' },
+  { label: 'Headquarters',     value: 'San Francisco, USA' },
+  { label: 'Chains Supported', value: 'EVM' },
+  { label: 'Price Range',      value: '$2 to $100+' },
 ]
 
 export function UdBanner() {

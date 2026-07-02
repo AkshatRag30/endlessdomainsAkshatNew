@@ -1,0 +1,223 @@
+@import '@newstyles/_mixins.scss';
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+}
+
+// ── Live Activity card ────────────────────────────────────────────────────────
+
+.liveCard {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 11px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  position: relative;
+  overflow: hidden;
+  // design-specific: diagonal repeating-linear-gradient texture over white base
+  background-color: var(--color-white-primary);
+  background-image: repeating-linear-gradient(
+    135deg,
+    transparent,
+    transparent 4px,
+    rgba(38, 57, 237, 0.03) 4px,
+    rgba(38, 57, 237, 0.03) 5px
+  );
+}
+
+.liveHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.liveDot {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  background: #22c55e;
+  flex-shrink: 0;
+  border: 0.1px solid #bbffaf;
+  box-shadow: 0 0 0 0 rgba(39, 255, 0, 0.33), 0 0 6px rgba(39, 255, 0, 0.4);
+  animation: live-pulse 2s ease-in-out infinite;
+}
+
+@keyframes live-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(39, 255, 0, 0.4), 0 0 6px rgba(39, 255, 0, 0.4); }
+  50%       { box-shadow: 0 0 0 4px rgba(39, 255, 0, 0), 0 0 10px rgba(39, 255, 0, 0.2); }
+}
+
+.liveTitle {
+  font-family: var(--font-satoshi);
+  font-size: 13px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  margin: 0;
+  line-height: 20px;
+}
+
+.liveList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.liveItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 6px 8px;
+  border-radius: 16px;
+}
+
+.liveIconWrap {
+  padding-top: 2px;
+  flex-shrink: 0;
+}
+
+.liveIcon {
+  color: #e879a0;
+  flex-shrink: 0;
+}
+
+.liveContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.liveMainLine {
+  font-family: var(--font-satoshi);
+  font-size: 13px;
+  font-weight: var(--font-weight-regular);
+  line-height: 17px;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--color-black-primary);
+}
+
+.liveAddr {
+  color: var(--color-blue-primary);
+}
+
+.liveAction {
+  color: var(--color-black-primary);
+}
+
+.liveChainWrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--chain-color, var(--color-blue-primary));
+}
+
+.liveChainDot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: var(--radius-full);
+  background: currentColor;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+.liveChainName {
+  font-size: 13px;
+  font-family: var(--font-satoshi);
+  color: var(--color-black-primary);
+}
+
+.liveTime {
+  font-family: var(--font-satoshi);
+  font-size: 11px;
+  font-weight: var(--font-weight-regular);
+  color: #878792;
+  line-height: 13.5px;
+  margin: 0;
+  white-space: nowrap;
+}
+
+// ── Stats card ────────────────────────────────────────────────────────────────
+
+.statsCard {
+  // design-specific: Figma gradient + repeating-linear-gradient diagonal texture overlay
+  background-color: #2639ed;
+  background-image:
+    repeating-linear-gradient(
+      135deg,
+      transparent,
+      transparent 4px,
+      rgba(255, 255, 255, 0.04) 4px,
+      rgba(255, 255, 255, 0.04) 5px
+    ),
+    linear-gradient(to top right, #050510 0%, #1e2fe0 25%, #2639ed 50%);
+  border: 1px solid rgba(38, 57, 237, 0.3);
+  padding: var(--space-5) var(--space-4);
+  position: relative;
+  box-shadow: inset 0px 0px 7px 0px white;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 18px;
+}
+
+// ── Stat item with 4-corner brackets ─────────────────────────────────────────
+
+.statItem {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 10px;
+}
+
+// design-specific: 4 individual corner bracket spans — same pattern as StorySection/Hero eyebrow
+%stat-bracket {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-color: rgba(255, 255, 255, 0.55);
+  border-style: solid;
+}
+
+.bTL { @extend %stat-bracket; top: 0;    left: 0;  border-width: 1.5px 0 0 1.5px; }
+.bTR { @extend %stat-bracket; top: 0;    right: 0; border-width: 1.5px 1.5px 0 0; }
+.bBL { @extend %stat-bracket; bottom: 0; left: 0;  border-width: 0 0 1.5px 1.5px; }
+.bBR { @extend %stat-bracket; bottom: 0; right: 0; border-width: 0 1.5px 1.5px 0; }
+
+.statValue {
+  font-family: var(--font-satoshi);
+  font-size: 25px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white-primary);
+  line-height: 1.2;
+  white-space: nowrap;
+  // design-specific: Figma text-shadow on stat numbers
+  text-shadow: 0px 0.47px 0.61px rgba(0, 0, 0, 0.25);
+}
+
+.statLabel {
+  font-family: var(--font-space-grotesk);
+  font-size: 9px;
+  font-weight: var(--font-weight-medium);
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: -0.12px;
+  line-height: 1.2;
+  text-align: center;
+}
