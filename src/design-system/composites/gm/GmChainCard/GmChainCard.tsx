@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import { FiStar } from 'react-icons/fi'
 import { HiOutlineClock } from 'react-icons/hi'
+import { IoSunnyOutline } from 'react-icons/io5'
 import { PrimaryButton } from '@/design-system/primitives/button/PrimaryButton'
 import { GmChain } from '../gm.data'
 import styles from './GmChainCard.module.scss'
@@ -97,8 +98,9 @@ export function GmChainCard({ chain, onSayGm, onToggleFavorite }: GmChainCardPro
           disabled={loading || done}
           loading={loading}
           fullWidth
+          icon={!loading && !done ? <IoSunnyOutline size={16} /> : undefined}
+          iconPosition="left"
         >
-          {!loading && <span className={styles.btnStar} aria-hidden="true">✦</span>}
           {loading ? 'Sending…' : done ? 'GM Sent ✓' : 'Say Gm'}
         </PrimaryButton>
       </div>
