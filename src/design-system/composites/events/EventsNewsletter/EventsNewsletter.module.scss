@@ -8,17 +8,17 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: var(--space-12) var(--container-padding-x);
-  gap: var(--space-10);
+  padding: var(--space-12) var(--container-padding-x) var(--space-14);
+  gap: var(--space-13); // ~96px between stats row and newsletter banner
 
   @include tablet-down {
-    padding: var(--space-10) var(--space-7);
-    gap: var(--space-8);
+    padding: var(--space-10) var(--space-7) var(--space-12);
+    gap: var(--space-11);
   }
 
   @include mobile {
-    padding: var(--space-8) var(--space-5);
-    gap: var(--space-7);
+    padding: var(--space-8) var(--space-5) var(--space-10);
+    gap: var(--space-9);
   }
 }
 
@@ -30,33 +30,8 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  max-width: 900px;
-  // design-specific: 4 corner bracket marks frame the entire stats row
-  position: relative;
+  max-width: 1120px; // matches .banner's max-width so the two elements line up
   padding: var(--space-6) var(--space-8);
-
-  // corner bracket marks
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    border-color: var(--color-gray-200);
-    border-style: solid;
-  }
-
-  &::before {
-    top: 0;
-    left: 0;
-    border-width: 1px 0 0 1px;
-  }
-
-  &::after {
-    bottom: 0;
-    right: 0;
-    border-width: 0 1px 1px 0;
-  }
 
   @include tablet-down {
     flex-wrap: wrap;
@@ -66,15 +41,17 @@
   }
 
   @include mobile {
-    gap: var(--space-6);
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-5);
     padding: var(--space-5);
+    align-items: start;
   }
-}
 
-// design-specific: top-right and bottom-left corner brackets on stats row
-.statsRow > :first-child::before,
-.statsRow > :last-child::after {
-  display: none; // handled via pseudo-elements on .statsRow
+  @include small-mobile {
+    gap: var(--space-4);
+    padding: var(--space-4);
+  }
 }
 
 // ── Stat item ─────────────────────────────────────────────────────────────────
@@ -93,30 +70,45 @@
   }
 
   @include mobile {
-    flex: 0 0 calc(50% - var(--space-6));
+    // grid context on mobile — flex props are overridden by grid
+    flex: unset;
+    min-width: 0;
   }
 }
 
-// design-specific: vertical dashed divider between stat items
-.statDivider {
+// ── Per-stat bracket corners ───────────────────────────────────────────────────
+
+.statBracketWrap {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-6);
+
+  @include mobile {
+    padding: var(--space-3) var(--space-4);
+  }
+
+  @include small-mobile {
+    padding: var(--space-2) var(--space-3);
+  }
+}
+
+%stat-bracket {
   position: absolute;
-  left: 0;
-  top: 10%;
-  bottom: 10%;
-  width: 1px;
-  background: repeating-linear-gradient(
-    180deg,
-    var(--color-gray-200) 0px,
-    var(--color-gray-200) 5px,
-    transparent 5px,
-    transparent 10px
-  );
-  pointer-events: none;
-
-  @include tablet-down {
-    display: none;
-  }
+  width: 10px;
+  height: 10px;
+  border-color: var(--color-gray-200);
+  border-style: solid;
 }
+
+.bTL { @extend %stat-bracket; top: 0; left: 0; border-width: 2.5px 0 0 2.5px; }
+.bTR { @extend %stat-bracket; top: 0; right: 0; border-width: 2.5px 2.5px 0 0; }
+.bBL { @extend %stat-bracket; bottom: 0; left: 0; border-width: 0 0 2.5px 2.5px; }
+.bBR { @extend %stat-bracket; bottom: 0; right: 0; border-width: 0 2.5px 2.5px 0; }
+
 
 .statValue {
   margin: 0;
@@ -134,13 +126,14 @@
   @include max-width(1280px) { font-size: 44px; }
   @include tablet-down { font-size: 38px; }
   @include mobile { font-size: 32px; }
+  @include small-mobile { font-size: 28px; }
 }
 
 .statLabel {
   margin: 0;
   font-family: var(--font-satoshi);
   font-size: var(--text-small-13);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-bold);
   color: var(--color-gray-dark);
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -154,17 +147,44 @@
   position: relative;
   width: 100%;
   max-width: 1120px;
-  // design-specific: Figma banner height ~290px
-  min-height: 200px;
-  border-radius: var(--radius-lg);
+  height: 290px; // design-specific: Figma banner height — explicit height required for Next.js fill Image
   overflow: hidden;
   display: flex;
   align-items: center;
+
+  @include tablet-down {
+    height: 240px;
+  }
+
+  @include mobile {
+    height: 420px;
+  }
+
+  @include small-mobile {
+    height: 460px;
+  }
 }
 
 .bannerBg {
   object-fit: cover;
   object-position: center;
+
+  @include mobile {
+    display: none;
+  }
+}
+
+// dedicated mobile banner image — swapped in below the mobile breakpoint.
+// object-fit: fill shows the entire image stretched to the banner box — no cropping
+// (like cover would do) and no letterboxing/empty space (like contain would do)
+.bannerBgMobile {
+  display: none;
+  object-fit: fill;
+  object-position: center;
+
+  @include mobile {
+    display: block;
+  }
 }
 
 .bannerContent {
@@ -174,18 +194,22 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: flex-start;
   gap: var(--space-6);
-  padding: var(--space-10) var(--space-12);
+  padding: var(--space-13) var(--space-12) var(--space-10);
   text-align: center;
 
   @include tablet-down {
-    padding: var(--space-9) var(--space-8);
+    padding: var(--space-11) var(--space-8) var(--space-9);
     gap: var(--space-5);
   }
 
   @include mobile {
-    padding: var(--space-8) var(--space-5);
-    gap: var(--space-5);
+    align-items: flex-start;
+    text-align: left;
+    // reduced top padding shifts the text and form upward within the banner
+    padding: var(--space-5) var(--space-5) var(--space-8);
+    gap: var(--space-6);
   }
 }
 
@@ -206,7 +230,8 @@
 
   @include max-width(1280px) { font-size: 40px; }
   @include tablet-down { font-size: 32px; }
-  @include mobile { font-size: 26px; }
+  @include mobile { font-size: 44px; font-weight: var(--font-weight-bold); }
+  @include small-mobile { font-size: 36px; }
 }
 
 .bannerDesc {
@@ -219,8 +244,10 @@
   max-width: 480px;
 
   @include mobile {
-    font-size: var(--text-small-12);
+    font-size: var(--text-small-13);
     max-width: 100%;
+    text-align: center;
+    align-self: center;
   }
 }
 
@@ -231,20 +258,17 @@
   flex-direction: row;
   align-items: center;
   width: 100%;
-  max-width: 460px;
+  max-width: 475px;
   // design-specific: white pill container wrapping input + button
   background: var(--color-white-primary);
-  border-radius: var(--radius-sm);
   overflow: hidden;
   padding: 4px;
   gap: 0;
 
   @include mobile {
     max-width: 100%;
-    flex-direction: column;
-    border-radius: var(--radius-sm);
-    padding: var(--space-2);
-    gap: var(--space-2);
+    flex-direction: row;
+    padding: 4px;
   }
 }
 
@@ -266,10 +290,10 @@
   }
 
   @include mobile {
-    width: 100%;
-    padding: var(--space-3) var(--space-4);
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--color-gray-200);
+    width: auto;
+    padding: 10px var(--space-3);
+    border-radius: 0;
+    border: none;
   }
 }
 
@@ -284,7 +308,6 @@
   border: none;
   cursor: pointer;
   padding: 10px var(--space-6);
-  border-radius: var(--radius-sm);
   line-height: 1;
   transition: background 0.2s ease;
 
@@ -297,8 +320,9 @@
   }
 
   @include mobile {
-    width: 100%;
-    padding: var(--space-3) var(--space-6);
+    width: auto;
+    flex-shrink: 0;
+    padding: 10px var(--space-5);
   }
 }
 

@@ -1,7 +1,7 @@
 import Image, { StaticImageData } from 'next/image'
+import Link from 'next/link'
 import React, { useState, useCallback } from 'react'
 import { FiCalendar, FiMapPin } from 'react-icons/fi'
-import { PrimaryButton } from '@/design-system/primitives/button/PrimaryButton'
 import styles from './EventCard.module.scss'
 
 export interface EventCardData {
@@ -17,10 +17,9 @@ export interface EventCardData {
 
 interface EventCardProps {
   event: EventCardData
-  onExplore?: (id: string) => void
 }
 
-export function EventCard({ event, onExplore }: EventCardProps) {
+export function EventCard({ event }: EventCardProps) {
   const [hovered, setHovered] = useState(false)
   const [pos, setPos] = useState({ x: 0, y: 0 })
 
@@ -36,10 +35,6 @@ export function EventCard({ event, onExplore }: EventCardProps) {
   }, [])
 
   const handleMouseLeave = useCallback(() => setHovered(false), [])
-
-  const handleExplore = useCallback(() => {
-    onExplore?.(event.id)
-  }, [onExplore, event.id])
 
   return (
     <div
@@ -93,9 +88,9 @@ export function EventCard({ event, onExplore }: EventCardProps) {
 
             {/* Primary CTA */}
             <div className={styles.btnWrap}>
-              <PrimaryButton onClick={handleExplore} size="md">
-                Explore Events
-              </PrimaryButton>
+              <Link href={event.href} className={styles.exploreBtn}>
+                Become An Ambassador
+              </Link>
             </div>
           </div>
         </div>

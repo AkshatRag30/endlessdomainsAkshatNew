@@ -1,0 +1,451 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Section shell ─────────────────────────────────────────────────────────────
+
+.section {
+  position: relative;
+  width: 100%;
+  background: var(--color-white-primary);
+  overflow: hidden;
+}
+
+// ── Top content area ──────────────────────────────────────────────────────────
+
+.topArea {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: stretch;
+  // design-specific: ~297px tall top zone matching Figma
+  min-height: 316px;
+  padding: 0 var(--space-8);
+  border-top: 1px dashed rgba(0, 0, 0, 0.12);
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.12);
+
+  @include tablet-down {
+    min-height: auto;
+    flex-direction: column;
+    padding: 0;
+  }
+}
+
+// Decorative striped columns (left + right of text block)
+// design-specific: 63px wide, repeating diagonal line pattern, 12% opacity
+.stripeCol {
+  flex-shrink: 0;
+  // design-specific: ~63px wide stripe columns
+  width: 63px;
+  position: relative;
+  overflow: hidden;
+  opacity: 0.12;
+
+  // Repeating diagonal SVG-style line pattern rendered as CSS
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent 0px,
+    transparent 10px,
+    rgba(0, 0, 0, 0.5) 10px,
+    rgba(0, 0, 0, 0.5) 11px
+  );
+
+  &[data-side='left'] {
+    border-right: 0.5px solid rgba(0, 0, 0, 0.12);
+  }
+
+  &[data-side='right'] {
+    border-left: 0.5px solid rgba(0, 0, 0, 0.12);
+  }
+
+  @include tablet-down {
+    display: none;
+  }
+}
+
+// Thin vertical divider lines between stripe cols and center content
+.dividerLine {
+  display: none; // handled by stripe col border
+}
+
+// Center content block
+.centerContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-6);
+  padding: var(--space-9) var(--space-7);
+  text-align: center;
+
+  @include tablet-down {
+    padding: var(--space-7) var(--space-6);
+    gap: var(--space-5);
+  }
+
+  @include mobile {
+    padding: var(--space-6) var(--space-5);
+    gap: var(--space-4);
+  }
+}
+
+// ── Subtitle with brackets ────────────────────────────────────────────────────
+
+.subtitleWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 44px;
+}
+
+%subtitle-corner {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-style: solid;
+  border-color: var(--color-blue-primary);
+  pointer-events: none;
+}
+
+.subtitleBracketTL { @extend %subtitle-corner; top: 0; left: 0; border-width: 1.5px 0 0 1.5px; }
+.subtitleBracketTR { @extend %subtitle-corner; top: 0; right: 0; border-width: 1.5px 1.5px 0 0; }
+.subtitleBracketBL { @extend %subtitle-corner; bottom: 0; left: 0; border-width: 0 0 1.5px 1.5px; }
+.subtitleBracketBR { @extend %subtitle-corner; bottom: 0; right: 0; border-width: 0 1.5px 1.5px 0; }
+
+.subtitleText {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-faq-bracket);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+
+  @include mobile {
+    font-size: 12px;
+    white-space: normal;
+    text-align: center;
+  }
+}
+
+// ── Heading ───────────────────────────────────────────────────────────────────
+
+.heading {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.headingLine1 {
+  display: block;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-transform: capitalize;
+
+  @include tablet-down { font-size: 42px; }
+  @include mobile { font-size: 30px; }
+}
+
+.headingLine2 {
+  display: block;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2);
+  font-weight: var(--font-weight-regular);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-transform: capitalize;
+  // design-specific: blue gradient matching Figma
+  background: linear-gradient(132deg, var(--color-blue-primary) 70%, var(--color-blue-primary-faded) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  @include tablet-down { font-size: 42px; }
+  @include mobile { font-size: 30px; }
+}
+
+// ── Description ───────────────────────────────────────────────────────────────
+
+.description {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-body);
+  font-weight: var(--font-weight-regular);
+  color: rgba(0, 0, 0, 0.7);
+  line-height: var(--leading-normal);
+  max-width: 1080px;
+  text-align: center;
+
+  @include tablet-down {
+    font-size: var(--text-normal);
+  }
+
+  @include mobile {
+    font-size: var(--text-body-small);
+  }
+}
+
+// ── Bottom area (feature cards) ────────────────────────────────────────────────
+
+.bottomArea {
+  position: relative;
+  width: 100%;
+  // design-specific: ~504px tall lower zone
+  min-height: 484px;
+  display: flex;
+  align-items: flex-start;
+
+  @include tablet-down {
+    min-height: auto;
+    flex-direction: column;
+    align-items: stretch;
+    padding: var(--space-10) var(--space-6) var(--space-10);
+    gap: 0;
+  }
+
+  @include mobile {
+    padding: var(--space-9) var(--space-5);
+  }
+}
+
+// Vertical glow divider beams between left card and center, right card and center
+// design-specific: tall vertical glowing lines that taper — blue gradient beam
+.glowDivider {
+  position: absolute;
+  top: 0;
+  // design-specific: ~504px tall beam
+  height: 504px;
+  width: 0;
+  pointer-events: none;
+
+  &[data-side='left'] {
+    // design-specific: left beam at ~232px left of center
+    left: calc(50% - 232px);
+  }
+
+  &[data-side='right'] {
+    // design-specific: right beam at ~231px right of center
+    right: calc(50% - 231px);
+  }
+
+  // Glow line rendered as box-shadow
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1px;
+    height: 100%;
+    // design-specific: blue gradient glow beam fading at edges
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(38, 57, 237, 0.08) 15%,
+      rgba(38, 57, 237, 0.25) 50%,
+      rgba(38, 57, 237, 0.08) 85%,
+      transparent 100%
+    );
+    box-shadow:
+      0 0 22px rgba(255, 255, 255, 0.8),
+      0 0 8px rgba(255, 255, 255, 0.6);
+  }
+
+  @include tablet-down {
+    display: none;
+  }
+}
+
+// ── Feature cards ─────────────────────────────────────────────────────────────
+
+.featureCard {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  // design-specific: 285px wide cards
+  width: 285px;
+
+  &[data-position='left'] {
+    // design-specific: left-aligned card at left: 138px, top: ~137px from bottom zone top
+    left: 138px;
+    top: 137px;
+  }
+
+  &[data-position='right'] {
+    // design-specific: right-aligned card at right edge (1096px from left = right: 138px mirror)
+    right: 138px;
+    top: 137px;
+  }
+
+  @include tablet-up {
+    &[data-position='center'] {
+      // design-specific: center card lower, at left: 50% - ~142px
+      left: 50%;
+      transform: translateX(-50%);
+      top: 241px;
+    }
+  }
+
+  @include tablet-down {
+    position: static;
+    left: auto;
+    right: auto;
+    transform: none;
+    width: 100%;
+    max-width: 100%;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+    text-align: center;
+    padding: var(--space-7) 0;
+    border-bottom: 1px dashed rgba(0, 0, 0, 0.12);
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  @include mobile {
+    min-height: 260px;
+  }
+}
+
+// ── Icon badge ────────────────────────────────────────────────────────────────
+
+.iconBadgeWrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex-shrink: 0;
+
+  @include tablet-down {
+    flex-direction: column;
+  }
+}
+
+// design-specific: blue gradient rounded square badge, 58px, with inner glow
+.iconBadge {
+  position: relative;
+  z-index: 1;
+  width: 58px;
+  height: 58px;
+  border-radius: 18.765px;
+  background: linear-gradient(180deg, var(--color-blue-primary) 0%, rgba(38, 57, 237, 0.47) 100%);
+  // design-specific: multi-layer shadow: blue glow layers + white border rings
+  box-shadow:
+    0px 20px 51px 0px rgba(87, 177, 255, 0.34),
+    0px 11.8px 15.4px 0px rgba(87, 177, 255, 0.19),
+    0px 4.9px 6.4px 0px rgba(87, 177, 255, 0.22),
+    0px 1.8px 2.3px 0px rgba(87, 177, 255, 0.15),
+    0px 0px 0px 1.9px #e0e9f2,
+    0px 0px 0px 2.4px var(--color-white-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  // design-specific: inner highlight ring
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 18.765px;
+    box-shadow:
+      inset 0px 0.5px 8.6px 1px #d2eaff,
+      inset 0px 0.5px 1.9px 1px #d2eaff;
+    pointer-events: none;
+  }
+
+  svg {
+    display: block;
+    flex-shrink: 0;
+  }
+}
+
+// design-specific: tall blue glow beam that runs from above the badge down through it, fading at both ends
+.iconGlowBeam {
+  width: 58px;
+  // design-specific: beam is ~140px tall, bottom-aligned with the badge so it extends upward from it
+  height: 140px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(38, 57, 237, 0.017) 5%,
+    rgba(38, 57, 237, 0.5) 77%,
+    transparent 100%
+  );
+
+  // Inner white highlight
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    border-radius: 2px;
+    box-shadow: inset 0px 0px 22px 0px white;
+    pointer-events: none;
+  }
+
+  // White border lines on left and right of beam
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-left: 1px solid rgba(255, 255, 255, 0.6);
+    border-right: 1px solid rgba(255, 255, 255, 0.6);
+    pointer-events: none;
+  }
+
+  @include tablet-down {
+    display: none;
+  }
+}
+
+// ── Card text ─────────────────────────────────────────────────────────────────
+
+.cardText {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.cardTitle {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h3);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.2;
+  text-transform: capitalize;
+  // design-specific: blue gradient on card titles
+  background: linear-gradient(144deg, var(--color-blue-primary) 70%, var(--color-blue-primary-faded) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  @include tablet-down {
+    font-size: 24px;
+  }
+
+  @include mobile {
+    font-size: 22px;
+  }
+}
+
+.cardDescription {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-body);
+  line-height: var(--leading-normal);
+}

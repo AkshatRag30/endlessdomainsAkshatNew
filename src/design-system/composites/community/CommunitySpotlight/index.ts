@@ -1,0 +1,1 @@
+export { CommunitySpotlight } from './CommunitySpotlight'

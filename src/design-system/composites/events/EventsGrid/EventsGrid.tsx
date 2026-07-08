@@ -1,10 +1,12 @@
-import React, { useState, useCallback } from 'react'
-import { FiSearch } from 'react-icons/fi'
+import React, { useState, useCallback, useEffect, useRef } from 'react'
+import { FiSearch, FiX, FiChevronDown } from 'react-icons/fi'
 import { EventCard } from '../EventCard'
 import type { EventCardData } from '../EventCard'
 import styles from './EventsGrid.module.scss'
 
-type FilterTab = 'all' | 'upcoming' | 'past'
+type FilterTab = 'all' | 'global' | 'regional' | 'virtual'
+
+const LOCATION_OPTIONS = ['All Location', 'India', 'Dubai', 'Singapore', 'New Delhi', 'Mumbai', 'Bangalore']
 
 interface EventsGridProps {
   events?: EventCardData[]
@@ -19,7 +21,7 @@ const PLACEHOLDER_EVENTS: EventCardData[] = [
     category: 'global',
     date: '12/3/25',
     location: 'Bangalore',
-    href: '#',
+    href: '/events/domainer-conference-expo',
   },
   {
     id: '2',
@@ -29,7 +31,7 @@ const PLACEHOLDER_EVENTS: EventCardData[] = [
     category: 'global',
     date: '01/5/25',
     location: 'Dubai',
-    href: '#',
+    href: '/events/token2049-dubai',
   },
   {
     id: '3',
@@ -39,7 +41,7 @@ const PLACEHOLDER_EVENTS: EventCardData[] = [
     category: 'hackathon',
     date: '14/4/25',
     location: 'New Delhi',
-    href: '#',
+    href: '/events/ethglobal-new-delhi',
   },
   {
     id: '4',
@@ -49,7 +51,7 @@ const PLACEHOLDER_EVENTS: EventCardData[] = [
     category: 'regional',
     date: '22/6/25',
     location: 'Mumbai',
-    href: '#',
+    href: '/events/india-blockchain-week',
   },
   {
     id: '5',
@@ -59,7 +61,7 @@ const PLACEHOLDER_EVENTS: EventCardData[] = [
     category: 'global',
     date: '10/7/25',
     location: 'Dubai',
-    href: '#',
+    href: '/events/domain-days-dubai',
   },
   {
     id: '6',
@@ -69,78 +71,154 @@ const PLACEHOLDER_EVENTS: EventCardData[] = [
     category: 'summit',
     date: '18/8/25',
     location: 'Singapore',
-    href: '#',
+    href: '/events/web3-identity-summit',
   },
 ]
 
+const TABS: { key: FilterTab; label: string }[] = [
+  { key: 'all',      label: 'All'      },
+  { key: 'global',   label: 'Global'   },
+  { key: 'regional', label: 'Regional' },
+  { key: 'virtual',  label: 'Virtual'  },
+]
+
 export function EventsGrid({ events = PLACEHOLDER_EVENTS }: EventsGridProps) {
-  const [activeTab, setActiveTab] = useState<FilterTab>('upcoming')
+  const [activeTab, setActiveTab] = useState<FilterTab>('all')
   const [searchQuery, setSearchQuery] = useState('')
+  const [location, setLocation] = useState('All Location')
+  const [locationOpen, setLocationOpen] = useState(false)
+  const locationRef = useRef<HTMLDivElement>(null)
 
   const handleTabClick = useCallback((tab: FilterTab) => setActiveTab(tab), [])
+  const handleClear = useCallback(() => setSearchQuery(''), [])
+  const handleLocationToggle = useCallback(() => setLocationOpen(prev => !prev), [])
+  const handleLocationSelect = useCallback((opt: string) => { setLocation(opt); setLocationOpen(false) }, [])
 
-  const filteredEvents = events.filter(e =>
-    e.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    e.location.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  useEffect(() => {
+    if (!locationOpen) return
+    const handler = (e: MouseEvent) => {
+      if (locationRef.current && !locationRef.current.contains(e.target as Node)) setLocationOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [locationOpen])
+
+  const filteredEvents = events.filter(e => {
+    const matchSearch = e.title.toLowerCase().includes(searchQuery.toLowerCase()) || e.location.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchTab = activeTab === 'all' || e.category === activeTab
+    const matchLocation = location === 'All Location' || e.location.toLowerCase() === location.toLowerCase()
+    return matchSearch && matchTab && matchLocation
+  })
 
   return (
-    <section className={styles.section} aria-labelledby="events-grid-heading">
+    <section id="browse" className={styles.section} aria-labelledby="events-grid-heading">
 
-      {/* ── Section header ── */}
-      <div className={styles.sectionHeader}>
-
-        {/* Left — eyebrow + heading */}
-        <div className={styles.headerLeft}>
-          <div className={styles.eyebrowWrap} aria-hidden="true">
-            <span className={styles.bracketTL} />
-            <span className={styles.bracketTR} />
-            <span className={styles.bracketBL} />
-            <span className={styles.bracketBR} />
-            <p className={styles.eyebrow}>Our Events</p>
-          </div>
-          <h2 id="events-grid-heading" className={styles.heading}>
-            Events <span className={styles.headingLight}>we attend</span>
-          </h2>
+      {/* ── Title block ── */}
+      <div className={styles.titleBlock}>
+        <div className={styles.eyebrowWrap} aria-hidden="true">
+          <span className={styles.bracketTL} />
+          <span className={styles.bracketTR} />
+          <span className={styles.bracketBL} />
+          <span className={styles.bracketBR} />
+          <p className={styles.eyebrow}>BROWSE</p>
         </div>
+        <h2 id="events-grid-heading" className={styles.heading}>
+          All Events
+        </h2>
+        <p className={styles.headingBlue}>100+ Gatherings</p>
+      </div>
 
-        {/* Right — search + filter tabs */}
-        <div className={styles.headerRight}>
-          {/* Search input */}
-          <div className={styles.searchWrap}>
-            <FiSearch className={styles.searchIcon} size={16} aria-hidden="true" />
+      {/* ── Controls row — search left, tabs + dropdown right ── */}
+      <div className={styles.controlsRow}>
+
+        {/* Search — GM style */}
+        <div className={styles.searchForm}>
+          <div className={styles.searchInputWrap}>
             <input
               type="search"
               className={styles.searchInput}
-              placeholder="Search events"
+              placeholder="Search"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               aria-label="Search events"
             />
-          </div>
-
-          {/* Filter tabs */}
-          <nav className={styles.tabsWrap} aria-label="Event filters">
-            <div className={styles.tabsBg}>
-              {(['all', 'upcoming', 'past'] as FilterTab[]).map(tab => (
-                <button
-                  key={tab}
-                  type="button"
-                  className={`${styles.tab} ${activeTab === tab ? styles.tabActive : ''}`}
-                  onClick={() => handleTabClick(tab)}
-                  aria-pressed={activeTab === tab}
-                >
-                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            {searchQuery && (
+              <div className={styles.clearWrap}>
+                <button className={styles.clearBtn} onClick={handleClear} aria-label="Clear search">
+                  <FiX size={14} />
                 </button>
-              ))}
-            </div>
+              </div>
+            )}
+          </div>
+          <div className={styles.searchDivider} aria-hidden="true" />
+          <button className={styles.searchBtn} aria-label="Search events">
+            <FiSearch size={18} aria-hidden="true" />
+            <span>Search Events</span>
+          </button>
+        </div>
+
+        {/* Filter tabs and location — two visually separate controls */}
+        <div className={styles.filtersRight}>
+          <nav className={styles.tabs} role="tablist" aria-label="Filter events by type">
+            {TABS.map((tab, index) =>
+              React.createElement(
+                React.Fragment,
+                { key: tab.key },
+                index > 0 && <span className={styles.tabSep} aria-hidden="true" />,
+                <button
+                  role="tab"
+                  type="button"
+                  aria-selected={activeTab === tab.key}
+                  className={`${styles.tab} ${styles[`tab_${tab.key}`]} ${activeTab === tab.key ? styles.tabActive : ''}`}
+                  onClick={() => handleTabClick(tab.key)}
+                >
+                  <span>{tab.label}</span>
+                </button>,
+              )
+            )}
           </nav>
+
+          {/* Location dropdown — its own separate control, not part of the tabs bar */}
+          <div className={styles.locationWrap} ref={locationRef}>
+            <button
+              type="button"
+              className={styles.locationTrigger}
+              onClick={handleLocationToggle}
+              aria-expanded={locationOpen}
+              aria-haspopup="listbox"
+            >
+              <span>{location}</span>
+              <FiChevronDown
+                size={14}
+                aria-hidden="true"
+                className={`${styles.locationChevron} ${locationOpen ? styles.locationChevronOpen : ''}`}
+              />
+            </button>
+            {locationOpen && (
+              <ul className={styles.locationPanel} role="listbox" aria-label="Location options">
+                {LOCATION_OPTIONS.map(opt => (
+                  <li key={opt} role="option" aria-selected={opt === location}>
+                    <button
+                      type="button"
+                      className={`${styles.locationOption} ${opt === location ? styles.locationOptionSelected : ''}`}
+                      onClick={() => handleLocationSelect(opt)}
+                    >
+                      {opt}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
 
       </div>
 
-      {/* ── Dashed full-width divider ── */}
-      <div className={styles.fullDivider} aria-hidden="true" />
+      {/* ── Dashed divider + hatched band — no gap between them ── */}
+      <div className={styles.dividerGroup} aria-hidden="true">
+        <div className={styles.fullDivider} />
+        <div className={styles.hatchBand} />
+      </div>
 
       {/* ── Card grid ── */}
       <div className={styles.grid}>

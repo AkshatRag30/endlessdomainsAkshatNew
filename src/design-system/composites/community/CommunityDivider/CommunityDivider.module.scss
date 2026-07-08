@@ -1,0 +1,44 @@
+@import '@newstyles/_mixins.scss';
+
+.section {
+  width: 100%;
+  background: var(--color-white-primary);
+  overflow: hidden;
+  line-height: 0;
+  padding-top: var(--space-12);
+  padding-bottom: var(--space-9); // gap between the connector graphic and the dashed line of the section below
+
+  @include tablet-down {
+    padding-top: var(--space-9);
+    padding-bottom: var(--space-7);
+  }
+
+  @include mobile {
+    padding-top: var(--space-7);
+    padding-bottom: var(--space-6);
+  }
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  // design-specific: 91px tall connector graphic, matching Figma node 1:1190
+  height: 91px;
+
+  @include tablet-down {
+    height: 60px;
+  }
+
+  @include mobile {
+    height: 44px;
+  }
+}
+
+.rotated {
+  transform: rotate(180deg);
+}
+
+// used when this divider caps off the section directly above it — no gap, just the graphic itself
+.tight {
+  padding-top: 0;
+}

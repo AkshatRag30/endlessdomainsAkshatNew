@@ -1,0 +1,470 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Hero shell ────────────────────────────────────────────────────────────────
+
+.hero {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--color-white-primary);
+}
+
+// ── Background ────────────────────────────────────────────────────────────────
+
+.bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+// design-specific: concentric radar rings centered in hero
+.ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+
+  &[data-ring='1'] {
+    // design-specific: innermost ring ~455px
+    width: 455px;
+    height: 455px;
+    border-color: rgba(38, 57, 237, 0.08);
+
+    @include mobile { width: 260px; height: 260px; }
+  }
+
+  &[data-ring='2'] {
+    // design-specific: middle ring ~710px
+    width: 710px;
+    height: 710px;
+    border-color: rgba(0, 0, 0, 0.05);
+
+    @include mobile { width: 400px; height: 400px; }
+  }
+
+  &[data-ring='3'] {
+    // design-specific: third ring ~950px — bluish tint fills the band between ring 2 and ring 3
+    width: 950px;
+    height: 950px;
+    border-color: rgba(38, 57, 237, 0.12);
+    background: radial-gradient(circle, transparent 60%, rgba(38, 57, 237, 0.05) 100%);
+
+    @include mobile { width: 460px; height: 460px; }
+  }
+
+  &[data-ring='4'] {
+    // design-specific: outermost ring ~1250px — YouTube + LinkedIn orbit on this
+    width: 1250px;
+    height: 1250px;
+    border-color: rgba(0, 0, 0, 0.03);
+
+    @include mobile { width: 560px; height: 560px; }
+  }
+}
+
+// design-specific: soft centered glow — light bluish wash behind content
+.glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 900px;
+  height: 600px;
+  border-radius: var(--radius-full);
+  // design-specific: very light bluish-gray fill — low opacity translucent donut band
+  background: radial-gradient(ellipse at center, rgba(38, 57, 237, 0.03) 0%, rgba(200, 210, 255, 0.06) 50%, transparent 72%);
+}
+
+// design-specific: gradient white fade at bottom to blend into next section
+.fadeBottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100px;
+  background: linear-gradient(to bottom, transparent, var(--color-white-primary));
+}
+
+// design-specific: gradient white fade at top (below navbar)
+.fadeTop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100px;
+  background: linear-gradient(to top, transparent, var(--color-white-primary));
+}
+
+// ── Orbiting social icons ─────────────────────────────────────────────────────
+// Each ring div is centered on the hero and rotates around its own center.
+// Icons sit at 12 o'clock (top: 0) and 6 o'clock (top: 100%), both translated
+// so their center lands on the circle border. An inner wrapper counter-rotates
+// at the exact same speed so the icon always faces upright.
+
+// Ring rotations — must keep translate(-50%,-50%) to stay centered
+@keyframes orbitCW {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to   { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@keyframes orbitCCW {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to   { transform: translate(-50%, -50%) rotate(-360deg); }
+}
+
+// Counter-rotations — pure rotate, no translate (translation is on parent)
+@keyframes unspinCW {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(-360deg); }
+}
+
+@keyframes unspinCCW {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+// Base ring shell — centered on hero via translate in keyframes
+.orbitRing {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: var(--radius-full);
+  border: 1px dashed rgba(38, 57, 237, 0.1);
+  z-index: 2;
+  pointer-events: none;
+}
+
+// Icon position anchors — sit on the circle border, transform only for placement
+.orbitIconTop {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.orbitIconBottom {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+// Counter-rotate wrappers — keep icon upright while ring spins
+// display:flex + transform-origin:center ensures rotation is around icon center
+.counterOuter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center center;
+  animation: unspinCW 12s linear infinite;
+
+  img {
+    display: block;
+    filter: drop-shadow(0 6px 20px rgba(0, 0, 0, 0.16));
+
+    @include mobile {
+      width: 60px;
+      height: auto;
+    }
+  }
+}
+
+.counterOutermost {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center center;
+  animation: unspinCCW 16s linear infinite;
+
+  img {
+    display: block;
+    filter: drop-shadow(0 6px 20px rgba(0, 0, 0, 0.16));
+
+    @include mobile {
+      width: 55px;
+      height: auto;
+    }
+  }
+}
+
+// Middle ring — LinkedIn + YouTube — CW, on bg ring (1165px)
+.orbitOuter {
+  width: 950px;
+  height: 950px;
+  animation: orbitCW 12s linear infinite;
+
+  @include tablet-down { width: 700px; height: 700px; }
+  @include mobile { width: 460px; height: 460px; }
+}
+
+// Outermost ring — Discord + Telegram — CCW, on bg ring (1250px)
+.orbitOutermost {
+  width: 1250px;
+  height: 1250px;
+  animation: orbitCCW 16s linear infinite;
+
+  @include tablet-down { width: 900px; height: 900px; }
+  @include mobile { width: 560px; height: 560px; }
+}
+
+
+// ── Content block ─────────────────────────────────────────────────────────────
+
+.content {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-7);
+  max-width: 1090px;
+  width: 100%;
+  padding: var(--space-14) var(--container-padding-x);
+  padding-top: var(--space-12);
+
+  @include tablet-down {
+    gap: var(--space-6);
+    padding: var(--space-10) var(--space-7);
+  }
+
+  @include mobile {
+    gap: var(--space-5);
+    padding: var(--space-9) var(--space-5);
+  }
+}
+
+// ── Top label with 4-corner brackets ─────────────────────────────────────────
+
+.labelWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 20px;
+
+  // fade-in animation
+  animation: fadeUp 0.7s ease both;
+  animation-delay: 0.1s;
+}
+
+%label-corner {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-style: solid;
+  border-color: var(--color-blue-primary);
+  pointer-events: none;
+}
+
+.labelBracketTL { @extend %label-corner; top: 0; left: 0; border-width: 1.5px 0 0 1.5px; }
+.labelBracketTR { @extend %label-corner; top: 0; right: 0; border-width: 1.5px 1.5px 0 0; }
+.labelBracketBL { @extend %label-corner; bottom: 0; left: 0; border-width: 0 0 1.5px 1.5px; }
+.labelBracketBR { @extend %label-corner; bottom: 0; right: 0; border-width: 0 1.5px 1.5px 0; }
+
+.labelText {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+
+  @include mobile {
+    font-size: 11px;
+    white-space: normal;
+    text-align: center;
+    letter-spacing: 0.06em;
+  }
+}
+
+// ── Heading ───────────────────────────────────────────────────────────────────
+
+.heading {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  animation: fadeUp 0.8s ease both;
+  animation-delay: 0.2s;
+}
+
+.headingLine1 {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-shadow: 0 1px 1.3px rgba(0, 0, 0, 0.15);
+
+  @include tablet-down { font-size: 42px; }
+  @include mobile { font-size: 32px; }
+}
+
+.headingLine2 {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  background: linear-gradient(146deg, var(--color-blue-primary) 76%, var(--color-blue-primary-faded) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  @include tablet-down { font-size: 42px; }
+  @include mobile { font-size: 32px; }
+}
+
+// ── Description ───────────────────────────────────────────────────────────────
+
+.description {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-body);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-body);
+  line-height: 1.2;
+  max-width: 664px;
+  animation: fadeUp 0.9s ease both;
+  animation-delay: 0.35s;
+
+  @include tablet-down {
+    font-size: var(--text-normal);
+    max-width: 540px;
+  }
+
+  @include mobile {
+    font-size: var(--text-body-small);
+    max-width: 100%;
+  }
+}
+
+// ── CTA button ────────────────────────────────────────────────────────────────
+
+.ctaWrap {
+  display: flex;
+  justify-content: center;
+  animation: fadeUp 1s ease both;
+  animation-delay: 0.5s;
+}
+
+.ctaLink {
+  text-decoration: none;
+  display: inline-flex;
+}
+
+// ── Stats row ─────────────────────────────────────────────────────────────────
+
+.statsRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  animation: fadeUp 1.1s ease both;
+  animation-delay: 0.65s;
+
+  @include mobile {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+    width: 100%;
+    max-width: 380px;
+  }
+}
+
+.statBlock {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 13px;
+  width: 214px;
+  min-height: 95px;
+  padding: var(--space-3) var(--space-7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+
+  @include tablet-down {
+    width: 180px;
+    padding: var(--space-3) var(--space-5);
+  }
+
+  @include mobile {
+    width: 100%;
+    min-height: 80px;
+  }
+}
+
+%stat-corner {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-color: var(--color-gray-300);
+  border-style: solid;
+  pointer-events: none;
+}
+
+.statCornerTL { @extend %stat-corner; top: 0; left: 0; border-width: 2px 0 0 2px; }
+.statCornerTR { @extend %stat-corner; top: 0; right: 0; border-width: 2px 2px 0 0; }
+.statCornerBL { @extend %stat-corner; bottom: 0; left: 0; border-width: 0 0 2px 2px; }
+.statCornerBR { @extend %stat-corner; bottom: 0; right: 0; border-width: 0 2px 2px 0; }
+
+.statValue {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: 30px; // design-specific: Figma stat number size
+  font-weight: var(--font-weight-bold);
+  line-height: 1.2;
+  background: linear-gradient(110deg, var(--color-blue-primary) 70%, var(--color-blue-primary-faded) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: none;
+  white-space: nowrap;
+
+  @include mobile {
+    font-size: 26px;
+  }
+}
+
+.statLabel {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: rgba(0, 0, 0, 0.6);
+  text-transform: uppercase;
+  letter-spacing: -0.016em;
+  text-align: center;
+  line-height: 1.2;
+  white-space: pre-line;
+}
+
+// ── Enter animations ──────────────────────────────────────────────────────────
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

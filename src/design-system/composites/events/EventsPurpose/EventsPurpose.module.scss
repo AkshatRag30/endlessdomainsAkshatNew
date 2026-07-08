@@ -9,6 +9,30 @@
   flex-direction: column;
   align-items: stretch;
   overflow: hidden;
+  padding-top: var(--space-8); // extra gap on top of the internal topLeft padding
+
+  @include tablet-down {
+    padding-top: var(--space-6);
+  }
+
+  @include mobile {
+    padding-top: var(--space-5);
+  }
+}
+
+// ── Top dashed divider — edge-to-edge bleed ──────────────────────────────────
+
+.topDivider {
+  width: 100%;
+  height: 1px;
+  flex-shrink: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--color-blue-primary-alpha-18) 0px,
+    var(--color-blue-primary-alpha-18) 6px,
+    transparent 6px,
+    transparent 12px
+  );
 }
 
 // ── Top row ───────────────────────────────────────────────────────────────────
@@ -141,6 +165,7 @@
   // design-specific: Figma shows 2 narrow hatched strips with a gap, positioned centre
   gap: 128px;
   align-items: stretch;
+  margin-left: -64px; // pulls the strips left, closer to the heading instead of centred in the row
 
   @include tablet-down {
     display: none;
@@ -281,11 +306,9 @@
   }
 }
 
-// design-specific: Figma has hatched #f8f8f8 panels at bottom of the section:
-//   bottom-left  0–382px wide, 125px tall
-//   bottom-right 773–1123px, 125px tall (centre)
-//   both outer right corners
-// Approximated with 2 pseudo-elements on the row
+// design-specific: hatched #f8f8f8 panels sit under the 1st and 3rd columns only —
+// those are the shorter (non-offset) cards, so the panel shows more below them; the
+// 2nd and 4th columns are pushed down via .colOffset and get no panel, so less shows
 .bottomRow::before {
   content: '';
   position: absolute;
@@ -306,7 +329,7 @@
   content: '';
   position: absolute;
   bottom: 0;
-  right: 0;
+  left: 50%;
   width: 25%;
   height: 125px;
   background-color: var(--color-gray-light-bg);
@@ -356,6 +379,10 @@
 
   @include tablet-down {
     padding-top: var(--space-7);
+  }
+
+  @include mobile {
+    padding-top: var(--space-6);
   }
 }
 
@@ -471,6 +498,15 @@
     rgba(38, 57, 237, 0) 100%
   );
   pointer-events: none;
+
+  @include mobile {
+    height: 60px;
+    width: 44px;
+  }
+
+  @include small-mobile {
+    display: none;
+  }
 }
 
 .iconImg {
@@ -513,6 +549,10 @@
   color: #474747;
   line-height: var(--leading-normal);
   max-width: 273px;
+  // reserves space for up to 6 wrapped lines (in em, so it scales with font-size per
+  // breakpoint) so all four cards' text blocks match height within their offset pair —
+  // card 1 & 3 end up the same height, card 2 & 4 end up the same (taller) height
+  min-height: calc(var(--leading-normal) * 6em);
 
   @include tablet-down { font-size: 15px; max-width: 100%; }
   @include mobile { font-size: 14px; }

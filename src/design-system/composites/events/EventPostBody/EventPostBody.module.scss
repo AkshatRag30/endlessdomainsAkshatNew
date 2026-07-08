@@ -1,0 +1,542 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Two-column layout ─────────────────────────────────────────────────────────
+
+.layout {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: var(--space-12) var(--container-padding-x);
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: var(--space-12);
+  align-items: start;
+
+  @include max-width(1280px) {
+    grid-template-columns: 1fr 300px;
+    gap: var(--space-10);
+  }
+
+  @include tablet-down {
+    grid-template-columns: 1fr;
+    padding: var(--space-10) var(--space-6);
+    gap: var(--space-8);
+  }
+
+  @include mobile {
+    padding: var(--space-8) var(--space-4);
+    gap: var(--space-7);
+  }
+}
+
+// ── Article ───────────────────────────────────────────────────────────────────
+
+.article {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+
+  @include mobile {
+    gap: var(--space-9);
+  }
+}
+
+// ── Section eyebrow ───────────────────────────────────────────────────────────
+
+.aboutSection,
+.gallerySection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.sectionEyebrow {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-start;
+  padding: 6px 14px;
+}
+
+%eyebrow-bracket-post {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-color: var(--color-gray-200);
+  border-style: solid;
+  pointer-events: none;
+}
+
+.eyebrowBracketTL { @extend %eyebrow-bracket-post; top: 0; left: 0; border-width: 1.5px 0 0 1.5px; }
+.eyebrowBracketTR { @extend %eyebrow-bracket-post; top: 0; right: 0; border-width: 1.5px 1.5px 0 0; }
+.eyebrowBracketBL { @extend %eyebrow-bracket-post; bottom: 0; left: 0; border-width: 0 0 1.5px 1.5px; }
+.eyebrowBracketBR { @extend %eyebrow-bracket-post; bottom: 0; right: 0; border-width: 0 1.5px 1.5px 0; }
+
+.eyebrowText {
+  margin: 0;
+  font-family: var(--font-ibm-plex-mono);
+  font-size: 11px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-dark);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+// ── Section title ─────────────────────────────────────────────────────────────
+
+.sectionTitle {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2);
+  font-weight: var(--font-weight-bold);
+  background: linear-gradient(110deg, var(--color-blue-primary) 70%, rgba(38, 57, 237, 0.28) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: var(--tracking-h1);
+  line-height: 1.1;
+}
+
+// ── Tags ──────────────────────────────────────────────────────────────────────
+
+.tagRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border-black-subtle);
+  font-family: var(--font-ibm-plex-mono);
+  font-size: 10px;
+  font-weight: var(--font-weight-regular);
+  color: var(--color-gray-dark);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+// ── Content (article body) ────────────────────────────────────────────────────
+
+.content {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-body);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-gray-dark);
+  line-height: var(--leading-relaxed);
+
+  p {
+    margin: 0 0 var(--space-5);
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  h2 {
+    font-family: var(--font-satoshi);
+    font-size: var(--text-h3);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-black-primary);
+    margin: var(--space-8) 0 var(--space-4);
+  }
+}
+
+// ── Photo grid ────────────────────────────────────────────────────────────────
+
+.photoGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: auto auto;
+  gap: var(--space-3);
+
+  @include mobile {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+}
+
+.photoLarge {
+  position: relative;
+  // design-specific: large photos span full width of their column, landscape ratio
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+
+  @include mobile {
+    aspect-ratio: 16 / 9;
+  }
+}
+
+.photoSmall {
+  position: relative;
+  // design-specific: small photos in a 3-column bottom row, portrait-ish
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  grid-column: span 1;
+
+  // bottom row: 3 images across two columns — use auto-fill trick
+  &:nth-child(3) { grid-column: 1; }
+  &:nth-child(4) { grid-column: 1; }
+  &:nth-child(5) { grid-column: 2; }
+  &:nth-child(6) { grid-column: 2; }
+
+  @include mobile {
+    grid-column: 1 !important;
+    aspect-ratio: 16 / 9;
+  }
+}
+
+// override grid to handle 2+4 layout: first two large, next four small
+// design-specific: matches Figma 2-top / 4-bottom photo grid
+.photoGrid {
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: auto auto;
+
+  .photoLarge {
+    grid-column: span 1;
+    grid-row: 1;
+  }
+
+  .photoSmall {
+    grid-column: span 1;
+    grid-row: 2;
+
+    // 4 smalls in one row — treat as a 4-col sub-grid via explicit columns
+    &:nth-child(3),
+    &:nth-child(4),
+    &:nth-child(5),
+    &:nth-child(6) {
+      grid-column: unset;
+      grid-row: unset;
+    }
+  }
+
+  // rebuild as 4-col for small images
+  .photoSmall {
+    // reset for 4-col approach: wrap photoSmalls inside their own row
+  }
+}
+
+// Simpler flat grid — 2 large on top row, 4 small in a second row (3-col or 4-col)
+// Actual layout via order + grid-column
+.photoGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-3);
+
+  .photoLarge {
+    grid-column: span 2;
+  }
+
+  .photoSmall {
+    grid-column: span 1;
+  }
+
+  @include tablet-down {
+    grid-template-columns: repeat(2, 1fr);
+
+    .photoLarge {
+      grid-column: span 1;
+    }
+
+    .photoSmall {
+      grid-column: span 1;
+    }
+  }
+
+  @include mobile {
+    grid-template-columns: repeat(2, 1fr);
+
+    .photoLarge {
+      grid-column: span 2;
+    }
+
+    .photoSmall {
+      grid-column: span 1;
+    }
+  }
+}
+
+.photo {
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.4s ease;
+
+  &:hover {
+    transform: scale(1.03);
+  }
+}
+
+// ── Sidebar ───────────────────────────────────────────────────────────────────
+
+.sidebar {
+  position: sticky;
+  top: calc(var(--header-height) + var(--space-5));
+
+  @include tablet-down {
+    position: static;
+  }
+}
+
+// One unified bordered container with diagonal texture — same as blog sidebar
+.sidebarInner {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--color-border-black-subtle);
+  background-color: var(--color-gray-light-hover);
+  background-image: repeating-linear-gradient(135deg, transparent 0px, transparent 4px, var(--color-black-alpha-01) 4px, var(--color-black-alpha-01) 6px);
+}
+
+// ── Shared card label — matches blog .cardLabel exactly ───────────────────────
+
+.cardLabel {
+  font-family: var(--font-satoshi);
+  font-size: 11px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-blue-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 0 0 var(--space-3);
+}
+
+// ── Status CTA card — flush at top like blog .ctaCard ─────────────────────────
+
+.statusCard {
+  background: linear-gradient(to top right, var(--color-blue-darker) 0%, var(--color-blue-primary) 55%, #6674F6 100%); // design-specific: matches blog CTA gradient
+  padding: var(--space-7) var(--space-6);
+  margin-bottom: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.statusEyebrow {
+  font-family: var(--font-satoshi);
+  font-size: 11px;
+  font-weight: var(--font-weight-medium);
+  color: rgba(255, 255, 255, 0.65);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 0;
+}
+
+.statusTitle {
+  font-family: var(--font-satoshi);
+  font-size: 22px; // design-specific: prominent CTA heading matching blog sidebar
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white-primary);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.statusDesc {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  color: rgba(255, 255, 255, 0.75);
+  line-height: var(--leading-body);
+  margin: 0;
+}
+
+.watchRecapBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  height: 40px;
+  padding: 0 var(--space-5);
+  background: var(--color-white-primary);
+  color: var(--color-blue-primary);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+  width: 100%;
+  text-align: center;
+
+  &:hover {
+    opacity: 0.88;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.statusMeta {
+  font-family: var(--font-satoshi);
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+
+.shareEventBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  height: 36px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.8);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+
+  &:hover {
+    border-color: var(--color-white-primary);
+    color: var(--color-white-primary);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// ── Inner cards — white bg, border-top separator, margin inset — matches blog ─
+
+.detailsCard {
+  background: var(--color-white-primary);
+  border-top: 1px solid var(--color-border-black-subtle);
+  padding: var(--space-5);
+  margin: 0 var(--space-3) var(--space-3);
+}
+
+.detailsList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-top: 1px solid var(--color-border-black-subtle);
+  padding-top: var(--space-2);
+}
+
+.detailItem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border-black-subtle);
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: var(--color-blue-primary);
+  }
+}
+
+.detailText {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  line-height: 1.4;
+}
+
+.detailLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-blue-primary);
+  text-decoration: none;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// ── Sidebar image — inset inside the unified container ────────────────────────
+
+.sidebarImageWrap {
+  position: relative;
+  width: calc(100% - var(--space-6));
+  margin: 0 var(--space-3) var(--space-3);
+  // design-specific: Figma sidebar photo ratio
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+}
+
+.sidebarImg {
+  object-fit: cover;
+  object-position: center;
+}
+
+// ── Organised by card ─────────────────────────────────────────────────────────
+
+.organisedCard {
+  background: var(--color-white-primary);
+  border-top: 1px solid var(--color-border-black-subtle);
+  padding: var(--space-5) var(--space-5) var(--space-4);
+  margin: 0 var(--space-3) var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.organiserRow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border-black-subtle);
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+}
+
+.organiserNum {
+  flex-shrink: 0;
+  font-family: var(--font-satoshi);
+  font-size: 32px; // design-specific: large muted number matching blog popular list
+  font-weight: var(--font-weight-bold);
+  color: var(--color-border-black-subtle);
+  line-height: 1;
+  width: 28px;
+  text-align: left;
+  padding-top: 2px;
+}
+
+.organiserContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.organiserRoleLabel {
+  font-family: var(--font-ibm-plex-mono);
+  font-size: 11px;
+  color: var(--color-gray-primary);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.organiserName {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  line-height: 1.4;
+}

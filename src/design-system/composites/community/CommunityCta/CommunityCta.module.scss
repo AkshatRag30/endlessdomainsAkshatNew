@@ -1,0 +1,185 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Section shell ─────────────────────────────────────────────────────────────
+
+.section {
+  position: relative;
+  width: 100%;
+  background: var(--color-white-primary);
+  overflow: hidden;
+  padding: var(--space-11) var(--container-padding-x) var(--space-13);
+
+  @include tablet-down {
+    padding: var(--space-9) var(--space-6) var(--space-10);
+  }
+
+  @include mobile {
+    padding: var(--space-8) var(--space-5) var(--space-9);
+  }
+}
+
+// ── Banner wrapper — inset within the page container ──────────────────────────
+
+.bannerWrap {
+  position: relative;
+  width: 100%;
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  background-color: #000;
+  // design-specific: soft whitish-blue glow washes over the black backdrop, brightest
+  // behind the heading and fading toward the corners
+  background-image:
+    radial-gradient(ellipse 60% 80% at 50% 35%, rgba(255, 255, 255, 0.14) 0%, transparent 70%),
+    radial-gradient(ellipse 70% 60% at 50% 50%, rgba(120, 150, 255, 0.12) 0%, transparent 75%);
+  // design-specific: ~314px tall banner, matching Figma proportions
+  min-height: 314px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+
+  @include tablet-down {
+    min-height: 420px;
+    padding: var(--space-9) var(--space-6);
+  }
+
+  @include mobile {
+    min-height: 340px;
+    padding: var(--space-7) var(--space-5);
+  }
+}
+
+// ── Tier decorative badges — bottom corners, bleeding off the banner edges ────
+
+.tierBadge {
+  position: absolute;
+  // design-specific: badges are near-square source PNGs (~2000×2000) — bottom offset
+  // is set to roughly half the badge's own width/height so only the top half peeks
+  // out above the banner's clipped bottom edge
+  bottom: -140px;
+  z-index: 0;
+  pointer-events: none;
+  width: 400px;
+  height: auto;
+
+  @include tablet-down {
+    width: 280px;
+    bottom: -140px;
+  }
+
+  @include mobile {
+    width: 180px;
+    bottom: -90px;
+  }
+}
+
+.tierBadgeLeft {
+  left: -6%;
+  transform: translateX(-40px); // nudges the left badge further left
+
+  @include tablet-down {
+    transform: translateX(-28px);
+  }
+
+  @include mobile {
+    left: -10%;
+    transform: translateX(-18px);
+    // design-specific: diagonal layout on mobile — left badge moves to the top
+    top: -90px;
+    bottom: auto;
+  }
+}
+
+.tierBadgeRight {
+  right: -6%;
+  transform: translateX(40px); // nudges the right badge further right
+
+  @include tablet-down {
+    transform: translateX(28px);
+  }
+
+  @include mobile {
+    right: -10%;
+    transform: translateX(18px);
+  }
+}
+
+// ── Content ───────────────────────────────────────────────────────────────────
+
+.content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  max-width: 860px;
+  padding: 0 var(--space-6);
+  text-align: center;
+}
+
+.heading {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: 48px;
+  font-weight: var(--font-weight-medium);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--color-white-primary);
+  text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+
+  @include tablet-down {
+    font-size: 36px;
+  }
+
+  @include mobile {
+    font-size: 26px;
+  }
+}
+
+.description {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-white-primary);
+  opacity: 0.85;
+  line-height: var(--leading-normal);
+  max-width: 600px;
+
+  @include mobile {
+    font-size: var(--text-small-13);
+  }
+}
+
+// ── CTA buttons ───────────────────────────────────────────────────────────────
+
+.ctaRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  margin-top: var(--space-2);
+  filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.5));
+  flex-wrap: wrap;
+  justify-content: center;
+
+  @include mobile {
+    gap: var(--space-3);
+  }
+}
+
+// Override the SecondaryButton's default gray styling to white for this dark banner
+.secondaryButtonInverted {
+  // design-specific: --color-gray-primary drives both the label color and corner
+  // bracket fill in Secondarybutton.module.scss — scoping the override here keeps
+  // the primitive itself background-agnostic
+  --color-gray-primary: var(--color-white-primary);
+
+  @include mobile {
+    // SecondaryButton has a fixed 200px width — two side by side would overflow
+    // a narrow viewport, so shrink it to fit alongside PrimaryButton
+    button {
+      width: 150px;
+    }
+  }
+}

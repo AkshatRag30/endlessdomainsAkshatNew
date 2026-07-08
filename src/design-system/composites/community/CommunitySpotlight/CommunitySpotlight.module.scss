@@ -1,0 +1,393 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Section shell ─────────────────────────────────────────────────────────────
+
+.section {
+  position: relative;
+  width: 100%;
+  background: var(--color-white-primary);
+  overflow: hidden;
+}
+
+// ── Header row (reuses the same pattern as CommunityDifferent / CommunityAmbassador) ──
+
+.topArea {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: stretch;
+  min-height: 297px;
+  padding: 0 var(--space-8);
+  border-top: 1px dashed rgba(0, 0, 0, 0.12);
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.12);
+
+  @include tablet-down {
+    min-height: auto;
+    flex-direction: column;
+    padding: 0;
+  }
+}
+
+.stripeCol {
+  flex-shrink: 0;
+  width: 63px;
+  position: relative;
+  overflow: hidden;
+  opacity: 0.12;
+
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent 0px,
+    transparent 10px,
+    rgba(0, 0, 0, 0.5) 10px,
+    rgba(0, 0, 0, 0.5) 11px
+  );
+
+  &[data-side='left'] {
+    border-right: 0.5px solid rgba(0, 0, 0, 0.12);
+  }
+
+  &[data-side='right'] {
+    border-left: 0.5px solid rgba(0, 0, 0, 0.12);
+  }
+
+  @include tablet-down {
+    display: none;
+  }
+}
+
+.centerContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-6);
+  padding: var(--space-9) var(--space-7);
+  text-align: center;
+
+  @include tablet-down {
+    padding: var(--space-7) var(--space-6);
+    gap: var(--space-5);
+  }
+
+  @include mobile {
+    padding: var(--space-6) var(--space-5);
+    gap: var(--space-4);
+  }
+}
+
+// ── Subtitle with brackets ────────────────────────────────────────────────────
+
+.subtitleWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 44px;
+}
+
+%subtitle-corner {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-style: solid;
+  border-color: var(--color-blue-primary);
+  pointer-events: none;
+}
+
+.subtitleBracketTL { @extend %subtitle-corner; top: 0; left: 0; border-width: 1.5px 0 0 1.5px; }
+.subtitleBracketTR { @extend %subtitle-corner; top: 0; right: 0; border-width: 1.5px 1.5px 0 0; }
+.subtitleBracketBL { @extend %subtitle-corner; bottom: 0; left: 0; border-width: 0 0 1.5px 1.5px; }
+.subtitleBracketBR { @extend %subtitle-corner; bottom: 0; right: 0; border-width: 0 1.5px 1.5px 0; }
+
+.subtitleText {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-faq-bracket);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+
+  @include mobile {
+    font-size: 12px;
+    white-space: normal;
+    text-align: center;
+  }
+}
+
+// ── Heading ───────────────────────────────────────────────────────────────────
+
+.heading {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.headingLine1 {
+  display: block;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-transform: capitalize;
+
+  @include tablet-down { font-size: 42px; }
+  @include mobile { font-size: 30px; }
+}
+
+.headingLine2 {
+  display: block;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2);
+  font-weight: var(--font-weight-regular);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-transform: capitalize;
+  background: linear-gradient(132deg, var(--color-blue-primary) 70%, var(--color-blue-primary-faded) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  @include tablet-down { font-size: 42px; }
+  @include mobile { font-size: 30px; }
+}
+
+// ── Description ───────────────────────────────────────────────────────────────
+
+.description {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-body);
+  font-weight: var(--font-weight-regular);
+  color: rgba(0, 0, 0, 0.7);
+  line-height: var(--leading-normal);
+  max-width: 780px;
+  text-align: center;
+
+  @include tablet-down {
+    font-size: var(--text-normal);
+  }
+
+  @include mobile {
+    font-size: var(--text-body-small);
+  }
+}
+
+// ── Spotlight cards row ───────────────────────────────────────────────────────
+
+.cardsRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-9);
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: var(--space-11) var(--container-padding-x) var(--space-13);
+
+  @include tablet-down {
+    grid-template-columns: repeat(2, 1fr);
+    padding: var(--space-9) var(--space-6) var(--space-10);
+    gap: var(--space-7);
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+    padding: var(--space-8) var(--space-5) var(--space-9);
+    gap: var(--space-8);
+  }
+}
+
+// ── Spotlight card ────────────────────────────────────────────────────────────
+
+.spotlightCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+
+  @include tablet {
+    // design-specific: with 3 cards in a 2-column grid, the odd one out lands
+    // alone in the last row — center it instead of leaving it stuck to the left
+    &:last-child:nth-child(odd) {
+      grid-column: 1 / -1;
+      max-width: calc(50% - var(--space-7) / 2);
+      margin: 0 auto;
+    }
+  }
+}
+
+// Corner bracket ticks framing the card
+.cornerTopLeft,
+.cornerTopRight,
+.cornerBottomLeft,
+.cornerBottomRight {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  pointer-events: none;
+}
+
+.cornerTopLeft {
+  top: -6px;
+  left: -6px;
+  border-top: 2.5px solid var(--color-blue-primary);
+  border-left: 2.5px solid var(--color-blue-primary);
+}
+
+.cornerTopRight {
+  top: -6px;
+  right: -6px;
+  border-top: 2.5px solid var(--color-blue-primary);
+  border-right: 2.5px solid var(--color-blue-primary);
+}
+
+.cornerBottomLeft {
+  bottom: -6px;
+  left: -6px;
+  border-bottom: 2.5px solid var(--color-blue-primary);
+  border-left: 2.5px solid var(--color-blue-primary);
+}
+
+.cornerBottomRight {
+  bottom: -6px;
+  right: -6px;
+  border-bottom: 2.5px solid var(--color-blue-primary);
+  border-right: 2.5px solid var(--color-blue-primary);
+}
+
+// ── Featured image ────────────────────────────────────────────────────────────
+
+.imageWrap {
+  position: relative;
+  width: 100%;
+  // design-specific: ~231px tall image matching Figma proportions at 424px wide
+  aspect-ratio: 424 / 231;
+  overflow: hidden;
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+// ── Card body ─────────────────────────────────────────────────────────────────
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-5) var(--space-4);
+}
+
+// ── Author row ────────────────────────────────────────────────────────────────
+
+.authorRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+.avatarWrap {
+  flex-shrink: 0;
+  width: 58px;
+  height: 58px;
+  border-radius: var(--radius-full);
+  border: 2.7px solid rgba(255, 255, 255, 0.26);
+  overflow: hidden;
+}
+
+.avatar {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.authorInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.authorName {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h3);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-black-primary);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.authorHandleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.handleIcon {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  color: var(--color-black-primary);
+}
+
+.authorHandle {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-blue-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// ── Quote ─────────────────────────────────────────────────────────────────────
+
+.quote {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-regular);
+  color: rgba(0, 0, 0, 0.7);
+  line-height: var(--leading-normal);
+}
+
+// ── CTA link ──────────────────────────────────────────────────────────────────
+
+.ctaLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  align-self: flex-start;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-blue-primary);
+  text-transform: capitalize;
+  text-decoration: none;
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}

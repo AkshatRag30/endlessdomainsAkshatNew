@@ -1,0 +1,428 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Section shell ─────────────────────────────────────────────────────────────
+
+.section {
+  position: relative;
+  width: 100%;
+  background: var(--color-white-primary);
+  overflow: hidden;
+}
+
+// ── Header row (reuses the same pattern as CommunityDifferent) ────────────────
+
+.topArea {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: stretch;
+  min-height: 297px;
+  padding: 0 var(--space-8);
+  border-top: 1px dashed rgba(0, 0, 0, 0.12);
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.12);
+
+  @include tablet-down {
+    min-height: auto;
+    flex-direction: column;
+    padding: 0;
+  }
+}
+
+.stripeCol {
+  flex-shrink: 0;
+  width: 63px;
+  position: relative;
+  overflow: hidden;
+  opacity: 0.12;
+
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent 0px,
+    transparent 10px,
+    rgba(0, 0, 0, 0.5) 10px,
+    rgba(0, 0, 0, 0.5) 11px
+  );
+
+  &[data-side='left'] {
+    border-right: 0.5px solid rgba(0, 0, 0, 0.12);
+  }
+
+  &[data-side='right'] {
+    border-left: 0.5px solid rgba(0, 0, 0, 0.12);
+  }
+
+  @include tablet-down {
+    display: none;
+  }
+}
+
+.centerContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-6);
+  padding: var(--space-9) var(--space-7);
+  text-align: center;
+
+  @include tablet-down {
+    padding: var(--space-7) var(--space-6);
+    gap: var(--space-5);
+  }
+
+  @include mobile {
+    padding: var(--space-6) var(--space-5);
+    gap: var(--space-4);
+  }
+}
+
+// ── Subtitle with brackets ────────────────────────────────────────────────────
+
+.subtitleWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 44px;
+}
+
+%subtitle-corner {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-style: solid;
+  border-color: var(--color-blue-primary);
+  pointer-events: none;
+}
+
+.subtitleBracketTL { @extend %subtitle-corner; top: 0; left: 0; border-width: 1.5px 0 0 1.5px; }
+.subtitleBracketTR { @extend %subtitle-corner; top: 0; right: 0; border-width: 1.5px 1.5px 0 0; }
+.subtitleBracketBL { @extend %subtitle-corner; bottom: 0; left: 0; border-width: 0 0 1.5px 1.5px; }
+.subtitleBracketBR { @extend %subtitle-corner; bottom: 0; right: 0; border-width: 0 1.5px 1.5px 0; }
+
+.subtitleText {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-faq-bracket);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+
+  @include mobile {
+    font-size: 12px;
+    white-space: normal;
+    text-align: center;
+  }
+}
+
+// ── Heading ───────────────────────────────────────────────────────────────────
+
+.heading {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.headingLine1 {
+  display: block;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-transform: capitalize;
+
+  @include tablet-down { font-size: 42px; }
+  @include mobile { font-size: 30px; }
+}
+
+.headingLine2 {
+  display: block;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2);
+  font-weight: var(--font-weight-regular);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-transform: capitalize;
+  background: linear-gradient(132deg, var(--color-blue-primary) 70%, var(--color-blue-primary-faded) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  @include tablet-down { font-size: 42px; }
+  @include mobile { font-size: 30px; }
+}
+
+// ── Description ───────────────────────────────────────────────────────────────
+
+.description {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-body);
+  font-weight: var(--font-weight-regular);
+  color: rgba(0, 0, 0, 0.7);
+  line-height: var(--leading-normal);
+  max-width: 780px;
+  text-align: center;
+
+  @include tablet-down {
+    font-size: var(--text-normal);
+  }
+
+  @include mobile {
+    font-size: var(--text-body-small);
+  }
+}
+
+// ── Benefits grid ─────────────────────────────────────────────────────────────
+
+.benefitsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.12);
+
+  @include tablet-down {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.benefitCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5) var(--space-6);
+  border-right: 1px dashed rgba(0, 0, 0, 0.12);
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.12);
+
+  &:nth-child(3n) {
+    border-right: none;
+  }
+
+  &:nth-last-child(-n+3) {
+    border-bottom: none;
+  }
+
+  @include tablet-down {
+    &:nth-child(3n) {
+      border-right: 1px dashed rgba(0, 0, 0, 0.12);
+    }
+
+    &:nth-child(2n) {
+      border-right: none;
+    }
+
+    &:nth-last-child(-n+3) {
+      border-bottom: 1px dashed rgba(0, 0, 0, 0.12);
+    }
+
+    &:nth-last-child(-n+2) {
+      border-bottom: none;
+    }
+  }
+
+  @include mobile {
+    padding: var(--space-4) var(--space-4);
+  }
+}
+
+.benefitText {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-normal);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.2;
+  text-align: center;
+  text-transform: capitalize;
+  white-space: nowrap;
+  background: linear-gradient(155deg, var(--color-blue-primary) 70%, var(--color-blue-primary-faded) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  @include tablet-down {
+    font-size: 16px;
+  }
+
+  @include mobile {
+    font-size: 13px;
+  }
+}
+
+// ── CTA banner shape (reuses the provider-page "Union" pill graphic) ──────────
+
+.ctaSection {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-6) 0 var(--space-2);
+
+  @include tablet {
+    padding: var(--space-7) var(--space-6) var(--space-4);
+  }
+
+  @include mobile {
+    padding: var(--space-7) var(--space-5) var(--space-3);
+  }
+}
+
+.bannerWrap {
+  position: relative;
+  width: 100%;
+  height: 125px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden; // clips thin side arms on narrow viewports
+
+  @include wide {
+    height: 140px;
+  }
+
+  @include tablet-down {
+    height: 110px;
+  }
+
+  @include tablet {
+    height: 130px;
+  }
+
+  @include mobile {
+    // design-specific: taller on mobile so the three steps can stack vertically inside the shape
+    height: auto;
+    min-height: 260px;
+    padding: var(--space-6) var(--space-5);
+  }
+}
+
+.unionBg {
+  object-fit: fill;
+  object-position: center;
+
+  @include tablet {
+    // design-specific: narrows the pill's tapered side arms at tablet width
+    object-fit: cover;
+    transform: scaleX(1.3);
+    transform-origin: center center;
+  }
+
+  @include mobile {
+    object-fit: cover;
+    transform: scaleX(1.18);
+    transform-origin: center center;
+  }
+}
+
+.stepsRow {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  width: 100%;
+  max-width: var(--container-max-width);
+  padding: 0 var(--container-padding-x);
+
+  @include tablet-down {
+    padding: 0 var(--space-6);
+  }
+
+  @include tablet {
+    padding: 0 var(--space-4);
+  }
+
+  @include mobile {
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: 0;
+  }
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  max-width: 170px;
+
+  @include tablet {
+    max-width: 130px;
+  }
+
+  @include mobile {
+    flex: none;
+    width: 100%;
+    justify-content: center;
+    max-width: none;
+  }
+}
+
+.stepContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  text-align: center;
+  width: 100%;
+}
+
+.stepTitle {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-white-primary);
+  line-height: 1.2;
+  text-transform: capitalize;
+
+  @include tablet-down {
+    font-size: var(--text-normal);
+  }
+
+  @include tablet {
+    font-size: var(--text-body-small);
+  }
+
+  @include mobile {
+    font-size: var(--text-body-small);
+  }
+}
+
+.stepDescription {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-white-primary);
+  opacity: 0.9;
+  line-height: var(--leading-normal);
+  white-space: normal;
+
+  @include tablet-down {
+    font-size: var(--text-small-12);
+    max-width: 140px;
+  }
+
+  @include tablet {
+    font-size: var(--text-small-10);
+    max-width: 110px;
+  }
+
+  @include mobile {
+    font-size: var(--text-small-10);
+    max-width: none;
+    white-space: nowrap;
+  }
+}
+
+.ctaButtonWrap {
+  position: relative;
+  margin-top: var(--space-4);
+}

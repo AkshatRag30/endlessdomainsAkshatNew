@@ -42,6 +42,9 @@ export function EventsPurpose() {
   return (
     <section className={styles.section} aria-label="Events with purpose">
 
+      {/* ── Top dashed divider — edge-to-edge ── */}
+      <div className={styles.topDivider} aria-hidden="true" />
+
       {/* ── Top row ──────────────────────────────────────────────────────── */}
       <div className={styles.topRow}>
         {/* Left — eyebrow + heading */}

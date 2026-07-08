@@ -287,18 +287,21 @@
   justify-content: center;
   overflow: hidden;
   background: var(--color-white-primary);
-  margin-top: var(--space-10);
+  margin-top: var(--space-15);
 
   @include wide {
     height: 140px;
+    margin-top: var(--space-15);
   }
 
   @include tablet-down {
     height: 110px;
+    margin-top: var(--space-13);
   }
 
   @include mobile {
     height: 80px;
+    margin-top: var(--space-11);
   }
 }
 

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import frameBg from '/public/events/Frame.jpg'
+import mobileFrameBg from '/public/events/mobilenewsleter.jpg'
 import styles from './EventsNewsletter.module.scss'
 
 const STATS = [
@@ -25,9 +26,15 @@ export function EventsNewsletter() {
       <div className={styles.statsRow} aria-label="Event statistics">
         {STATS.map((stat, i) => (
           <div key={stat.label} className={styles.statItem}>
-            {i > 0 && <span className={styles.statDivider} aria-hidden="true" />}
-            <p className={styles.statValue}>{stat.value}</p>
-            <p className={styles.statLabel}>{stat.label}</p>
+
+            <div className={styles.statBracketWrap}>
+              <span className={styles.bTL} aria-hidden="true" />
+              <span className={styles.bTR} aria-hidden="true" />
+              <span className={styles.bBL} aria-hidden="true" />
+              <span className={styles.bBR} aria-hidden="true" />
+              <p className={styles.statValue}>{stat.value}</p>
+              <p className={styles.statLabel}>{stat.label}</p>
+            </div>
           </div>
         ))}
       </div>
@@ -38,7 +45,18 @@ export function EventsNewsletter() {
           src={frameBg}
           alt=""
           fill
+          unoptimized
+          sizes="(max-width: 768px) 100vw, 1120px"
           className={styles.bannerBg}
+          aria-hidden="true"
+        />
+        <Image
+          src={mobileFrameBg}
+          alt=""
+          fill
+          unoptimized
+          sizes="100vw"
+          className={styles.bannerBgMobile}
           aria-hidden="true"
         />
 

@@ -5,43 +5,43 @@
 .section {
   width: 100%;
   background: var(--color-white-primary);
-  padding: var(--space-14) var(--container-padding-x);
+  padding: var(--space-10) var(--container-padding-x) var(--space-12);
   display: flex;
   flex-direction: column;
-  gap: var(--space-10);
 
   @include tablet-down {
-    padding: var(--space-12) var(--space-6);
-    gap: var(--space-8);
+    padding: var(--space-8) var(--space-6) var(--space-10);
   }
 
   @include mobile {
-    padding: var(--space-10) var(--space-4);
-    gap: var(--space-7);
+    padding: var(--space-7) var(--space-4) var(--space-8);
+  }
+
+  @include small-mobile {
+    padding: var(--space-6) var(--space-4) var(--space-7);
   }
 }
 
-// ── Section header ────────────────────────────────────────────────────────────
+// ── Title block ───────────────────────────────────────────────────────────────
 
-.sectionHeader {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--space-8);
-
-  @include tablet-down {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--space-6);
-  }
-}
-
-// ── Header left — eyebrow + heading ───────────────────────────────────────────
-
-.headerLeft {
+.titleBlock {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-3);
+  // space above the controls/filter row — reduced from the old uniform section gap
+  margin-bottom: var(--space-6);
+
+  @include tablet-down {
+    margin-bottom: var(--space-5);
+  }
+
+  @include mobile {
+    margin-bottom: var(--space-4);
+  }
+
+  @include small-mobile {
+    margin-bottom: var(--space-3);
+  }
 }
 
 .eyebrowWrap {
@@ -80,7 +80,7 @@
 .heading {
   font-family: var(--font-satoshi);
   font-size: var(--text-h2);
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--font-weight-medium);
   color: var(--color-black-primary);
   letter-spacing: var(--tracking-h1);
   line-height: var(--leading-tight);
@@ -93,138 +93,435 @@
   @include mobile {
     font-size: 32px;
   }
+
+  @include small-mobile {
+    font-size: 26px;
+  }
 }
 
-.headingLight {
+.headingBlue {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2);
   font-weight: var(--font-weight-regular);
-}
-
-// ── Header right — search + tabs ──────────────────────────────────────────────
-
-.headerRight {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  flex-shrink: 0;
+  color: var(--color-blue-primary);
+  letter-spacing: var(--tracking-h1);
+  line-height: var(--leading-tight);
+  margin: 0;
 
   @include tablet-down {
-    width: 100%;
-    flex-wrap: wrap;
+    font-size: 40px;
   }
 
   @include mobile {
+    font-size: 32px;
+  }
+
+  @include small-mobile {
+    font-size: 26px;
+  }
+}
+
+// ── Controls row — search left, tabs + dropdown right ─────────────────────────
+
+.controlsRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  // space below the controls/filter row, before the divider — reduced from the old uniform section gap
+  margin-bottom: var(--space-6);
+
+  @include tablet-down {
     flex-direction: column;
     align-items: stretch;
+    gap: var(--space-4);
+    margin-bottom: var(--space-5);
+  }
+
+  @include mobile {
     gap: var(--space-3);
+    margin-bottom: var(--space-4);
+  }
+
+  @include small-mobile {
+    margin-bottom: var(--space-3);
   }
 }
 
-// ── Search input ──────────────────────────────────────────────────────────────
+// ── Search form — GM style ────────────────────────────────────────────────────
 
-.searchWrap {
-  position: relative;
+.searchForm {
   display: flex;
   align-items: center;
-  width: 280px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow:
+    0.287px 0.287px 0.287px 0px rgba(30, 45, 82, 0.2),
+    0px 0px 0.287px 0px rgba(30, 45, 82, 0.06),
+    0px 0px 19px 0px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
   flex-shrink: 0;
+  width: 340px;
 
   @include tablet-down {
-    width: 240px;
+    width: 100%;
   }
 
   @include mobile {
     width: 100%;
+    height: 44px;
   }
 }
 
-.searchIcon {
-  position: absolute;
-  left: var(--space-4);
-  color: var(--color-gray-dark);
-  pointer-events: none;
-  flex-shrink: 0;
+.searchInputWrap {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
 }
 
 .searchInput {
-  width: 100%;
-  height: 48px;
-  padding: 0 var(--space-4) 0 calc(var(--space-4) + 16px + var(--space-2));
-  border: 1px solid var(--color-gray-200);
-  border-radius: var(--radius-sm);
-  background: var(--color-white-primary);
-  font-family: var(--font-satoshi);
-  font-size: var(--text-small-15);
-  font-weight: var(--font-weight-regular);
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 var(--space-3) 0 var(--space-4);
+  background: transparent;
+  border: none;
+  font-family: var(--font-space-grotesk);
+  font-size: 14px;
+  font-weight: var(--font-weight-medium);
   color: var(--color-black-primary);
   outline: none;
-  transition: border-color 0.2s ease;
 
   &::placeholder {
-    color: var(--color-gray-dark);
+    color: rgba(69, 69, 69, 0.63);
   }
 
-  &:focus {
-    border-color: var(--color-blue-primary);
-  }
-
-  // remove native search clear button
   &::-webkit-search-cancel-button { display: none; }
 }
 
-// ── Filter tabs ───────────────────────────────────────────────────────────────
+.clearWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 31px;
+  height: 38px;
+  border-right: 0.633px solid #ededee;
+}
 
-.tabsWrap {
+.clearBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background: none;
+  border: none;
+  border-radius: var(--radius-full);
+  padding: 0;
+  color: var(--color-gray-dark);
+  cursor: pointer;
+  transition: color 0.15s ease;
+
+  &:hover { color: var(--color-black-primary); }
+
+  &:focus-visible { @include focus-ring; }
+}
+
+.searchDivider {
+  width: 0.633px;
+  height: 38px;
+  background: #ededee;
   flex-shrink: 0;
 }
 
-.tabsBg {
+.searchBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 41px;
+  padding: 0 var(--space-5);
+  background: linear-gradient(to bottom, #404040, #1a1a1a);
+  box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.15), inset 0px 1px 1px 0px rgba(255, 255, 255, 0.25);
+  color: var(--color-white-primary);
+  border: none;
+  font-family: var(--font-satoshi);
+  font-size: 14.9px;
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.447px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: opacity 0.2s ease;
+
+  &:hover { opacity: 0.9; }
+
+  &:focus-visible { @include focus-ring; }
+}
+
+// ── Filter tabs + location — right side, GM style ─────────────────────────────
+
+.filtersRight {
   display: flex;
   align-items: center;
-  background: var(--color-gray-light-bg);
-  border: 1px solid var(--color-gray-200);
-  border-radius: var(--radius-sm);
-  padding: var(--space-1);
-  gap: 2px;
+  gap: var(--space-3);
+  flex-shrink: 0;
+
+  @include tablet-down {
+    width: 100%;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar { display: none; }
+  }
+
+  @include mobile {
+    gap: var(--space-2);
+  }
+}
+
+.tabs {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  height: 48px; // matches .searchForm's height so the search bar and filter bar line up
+  padding: 0 var(--space-5);
+  background: var(--color-black-primary);
+  flex-shrink: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar { display: none; }
+
+  @include tablet-down {
+    display: flex;
+    padding: 0 var(--space-3);
+    flex-wrap: nowrap;
+  }
+
+  @include mobile {
+    padding: 0 var(--space-2);
+  }
+}
+
+// Vertical pipe separator injected between tabs via JS
+.tabSep {
+  width: 1px;
+  height: 23px;
+  background: rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+  margin: 0 var(--space-5);
+
+  @include tablet-down {
+    margin: 0 var(--space-2);
+    height: 16px;
+  }
 }
 
 .tab {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-2) var(--space-5);
-  height: 38px;
-  border: none;
-  border-radius: 6px;
-  background: transparent;
   font-family: var(--font-satoshi);
-  font-size: var(--text-small-15);
-  font-weight: var(--font-weight-medium);
-  color: var(--color-gray-dark);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-regular);
+  color: #bfbfbf;
+  padding: var(--space-2) var(--space-5);
+  border: none;
+  background: none;
   cursor: pointer;
   white-space: nowrap;
-  transition: background 0.15s ease, color 0.15s ease;
+  letter-spacing: -0.058em;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  transition: color 0.18s ease;
 
-  &:hover {
-    background: var(--color-white-primary);
-    color: var(--color-black-primary);
+  &:hover:not(.tabActive) { color: var(--color-white-primary); }
+
+  &:focus-visible { @include focus-ring; }
+
+  @include tablet-down {
+    font-size: var(--text-small-12);
+    padding: var(--space-1-5) var(--space-3);
+    letter-spacing: -0.03em;
   }
 
-  &:focus-visible {
-    @include focus-ring;
+  @include mobile {
+    padding: var(--space-1-5) var(--space-2);
+    font-size: var(--text-small-12);
   }
 }
+
+// variant classes kept for JS className composition — no extra style needed
+.tab_all, .tab_global, .tab_regional, .tab_virtual {}
 
 .tabActive {
-  background: var(--color-white-primary);
-  color: var(--color-black-primary);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  background: linear-gradient(to bottom, #f4f4f4, #fefefe);
+  border: 2px solid var(--color-white-primary);
+  height: 40px;
+  padding: 0 var(--space-5);
+  color: transparent;
+  font-weight: var(--font-weight-medium);
+  letter-spacing: -0.058em;
+  background-image: linear-gradient(to bottom, #f4f4f4, #fefefe);
+  // gradient clip text for the label
+  span {
+    background-image: linear-gradient(138.5deg, var(--color-blue-primary) 9.36%, #a6aeff 94.74%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    font-weight: var(--font-weight-medium);
+  }
+
+  @include tablet-down {
+    height: 30px;
+    padding: 0 var(--space-3);
+    border-width: 1.5px;
+  }
 }
 
-// ── Full-width dashed divider ─────────────────────────────────────────────────
+// ── Location dropdown ─────────────────────────────────────────────────────────
+
+.locationWrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.locationTrigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 48px; // matches the tabs bar height — a separate control sitting next to it
+  padding: 0 var(--space-5);
+  border: none;
+  background: var(--color-black-primary);
+  color: #bfbfbf;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-regular);
+  letter-spacing: -0.058em;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: color 0.18s ease;
+
+  &:hover {
+    color: var(--color-white-primary);
+  }
+
+  &[aria-expanded='true'] {
+    color: var(--color-white-primary);
+  }
+
+  &:focus-visible { @include focus-ring; }
+
+  @include tablet-down {
+    height: 42px;
+    padding: 0 var(--space-3);
+    font-size: var(--text-small-12);
+    letter-spacing: -0.03em;
+  }
+}
+
+.locationChevron {
+  transition: transform 0.15s ease;
+  color: #bfbfbf;
+  flex-shrink: 0;
+}
+
+.locationChevronOpen {
+  transform: rotate(180deg);
+}
+
+.locationPanel {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  min-width: 160px;
+  z-index: 200;
+  list-style: none;
+  margin: 0;
+  padding: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1-5);
+  background: var(--color-white-primary);
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 4px 12px var(--color-black-alpha-10);
+
+  // flip upward when near bottom of viewport on mobile
+  @include mobile {
+    top: auto;
+    bottom: calc(100% + 4px);
+    right: 0;
+    max-width: calc(100vw - var(--space-8));
+  }
+}
+
+.locationOption {
+  display: block;
+  width: 100%;
+  padding: var(--space-2) var(--space-4);
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-black-primary);
+  text-align: left;
+  white-space: nowrap;
+  transition: background 0.1s ease;
+
+  &:hover { background: var(--color-gray-light-hover); }
+}
+
+.locationOptionSelected {
+  background: var(--color-blue-primary);
+  border-color: var(--color-blue-primary);
+  color: var(--color-white-primary);
+  font-weight: var(--font-weight-medium);
+  box-shadow: inset 0 0 14px rgba(255, 255, 255, 0.35);
+
+  &:hover { background: var(--color-blue-primary); }
+}
+
+// ── Divider + hatch group — bleed on wrapper, no gap between children ─────────
+
+.dividerGroup {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  margin-left: calc(-1 * var(--container-padding-x));
+  margin-right: calc(-1 * var(--container-padding-x));
+  width: calc(100% + 2 * var(--container-padding-x));
+  // space below the divider, before the card grid — preserves the original section gap value
+  margin-bottom: var(--space-10);
+
+  @include tablet-down {
+    margin-left: calc(-1 * var(--space-6));
+    margin-right: calc(-1 * var(--space-6));
+    width: calc(100% + 2 * var(--space-6));
+    margin-bottom: var(--space-8);
+  }
+
+  @include mobile {
+    margin-left: calc(-1 * var(--space-4));
+    margin-right: calc(-1 * var(--space-4));
+    width: calc(100% + 2 * var(--space-4));
+    margin-bottom: var(--space-7);
+  }
+
+  @include small-mobile {
+    margin-bottom: var(--space-5);
+  }
+}
 
 .fullDivider {
   width: 100%;
   height: 1px;
+  flex-shrink: 0;
   background: repeating-linear-gradient(
     90deg,
     var(--color-blue-primary-alpha-18) 0px,
@@ -232,7 +529,36 @@
     transparent 6px,
     transparent 12px
   );
+}
+
+.hatchBand {
+  position: relative;
+  width: 100%;
+  height: 55px;
   flex-shrink: 0;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(38, 57, 237, 0.08); // design-specific: matches perceived lightness of the dashed lines above
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+      45deg,
+      transparent 0px,
+      transparent 14px,
+      rgba(0, 0, 0, 0.06) 14px,
+      rgba(0, 0, 0, 0.06) 15px
+    );
+  }
+
+  @include tablet-down {
+    height: 44px;
+  }
+
+  @include mobile {
+    height: 36px;
+  }
 }
 
 // ── Card grid ─────────────────────────────────────────────────────────────────

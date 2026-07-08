@@ -104,6 +104,10 @@
   background: var(--color-gray-light);
   overflow: hidden;
   flex-shrink: 0;
+
+  @include small-mobile {
+    aspect-ratio: 4 / 3;
+  }
 }
 
 .image {
@@ -199,6 +203,10 @@
   @include mobile {
     font-size: 17px;
   }
+
+  @include small-mobile {
+    font-size: 15px;
+  }
 }
 
 // ── Excerpt ───────────────────────────────────────────────────────────────────
@@ -222,10 +230,7 @@
   position: absolute;
   bottom: 0;
   left: 0;
-  // design-specific: bar stops before the right edge — does not span full width
-  // the imagePolygon clip-path cuts the bottom-right corner, leaving it exposed
-  width: fit-content;
-  max-width: calc(100% - 24px);
+  width: 70%;
   z-index: 2;
   display: flex;
   align-items: center;
@@ -235,9 +240,14 @@
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   border-top: 1px solid rgba(0, 0, 0, 0.06);
-  // design-specific: diagonal cut on top-right corner matching the imagePolygon cut
-  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
+  border-top-right-radius: var(--radius-md);
   white-space: nowrap;
+
+  @include small-mobile {
+    width: 85%;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3) var(--space-2) var(--space-3);
+  }
 }
 
 .footerItem {
@@ -249,6 +259,11 @@
   font-weight: var(--font-weight-regular);
   color: rgba(0, 0, 0, 0.65);
   line-height: 1;
+
+  @include small-mobile {
+    font-size: var(--text-small-12);
+    gap: var(--space-1);
+  }
 }
 
 .footerSep {
@@ -266,9 +281,33 @@
 
   @include mobile {
     align-self: stretch;
+  }
+}
 
-    button {
-      width: 100%;
-    }
+.exploreBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 var(--space-5);
+  background: var(--color-blue-primary);
+  color: var(--color-white-primary);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+  white-space: nowrap;
+
+  &:hover {
+    opacity: 0.88;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  @include mobile {
+    width: 100%;
   }
 }

@@ -1,6 +1,8 @@
 import React, { useRef } from 'react'
 import Image from 'next/image'
 import { useEntranceAnimation } from '@/design-system/composites/about-us/useEntranceAnimation'
+import { PrimaryButton } from '@/design-system/primitives/button/PrimaryButton'
+import { SecondaryButton } from '@/design-system/primitives/secondary-button/SecondaryButton'
 import styles from './EventsHero.module.scss'
 
 export interface EventsHeroProps {
@@ -28,8 +30,7 @@ export function EventsHero({ onViewHighlights, onExploreEvents }: EventsHeroProp
         muted
         playsInline
       >
-        <source src="/events/herowebm.webm" type="video/webm" />
-        <source src="/events/herovideo.mp4" type="video/mp4" />
+        <source src="/events/events-video 1.mp4" type="video/mp4" />
       </video>
 
       {/* Gradient overlays matching Figma — left dark sweep + centre fade */}
@@ -39,12 +40,6 @@ export function EventsHero({ onViewHighlights, onExploreEvents }: EventsHeroProp
       <div className={styles.inner}>
         {/* Eyebrow */}
         <div className={styles.eyebrowWrap} ref={eyebrowRef} aria-hidden="true">
-          {/* Reticle corners */}
-          <span className={styles.bracketTL} />
-          <span className={styles.bracketTR} />
-          <span className={styles.bracketBL} />
-          <span className={styles.bracketBR} />
-
           {/* Left corner icon pair */}
           <span className={styles.cornerIconLeft} aria-hidden="true">
             <span className={`${styles.cornerDot} ${styles.cornerDotTop}`} />
@@ -75,28 +70,12 @@ export function EventsHero({ onViewHighlights, onExploreEvents }: EventsHeroProp
 
         {/* CTA row */}
         <div className={styles.ctaRow} ref={ctaRef}>
-          {/* Ghost / outline button — "View Highlights" */}
-          <button
-            type="button"
-            className={styles.btnGhost}
-            onClick={onViewHighlights}
-            aria-label="View highlights"
-          >
-            <span className={styles.btnGhostCornerTL} aria-hidden="true" />
-            <span className={styles.btnGhostCornerBR} aria-hidden="true" />
-            <span className={styles.btnGhostCornerTR} aria-hidden="true" />
-            <span className={styles.btnGhostCornerBL} aria-hidden="true" />
-            <span className={styles.btnGhostLabel}>View Highlights</span>
-          </button>
-
-          {/* Primary blue button — "Explore All Events" */}
-          <button
-            type="button"
-            className={styles.btnPrimary}
-            onClick={onExploreEvents}
-          >
+          <SecondaryButton onClick={onViewHighlights}>
+            View Highlights
+          </SecondaryButton>
+          <PrimaryButton onClick={onExploreEvents}>
             Explore All Events
-          </button>
+          </PrimaryButton>
         </div>
       </div>
     </section>

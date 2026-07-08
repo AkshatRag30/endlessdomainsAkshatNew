@@ -1,0 +1,411 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Section shell ─────────────────────────────────────────────────────────────
+
+.section {
+  position: relative;
+  width: 100%;
+  background: var(--color-white-primary);
+  overflow: hidden;
+}
+
+// ── Header row ────────────────────────────────────────────────────────────────
+
+.header {
+  position: relative;
+  width: 100%;
+  display: grid;
+  // design-specific: three columns — title, connector graphic, description
+  grid-template-columns: 1fr 1.15fr 1fr;
+  align-items: center;
+  // design-specific: ~297px tall header zone matching Figma
+  min-height: 297px;
+  border-top: 1px dashed rgba(0, 0, 0, 0.12);
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.12);
+
+  @include tablet-down {
+    grid-template-columns: 1fr;
+    min-height: auto;
+    padding: var(--space-9) var(--space-6);
+    gap: var(--space-7);
+  }
+
+  @include mobile {
+    padding: var(--space-8) var(--space-5);
+  }
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  height: 100%;
+  justify-content: center;
+  padding: var(--space-10) var(--space-8);
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
+
+  @include tablet-down {
+    height: auto;
+    padding: 0;
+    text-align: left;
+    align-items: flex-start;
+    border-right: none;
+  }
+}
+
+.headerCenter {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
+
+  @include tablet-down {
+    display: none;
+  }
+}
+
+.headerRight {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: var(--space-10) var(--space-8);
+
+  @include tablet-down {
+    height: auto;
+    padding: 0;
+    text-align: left;
+    justify-content: flex-start;
+  }
+}
+
+// Small corner-tick marks framing the description — top-left and bottom-right only
+.headerRightBracketTop,
+.headerRightBracketBottom {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  pointer-events: none;
+
+  @include tablet-down {
+    display: none;
+  }
+}
+
+.headerRightBracketTop {
+  top: var(--space-5);
+  left: var(--space-4);
+  border-top: 1.5px solid var(--color-blue-primary);
+  border-left: 1.5px solid var(--color-blue-primary);
+}
+
+.headerRightBracketBottom {
+  bottom: var(--space-5);
+  right: var(--space-4);
+  border-bottom: 1.5px solid var(--color-blue-primary);
+  border-right: 1.5px solid var(--color-blue-primary);
+}
+
+// ── Subtitle with brackets ────────────────────────────────────────────────────
+
+.subtitleWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-start; // headerLeft is a column flex container with default stretch — pin to content width
+  width: fit-content;
+  padding: 10px 44px;
+}
+
+%subtitle-corner {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-style: solid;
+  border-color: var(--color-blue-primary);
+  pointer-events: none;
+}
+
+.subtitleBracketTL { @extend %subtitle-corner; top: 0; left: 0; border-width: 1.5px 0 0 1.5px; }
+.subtitleBracketTR { @extend %subtitle-corner; top: 0; right: 0; border-width: 1.5px 1.5px 0 0; }
+.subtitleBracketBL { @extend %subtitle-corner; bottom: 0; left: 0; border-width: 0 0 1.5px 1.5px; }
+.subtitleBracketBR { @extend %subtitle-corner; bottom: 0; right: 0; border-width: 0 1.5px 1.5px 0; }
+
+.subtitleText {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-faq-bracket);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+// ── Heading ───────────────────────────────────────────────────────────────────
+
+.heading {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-transform: capitalize;
+
+  @include tablet-down { font-size: 42px; }
+  @include mobile { font-size: 30px; }
+}
+
+.headingLine1 {
+  display: block;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+}
+
+.headingLine2 {
+  display: block;
+  font-weight: var(--font-weight-regular);
+  // design-specific: blue gradient matching Figma
+  background: linear-gradient(112deg, var(--color-blue-primary) 70%, var(--color-blue-primary-faded) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+// ── Description ───────────────────────────────────────────────────────────────
+
+.description {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-body);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-gray-dark);
+  line-height: var(--leading-normal);
+
+  @include tablet-down {
+    font-size: var(--text-normal);
+  }
+
+  @include mobile {
+    font-size: var(--text-body-small);
+  }
+}
+
+// ── Connector graphic (its own center column) ─────────────────────────────────
+
+.connectorWrap {
+  position: relative;
+  pointer-events: none;
+
+  @include tablet-down {
+    display: none;
+  }
+}
+
+.connectorBase {
+  display: block;
+  width: 420px;
+  height: auto;
+}
+
+.connectorGlow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  filter:
+    drop-shadow(0 0 4px rgba(255, 255, 255, 0.9))
+    drop-shadow(0 0 10px rgba(38, 57, 237, 0.55))
+    drop-shadow(0 0 20px rgba(38, 57, 237, 0.3));
+}
+
+.glowPath1,
+.glowPath2 {
+  stroke-dasharray: 80 9999;
+  stroke-dashoffset: 80;
+  opacity: 0;
+}
+
+.glowPath1 {
+  animation: gatherFlowBeam 4s linear infinite;
+}
+
+.glowPath2 {
+  animation: gatherFlowBeam 4s linear infinite 2s;
+}
+
+@keyframes gatherFlowBeam {
+  0% {
+    stroke-dashoffset: 80;
+    opacity: 0;
+    stroke-width: 1.5;
+  }
+  12% {
+    opacity: 0.85;
+    stroke-width: 2;
+  }
+  50% {
+    opacity: 1;
+    stroke-width: 2.5;
+  }
+  88% {
+    opacity: 0.85;
+    stroke-width: 2;
+  }
+  100% {
+    stroke-dashoffset: -410;
+    opacity: 0;
+    stroke-width: 1.5;
+  }
+}
+
+// ── Platform cards row ────────────────────────────────────────────────────────
+
+.cardsRow {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.12);
+
+  @include tablet-down {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.platformCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: var(--space-9) var(--space-6);
+  border-right: 1px dashed rgba(0, 0, 0, 0.12);
+  background: linear-gradient(180deg, transparent 0%, transparent 100%);
+  transition: background 0.25s ease;
+
+  // design-specific: very light blue tint wash on hover, top to bottom — mirrored on
+  // focus-within so keyboard users tabbing to the card's link see the same effect
+  &:hover,
+  &:focus-within {
+    background: linear-gradient(180deg, #2639ED2B 0%, transparent 100%);
+  }
+
+  &:last-child {
+    border-right: none;
+  }
+
+  @include tablet-down {
+    border-right: 1px dashed rgba(0, 0, 0, 0.12);
+    border-bottom: 1px dashed rgba(0, 0, 0, 0.12);
+
+    &:nth-child(2n) {
+      border-right: none;
+    }
+  }
+
+  @include mobile {
+    &,
+    &:nth-child(2n) {
+      border-right: none;
+    }
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+}
+
+// ── Icon badge ────────────────────────────────────────────────────────────────
+
+.iconBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 39px;
+  height: 39px;
+  border-radius: 12.6px;
+  background: linear-gradient(180deg, var(--color-blue-primary) 0%, rgba(38, 57, 237, 0.47) 100%);
+  box-shadow:
+    0px 13.5px 34.4px 0px rgba(87, 177, 255, 0.34),
+    0px 8px 10.4px 0px rgba(87, 177, 255, 0.19),
+    0px 3.3px 4.3px 0px rgba(87, 177, 255, 0.22),
+    0px 1.2px 1.6px 0px rgba(87, 177, 255, 0.15),
+    0px 0px 0px 1.3px #e0e9f2,
+    0px 0px 0px 1.6px var(--color-white-primary);
+  color: var(--color-white-primary);
+  font-size: 18px;
+}
+
+// ── Card text ─────────────────────────────────────────────────────────────────
+
+.cardText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.cardTitle {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h3);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.2;
+  text-transform: capitalize;
+  background: linear-gradient(120deg, var(--color-blue-primary) 70%, var(--color-blue-primary-faded) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  @include tablet-down {
+    font-size: 24px;
+  }
+}
+
+.cardDescription {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-gray-dark);
+  line-height: var(--leading-normal);
+}
+
+// ── CTA link ──────────────────────────────────────────────────────────────────
+
+.ctaLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+  text-transform: capitalize;
+  text-decoration: none;
+  margin-top: auto;
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
