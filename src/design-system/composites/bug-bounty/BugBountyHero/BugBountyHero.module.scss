@@ -1,0 +1,402 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Hero shell ────────────────────────────────────────────────────────────────
+
+.hero {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--color-white-primary);
+  animation: heroFadeIn 1s ease both;
+}
+
+// ── Background layers ──────────────────────────────────────────────────────────
+
+.bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+// design-specific: repeating vertical scan-line texture — technical/blueprint feel
+.stripeLayer {
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent 0px,
+    transparent 38px,
+    var(--color-black-alpha-03) 38px,
+    var(--color-black-alpha-03) 39px
+  );
+}
+
+// design-specific: purple/blue ambient glow — a single full-bleed horizontal band sitting low in the
+// hero, just below the CTA. Fades in from transparent and deepens toward the bottom edge, matching
+// the reference exactly (a flat fog band, not a radial blob).
+.glowBand {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 300px;
+  // first 52% stays fully transparent — a dead buffer so nothing shows until well clear of the CTA,
+  // and the shorter band height on top of that keeps the whole glow from reaching too far up
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent 52%,
+    var(--color-blue-primary-alpha-13) 63%,
+    var(--color-purple-glow-fade) 75%,
+    var(--color-purple-glow-mid) 90%,
+    var(--color-purple-glow-strong) 100%
+  );
+  filter: blur(14px);
+  animation: glowBreathe 7s ease-in-out infinite;
+
+  @include tablet-down { height: 240px; }
+  @include mobile { height: 180px; }
+}
+
+// Shared gray halftone dot texture — same recipe as .ditherPatch below, factored out so the three
+// margin/top patches don't repeat it. White-based mask stops specifically: black-to-transparent
+// masks behave inconsistently across engines (luminance vs alpha) and previously made a layer
+// render as fully invisible; white reads as "fully visible" under both interpretations.
+%dither-texture {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0.7;
+  background-image: radial-gradient(circle, var(--color-gray-300) 1px, transparent 1.3px);
+  background-size: 5px 5px;
+  mask-image: radial-gradient(ellipse at center, white 0%, white 35%, transparent 72%);
+  -webkit-mask-image: radial-gradient(ellipse at center, white 0%, white 35%, transparent 72%);
+}
+
+// design-specific: big halftone area sitting just below the navbar, spanning most of the hero's
+// top edge (hero's own top === navbar's bottom, no gap between them)
+.ditherPatchTop {
+  @extend %dither-texture;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(1100px, 92vw);
+  height: 220px;
+
+  @include tablet-down { height: 170px; }
+  @include mobile { display: none; }
+}
+
+// design-specific: big halftone areas in the left/right margins, giving the hero the same kind of
+// wide atmospheric texture as the reference instead of just the small patch behind the title
+.ditherPatchLeft {
+  @extend %dither-texture;
+  top: 8%;
+  left: 1%;
+  width: 360px;
+  height: 560px;
+
+  @include tablet-down { width: 220px; height: 420px; }
+  @include mobile { display: none; }
+}
+
+.ditherPatchRight {
+  @extend %dither-texture;
+  top: 8%;
+  right: 1%;
+  width: 360px;
+  height: 560px;
+
+  @include tablet-down { width: 220px; height: 420px; }
+  @include mobile { display: none; }
+}
+
+// ── Falling comets — slow downward data-stream drift ──────────────────────────
+
+.arrowsLayer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.arrow {
+  position: absolute;
+  top: -48px;
+  color: var(--color-blue-primary-alpha-70);
+  animation-name: arrowFall;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+
+  // design-specific: left offsets are locked to the stripe grid (lines sit at 38px, then every
+  // 39px after) so each comet rides down an actual stripe line instead of the gap between them.
+  // Each still gets its own speed so the stream never feels synchronized.
+  &:nth-child(1) { left: 38px;   animation-duration: 7s;    animation-delay: -1s; }
+  &:nth-child(2) { left: 194px;  animation-duration: 9.5s;  animation-delay: -4s;   color: var(--color-purple-glow-strong); }
+  &:nth-child(3) { left: 389px;  animation-duration: 6.2s;  animation-delay: -2.5s; }
+  &:nth-child(4) { left: 584px;  animation-duration: 10.5s; animation-delay: -6s;   color: var(--color-purple-glow-strong); }
+  &:nth-child(5) { left: 779px;  animation-duration: 7.8s;  animation-delay: -3.2s; }
+  &:nth-child(6) { left: 974px;  animation-duration: 9s;    animation-delay: -0.5s; color: var(--color-purple-glow-strong); }
+  &:nth-child(7) { left: 1169px; animation-duration: 6.8s;  animation-delay: -5s; }
+  &:nth-child(8) { left: 1364px; animation-duration: 11s;   animation-delay: -7s;   color: var(--color-purple-glow-strong); }
+
+  @include tablet-down {
+    &:nth-child(1) { left: 38px; }
+    &:nth-child(2) { left: 155px; }
+    &:nth-child(3) { left: 272px; }
+    &:nth-child(4) { left: 389px; }
+    &:nth-child(5) { left: 506px; }
+    &:nth-child(6) { left: 623px; }
+    &:nth-child(7) { left: 740px; }
+    &:nth-child(8) { left: 857px; }
+  }
+
+  @include mobile {
+    &:nth-child(1) { left: 38px; }
+    &:nth-child(2) { left: 116px; }
+    &:nth-child(3) { left: 194px; }
+    &:nth-child(4) { left: 272px; }
+    &:nth-child(5) { left: 350px; }
+    &:nth-child(6) { left: 428px; }
+    &:nth-child(7) { left: 506px; }
+    &:nth-child(8) { left: 584px; }
+  }
+
+  svg { display: block; }
+}
+
+// ── Content block ─────────────────────────────────────────────────────────────
+
+.content {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-6);
+  max-width: 1090px;
+  width: 100%;
+  padding: var(--space-4) var(--container-padding-x) var(--space-9);
+
+  @include tablet-down {
+    gap: var(--space-5);
+    padding: var(--space-10) var(--space-7) var(--space-7);
+  }
+
+  @include mobile {
+    gap: var(--space-4);
+    padding: var(--space-9) var(--space-5) var(--space-6);
+  }
+}
+
+// ── Text stack — label/heading/description/CTA block ──────────────────────────
+
+.textStack {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+
+  @include tablet-down { gap: var(--space-5); }
+  @include mobile { gap: var(--space-4); }
+}
+
+// ── Title block — label + heading, with a contained gray halftone patch behind them ──────
+
+.titleBlock {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+
+  @include tablet-down { gap: var(--space-5); }
+  @include mobile { gap: var(--space-4); }
+}
+
+// design-specific: a static, contained gray halftone patch — not edge-to-edge, not animated, not
+// blue — matching the reference exactly. Sized to roughly cover the eyebrow label and heading only,
+// centered behind them. z-index: -1 puts it behind this block's own text (a negative z-index child
+// paints before its static in-flow siblings in the same stacking context) while staying above the
+// striped background, which lives in a separate, earlier ancestor. Feathered edges via mask-image
+// using WHITE stops specifically — black-to-transparent masks are inconsistent across engines
+// (luminance vs alpha) and previously made a layer render as fully invisible; white reads as
+// "fully visible" under both interpretations.
+.ditherPatch {
+  @extend %dither-texture;
+  top: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 560px;
+  height: 260px;
+  z-index: -1;
+
+  @include tablet-down {
+    width: 420px;
+    height: 220px;
+  }
+
+  @include mobile {
+    width: 300px;
+    height: 180px;
+  }
+}
+
+// ── Top label with 4-corner brackets ─────────────────────────────────────────
+
+.labelWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 20px;
+  animation: fadeUp 0.7s ease both;
+  animation-delay: 0.1s;
+}
+
+%bracket-corner {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-style: solid;
+  border-color: var(--color-blue-primary);
+  pointer-events: none;
+}
+
+.labelBracketTL { @extend %bracket-corner; top: 0; left: 0; border-width: 1.5px 0 0 1.5px; }
+.labelBracketTR { @extend %bracket-corner; top: 0; right: 0; border-width: 1.5px 1.5px 0 0; }
+.labelBracketBL { @extend %bracket-corner; bottom: 0; left: 0; border-width: 0 0 1.5px 1.5px; }
+.labelBracketBR { @extend %bracket-corner; bottom: 0; right: 0; border-width: 0 1.5px 1.5px 0; }
+
+.labelText {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+
+  @include mobile {
+    font-size: 11px;
+    letter-spacing: 0.06em;
+  }
+}
+
+// ── Heading ───────────────────────────────────────────────────────────────────
+
+.heading {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  animation: fadeUp 0.8s ease both;
+  animation-delay: 0.2s;
+}
+
+.headingLine1,
+.headingLine2 {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+
+  @include tablet-down { font-size: 42px; }
+  @include mobile { font-size: 32px; }
+}
+
+.headingLine1 {
+  color: var(--color-black-primary);
+}
+
+.headingLine2 {
+  background: linear-gradient(146deg, var(--color-blue-primary) 76%, var(--color-blue-primary-faded) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+// ── Description ───────────────────────────────────────────────────────────────
+
+.description {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-normal);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-light);
+  line-height: var(--leading-body);
+  max-width: 720px;
+  animation: fadeUp 0.9s ease both;
+  animation-delay: 0.35s;
+
+  @include tablet-down { max-width: 540px; }
+
+  @include mobile {
+    font-size: var(--text-body-small);
+    max-width: 100%;
+  }
+}
+
+// ── CTA row ───────────────────────────────────────────────────────────────────
+
+.ctaRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-7);
+  animation: fadeUp 1s ease both;
+  animation-delay: 0.5s;
+
+  @include mobile {
+    flex-direction: column;
+    gap: var(--space-4);
+    width: 100%;
+  }
+}
+
+// ── Animations ────────────────────────────────────────────────────────────────
+
+@keyframes heroFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes arrowFall {
+  0%   { transform: translateY(0);       opacity: 0; }
+  8%   { opacity: 1; }
+  92%  { opacity: 1; }
+  100% { transform: translateY(calc(100vh + 48px)); opacity: 0; }
+}
+
+@keyframes glowBreathe {
+  0%, 100% { opacity: 0.75; }
+  50%      { opacity: 1; }
+}
+
+// ── Reduced motion ────────────────────────────────────────────────────────────
+
+@media (prefers-reduced-motion: reduce) {
+  .hero,
+  .glowBand,
+  .arrow,
+  .labelWrap,
+  .heading,
+  .description,
+  .ctaRow {
+    animation: none !important;
+  }
+}

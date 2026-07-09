@@ -337,7 +337,7 @@ export function ParkedRoadmap() {
             <div className={styles.descWrap}>
               <span className={styles.bracketDescTL} aria-hidden="true" />
               <p className={styles.headerSubtitle}>
-                Every identity you have ever built online sits on a layer someone else controls and they have always reserved the right to take it back.
+                From Login to Live in Under 5 Minutes Getting your domain live takes just 7 simple steps. No coding, no hosting setup, and no ongoing maintenance.
               </p>
               <span className={styles.bracketDescBR} aria-hidden="true" />
             </div>

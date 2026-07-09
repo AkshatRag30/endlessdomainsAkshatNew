@@ -100,6 +100,17 @@ $clip-sm: polygon(
     }
   }
 
+  // Plain rounded-rectangle variant — for contexts where the octagon cut reads too technical
+  &.rounded {
+    clip-path: none;
+    border-radius: var(--radius-sm); // 8px, nearest token to Figma 4.67px
+
+    &::before {
+      clip-path: none;
+      border-radius: var(--radius-sm);
+    }
+  }
+
   &::before {
     content: "";
     position: absolute;

@@ -1,0 +1,280 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Section shell ─────────────────────────────────────────────────────────────
+
+.section {
+  position: relative;
+  background: var(--color-white-primary);
+  padding: var(--section-spacing) var(--container-padding-x);
+}
+
+// ── Two-column grid ───────────────────────────────────────────────────────────
+// The divider is a real flex item between the two columns, not an absolutely-positioned
+// line guessing where the midpoint is — that's what guarantees the feature-card icons on
+// the right can never overlap it, since the gap on either side of it is real layout space.
+
+.grid {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-9);
+  max-width: 1440px;
+  margin: 0 auto;
+
+  @include tablet-down {
+    flex-direction: column;
+    gap: var(--space-9);
+  }
+}
+
+.dividerCol {
+  flex: 0 0 auto;
+  align-self: stretch;
+  width: 0;
+  border-left: 1px dashed var(--color-gray-300);
+  pointer-events: none;
+
+  @include tablet-down {
+    display: none;
+  }
+}
+
+// ── Left column ───────────────────────────────────────────────────────────────
+// No max-width cap — it takes the full space the flex layout gives it, which is what
+// keeps the checklist copy on a single line instead of wrapping to two.
+
+.left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-7);
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+// ── Top label with 4-corner brackets ─────────────────────────────────────────
+
+.labelWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 20px;
+}
+
+%bracket-corner {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-style: solid;
+  border-color: var(--color-blue-primary);
+  pointer-events: none;
+}
+
+.labelBracketTL { @extend %bracket-corner; top: 0; left: 0; border-width: 1.5px 0 0 1.5px; }
+.labelBracketTR { @extend %bracket-corner; top: 0; right: 0; border-width: 1.5px 1.5px 0 0; }
+.labelBracketBL { @extend %bracket-corner; bottom: 0; left: 0; border-width: 0 0 1.5px 1.5px; }
+.labelBracketBR { @extend %bracket-corner; bottom: 0; right: 0; border-width: 0 1.5px 1.5px 0; }
+
+.labelText {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-faq-bracket);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+
+  @include mobile {
+    font-size: var(--text-small-13);
+    white-space: normal;
+  }
+}
+
+// ── Heading ───────────────────────────────────────────────────────────────────
+
+.heading {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.headingLine1,
+.headingLine2 {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2);
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+
+  @include tablet-down { font-size: 40px; }
+  @include mobile { font-size: 32px; }
+}
+
+.headingLine1 {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+}
+
+.headingLine2 {
+  font-weight: var(--font-weight-regular);
+  background: linear-gradient(126deg, var(--color-blue-primary) 80.366%, var(--color-blue-primary-faded) 95.59%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+// ── Tester expectations ───────────────────────────────────────────────────────
+
+.expectations {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-5);
+  width: 100%;
+}
+
+.expectationsTitle {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-body-small);
+  color: var(--color-black-primary);
+}
+
+.checklist {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.checklistItem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.checklistIcon {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  color: var(--color-status-available);
+  margin-top: 1px;
+}
+
+.checklistItem span {
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-small-13);
+  line-height: 1.2;
+  letter-spacing: 0.005em;
+  color: var(--color-black-primary);
+}
+
+.note {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-body-small);
+  line-height: 1.2;
+  color: var(--color-black-alpha-55);
+
+  strong {
+    font-weight: var(--font-weight-medium);
+    color: var(--color-black-primary);
+  }
+}
+
+// ── Right column — feature cards ──────────────────────────────────────────────
+
+.featureGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-9) var(--space-6);
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 684px;
+  margin: 0;
+  // proper breathing room on every side, and specifically away from the divider on the left
+  padding: var(--space-2) var(--space-2) 0 var(--space-7);
+  list-style: none;
+
+  @include tablet-down {
+    grid-template-columns: 1fr;
+    max-width: 100%;
+    padding: 0;
+  }
+}
+
+.featureCard {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+// design-specific: same badge shadow recipe as the ParkedRoadmap step badges — Figma-exact values
+.featureBadge {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  color: var(--color-white-primary);
+  background: linear-gradient(to bottom, var(--color-blue-primary), var(--color-blue-primary-alpha-50));
+  box-shadow:
+    0px 25.3px 64.5px rgba(87, 177, 255, 0.34),
+    0px 14.9px 19.4px rgba(87, 177, 255, 0.19),
+    0px 6.2px 8.1px rgba(87, 177, 255, 0.22),
+    0px 2.2px 2.9px rgba(87, 177, 255, 0.15),
+    0 0 0 2.41px #e0e9f2,
+    0 0 0 3px var(--color-white-primary);
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-sm);
+    box-shadow:
+      inset 0px 0.6px 10.8px 1.2px #d2eaff,
+      inset 0px 0.6px 2.4px 1.2px #d2eaff;
+    pointer-events: none;
+  }
+
+  svg {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+.featureText {
+  flex: 1;
+  min-width: 0;
+}
+
+.featureTitle {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: 22px;
+  line-height: 1.2;
+  color: var(--color-black-primary);
+
+  // note: not var(--text-h3) — that token stays at 30px until the mobile breakpoint, which made
+  // this render larger at tablet width (768–991px) than on desktop
+  @include mobile { font-size: 19px; }
+}
+
+.featureDesc {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-small-15);
+  line-height: var(--leading-small);
+  color: var(--color-black-alpha-55);
+}

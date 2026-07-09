@@ -8,6 +8,7 @@ export interface PrimaryButtonProps {
   transparent?: boolean
   dark?: boolean
   size?: 'sm' | 'md'
+  shape?: 'octagon' | 'rounded'
   disabled?: boolean
   loading?: boolean
   type?: 'button' | 'submit' | 'reset'
@@ -27,6 +28,7 @@ export const PrimaryButton = forwardRef<HTMLButtonElement, PrimaryButtonProps>(
       transparent = false,
       dark = false,
       size         = 'md',
+      shape        = 'octagon',
       loading      = false,
       type         = 'button',
       className    = '',
@@ -44,6 +46,7 @@ export const PrimaryButton = forwardRef<HTMLButtonElement, PrimaryButtonProps>(
     const shellClass = [
       styles.button,
       size === 'sm' ? styles.sm : '',
+      shape === 'rounded' ? styles.rounded : '',
       fullWidth     ? styles.fullWidth : '',
       isDisabled    ? styles.disabled  : '',
       resolvedVariant !== 'default' ? styles[resolvedVariant] : '',

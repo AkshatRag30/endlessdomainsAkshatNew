@@ -1,0 +1,347 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Section shell ─────────────────────────────────────────────────────────────
+
+.section {
+  position: relative;
+  background: var(--color-white-primary);
+  padding: var(--section-spacing) var(--container-padding-x);
+}
+
+// ── Hero connector — sits in this section's own top padding, bridging the hero seam
+// (top edge of this section) down to the title, without bleeding into the hero itself.
+// Sized by height (not width) since the constraint that matters is vertical: it must never
+// exceed the gap it sits in. max-height is the hard guarantee — it reads --section-spacing
+// live at every breakpoint, so no matter what height we aim for below, it can never grow
+// tall enough to reach the title. z-index sits below the header so title/hero always win
+// any stacking conflict if this ever visually overlaps them.
+
+.heroConnector {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
+  height: 72px;
+  max-height: calc(var(--section-spacing) - var(--space-4));
+  z-index: 0;
+  pointer-events: none;
+
+  @include mobile-up { height: 88px; }
+  @include tablet-up { height: 112px; }
+  @include desktop    { height: 140px; }
+  @include wide        { height: 168px; }
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
+
+.header {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-11);
+
+  @include mobile {
+    margin-bottom: var(--space-8);
+  }
+}
+
+// ── Top label with 4-corner brackets ─────────────────────────────────────────
+
+.labelWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 20px;
+}
+
+%bracket-corner {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-style: solid;
+  border-color: var(--color-blue-primary);
+  pointer-events: none;
+}
+
+.labelBracketTL { @extend %bracket-corner; top: 0; left: 0; border-width: 1.5px 0 0 1.5px; }
+.labelBracketTR { @extend %bracket-corner; top: 0; right: 0; border-width: 1.5px 1.5px 0 0; }
+.labelBracketBL { @extend %bracket-corner; bottom: 0; left: 0; border-width: 0 0 1.5px 1.5px; }
+.labelBracketBR { @extend %bracket-corner; bottom: 0; right: 0; border-width: 0 1.5px 1.5px 0; }
+
+.labelText {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-faq-bracket);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+
+  @include mobile {
+    font-size: var(--text-small-13);
+  }
+}
+
+// ── Heading ───────────────────────────────────────────────────────────────────
+
+.heading {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  text-transform: capitalize;
+}
+
+.headingLine1 {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  // design-specific: Figma-exact 45px — sits between --text-h3 (30px) and --text-h2 (55px), no token matches
+  font-size: 45px;
+  line-height: 1.2;
+  color: var(--color-black-primary);
+
+  @include tablet-down { font-size: 34px; }
+  @include mobile { font-size: 28px; }
+}
+
+.headingLine2 {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-h2);
+  line-height: 1.2;
+  background: linear-gradient(132deg, var(--color-blue-primary) 70.225%, var(--color-blue-primary-faded) 95.59%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  @include tablet-down { font-size: 40px; }
+  @include mobile { font-size: 32px; }
+}
+
+// ── Desktop wave — 5 overlapping circles on a gentle arc ─────────────────────
+
+.wave {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  // shifted up toward the heading, and shrunk to match the smaller circles below
+  margin-top: calc(var(--space-7) * -1);
+  // design-specific: bottom padding absorbs the deepest circle's downward translateY (102px)
+  // plus breathing room, so it doesn't collide with whatever section follows
+  padding-bottom: 150px;
+
+  @include tablet-down {
+    display: none;
+  }
+}
+
+.circle {
+  position: relative;
+  flex: 0 0 auto;
+  // design-specific: scaled down ~20% from the Figma-exact 289px diameter
+  width: 230px;
+  height: 230px;
+  border-radius: var(--radius-full);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-5);
+  color: var(--color-white-primary);
+  // design-specific: exact gradient as specified — #C3C9FF has no token equivalent
+  background: linear-gradient(100deg, var(--color-blue-primary) -18.66%, #C3C9FF 108.04%);
+
+  // design-specific: overlap scaled down to match the smaller circle diameter
+  &:not(:first-child) {
+    margin-left: -13px;
+  }
+
+  // design-specific: gentle arc — middle circle sits lowest, tapering up toward both ends
+  &:nth-child(1) { transform: translateY(0); }
+  &:nth-child(2) { transform: translateY(47px); }
+  &:nth-child(3) { transform: translateY(102px); }
+  &:nth-child(4) { transform: translateY(47px); }
+  &:nth-child(5) { transform: translateY(0); }
+
+  @include between(992px, 1439px) {
+    width: 145px;
+    height: 145px;
+    padding: var(--space-3);
+
+    &:not(:first-child) { margin-left: -8px; }
+
+    &:nth-child(1) { transform: translateY(0); }
+    &:nth-child(2) { transform: translateY(30px); }
+    &:nth-child(3) { transform: translateY(64px); }
+    &:nth-child(4) { transform: translateY(30px); }
+    &:nth-child(5) { transform: translateY(0); }
+  }
+}
+
+.circleNum {
+  display: block;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-body);
+  margin-bottom: var(--space-1);
+}
+
+.circleTitle {
+  margin: 0 0 var(--space-1);
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: 21px;
+  line-height: 1.2;
+
+  @include between(992px, 1439px) { font-size: 16px; }
+}
+
+.circleDesc {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-small-13);
+  line-height: var(--leading-small);
+  max-width: 189px;
+  opacity: 0.92;
+
+  @include between(992px, 1439px) {
+    font-size: var(--text-small-12);
+    max-width: 120px;
+  }
+}
+
+// ── Corner connector lines — two staircase accents per outer edge, below the circles ──────────
+
+.connectorLines {
+  position: relative;
+  // pulled up further to follow the circles shifting up and shrinking
+  margin-top: calc(var(--space-13) * -1);
+  height: 220px;
+  pointer-events: none;
+
+  @include between(992px, 1439px) {
+    margin-top: calc(var(--space-11) * -1);
+    height: 150px;
+  }
+
+  @include tablet-down {
+    display: none;
+  }
+}
+
+.connectorLeft,
+.connectorRight {
+  position: absolute;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+
+  svg {
+    display: block;
+    // scaled down to match the smaller circles above
+    width: 320px;
+    height: auto;
+
+    @include between(992px, 1439px) { width: 220px; }
+  }
+
+  // second copy continues the staircase further down and reads as receding from the circles.
+  // Pulled up with a negative margin since the SVG's own transparent margins otherwise leave
+  // the two lines looking far apart even with zero flex gap between the boxes.
+  svg:nth-child(2) {
+    margin-top: -60px;
+    opacity: 0.6;
+
+    @include between(992px, 1439px) { margin-top: -40px; }
+  }
+}
+
+.connectorLeft {
+  left: -40px;
+
+  @include between(992px, 1439px) { left: -20px; }
+}
+
+.connectorRight {
+  right: -40px;
+  align-items: flex-end;
+
+  @include between(992px, 1439px) { right: -20px; }
+}
+
+// ── Mobile / tablet — same circular badges as desktop, wrapped 2-per-row ──────
+// flex-wrap + justify-content: center is what makes the lone 5th circle center itself on its own
+// row automatically, no manual grid-column spanning needed.
+
+.mobileWave {
+  display: none;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-5);
+
+  @include tablet-down {
+    display: flex;
+  }
+
+  @include mobile {
+    gap: var(--space-4);
+  }
+}
+
+.mobileCircle {
+  flex: 0 0 auto;
+  // design-specific: scales with viewport but capped so it doesn't blow up at tablet width
+  width: min(42vw, 190px);
+  height: min(42vw, 190px);
+  border-radius: var(--radius-full);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-4);
+  color: var(--color-white-primary);
+  // design-specific: exact gradient as specified — #C3C9FF has no token equivalent
+  background: linear-gradient(100deg, var(--color-blue-primary) -18.66%, #C3C9FF 108.04%);
+}
+
+.mobileCircleNum {
+  display: block;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: 26px;
+  margin-bottom: var(--space-1);
+
+  @include small-mobile { font-size: 20px; }
+}
+
+.mobileCircleTitle {
+  margin: 0 0 var(--space-1);
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: 19px;
+  line-height: 1.2;
+
+  @include small-mobile { font-size: 15px; }
+}
+
+.mobileCircleDesc {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-regular);
+  font-size: 12px;
+  line-height: var(--leading-small);
+  opacity: 0.92;
+
+  @include small-mobile { font-size: 10px; }
+}

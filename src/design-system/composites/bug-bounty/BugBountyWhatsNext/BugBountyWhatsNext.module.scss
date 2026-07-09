@@ -1,0 +1,308 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Section shell ─────────────────────────────────────────────────────────────
+
+.section {
+  position: relative;
+  background: var(--color-white-primary);
+  padding: var(--section-spacing) var(--container-padding-x);
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
+
+.header {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-9);
+  max-width: 1440px;
+  margin: 0 auto var(--space-12);
+  padding-bottom: var(--space-9);
+  border-bottom: 1px dashed var(--color-black-alpha-12);
+
+  @include tablet-down {
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+}
+
+.left {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.dividerCol {
+  flex: 0 0 auto;
+  align-self: stretch;
+  width: 0;
+  border-left: 1px dashed var(--color-gray-300);
+
+  @include tablet-down {
+    display: none;
+  }
+}
+
+.right {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  padding: var(--space-6) var(--space-6) var(--space-6) var(--space-7);
+}
+
+%header-corner {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-style: solid;
+  border-color: var(--color-black-alpha-25);
+  pointer-events: none;
+}
+
+.rightCornerTL { @extend %header-corner; top: 0; left: 0; border-width: 1.5px 0 0 1.5px; }
+.rightCornerBR { @extend %header-corner; bottom: 0; right: 0; border-width: 0 1.5px 1.5px 0; }
+
+.rightText {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-normal);
+  line-height: var(--leading-normal);
+  text-align: justify;
+  color: var(--color-text-body);
+
+  // justified text reads fine at the desktop column width but produces uneven, ugly word-spacing
+  // once the column narrows to a single mobile-width line
+  @include tablet-down {
+    text-align: left;
+  }
+}
+
+// ── Top label with 4-corner brackets ─────────────────────────────────────────
+
+.labelWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 20px;
+}
+
+%bracket-corner {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-style: solid;
+  border-color: var(--color-blue-primary);
+  pointer-events: none;
+}
+
+.labelBracketTL { @extend %bracket-corner; top: 0; left: 0; border-width: 1.5px 0 0 1.5px; }
+.labelBracketTR { @extend %bracket-corner; top: 0; right: 0; border-width: 1.5px 1.5px 0 0; }
+.labelBracketBL { @extend %bracket-corner; bottom: 0; left: 0; border-width: 0 0 1.5px 1.5px; }
+.labelBracketBR { @extend %bracket-corner; bottom: 0; right: 0; border-width: 0 1.5px 1.5px 0; }
+
+.labelText {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-faq-bracket);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+
+  @include mobile {
+    font-size: var(--text-small-13);
+  }
+}
+
+// ── Heading ───────────────────────────────────────────────────────────────────
+
+.heading {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.headingLine1,
+.headingLine2 {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2);
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  text-transform: capitalize;
+
+  @include tablet-down { font-size: 40px; }
+  @include mobile { font-size: 30px; }
+}
+
+.headingLine1 {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+}
+
+.headingLine2 {
+  font-weight: var(--font-weight-regular);
+  background: linear-gradient(129deg, var(--color-blue-primary) 70.225%, var(--color-blue-primary-faded) 95.59%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+// ── Card grid ─────────────────────────────────────────────────────────────────
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-6);
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+
+  @include tablet-down {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-7);
+  border-radius: var(--radius-lg);
+  min-height: 260px;
+  // grid tone flips per variant so the pixel grid stays visible against either background
+  --grid-color: var(--color-black-alpha-03);
+
+  &[data-variant='white'] {
+    background: var(--color-black-alpha-01);
+    border: 1px solid var(--color-border-black-subtle);
+  }
+
+  &[data-variant='blue'] {
+    background: #0358f7;
+    border: 1px solid var(--color-border-black-subtle);
+    --grid-color: var(--color-white-alpha-08);
+  }
+}
+
+// design-specific: pure-CSS pixelated checker grid sitting behind the badge/text on every card —
+// classic two-layer checkerboard trick via offset repeating gradients, no image asset needed
+.cardPixelGrid {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(45deg, var(--grid-color) 25%, transparent 25%, transparent 75%, var(--grid-color) 75%, var(--grid-color)),
+    linear-gradient(45deg, var(--grid-color) 25%, transparent 25%, transparent 75%, var(--grid-color) 75%, var(--grid-color));
+  background-size: 10px 10px;
+  background-position: 0 0, 5px 5px;
+}
+
+// design-specific: soft whitish glow corners — bottom-left and top-right on every card
+.cardGlowBL,
+.cardGlowTR {
+  position: absolute;
+  z-index: 0;
+  width: 220px;
+  height: 220px;
+  border-radius: var(--radius-full);
+  background: radial-gradient(circle, var(--color-white-alpha-40) 0%, transparent 70%);
+  filter: blur(30px);
+  pointer-events: none;
+}
+
+.cardGlowBL { bottom: -70px; left: -70px; }
+.cardGlowTR { top: -70px; right: -70px; }
+
+// ── Icon badge ────────────────────────────────────────────────────────────────
+// design-specific: same badge shadow recipe used across the page, sized up for this section
+
+.cardBadge {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-white-primary);
+  background: linear-gradient(to bottom, var(--color-blue-primary), var(--color-blue-primary-alpha-50));
+  box-shadow:
+    0px 25.3px 64.5px rgba(87, 177, 255, 0.34),
+    0px 14.9px 19.4px rgba(87, 177, 255, 0.19),
+    0px 6.2px 8.1px rgba(87, 177, 255, 0.22),
+    0px 2.2px 2.9px rgba(87, 177, 255, 0.15),
+    0 0 0 3px rgba(224, 233, 242, 0.34);
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-md);
+    box-shadow:
+      inset 0px 0.9px 16px 1.8px #d2eaff,
+      inset 0px 0.9px 3.6px 1.8px #d2eaff;
+    pointer-events: none;
+  }
+
+  svg {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+// ── Card text ─────────────────────────────────────────────────────────────────
+
+.cardText {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.cardTitle {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--text-h3);
+  line-height: 1.2;
+
+  [data-variant='blue'] & {
+    color: var(--color-white-primary);
+  }
+
+  [data-variant='white'] & {
+    color: var(--color-blue-primary);
+  }
+}
+
+.cardDesc {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-body-small);
+  line-height: 1.4;
+  max-width: 420px;
+
+  [data-variant='blue'] & {
+    color: var(--color-white-alpha-90);
+  }
+
+  [data-variant='white'] & {
+    color: var(--color-black-primary);
+  }
+}

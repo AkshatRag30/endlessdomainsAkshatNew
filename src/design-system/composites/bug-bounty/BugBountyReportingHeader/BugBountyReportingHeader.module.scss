@@ -1,0 +1,170 @@
+@import '@newstyles/_mixins.scss';
+
+// Same header treatment as CommunityDifferent's .topArea — striped side columns, dashed top/bottom
+// borders, centered bracket-eyebrow + two-line heading. Reused verbatim per design direction rather
+// than reinvented, so the two pages share one visual language for this kind of section header.
+
+// ── Section shell ─────────────────────────────────────────────────────────────
+
+.section {
+  position: relative;
+  width: 100%;
+  background: var(--color-white-primary);
+  overflow: hidden;
+}
+
+// ── Top content area ──────────────────────────────────────────────────────────
+
+.topArea {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: stretch;
+  // design-specific: ~289px tall zone matching Figma
+  min-height: 289px;
+  padding: 0 var(--space-8);
+  border-top: 1px dashed rgba(0, 0, 0, 0.12);
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.12);
+
+  @include tablet-down {
+    min-height: auto;
+    flex-direction: column;
+    padding: 0;
+  }
+}
+
+// Decorative striped columns (left + right of text block)
+// design-specific: 158px wide, repeating diagonal line pattern, 12% opacity
+.stripeCol {
+  flex-shrink: 0;
+  // design-specific: ~158px wide stripe columns, matching Figma
+  width: 158px;
+  position: relative;
+  overflow: hidden;
+  opacity: 0.12;
+
+  // Repeating diagonal SVG-style line pattern rendered as CSS
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent 0px,
+    transparent 10px,
+    rgba(0, 0, 0, 0.5) 10px,
+    rgba(0, 0, 0, 0.5) 11px
+  );
+
+  &[data-side='left'] {
+    border-right: 0.5px solid rgba(0, 0, 0, 0.12);
+  }
+
+  &[data-side='right'] {
+    border-left: 0.5px solid rgba(0, 0, 0, 0.12);
+  }
+
+  @include tablet-down {
+    display: none;
+  }
+}
+
+// Center content block
+.centerContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-6);
+  padding: var(--space-9) var(--space-7);
+  text-align: center;
+
+  @include tablet-down {
+    padding: var(--space-7) var(--space-6);
+    gap: var(--space-5);
+  }
+
+  @include mobile {
+    padding: var(--space-6) var(--space-5);
+    gap: var(--space-4);
+  }
+}
+
+// ── Eyebrow with brackets ─────────────────────────────────────────────────────
+
+.subtitleWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 44px;
+}
+
+%subtitle-corner {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-style: solid;
+  border-color: var(--color-blue-primary);
+  pointer-events: none;
+}
+
+.subtitleBracketTL { @extend %subtitle-corner; top: 0; left: 0; border-width: 1.5px 0 0 1.5px; }
+.subtitleBracketTR { @extend %subtitle-corner; top: 0; right: 0; border-width: 1.5px 1.5px 0 0; }
+.subtitleBracketBL { @extend %subtitle-corner; bottom: 0; left: 0; border-width: 0 0 1.5px 1.5px; }
+.subtitleBracketBR { @extend %subtitle-corner; bottom: 0; right: 0; border-width: 0 1.5px 1.5px 0; }
+
+.subtitleText {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-faq-bracket);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+
+  @include mobile {
+    font-size: 12px;
+    white-space: normal;
+    text-align: center;
+  }
+}
+
+// ── Heading ───────────────────────────────────────────────────────────────────
+
+.heading {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.headingLine1 {
+  display: block;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-transform: capitalize;
+
+  @include tablet-down { font-size: 42px; }
+  @include mobile { font-size: 30px; }
+}
+
+.headingLine2 {
+  display: block;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2);
+  font-weight: var(--font-weight-regular);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-transform: capitalize;
+  background: linear-gradient(125deg, var(--color-blue-primary) 80.366%, var(--color-blue-primary-faded) 95.59%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  @include tablet-down { font-size: 42px; }
+  @include mobile { font-size: 30px; }
+}
