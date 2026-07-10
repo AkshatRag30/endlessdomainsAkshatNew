@@ -20,7 +20,7 @@ function RightConnector({ gradientId }: { gradientId: string }) {
       <path d="M733.131 0.414429L614.631 80.4144V135.914L315.131 218.414V264.914L0.130981 350.414" stroke={`url(#${gradientId})`} />
       <defs>
         <linearGradient id={gradientId} x1="733.131" y1="175.414" x2="176.974" y2="175.408" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#2639ED" stopOpacity="0.31" />
+          <stop stopColor="#2639ED" stopOpacity="0.55" />
           <stop offset="0.950792" stopColor="#2639ED" stopOpacity="0" />
         </linearGradient>
       </defs>
@@ -35,7 +35,7 @@ function LeftConnector({ gradientId }: { gradientId: string }) {
       <path d="M0.279785 0.414429L118.78 80.4144V135.914L418.28 218.414V264.914L733.28 350.414" stroke={`url(#${gradientId})`} />
       <defs>
         <linearGradient id={gradientId} x1="0.279785" y1="175.414" x2="556.437" y2="175.408" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#2639ED" stopOpacity="0.31" />
+          <stop stopColor="#2639ED" stopOpacity="0.55" />
           <stop offset="0.950792" stopColor="#2639ED" stopOpacity="0" />
         </linearGradient>
       </defs>

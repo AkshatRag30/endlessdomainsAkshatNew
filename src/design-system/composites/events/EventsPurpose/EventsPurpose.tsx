@@ -90,7 +90,7 @@ export function EventsPurpose() {
 
             {/* Icon box */}
             <div className={styles.iconBox} aria-hidden="true">
-              <div className={styles.iconGlow} />
+              <div className={`${styles.iconGlow}${i % 2 === 0 ? ` ${styles.iconGlowShort}` : ''}`} />
               <Image src={item.icon} alt={item.iconAlt} width={32} height={32} className={styles.iconImg} />
             </div>
 

@@ -62,23 +62,19 @@ export const PrimaryButton = forwardRef<HTMLButtonElement, PrimaryButtonProps>(
         className={shellClass}
         aria-busy={loading}
       >
-        {/* <span className={styles.inner}> */}
+        {loading && (
+          <span className={styles.spinner} aria-hidden="true" />
+        )}
 
-          {loading && (
-            <span className={styles.spinner} aria-hidden="true" />
-          )}
+        {!loading && icon && iconPosition === 'left' && (
+          <span className={styles.iconLeft} aria-hidden="true">{icon}</span>
+        )}
 
-          {!loading && icon && iconPosition === 'left' && (
-            <span className={styles.iconLeft} aria-hidden="true">{icon}</span>
-          )}
+        <span>{children}</span>
 
-          <span>{children}</span>
-
-          {!loading && icon && iconPosition === 'right' && (
-            <span className={styles.iconRight} aria-hidden="true">{icon}</span>
-          )}
-
-        {/* </span> */}
+        {!loading && icon && iconPosition === 'right' && (
+          <span className={styles.iconRight} aria-hidden="true">{icon}</span>
+        )}
       </button>
     )
   },

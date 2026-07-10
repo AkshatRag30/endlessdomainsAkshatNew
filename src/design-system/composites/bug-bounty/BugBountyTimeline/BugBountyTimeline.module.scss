@@ -135,8 +135,8 @@
   // shifted up toward the heading, and shrunk to match the smaller circles below
   margin-top: calc(var(--space-7) * -1);
   // design-specific: bottom padding absorbs the deepest circle's downward translateY (102px)
-  // plus breathing room, so it doesn't collide with whatever section follows
-  padding-bottom: 150px;
+  // plus a little breathing room, so it doesn't collide with whatever section follows
+  padding-bottom: 90px;
 
   @include tablet-down {
     display: none;
@@ -226,12 +226,12 @@
   position: relative;
   // pulled up further to follow the circles shifting up and shrinking
   margin-top: calc(var(--space-13) * -1);
-  height: 220px;
+  height: 140px;
   pointer-events: none;
 
   @include between(992px, 1439px) {
     margin-top: calc(var(--space-11) * -1);
-    height: 150px;
+    height: 100px;
   }
 
   @include tablet-down {
@@ -259,10 +259,10 @@
   // Pulled up with a negative margin since the SVG's own transparent margins otherwise leave
   // the two lines looking far apart even with zero flex gap between the boxes.
   svg:nth-child(2) {
-    margin-top: -60px;
+    margin-top: -110px;
     opacity: 0.6;
 
-    @include between(992px, 1439px) { margin-top: -40px; }
+    @include between(992px, 1439px) { margin-top: -75px; }
   }
 }
 

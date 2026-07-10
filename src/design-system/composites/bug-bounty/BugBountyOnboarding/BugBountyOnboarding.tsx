@@ -71,7 +71,7 @@ export function BugBountyOnboarding() {
             <span className={styles.labelBracketTR} aria-hidden="true" />
             <span className={styles.labelBracketBL} aria-hidden="true" />
             <span className={styles.labelBracketBR} aria-hidden="true" />
-            <p className={styles.labelText}>Eyebrow: Onboarding Steps</p>
+            <p className={styles.labelText}>Onboarding Steps</p>
           </div>
 
           <h2 id="bug-bounty-onboarding-heading" className={styles.heading}>

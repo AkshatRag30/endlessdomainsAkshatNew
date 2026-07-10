@@ -27,6 +27,10 @@ const FAQS = [
   },
 ]
 
+function goToSupport() {
+  window.location.href = '/support'
+}
+
 export function BugBountyFaq() {
   const [openIndex, setOpenIndex] = useState(0)
 
@@ -38,6 +42,10 @@ export function BugBountyFaq() {
   const toggle = useCallback((i: number) => {
     setOpenIndex(prev => (prev === i ? -1 : i))
   }, [])
+
+  const handleItemClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    toggle(Number(e.currentTarget.dataset.index))
+  }, [toggle])
 
   return (
     <section className={styles.section} aria-labelledby="bug-bounty-faq-heading">
@@ -65,7 +73,7 @@ export function BugBountyFaq() {
 
             <p className={styles.description}>Answers to your most common bug bounty program questions</p>
 
-            <PrimaryButton onClick={() => window.location.href = '/support'}>
+            <PrimaryButton onClick={goToSupport}>
               Support Ticket
             </PrimaryButton>
           </div>
@@ -77,7 +85,8 @@ export function BugBountyFaq() {
             <div key={faq.q} className={`${styles.item} ${openIndex === i ? styles.itemOpen : ''}`}>
               <button
                 className={styles.itemBtn}
-                onClick={() => toggle(i)}
+                data-index={i}
+                onClick={handleItemClick}
                 aria-expanded={openIndex === i}
                 aria-controls={`bug-bounty-faq-panel-${i}`}
               >

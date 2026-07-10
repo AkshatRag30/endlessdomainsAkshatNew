@@ -36,83 +36,35 @@
   );
 }
 
-// design-specific: purple/blue ambient glow — a single full-bleed horizontal band sitting low in the
-// hero, just below the CTA. Fades in from transparent and deepens toward the bottom edge, matching
-// the reference exactly (a flat fog band, not a radial blob).
-.glowBand {
+// design-specific: sonar-ping rings — three thin circle outlines, all centered on the exact middle
+// of the hero, each expanding outward from nothing to a large radius while fading out, staggered so
+// a new ring starts roughly every third of the cycle. Reads as a clean, intentional "signal pulse"
+// rather than a texture, and needs no mask/checker math at all.
+.sonarPing {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 300px;
-  // first 52% stays fully transparent — a dead buffer so nothing shows until well clear of the CTA,
-  // and the shorter band height on top of that keeps the whole glow from reaching too far up
-  background: linear-gradient(
-    to bottom,
-    transparent 0%,
-    transparent 52%,
-    var(--color-blue-primary-alpha-13) 63%,
-    var(--color-purple-glow-fade) 75%,
-    var(--color-purple-glow-mid) 90%,
-    var(--color-purple-glow-strong) 100%
-  );
-  filter: blur(14px);
-  animation: glowBreathe 7s ease-in-out infinite;
-
-  @include tablet-down { height: 240px; }
-  @include mobile { height: 180px; }
-}
-
-// Shared gray halftone dot texture — same recipe as .ditherPatch below, factored out so the three
-// margin/top patches don't repeat it. White-based mask stops specifically: black-to-transparent
-// masks behave inconsistently across engines (luminance vs alpha) and previously made a layer
-// render as fully invisible; white reads as "fully visible" under both interpretations.
-%dither-texture {
-  position: absolute;
-  pointer-events: none;
-  opacity: 0.7;
-  background-image: radial-gradient(circle, var(--color-gray-300) 1px, transparent 1.3px);
-  background-size: 5px 5px;
-  mask-image: radial-gradient(ellipse at center, white 0%, white 35%, transparent 72%);
-  -webkit-mask-image: radial-gradient(ellipse at center, white 0%, white 35%, transparent 72%);
-}
-
-// design-specific: big halftone area sitting just below the navbar, spanning most of the hero's
-// top edge (hero's own top === navbar's bottom, no gap between them)
-.ditherPatchTop {
-  @extend %dither-texture;
-  top: 0;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
-  width: min(1100px, 92vw);
-  height: 220px;
-
-  @include tablet-down { height: 170px; }
-  @include mobile { display: none; }
+  width: 0;
+  height: 0;
+  pointer-events: none;
 }
 
-// design-specific: big halftone areas in the left/right margins, giving the hero the same kind of
-// wide atmospheric texture as the reference instead of just the small patch behind the title
-.ditherPatchLeft {
-  @extend %dither-texture;
-  top: 8%;
-  left: 1%;
-  width: 360px;
-  height: 560px;
+.pingRing {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 48px;
+  height: 48px;
+  margin: -24px 0 0 -24px;
+  border-radius: var(--radius-full);
+  border: 10px solid var(--color-blue-primary-alpha-30);
+  filter: blur(2px);
+  transform: scale(0);
+  opacity: 0;
+  animation: pingExpand 8s ease-out infinite;
 
-  @include tablet-down { width: 220px; height: 420px; }
-  @include mobile { display: none; }
-}
-
-.ditherPatchRight {
-  @extend %dither-texture;
-  top: 8%;
-  right: 1%;
-  width: 360px;
-  height: 560px;
-
-  @include tablet-down { width: 220px; height: 420px; }
-  @include mobile { display: none; }
+  &:nth-child(2) { animation-delay: -2.67s; }
+  &:nth-child(3) { animation-delay: -5.33s; }
 }
 
 // ── Falling comets — slow downward data-stream drift ──────────────────────────
@@ -128,6 +80,9 @@
 .arrow {
   position: absolute;
   top: -48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   color: var(--color-blue-primary-alpha-70);
   animation-name: arrowFall;
   animation-iteration-count: infinite;
@@ -135,39 +90,152 @@
 
   // design-specific: left offsets are locked to the stripe grid (lines sit at 38px, then every
   // 39px after) so each comet rides down an actual stripe line instead of the gap between them.
-  // Each still gets its own speed so the stream never feels synchronized.
-  &:nth-child(1) { left: 38px;   animation-duration: 7s;    animation-delay: -1s; }
-  &:nth-child(2) { left: 194px;  animation-duration: 9.5s;  animation-delay: -4s;   color: var(--color-purple-glow-strong); }
-  &:nth-child(3) { left: 389px;  animation-duration: 6.2s;  animation-delay: -2.5s; }
-  &:nth-child(4) { left: 584px;  animation-duration: 10.5s; animation-delay: -6s;   color: var(--color-purple-glow-strong); }
-  &:nth-child(5) { left: 779px;  animation-duration: 7.8s;  animation-delay: -3.2s; }
-  &:nth-child(6) { left: 974px;  animation-duration: 9s;    animation-delay: -0.5s; color: var(--color-purple-glow-strong); }
-  &:nth-child(7) { left: 1169px; animation-duration: 6.8s;  animation-delay: -5s; }
-  &:nth-child(8) { left: 1364px; animation-duration: 11s;   animation-delay: -7s;   color: var(--color-purple-glow-strong); }
+  // Each still gets its own speed so the stream never feels synchronized. 40 columns evenly spaced
+  // (~47px apart) across the full ~38px-1871px range, so density reads the same left to right
+  // instead of clustering in some regions and thinning out in others.
+  &:nth-child(1)  { left: 38px;   animation-duration: 7s;    animation-delay: -1s; }
+  &:nth-child(2)  { left: 85px;   animation-duration: 7.9s;  animation-delay: -1.8s; color: var(--color-purple-glow-strong); }
+  &:nth-child(3)  { left: 132px;  animation-duration: 8.4s;  animation-delay: -2.2s; }
+  &:nth-child(4)  { left: 179px;  animation-duration: 6.8s;  animation-delay: -3.1s; }
+  &:nth-child(5)  { left: 226px;  animation-duration: 9.5s;  animation-delay: -4s;   color: var(--color-purple-glow-strong); }
+  &:nth-child(6)  { left: 273px;  animation-duration: 7.1s;  animation-delay: -1.3s; }
+  &:nth-child(7)  { left: 320px;  animation-duration: 6.6s;  animation-delay: -3.6s; }
+  &:nth-child(8)  { left: 367px;  animation-duration: 8.9s;  animation-delay: -4.9s; color: var(--color-purple-glow-strong); }
+  &:nth-child(9)  { left: 414px;  animation-duration: 6.2s;  animation-delay: -2.5s; }
+  &:nth-child(10) { left: 461px;  animation-duration: 9.7s;  animation-delay: -0.4s; }
+  &:nth-child(11) { left: 508px;  animation-duration: 10s;   animation-delay: -0.8s; color: var(--color-purple-glow-strong); }
+  &:nth-child(12) { left: 555px;  animation-duration: 7.5s;  animation-delay: -2.9s; }
+  &:nth-child(13) { left: 602px;  animation-duration: 10.5s; animation-delay: -6s; }
+  &:nth-child(14) { left: 649px;  animation-duration: 6.3s;  animation-delay: -4.2s; color: var(--color-purple-glow-strong); }
+  &:nth-child(15) { left: 696px;  animation-duration: 7.4s;  animation-delay: -5.2s; }
+  &:nth-child(16) { left: 743px;  animation-duration: 9.1s;  animation-delay: -1.7s; }
+  &:nth-child(17) { left: 790px;  animation-duration: 7.8s;  animation-delay: -3.2s; color: var(--color-purple-glow-strong); }
+  &:nth-child(18) { left: 837px;  animation-duration: 8.3s;  animation-delay: -0.6s; }
+  &:nth-child(19) { left: 884px;  animation-duration: 9.2s;  animation-delay: -1.6s; }
+  &:nth-child(20) { left: 931px;  animation-duration: 7.6s;  animation-delay: -3.9s; color: var(--color-purple-glow-strong); }
+  &:nth-child(21) { left: 978px;  animation-duration: 8.1s;  animation-delay: -3.4s; }
+  &:nth-child(22) { left: 1025px; animation-duration: 6.6s;  animation-delay: -5.4s; }
+  &:nth-child(23) { left: 1072px; animation-duration: 9s;    animation-delay: -0.5s; color: var(--color-purple-glow-strong); }
+  &:nth-child(24) { left: 1119px; animation-duration: 7.3s;  animation-delay: -2.1s; }
+  &:nth-child(25) { left: 1166px; animation-duration: 6.4s;  animation-delay: -4.6s; }
+  &:nth-child(26) { left: 1213px; animation-duration: 10.4s; animation-delay: -6.6s; color: var(--color-purple-glow-strong); }
+  &:nth-child(27) { left: 1260px; animation-duration: 6.8s;  animation-delay: -5s; }
+  &:nth-child(28) { left: 1307px; animation-duration: 8.6s;  animation-delay: -0.9s; }
+  &:nth-child(29) { left: 1354px; animation-duration: 8.8s;  animation-delay: -2.8s; color: var(--color-purple-glow-strong); }
+  &:nth-child(30) { left: 1401px; animation-duration: 7s;    animation-delay: -4.8s; }
+  &:nth-child(31) { left: 1448px; animation-duration: 11s;   animation-delay: -7s; }
+  &:nth-child(32) { left: 1495px; animation-duration: 6.5s;  animation-delay: -1.1s; color: var(--color-purple-glow-strong); }
+  &:nth-child(33) { left: 1542px; animation-duration: 7.2s;  animation-delay: -3.8s; }
+  &:nth-child(34) { left: 1589px; animation-duration: 9.9s;  animation-delay: -5.7s; }
+  &:nth-child(35) { left: 1636px; animation-duration: 8.2s;  animation-delay: -1.4s; color: var(--color-purple-glow-strong); }
+  &:nth-child(36) { left: 1683px; animation-duration: 9.8s;  animation-delay: -4.4s; }
+  &:nth-child(37) { left: 1730px; animation-duration: 6.9s;  animation-delay: -2.6s; }
+  &:nth-child(38) { left: 1777px; animation-duration: 10.2s; animation-delay: -5.6s; color: var(--color-purple-glow-strong); }
+  &:nth-child(39) { left: 1824px; animation-duration: 7.6s;  animation-delay: -0.3s; }
+  &:nth-child(40) { left: 1871px; animation-duration: 9.6s;  animation-delay: -3.4s; }
 
   @include tablet-down {
-    &:nth-child(1) { left: 38px; }
-    &:nth-child(2) { left: 155px; }
-    &:nth-child(3) { left: 272px; }
-    &:nth-child(4) { left: 389px; }
-    &:nth-child(5) { left: 506px; }
-    &:nth-child(6) { left: 623px; }
-    &:nth-child(7) { left: 740px; }
-    &:nth-child(8) { left: 857px; }
+    &:nth-child(1)  { left: 38px; }
+    &:nth-child(2)  { left: 62px; }
+    &:nth-child(3)  { left: 86px; }
+    &:nth-child(4)  { left: 110px; }
+    &:nth-child(5)  { left: 134px; }
+    &:nth-child(6)  { left: 158px; }
+    &:nth-child(7)  { left: 182px; }
+    &:nth-child(8)  { left: 206px; }
+    &:nth-child(9)  { left: 230px; }
+    &:nth-child(10) { left: 254px; }
+    &:nth-child(11) { left: 278px; }
+    &:nth-child(12) { left: 302px; }
+    &:nth-child(13) { left: 326px; }
+    &:nth-child(14) { left: 350px; }
+    &:nth-child(15) { left: 374px; }
+    &:nth-child(16) { left: 398px; }
+    &:nth-child(17) { left: 422px; }
+    &:nth-child(18) { left: 446px; }
+    &:nth-child(19) { left: 470px; }
+    &:nth-child(20) { left: 494px; }
+    &:nth-child(21) { left: 518px; }
+    &:nth-child(22) { left: 542px; }
+    &:nth-child(23) { left: 566px; }
+    &:nth-child(24) { left: 590px; }
+    &:nth-child(25) { left: 614px; }
+    &:nth-child(26) { left: 638px; }
+    &:nth-child(27) { left: 662px; }
+    &:nth-child(28) { left: 686px; }
+    &:nth-child(29) { left: 710px; }
+    &:nth-child(30) { left: 734px; }
+    &:nth-child(31) { left: 758px; }
+    &:nth-child(32) { left: 782px; }
+    &:nth-child(33) { left: 806px; }
+    &:nth-child(34) { left: 830px; }
+    &:nth-child(35) { left: 854px; }
+    &:nth-child(36) { left: 878px; }
+    &:nth-child(37) { left: 902px; }
+    &:nth-child(38) { left: 926px; }
+    &:nth-child(39) { left: 950px; }
+    &:nth-child(40) { left: 974px; }
   }
 
   @include mobile {
-    &:nth-child(1) { left: 38px; }
-    &:nth-child(2) { left: 116px; }
-    &:nth-child(3) { left: 194px; }
-    &:nth-child(4) { left: 272px; }
-    &:nth-child(5) { left: 350px; }
-    &:nth-child(6) { left: 428px; }
-    &:nth-child(7) { left: 506px; }
-    &:nth-child(8) { left: 584px; }
+    &:nth-child(1)  { left: 38px; }
+    &:nth-child(2)  { left: 53px; }
+    &:nth-child(3)  { left: 68px; }
+    &:nth-child(4)  { left: 83px; }
+    &:nth-child(5)  { left: 98px; }
+    &:nth-child(6)  { left: 113px; }
+    &:nth-child(7)  { left: 128px; }
+    &:nth-child(8)  { left: 143px; }
+    &:nth-child(9)  { left: 158px; }
+    &:nth-child(10) { left: 173px; }
+    &:nth-child(11) { left: 188px; }
+    &:nth-child(12) { left: 203px; }
+    &:nth-child(13) { left: 218px; }
+    &:nth-child(14) { left: 233px; }
+    &:nth-child(15) { left: 248px; }
+    &:nth-child(16) { left: 263px; }
+    &:nth-child(17) { left: 278px; }
+    &:nth-child(18) { left: 293px; }
+    &:nth-child(19) { left: 308px; }
+    &:nth-child(20) { left: 323px; }
+    &:nth-child(21) { left: 338px; }
+    &:nth-child(22) { left: 353px; }
+    &:nth-child(23) { left: 368px; }
+    &:nth-child(24) { left: 383px; }
+    &:nth-child(25) { left: 398px; }
+    &:nth-child(26) { left: 413px; }
+    &:nth-child(27) { left: 428px; }
+    &:nth-child(28) { left: 443px; }
+    &:nth-child(29) { left: 458px; }
+    &:nth-child(30) { left: 473px; }
+    &:nth-child(31) { left: 488px; }
+    &:nth-child(32) { left: 503px; }
+    &:nth-child(33) { left: 518px; }
+    &:nth-child(34) { left: 533px; }
+    &:nth-child(35) { left: 548px; }
+    &:nth-child(36) { left: 563px; }
+    &:nth-child(37) { left: 578px; }
+    &:nth-child(38) { left: 593px; }
+    &:nth-child(39) { left: 608px; }
+    &:nth-child(40) { left: 623px; }
   }
 
-  svg { display: block; }
+  // design-specific: leading digit is the brightest/boldest (reads as the "active" head of the
+  // stream, same visual role the old dot played), trailing digits fade toward transparent
+  .arrowDigit {
+    font-family: var(--font-space-grotesk);
+    font-size: 13px;
+    font-weight: var(--font-weight-medium);
+    line-height: 1.3;
+    color: currentColor;
+
+    &:first-child { opacity: 1; font-weight: var(--font-weight-semibold); }
+    &:nth-child(2) { opacity: 0.7; }
+    &:nth-child(3) { opacity: 0.5; }
+    &:nth-child(4) { opacity: 0.35; }
+    &:nth-child(5) { opacity: 0.22; }
+    &:nth-child(6) { opacity: 0.12; }
+  }
 }
 
 // ── Content block ─────────────────────────────────────────────────────────────
@@ -196,6 +264,12 @@
 }
 
 // ── Text stack — label/heading/description/CTA block ──────────────────────────
+// One shared circular backdrop covers the title block AND the CTA row together, instead of two
+// separate rectangular patches. Slightly translucent (not fully opaque white) so the ping rings and
+// digit streams show through faintly behind the text, while filter: blur() still keeps the visible
+// bleed-through confined to a soft, short band right at the shape's own edge rather than a hard cut.
+// z-index: -1 puts it behind textStack's own static children while staying above the sonar rings,
+// which live in .bg, a separate, earlier-painted ancestor entirely.
 
 .textStack {
   position: relative;
@@ -206,9 +280,31 @@
 
   @include tablet-down { gap: var(--space-5); }
   @include mobile { gap: var(--space-4); }
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -56px -160px;
+    z-index: -1;
+    border-radius: var(--radius-full);
+    pointer-events: none;
+    // design-specific: heavy blur on a large translucent shape tends to average toward solid no
+    // matter the base alpha, since the blur samples a big radius of the same flat color — dropping
+    // to alpha-40 and trimming the blur radius is what actually makes the difference visible
+    background: var(--color-white-alpha-40);
+    filter: blur(16px);
+
+    @include tablet-down {
+      inset: -40px -60px;
+    }
+
+    @include mobile {
+      inset: -28px -20px;
+    }
+  }
 }
 
-// ── Title block — label + heading, with a contained gray halftone patch behind them ──────
+// ── Title block — label + heading ─────────────────────────────────────────────
 
 .titleBlock {
   position: relative;
@@ -219,34 +315,6 @@
 
   @include tablet-down { gap: var(--space-5); }
   @include mobile { gap: var(--space-4); }
-}
-
-// design-specific: a static, contained gray halftone patch — not edge-to-edge, not animated, not
-// blue — matching the reference exactly. Sized to roughly cover the eyebrow label and heading only,
-// centered behind them. z-index: -1 puts it behind this block's own text (a negative z-index child
-// paints before its static in-flow siblings in the same stacking context) while staying above the
-// striped background, which lives in a separate, earlier ancestor. Feathered edges via mask-image
-// using WHITE stops specifically — black-to-transparent masks are inconsistent across engines
-// (luminance vs alpha) and previously made a layer render as fully invisible; white reads as
-// "fully visible" under both interpretations.
-.ditherPatch {
-  @extend %dither-texture;
-  top: -24px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 560px;
-  height: 260px;
-  z-index: -1;
-
-  @include tablet-down {
-    width: 420px;
-    height: 220px;
-  }
-
-  @include mobile {
-    width: 300px;
-    height: 180px;
-  }
 }
 
 // ── Top label with 4-corner brackets ─────────────────────────────────────────
@@ -382,21 +450,24 @@
   100% { transform: translateY(calc(100vh + 48px)); opacity: 0; }
 }
 
-@keyframes glowBreathe {
-  0%, 100% { opacity: 0.75; }
-  50%      { opacity: 1; }
+// design-specific: scale(40) takes a 48px ring up to roughly hero-width diameter by the end of the
+// cycle — comfortably reaching the edges on typical desktop widths before it's fully faded out
+@keyframes pingExpand {
+  0%   { transform: scale(0);  opacity: 0.4; }
+  15%  { opacity: 0.32; }
+  100% { transform: scale(40); opacity: 0; }
 }
 
 // ── Reduced motion ────────────────────────────────────────────────────────────
 
 @media (prefers-reduced-motion: reduce) {
   .hero,
-  .glowBand,
   .arrow,
   .labelWrap,
   .heading,
   .description,
-  .ctaRow {
+  .ctaRow,
+  .pingRing {
     animation: none !important;
   }
 }

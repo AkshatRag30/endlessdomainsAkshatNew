@@ -1,31 +1,47 @@
-import React from 'react'
-import { PrimaryButton } from '@/design-system/primitives/button/PrimaryButton'
-import { SecondaryButton } from '@/design-system/primitives/secondary-button/SecondaryButton'
+import React, { useMemo } from 'react'
+import { PrimaryButton } from '@/design-system/primitives/button'
+import { SecondaryButton } from '@/design-system/primitives/secondary-button'
 import styles from './BugBountyHero.module.scss'
 
-const ARROWS = Array.from({ length: 8 })
+const ARROWS = Array.from({ length: 40 })
+// Each falling column shows 6 stacked characters instead of the old line+dot comet — fixed
+// per-column count keeps every column's height (and therefore its fall timing) identical to before.
+const DIGITS_PER_COLUMN = 6
+// Mixed hex/symbol pool instead of plain 0-9 — reads more like a hash/cipher stream than a counter
+const CHAR_POOL = '0123456789ABCDEF$#%&@'
+
+function randomChar() {
+  return CHAR_POOL[Math.floor(Math.random() * CHAR_POOL.length)]
+}
 
 export function BugBountyHero() {
+  // Generated once per mount, not per render — these are purely decorative and don't need to
+  // change on every re-render, only reroll if the component actually remounts.
+  const columnChars = useMemo(
+    () => ARROWS.map(() => Array.from({ length: DIGITS_PER_COLUMN }, randomChar)),
+    [],
+  )
+
   return (
     <section className={styles.hero} aria-labelledby="bug-bounty-heading">
 
       {/* ── Background layers ── */}
       <div className={styles.bg} aria-hidden="true">
         <div className={styles.stripeLayer} />
-        <div className={styles.glowBand} />
-        <div className={styles.ditherPatchTop} />
-        <div className={styles.ditherPatchLeft} />
-        <div className={styles.ditherPatchRight} />
+        <div className={styles.sonarPing}>
+          <span className={styles.pingRing} />
+          <span className={styles.pingRing} />
+          <span className={styles.pingRing} />
+        </div>
       </div>
 
-      {/* ── Falling comets — thin trailing line with a bold dot at the tip ── */}
+      {/* ── Falling character streams — hash/cipher feel, computeristic replacement for the old comet dots ── */}
       <div className={styles.arrowsLayer} aria-hidden="true">
-        {ARROWS.map((_, i) => (
+        {columnChars.map((chars, i) => (
           <span key={i} className={styles.arrow}>
-            <svg width="10" height="42" viewBox="0 0 10 42" fill="none">
-              <line x1="5" y1="0" x2="5" y2="32" stroke="currentColor" strokeWidth="1.5" />
-              <circle cx="5" cy="36" r="3" fill="currentColor" />
-            </svg>
+            {chars.map((char, j) => (
+              <span key={j} className={styles.arrowDigit}>{char}</span>
+            ))}
           </span>
         ))}
       </div>
@@ -35,9 +51,9 @@ export function BugBountyHero() {
 
         <div className={styles.textStack}>
 
-          {/* Title block — label + heading share a contained gray halftone patch behind them */}
+          {/* Title block — label + heading. One shared circular backdrop behind title + CTA lives
+              on .textStack itself; the sonar-ping rings live in .bg behind everything */}
           <div className={styles.titleBlock}>
-            <div className={styles.ditherPatch} aria-hidden="true" />
 
             {/* Top label */}
             <div className={styles.labelWrap}>
