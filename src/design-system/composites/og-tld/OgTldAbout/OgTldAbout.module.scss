@@ -1,0 +1,335 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Section shell ─────────────────────────────────────────────────────────────
+
+.section {
+  position: relative;
+  width: 100%;
+  background: var(--color-white-primary);
+  padding-top: var(--space-13);
+  overflow: hidden;
+
+  @include tablet-down { padding-top: var(--space-11); }
+  @include mobile { padding-top: var(--space-9); }
+}
+
+// ── Arc rings + grid — sit tight behind the eyebrow/heading, only a shallow curve peeking in
+// from the sides ─────────────────────────────────────────────────────────────
+
+.archArea {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  width: 1200px;
+  height: 260px;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+
+  // design-specific: kept visible (scaled down) rather than hidden — the Figma mobile mockup still
+  // shows a small version of the arcs peeking in behind the eyebrow/heading
+  @include tablet-down {
+    width: 640px;
+    height: 160px;
+  }
+
+  @include mobile {
+    width: 420px;
+    height: 120px;
+  }
+}
+
+// design-specific: three concentric circles, each centered well BELOW .archArea's own bottom
+// edge, so only a shallow slice of each circle's TOP arc pokes up into the visible viewport —
+// this is what makes the curve dome upward over the heading (like a hood arching overhead) rather
+// than smiling downward under it. Tightly nested so the gap between each ring stays narrow, and
+// kept compact/close to the heading rather than spanning the whole section width. Radii increased
+// so the arcs read as broader, flatter curves.
+.archRing {
+  position: absolute;
+  left: 50%;
+  top: 80px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-blue-primary-alpha-13);
+  transform: translateX(-50%);
+
+  &:nth-child(1) { width: 1200px; height: 1200px; }
+  &:nth-child(2) { width: 1020px; height: 1020px; top: 120px; }
+  &:nth-child(3) { width: 840px; height: 840px; top: 160px; }
+
+  @include tablet-down {
+    top: 50px;
+
+    &:nth-child(1) { width: 640px; height: 640px; }
+    &:nth-child(2) { width: 540px; height: 540px; top: 75px; }
+    &:nth-child(3) { width: 440px; height: 440px; top: 100px; }
+  }
+
+  @include mobile {
+    top: 36px;
+
+    &:nth-child(1) { width: 420px; height: 420px; }
+    &:nth-child(2) { width: 350px; height: 350px; top: 55px; }
+    &:nth-child(3) { width: 280px; height: 280px; top: 74px; }
+  }
+}
+
+// design-specific: very faint grid, tightly masked so it only shows through a small area right
+// behind the eyebrow label — the reference shows this as a subtle hint, not a visible block
+.archGrid {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  width: 560px;
+  height: 140px;
+  opacity: 0.3;
+  background-image:
+    linear-gradient(var(--color-blue-primary-alpha-07) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-blue-primary-alpha-07) 1px, transparent 1px);
+  background-size: 32px 32px;
+  background-position: center top;
+  -webkit-mask-image: radial-gradient(ellipse 220px 130px at center top, white 0%, white 40%, transparent 85%);
+  mask-image: radial-gradient(ellipse 220px 130px at center top, white 0%, white 40%, transparent 85%);
+
+  @include tablet-down {
+    width: 340px;
+    height: 90px;
+    -webkit-mask-image: radial-gradient(ellipse 150px 85px at center top, white 0%, white 40%, transparent 85%);
+    mask-image: radial-gradient(ellipse 150px 85px at center top, white 0%, white 40%, transparent 85%);
+  }
+
+  @include mobile {
+    width: 260px;
+    height: 70px;
+    -webkit-mask-image: radial-gradient(ellipse 110px 65px at center top, white 0%, white 40%, transparent 85%);
+    mask-image: radial-gradient(ellipse 110px 65px at center top, white 0%, white 40%, transparent 85%);
+  }
+}
+
+// ── Title block ───────────────────────────────────────────────────────────────
+// Normal document flow, stacked above .octagonBand — kept simple and non-absolute so it can
+// never end up overlapped/hidden behind the octagon band's background.
+
+.titleBlock {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  text-align: center;
+  padding: 0 var(--container-padding-x);
+  // shifts the eyebrow/heading down without changing the gap to .octagonBand below — that gap is
+  // cancelled back out by an equal negative margin-top on .octagonBand itself
+  margin-top: 82px;
+
+  @include tablet-down { margin-top: 0; }
+}
+
+// ── Top label with 4-corner brackets ─────────────────────────────────────────
+
+.labelWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 20px;
+}
+
+%bracket-corner {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-style: solid;
+  border-color: rgba(143, 115, 255, 0.65);
+  pointer-events: none;
+}
+
+.labelBracketTL { @extend %bracket-corner; top: 0; left: 0; border-width: 1.5px 0 0 1.5px; }
+.labelBracketTR { @extend %bracket-corner; top: 0; right: 0; border-width: 1.5px 1.5px 0 0; }
+.labelBracketBL { @extend %bracket-corner; bottom: 0; left: 0; border-width: 0 0 1.5px 1.5px; }
+.labelBracketBR { @extend %bracket-corner; bottom: 0; right: 0; border-width: 0 1.5px 1.5px 0; }
+
+.labelText {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+
+  @include mobile { font-size: var(--text-small-13); }
+}
+
+// ── Heading ───────────────────────────────────────────────────────────────────
+
+.heading {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+.headingLine1,
+.headingLine2 {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  text-transform: capitalize;
+
+  @include tablet-down { font-size: 40px; }
+  @include mobile { font-size: 30px; }
+}
+
+.headingLine1 {
+  color: var(--color-black-primary);
+}
+
+.headingLine2 {
+  background: linear-gradient(109deg, var(--color-blue-primary) 70%, var(--color-blue-primary-faded) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+// ── Octagon band ──────────────────────────────────────────────────────────────
+// design-specific: clip-path cuts both top corners inward, giving the band an octagon-like top
+// edge that the title block appears to sit inside of
+
+.octagonBand {
+  position: relative;
+  z-index: 1;
+  // cancels out .titleBlock's added margin-top so the gap between the title and this band stays
+  // exactly as it was — only the title itself moves down, not the space beneath it
+  margin-top: -82px;
+  width: 100%;
+  min-height: 300px;
+  background: var(--color-gray-light-bg);
+  clip-path: polygon(36% 26%, 64% 26%, 71% 0, 100% 0, 100% 100%, 0 100%, 0 0, 30% 0); 
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--space-13);
+  padding: var(--space-11) var(--container-padding-x) var(--space-11);
+
+  // design-specific: notch shape kept (not removed) at tablet/mobile, just shallower — the Figma
+  // mobile mockup still shows the octagon cut, scaled down to match the narrower heading beneath it
+  @include tablet-down {
+    clip-path: polygon(30% 12%, 70% 12%, 78% 0, 100% 0, 100% 100%, 0 100%, 0 0, 22% 0);
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-9);
+    padding: calc(var(--space-9) + 24px) var(--space-7) var(--space-9);
+    margin-top: var(--space-7);
+  }
+
+  @include mobile {
+    clip-path: polygon(26% 8%, 74% 8%, 82% 0, 100% 0, 100% 100%, 0 100%, 0 0, 18% 0);
+    padding: calc(var(--space-8) + 18px) var(--space-5) var(--space-8);
+  }
+}
+
+.sideFeature {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  width: 324px;
+  max-width: 100%;
+  margin-top: var(--space-9);
+
+  @include tablet-down {
+    margin-top: 0;
+  }
+}
+
+.centerFeature {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  width: 324px;
+  max-width: 100%;
+  margin-top: var(--space-14);
+
+  @include tablet-down {
+    margin-top: 0;
+  }
+}
+
+// design-specific: on desktop this is the visual center of a 3-column row, so DOM order already
+// puts it second. Once the layout stacks into a single column at tablet-down, the reference shows
+// it last (Ownership, Identity OS, then Compatibility) — order:3 re-sequences it without touching
+// desktop, where flex-direction is still row and this rule doesn't apply.
+.centerFeatureLast {
+  @include tablet-down {
+    order: 3;
+  }
+}
+
+// ── Icon badge ────────────────────────────────────────────────────────────────
+// design-specific: same blue-gradient glow badge recipe used on EventsPurpose's icon boxes,
+// scaled down to the Figma-exact 39px size for this section
+
+.iconBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 39px;
+  height: 39px;
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  color: var(--color-white-primary);
+  background: linear-gradient(180deg, var(--color-blue-primary) 0%, var(--color-blue-primary-faded) 100%);
+  box-shadow:
+    0px 14px 34px 0px rgba(87, 177, 255, 0.34),
+    0px 8px 10px 0px rgba(87, 177, 255, 0.19),
+    0px 3px 4px 0px rgba(87, 177, 255, 0.22),
+    0px 1px 2px 0px rgba(87, 177, 255, 0.15),
+    0px 0px 0px 1.3px #e0e9f2,
+    0px 0px 0px 1.6px var(--color-white-primary),
+    inset 0px 0.3px 6px 1px #d2eaff,
+    inset 0px 0.3px 1.3px 1px #d2eaff;
+}
+
+.featureText {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  text-align: center;
+}
+
+.featureTitle {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-h3);
+  line-height: 1.2;
+  text-transform: capitalize;
+  background: linear-gradient(149deg, var(--color-blue-primary) 70%, var(--color-blue-primary-faded) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  @include mobile { font-size: 24px; }
+}
+
+.featureDesc {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-small-15);
+  line-height: 1.3;
+  color: var(--color-text-body);
+  max-width: 352px;
+
+  @include mobile { font-size: var(--text-small-13); }
+}

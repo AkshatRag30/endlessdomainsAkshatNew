@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useState } from 'react'
 import { PrimaryButton } from '@/design-system/primitives/button'
 import { SecondaryButton } from '@/design-system/primitives/secondary-button'
 import styles from './BugBountyHero.module.scss'
@@ -7,20 +7,22 @@ const ARROWS = Array.from({ length: 40 })
 // Each falling column shows 6 stacked characters instead of the old line+dot comet — fixed
 // per-column count keeps every column's height (and therefore its fall timing) identical to before.
 const DIGITS_PER_COLUMN = 6
-// Mixed hex/symbol pool instead of plain 0-9 — reads more like a hash/cipher stream than a counter
-const CHAR_POOL = '0123456789ABCDEF$#%&@'
+const CHAR_POOL = '01'
 
 function randomChar() {
   return CHAR_POOL[Math.floor(Math.random() * CHAR_POOL.length)]
 }
 
 export function BugBountyHero() {
-  // Generated once per mount, not per render — these are purely decorative and don't need to
-  // change on every re-render, only reroll if the component actually remounts.
-  const columnChars = useMemo(
-    () => ARROWS.map(() => Array.from({ length: DIGITS_PER_COLUMN }, randomChar)),
-    [],
-  )
+  // Randomized only after mount, on the client — generating these during the render that gets
+  // server-rendered would produce different characters on the server vs. the client's own first
+  // render, which React's hydration flags as a text mismatch. Starting empty keeps server and
+  // client markup identical, then this fills in right after mount, before the user can notice.
+  const [columnChars, setColumnChars] = useState<string[][] | null>(null)
+
+  useEffect(() => {
+    setColumnChars(ARROWS.map(() => Array.from({ length: DIGITS_PER_COLUMN }, randomChar)))
+  }, [])
 
   return (
     <section className={styles.hero} aria-labelledby="bug-bounty-heading">
@@ -37,7 +39,7 @@ export function BugBountyHero() {
 
       {/* ── Falling character streams — hash/cipher feel, computeristic replacement for the old comet dots ── */}
       <div className={styles.arrowsLayer} aria-hidden="true">
-        {columnChars.map((chars, i) => (
+        {columnChars?.map((chars, i) => (
           <span key={i} className={styles.arrow}>
             {chars.map((char, j) => (
               <span key={j} className={styles.arrowDigit}>{char}</span>

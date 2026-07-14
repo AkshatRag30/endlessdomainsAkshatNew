@@ -1,0 +1,224 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Section shell ─────────────────────────────────────────────────────────────
+
+.section {
+  position: relative;
+  width: 100%;
+  background: var(--color-white-primary);
+  padding: var(--space-6) var(--container-padding-x) var(--space-14);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-13);
+
+  @include tablet-down {
+    padding: var(--space-11) var(--space-7) var(--space-11);
+    gap: var(--space-11);
+  }
+
+  @include mobile {
+    padding: var(--space-9) var(--space-5) var(--space-9);
+    gap: var(--space-9);
+  }
+}
+
+// ── Title block ───────────────────────────────────────────────────────────────
+
+.titleBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  width: 100%;
+  max-width: 1069px;
+}
+
+// design-specific: dashed rule above and below the eyebrow/heading block — same recipe used
+// throughout this page (EventsPurpose, BugBountyReportingBody, OgTldWhy)
+.dividerLine {
+  width: 100%;
+  height: 1px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--color-gray-200) 0px,
+    var(--color-gray-200) 6px,
+    transparent 6px,
+    transparent 12px
+  );
+}
+
+// ── Top label with 4-corner brackets ─────────────────────────────────────────
+
+.labelWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 20px;
+}
+
+%bracket-corner {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-style: solid;
+  border-color: rgba(143, 115, 255, 0.65);
+  pointer-events: none;
+}
+
+.labelBracketTL { @extend %bracket-corner; top: 0; left: 0; border-width: 1.5px 0 0 1.5px; }
+.labelBracketTR { @extend %bracket-corner; top: 0; right: 0; border-width: 1.5px 1.5px 0 0; }
+.labelBracketBL { @extend %bracket-corner; bottom: 0; left: 0; border-width: 0 0 1.5px 1.5px; }
+.labelBracketBR { @extend %bracket-corner; bottom: 0; right: 0; border-width: 0 1.5px 1.5px 0; }
+
+.labelText {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+
+  @include mobile { font-size: var(--text-small-13); }
+}
+
+// ── Heading ───────────────────────────────────────────────────────────────────
+
+.heading {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  text-align: center;
+}
+
+.headingLine1,
+.headingLine2 {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.2;
+  text-transform: lowercase;
+
+  &::first-letter { text-transform: uppercase; }
+
+  @include tablet-down { font-size: 40px; }
+  @include mobile { font-size: 30px; }
+}
+
+.headingLine1 {
+  color: var(--color-black-primary);
+}
+
+.headingLine2 {
+  background: linear-gradient(113deg, var(--color-blue-primary) 70%, var(--color-blue-primary-faded) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  // design-specific: ".og" stays lowercase even at the start of the line, only "Unlocks" gets
+  // the capitalized first letter — the shared ::first-letter rule above would wrongly capitalize
+  // the leading dot-og otherwise, so this line overrides it back down
+  text-transform: none;
+}
+
+// ── Utility grid ──────────────────────────────────────────────────────────────
+
+.grid {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  width: 100%;
+  max-width: 1360px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px dashed var(--color-black-alpha-10);
+  border-left: 1px dashed var(--color-black-alpha-10);
+
+  @include tablet-down {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-5);
+  padding: var(--space-7) var(--space-6) var(--space-9);
+  border-right: 1px dashed var(--color-black-alpha-10);
+  border-bottom: 1px dashed var(--color-black-alpha-10);
+
+  @include mobile {
+    padding: var(--space-6) var(--space-5) var(--space-7);
+  }
+}
+
+%card-corner {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-style: solid;
+  border-color: var(--color-blue-primary-alpha-50);
+  pointer-events: none;
+}
+
+.cardBracketTL { @extend %card-corner; top: var(--space-4); left: var(--space-4); border-width: 2.5px 0 0 2.5px; }
+.cardBracketBR { @extend %card-corner; bottom: var(--space-4); right: var(--space-4); border-width: 0 2.5px 2.5px 0; }
+
+// ── Icon badge ────────────────────────────────────────────────────────────────
+// design-specific: same blue-gradient glow badge recipe used on EventsPurpose/OgTldAbout,
+// scaled up to the Figma-exact 56px size for this section
+
+.iconBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: var(--radius-lg);
+  color: var(--color-white-primary);
+  background: linear-gradient(180deg, var(--color-blue-primary) 0%, var(--color-blue-primary-faded) 100%);
+  box-shadow:
+    0px 19px 49px 0px rgba(87, 177, 255, 0.34),
+    0px 11px 15px 0px rgba(87, 177, 255, 0.19),
+    0px 5px 6px 0px rgba(87, 177, 255, 0.22),
+    0px 2px 2px 0px rgba(87, 177, 255, 0.15),
+    0px 0px 0px 1.8px #e0e9f2,
+    0px 0px 0px 2.3px var(--color-white-primary),
+    inset 0px 0.5px 8px 1px #d2eaff,
+    inset 0px 0.5px 2px 1px #d2eaff;
+}
+
+.cardTitle {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-h3);
+  line-height: 1.2;
+  text-transform: capitalize;
+  background: linear-gradient(140deg, var(--color-blue-primary) 70%, var(--color-blue-primary-faded) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  @include mobile { font-size: 24px; }
+}
+
+.cardDesc {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-small-13);
+  line-height: 1.3;
+  color: var(--color-text-body);
+}

@@ -1,0 +1,5 @@
+export { OgTldHero } from './OgTldHero'
+export { OgTldAbout } from './OgTldAbout'
+export { OgTldWhy } from './OgTldWhy'
+export { OgTldUtility } from './OgTldUtility'
+export { OgTldFaq } from './OgTldFaq'

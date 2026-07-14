@@ -1,0 +1,293 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Hero shell ────────────────────────────────────────────────────────────────
+
+.hero {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--color-white-primary);
+  padding: var(--space-14) var(--container-padding-x) var(--space-11);
+
+  @include tablet-down {
+    padding: var(--space-11) var(--space-7) var(--space-9);
+  }
+
+  @include mobile {
+    padding: var(--space-9) var(--space-5) var(--space-7);
+  }
+}
+
+// ── Background grid texture ────────────────────────────────────────────────────
+
+// design-specific: extends a bit beyond the text block's own edges so the grid doesn't feel
+// cropped flush against the label/heading/description — scoped to just this block, not the
+// full hero, per request to keep the grid confined to the area above the search bar
+.bg {
+  position: absolute;
+  inset: -48px -80px;
+  pointer-events: none;
+  z-index: -1;
+
+  @include tablet-down { inset: -32px -40px; }
+  @include mobile { inset: -24px -16px; }
+}
+
+// design-specific: faint grid — matches the Figma "Grid" layer sitting behind the hero content
+.gridLayer {
+  position: absolute;
+  inset: 0;
+  opacity: 0.9;
+  background-image:
+    linear-gradient(var(--color-blue-primary-alpha-13) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-blue-primary-alpha-13) 1px, transparent 1px);
+  background-size: 42px 42px;
+  background-position: center top;
+  // design-specific: fades the grid out toward all four edges so it reads as a soft
+  // background field rather than a hard-edged tile
+  -webkit-mask-image: radial-gradient(ellipse at center, white 0%, white 45%, transparent 85%);
+  mask-image: radial-gradient(ellipse at center, white 0%, white 45%, transparent 85%);
+}
+
+// ── Content ───────────────────────────────────────────────────────────────────
+
+.content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-9);
+  max-width: 1120px;
+  width: 100%;
+
+  @include tablet-down { gap: var(--space-7); }
+  @include mobile { gap: var(--space-6); }
+}
+
+.textStack {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  text-align: center;
+
+  @include tablet-down { gap: var(--space-5); }
+  @include mobile { gap: var(--space-4); }
+}
+
+// ── Top label with 4-corner brackets ─────────────────────────────────────────
+
+.labelWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 20px;
+}
+
+%bracket-corner {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-style: solid;
+  border-color: var(--color-blue-primary);
+  pointer-events: none;
+}
+
+.labelBracketTL { @extend %bracket-corner; top: 0; left: 0; border-width: 1.5px 0 0 1.5px; }
+.labelBracketTR { @extend %bracket-corner; top: 0; right: 0; border-width: 1.5px 1.5px 0 0; }
+.labelBracketBL { @extend %bracket-corner; bottom: 0; left: 0; border-width: 0 0 1.5px 1.5px; }
+.labelBracketBR { @extend %bracket-corner; bottom: 0; right: 0; border-width: 0 1.5px 1.5px 0; }
+
+.labelText {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+
+  @include mobile { font-size: var(--text-small-13); }
+}
+
+// ── Heading ───────────────────────────────────────────────────────────────────
+
+.heading {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.headingLine1,
+.headingLine2 {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-transform: capitalize;
+
+  @include tablet-down { font-size: 40px; }
+  @include mobile { font-size: 30px; }
+}
+
+.headingLine1 {
+  color: var(--color-black-primary);
+}
+
+.headingLine2 {
+  background: linear-gradient(146deg, var(--color-blue-primary) 76%, var(--color-blue-primary-faded) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+// ── Description ───────────────────────────────────────────────────────────────
+
+.description {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-body);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-body);
+  line-height: var(--leading-body);
+  max-width: 780px;
+
+  @include tablet-down { font-size: var(--text-body-small); max-width: 560px; }
+  @include mobile { font-size: var(--text-small-15); max-width: 100%; }
+}
+
+// ── Stats row ─────────────────────────────────────────────────────────────────
+
+.statsRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-12);
+
+  @include tablet-down { gap: var(--space-9); flex-wrap: wrap; }
+  @include mobile { gap: var(--space-6); }
+}
+
+.statItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+%stat-bracket {
+  flex-shrink: 0;
+  width: 12px;
+  height: 52px;
+  position: relative;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-style: solid;
+    border-color: var(--color-gray-300);
+  }
+}
+
+.statBracketLeft {
+  @extend %stat-bracket;
+
+  &::before { top: 0; left: 0; border-width: 1.5px 0 0 1.5px; }
+  &::after { bottom: 0; left: 0; border-width: 0 0 1.5px 1.5px; }
+
+  @include mobile { display: none; }
+}
+
+.statBracketRight {
+  @extend %stat-bracket;
+
+  &::before { top: 0; right: 0; border-width: 1.5px 1.5px 0 0; }
+  &::after { bottom: 0; right: 0; border-width: 0 1.5px 1.5px 0; }
+
+  @include mobile { display: none; }
+}
+
+.statInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.statValue {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--text-h3);
+  line-height: 1.2;
+  background: linear-gradient(106deg, var(--color-blue-primary) 70%, var(--color-blue-primary-faded) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  @include mobile { font-size: 24px; }
+}
+
+.statLabel {
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-small-13);
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: var(--color-black-alpha-60);
+  text-align: center;
+  white-space: nowrap;
+
+  @include mobile { font-size: var(--text-small-12); }
+}
+
+// ── Live badge ────────────────────────────────────────────────────────────────
+
+.liveBadge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 24px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-white-primary);
+  background: linear-gradient(180deg, var(--color-blue-primary) 0%, var(--color-blue-primary-faded) 100%);
+  box-shadow:
+    0px 14px 34px 0px rgba(87, 177, 255, 0.34),
+    0px 8px 10px 0px rgba(87, 177, 255, 0.19),
+    0px 3px 4px 0px rgba(87, 177, 255, 0.22),
+    0px 1px 2px 0px rgba(87, 177, 255, 0.15),
+    inset 0px 0.3px 6px 0px #d2eaff,
+    inset 0px 0.3px 1px 0px #d2eaff;
+}
+
+.liveDot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-white-primary);
+  flex-shrink: 0;
+}
+
+.liveBadgeText {
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-small-12);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--color-white-primary);
+  white-space: nowrap;
+}

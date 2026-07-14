@@ -1,0 +1,195 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Section shell ─────────────────────────────────────────────────────────────
+
+.section {
+  position: relative;
+  width: 100%;
+  background: var(--color-white-primary);
+  padding: var(--space-13) var(--container-padding-x) var(--space-14);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-13);
+
+  @include tablet-down {
+    padding: var(--space-11) var(--space-7) var(--space-11);
+    gap: var(--space-11);
+  }
+
+  @include mobile {
+    padding: var(--space-9) var(--space-5) var(--space-9);
+    gap: var(--space-9);
+  }
+}
+
+// ── Title block ───────────────────────────────────────────────────────────────
+
+.titleBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  width: 100%;
+  max-width: 1069px;
+}
+
+// design-specific: dashed rule above and below the eyebrow/heading block — same repeating-gradient
+// dash recipe used elsewhere on this page (EventsPurpose, BugBountyReportingBody)
+.dividerLine {
+  width: 100%;
+  height: 1px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--color-gray-200) 0px,
+    var(--color-gray-200) 6px,
+    transparent 6px,
+    transparent 12px
+  );
+}
+
+// ── Top label with 4-corner brackets ─────────────────────────────────────────
+
+.labelWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 20px;
+}
+
+%bracket-corner {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-style: solid;
+  border-color: rgba(143, 115, 255, 0.65);
+  pointer-events: none;
+}
+
+.labelBracketTL { @extend %bracket-corner; top: 0; left: 0; border-width: 1.5px 0 0 1.5px; }
+.labelBracketTR { @extend %bracket-corner; top: 0; right: 0; border-width: 1.5px 1.5px 0 0; }
+.labelBracketBL { @extend %bracket-corner; bottom: 0; left: 0; border-width: 0 0 1.5px 1.5px; }
+.labelBracketBR { @extend %bracket-corner; bottom: 0; right: 0; border-width: 0 1.5px 1.5px 0; }
+
+.labelText {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+
+  @include mobile { font-size: var(--text-small-13); }
+}
+
+// ── Heading ───────────────────────────────────────────────────────────────────
+
+.heading {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  text-align: center;
+}
+
+.headingLine1,
+.headingLine2 {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.2;
+  text-transform: lowercase;
+
+  &::first-letter { text-transform: uppercase; }
+
+  @include tablet-down { font-size: 40px; }
+  @include mobile { font-size: 30px; }
+}
+
+.headingLine1 {
+  color: var(--color-black-primary);
+}
+
+.headingLine2 {
+  background: linear-gradient(151deg, var(--color-blue-primary) 70%, var(--color-blue-primary-faded) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+// ── Content row — card panel + description ────────────────────────────────────
+
+.contentRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-13);
+  width: 100%;
+  max-width: 1400px;
+
+  @include tablet-down {
+    flex-direction: column;
+    gap: var(--space-9);
+  }
+}
+
+// ── Card panel ────────────────────────────────────────────────────────────────
+
+.cardPanel {
+  position: relative;
+  flex: 1 1 690px;
+  min-width: 0;
+  // design-specific: source image is ~1.92:1 (2067x1076) — this fixed height is what the `fill`
+  // image sizes itself against (position: absolute; height: 100% needs a definite ancestor height
+  // to resolve against, which flex-basis / aspect-ratio don't reliably provide here). Preserved
+  // close to the natural ratio on desktop, capped shorter on tablet/mobile so the image doesn't
+  // grow taller as the viewport narrows — that was wasting a lot of vertical scroll space.
+  height: 360px;
+
+  // once .contentRow switches to flex-direction: column, `flex: 1 1 690px` applies its 690px
+  // flex-basis along the now-vertical main axis instead of width — the panel's cross-axis width
+  // was left undefined and collapsing toward 0, which is why the fill image had nothing to size
+  // against and disappeared. width: 100% + flex: none fixes the sizing for the column layout.
+  @include tablet-down {
+    flex: none;
+    width: 100%;
+    height: 320px;
+  }
+
+  @include mobile {
+    height: 220px;
+  }
+}
+
+.cardPanelImage {
+  border-radius: var(--radius-lg);
+  object-fit: cover;
+  object-position: top;
+}
+
+// ── Description ───────────────────────────────────────────────────────────────
+
+.description {
+  flex: 1 1 500px;
+  min-width: 0;
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-body);
+  line-height: 1.3;
+  color: var(--color-black-alpha-60);
+
+  // same bug as .cardPanel above — once .contentRow is a column, `flex: 1 1 500px` reserves
+  // 500px along the vertical axis instead of sizing width, leaving a large empty gap under the
+  // actual text. flex: none + width: 100% makes it size like a normal block again.
+  @include tablet-down {
+    flex: none;
+    width: 100%;
+    font-size: var(--text-body-small);
+  }
+
+  @include mobile { font-size: var(--text-small-15); }
+}
