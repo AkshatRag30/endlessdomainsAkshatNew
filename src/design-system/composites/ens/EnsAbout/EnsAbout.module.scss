@@ -22,17 +22,20 @@
   top: 0;
   transform: translateX(-50%);
   width: 1200px;
-  // design-specific: taller than OgTldAbout's 260px so the arcs keep drawing down far enough to
-  // reach the octagon band's notch — this title block also carries a description paragraph, which
-  // pushes the band further down than the label + heading alone would
-  height: 360px;
+  // design-specific: expanded down far enough to reach the octagon band below, instead of
+  // stopping short at the heading — the rings now draw all the way down to the band
+  height: 620px;
   pointer-events: none;
   overflow: hidden;
   z-index: 0;
+  // design-specific: fades out the top/crown of each ring rather than leaving it solid, so the
+  // curve appears to emerge from nothing rather than being hard-capped at the very top
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, transparent 27%, white 46%);
+  mask-image: linear-gradient(to bottom, transparent 0%, transparent 27%, white 46%);
 
   @include tablet-down {
     width: 640px;
-    height: 220px;
+    height: 380px;
   }
 
   @include mobile {
@@ -43,21 +46,21 @@
 .archRing {
   position: absolute;
   left: 50%;
-  top: 80px;
   border-radius: var(--radius-full);
-  border: 1px solid var(--color-blue-primary-alpha-13);
+  // design-specific: thicker + slightly stronger opacity so the smaller curves stay legible
+  border: 1px solid var(--color-blue-primary-alpha-20);
   transform: translateX(-50%);
 
-  &:nth-child(1) { width: 1200px; height: 1200px; }
-  &:nth-child(2) { width: 1020px; height: 1020px; top: 120px; }
-  &:nth-child(3) { width: 840px; height: 840px; top: 160px; }
+  // design-specific: smaller diameters than before, repositioned so the visible window now runs
+  // from each circle's crown down to the octagon band, instead of just a shallow cap up top
+  &:nth-child(1) { width: 900px; height: 900px; top: 40px; }
+  &:nth-child(2) { width: 760px; height: 760px; top: 90px; }
+  &:nth-child(3) { width: 620px; height: 620px; top: 140px; }
 
   @include tablet-down {
-    top: 50px;
-
-    &:nth-child(1) { width: 640px; height: 640px; }
-    &:nth-child(2) { width: 540px; height: 540px; top: 75px; }
-    &:nth-child(3) { width: 440px; height: 440px; top: 100px; }
+    &:nth-child(1) { width: 480px; height: 480px; top: 20px; }
+    &:nth-child(2) { width: 400px; height: 400px; top: 50px; }
+    &:nth-child(3) { width: 320px; height: 320px; top: 80px; }
   }
 }
 
@@ -216,13 +219,25 @@
   margin-top: -24px;
   width: 100%;
   min-height: 300px;
-  background: var(--color-gray-light-bg);
+  // design-specific: base layer is the border color, faded out toward the center and solid near
+  // the outer top corners — the actual gray fill sits on a ::before inset only from the top, so
+  // this gradient shows through as a blue line that fades in the middle of the top edge
+  background: linear-gradient(to right, var(--color-blue-primary) 0%, var(--color-blue-primary-alpha-20) 30%, var(--color-blue-primary-alpha-20) 70%, var(--color-blue-primary) 100%);
   clip-path: polygon(36% 26%, 64% 26%, 71% 0, 100% 0, 100% 100%, 0 100%, 0 0, 30% 0);
   display: flex;
   align-items: flex-start;
   justify-content: center;
   gap: var(--space-13);
   padding: var(--space-11) var(--container-padding-x) var(--space-11);
+
+  &::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: 2px 0 0 0;
+    background: var(--color-gray-light-bg);
+    clip-path: inherit;
+  }
 
   @include tablet-down {
     clip-path: polygon(30% 12%, 70% 12%, 78% 0, 100% 0, 100% 100%, 0 100%, 0 0, 22% 0);
@@ -235,7 +250,10 @@
 
   @include mobile {
     clip-path: polygon(26% 8%, 74% 8%, 82% 0, 100% 0, 100% 100%, 0 100%, 0 0, 18% 0);
-    padding: calc(var(--space-8) + 18px) var(--space-5) var(--space-8);
+    // design-specific: extra top padding beyond the notch clearance — without it the first
+    // stacked feature's icon badge sits flush against the padding boundary with no breathing
+    // room above it, since .sideFeature/.centerFeature zero out their own margin-top here
+    padding: calc(var(--space-8) + 18px + var(--space-6)) var(--space-5) var(--space-8);
   }
 }
 
