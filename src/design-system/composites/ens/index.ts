@@ -1,2 +1,5 @@
 export { EnsHero } from './EnsHero'
 export { EnsAbout } from './EnsAbout'
+export { EnsWhy } from './EnsWhy'
+export { EnsUtility } from './EnsUtility'
+export { EnsFaq } from './EnsFaq'

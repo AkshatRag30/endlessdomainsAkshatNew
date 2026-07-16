@@ -1,17 +1,17 @@
 import React from 'react'
 import Image from 'next/image'
-import { SiEthereum } from 'react-icons/si'
 import { Input } from '@/design-system/primitives/input/Input'
+import type { TldPageData } from '@/data/tldPages'
 
 import styles from './EnsHero.module.scss'
 
-const STATS = [
-  { value: 'Millions', label: 'Registered Identities' },
-  { value: '1000+', label: 'Integrations' },
-  { value: '$5', label: 'Starting Price' },
-]
+export interface EnsHeroProps {
+  data: TldPageData
+}
 
-export function EnsHero() {
+export function EnsHero({ data }: EnsHeroProps) {
+  const { hero, providerShort, providerIcon: ProviderIcon } = data
+
   return (
     <section className={styles.hero} aria-labelledby="ens-heading">
 
@@ -31,18 +31,18 @@ export function EnsHero() {
             <span className={styles.labelBracketTR} aria-hidden="true" />
             <span className={styles.labelBracketBL} aria-hidden="true" />
             <span className={styles.labelBracketBR} aria-hidden="true" />
-            <p className={styles.labelText}>On-Chain Identity</p>
+            <p className={styles.labelText}>{hero.label}</p>
           </div>
 
           {/* Heading */}
           <h1 id="ens-heading" className={styles.heading}>
-            <span className={styles.headingLine1}>Register Your</span>
-            <span className={styles.headingLine2}>.eth Identity</span>
+            <span className={styles.headingLine1}>{hero.headingLine1}</span>
+            <span className={styles.headingLine2}>{hero.headingLine2}</span>
           </h1>
 
           {/* Description */}
           <p className={styles.description}>
-            The original on-chain identity on Ethereum. One name for payments, login, governance, and digital ownership.
+            {hero.description}
           </p>
         </div>
 
@@ -54,7 +54,7 @@ export function EnsHero() {
           <Image src="/og-tld/bottomright.svg" alt="" aria-hidden="true" width={53} height={91} className={`${styles.cornerImgDesktop} ${styles.topLeft}`}     unoptimized />
           <Image src="/og-tld/bottomright.svg" alt="" aria-hidden="true" width={53} height={91} className={`${styles.cornerImgDesktop} ${styles.bottomRight}`} unoptimized />
           <div className={styles.statsRow} role="list">
-            {STATS.map(stat => (
+            {hero.stats.map(stat => (
               <div key={stat.label} className={styles.statItem} role="listitem">
                 <span className={styles.statBracketLeft} aria-hidden="true" />
                 <div className={styles.statInfo}>
@@ -67,15 +67,14 @@ export function EnsHero() {
           </div>
         </div>
 
-        {/* Partnership lockup — Endless Domains × ENS */}
+        {/* Partnership lockup — Endless Domains × provider */}
         <div className={styles.partnerWrap}>
           <Image src="/ens/Subtract.svg" alt="" aria-hidden="true" width={560} height={78} className={styles.partnerFrame} unoptimized />
           <div className={styles.partnerLockup}>
             <Image src="/ens/endlesslogo.svg" alt="Endless Domains" width={140} height={45} className={styles.partnerLogo} unoptimized />
-            <span className={styles.partnerDivider} aria-hidden="true" />
             <span className={styles.partnerEns}>
-              <SiEthereum className={styles.partnerEnsIcon} aria-hidden="true" />
-              ENS
+              <ProviderIcon className={styles.partnerEnsIcon} aria-hidden="true" />
+              {providerShort}
             </span>
           </div>
         </div>

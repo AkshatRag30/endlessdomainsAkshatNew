@@ -11,14 +11,14 @@
   justify-content: center;
   overflow: hidden;
   background: var(--color-white-primary);
-  padding: var(--space-14) var(--container-padding-x) var(--space-11);
+  padding: var(--space-1) var(--container-padding-x) 0;
 
   @include tablet-down {
-    padding: var(--space-11) var(--space-7) var(--space-9);
+    padding: var(--space-11) var(--space-7) 0;
   }
 
   @include mobile {
-    padding: var(--space-7) var(--space-5) var(--space-6);
+    padding: var(--space-7) var(--space-5) 0;
   }
 }
 

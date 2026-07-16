@@ -1,8 +1,11 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import { PerksNavBar } from '@/design-system/composites/reputation/perks/PerksNavBar'
-import { EnsHero, EnsAbout } from '@/design-system/composites/ens'
+import { EnsHero, EnsAbout, EnsWhy, EnsUtility, EnsFaq } from '@/design-system/composites/ens'
+import { getTldPageData } from '@/data/tldPages'
 import styles from './ens.module.scss'
+
+const data = getTldPageData('ens')!
 
 const EnsTldPage: NextPage = () => {
   return (
@@ -16,8 +19,11 @@ const EnsTldPage: NextPage = () => {
       </Head>
       <PerksNavBar onGoldClick={() => {}} />
       <main className={styles.main}>
-        <EnsHero />
-        <EnsAbout />
+        <EnsHero data={data} />
+        <EnsAbout data={data} />
+        <EnsWhy data={data} />
+        <EnsUtility data={data} />
+        <EnsFaq data={data} />
       </main>
     </>
   )

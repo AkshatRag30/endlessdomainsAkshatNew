@@ -30,12 +30,15 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   showExtensions?: boolean
   initialQuery?: string
   onSearch?: (query: string) => void
+  // design-specific: lets a TLD-specific page (e.g. og-tld) scope the animated placeholder to its
+  // own extension instead of the shared cross-TLD default list
+  placeholderDomains?: readonly string[]
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ variant = 'hero', showExtensions = true, initialQuery = '', onSearch, className, ...inputProps }, ref) => {
+  ({ variant = 'hero', showExtensions = true, initialQuery = '', onSearch, placeholderDomains = PLACEHOLDER_DOMAINS, className, ...inputProps }, ref) => {
     const router = useRouter()
 
     const [query, setQuery] = useState(initialQuery)
@@ -63,7 +66,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         return
       }
 
-      const currentDomain = PLACEHOLDER_DOMAINS[currentDomainIndex]
+      const currentDomain = placeholderDomains[currentDomainIndex]
       const currentText = placeholder
 
       const tick = () => {
@@ -80,7 +83,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             typingRef.current = setTimeout(tick, DELETING_SPEED)
           } else {
             setIsDeleting(false)
-            setCurrentDomainIndex(prev => (prev + 1) % PLACEHOLDER_DOMAINS.length)
+            setCurrentDomainIndex(prev => (prev + 1) % placeholderDomains.length)
           }
         }
       }
@@ -90,7 +93,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       return () => {
         if (typingRef.current) clearTimeout(typingRef.current)
       }
-    }, [placeholder, currentDomainIndex, isDeleting, isFocused, query, variant])
+    }, [placeholder, currentDomainIndex, isDeleting, isFocused, query, variant, placeholderDomains])
 
     // ─── Handlers ─────────────────────────────────────────────────────────────
 

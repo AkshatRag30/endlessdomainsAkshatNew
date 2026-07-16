@@ -10,6 +10,17 @@ const STATS = [
   { value: '$2', label: 'Starting Price' },
 ]
 
+// design-specific: scoped to only .og examples, rather than the Input primitive's shared
+// cross-TLD default list, since this is the .og-specific hero
+const OG_PLACEHOLDER_DOMAINS = [
+  'explorer.og',
+  'metaverse.og',
+  'digital.og',
+  'crypto.og',
+  'identity.og',
+  'onchain.og',
+] as const
+
 export function OgTldHero() {
   return (
     <section className={styles.hero} aria-labelledby="og-tld-heading">
@@ -46,7 +57,7 @@ export function OgTldHero() {
         </div>
 
         {/* Search bar */}
-        <Input variant="hero" />
+        <Input variant="hero" placeholderDomains={OG_PLACEHOLDER_DOMAINS} />
 
         {/* Stats row */}
         <div className={styles.statsFrame}>

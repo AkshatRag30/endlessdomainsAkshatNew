@@ -345,10 +345,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-6);
+  gap: var(--space-8);
 
   @include mobile {
-    gap: var(--space-4);
+    gap: var(--space-6);
   }
 }
 
@@ -359,13 +359,6 @@
   @include mobile { width: 84px; }
 }
 
-.partnerDivider {
-  width: 1px;
-  height: 28px;
-  background: var(--color-blue-primary-alpha-30);
-
-  @include mobile { height: 20px; }
-}
 
 .partnerEns {
   display: inline-flex;

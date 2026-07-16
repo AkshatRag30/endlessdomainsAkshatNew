@@ -197,8 +197,10 @@
 .bottomArea {
   position: relative;
   width: 100%;
-  // design-specific: ~504px tall lower zone
-  min-height: 484px;
+  // design-specific: base 484px zone plus the center card's own 104px lower start offset
+  // (top: 241px vs the side cards' top: 137px) — without this extra room the center card's
+  // content overflows past the section's own bottom edge into whatever follows it
+  min-height: 588px;
   display: flex;
   align-items: flex-start;
 

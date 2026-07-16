@@ -1,31 +1,16 @@
 import React from 'react'
 import Image from 'next/image'
+import type { TldPageData } from '@/data/tldPages'
 
 import styles from './EnsAbout.module.scss'
 
-const FEATURES = [
-  {
-    id: 'ethereum-native',
-    iconSrc: '/ens/icon-ethereum-native.svg',
-    title: 'Ethereum-Native Identity',
-    desc: "Built on Ethereum and secured by the world's largest smart contract ecosystem.",
-  },
-  {
-    id: 'universal-recognition',
-    iconSrc: '/ens/icon-universal-recognition.svg',
-    title: 'Universal Recognition',
-    desc: 'Supported by wallets, marketplaces, DAOs, applications, and Web3 services worldwide.',
-  },
-  {
-    id: 'own-presence',
-    iconSrc: '/ens/icon-own-presence.svg',
-    title: 'Own Your Presence',
-    desc: 'Create a memorable on-chain identity that travels with you across the Ethereum ecosystem.',
-  },
-]
+export interface EnsAboutProps {
+  data: TldPageData
+}
 
-export function EnsAbout() {
-  const [ethereumNative, universalRecognition, ownPresence] = FEATURES
+export function EnsAbout({ data }: EnsAboutProps) {
+  const { about } = data
+  const [ownership, compatibility, identityOs] = about.features
 
   return (
     <section className={styles.section} aria-labelledby="ens-about-heading">
@@ -45,16 +30,16 @@ export function EnsAbout() {
           <span className={styles.labelBracketTR} aria-hidden="true" />
           <span className={styles.labelBracketBL} aria-hidden="true" />
           <span className={styles.labelBracketBR} aria-hidden="true" />
-          <p className={styles.labelText}>About The Identity</p>
+          <p className={styles.labelText}>{about.label}</p>
         </div>
 
         <h2 id="ens-about-heading" className={styles.heading}>
-          <span className={styles.headingLine1}>Everything</span>
-          <span className={styles.headingLine2}>About .eth</span>
+          <span className={styles.headingLine1}>{about.headingLine1}</span>
+          <span className={styles.headingLine2}>{about.headingLine2}</span>
         </h2>
 
         <p className={styles.description}>
-          Every .eth identity is registered through Ethereum Name Service (ENS), allowing users to replace complex wallet addresses with a simple, human-readable name that works across wallets, applications, DAOs, and protocols.
+          {about.description}
         </p>
       </div>
 
@@ -62,31 +47,31 @@ export function EnsAbout() {
       <div className={styles.octagonBand}>
         <div className={styles.sideFeature}>
           <span className={styles.iconBadge} aria-hidden="true">
-            <Image src={ethereumNative.iconSrc} alt="" width={20} height={20} unoptimized />
+            <Image src={ownership.iconSrc} alt="" width={20} height={20} unoptimized />
           </span>
           <div className={styles.featureText}>
-            <h3 className={styles.featureTitle}>{ethereumNative.title}</h3>
-            <p className={styles.featureDesc}>{ethereumNative.desc}</p>
+            <h3 className={styles.featureTitle}>{ownership.title}</h3>
+            <p className={styles.featureDesc}>{ownership.desc}</p>
           </div>
         </div>
 
         <div className={`${styles.centerFeature} ${styles.centerFeatureLast}`}>
           <span className={styles.iconBadge} aria-hidden="true">
-            <Image src={universalRecognition.iconSrc} alt="" width={20} height={20} unoptimized />
+            <Image src={compatibility.iconSrc} alt="" width={20} height={20} unoptimized />
           </span>
           <div className={styles.featureText}>
-            <h3 className={styles.featureTitle}>{universalRecognition.title}</h3>
-            <p className={styles.featureDesc}>{universalRecognition.desc}</p>
+            <h3 className={styles.featureTitle}>{compatibility.title}</h3>
+            <p className={styles.featureDesc}>{compatibility.desc}</p>
           </div>
         </div>
 
         <div className={styles.sideFeature}>
           <span className={styles.iconBadge} aria-hidden="true">
-            <Image src={ownPresence.iconSrc} alt="" width={20} height={20} unoptimized />
+            <Image src={identityOs.iconSrc} alt="" width={20} height={20} unoptimized />
           </span>
           <div className={styles.featureText}>
-            <h3 className={styles.featureTitle}>{ownPresence.title}</h3>
-            <p className={styles.featureDesc}>{ownPresence.desc}</p>
+            <h3 className={styles.featureTitle}>{identityOs.title}</h3>
+            <p className={styles.featureDesc}>{identityOs.desc}</p>
           </div>
         </div>
       </div>

@@ -1,0 +1,308 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Section shell ─────────────────────────────────────────────────────────────
+
+.section {
+  position: relative;
+  width: 100%;
+  background: var(--color-white-primary);
+  padding: var(--space-11) var(--container-padding-x) var(--space-9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-9);
+  overflow: hidden;
+
+  @include tablet-down {
+    padding: var(--space-9) var(--space-7) var(--space-7);
+    gap: var(--space-7);
+  }
+
+  @include mobile {
+    padding: var(--space-7) var(--space-5) var(--space-6);
+    gap: var(--space-6);
+  }
+}
+
+// ── Stage — positioning context for the pill field + centered title block ───
+// design-specific: the heading sits vertically in the middle of the 3 pill rows (row 1+2 above,
+// row 3 straddling its baseline) rather than stacked below the whole pill block, so the pill
+// field and title block are both absolutely placed inside one shared stage instead of flowing
+// one after the other.
+
+.stage {
+  position: relative;
+  width: 100%;
+  max-width: 1300px;
+  height: 210px;
+
+  @include tablet-down {
+    height: auto;
+  }
+}
+
+.pillField {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  @include tablet-down {
+    display: none;
+  }
+}
+
+// marker class toggled on once the section scrolls into view — see .pill's animation rules
+.pillFieldVisible {
+  // intentionally empty: this class exists only to be referenced as an ancestor selector above
+}
+
+.pillRow {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  &[data-row='1'] { top: 0; }
+  &[data-row='2'] { top: 64px; }
+  &[data-row='3'] { top: 128px; }
+}
+
+// ── Connector lines — diagonal-then-flat segment running from each pill toward the heading ────
+// design-specific: connector-line.svg is the exact Figma vector (a two-segment diagonal-then-flat
+// polyline), mirrored via scaleX for the right side rather than approximated with a CSS rotation
+
+.connector {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 230px;
+  height: auto;
+}
+
+.connectorLeft {
+  left: 195px;
+}
+
+.connectorRight {
+  right: 195px;
+  transform: translateY(-50%) scaleX(-1);
+}
+
+// ── Pill ──────────────────────────────────────────────────────────────────────
+
+.pill {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 var(--space-5);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--color-blue-primary) 0%, var(--color-blue-primary-alpha-50) 100%);
+  box-shadow:
+    0px 19px 49px 0px rgba(87, 177, 255, 0.34),
+    0px 11px 15px 0px rgba(87, 177, 255, 0.19),
+    0px 5px 6px 0px rgba(87, 177, 255, 0.22),
+    0px 2px 2px 0px rgba(87, 177, 255, 0.15),
+    0px 0px 0px 1.8px #e0e9f2,
+    0px 0px 0px 2.3px var(--color-white-primary),
+    inset 0px 0.5px 8px 1px #d2eaff,
+    inset 0px 0.5px 2px 1px #d2eaff;
+
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--text-small-15);
+  color: var(--color-white-primary);
+  white-space: nowrap;
+
+  // starts hidden — only animates in once the section has scrolled into view (.pillFieldVisible
+  // added by an IntersectionObserver in the component). Each row's left/right pair gets its own
+  // delay step so all 6 pills pop in sequentially rather than by row.
+  opacity: 0;
+
+  .pillFieldVisible & {
+    animation: pillIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation-delay: 0s;
+  }
+
+  .pillFieldVisible [data-row='1'] &.pillRight { animation-delay: 0.1s; }
+  .pillFieldVisible [data-row='2'] &.pillLeft  { animation-delay: 0.2s; }
+  .pillFieldVisible [data-row='2'] &.pillRight { animation-delay: 0.3s; }
+  .pillFieldVisible [data-row='3'] &.pillLeft  { animation-delay: 0.4s; }
+  .pillFieldVisible [data-row='3'] &.pillRight { animation-delay: 0.5s; }
+}
+
+@keyframes pillIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pill {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+// ── Title block ───────────────────────────────────────────────────────────────
+
+.titleBlock {
+  position: absolute;
+  left: 50%;
+  top: 100px;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  text-align: center;
+  width: max-content;
+  max-width: 100%;
+
+  @include tablet-down {
+    position: static;
+    transform: none;
+    width: auto;
+  }
+}
+
+// ── Top label with 4-corner brackets ─────────────────────────────────────────
+
+.labelWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 20px;
+}
+
+%bracket-corner {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-style: solid;
+  border-color: rgba(143, 115, 255, 0.65);
+  pointer-events: none;
+}
+
+.labelBracketTL { @extend %bracket-corner; top: 0; left: 0; border-width: 1.5px 0 0 1.5px; }
+.labelBracketTR { @extend %bracket-corner; top: 0; right: 0; border-width: 1.5px 1.5px 0 0; }
+.labelBracketBL { @extend %bracket-corner; bottom: 0; left: 0; border-width: 0 0 1.5px 1.5px; }
+.labelBracketBR { @extend %bracket-corner; bottom: 0; right: 0; border-width: 0 1.5px 1.5px 0; }
+
+.labelText {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+
+  @include mobile { font-size: var(--text-small-13); }
+}
+
+// ── Heading ───────────────────────────────────────────────────────────────────
+
+.heading {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+.headingLine1,
+.headingLine2 {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  text-transform: capitalize;
+
+  @include tablet-down { font-size: 40px; }
+  @include mobile { font-size: 30px; }
+}
+
+.headingLine1 {
+  color: var(--color-black-primary);
+}
+
+.headingLine2 {
+  background: linear-gradient(126deg, var(--color-blue-primary) 70%, var(--color-blue-primary-faded) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+// ── Mobile-only pill stack — heading above, 3 centered pill-pair rows below ──
+// design-specific: a genuinely different mobile composition (not a resize of the desktop fan-out)
+// — a short vertical stub line drops from the heading, then 3 rows of 2 pills each, stacked and
+// centered, matching the reference mobile mock exactly
+
+.pillStackMobile {
+  display: none;
+
+  @include tablet-down {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-6);
+    width: 100%;
+    padding-top: var(--space-2);
+  }
+}
+
+.stubConnector {
+  width: 1px;
+  height: 28px;
+  background: linear-gradient(to bottom, var(--color-blue-primary-alpha-30), transparent);
+}
+
+.pillRowMobile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  width: 100%;
+
+  @include mobile {
+    gap: var(--space-3);
+  }
+}
+
+// marker class toggled on once the section scrolls into view — see .pill's animation rules
+.pillStackMobileVisible {
+  // intentionally empty: this class exists only to be referenced as an ancestor selector below
+}
+
+.pillStackMobile .pill {
+  white-space: normal;
+  text-align: center;
+  height: auto;
+  min-height: 36px;
+  padding: var(--space-2) var(--space-4);
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: visible;
+  line-height: 1.25;
+}
+
+// .pillStackMobileVisible is applied to the SAME element as .pillStackMobile (not an ancestor of
+// a separate element), so these must be plain descendant selectors from that shared element, not
+// nested `&` compounds — `.pillStackMobileVisible .pillStackMobile .pill` can never match since
+// .pillStackMobileVisible and .pillStackMobile are never two different nested elements
+.pillStackMobileVisible.pillStackMobile .pill {
+  animation: pillIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.pillStackMobileVisible.pillStackMobile [data-row='1'] .pill { animation-delay: 0s; }
+.pillStackMobileVisible.pillStackMobile [data-row='2'] .pill { animation-delay: 0.15s; }
+.pillStackMobileVisible.pillStackMobile [data-row='3'] .pill { animation-delay: 0.3s; }

@@ -1,0 +1,478 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Section shell ─────────────────────────────────────────────────────────────
+
+.section {
+  position: relative;
+  width: 100%;
+  background: var(--color-white-primary);
+  padding: var(--space-9) 0 var(--space-14);
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+
+  @include tablet-down { padding: var(--space-7) 0 var(--space-11); }
+  @include mobile { padding: var(--space-6) 0 var(--space-9); }
+}
+
+// ── Stage — shared coordinate box for the dome image, title block, and icon arc ──
+// design-specific: all three layers are positioned relative to this one box instead of flowing
+// independently, so the title sits inside the dome's flat notch and the icon arc lines up with
+// the dome's own curve rather than drifting apart at different viewport widths
+
+.stage {
+  position: relative;
+  width: 100%;
+  max-width: 1300px;
+  height: 520px;
+
+  @include tablet-down {
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-9);
+  }
+
+  // mobile has its own dedicated layout below (.mobileStage) — matches the same desktop
+  // composition exactly, just with the dome image cropped to its circular-ring center
+  @include mobile {
+    display: none;
+  }
+}
+
+// ── Dome background — blue notch shape behind, white ring/line shape on top ──
+// design-specific: Vector (3).png is the solid blue notch, Vector (4).png is the white overlay
+// carrying the concentric rings + the label connector lines — stacked so the white shape's own
+// notch cutout reveals a sliver of blue behind it, matching the Figma "sign" silhouette exactly
+
+.domeArea {
+  position: absolute;
+  // design-specific: full-bleed edge-to-edge, independent of .stage's own capped width — the
+  // classic 100vw + centered-negative-margin trick, since this box's ancestor is width-constrained
+  left: 50%;
+  top: 0;
+  width: 100vw;
+  margin-left: -50vw;
+  height: 460px;
+  pointer-events: none;
+  z-index: 0;
+
+  @include tablet-down {
+    position: relative;
+    left: auto;
+    top: auto;
+    width: 100vw;
+    margin-left: -50vw;
+    height: 380px;
+  }
+}
+
+.domeBgWrap {
+  position: absolute;
+  inset: 0;
+}
+
+// design-specific: pushed down from the blue layer beneath it so a thicker band of the blue
+// notch's own edge stays visible peeking out from behind the white shape, per design direction
+.domeRingsWrap {
+  position: absolute;
+  inset: 0;
+  top: 18px;
+
+  @include tablet-down { top: 12px; }
+}
+
+.domeBg,
+.domeRings {
+  object-fit: cover;
+  object-position: top;
+}
+
+// ── Title block ───────────────────────────────────────────────────────────────
+
+.titleBlock {
+  position: absolute;
+  left: 50%;
+  top: 70px;
+  transform: translateX(-50%);
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  text-align: center;
+  padding: 0 var(--container-padding-x);
+  width: max-content;
+  max-width: 100%;
+
+  @include tablet-down {
+    position: relative;
+    left: auto;
+    top: auto;
+    transform: none;
+    width: auto;
+    margin-top: 0;
+  }
+}
+
+// ── Top label with 4-corner brackets ─────────────────────────────────────────
+
+.labelWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 20px;
+}
+
+%bracket-corner {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-style: solid;
+  border-color: rgba(143, 115, 255, 0.65);
+  pointer-events: none;
+}
+
+.labelBracketTL { @extend %bracket-corner; top: 0; left: 0; border-width: 1.5px 0 0 1.5px; }
+.labelBracketTR { @extend %bracket-corner; top: 0; right: 0; border-width: 1.5px 1.5px 0 0; }
+.labelBracketBL { @extend %bracket-corner; bottom: 0; left: 0; border-width: 0 0 1.5px 1.5px; }
+.labelBracketBR { @extend %bracket-corner; bottom: 0; right: 0; border-width: 0 1.5px 1.5px 0; }
+
+.labelText {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+
+  @include mobile { font-size: var(--text-small-13); }
+}
+
+// ── Heading ───────────────────────────────────────────────────────────────────
+
+.heading {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+.headingLine1,
+.headingLine2 {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  text-transform: capitalize;
+
+  @include tablet-down { font-size: 40px; }
+  @include mobile { font-size: 30px; }
+}
+
+.headingLine1 {
+  color: var(--color-black-primary);
+}
+
+.headingLine2 {
+  background: linear-gradient(113deg, var(--color-blue-primary) 70%, var(--color-blue-primary-faded) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+// ── Utility arc — 5 icon+label items positioned along the dome curve ─────────
+// design-specific: the outer 2 items sit highest (closest to the section's top edge), stepping
+// down toward the centered item, mirroring the dome's own curvature in the Figma reference
+
+// marker class toggled on once the section scrolls into view — see .utilityItem's animation rules
+.utilityArcVisible {
+  // intentionally empty: this class exists only to be referenced as an ancestor selector below
+}
+
+.utilityArc {
+  position: absolute;
+  left: 50%;
+  bottom: 40px;
+  transform: translateX(-50%);
+  z-index: 1;
+  padding: 0;
+  list-style: none;
+  width: 100%;
+  max-width: 980px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  @include tablet-down {
+    position: relative;
+    left: auto;
+    bottom: auto;
+    transform: none;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    row-gap: var(--space-9);
+    column-gap: var(--space-7);
+    max-width: 100%;
+  }
+}
+
+.utilityItem {
+  // design-specific: equal-width slots instead of letting space-between react to each pill's own
+  // label width — "Show Digital Ownership" is much wider than "Park And Earn"/"Marketplace", so
+  // raw content-based spacing read as visually uneven even though the gaps were mathematically equal
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+
+  // design-specific: 5-step dome curve — outermost items ride highest (largest lift off the
+  // shared flex-end baseline), stepping down smoothly toward the centered item, which sits
+  // lowest with no lift at all
+  &[data-item='universal-login'],
+  &[data-item='receive-payments'] {
+    margin-bottom: 130px;
+  }
+
+  &[data-item='marketplace'],
+  &[data-item='show-digital-ownership'] {
+    margin-bottom: 55px;
+  }
+
+  &[data-item='park-and-earn'] {
+    margin-bottom: 0;
+  }
+
+  @include tablet-down {
+    margin-bottom: 0 !important;
+  }
+
+  // starts hidden — only animates in once the section has scrolled into view (.utilityArcVisible
+  // added by an IntersectionObserver in the component). Outer items pop in first, stepping inward
+  // toward the centered item, mirroring the reading order of the dome.
+  opacity: 0;
+
+  .utilityArcVisible & {
+    animation: utilityItemIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .utilityArcVisible &[data-item='universal-login'],
+  .utilityArcVisible &[data-item='receive-payments'] { animation-delay: 0s; }
+
+  .utilityArcVisible &[data-item='marketplace'],
+  .utilityArcVisible &[data-item='show-digital-ownership'] { animation-delay: 0.15s; }
+
+  .utilityArcVisible &[data-item='park-and-earn'] { animation-delay: 0.3s; }
+}
+
+@keyframes utilityItemIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .utilityItem {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+// ── Icon badge ────────────────────────────────────────────────────────────────
+
+.iconBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  color: var(--color-white-primary);
+  background: linear-gradient(180deg, var(--color-blue-primary) 0%, var(--color-blue-primary-faded) 100%);
+  box-shadow:
+    0px 21px 53px 0px rgba(87, 177, 255, 0.34),
+    0px 12px 16px 0px rgba(87, 177, 255, 0.19),
+    0px 5px 7px 0px rgba(87, 177, 255, 0.22),
+    0px 2px 2px 0px rgba(87, 177, 255, 0.15),
+    0px 0px 0px 2px #e0e9f2,
+    0px 0px 0px 2.5px var(--color-white-primary),
+    inset 0px 0.5px 9px 1px #d2eaff,
+    inset 0px 0.5px 2px 1px #d2eaff;
+}
+
+// ── Utility pill ──────────────────────────────────────────────────────────────
+
+.utilityPill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 var(--space-5);
+  border-radius: var(--radius-md);
+  background: linear-gradient(180deg, var(--color-blue-primary) 0%, var(--color-blue-primary-alpha-50) 100%);
+  box-shadow:
+    0px 19px 49px 0px rgba(87, 177, 255, 0.34),
+    0px 11px 15px 0px rgba(87, 177, 255, 0.19),
+    0px 5px 6px 0px rgba(87, 177, 255, 0.22),
+    0px 2px 2px 0px rgba(87, 177, 255, 0.15),
+    0px 0px 0px 1.8px #e0e9f2,
+    0px 0px 0px 2.3px var(--color-white-primary),
+    inset 0px 0.5px 8px 1px #d2eaff,
+    inset 0px 0.5px 2px 1px #d2eaff;
+
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--text-small-15);
+  color: var(--color-white-primary);
+  white-space: nowrap;
+  text-transform: capitalize;
+
+  @include mobile {
+    height: auto;
+    min-height: 36px;
+    max-width: 150px;
+    padding: var(--space-2) var(--space-4);
+    white-space: normal;
+    text-align: center;
+    line-height: 1.25;
+  }
+}
+
+// ── Mobile layout ─────────────────────────────────────────────────────────────
+// design-specific: only a thin sliver of Vector (3)'s blue notch shows at the very top edge —
+// the rest of the section is plain white. Vector (4)'s faint ring lines continue down over that
+// white background behind the icon grid, reusing the same two images as desktop but cropped to
+// very different heights each, rather than stacking them as one tall solid dome like desktop does.
+
+.mobileStage {
+  display: none;
+
+  @include mobile {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+}
+
+// the thin blue notch strip at the very top only — the source image (3827x1303) has its notch
+// silhouette occupying only the top slice of its own height, so a plain object-fit: cover box
+// at this shallow aspect ratio already crops to just that notch edge with no extra offset math
+.mobileDomeBgArea {
+  position: relative;
+  width: 100%;
+  height: 40px;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.mobileDomeBgWrap {
+  position: absolute;
+  inset: 0;
+}
+
+.mobileDomeBg {
+  object-fit: cover;
+  object-position: center top;
+}
+
+// the faint ring lines, tall enough to run behind the whole icon grid below — this source image
+// has an OPAQUE white background (not transparent) outside the ring strokes, so it must start
+// below the blue notch strip rather than at top: 0, or it paints over and hides the notch entirely
+.mobileDomeRingsArea {
+  position: absolute;
+  left: 0;
+  top: 40px;
+  width: 100%;
+  height: 460px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.mobileDomeRingsWrap {
+  position: absolute;
+  inset: 0;
+}
+
+.mobileDomeRings {
+  object-fit: cover;
+  // design-specific: center-cropped instead of top-aligned — the source image is a very wide,
+  // short strip (3827x1303) whose circular rings live in the horizontal middle, with long flat
+  // tails left and right. Centering the crop keeps just the rings, dropping the tails entirely.
+  object-position: center top;
+}
+
+.mobileTitleBlock {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  text-align: center;
+  padding: 0 var(--container-padding-x);
+  margin-top: var(--space-6);
+}
+
+.mobileUtilityGrid {
+  position: relative;
+  z-index: 1;
+  margin: var(--space-9) auto 0;
+  padding: 0 var(--space-5);
+  list-style: none;
+  width: 100%;
+  max-width: 360px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  row-gap: var(--space-6);
+  column-gap: var(--space-4);
+}
+
+.mobileUtilityItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+
+  // centers the odd one out (5th item) under the 2-column grid
+  &:last-child {
+    grid-column: 1 / -1;
+  }
+
+  // starts hidden — only animates in once the section has scrolled into view
+  // (.mobileUtilityGridVisible added by the same IntersectionObserver as the desktop layout)
+  opacity: 0;
+
+  .mobileUtilityGridVisible & {
+    animation: utilityItemIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .mobileUtilityGridVisible &:nth-child(1) { animation-delay: 0s; }
+  .mobileUtilityGridVisible &:nth-child(2) { animation-delay: 0.1s; }
+  .mobileUtilityGridVisible &:nth-child(3) { animation-delay: 0.2s; }
+  .mobileUtilityGridVisible &:nth-child(4) { animation-delay: 0.3s; }
+  .mobileUtilityGridVisible &:nth-child(5) { animation-delay: 0.4s; }
+}
+
+// marker class toggled on once the section scrolls into view — see .mobileUtilityItem's rules
+.mobileUtilityGridVisible {
+  // intentionally empty: this class exists only to be referenced as an ancestor selector above
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobileUtilityItem {
+    animation: none;
+    opacity: 1;
+  }
+}

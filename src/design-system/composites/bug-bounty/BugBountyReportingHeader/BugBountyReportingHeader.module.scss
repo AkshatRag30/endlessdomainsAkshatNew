@@ -47,7 +47,7 @@
   width: 80px;
   position: relative;
   overflow: hidden;
-  opacity: 0.12;
+  opacity: 0.22;
 
   // Repeating diagonal SVG-style line pattern rendered as CSS
   background-image: repeating-linear-gradient(
@@ -71,6 +71,43 @@
   }
 }
 
+// Outermost dense diagonal strips, flanking the existing .stripeCol on either side — pushes
+// .stripeCol inward away from the section's edges, rather than sitting flush against them
+// design-specific: same recipe as .stripeCol but a much tighter repeat (3px/4px instead of
+// 10px/11px) so the lines pack noticeably denser than the column next to it
+.denseStripeCol {
+  flex-shrink: 0;
+  // design-specific: widened substantially — the previous 48px was proportionally negligible
+  // against the section's own width, so .stripeCol still read as flush against the edge
+  width: 120px;
+  position: relative;
+  overflow: hidden;
+  opacity: 0.22;
+
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent 0px,
+    transparent 3px,
+    rgba(0, 0, 0, 0.5) 3px,
+    rgba(0, 0, 0, 0.5) 4px
+  );
+
+  // design-specific: bleeds the dense pattern back out through .topArea's own side padding so it
+  // reaches the true section edge, while the element's own layout width (which keeps .stripeCol
+  // pushed inward) stays unchanged
+  &[data-side='left'] {
+    margin-left: calc(-1 * var(--space-8));
+  }
+
+  &[data-side='right'] {
+    margin-right: calc(-1 * var(--space-8));
+  }
+
+  @include tablet-down {
+    display: none;
+  }
+}
+
 // Center content block
 .centerContent {
   flex: 1;
@@ -79,7 +116,9 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-6);
-  padding: var(--space-9) var(--space-7);
+  // design-specific: reduced horizontal padding brings the stripe columns visually closer to the
+  // heading text, without moving .stripeCol itself
+  padding: var(--space-9) var(--space-5);
   text-align: center;
 
   @include tablet-down {

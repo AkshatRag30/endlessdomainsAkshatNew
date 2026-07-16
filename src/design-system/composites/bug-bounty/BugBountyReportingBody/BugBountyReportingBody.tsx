@@ -1,4 +1,5 @@
 import React from 'react'
+import Image from 'next/image'
 import { HiArrowUpRight } from 'react-icons/hi2'
 import styles from './BugBountyReportingBody.module.scss'
 
@@ -60,6 +61,14 @@ export function BugBountyReportingBody() {
       {/* ── Trapezoid footer banner ── */}
       <div className={styles.bannerWrap}>
         <div className={styles.banner}>
+          <Image
+            src="/providers/freename/icon-bg-texture.png"
+            alt=""
+            aria-hidden="true"
+            fill
+            className={styles.bannerTexture}
+            unoptimized
+          />
           <p className={styles.bannerText}>
             Final severity classification and reward amount are determined by the program team during review, based on impact, exploitability, and how clearly the issue is documented.
           </p>

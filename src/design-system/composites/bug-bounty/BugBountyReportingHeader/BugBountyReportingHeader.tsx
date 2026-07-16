@@ -6,6 +6,9 @@ export function BugBountyReportingHeader() {
     <section className={styles.section} aria-labelledby="bug-bounty-reporting-heading">
       <div className={styles.topArea}>
 
+        {/* Dense diagonal-line strip, outermost on the left */}
+        <div className={styles.denseStripeCol} data-side="left" aria-hidden="true" />
+
         {/* Decorative striped column on the left */}
         <div className={styles.stripeCol} data-side="left" aria-hidden="true" />
 
@@ -31,6 +34,9 @@ export function BugBountyReportingHeader() {
 
         {/* Decorative striped column on the right */}
         <div className={styles.stripeCol} data-side="right" aria-hidden="true" />
+
+        {/* Dense diagonal-line strip, outermost on the right */}
+        <div className={styles.denseStripeCol} data-side="right" aria-hidden="true" />
       </div>
     </section>
   )

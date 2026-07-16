@@ -5,7 +5,9 @@
 .section {
   position: relative;
   background: var(--color-white-primary);
-  padding: var(--section-spacing) var(--container-padding-x);
+  // design-specific: tighter than the shared --section-spacing rhythm — this section reads with
+  // too much top/bottom breathing room at the full value
+  padding: var(--space-7) var(--container-padding-x);
   // design-specific: repeating-gradient dash recipe instead of border: dashed — a 1px dashed
   // border renders as near-square dots at this thickness, this gives real elongated dashes.
   // Marks the section seam against the Timeline section above it.
@@ -13,6 +15,14 @@
   background-size: 100% 1px;
   background-repeat: no-repeat;
   background-position: top;
+
+  @include tablet-down {
+    padding: var(--space-11) var(--container-padding-x);
+  }
+
+  @include mobile {
+    padding: var(--space-9) var(--container-padding-x);
+  }
 }
 
 // ── Two-column grid ───────────────────────────────────────────────────────────
@@ -211,14 +221,21 @@
 .featureGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--space-9) var(--space-6);
+  // design-specific: align-items: start stops grid from stretching every card to match the
+  // tallest one in its row — without it, a shorter card visually reads as having a bigger gap
+  // below it than its taller neighbor, even though the actual row-gap value is the same
+  align-items: start;
+  // design-specific: centers the whole grid vertically within .grid's stretched row height,
+  // rather than sitting flush at the top of it
+  align-self: center;
+  gap: var(--space-5) var(--space-6);
   // design-specific: narrower than the left column now that .left takes a larger share of the row
   flex: 1 1 0;
   min-width: 0;
   max-width: 560px;
   margin: 0;
   // proper breathing room on every side, and specifically away from the divider on the left
-  padding: var(--space-2) var(--space-2) 0 var(--space-7);
+  padding: 0 var(--space-2) 0 var(--space-7);
   list-style: none;
 
   @include tablet-down {
