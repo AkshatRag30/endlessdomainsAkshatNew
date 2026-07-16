@@ -19,9 +19,9 @@ const CommunityPage: NextPage = () => {
         <CommunityHero />
         <CommunityDifferent />
         <CommunityGather />
-        <CommunityDivider />
+        <CommunityDivider hideOnMobile />
         <CommunityAmbassador />
-        <CommunityDivider rotate />
+        <CommunityDivider rotate hideOnMobile />
         <CommunitySpotlight />
         <CommunityCta />
       </main>

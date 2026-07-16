@@ -34,6 +34,22 @@
   }
 }
 
+// design-specific: same shapes/defs as .svgDesktop, only its viewBox is cropped narrower to trim
+// the long flat side arms on mobile — toggled by breakpoint since viewBox can't be set from CSS
+.svgDesktop {
+  @include mobile {
+    display: none;
+  }
+}
+
+.svgMobile {
+  display: none;
+
+  @include mobile {
+    display: block;
+  }
+}
+
 .rotated {
   transform: rotate(180deg);
 }
@@ -41,4 +57,10 @@
 // used when this divider caps off the section directly above it — no gap, just the graphic itself
 .tight {
   padding-top: 0;
+}
+
+.hideOnMobile {
+  @include mobile {
+    display: none;
+  }
 }

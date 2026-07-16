@@ -425,9 +425,14 @@
   animation-delay: 0.5s;
 
   @include mobile {
-    flex-direction: column;
-    gap: var(--space-4);
+    gap: var(--space-3);
     width: 100%;
+
+    > * {
+      flex: 1 1 0;
+      width: auto;
+      min-width: 0;
+    }
   }
 }
 

@@ -6,7 +6,20 @@
   position: relative;
   width: 100%;
   background: var(--color-white-primary);
-  overflow: hidden;
+  margin-bottom: var(--space-9);
+  // no overflow:hidden here — .ctaButtonWrap intentionally overflows past the bottom edge to sit
+  // inside the upward-pointing notch of the CommunityDivider (rotate) that follows this section.
+  // margin-bottom has to clear that overflow (the button's own height plus its translateY push)
+  // before adding real gap, since margin is measured from .section's own box, not the button's
+  // visual bottom.
+
+  @include tablet-down {
+    margin-bottom: var(--space-7);
+  }
+
+  @include mobile {
+    margin-bottom: calc(var(--space-9) + var(--space-6));
+  }
 }
 
 // ── Header row (reuses the same pattern as CommunityDifferent) ────────────────
@@ -250,7 +263,10 @@
   }
 
   @include mobile {
-    font-size: 13px;
+    // design-specific: reference design wraps this text onto two lines per cell instead of
+    // overflowing past the screen edge — nowrap only makes sense once there's enough column width
+    white-space: normal;
+    font-size: var(--text-small-13);
   }
 }
 
@@ -262,14 +278,14 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: var(--space-6) 0 var(--space-2);
+  padding: var(--space-6) 0 0;
 
   @include tablet {
-    padding: var(--space-7) var(--space-6) var(--space-4);
+    padding: var(--space-7) var(--space-6) 0;
   }
 
   @include mobile {
-    padding: var(--space-7) var(--space-5) var(--space-3);
+    padding: var(--space-7) var(--space-5) 0;
   }
 }
 
@@ -302,6 +318,25 @@
   }
 }
 
+// design-specific: the background Images use `fill`, which needs a definite ancestor height —
+// .bannerWrap itself is height:auto at mobile (content-driven, for the stacked steps), so this
+// separate absolutely-positioned layer gives the images their own fixed height to size against
+// without constraining .bannerWrap's real content height.
+.bannerBgLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+
+  @include mobile {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 260px;
+    bottom: auto;
+  }
+}
+
 .unionBg {
   object-fit: fill;
   object-position: center;
@@ -312,11 +347,24 @@
     transform: scaleX(1.3);
     transform-origin: center center;
   }
+}
+
+// design-specific: swaps to public/community/mobilectabanner.svg on mobile — a separate asset
+// with its own notch geometry, not just a scaled version of Union.svg
+.unionBgDesktop {
+  @include mobile {
+    display: none;
+  }
+}
+
+// design-specific: inline SVG (see CommunityAmbassador.tsx) — width/height 100% plus
+// preserveAspectRatio="none" on the element itself stretches it to fill .bannerBgLayer exactly,
+// no object-fit/object-position needed since those only apply to replaced elements like <img>
+.unionBgMobile {
+  display: none;
 
   @include mobile {
-    object-fit: cover;
-    transform: scaleX(1.18);
-    transform-origin: center center;
+    display: block;
   }
 }
 
@@ -422,7 +470,37 @@
   }
 }
 
+// design-specific: sits inside the upward-pointing notch of the CommunityDivider (rotate) that
+// immediately follows this section in pages/community/index.tsx — absolutely positioned so its
+// top edge clears .bannerWrap's bottom edge (the podium shape) entirely, then drops further down
+// by roughly half the divider's own height (91px desktop / 60px tablet-down / 44px mobile) so it
+// lands centered inside the notch instead of overlapping the podium above it.
 .ctaButtonWrap {
-  position: relative;
-  margin-top: var(--space-4);
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  transform: translate(-50%, 24px);
+  z-index: 2;
+  // widens to fit the label on one line instead of letting the button's own fit-content sizing
+  // get squeezed by the notch's available width, which is what was forcing the text to wrap
+  width: max-content;
+  max-width: 90vw;
+
+  @include tablet-down {
+    transform: translate(-50%, 16px);
+  }
+
+  @include mobile {
+    transform: translate(-50%, 10px);
+  }
+
+  // scoped to this one instance only — not a change to the shared PrimaryButton primitive
+  :global(button) {
+    white-space: nowrap;
+    font-size: var(--text-small-13);
+
+    @include mobile {
+      font-size: var(--text-small-12);
+    }
+  }
 }

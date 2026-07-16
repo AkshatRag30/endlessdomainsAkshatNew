@@ -202,12 +202,17 @@ $diagonal-strip-h: 75px;
   flex: 1;
   display: flex;
   flex-direction: column;
-  // design-specific: vertical dashed divider between left and right columns
-  border-left: 1px dashed var(--color-blue-primary-alpha-13);
+  // design-specific: repeating-gradient dash recipe instead of border: dashed — a 1px dashed
+  // border renders as near-square dots at this thickness, this gives real elongated dashes
+  background-image: repeating-linear-gradient(to bottom, var(--color-blue-primary-alpha-13) 0px, var(--color-blue-primary-alpha-13) 8px, transparent 8px, transparent 16px);
+  background-size: 1px 100%;
+  background-repeat: no-repeat;
+  background-position: left;
 
   @include tablet-down {
-    border-left: none;
-    border-top: 1px dashed var(--color-blue-primary-alpha-13);
+    background-image: repeating-linear-gradient(to right, var(--color-blue-primary-alpha-13) 0px, var(--color-blue-primary-alpha-13) 8px, transparent 8px, transparent 16px);
+    background-size: 100% 1px;
+    background-position: top;
   }
 }
 

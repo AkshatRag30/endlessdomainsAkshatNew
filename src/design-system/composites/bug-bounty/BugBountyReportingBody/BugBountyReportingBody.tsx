@@ -21,24 +21,29 @@ export function BugBountyReportingBody() {
     <section className={styles.section} aria-label="Reporting, review, and reward structure">
 
       {/* ── Row 1 — process steps, hover turns each card purple ── */}
-      <div className={styles.rowOneWrap}>
-        <div className={styles.stripeCol} data-side="left" aria-hidden="true" />
+      <div className={styles.rowOneSection}>
+        <div className={styles.rowOneBg} aria-hidden="true" />
+        <div className={styles.rowOneWrap}>
+          <div className={styles.stripeCol} data-side="left" aria-hidden="true" />
 
-        <ul className={styles.rowOne} role="list">
-          {STEPS.map(step => (
-            <li key={step.num} className={styles.stepCard}>
-              <span className={styles.stepNum}>{step.num}</span>
-              <h3 className={styles.stepTitle}>{step.title}</h3>
-              <p className={styles.stepDesc}>{step.desc}</p>
-            </li>
-          ))}
-        </ul>
+          <ul className={styles.rowOne} role="list">
+            {STEPS.map(step => (
+              <li key={step.num} className={styles.stepCard}>
+                <span className={styles.stepNum}>{step.num}</span>
+                <h3 className={styles.stepTitle}>{step.title}</h3>
+                <p className={styles.stepDesc}>{step.desc}</p>
+              </li>
+            ))}
+          </ul>
 
-        <div className={styles.stripeCol} data-side="right" aria-hidden="true" />
+          <div className={styles.stripeCol} data-side="right" aria-hidden="true" />
+        </div>
       </div>
 
       {/* ── Row 2 — severity / reward tiers ── */}
       <ul className={styles.rowTwo} role="list">
+        <span className={styles.rowTwoEdgeLine} data-side="left" aria-hidden="true" />
+        <span className={styles.rowTwoEdgeLine} data-side="right" aria-hidden="true" />
         {TIERS.map(tier => (
           <li key={tier.tier} className={styles.tierCard}>
             <span className={styles.tierCornerTL} aria-hidden="true" />

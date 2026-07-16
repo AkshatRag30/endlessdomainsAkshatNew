@@ -6,6 +6,13 @@
   position: relative;
   background: var(--color-white-primary);
   padding: var(--section-spacing) var(--container-padding-x);
+  // design-specific: repeating-gradient dash recipe instead of border: dashed — a 1px dashed
+  // border renders as near-square dots at this thickness, this gives real elongated dashes.
+  // Marks the section seam against the Timeline section above it.
+  background-image: repeating-linear-gradient(to right, var(--color-black-alpha-10) 0px, var(--color-black-alpha-10) 8px, transparent 8px, transparent 16px);
+  background-size: 100% 1px;
+  background-repeat: no-repeat;
+  background-position: top;
 }
 
 // ── Two-column grid ───────────────────────────────────────────────────────────
@@ -29,8 +36,17 @@
 .dividerCol {
   flex: 0 0 auto;
   align-self: stretch;
-  width: 0;
-  border-left: 1px dashed var(--color-gray-300);
+  width: 1px;
+  // design-specific: a 1px border renders `dashed` as near-square dots at this thickness — the
+  // repeating-gradient recipe (used elsewhere on this page for dashed rules) gives real elongated
+  // dash segments instead
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--color-gray-300) 0px,
+    var(--color-gray-300) 8px,
+    transparent 8px,
+    transparent 16px
+  );
   pointer-events: none;
 
   @include tablet-down {
@@ -47,7 +63,9 @@
   flex-direction: column;
   align-items: flex-start;
   gap: var(--space-7);
-  flex: 1 1 0;
+  // design-specific: wider than the right column so the checklist copy has more room to breathe
+  // horizontally instead of wrapping and stacking tall vertically
+  flex: 1.4 1 0;
   min-width: 0;
 }
 
@@ -183,8 +201,8 @@
   color: var(--color-black-alpha-55);
 
   strong {
-    font-weight: var(--font-weight-medium);
-    color: var(--color-black-primary);
+    font-weight: var(--font-weight-sm);
+    color: var(--color-gray-primary);
   }
 }
 
@@ -194,9 +212,10 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--space-9) var(--space-6);
+  // design-specific: narrower than the left column now that .left takes a larger share of the row
   flex: 1 1 0;
   min-width: 0;
-  max-width: 684px;
+  max-width: 560px;
   margin: 0;
   // proper breathing room on every side, and specifically away from the divider on the left
   padding: var(--space-2) var(--space-2) 0 var(--space-7);

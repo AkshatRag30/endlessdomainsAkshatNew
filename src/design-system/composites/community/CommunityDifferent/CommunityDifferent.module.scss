@@ -211,7 +211,9 @@
   }
 
   @include mobile {
-    padding: var(--space-9) var(--space-5);
+    // design-specific: matches reference — tight top gap under the header block, cards close
+    // together with a thin divider between them rather than the desktop's wide absolute layout
+    padding: var(--space-6) var(--space-5) var(--space-7);
   }
 }
 
@@ -313,7 +315,23 @@
   }
 
   @include mobile {
-    min-height: 260px;
+    // design-specific: left-aligned on mobile — icon, beam, title, and description all sit
+    // flush left instead of centered
+    align-items: flex-start;
+    text-align: left;
+    min-height: 0;
+    padding: var(--space-6) 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+
+    &:first-child {
+      // small top gap (not 0) so the icon's glow beam has room to clear .bottomArea's own edge
+      padding-top: var(--space-3);
+    }
+
+    &:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
   }
 }
 
@@ -325,9 +343,25 @@
   flex-direction: column;
   align-items: flex-start;
   flex-shrink: 0;
+  // design-specific: .iconGlowBeam is absolutely positioned (140px tall, bottom-aligned to this
+  // wrap) so it doesn't naturally affect this box's height — reserving that full height here means
+  // .featureCard's flex column allocates real space above the badge for the beam instead of it
+  // overlapping whatever sits above it
+  min-height: 140px;
+  justify-content: flex-end;
 
   @include tablet-down {
     flex-direction: column;
+    // design-specific: cards switch to a centered column layout at tablet-down (see
+    // .featureCard's align-items: center), so the icon badge needs to center with them
+    // instead of staying left-aligned
+    align-items: center;
+  }
+
+  @include mobile {
+    // design-specific: mobile reverts to left-aligned (unlike tablet, which stays centered) —
+    // matches .featureCard's own align-items: flex-start at this breakpoint
+    align-items: flex-start;
   }
 }
 
@@ -404,10 +438,6 @@
     border-left: 1px solid rgba(255, 255, 255, 0.6);
     border-right: 1px solid rgba(255, 255, 255, 0.6);
     pointer-events: none;
-  }
-
-  @include tablet-down {
-    display: none;
   }
 }
 

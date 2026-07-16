@@ -1,18 +1,19 @@
 import React from 'react'
 import Image from 'next/image'
+import { SiEthereum } from 'react-icons/si'
 import { Input } from '@/design-system/primitives/input/Input'
 
-import styles from './OgTldHero.module.scss'
+import styles from './EnsHero.module.scss'
 
 const STATS = [
-  { value: '4K+', label: 'Registered Identities' },
-  { value: '450+', label: 'Integrations' },
-  { value: '$2', label: 'Starting Price' },
+  { value: 'Millions', label: 'Registered Identities' },
+  { value: '1000+', label: 'Integrations' },
+  { value: '$5', label: 'Starting Price' },
 ]
 
-export function OgTldHero() {
+export function EnsHero() {
   return (
-    <section className={styles.hero} aria-labelledby="og-tld-heading">
+    <section className={styles.hero} aria-labelledby="ens-heading">
 
       {/* ── Main content ── */}
       <div className={styles.content}>
@@ -34,14 +35,14 @@ export function OgTldHero() {
           </div>
 
           {/* Heading */}
-          <h1 id="og-tld-heading" className={styles.heading}>
+          <h1 id="ens-heading" className={styles.heading}>
             <span className={styles.headingLine1}>Register Your</span>
-            <span className={styles.headingLine2}>.og Identity in just $2</span>
+            <span className={styles.headingLine2}>.eth Identity</span>
           </h1>
 
           {/* Description */}
           <p className={styles.description}>
-            The native identity of the Endless ecosystem. One name for payments, reputation, login, and ownership across Web3. Permanent ownership. No renewals. Starting from $2.
+            The original on-chain identity on Ethereum. One name for payments, login, governance, and digital ownership.
           </p>
         </div>
 
@@ -66,13 +67,20 @@ export function OgTldHero() {
           </div>
         </div>
 
-        {/* Live badge */}
-        <div className={styles.liveBadge}>
-          <span className={styles.liveDot} aria-hidden="true" />
-          <span className={styles.liveBadgeText}>Live · 4,000+ Registered</span>
+        {/* Partnership lockup — Endless Domains × ENS */}
+        <div className={styles.partnerWrap}>
+          <Image src="/ens/Subtract.svg" alt="" aria-hidden="true" width={560} height={78} className={styles.partnerFrame} unoptimized />
+          <div className={styles.partnerLockup}>
+            <Image src="/ens/endlesslogo.svg" alt="Endless Domains" width={140} height={45} className={styles.partnerLogo} unoptimized />
+            <span className={styles.partnerDivider} aria-hidden="true" />
+            <span className={styles.partnerEns}>
+              <SiEthereum className={styles.partnerEnsIcon} aria-hidden="true" />
+              ENS
+            </span>
+          </div>
         </div>
 
-        {/* Corner marks — mobile only, below the live badge, one on each edge */}
+        {/* Corner marks — mobile only, below the partnership lockup, one on each edge */}
         <div className={styles.cornerRow} aria-hidden="true">
           <Image src="/og-tld/bottomright.svg" alt="" width={24} height={41} className={`${styles.cornerImgMobile} ${styles.cornerImgMobileLeft}`}  unoptimized />
           <Image src="/og-tld/bottomright.svg" alt="" width={24} height={41} className={`${styles.cornerImgMobile} ${styles.cornerImgMobileRight}`} unoptimized />
@@ -83,4 +91,4 @@ export function OgTldHero() {
   )
 }
 
-export default OgTldHero
+export default EnsHero

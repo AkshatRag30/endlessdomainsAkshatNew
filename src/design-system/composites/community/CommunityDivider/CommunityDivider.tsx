@@ -3,13 +3,17 @@ import styles from './CommunityDivider.module.scss'
 
 export interface CommunityDividerProps {
   rotate?: boolean
+  hideOnMobile?: boolean
 }
 
-export function CommunityDivider({ rotate = false }: CommunityDividerProps) {
+export function CommunityDivider({ rotate = false, hideOnMobile = false }: CommunityDividerProps) {
   return (
-    <div className={`${styles.section} ${rotate ? styles.tight : ''}`} aria-hidden="true">
+    <div
+      className={`${styles.section} ${rotate ? styles.tight : ''} ${hideOnMobile ? styles.hideOnMobile : ''}`}
+      aria-hidden="true"
+    >
       <svg
-        className={`${styles.svg} ${rotate ? styles.rotated : ''}`}
+        className={`${styles.svg} ${styles.svgDesktop} ${rotate ? styles.rotated : ''}`}
         width="100%"
         height="91"
         viewBox="0 0 1512 91"
@@ -111,6 +115,52 @@ export function CommunityDivider({ rotate = false }: CommunityDividerProps) {
             xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAcSURBVHgB7cohAQAAAMKw9y8NFVCoTw82MZ1TAe0QCfcGJVSnAAAAAElFTkSuQmCC"
           />
         </defs>
+      </svg>
+
+      {/* design-specific: mobile-only — identical shapes/defs (reuses the same #communityDivider*
+          IDs, valid since SVG ids resolve document-wide), only the viewBox is cropped 200 units in
+          from each side (200 → 1312 of the original 0 → 1512) so the long flat side arms are
+          trimmed while the notch and its diagonal cuts render completely untouched */}
+      <svg
+        className={`${styles.svg} ${styles.svgMobile} ${rotate ? styles.rotated : ''}`}
+        width="100%"
+        height="91"
+        viewBox="200 0 1112 91"
+        preserveAspectRatio="none"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        xmlnsXlink="http://www.w3.org/1999/xlink"
+      >
+        <g filter="url(#communityDividerFilter0)">
+          <path
+            d="M623 0.00012207H756V40.0001H623L572 91.0001H-24V51.0001H572L623 0.00012207Z"
+            fill="url(#communityDividerPaint0)"
+            fillOpacity="0.2"
+          />
+        </g>
+        <g filter="url(#communityDividerFilter1)">
+          <path d="M572 90.5001V51.5001L622.5 1.00012V40.5001L572 90.5001Z" fill="white" />
+          <path
+            d="M572 90.5001V51.5001L622.5 1.00012V40.5001L572 90.5001Z"
+            fill="url(#communityDividerPattern0)"
+            fillOpacity="0.14"
+          />
+        </g>
+        <g filter="url(#communityDividerFilter2)">
+          <path
+            d="M889 6.55078e-05L756 5.38805e-05L756 40.0001L889 40.0001L940 91.0001L1536 91.0001L1536 51.0001L940 51.0001L889 6.55078e-05Z"
+            fill="url(#communityDividerPaint1)"
+            fillOpacity="0.2"
+          />
+        </g>
+        <g filter="url(#communityDividerFilter3)">
+          <path d="M940 90.5001L940 51.5001L889.5 1.00012L889.5 40.5001L940 90.5001Z" fill="white" />
+          <path
+            d="M940 90.5001L940 51.5001L889.5 1.00012L889.5 40.5001L940 90.5001Z"
+            fill="url(#communityDividerPattern1)"
+            fillOpacity="0.14"
+          />
+        </g>
       </svg>
     </div>
   )

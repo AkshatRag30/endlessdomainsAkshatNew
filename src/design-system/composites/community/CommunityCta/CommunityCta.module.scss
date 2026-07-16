@@ -164,7 +164,16 @@
   justify-content: center;
 
   @include mobile {
+    // both buttons stay side by side on one row instead of wrapping — combined with the
+    // narrower SecondaryButton width and smaller PrimaryButton font-size below, they now fit
+    // a typical mobile viewport without overflowing
+    flex-wrap: nowrap;
     gap: var(--space-3);
+
+    button {
+      font-size: var(--text-small-13);
+      padding: 0 var(--space-4);
+    }
   }
 }
 
@@ -179,7 +188,9 @@
     // SecondaryButton has a fixed 200px width — two side by side would overflow
     // a narrow viewport, so shrink it to fit alongside PrimaryButton
     button {
-      width: 150px;
+      width: 140px;
+      font-size: var(--text-small-12);
+      padding: 0 var(--space-3);
     }
   }
 }

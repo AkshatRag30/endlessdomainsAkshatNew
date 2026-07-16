@@ -52,7 +52,7 @@ export function BugBountyWhatsNext() {
           </h2>
         </div>
 
-        <span className={styles.dividerCol} aria-hidden="true" />
+        <span className={styles.stripeCol} aria-hidden="true" />
 
         <div className={styles.right}>
           <span className={styles.rightCornerTL} aria-hidden="true" />

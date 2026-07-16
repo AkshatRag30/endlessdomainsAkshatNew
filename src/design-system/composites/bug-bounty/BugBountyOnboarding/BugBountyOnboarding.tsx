@@ -1,6 +1,7 @@
 import React from 'react'
 import { LuNetwork } from 'react-icons/lu'
-import { IoShieldCheckmarkOutline, IoCheckmarkCircle } from 'react-icons/io5'
+import { IoShieldCheckmarkOutline } from 'react-icons/io5'
+import { IoMdCheckboxOutline } from 'react-icons/io'
 import { BsPersonLock } from 'react-icons/bs'
 import styles from './BugBountyOnboarding.module.scss'
 
@@ -85,7 +86,7 @@ export function BugBountyOnboarding() {
             <ul className={styles.checklist}>
               {EXPECTATIONS.map(item => (
                 <li key={item} className={styles.checklistItem}>
-                  <IoCheckmarkCircle className={styles.checklistIcon} aria-hidden="true" />
+                  <IoMdCheckboxOutline className={styles.checklistIcon} aria-hidden="true" />
                   <span>{item}</span>
                 </li>
               ))}

@@ -16,8 +16,17 @@
   gap: var(--space-9);
   max-width: 1440px;
   margin: 0 auto var(--space-12);
-  padding-bottom: var(--space-9);
-  border-bottom: 1px dashed var(--color-black-alpha-12);
+  padding: var(--space-4) 0;
+  // design-specific: repeating-gradient dash recipe instead of border: dashed — a 1px dashed
+  // border renders as near-square dots at this thickness, this gives real elongated dashes.
+  // Two layers (one per edge) since a single background-image can't be positioned at both
+  // top and bottom at once.
+  background-image:
+    repeating-linear-gradient(to right, var(--color-black-alpha-12) 0px, var(--color-black-alpha-12) 8px, transparent 8px, transparent 16px),
+    repeating-linear-gradient(to right, var(--color-black-alpha-12) 0px, var(--color-black-alpha-12) 8px, transparent 8px, transparent 16px);
+  background-size: 100% 1px;
+  background-repeat: no-repeat;
+  background-position: top, bottom;
 
   @include tablet-down {
     flex-direction: column;
@@ -34,11 +43,25 @@
   gap: var(--space-4);
 }
 
-.dividerCol {
-  flex: 0 0 auto;
+// design-specific: same wide diagonal-striped column recipe as BugBountyReportingHeader's
+// .stripeCol, replacing the earlier thin dashed divider line
+.stripeCol {
+  flex-shrink: 0;
   align-self: stretch;
-  width: 0;
-  border-left: 1px dashed var(--color-gray-300);
+  width: 158px;
+  position: relative;
+  overflow: hidden;
+  opacity: 0.12;
+  border-left: 0.5px solid rgba(0, 0, 0, 0.12);
+  border-right: 0.5px solid rgba(0, 0, 0, 0.12);
+
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent 0px,
+    transparent 10px,
+    rgba(0, 0, 0, 0.5) 10px,
+    rgba(0, 0, 0, 0.5) 11px
+  );
 
   @include tablet-down {
     display: none;
@@ -63,8 +86,8 @@
   pointer-events: none;
 }
 
-.rightCornerTL { @extend %header-corner; top: 0; left: 0; border-width: 1.5px 0 0 1.5px; }
-.rightCornerBR { @extend %header-corner; bottom: 0; right: 0; border-width: 0 1.5px 1.5px 0; }
+.rightCornerTL { @extend %header-corner; top: 0; left: 0; border-width: 2.5px 0 0 2.5px; }
+.rightCornerBR { @extend %header-corner; bottom: 0; right: 0; border-width: 0 2.5px 2.5px 0; }
 
 .rightText {
   margin: 0;
@@ -193,10 +216,34 @@
     border: 1px solid var(--color-border-black-subtle);
     --grid-color: var(--color-white-alpha-08);
   }
+
+  // design-specific: the desktop 2-column checkerboard order (blue, white, white, blue) reads as
+  // two blues in a row once the grid collapses to a single mobile column — force strict
+  // alternation here instead, independent of each card's own data-variant
+  @include mobile {
+    &:nth-child(odd) {
+      background: #0358f7;
+      border: 1px solid var(--color-border-black-subtle);
+      --grid-color: var(--color-white-alpha-08);
+
+      .cardPixelGrid { display: block; }
+      .cardTitle { color: var(--color-white-primary); }
+      .cardDesc { color: var(--color-white-alpha-90); }
+    }
+
+    &:nth-child(even) {
+      background: var(--color-black-alpha-01);
+      border: 1px solid var(--color-border-black-subtle);
+
+      .cardPixelGrid { display: none; }
+      .cardTitle { color: var(--color-blue-primary); }
+      .cardDesc { color: var(--color-black-primary); }
+    }
+  }
 }
 
-// design-specific: pure-CSS pixelated checker grid sitting behind the badge/text on every card —
-// classic two-layer checkerboard trick via offset repeating gradients, no image asset needed
+// design-specific: pure-CSS pixelated checker grid sitting behind the badge/text — only on blue
+// cards now, white cards render as a plain flat background
 .cardPixelGrid {
   position: absolute;
   inset: 0;
@@ -207,6 +254,10 @@
     linear-gradient(45deg, var(--grid-color) 25%, transparent 25%, transparent 75%, var(--grid-color) 75%, var(--grid-color));
   background-size: 10px 10px;
   background-position: 0 0, 5px 5px;
+
+  [data-variant='white'] & {
+    display: none;
+  }
 }
 
 // design-specific: soft whitish glow corners — bottom-left and top-right on every card

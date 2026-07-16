@@ -23,8 +23,14 @@
   // design-specific: ~289px tall zone matching Figma
   min-height: 289px;
   padding: 0 var(--space-8);
-  border-top: 1px dashed rgba(0, 0, 0, 0.12);
-  border-bottom: 1px dashed rgba(0, 0, 0, 0.12);
+  // design-specific: repeating-gradient dash recipe instead of border: dashed — a 1px dashed
+  // border renders as near-square dots at this thickness, this gives real elongated dashes
+  background-image:
+    repeating-linear-gradient(to right, rgba(0, 0, 0, 0.12) 0px, rgba(0, 0, 0, 0.12) 8px, transparent 8px, transparent 16px),
+    repeating-linear-gradient(to right, rgba(0, 0, 0, 0.12) 0px, rgba(0, 0, 0, 0.12) 8px, transparent 8px, transparent 16px);
+  background-size: 100% 1px;
+  background-repeat: no-repeat;
+  background-position: top, bottom;
 
   @include tablet-down {
     min-height: auto;
@@ -37,8 +43,8 @@
 // design-specific: 158px wide, repeating diagonal line pattern, 12% opacity
 .stripeCol {
   flex-shrink: 0;
-  // design-specific: ~158px wide stripe columns, matching Figma
-  width: 158px;
+  // design-specific: reduced from the original ~158px Figma width
+  width: 80px;
   position: relative;
   overflow: hidden;
   opacity: 0.12;

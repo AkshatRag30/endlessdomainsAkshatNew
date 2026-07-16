@@ -22,28 +22,24 @@
   top: 0;
   transform: translateX(-50%);
   width: 1200px;
-  height: 260px;
+  // design-specific: taller than OgTldAbout's 260px so the arcs keep drawing down far enough to
+  // reach the octagon band's notch — this title block also carries a description paragraph, which
+  // pushes the band further down than the label + heading alone would
+  height: 360px;
   pointer-events: none;
   overflow: hidden;
   z-index: 0;
 
   @include tablet-down {
     width: 640px;
-    height: 160px;
+    height: 220px;
   }
 
-  // hidden on mobile per request — rings + grid no longer shown behind the eyebrow/heading here
   @include mobile {
     display: none;
   }
 }
 
-// design-specific: three concentric circles, each centered well BELOW .archArea's own bottom
-// edge, so only a shallow slice of each circle's TOP arc pokes up into the visible viewport —
-// this is what makes the curve dome upward over the heading (like a hood arching overhead) rather
-// than smiling downward under it. Tightly nested so the gap between each ring stays narrow, and
-// kept compact/close to the heading rather than spanning the whole section width. Radii increased
-// so the arcs read as broader, flatter curves.
 .archRing {
   position: absolute;
   left: 50%;
@@ -63,18 +59,8 @@
     &:nth-child(2) { width: 540px; height: 540px; top: 75px; }
     &:nth-child(3) { width: 440px; height: 440px; top: 100px; }
   }
-
-  @include mobile {
-    top: 36px;
-
-    &:nth-child(1) { width: 420px; height: 420px; }
-    &:nth-child(2) { width: 350px; height: 350px; top: 55px; }
-    &:nth-child(3) { width: 280px; height: 280px; top: 74px; }
-  }
 }
 
-// design-specific: very faint grid, tightly masked so it only shows through a small area right
-// behind the eyebrow label — the reference shows this as a subtle hint, not a visible block
 .archGrid {
   position: absolute;
   left: 50%;
@@ -97,18 +83,9 @@
     -webkit-mask-image: radial-gradient(ellipse 150px 85px at center top, white 0%, white 40%, transparent 85%);
     mask-image: radial-gradient(ellipse 150px 85px at center top, white 0%, white 40%, transparent 85%);
   }
-
-  @include mobile {
-    width: 260px;
-    height: 70px;
-    -webkit-mask-image: radial-gradient(ellipse 110px 65px at center top, white 0%, white 40%, transparent 85%);
-    mask-image: radial-gradient(ellipse 110px 65px at center top, white 0%, white 40%, transparent 85%);
-  }
 }
 
 // ── Title block ───────────────────────────────────────────────────────────────
-// Normal document flow, stacked above .octagonBand — kept simple and non-absolute so it can
-// never end up overlapped/hidden behind the octagon band's background.
 
 .titleBlock {
   position: relative;
@@ -119,14 +96,10 @@
   gap: var(--space-4);
   text-align: center;
   padding: 0 var(--container-padding-x);
-  // shifts the eyebrow/heading down without changing the gap to .octagonBand below — that gap is
-  // cancelled back out by an equal negative margin-top on .octagonBand itself
   margin-top: 82px;
 
   @include tablet-down { margin-top: 0; }
 
-  // design-specific: faint blue grid sitting only behind the eyebrow + heading text, masked to
-  // fade out at the edges so it reads as a hint rather than a hard-edged block
   &::before {
     content: '';
     position: absolute;
@@ -217,28 +190,40 @@
   -webkit-text-fill-color: transparent;
 }
 
+// ── Description ───────────────────────────────────────────────────────────────
+
+.description {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-normal);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-body);
+  line-height: var(--leading-body);
+  max-width: 849px;
+
+  @include tablet-down { font-size: var(--text-body-small); max-width: 600px; }
+  @include mobile { font-size: var(--text-small-15); max-width: 100%; }
+}
+
 // ── Octagon band ──────────────────────────────────────────────────────────────
-// design-specific: clip-path cuts both top corners inward, giving the band an octagon-like top
-// edge that the title block appears to sit inside of
 
 .octagonBand {
   position: relative;
   z-index: 1;
-  // cancels out .titleBlock's added margin-top so the gap between the title and this band stays
-  // exactly as it was — only the title itself moves down, not the space beneath it
-  margin-top: -82px;
+  // design-specific: pulls the band up only far enough to tuck behind the heading's notch —
+  // shallower than OgTldAbout's -82px since this title block also carries a description
+  // paragraph beneath the heading that must stay clear of the band's top edge
+  margin-top: -24px;
   width: 100%;
   min-height: 300px;
   background: var(--color-gray-light-bg);
-  clip-path: polygon(36% 26%, 64% 26%, 71% 0, 100% 0, 100% 100%, 0 100%, 0 0, 30% 0); 
+  clip-path: polygon(36% 26%, 64% 26%, 71% 0, 100% 0, 100% 100%, 0 100%, 0 0, 30% 0);
   display: flex;
   align-items: flex-start;
   justify-content: center;
   gap: var(--space-13);
   padding: var(--space-11) var(--container-padding-x) var(--space-11);
 
-  // design-specific: notch shape kept (not removed) at tablet/mobile, just shallower — the Figma
-  // mobile mockup still shows the octagon cut, scaled down to match the narrower heading beneath it
   @include tablet-down {
     clip-path: polygon(30% 12%, 70% 12%, 78% 0, 100% 0, 100% 100%, 0 100%, 0 0, 22% 0);
     flex-direction: column;
@@ -282,10 +267,6 @@
   }
 }
 
-// design-specific: on desktop this is the visual center of a 3-column row, so DOM order already
-// puts it second. Once the layout stacks into a single column at tablet-down, the reference shows
-// it last (Ownership, Identity OS, then Compatibility) — order:3 re-sequences it without touching
-// desktop, where flex-direction is still row and this rule doesn't apply.
 .centerFeatureLast {
   @include tablet-down {
     order: 3;
@@ -293,8 +274,6 @@
 }
 
 // ── Icon badge ────────────────────────────────────────────────────────────────
-// design-specific: same blue-gradient glow badge recipe used on EventsPurpose's icon boxes,
-// scaled down to the Figma-exact 39px size for this section
 
 .iconBadge {
   display: flex;

@@ -24,9 +24,6 @@
 
 // ── Background grid texture ────────────────────────────────────────────────────
 
-// design-specific: extends a bit beyond the text block's own edges so the grid doesn't feel
-// cropped flush against the label/heading/description — scoped to just this block, not the
-// full hero, per request to keep the grid confined to the area above the search bar
 .bg {
   position: absolute;
   inset: -48px -80px;
@@ -37,7 +34,6 @@
   @include mobile { inset: -24px -16px; }
 }
 
-// design-specific: faint grid — matches the Figma "Grid" layer sitting behind the hero content
 .gridLayer {
   position: absolute;
   inset: 0;
@@ -47,8 +43,6 @@
     linear-gradient(90deg, var(--color-blue-primary-alpha-13) 1px, transparent 1px);
   background-size: 42px 42px;
   background-position: center top;
-  // design-specific: fades the grid out toward all four edges so it reads as a soft
-  // background field rather than a hard-edged tile
   -webkit-mask-image: radial-gradient(ellipse at center, white 0%, white 45%, transparent 85%);
   mask-image: radial-gradient(ellipse at center, white 0%, white 45%, transparent 85%);
 }
@@ -168,8 +162,6 @@
 }
 
 // ── Stats frame — container for the stats row + 2 corner brackets ───────────
-// design-specific: same topright.svg / bottomright.svg corner-bracket recipe used on
-// FreenameHero, flanking the stats row diagonally — top-left and bottom-right only
 
 .statsFrame {
   position: relative;
@@ -183,8 +175,6 @@
   }
 }
 
-// Desktop-only pair, flanking the stats row diagonally — hidden below desktop since there's no
-// room either side of the row once it wraps/stacks
 .cornerImgDesktop {
   position: absolute;
   pointer-events: none;
@@ -208,7 +198,7 @@
   right: 0;
 }
 
-// Mobile-only pair, below the live badge, one on each edge of the viewport
+// Mobile-only pair, below the partnership lockup, one on each edge of the viewport
 .cornerRow {
   display: none;
 
@@ -240,8 +230,6 @@
 
   @include tablet-down { gap: var(--space-9); flex-wrap: wrap; }
 
-  // design-specific: forces exactly 2 rows (first two stats, then the third centered alone)
-  // instead of letting flex-wrap decide the break point on its own
   @include mobile {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -332,41 +320,71 @@
   @include mobile { font-size: var(--text-small-12); }
 }
 
-// ── Live badge ────────────────────────────────────────────────────────────────
+// ── Partnership lockup — "Endless Domains × ENS" inside the chevron-cut frame ──
+// design-specific: Subtract.svg is a decorative frame only; the logo + provider mark are real
+// DOM content laid on top so the provider side can be swapped dynamically per TLD later
 
-.liveBadge {
+.partnerWrap {
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 560px;
+}
+
+.partnerFrame {
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+}
+
+.partnerLockup {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-6);
+
+  @include mobile {
+    gap: var(--space-4);
+  }
+}
+
+.partnerLogo {
+  width: 110px;
+  height: auto;
+
+  @include mobile { width: 84px; }
+}
+
+.partnerDivider {
+  width: 1px;
+  height: 28px;
+  background: var(--color-blue-primary-alpha-30);
+
+  @include mobile { height: 20px; }
+}
+
+.partnerEns {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  height: 24px;
-  padding: 0 var(--space-3);
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--color-white-primary);
-  background: linear-gradient(180deg, var(--color-blue-primary) 0%, var(--color-blue-primary-faded) 100%);
-  box-shadow:
-    0px 14px 34px 0px rgba(87, 177, 255, 0.34),
-    0px 8px 10px 0px rgba(87, 177, 255, 0.19),
-    0px 3px 4px 0px rgba(87, 177, 255, 0.22),
-    0px 1px 2px 0px rgba(87, 177, 255, 0.15),
-    inset 0px 0.3px 6px 0px #d2eaff,
-    inset 0px 0.3px 1px 0px #d2eaff;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--text-h3);
+  color: var(--color-black-primary);
+  letter-spacing: -0.01em;
+
+  @include mobile { font-size: var(--text-body); }
 }
 
-.liveDot {
-  width: 6px;
-  height: 6px;
-  border-radius: var(--radius-full);
-  background: var(--color-white-primary);
+.partnerEnsIcon {
+  width: 22px;
+  height: 22px;
+  color: var(--color-blue-primary);
   flex-shrink: 0;
-}
 
-.liveBadgeText {
-  font-family: var(--font-space-grotesk);
-  font-weight: var(--font-weight-medium);
-  font-size: var(--text-small-12);
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  color: var(--color-white-primary);
-  white-space: nowrap;
+  @include mobile { width: 18px; height: 18px; }
 }
