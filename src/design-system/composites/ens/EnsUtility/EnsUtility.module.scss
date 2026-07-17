@@ -348,10 +348,8 @@
 }
 
 // ── Mobile layout ─────────────────────────────────────────────────────────────
-// design-specific: only a thin sliver of Vector (3)'s blue notch shows at the very top edge —
-// the rest of the section is plain white. Vector (4)'s faint ring lines continue down over that
-// white background behind the icon grid, reusing the same two images as desktop but cropped to
-// very different heights each, rather than stacking them as one tall solid dome like desktop does.
+// design-specific: same two-layer dome stack as desktop (blue notch behind, white ring overlay
+// on top, offset by a few px so a sliver of blue peeks out), just scaled down into a shorter box
 
 .mobileStage {
   display: none;
@@ -362,19 +360,33 @@
     flex-direction: column;
     align-items: center;
     width: 100%;
+    padding-top: var(--space-7);
   }
 }
 
-// the thin blue notch strip at the very top only — the source image (3827x1303) has its notch
-// silhouette occupying only the top slice of its own height, so a plain object-fit: cover box
-// at this shallow aspect ratio already crops to just that notch edge with no extra offset math
-.mobileDomeBgArea {
-  position: relative;
-  width: 100%;
-  height: 40px;
+// design-specific: Vector (3) and Vector (4) are the SAME 3827x1303 composition (blue notch +
+// white ring overlay) stacked at identical scale. Kept at the same wide/short aspect desktop's
+// .domeArea uses (100vw wide, a short height) — stretching this box to the full stage height
+// (title + grid) instead scales the image up far more than desktop and crops away almost all of
+// the notch's horizontal curve, leaving only a heavily zoomed-in sliver that reads as a totally
+// different shape. A fade-to-transparent mask on the bottom edge lets the grid below sit on
+// plain white without an abrupt cutoff, instead of stretching the source image itself.
+// design-specific: height set in vw (not a fixed px) so the crop window keeps the same wide/
+// short aspect ratio desktop's box has relative to its own viewport width — a fixed px height
+// reused at mobile's much narrower width made the box close to square, forcing object-fit: cover
+// to zoom in far more and crop away the notch's horizontal curve
+.mobileDomeArea {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 100vw;
+  margin-left: -50vw;
+  height: 42vw;
   pointer-events: none;
   z-index: 0;
   overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, white 0%, white 85%, transparent 100%);
+  mask-image: linear-gradient(to bottom, white 0%, white 85%, transparent 100%);
 }
 
 .mobileDomeBgWrap {
@@ -382,34 +394,17 @@
   inset: 0;
 }
 
-.mobileDomeBg {
-  object-fit: cover;
-  object-position: center top;
-}
-
-// the faint ring lines, tall enough to run behind the whole icon grid below — this source image
-// has an OPAQUE white background (not transparent) outside the ring strokes, so it must start
-// below the blue notch strip rather than at top: 0, or it paints over and hides the notch entirely
-.mobileDomeRingsArea {
-  position: absolute;
-  left: 0;
-  top: 40px;
-  width: 100%;
-  height: 460px;
-  pointer-events: none;
-  z-index: 0;
-}
-
+// same stagger the desktop layer uses so a thin band of the blue notch stays visible peeking
+// out from behind the white rings
 .mobileDomeRingsWrap {
   position: absolute;
   inset: 0;
+  top: 10px;
 }
 
+.mobileDomeBg,
 .mobileDomeRings {
   object-fit: cover;
-  // design-specific: center-cropped instead of top-aligned — the source image is a very wide,
-  // short strip (3827x1303) whose circular rings live in the horizontal middle, with long flat
-  // tails left and right. Centering the crop keeps just the rings, dropping the tails entirely.
   object-position: center top;
 }
 
@@ -422,7 +417,6 @@
   gap: var(--space-4);
   text-align: center;
   padding: 0 var(--container-padding-x);
-  margin-top: var(--space-6);
 }
 
 .mobileUtilityGrid {

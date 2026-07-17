@@ -86,13 +86,23 @@
   justify-content: center;
   gap: var(--space-4);
   padding: var(--space-4) var(--space-6);
+  // design-specific: fixed minimum width so all four stat values (which differ a lot in
+  // character count, e.g. "15" vs "100+") get the same apparent bracket padding instead of each
+  // box shrink-wrapping tighter or looser around its own content
+  min-width: 120px;
 
   @include mobile {
     padding: var(--space-3) var(--space-4);
+    // design-specific: fixed width (not just min-width) — on mobile .statsRow is a 2-column grid,
+    // and each column stretches its .statItem to fill the 1fr track, so a shrink-wrapped
+    // inline-flex box still ends up looking differently sized/positioned per item. A fixed width
+    // makes every bracket box identical regardless of the grid track's own width.
+    width: 96px;
   }
 
   @include small-mobile {
     padding: var(--space-2) var(--space-3);
+    width: 80px;
   }
 }
 

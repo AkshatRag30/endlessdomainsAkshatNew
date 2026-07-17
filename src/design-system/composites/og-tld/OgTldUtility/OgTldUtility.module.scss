@@ -10,7 +10,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-13);
+  gap: var(--space-6);
 
   @include tablet-down {
     padding: var(--space-11) var(--space-7) var(--space-11);
@@ -41,8 +41,8 @@
   height: 1px;
   background: repeating-linear-gradient(
     90deg,
-    var(--color-gray-200) 0px,
-    var(--color-gray-200) 6px,
+    var(--color-gray-300) 0px,
+    var(--color-gray-300) 6px,
     transparent 6px,
     transparent 12px
   );
@@ -127,6 +127,9 @@
 
 // ── Utility grid ──────────────────────────────────────────────────────────────
 
+// design-specific: the grid's own outer top/left edges are solid — only the inner dividers
+// between cards use the dashed repeating-gradient recipe (a native 1px `dashed` border there
+// renders as tiny, tightly-packed near-square dots rather than real elongated dashes)
 .grid {
   margin: 0;
   padding: 0;
@@ -135,8 +138,8 @@
   max-width: 1360px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  border-top: 1px dashed var(--color-black-alpha-10);
-  border-left: 1px dashed var(--color-black-alpha-10);
+  border-top: 1px solid var(--color-black-alpha-10);
+  border-left: 1px solid var(--color-black-alpha-10);
 
   @include tablet-down {
     grid-template-columns: repeat(2, 1fr);
@@ -154,8 +157,12 @@
   align-items: flex-start;
   gap: var(--space-5);
   padding: var(--space-7) var(--space-6) var(--space-9);
-  border-right: 1px dashed var(--color-black-alpha-10);
-  border-bottom: 1px dashed var(--color-black-alpha-10);
+  background-image:
+    repeating-linear-gradient(90deg, var(--color-black-alpha-10) 0px, var(--color-black-alpha-10) 6px, transparent 6px, transparent 12px),
+    repeating-linear-gradient(180deg, var(--color-black-alpha-10) 0px, var(--color-black-alpha-10) 6px, transparent 6px, transparent 12px);
+  background-size: 1px 100%, 100% 1px;
+  background-repeat: no-repeat;
+  background-position: top right, bottom left;
 
   @include mobile {
     padding: var(--space-8) var(--space-5) var(--space-7);

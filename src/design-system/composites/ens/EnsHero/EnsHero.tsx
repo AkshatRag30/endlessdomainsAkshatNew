@@ -9,8 +9,13 @@ export interface EnsHeroProps {
   data: TldPageData
 }
 
+// design-specific: scoped to only this page's own tld, rather than the Input primitive's shared
+// cross-TLD default list, so each TLD page's hero only cycles through its own examples
+const EXAMPLE_NAMES = ['explorer', 'metaverse', 'digital', 'crypto', 'identity', 'onchain']
+
 export function EnsHero({ data }: EnsHeroProps) {
-  const { hero, providerShort, providerIcon: ProviderIcon } = data
+  const { hero, providerShort, providerIcon: ProviderIcon, tld } = data
+  const placeholderDomains = EXAMPLE_NAMES.map(name => `${name}${tld}`)
 
   return (
     <section className={styles.hero} aria-labelledby="ens-heading">
@@ -47,7 +52,7 @@ export function EnsHero({ data }: EnsHeroProps) {
         </div>
 
         {/* Search bar */}
-        <Input variant="hero" />
+        <Input variant="hero" placeholderDomains={placeholderDomains} />
 
         {/* Stats row */}
         <div className={styles.statsFrame}>

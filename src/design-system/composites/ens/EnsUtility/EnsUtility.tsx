@@ -82,15 +82,12 @@ export function EnsUtility({ data }: EnsUtilityProps) {
           down over plain white behind the title + icon grid ── */}
       <div className={styles.mobileStage}>
 
-        {/* thin blue notch strip — only its very top edge is visible */}
-        <div className={styles.mobileDomeBgArea} aria-hidden="true">
+        {/* blue notch + ring overlay — sized to the whole stage so the title + icon grid below
+            sit on top of the dome image itself, same composition as desktop's .domeArea */}
+        <div className={styles.mobileDomeArea} aria-hidden="true">
           <div className={styles.mobileDomeBgWrap}>
             <Image src="/ens/Vector (3).png" alt="" fill className={styles.mobileDomeBg} unoptimized />
           </div>
-        </div>
-
-        {/* faint ring lines, tall enough to sit behind the title block + icon grid below */}
-        <div className={styles.mobileDomeRingsArea} aria-hidden="true">
           <div className={styles.mobileDomeRingsWrap}>
             <Image src="/ens/Vector (4).png" alt="" fill className={styles.mobileDomeRings} unoptimized />
           </div>
