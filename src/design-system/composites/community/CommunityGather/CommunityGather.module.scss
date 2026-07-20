@@ -20,8 +20,14 @@
   align-items: center;
   // design-specific: ~297px tall header zone matching Figma
   min-height: 297px;
-  border-top: 1px dashed rgba(0, 0, 0, 0.12);
-  border-bottom: 1px dashed rgba(0, 0, 0, 0.12);
+  // design-specific: a native 1px `dashed` border renders as tiny near-square dots rather than
+  // real elongated dashes — this repeating-gradient recipe draws proper dash segments instead
+  background-image:
+    repeating-linear-gradient(90deg, var(--color-black-alpha-12) 0px, var(--color-black-alpha-12) 6px, transparent 6px, transparent 12px),
+    repeating-linear-gradient(90deg, var(--color-black-alpha-12) 0px, var(--color-black-alpha-12) 6px, transparent 6px, transparent 12px);
+  background-size: 100% 1px, 100% 1px;
+  background-repeat: no-repeat;
+  background-position: top, bottom;
 
   @include tablet-down {
     grid-template-columns: 1fr;
@@ -273,7 +279,12 @@
   position: relative;
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  border-bottom: 1px dashed rgba(0, 0, 0, 0.12);
+  // design-specific: a native 1px `dashed` border renders as tiny near-square dots rather than
+  // real elongated dashes — this repeating-gradient recipe draws proper dash segments instead
+  background-image: repeating-linear-gradient(90deg, var(--color-black-alpha-12) 0px, var(--color-black-alpha-12) 6px, transparent 6px, transparent 12px);
+  background-size: 100% 1px;
+  background-repeat: no-repeat;
+  background-position: bottom;
 
   @include tablet-down {
     grid-template-columns: repeat(2, 1fr);
@@ -284,6 +295,10 @@
   }
 }
 
+// design-specific: dashed edges use ::after (not background-image) because .platformCard's own
+// `background` is already occupied by the hover/focus tint gradient — a native 1px `dashed`
+// border also renders as tiny near-square dots rather than real elongated dashes, so this uses
+// the same repeating-gradient recipe, just layered on a pseudo-element instead of the background
 .platformCard {
   position: relative;
   display: flex;
@@ -291,7 +306,6 @@
   align-items: flex-start;
   gap: var(--space-4);
   padding: var(--space-9) var(--space-6);
-  border-right: 1px dashed rgba(0, 0, 0, 0.12);
   background: linear-gradient(180deg, transparent 0%, transparent 100%);
   transition: background 0.25s ease;
 
@@ -302,27 +316,47 @@
     background: linear-gradient(180deg, #2639ED2B 0%, transparent 100%);
   }
 
-  &:last-child {
-    border-right: none;
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: repeating-linear-gradient(180deg, var(--color-black-alpha-12) 0px, var(--color-black-alpha-12) 6px, transparent 6px, transparent 12px);
+    background-size: 1px 100%;
+    background-repeat: no-repeat;
+    background-position: right;
+  }
+
+  &:last-child::after {
+    background-image: none;
   }
 
   @include tablet-down {
-    border-right: 1px dashed rgba(0, 0, 0, 0.12);
-    border-bottom: 1px dashed rgba(0, 0, 0, 0.12);
+    &::after {
+      background-image:
+        repeating-linear-gradient(180deg, var(--color-black-alpha-12) 0px, var(--color-black-alpha-12) 6px, transparent 6px, transparent 12px),
+        repeating-linear-gradient(90deg, var(--color-black-alpha-12) 0px, var(--color-black-alpha-12) 6px, transparent 6px, transparent 12px);
+      background-size: 1px 100%, 100% 1px;
+      background-position: right, bottom;
+    }
 
-    &:nth-child(2n) {
-      border-right: none;
+    &:nth-child(2n)::after {
+      background-image: repeating-linear-gradient(90deg, var(--color-black-alpha-12) 0px, var(--color-black-alpha-12) 6px, transparent 6px, transparent 12px);
+      background-size: 100% 1px;
+      background-position: bottom;
     }
   }
 
   @include mobile {
-    &,
-    &:nth-child(2n) {
-      border-right: none;
+    &::after,
+    &:nth-child(2n)::after {
+      background-image: repeating-linear-gradient(90deg, var(--color-black-alpha-12) 0px, var(--color-black-alpha-12) 6px, transparent 6px, transparent 12px);
+      background-size: 100% 1px;
+      background-position: bottom;
     }
 
-    &:last-child {
-      border-bottom: none;
+    &:last-child::after {
+      background-image: none;
     }
   }
 }

@@ -19,8 +19,14 @@
   // design-specific: ~297px tall top zone matching Figma
   min-height: 316px;
   padding: 0 var(--space-8);
-  border-top: 1px dashed rgba(0, 0, 0, 0.12);
-  border-bottom: 1px dashed rgba(0, 0, 0, 0.12);
+  // design-specific: a native 1px `dashed` border renders as tiny near-square dots rather than
+  // real elongated dashes — this repeating-gradient recipe draws proper dash segments instead
+  background-image:
+    repeating-linear-gradient(90deg, var(--color-black-alpha-12) 0px, var(--color-black-alpha-12) 6px, transparent 6px, transparent 12px),
+    repeating-linear-gradient(90deg, var(--color-black-alpha-12) 0px, var(--color-black-alpha-12) 6px, transparent 6px, transparent 12px);
+  background-size: 100% 1px, 100% 1px;
+  background-repeat: no-repeat;
+  background-position: top, bottom;
 
   @include tablet-down {
     min-height: auto;
@@ -309,10 +315,13 @@
     gap: var(--space-4);
     text-align: center;
     padding: var(--space-7) 0;
-    border-bottom: 1px dashed rgba(0, 0, 0, 0.12);
+    background-image: repeating-linear-gradient(90deg, var(--color-black-alpha-12) 0px, var(--color-black-alpha-12) 6px, transparent 6px, transparent 12px);
+    background-size: 100% 1px;
+    background-repeat: no-repeat;
+    background-position: bottom;
 
     &:last-child {
-      border-bottom: none;
+      background-image: none;
     }
   }
 

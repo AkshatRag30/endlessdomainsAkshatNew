@@ -31,8 +31,14 @@
   align-items: stretch;
   min-height: 297px;
   padding: 0 var(--space-8);
-  border-top: 1px dashed rgba(0, 0, 0, 0.12);
-  border-bottom: 1px dashed rgba(0, 0, 0, 0.12);
+  // design-specific: a native 1px `dashed` border renders as tiny near-square dots rather than
+  // real elongated dashes — this repeating-gradient recipe draws proper dash segments instead
+  background-image:
+    repeating-linear-gradient(90deg, var(--color-black-alpha-12) 0px, var(--color-black-alpha-12) 6px, transparent 6px, transparent 12px),
+    repeating-linear-gradient(90deg, var(--color-black-alpha-12) 0px, var(--color-black-alpha-12) 6px, transparent 6px, transparent 12px);
+  background-size: 100% 1px, 100% 1px;
+  background-repeat: no-repeat;
+  background-position: top, bottom;
 
   @include tablet-down {
     min-height: auto;
@@ -195,10 +201,16 @@
 
 // ── Benefits grid ─────────────────────────────────────────────────────────────
 
+// design-specific: a native 1px `dashed` border renders as tiny near-square dots rather than
+// real elongated dashes — background-image repeating-gradients draw proper dash segments
+// instead, with the same conditional per-cell overrides (cleared via background-image: none)
 .benefitsGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  border-bottom: 1px dashed rgba(0, 0, 0, 0.12);
+  background-image: repeating-linear-gradient(90deg, var(--color-black-alpha-12) 0px, var(--color-black-alpha-12) 6px, transparent 6px, transparent 12px);
+  background-size: 100% 1px;
+  background-repeat: no-repeat;
+  background-position: bottom;
 
   @include tablet-down {
     grid-template-columns: repeat(2, 1fr);
@@ -210,32 +222,66 @@
   align-items: center;
   justify-content: center;
   padding: var(--space-5) var(--space-6);
-  border-right: 1px dashed rgba(0, 0, 0, 0.12);
-  border-bottom: 1px dashed rgba(0, 0, 0, 0.12);
+  background-image:
+    repeating-linear-gradient(180deg, var(--color-black-alpha-12) 0px, var(--color-black-alpha-12) 6px, transparent 6px, transparent 12px),
+    repeating-linear-gradient(90deg, var(--color-black-alpha-12) 0px, var(--color-black-alpha-12) 6px, transparent 6px, transparent 12px);
+  background-size: 1px 100%, 100% 1px;
+  background-repeat: no-repeat;
+  background-position: right, bottom;
 
   &:nth-child(3n) {
-    border-right: none;
+    background-image: repeating-linear-gradient(90deg, var(--color-black-alpha-12) 0px, var(--color-black-alpha-12) 6px, transparent 6px, transparent 12px);
+    background-size: 100% 1px;
+    background-position: bottom;
   }
 
   &:nth-last-child(-n+3) {
-    border-bottom: none;
+    background-image: repeating-linear-gradient(180deg, var(--color-black-alpha-12) 0px, var(--color-black-alpha-12) 6px, transparent 6px, transparent 12px);
+    background-size: 1px 100%;
+    background-position: right;
+  }
+
+  &:nth-child(3n):nth-last-child(-n+3) {
+    background-image: none;
   }
 
   @include tablet-down {
+    background-image:
+      repeating-linear-gradient(180deg, var(--color-black-alpha-12) 0px, var(--color-black-alpha-12) 6px, transparent 6px, transparent 12px),
+      repeating-linear-gradient(90deg, var(--color-black-alpha-12) 0px, var(--color-black-alpha-12) 6px, transparent 6px, transparent 12px);
+    background-size: 1px 100%, 100% 1px;
+    background-position: right, bottom;
+
     &:nth-child(3n) {
-      border-right: 1px dashed rgba(0, 0, 0, 0.12);
+      background-image:
+        repeating-linear-gradient(180deg, var(--color-black-alpha-12) 0px, var(--color-black-alpha-12) 6px, transparent 6px, transparent 12px),
+        repeating-linear-gradient(90deg, var(--color-black-alpha-12) 0px, var(--color-black-alpha-12) 6px, transparent 6px, transparent 12px);
+      background-size: 1px 100%, 100% 1px;
+      background-position: right, bottom;
     }
 
     &:nth-child(2n) {
-      border-right: none;
+      background-image: repeating-linear-gradient(90deg, var(--color-black-alpha-12) 0px, var(--color-black-alpha-12) 6px, transparent 6px, transparent 12px);
+      background-size: 100% 1px;
+      background-position: bottom;
     }
 
     &:nth-last-child(-n+3) {
-      border-bottom: 1px dashed rgba(0, 0, 0, 0.12);
+      background-image:
+        repeating-linear-gradient(180deg, var(--color-black-alpha-12) 0px, var(--color-black-alpha-12) 6px, transparent 6px, transparent 12px),
+        repeating-linear-gradient(90deg, var(--color-black-alpha-12) 0px, var(--color-black-alpha-12) 6px, transparent 6px, transparent 12px);
+      background-size: 1px 100%, 100% 1px;
+      background-position: right, bottom;
+    }
+
+    &:nth-child(2n):nth-last-child(-n+3) {
+      background-image: repeating-linear-gradient(90deg, var(--color-black-alpha-12) 0px, var(--color-black-alpha-12) 6px, transparent 6px, transparent 12px);
+      background-size: 100% 1px;
+      background-position: bottom;
     }
 
     &:nth-last-child(-n+2) {
-      border-bottom: none;
+      background-image: none;
     }
   }
 
