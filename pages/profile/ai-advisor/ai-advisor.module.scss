@@ -1,0 +1,15 @@
+@import '_mixins.scss';
+
+// ── Page shell ────────────────────────────────────────────────────────────────
+
+.shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-white-primary);
+}
+
+.mainArea {
+  flex: 1;
+  background: var(--color-white-primary);
+}

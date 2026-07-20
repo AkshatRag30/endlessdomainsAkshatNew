@@ -1,0 +1,474 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Panel shell ───────────────────────────────────────────────────────────────
+
+.panel {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-11); // tighter than the Figma-exact 104px at the default/laptop tier, so the
+                        // panel doesn't need the full height of a large monitor to breathe
+  width: 100%;
+  max-width: 882px;
+  padding: var(--space-5) var(--space-5) var(--space-7);
+
+  @include desktop {
+    gap: var(--space-13);
+  }
+
+  @include wide {
+    gap: var(--space-14); // Figma-exact 104px, only once there's a large-desktop viewport to fit it
+    padding-bottom: var(--space-9);
+  }
+
+  @include tablet-down {
+    gap: var(--space-9);
+    padding-bottom: var(--space-6);
+  }
+
+  @include mobile {
+    gap: var(--space-7);
+    padding-bottom: var(--space-5);
+  }
+
+  @include small-mobile {
+    gap: var(--space-6);
+    padding: var(--space-4) var(--space-4) var(--space-4);
+  }
+}
+
+// design-specific: once a conversation exists, the panel switches from the vertically-centered
+// empty state to a top-anchored thread with the chat input pinned near the bottom, matching the
+// Figma "Chat Bot UI" active-conversation frame. A plain fixed max-height (not tied to viewport
+// math elsewhere on the page) caps the panel so it never grows — like ChatGPT/Claude, only
+// .thread (the message list) scrolls internally, so the background and composer stay put as the
+// conversation lengthens.
+.panelActive {
+  justify-content: flex-end;
+  height: 630px;
+  gap: var(--space-9);
+  overflow: hidden;
+
+  @include tablet-down {
+    height: auto;
+  }
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// ── Intro block — mascot + heading + description ────────────────────────────
+
+.introBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+.mascotWrap {
+  position: relative;
+  width: 160px;
+  height: 118px;
+
+  @include mobile {
+    width: 120px;
+    height: 89px;
+  }
+
+  @include small-mobile {
+    width: 88px;
+    height: 65px;
+  }
+}
+
+.mascot {
+  object-fit: contain;
+}
+
+.textBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.heading {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-h3);
+  line-height: 1.2;
+  text-transform: capitalize;
+  text-align: center;
+  color: var(--color-blue-primary);
+
+  @include mobile { font-size: 24px; }
+  @include small-mobile { font-size: 20px; }
+}
+
+.description {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-body-small);
+  line-height: 1.3;
+  text-align: center;
+  color: var(--color-text-body);
+  max-width: 509px;
+
+  @include mobile { font-size: var(--text-small-15); }
+  @include small-mobile { font-size: var(--text-small-13); }
+}
+
+// ── Interaction block — chat box + divider + suggestions ─────────────────────
+
+.interactionBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  gap: var(--space-7);
+  width: 100%;
+
+  @include wide {
+    gap: var(--space-9); // Figma-exact 45px
+  }
+
+  @include tablet-down {
+    gap: var(--space-6);
+  }
+}
+
+// ── Chat box ──────────────────────────────────────────────────────────────────
+
+.chatBox {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 608px;
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-black-alpha-10);
+  // design-specific: Figma's chatbox fill is white at ~85% opacity — nearest token is
+  // --color-white-alpha-90
+  background: var(--color-white-alpha-90);
+  backdrop-filter: blur(42px);
+  box-shadow: 0px 4px 26.2px 0px var(--color-black-alpha-05);
+
+  @include mobile {
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+  }
+}
+
+.chatInput {
+  width: 100%;
+  min-height: 44px;
+  border: none;
+  outline: none;
+  resize: none;
+  background: transparent;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-nav);
+  line-height: 1.25;
+  color: var(--color-black-primary);
+
+  &::placeholder {
+    // design-specific: Figma's placeholder color (#838B8E) has no exact token match — nearest
+    // equivalent is --color-gray-dark
+    color: var(--color-gray-dark);
+  }
+}
+
+.chatBoxFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.creditInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.creditIcon {
+  flex-shrink: 0;
+}
+
+.creditCount,
+.creditLabel {
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-small-12);
+  line-height: 24px;
+  // design-specific: Figma's credit text color (#61686B) has no exact token match — nearest
+  // equivalent is --color-gray-dark
+  color: var(--color-gray-dark);
+  white-space: nowrap;
+}
+
+.creditLabel {
+  margin-left: var(--space-1);
+}
+
+.sendButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  padding: var(--space-1);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--color-black-primary);
+  color: var(--color-white-primary);
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// ── Divider ───────────────────────────────────────────────────────────────────
+// design-specific: reproduced as a CSS gradient instead of a separate SVG asset — the source
+// is a horizontal line that fades in from transparent to solid white and back out again
+
+.divider {
+  width: 100%;
+  max-width: 750.5px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, var(--color-white-primary) 50%, transparent 100%);
+}
+
+// ── Suggestions ───────────────────────────────────────────────────────────────
+
+.suggestions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-7); // Figma: 34px
+  width: 100%;
+
+  @include mobile {
+    gap: var(--space-5);
+  }
+
+  @include small-mobile {
+    gap: var(--space-4);
+  }
+}
+
+.suggestionsLabel {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-nav);
+  text-align: center;
+  color: var(--color-white-primary);
+}
+
+// design-specific: pills stay a 2-column grid on mobile (including small-mobile) rather than
+// collapsing to a single column, so the suggestions list reads as compact rows on phones too
+.suggestionsGrid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4) var(--space-3);
+  width: 100%;
+  max-width: 720px;
+
+  @include mobile {
+    gap: var(--space-3) var(--space-2);
+  }
+
+  @include small-mobile {
+    gap: var(--space-2);
+  }
+}
+
+.suggestionPill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 146px;
+  padding: var(--space-2-5);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-white-primary);
+  background: rgba(255, 255, 255, 0.5);
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-small-12);
+  line-height: 1.3;
+  text-align: center;
+  color: var(--color-black-primary);
+  cursor: pointer;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: var(--color-white-primary);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  @include mobile {
+    width: calc(50% - var(--space-2));
+  }
+
+  @include small-mobile {
+    width: calc(50% - var(--space-1));
+  }
+}
+
+// ── Message thread ────────────────────────────────────────────────────────────
+
+// design-specific: the only scrollable region once a conversation is active — grows to fill the
+// space between the top of the panel and the pinned composer below, and scrolls its own overflow
+// instead of pushing the panel/hero taller, matching ChatGPT/Claude's chat behavior
+.thread {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-9); // Figma: rows sit ~178px apart, this is the gap once bubbles are stacked in flow
+  width: 100%;
+  max-width: 750.5px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-2) var(--space-1);
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-black-alpha-10) transparent;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-black-alpha-10);
+    border-radius: var(--radius-full);
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  @include mobile {
+    gap: var(--space-6);
+  }
+}
+
+.messageRow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2-5); // Figma: 9px
+}
+
+.messageRowAssistant {
+  justify-content: flex-start;
+}
+
+.messageRowUser {
+  justify-content: flex-end;
+}
+
+.messageAvatarWrap {
+  position: relative;
+  flex-shrink: 0;
+  width: 44px;
+  height: 33px;
+  overflow: hidden;
+
+  @include mobile {
+    width: 36px;
+    height: 27px;
+  }
+}
+
+.messageAvatarMascot {
+  object-fit: contain;
+}
+
+.messageAvatarUser {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 39px;
+  height: 39px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-blue-primary-alpha-30);
+  background: var(--color-white-primary);
+  color: var(--color-blue-primary);
+  box-shadow: 0px 1px 5px 0px var(--color-blue-primary-alpha-20);
+
+  @include mobile {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+.messageBubble {
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-nav);
+  line-height: 1.41;
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  max-width: 431px;
+  min-width: 0;
+  word-break: break-word;
+
+  @include mobile {
+    max-width: calc(100% - 46px); // leaves room for the mobile-sized 36px avatar + its gap
+    font-size: var(--text-small-13);
+    padding: var(--space-2-5);
+  }
+
+  // design-specific: assistant bubbles use the same blue gradient recipe as the icon badges
+  // elsewhere in the design system; user bubbles are a plain white bordered pill
+  .messageRowAssistant & {
+    background: linear-gradient(90deg, var(--color-blue-primary) 0%, var(--color-blue-primary-alpha-70) 100%);
+    color: var(--color-white-primary);
+    box-shadow: 0px 0px 31px 0px var(--color-black-alpha-10);
+  }
+
+  .messageRowUser & {
+    background: var(--color-white-primary);
+    color: var(--color-blue-primary);
+    border: 1px solid var(--color-white-primary);
+    box-shadow: 0px 0px 15.5px 0px var(--color-black-alpha-10);
+    // design-specific: nowrap only applies while the bubble's own max-width comfortably fits a
+    // short line (the Figma reference text is one line) — on mobile the bubble may need to wrap
+    // to actually fit within the narrower viewport
+    white-space: nowrap;
+
+    @include mobile {
+      white-space: normal;
+    }
+  }
+}

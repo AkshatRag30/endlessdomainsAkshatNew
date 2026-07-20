@@ -141,18 +141,48 @@
   pointer-events: none;
 }
 
-// Icon position anchors — sit on the circle border, transform only for placement
-.orbitIconTop {
+// Icon position anchors — sit on the circle border at a given angle (0deg = 12 o'clock,
+// measured clockwise), transform only for placement
+.orbitIconAngle0 {
   position: absolute;
   top: 0;
   left: 50%;
   transform: translate(-50%, -50%);
 }
 
-.orbitIconBottom {
+.orbitIconAngle90 {
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  transform: translate(-50%, -50%);
+}
+
+.orbitIconAngle180 {
   position: absolute;
   top: 100%;
   left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.orbitIconAngle270 {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translate(-50%, -50%);
+}
+
+// design-specific: 120deg / 240deg placed via sin/cos of the ring radius (50% of box = radius)
+.orbitIconAngle120 {
+  position: absolute;
+  top: 75%;
+  left: 93.3%;
+  transform: translate(-50%, -50%);
+}
+
+.orbitIconAngle240 {
+  position: absolute;
+  top: 75%;
+  left: 6.7%;
   transform: translate(-50%, -50%);
 }
 
@@ -194,20 +224,20 @@
   }
 }
 
-// Middle ring — LinkedIn + YouTube — CW, on bg ring (1165px)
+// Inner ring — LinkedIn + YouTube + Facebook — CW, on bg ring (1165px)
 .orbitOuter {
   width: 950px;
   height: 950px;
   animation: orbitCW 12s linear infinite;
 
   @include tablet-down { width: 700px; height: 700px; }
-  // design-specific: radius increased so the 12/6 o'clock icons clear the content block's own
+  // design-specific: radius increased so the orbiting icons clear the content block's own
   // height (label + heading + description + CTA + stats grid) and sit clearly above/below it
   // instead of overlapping the text
   @include mobile { width: 720px; height: 720px; }
 }
 
-// Outermost ring — Discord + Telegram — CCW, on bg ring (1250px)
+// Outermost ring — Discord + Instagram + Telegram + Twitter — CCW, on bg ring (1250px)
 .orbitOutermost {
   width: 1250px;
   height: 1250px;

@@ -1,6 +1,6 @@
 import React from 'react'
 import { useRouter } from 'next/router'
-import { PiChartBar, PiGlobeSimple, PiShoppingCart, PiUsers } from 'react-icons/pi'
+import { PiChartBar, PiGlobeSimple, PiShoppingCart, PiSparkle, PiUsers } from 'react-icons/pi'
 import { FiUser } from 'react-icons/fi'
 import { TabButton } from '@/design-system/primitives/button/TabButton'
 import styles from './DashboardTabBar.module.scss'
@@ -11,6 +11,7 @@ const TABS = [
   { id: 'orders', label: 'My Order', icon: <PiShoppingCart size={22} aria-hidden="true" /> },
   { id: 'analytics', label: 'Analytics', icon: <PiChartBar size={22} aria-hidden="true" /> },
   { id: 'reputation', label: 'Reputation', icon: <PiUsers size={22} aria-hidden="true" /> },
+  { id: 'ai-advisor', label: 'AI Advisor', icon: <PiSparkle size={22} aria-hidden="true" /> },
 ]
 
 const TAB_ROUTES: Record<string, string> = {
@@ -19,6 +20,7 @@ const TAB_ROUTES: Record<string, string> = {
   orders: '/profile/orders',
   analytics: '/profile/analytics',
   reputation: '/profile/reputation',
+  'ai-advisor': '/profile/ai-advisor',
 }
 
 export interface DashboardTabBarProps {

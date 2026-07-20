@@ -6,6 +6,9 @@ import discordIcon from '../../../../../public/community/Subtract (1).png'
 import youtubeIcon from '../../../../../public/community/3d-render-youtube-play-button-icon 1.png'
 import linkedinIcon from '../../../../../public/community/linkedin-square-icon-3d-glossy-button-with-rounded-corners-light-blue-gradient-background 1.png'
 import telegramIcon from '../../../../../public/community/3d-telegram-app-icon-with-glossy-blue-finish 1.png'
+import twitterIcon from '../../../../../public/community/3d-twitter-x-icon 1.png'
+import instagramIcon from '../../../../../public/community/3d-instagram-icon 1.png'
+import facebookIcon from '../../../../../public/community/facebook-3d-icon 1.png'
 import styles from './CommunityHero.module.scss'
 
 const STATS = [
@@ -34,29 +37,44 @@ export function CommunityHero() {
       </div>
 
       {/* ── Orbiting social icons ── */}
-      {/* 1165px ring: LinkedIn (12 o'clock) + YouTube (6 o'clock), rotates CW */}
+      {/* Inner ring: LinkedIn (0°), YouTube (120°), Facebook (240°), rotates CW */}
       <div className={`${styles.orbitRing} ${styles.orbitOuter}`} aria-hidden="true">
-        <div className={styles.orbitIconTop}>
+        <div className={styles.orbitIconAngle0}>
           <div className={styles.counterOuter}>
             <Image src={linkedinIcon} alt="" width={100} height={100} />
           </div>
         </div>
-        <div className={styles.orbitIconBottom}>
+        <div className={styles.orbitIconAngle120}>
           <div className={styles.counterOuter}>
             <Image src={youtubeIcon} alt="" width={150} height={126} />
           </div>
         </div>
+        <div className={styles.orbitIconAngle240}>
+          <div className={styles.counterOuter}>
+            <Image src={facebookIcon} alt="" width={100} height={100} />
+          </div>
+        </div>
       </div>
-      {/* 1500px ring: Discord (12 o'clock) + Telegram (6 o'clock), rotates CCW */}
+      {/* Outermost ring: Discord (0°), Instagram (90°), Telegram (180°), Twitter (270°), rotates CCW */}
       <div className={`${styles.orbitRing} ${styles.orbitOutermost}`} aria-hidden="true">
-        <div className={styles.orbitIconTop}>
+        <div className={styles.orbitIconAngle0}>
           <div className={styles.counterOutermost}>
             <Image src={discordIcon} alt="" width={110} height={92} />
           </div>
         </div>
-        <div className={styles.orbitIconBottom}>
+        <div className={styles.orbitIconAngle90}>
+          <div className={styles.counterOutermost}>
+            <Image src={instagramIcon} alt="" width={100} height={100} />
+          </div>
+        </div>
+        <div className={styles.orbitIconAngle180}>
           <div className={styles.counterOutermost}>
             <Image src={telegramIcon} alt="" width={108} height={108} />
+          </div>
+        </div>
+        <div className={styles.orbitIconAngle270}>
+          <div className={styles.counterOutermost}>
+            <Image src={twitterIcon} alt="" width={100} height={100} />
           </div>
         </div>
       </div>
