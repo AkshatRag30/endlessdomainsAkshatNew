@@ -1,0 +1,210 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Section shell ─────────────────────────────────────────────────────────────
+
+.section {
+  position: relative;
+  width: 100%;
+  background: var(--color-white-primary);
+}
+
+// ── Header — dashed top/bottom rule lines, full viewport width ──────────────
+// design-specific: same full-bleed dashed border pattern as DomainOwnership/DomainBrowse — the
+// rules span edge-to-edge while the title content stays centered in the max-width container
+
+.header {
+  width: 100%;
+  border-top: 1px dashed var(--color-blue-primary-alpha-20);
+  border-bottom: 1px dashed var(--color-blue-primary-alpha-20);
+}
+
+.titleBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  text-align: center;
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: var(--space-11) var(--container-padding-x);
+
+  @include tablet-down { padding: var(--space-9) var(--space-7); }
+  @include mobile { padding: var(--space-7) var(--space-5); }
+}
+
+.labelWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 20px;
+}
+
+%bracket-corner {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-style: solid;
+  border-color: var(--color-blue-primary-alpha-30);
+  pointer-events: none;
+}
+
+.labelBracketTL { @extend %bracket-corner; top: 0; left: 0; border-width: 1.5px 0 0 1.5px; }
+.labelBracketTR { @extend %bracket-corner; top: 0; right: 0; border-width: 1.5px 1.5px 0 0; }
+.labelBracketBL { @extend %bracket-corner; bottom: 0; left: 0; border-width: 0 0 1.5px 1.5px; }
+.labelBracketBR { @extend %bracket-corner; bottom: 0; right: 0; border-width: 0 1.5px 1.5px 0; }
+
+.labelText {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-darkest); // #6e6e6e ≈ #4a4a4a Figma value, nearest token
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+
+  @include mobile { font-size: var(--text-small-13); }
+}
+
+.heading {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.headingLine1,
+.headingLine2 {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  text-transform: capitalize;
+
+  @include tablet-down { font-size: 40px; }
+  @include mobile { font-size: 30px; }
+}
+
+.headingLine1 {
+  color: var(--color-black-primary);
+}
+
+.headingLine2 {
+  background: linear-gradient(123deg, var(--color-blue-primary) 70%, var(--color-blue-primary-faded) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.description {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-body);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-black-alpha-60); // rgba(0,0,0,0.6) ≈ rgba(0,0,0,0.7) Figma value, nearest token
+  line-height: 1.3;
+  max-width: 935px;
+
+  @include tablet-down { font-size: var(--text-body-small); max-width: 640px; }
+  @include mobile { font-size: var(--text-small-15); max-width: 100%; }
+}
+
+// ── Content — feature grid (wider) + manage.png preview (narrower) ───────────
+// design-specific: left column carries more width than the right per design direction — a 3:2
+// fr split gives the feature grid noticeably more room than the preview image
+
+.content {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  align-items: center;
+  gap: var(--space-13);
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: var(--space-11) var(--container-padding-x);
+
+  @include tablet-down {
+    grid-template-columns: 1fr;
+    gap: var(--space-9);
+    padding: var(--space-9) var(--space-7);
+  }
+
+  @include mobile {
+    gap: var(--space-7);
+    padding: var(--space-7) var(--space-5);
+  }
+}
+
+// ── Feature grid — 2x2, vertical divider between columns, horizontal between rows ───
+
+.featureGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 1px solid var(--color-black-alpha-10);
+  border-left: 1px solid var(--color-black-alpha-10);
+
+  // design-specific: on mobile the manage.png preview (.previewWrap) shows above this feature
+  // grid instead of below it — swapped via order rather than DOM position so tablet/desktop's
+  // feature-grid-first layout is untouched
+  @include mobile {
+    grid-template-columns: 1fr;
+    order: 2;
+  }
+}
+
+.featureItem {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-7);
+  border-right: 1px solid var(--color-black-alpha-10);
+  border-bottom: 1px solid var(--color-black-alpha-10);
+
+  @include tablet-down {
+    padding: var(--space-6);
+  }
+}
+
+.featureTitle {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-normal);
+  line-height: 1.2;
+  background: linear-gradient(140deg, var(--color-blue-primary) 70%, var(--color-blue-primary-faded) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.featureDesc {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-small-13);
+  line-height: 1.3;
+  color: var(--color-black-alpha-60); // rgba(0,0,0,0.6) ≈ rgba(13,13,13,0.5) Figma value, nearest token
+}
+
+// ── Manage.png preview ────────────────────────────────────────────────────────
+
+.previewWrap {
+  display: flex;
+  justify-content: center;
+
+  @include tablet-down { justify-content: flex-start; }
+
+  @include mobile {
+    justify-content: center;
+    order: 1;
+  }
+}
+
+.previewImage {
+  width: 100%;
+  height: auto;
+  max-width: 455px;
+}

@@ -1,0 +1,459 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Section shell ─────────────────────────────────────────────────────────────
+
+.section {
+  position: relative;
+  width: 100%;
+  background: var(--color-white-primary);
+  overflow: hidden;
+}
+
+// ── Header — dashed top/bottom rules, diagonal stripe columns flanking the title, dense
+// diagonal texture panels further out on each edge (community page header pattern, extended
+// with a second, denser texture layer beyond the stripe columns per the Figma reference) ──────
+
+.header {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: stretch;
+  // design-specific: a native 1px `dashed` border renders as tiny near-square dots rather than
+  // real elongated dashes — this repeating-gradient recipe draws proper dash segments instead
+  background-image:
+    repeating-linear-gradient(90deg, var(--color-black-alpha-12) 0px, var(--color-black-alpha-12) 6px, transparent 6px, transparent 12px),
+    repeating-linear-gradient(90deg, var(--color-black-alpha-12) 0px, var(--color-black-alpha-12) 6px, transparent 6px, transparent 12px);
+  background-size: 100% 1px, 100% 1px;
+  background-repeat: no-repeat;
+  background-position: top, bottom;
+}
+
+.texturePanel {
+  flex: 1;
+  min-width: 0;
+  background-color: var(--color-gray-light-bg);
+  background-image: repeating-linear-gradient(
+    135deg,
+    transparent 0px,
+    transparent 4px,
+    var(--color-black-alpha-01) 4px,
+    var(--color-black-alpha-01) 6px
+  );
+
+  @include tablet-down { display: none; }
+}
+
+.topArea {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: stretch;
+  min-height: 252px;
+
+  @include tablet-down {
+    max-width: 100%;
+    min-height: auto;
+    flex-direction: column;
+  }
+}
+
+.stripeCol {
+  flex-shrink: 0;
+  width: 63px;
+  position: relative;
+  overflow: hidden;
+  opacity: 0.12;
+
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent 0px,
+    transparent 10px,
+    var(--color-black-alpha-55) 10px,
+    var(--color-black-alpha-55) 11px
+  );
+
+  &[data-side='left'] {
+    border-right: 0.5px solid var(--color-black-alpha-12);
+  }
+
+  &[data-side='right'] {
+    border-left: 0.5px solid var(--color-black-alpha-12);
+  }
+
+  @include tablet-down {
+    display: none;
+  }
+}
+
+.centerContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-6);
+  padding: var(--space-9) var(--space-3);
+  text-align: center;
+
+  @include tablet-down {
+    padding: var(--space-7) var(--space-6);
+    gap: var(--space-5);
+  }
+
+  @include mobile {
+    padding: var(--space-6) var(--space-5);
+    gap: var(--space-4);
+  }
+}
+
+.labelWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 20px;
+}
+
+%bracket-corner {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-style: solid;
+  border-color: var(--color-blue-primary-alpha-30);
+  pointer-events: none;
+}
+
+.labelBracketTL { @extend %bracket-corner; top: 0; left: 0; border-width: 1.5px 0 0 1.5px; }
+.labelBracketTR { @extend %bracket-corner; top: 0; right: 0; border-width: 1.5px 1.5px 0 0; }
+.labelBracketBL { @extend %bracket-corner; bottom: 0; left: 0; border-width: 0 0 1.5px 1.5px; }
+.labelBracketBR { @extend %bracket-corner; bottom: 0; right: 0; border-width: 0 1.5px 1.5px 0; }
+
+.labelText {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-darkest); // #6e6e6e ≈ #4a4a4a Figma value, nearest token
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+
+  @include mobile { font-size: var(--text-small-13); }
+}
+
+.heading {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+}
+
+.headingLine1,
+.headingLine2 {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  text-transform: capitalize;
+
+  @include tablet-down { font-size: 36px; }
+  @include mobile { font-size: 28px; }
+}
+
+.headingLine1 {
+  color: var(--color-black-primary);
+}
+
+.headingLine2 {
+  background: linear-gradient(149deg, var(--color-blue-primary) 70%, var(--color-blue-primary-faded) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.description {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-body);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-body);
+  line-height: 1.3;
+  max-width: 480px;
+
+  @include tablet-down { font-size: var(--text-body-small); }
+  @include mobile { font-size: var(--text-small-15); }
+}
+
+// ── Carousel — review.svg as the panel background ────────────────────────────
+
+.carousel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-7);
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: var(--space-9) var(--container-padding-x) var(--space-11);
+
+  @include tablet-down { padding: var(--space-7) var(--space-7) var(--space-9); }
+  @include mobile { padding: var(--space-6) var(--space-5) var(--space-7); }
+}
+
+.carouselPanel {
+  position: relative;
+  width: 100%;
+  max-width: 1356px;
+  aspect-ratio: 1356 / 584;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  @include tablet-down {
+    aspect-ratio: auto;
+    min-height: 380px;
+  }
+
+  // design-specific: the side reviews hide at tablet-down, leaving just the active review — the
+  // panel no longer needs the extra height reserved for a 3-column layout at mobile widths
+  @include mobile {
+    min-height: 320px;
+    padding: var(--space-6) 0;
+  }
+}
+
+.panelBg {
+  object-fit: fill;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.arrowButton {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--color-white-primary);
+  box-shadow: 0 2px 10px var(--color-black-alpha-15);
+  color: var(--color-black-primary);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: var(--color-gray-light);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  &[data-side='left'] { left: var(--space-4); }
+  &[data-side='right'] { right: var(--space-4); }
+
+  @include mobile {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+.reviewRow {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-9);
+  width: 100%;
+  padding: 0 var(--space-13);
+
+  // design-specific: once .sideReview hides at tablet-down, this row holds only .activeReview —
+  // the gap meant to separate 3 columns is no longer needed and just reads as stray whitespace
+  @include tablet-down {
+    gap: 0;
+    padding: 0 var(--space-9);
+  }
+
+  @include mobile {
+    padding: 0 var(--space-6);
+  }
+}
+
+// ── Side (faded neighbor) reviews — decorative preview of prev/next ──────────
+
+.sideReview {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+
+  @include tablet-down { display: none; }
+}
+
+.sideAuthorRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.sideAvatarWrap {
+  display: flex;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-white-alpha-26);
+  overflow: hidden;
+}
+
+.sideAvatar {
+  object-fit: cover;
+}
+
+.sideAuthorInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.sideAuthorName {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-15);
+  color: var(--color-black-primary);
+}
+
+.sideAuthorRole {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-9);
+  color: var(--color-black-primary);
+}
+
+.sideQuote {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-10);
+  line-height: 1.3;
+  color: var(--color-black-primary);
+  text-align: center;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+// ── Active (centered) review ──────────────────────────────────────────────────
+
+.activeReview {
+  flex: 2;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  max-width: 523px;
+}
+
+.activeAuthorRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+.activeAvatarWrap {
+  display: flex;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  border: 2px solid var(--color-white-alpha-26);
+  overflow: hidden;
+}
+
+.activeAvatar {
+  object-fit: cover;
+}
+
+.activeAuthorInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.activeAuthorName {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h3);
+  color: var(--color-black-primary);
+}
+
+.activeAuthorRole {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  color: var(--color-black-primary);
+}
+
+.activeQuote {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-normal);
+  line-height: 1.3;
+  color: var(--color-black-primary);
+  text-align: center;
+}
+
+@include mobile {
+  .activeAuthorName { font-size: var(--text-body); }
+  .activeQuote { font-size: var(--text-small-15); }
+}
+
+// ── Pagination dots ───────────────────────────────────────────────────────────
+
+.dots {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.dot {
+  // design-specific: the button's own box is a proper 40px touch target (via padding), but the
+  // visible bar is drawn as a separate ::after pill sized independently — background-clip:
+  // content-box was tried first to fake this with one box, but border-radius: full still rounds
+  // the whole padded box in some browsers regardless of background-clip, rendering as a large
+  // solid circle instead of a thin pill. A dedicated pseudo-element avoids that bug entirely.
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 31px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+
+  &::after {
+    content: '';
+    width: 23px;
+    height: 2px;
+    border-radius: var(--radius-full);
+    background: var(--color-gray-primary);
+    transition: width 0.25s ease, background 0.25s ease;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.dotActive::after {
+  width: 37px;
+  background: var(--color-black-primary);
+}

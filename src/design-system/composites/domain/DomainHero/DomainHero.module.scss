@@ -1,0 +1,380 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Hero shell ────────────────────────────────────────────────────────────────
+
+.hero {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--color-white-primary);
+  padding: var(--space-14) var(--container-padding-x) var(--space-11);
+
+  @include tablet-down {
+    padding: var(--space-11) var(--space-7) var(--space-9);
+  }
+
+  @include mobile {
+    padding: var(--space-7) var(--space-5) var(--space-6);
+  }
+}
+
+// ── Background grid texture ────────────────────────────────────────────────────
+
+.bg {
+  position: absolute;
+  inset: -48px -80px;
+  pointer-events: none;
+  z-index: -1;
+
+  @include tablet-down { inset: -32px -40px; }
+  @include mobile { inset: -24px -16px; }
+}
+
+.gridLayer {
+  position: absolute;
+  inset: 0;
+  opacity: 0.9;
+  background-image:
+    linear-gradient(var(--color-blue-primary-alpha-13) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-blue-primary-alpha-13) 1px, transparent 1px);
+  background-size: 42px 42px;
+  background-position: center top;
+  -webkit-mask-image: radial-gradient(ellipse at center, white 0%, white 45%, transparent 85%);
+  mask-image: radial-gradient(ellipse at center, white 0%, white 45%, transparent 85%);
+}
+
+// ── Content ───────────────────────────────────────────────────────────────────
+
+.content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-9);
+  max-width: 1120px;
+  width: 100%;
+
+  @include tablet-down { gap: var(--space-7); }
+  @include mobile { gap: var(--space-6); }
+}
+
+.textStack {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  text-align: center;
+
+  @include tablet-down { gap: var(--space-5); }
+  @include mobile { gap: var(--space-4); }
+}
+
+// ── Top label with 4-corner brackets ─────────────────────────────────────────
+
+.labelWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 20px;
+}
+
+%bracket-corner {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-style: solid;
+  border-color: var(--color-blue-primary);
+  pointer-events: none;
+}
+
+.labelBracketTL { @extend %bracket-corner; top: 0; left: 0; border-width: 1.5px 0 0 1.5px; }
+.labelBracketTR { @extend %bracket-corner; top: 0; right: 0; border-width: 1.5px 1.5px 0 0; }
+.labelBracketBL { @extend %bracket-corner; bottom: 0; left: 0; border-width: 0 0 1.5px 1.5px; }
+.labelBracketBR { @extend %bracket-corner; bottom: 0; right: 0; border-width: 0 1.5px 1.5px 0; }
+
+.labelText {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+
+  @include mobile { font-size: var(--text-small-13); }
+}
+
+// ── Heading ───────────────────────────────────────────────────────────────────
+
+.heading {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.headingLine1,
+.headingLine2 {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-transform: capitalize;
+
+  @include tablet-down { font-size: 40px; }
+  @include mobile { font-size: 30px; }
+}
+
+.headingLine1 {
+  color: var(--color-black-primary);
+}
+
+.headingLine2 {
+  background: linear-gradient(146deg, var(--color-blue-primary) 76%, var(--color-blue-primary-faded) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+// ── Description ───────────────────────────────────────────────────────────────
+
+.description {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-body);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-body);
+  line-height: var(--leading-body);
+  max-width: 780px;
+
+  @include tablet-down { font-size: var(--text-body-small); max-width: 560px; }
+  @include mobile { font-size: var(--text-small-15); max-width: 100%; }
+}
+
+// ── Search frame — search bar only ───────────────────────────────────────────
+
+.searchFrame {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+// ── Stats frame — stats row + 2 corner brackets ──────────────────────────────
+
+.statsFrame {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.cornerImgDesktop {
+  position: absolute;
+  pointer-events: none;
+  width: 53px;
+  height: 91px;
+  z-index: 0;
+
+  @include tablet-down {
+    display: none;
+  }
+}
+
+.topLeft {
+  top: -30px;
+  left: 0;
+  transform: scaleX(-1);
+}
+
+.bottomRight {
+  bottom: -30px;
+  right: 0;
+}
+
+// Mobile-only pair, below the stats row, one on each edge of the viewport
+.cornerRow {
+  display: none;
+
+  @include mobile {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+}
+
+.cornerImgMobile {
+  pointer-events: none;
+  width: 24px;
+  height: 41px;
+}
+
+.cornerImgMobileLeft {
+  transform: scaleX(-1);
+}
+
+// ── Stats row ─────────────────────────────────────────────────────────────────
+
+.statsRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+
+  @include tablet-down { flex-wrap: wrap; row-gap: var(--space-3); }
+
+  // design-specific: 2x2 grid on mobile — "Instant Availability | Minted to your Wallet" on row
+  // one, "450+ Integrations | No Renewals ever" on row two, each row keeping its own vertical
+  // divider between the two columns, instead of the single-column stack used at other breakpoints
+  @include mobile {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    row-gap: var(--space-4);
+    column-gap: var(--space-3);
+  }
+}
+
+.statItem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+}
+
+.statText {
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-nav);
+  letter-spacing: 0.01em;
+  color: var(--color-blue-primary);
+  text-transform: uppercase;
+  white-space: nowrap;
+
+  @include mobile { font-size: var(--text-small-13); }
+}
+
+.statDivider {
+  width: 1px;
+  height: 17px;
+  background: var(--color-blue-primary-alpha-30);
+  flex-shrink: 0;
+
+  // design-specific: only the first column's item in each row keeps its divider — the second
+  // column's item never shows one, since a 2x2 grid only needs one divider per row, between its
+  // two columns, not trailing after the row's last item
+  @include mobile {
+    .statItem:nth-child(2n) & {
+      display: none;
+    }
+  }
+}
+
+// ── TLD marquee ───────────────────────────────────────────────────────────────
+
+.tldWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+.tldMarquee {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background: var(--color-gray-light-bg);
+  @include stripe-bg;
+  border-top: 1px solid var(--color-black-alpha-05);
+  border-bottom: 1px solid var(--color-black-alpha-05);
+  padding: var(--space-4) 0;
+}
+
+.tldTrack {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  margin: 0;
+  list-style: none;
+  will-change: transform;
+  animation: tld-marquee-scroll 90s linear infinite;
+
+  &:hover {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes tld-marquee-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.tldChip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2) var(--space-4);
+  margin: 0 var(--space-2);
+  background: var(--color-white-primary);
+  border: 1px solid var(--color-black-alpha-05);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-body-small);
+  color: var(--color-black-primary);
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  @include mobile {
+    font-size: var(--text-small-13);
+    padding: var(--space-1-5) var(--space-3);
+  }
+}
+
+.tldFadeLeft,
+.tldFadeRight {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 120px;
+  pointer-events: none;
+  z-index: 1;
+
+  @include mobile { width: 48px; }
+}
+
+.tldFadeLeft {
+  left: 0;
+  background: linear-gradient(to right, var(--color-gray-light-bg) 0%, transparent 100%);
+}
+
+.tldFadeRight {
+  right: 0;
+  background: linear-gradient(to left, var(--color-gray-light-bg) 0%, transparent 100%);
+}
+
+.moreLink {
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-nav);
+  color: var(--color-blue-primary);
+  text-transform: uppercase;
+  text-decoration: none;
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}

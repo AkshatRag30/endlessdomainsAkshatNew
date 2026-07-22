@@ -1,0 +1,412 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Section shell ─────────────────────────────────────────────────────────────
+
+.section {
+  position: relative;
+  width: 100%;
+  background: var(--color-white-primary);
+  padding: var(--space-13) 0;
+  border-top: 1px solid var(--color-black-alpha-10);
+
+  @include tablet-down { padding: var(--space-11) 0; }
+  @include mobile { padding: var(--space-9) 0; }
+}
+
+// ── Title block ───────────────────────────────────────────────────────────────
+
+.titleBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  text-align: center;
+  padding: 0 var(--container-padding-x) var(--space-11);
+
+  @include tablet-down { padding: 0 var(--space-7) var(--space-9); }
+  @include mobile { padding: 0 var(--space-5) var(--space-7); }
+}
+
+.labelWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 20px;
+}
+
+%bracket-corner {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-style: solid;
+  border-color: var(--color-blue-primary-alpha-30);
+  pointer-events: none;
+}
+
+.labelBracketTL { @extend %bracket-corner; top: 0; left: 0; border-width: 1.5px 0 0 1.5px; }
+.labelBracketTR { @extend %bracket-corner; top: 0; right: 0; border-width: 1.5px 1.5px 0 0; }
+.labelBracketBL { @extend %bracket-corner; bottom: 0; left: 0; border-width: 0 0 1.5px 1.5px; }
+.labelBracketBR { @extend %bracket-corner; bottom: 0; right: 0; border-width: 0 1.5px 1.5px 0; }
+
+.labelText {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-darkest); // #6e6e6e ≈ #4a4a4a Figma value, nearest token
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+
+  @include mobile { font-size: var(--text-small-13); }
+}
+
+.heading {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  text-transform: capitalize;
+
+  @include tablet-down { font-size: 40px; }
+  @include mobile { font-size: 30px; }
+}
+
+.headingLine1 {
+  color: var(--color-black-primary);
+}
+
+.headingLine2 {
+  background: linear-gradient(109deg, var(--color-blue-primary) 70%, var(--color-blue-primary-faded) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+// ── Card band ─────────────────────────────────────────────────────────────────
+
+// design-specific: the top/bottom rule lines must span the full viewport edge-to-edge, while the
+// cards themselves stay centered within the page's max-width container — so the borders live on
+// this full-bleed wrapper, and .cardBand carries the centered content width (same pattern as
+// DomainStats' .section/.row split)
+.cardBandOuter {
+  width: 100%;
+  border-top: 1px solid var(--color-black-alpha-10);
+  border-bottom: 1px solid var(--color-black-alpha-10);
+}
+
+.cardBand {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-7);
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: var(--space-9) var(--container-padding-x);
+
+  @include tablet-down {
+    flex-direction: column;
+    gap: var(--space-6);
+    padding: var(--space-7) var(--space-7);
+  }
+
+  // design-specific: the paginated 3-per-page row is desktop/tablet only — mobile shows
+  // .mobileCardBand instead (all 6 cards, horizontal scroll-snap, 1 visible at a time)
+  @include mobile {
+    display: none;
+  }
+}
+
+// ── Mobile card band — all 6 cards, horizontal scroll-snap, 1 card visible at a time ─────────
+
+.mobileCardBand {
+  display: none;
+
+  @include mobile {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: var(--space-5);
+    padding: var(--space-6) var(--space-5);
+
+    scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; }
+  }
+}
+
+.mobileCard {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--space-4);
+  flex: 0 0 100%;
+  width: 100%;
+  scroll-snap-align: center;
+  padding: var(--space-6);
+  clip-path: polygon(24px 0, 100% 0, 100% 100%, 0 100%, 0 24px);
+  background-color: var(--color-gray-light-bg);
+  background-image: repeating-linear-gradient(
+    135deg,
+    transparent 0px,
+    transparent 4px,
+    var(--color-black-alpha-01) 4px,
+    var(--color-black-alpha-01) 6px
+  );
+}
+
+.cardDivider {
+  width: 1px;
+  align-self: stretch;
+  background: var(--color-black-alpha-10);
+  flex-shrink: 0;
+  // design-specific: negative vertical margin pulls the divider back out to touch .cardBand's
+  // own top/bottom border, since .cardBand now carries vertical padding for the cards themselves
+  margin: calc(-1 * var(--space-9)) 0;
+
+  @include tablet-down { display: none; }
+}
+
+// ── Card — notched top-left corner, diagonal-stripe texture on hover ─────────
+// design-specific: clip-path cuts only the top-left corner at a 24px diagonal, matching the
+// Figma "Subtract" card shape — right angle everywhere else, unlike the 2-corner notch used
+// elsewhere in the design system (e.g. EventCard's top-left + bottom-right cut)
+
+.card {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--space-4);
+  min-width: 0;
+  // design-specific: fixed min-height reserves the same space on every card (icon + gap + title
+  // line + gap + the 4-line clamped description + vertical padding) regardless of how long any
+  // individual card's description actually is — this is what keeps .cardBand's row height
+  // constant across pages, since align-items: stretch otherwise sizes the row to whichever
+  // page's tallest card happens to be
+  min-height: calc(56px + var(--space-4) + var(--text-h3) * 1.2 + var(--space-2) + var(--text-small-13) * 1.3 * 4 + var(--space-6) * 2);
+  padding: var(--space-6) var(--space-8);
+  clip-path: polygon(24px 0, 100% 0, 100% 100%, 0 100%, 0 24px);
+  background-color: var(--color-gray-light-bg);
+  background-image: repeating-linear-gradient(
+    135deg,
+    transparent 0px,
+    transparent 4px,
+    var(--color-black-alpha-01) 4px,
+    var(--color-black-alpha-01) 6px
+  );
+  overflow: hidden;
+  transition: background-color 0.25s ease;
+
+  @include tablet-down {
+    padding: var(--space-6) var(--space-6);
+  }
+}
+
+// hover state — Subtract 5.png becomes the card background on every card, same notch shape
+// via clip-path
+.card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: url('/domain-tld/Subtract 5.png');
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.card:hover::after,
+.card:focus-within::after {
+  opacity: 1;
+}
+
+.card > * {
+  position: relative;
+  z-index: 1;
+}
+
+// ── Icon badge ────────────────────────────────────────────────────────────────
+
+.iconBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: var(--radius-lg);
+  color: var(--color-white-primary);
+  background: linear-gradient(180deg, var(--color-blue-primary) 0%, var(--color-blue-primary-faded) 100%);
+  box-shadow:
+    0px 19px 49px 0px rgba(87, 177, 255, 0.34),
+    0px 11px 15px 0px rgba(87, 177, 255, 0.19),
+    0px 5px 6px 0px rgba(87, 177, 255, 0.22),
+    0px 2px 2px 0px rgba(87, 177, 255, 0.15);
+
+  // design-specific: pinned to white-background/blue-icon on hover across every card, so once
+  // Subtract 5.png layers in behind the badge the icon reads consistently against it, instead of
+  // the default gradient-fill badge staying on against the new blue image background
+  .card:hover &,
+  .card:focus-within & {
+    color: var(--color-blue-primary);
+    background: var(--color-white-primary);
+  }
+}
+
+.cardText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.cardTitle {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-h3);
+  line-height: 1.2;
+  text-transform: capitalize;
+  background: linear-gradient(142deg, var(--color-blue-primary) 70%, var(--color-blue-primary-faded) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  // design-specific: pinned to solid white on hover so the title stays legible against
+  // Subtract 5.png once it layers in, instead of the gradient clip staying on
+  .card:hover &,
+  .card:focus-within & {
+    background: none;
+    -webkit-text-fill-color: var(--color-white-primary);
+    color: var(--color-white-primary);
+  }
+
+  @include mobile { font-size: 24px; }
+}
+
+.cardDesc {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-small-13);
+  line-height: 1.3;
+  text-align: left;
+  color: var(--color-text-body);
+  // design-specific: clamped so long descriptions never push the card taller than the fixed
+  // height reserved on .card itself (see .card's min-height) — the actual uniform sizing across
+  // pages comes from that fixed card height, not from anything here, since min-height on a
+  // -webkit-box (required for line-clamp) isn't reliably respected inside a centered flex parent
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+
+  // design-specific: pinned to a legible white-on-blue tone on hover, same reasoning as
+  // .cardTitle's hover override above
+  .card:hover &,
+  .card:focus-within & {
+    color: var(--color-white-alpha-90);
+  }
+}
+
+// ── Pagination ────────────────────────────────────────────────────────────────
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-6);
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: var(--space-6) var(--container-padding-x) 0;
+
+  @include tablet-down { padding: var(--space-5) var(--space-7) 0; }
+
+  // design-specific: this pagination controls the desktop/tablet 3-per-page slice — hidden on
+  // mobile since .mobilePagination (below) drives .mobileCardBand instead
+  @include mobile { display: none; }
+}
+
+// ── Mobile pagination — arrows scroll .mobileCardBand one card at a time, dots jump to any card
+.mobilePagination {
+  display: none;
+
+  @include mobile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-4);
+    padding: 0 var(--space-5) var(--space-6);
+  }
+}
+
+.arrowButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-black-primary);
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.dots {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+
+  // design-specific: 6 dots at the desktop pagination's 41px width would overflow a phone-width
+  // row — shrunk to fit comfortably within .mobilePagination's available space
+  .mobilePagination & {
+    gap: 6px;
+  }
+}
+
+.dot {
+  width: 41px;
+  height: 4px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--color-black-alpha-31);
+  cursor: pointer;
+  transition: width 0.25s ease, background 0.25s ease;
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  .mobilePagination & {
+    width: 16px;
+  }
+}
+
+.dotActive {
+  width: 67px;
+  background: var(--color-black-primary);
+
+  .mobilePagination & {
+    width: 28px;
+  }
+}

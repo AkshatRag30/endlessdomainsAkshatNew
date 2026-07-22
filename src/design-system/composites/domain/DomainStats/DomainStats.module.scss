@@ -1,0 +1,204 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Section shell ─────────────────────────────────────────────────────────────
+// design-specific: the top/bottom rule lines must span the full viewport edge-to-edge,
+// while the stat columns stay centered within the page's max-width container — so the
+// borders live on this full-bleed section, and .row carries the centered content width
+
+.section {
+  position: relative;
+  width: 100%;
+  border-top: 1px solid var(--color-black-alpha-10);
+  border-bottom: 1px solid var(--color-black-alpha-10);
+  background: var(--color-white-primary);
+}
+
+.row {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: var(--space-9) var(--container-padding-x);
+
+  @include tablet-down {
+    flex-wrap: wrap;
+    padding: var(--space-7) var(--space-7);
+  }
+
+  // design-specific: 2x2 grid on mobile — all 4 stats pair up into two columns/two rows.
+  // Dividers are drawn as borders on the grid cells themselves (see .statItem) rather than
+  // pseudo-elements computed off guessed pixel offsets, so they always land exactly on the grid's
+  // own row/column boundaries regardless of how tall any individual cell's content renders
+  @include mobile {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    row-gap: 0;
+    column-gap: 0;
+    padding: var(--space-7) var(--space-5);
+  }
+}
+
+// ── Stat item ─────────────────────────────────────────────────────────────────
+
+.statItem {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-6);
+
+  // design-specific: dividers must touch the section's top/bottom border regardless of
+  // .row's vertical padding, so they're full-height pseudo-elements anchored to .section's
+  // edges (top: calc(-1 * padding)) rather than a border on the padded .statItem box
+  &::before {
+    content: '';
+    position: absolute;
+    top: calc(-1 * var(--space-9));
+    bottom: calc(-1 * var(--space-9));
+    left: 0;
+    width: 1px;
+    background: var(--color-black-alpha-10);
+  }
+
+  // outer border — right edge of the last stat
+  &:last-child::after {
+    content: '';
+    position: absolute;
+    top: calc(-1 * var(--space-9));
+    bottom: calc(-1 * var(--space-9));
+    right: 0;
+    width: 1px;
+    background: var(--color-black-alpha-10);
+  }
+
+  @include tablet-down {
+    flex: 1 1 50%;
+    padding: var(--space-4) 0;
+
+    &::before,
+    &:last-child::after {
+      top: calc(-1 * var(--space-7));
+      bottom: calc(-1 * var(--space-7));
+    }
+  }
+
+  // design-specific: 2x2 grid cell — the flex-row divider pseudo-elements above don't apply here
+  // (overridden to none), replaced by real borders on the grid cells themselves: a right border
+  // on column 1's items divides the two columns, a bottom border on row 1's items divides the
+  // two rows — both land exactly on the grid's own boundaries regardless of cell content height.
+  // The left/right bracket spans (statBracketLeft/Right) are hidden entirely on mobile (see
+  // %stat-bracket below); small 4-corner tick marks are drawn here instead, one set per cell,
+  // matching the reference image's crop-mark styling around each stat.
+  @include mobile {
+    flex: none;
+    padding: var(--space-6) var(--space-4);
+
+    &::before,
+    &:last-child::after {
+      display: none;
+    }
+
+    // column 1 (1st, 3rd) — vertical divider on the right edge
+    &:nth-child(odd) {
+      border-right: 1px solid var(--color-black-alpha-10);
+    }
+
+    // row 1 (1st, 2nd) — horizontal divider on the bottom edge
+    &:nth-child(1),
+    &:nth-child(2) {
+      border-bottom: 1px solid var(--color-black-alpha-10);
+    }
+  }
+}
+
+%stat-bracket {
+  flex-shrink: 0;
+  width: 12px;
+  height: 105px;
+  position: relative;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-style: solid;
+    border-color: var(--color-black-alpha-25);
+  }
+
+  @include tablet-down { height: 72px; }
+  @include mobile { display: none; }
+}
+
+// ── Mobile-only 4-corner tick marks — one set per grid cell, matching the reference image's
+// crop-mark styling around each stat (replaces the desktop left/right bracket spans, which
+// hide entirely on mobile via %stat-bracket above) ───────────────────────────────────────────
+
+%mobile-corner-tick {
+  display: none;
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-style: solid;
+  border-color: var(--color-black-alpha-25);
+  pointer-events: none;
+
+  @include mobile { display: block; }
+}
+
+.mobileCornerTL { @extend %mobile-corner-tick; top: 6px;    left: 6px;  border-width: 1.5px 0 0 1.5px; }
+.mobileCornerTR { @extend %mobile-corner-tick; top: 6px;    right: 6px; border-width: 1.5px 1.5px 0 0; }
+.mobileCornerBL { @extend %mobile-corner-tick; bottom: 6px; left: 6px;  border-width: 0 0 1.5px 1.5px; }
+.mobileCornerBR { @extend %mobile-corner-tick; bottom: 6px; right: 6px; border-width: 0 1.5px 1.5px 0; }
+
+.statBracketLeft {
+  @extend %stat-bracket;
+
+  &::before { top: 0; left: 0; border-width: 2px 0 0 2px; }
+  &::after { bottom: 0; left: 0; border-width: 0 0 2px 2px; }
+}
+
+.statBracketRight {
+  @extend %stat-bracket;
+
+  &::before { top: 0; right: 0; border-width: 2px 2px 0 0; }
+  &::after { bottom: 0; right: 0; border-width: 0 2px 2px 0; }
+}
+
+.statInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.statValue {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--text-display-md); // 48px ≈ 40px Figma value, nearest token
+  line-height: 1.2;
+  background: linear-gradient(106deg, var(--color-blue-primary) 70%, var(--color-blue-primary-faded) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  white-space: nowrap;
+
+  @include mobile { font-size: var(--text-h3); }
+}
+
+.statLabel {
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-small-13);
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: var(--color-black-alpha-60);
+  text-align: center;
+  white-space: nowrap;
+
+  @include mobile { font-size: var(--text-small-12); }
+}
