@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import Image from 'next/image'
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 
@@ -65,6 +65,27 @@ export function DomainReviews() {
     setActiveIndex(index)
   }, [])
 
+  // design-specific: mobile swipe on the review row — arrows are hidden there (see .arrowButton's
+  // mobile rule), so left/right touch drags are the only way to change the active review
+  const touchStartX = useRef<number | null>(null)
+
+  const handleTouchStart = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    touchStartX.current = e.touches[0].clientX
+  }, [])
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    if (touchStartX.current === null) return
+    const deltaX = e.changedTouches[0].clientX - touchStartX.current
+    touchStartX.current = null
+
+    const SWIPE_THRESHOLD = 40
+    if (deltaX > SWIPE_THRESHOLD) {
+      handlePrev()
+    } else if (deltaX < -SWIPE_THRESHOLD) {
+      handleNext()
+    }
+  }, [handlePrev, handleNext])
+
   const prevReview = REVIEWS[(activeIndex - 1 + REVIEWS.length) % REVIEWS.length]
   const activeReview = REVIEWS[activeIndex]
   const nextReview = REVIEWS[(activeIndex + 1) % REVIEWS.length]
@@ -121,7 +142,7 @@ export function DomainReviews() {
             <FiChevronLeft size={28} aria-hidden="true" />
           </button>
 
-          <div className={styles.reviewRow}>
+          <div className={styles.reviewRow} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
             <div className={styles.sideReview}>
               <div className={styles.sideAuthorRow}>
                 <span className={styles.sideAvatarWrap}>
@@ -165,20 +186,20 @@ export function DomainReviews() {
           <button type="button" className={styles.arrowButton} data-side="right" onClick={handleNext} aria-label="Next review">
             <FiChevronRight size={28} aria-hidden="true" />
           </button>
-        </div>
 
-        <div className={styles.dots} role="tablist" aria-label="Review pages">
-          {REVIEWS.map((review, index) => (
-            <button
-              key={review.id}
-              type="button"
-              role="tab"
-              aria-selected={activeIndex === index}
-              aria-label={`Show review from ${review.name}`}
-              className={`${styles.dot} ${activeIndex === index ? styles.dotActive : ''}`}
-              onClick={() => handleDotClick(index)}
-            />
-          ))}
+          <div className={styles.dots} role="tablist" aria-label="Review pages">
+            {REVIEWS.map((review, index) => (
+              <button
+                key={review.id}
+                type="button"
+                role="tab"
+                aria-selected={activeIndex === index}
+                aria-label={`Show review from ${review.name}`}
+                className={`${styles.dot} ${activeIndex === index ? styles.dotActive : ''}`}
+                onClick={() => handleDotClick(index)}
+              />
+            ))}
+          </div>
         </div>
       </div>
 

@@ -9,6 +9,10 @@
   width: 100%;
   overflow: hidden;
   padding: var(--space-4) 0;
+
+  // design-specific: shorter vertical padding on laptop-and-up so this marquee fits inside the
+  // initial hero viewport, matching DomainHero's own fit-in-one-viewport padding reductions
+  @include desktop { padding: var(--space-2) 0; }
 }
 
 .track {
@@ -49,6 +53,13 @@
   background: var(--color-white-primary);
   box-shadow: 0 1px 4px var(--color-blue-primary-alpha-20);
   overflow: hidden;
+
+  // design-specific: smaller on laptop-and-up, part of the same fit-in-one-viewport fix as
+  // .marquee's reduced padding above
+  @include desktop {
+    width: 26px;
+    height: 26px;
+  }
 
   @include mobile {
     width: 26px;

@@ -118,7 +118,7 @@ export function DomainHero() {
             <span className={styles.tldFadeLeft} aria-hidden="true" />
             <span className={styles.tldFadeRight} aria-hidden="true" />
           </div>
-          <Link href="/domain" className={styles.moreLink}>All {ALL_TLDS.length} TLDs</Link>
+          <Link href="/domain" className={styles.moreLink}>+60 MORE</Link>
         </div>
 
         {/* Provider marquee */}

@@ -13,12 +13,20 @@
   background: var(--color-white-primary);
   padding: var(--space-14) var(--container-padding-x) var(--space-11);
 
+  // design-specific: reduced top/bottom padding on laptop-and-up widths so both marquees fit
+  // inside the initial viewport instead of sitting just below the fold — combined with the
+  // tighter .content gap and smaller marquee sizing below, this keeps the whole hero (text,
+  // search bar, stats, both marquees) visible without scrolling on typical laptop screens
+  @include desktop {
+    padding: var(--space-9) var(--container-padding-x) var(--space-7);
+  }
+
   @include tablet-down {
     padding: var(--space-11) var(--space-7) var(--space-9);
   }
 
   @include mobile {
-    padding: var(--space-7) var(--space-5) var(--space-6);
+    padding: var(--space-4) var(--space-5) var(--space-5);
   }
 }
 
@@ -59,6 +67,7 @@
   max-width: 1120px;
   width: 100%;
 
+  @include desktop { gap: var(--space-6); }
   @include tablet-down { gap: var(--space-7); }
   @include mobile { gap: var(--space-6); }
 }
@@ -164,9 +173,21 @@
 // ── Search frame — search bar only ───────────────────────────────────────────
 
 .searchFrame {
+  // design-specific: widens the shared Input primitive's hero search bar to match the stats
+  // row's own width below it, so it stretches out to where the bottom-right corner SVGs sit
+  // instead of staying capped at the primitive's narrower default max-width
+  --search-max-width: 1120px;
   width: 100%;
   display: flex;
   justify-content: center;
+
+  // design-specific: .content's shared gap already separates the search bar from the heading
+  // above it, but the stats row right below needs its own breathing room on mobile — handled
+  // here (margin-bottom on the search bar) rather than as margin-top on .statsFrame, since
+  // .statsFrame already carries its own mobile margin-top for the gap above it
+  @include mobile {
+    margin-bottom: var(--space-3);
+  }
 }
 
 // ── Stats frame — stats row + 2 corner brackets ──────────────────────────────
@@ -176,6 +197,12 @@
   width: 100%;
   display: flex;
   justify-content: center;
+
+  // design-specific: extra top margin on mobile only — .content's shared gap alone reads as too
+  // tight between the search bar and the stats row at narrow widths
+  @include mobile {
+    margin-top: var(--space-3);
+  }
 }
 
 .cornerImgDesktop {
@@ -295,11 +322,18 @@
   position: relative;
   width: 100%;
   overflow: hidden;
-  background: var(--color-gray-light-bg);
+  // design-specific: white base instead of the gray fill — @include stripe-bg still draws its
+  // faint diagonal stripe overlay on top, so the marquee now reads as white with subtle white/
+  // gray diagonal lines rather than a solid gray band
+  background: var(--color-white-primary);
   @include stripe-bg;
   border-top: 1px solid var(--color-black-alpha-05);
   border-bottom: 1px solid var(--color-black-alpha-05);
   padding: var(--space-4) 0;
+
+  // design-specific: shorter vertical padding on laptop-and-up so this marquee (and the provider
+  // one below it) fit inside the initial viewport instead of scrolling below the fold
+  @include desktop { padding: var(--space-2) 0; }
 }
 
 .tldTrack {
@@ -338,6 +372,13 @@
   white-space: nowrap;
   flex-shrink: 0;
 
+  // design-specific: smaller text + tighter padding on laptop-and-up, part of the same fit-in-
+  // one-viewport fix as .tldMarquee's reduced padding above
+  @include desktop {
+    font-size: var(--text-small-13);
+    padding: var(--space-1-5) var(--space-3);
+  }
+
   @include mobile {
     font-size: var(--text-small-13);
     padding: var(--space-1-5) var(--space-3);
@@ -358,12 +399,12 @@
 
 .tldFadeLeft {
   left: 0;
-  background: linear-gradient(to right, var(--color-gray-light-bg) 0%, transparent 100%);
+  background: linear-gradient(to right, var(--color-white-primary) 0%, transparent 100%);
 }
 
 .tldFadeRight {
   right: 0;
-  background: linear-gradient(to left, var(--color-gray-light-bg) 0%, transparent 100%);
+  background: linear-gradient(to left, var(--color-white-primary) 0%, transparent 100%);
 }
 
 .moreLink {

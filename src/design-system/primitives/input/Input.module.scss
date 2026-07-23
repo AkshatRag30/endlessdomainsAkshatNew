@@ -34,8 +34,11 @@
 
 .searchContainer {
   --border-angle: 0deg;
+  // design-specific: max width is a custom property (default 580px, matching the original fixed
+  // value) so individual pages can widen this shared hero search bar via their own wrapper
+  // element, without changing the default for every other page that uses this primitive
   position: relative;
-  width: clamp(280px, 85%, 580px);
+  width: clamp(280px, 85%, var(--search-max-width, 580px));
   height: clamp(48px, 8vw, 60px);
   margin: 0 auto;
   border-radius: var(--radius-xl);

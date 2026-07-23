@@ -222,6 +222,10 @@
   @include mobile {
     min-height: 320px;
     padding: var(--space-6) 0;
+    // review.svg is replaced with a plain gray rectangle on mobile (see .panelBg below) — the
+    // svg's artwork is tuned for the wide 3-column desktop/tablet layout and reads as visual
+    // noise once only the single centered active review remains
+    background: var(--color-gray-light-bg);
   }
 }
 
@@ -229,6 +233,10 @@
   object-fit: fill;
   z-index: 0;
   pointer-events: none;
+
+  @include mobile {
+    display: none;
+  }
 }
 
 .arrowButton {
@@ -260,9 +268,11 @@
   &[data-side='left'] { left: var(--space-4); }
   &[data-side='right'] { right: var(--space-4); }
 
+  // design-specific: replaced by touch swipe on the review row itself (see .reviewRow's
+  // touch handlers in DomainReviews.tsx) — the side reviews are already hidden at this width, so
+  // the arrows had nothing but the single active card left to sit awkwardly on top of
   @include mobile {
-    width: 40px;
-    height: 40px;
+    display: none;
   }
 }
 
@@ -417,9 +427,17 @@
 // ── Pagination dots ───────────────────────────────────────────────────────────
 
 .dots {
+  position: absolute;
+  bottom: var(--space-7);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
   display: flex;
   align-items: center;
   gap: var(--space-2);
+
+  @include tablet-down { bottom: var(--space-5); }
+  @include mobile { bottom: var(--space-4); }
 }
 
 .dot {

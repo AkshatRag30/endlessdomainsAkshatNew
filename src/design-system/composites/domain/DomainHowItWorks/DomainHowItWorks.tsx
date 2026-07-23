@@ -88,51 +88,82 @@ export function DomainHowItWorks() {
   // Scroll-driven step advancement — desktop/tablet only (mobile renders its own scroll-snap card
   // list instead, see .mobileCardList below). Maps scroll progress through a tall wrapper section
   // onto a discrete step index, same technique as ParkedRoadmap's sticky-pin pattern.
+  //
+  // design-specific: the mobile/reduced-motion checks below only gate whether scroll listeners
+  // get ATTACHED, not whether they stay attached — a matchMedia check read once inside a mount-
+  // only effect (empty deps) never re-evaluates if the viewport crosses the breakpoint afterwards
+  // (device rotation, resizing a browser window, or React re-mounting at a different width than
+  // it first painted at). That left scrollWrapperHeight permanently set to its inflated
+  // 100vh + N*60vh value with nothing to ever clear it back to undefined on mobile, which is
+  // exactly what produced the large leftover blank space below the mobile card list — the tall
+  // inline minHeight on .section was still in effect underneath it. A window-level resize
+  // listener (registered unconditionally, before any early return) now re-checks the breakpoint
+  // on every resize and tears the whole scroll-driven setup down — clearing scrollWrapperHeight
+  // and isScrollDriven, and removing the scroll listener — the moment the viewport becomes mobile.
   useEffect(() => {
     if (typeof window === 'undefined') return
-    if (window.matchMedia('(max-width: 767px)').matches) return
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
-    const section = sectionRef.current
-    if (!section) return
+    let cleanupScroll: (() => void) | undefined
 
-    setScrollWrapperHeight(`calc(100vh + ${STEPS.length * SCROLL_VH_PER_STEP * 100}vh)`)
-
-    let sectionTop = 0
-    let scrollDist = 0
-
-    function cacheLayout() {
-      if (!section) return
-      // computed directly from the known target height rather than section.offsetHeight, since
-      // the inline height style set just above may not have painted yet on the very first call
-      const targetHeight = window.innerHeight + STEPS.length * SCROLL_VH_PER_STEP * window.innerHeight
-      const rect = section.getBoundingClientRect()
-      sectionTop = window.scrollY + rect.top
-      scrollDist = Math.max(1, targetHeight - window.innerHeight)
+    function teardown() {
+      cleanupScroll?.()
+      cleanupScroll = undefined
+      setScrollWrapperHeight(undefined)
+      setIsScrollDriven(false)
     }
 
-    function onScroll() {
-      const raw = window.scrollY - sectionTop
-      // outside the section's own scroll range — leave activeIndex to click/timer control
-      if (raw < 0 || raw > scrollDist) {
-        setIsScrollDriven(false)
+    function setup() {
+      if (window.matchMedia('(max-width: 767px)').matches) {
+        teardown()
         return
       }
-      setIsScrollDriven(true)
-      const p = Math.max(0, Math.min(1, raw / scrollDist))
-      const index = Math.min(STEPS.length - 1, Math.floor(p * STEPS.length))
-      setActiveIndex(index)
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+      if (cleanupScroll) return // already set up for this desktop/tablet session
+
+      const section = sectionRef.current
+      if (!section) return
+
+      setScrollWrapperHeight(`calc(100vh + ${STEPS.length * SCROLL_VH_PER_STEP * 100}vh)`)
+
+      let sectionTop = 0
+      let scrollDist = 0
+
+      function cacheLayout() {
+        if (!section) return
+        // computed directly from the known target height rather than section.offsetHeight, since
+        // the inline height style set just above may not have painted yet on the very first call
+        const targetHeight = window.innerHeight + STEPS.length * SCROLL_VH_PER_STEP * window.innerHeight
+        const rect = section.getBoundingClientRect()
+        sectionTop = window.scrollY + rect.top
+        scrollDist = Math.max(1, targetHeight - window.innerHeight)
+      }
+
+      function onScroll() {
+        const raw = window.scrollY - sectionTop
+        // outside the section's own scroll range — leave activeIndex to click/timer control
+        if (raw < 0 || raw > scrollDist) {
+          setIsScrollDriven(false)
+          return
+        }
+        setIsScrollDriven(true)
+        const p = Math.max(0, Math.min(1, raw / scrollDist))
+        const index = Math.min(STEPS.length - 1, Math.floor(p * STEPS.length))
+        setActiveIndex(index)
+      }
+
+      cacheLayout()
+      onScroll()
+
+      window.addEventListener('scroll', onScroll, { passive: true })
+      cleanupScroll = () => window.removeEventListener('scroll', onScroll)
     }
 
-    cacheLayout()
-    onScroll()
-
-    window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('resize', cacheLayout)
+    setup()
+    window.addEventListener('resize', setup)
 
     return () => {
-      window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', cacheLayout)
+      window.removeEventListener('resize', setup)
+      cleanupScroll?.()
     }
   }, [])
 
@@ -225,8 +256,10 @@ export function DomainHowItWorks() {
 
       </div>
 
-      {/* Mobile only — each step becomes its own card, stacked and scrollable vertically,
-          instead of the desktop's step-list + single mockup + side caption layout */}
+      {/* Mobile only — each step becomes its own card. Normal page scroll (no scroll-snap, no
+          inflated section height) with all 4 cards stacked via position: sticky at the same
+          offset, so the next card scrolls up and over the previous one as you scroll — a
+          parallax stacking reveal instead of a one-card-at-a-time carousel. */}
       <ul className={styles.mobileCardList} aria-label="How it works steps">
         {STEPS.map(step => (
           <li key={step.id} className={styles.mobileCard}>

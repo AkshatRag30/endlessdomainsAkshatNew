@@ -32,22 +32,27 @@
 }
 
 .layout {
+  // design-specific: fixed height (not min-height) so this sticky-pinned box is always exactly
+  // one viewport tall — combined with align-items: center, the content (including the taller
+  // mockup) centers vertically within that fixed space instead of overflowing past its bottom
+  // edge once the mockup's own height plus padding exceeds 100vh
   position: sticky;
   top: 0;
-  min-height: 100vh;
+  height: 100vh;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: var(--space-9);
   max-width: var(--container-max-width);
   margin: 0 auto;
-  padding: var(--space-13) var(--container-padding-x);
+  padding: var(--space-9) var(--container-padding-x);
+  overflow: hidden;
 
   @include tablet-down {
     grid-template-columns: 1fr;
     justify-items: center;
-    gap: var(--space-7);
-    padding: var(--space-11) var(--space-7);
+    gap: var(--space-6);
+    padding: var(--space-7) var(--space-7);
   }
 
   // design-specific: the interactive step-list/mockup/caption layout is desktop and tablet only —
@@ -58,7 +63,13 @@
   }
 }
 
-// ── Mobile card list — one card per step, stacked and scrollable vertically ──────────────────
+// ── Mobile card list — normal page scroll, cards stack with a parallax reveal ────────────────
+// design-specific: each card is position: sticky at the SAME top offset, with increasing z-index
+// down the list — as the page scrolls normally, each card sticks in place while the next one
+// scrolls up over it, creating a layered/parallax stacking reveal instead of either a plain flat
+// stack or a snap-locked one-card-at-a-time carousel. The list's own height is just the natural
+// sum of all 4 cards (no inflated scroll distance, no fixed viewport-height container), so there
+// is no extra blank scroll space below the last card the way the snap-carousel version had.
 
 .mobileCardList {
   display: none;
@@ -66,38 +77,38 @@
   padding: 0;
   list-style: none;
 
-  // design-specific: capped to a viewport-relative max-height so only roughly one card's worth
-  // of content is visible at a time — scroll-snap then locks each swipe to the next card's top
-  // edge. Uncapped (height: auto) would let the container grow to fit every card at once, which
-  // defeats scroll-snap entirely since there'd be nothing left to scroll.
   @include mobile {
     display: block;
-    max-height: min(600px, 75vh);
-    overflow-y: auto;
-    scroll-snap-type: y mandatory;
-    -webkit-overflow-scrolling: touch;
-
-    scrollbar-width: none;
-    &::-webkit-scrollbar { display: none; }
   }
 }
 
 .mobileCard {
+  position: sticky;
+  top: var(--space-7);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: center;
   gap: var(--space-3);
-  min-height: min(600px, 75vh);
   padding: var(--space-6);
   border-radius: var(--radius-2xl);
   background: var(--color-gray-light-bg);
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
+  box-shadow: 0 12px 30px var(--color-black-alpha-14);
+
+  // design-specific: stacking order down the list (1st card lowest z-index, last highest) — so
+  // as each card scrolls up and stops at the same sticky offset, the next card scrolls over the
+  // top of it rather than underneath, matching the visual layering of a parallax card stack
+  @for $i from 1 through 4 {
+    &:nth-child(#{$i}) { z-index: $i; }
+  }
+
+  &:not(:last-child) {
+    margin-bottom: var(--space-9);
+  }
 }
 
 .mobileCardTitle {
   margin: 0;
+  flex-shrink: 0;
   font-family: var(--font-satoshi);
   font-weight: var(--font-weight-medium);
   font-size: var(--text-normal);
@@ -111,6 +122,7 @@
 
 .mobileCardCaption {
   margin: 0;
+  flex-shrink: 0;
   font-family: var(--font-space-grotesk);
   font-weight: var(--font-weight-regular);
   font-size: var(--text-small-15);
@@ -121,12 +133,11 @@
 .mobileCardImageWrap {
   position: relative;
   width: 100%;
-  // design-specific: aspect-ratio is set inline per step (see DomainHowItWorks.tsx), since the 4
-  // mob screenshots aren't all identical dimensions — this keeps the card's height driven by the
-  // image's own real proportions instead of a fixed/flexed box that stretches or crops it
+  // design-specific: aspect-ratio set inline per step (see DomainHowItWorks.tsx), since the 4 mob
+  // screenshots aren't all identical dimensions — safe to size this way now that the card is no
+  // longer forced into a fixed viewport-height box, so there's no risk of it collapsing to zero
   border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: 0 12px 30px var(--color-black-alpha-14);
 }
 
 .mobileCardImage {
@@ -212,7 +223,7 @@
 
 .mockupFrame {
   position: relative;
-  width: 340px;
+  width: 420px;
   aspect-ratio: 1254 / 2043;
   border-radius: var(--radius-2xl);
   overflow: hidden;
@@ -220,11 +231,11 @@
 
   @include tablet-down {
     order: 1;
-    width: 280px;
+    width: 340px;
   }
 
   @include mobile {
-    width: 220px;
+    width: 260px;
   }
 }
 

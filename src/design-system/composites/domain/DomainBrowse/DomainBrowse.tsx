@@ -125,7 +125,7 @@ export function DomainBrowse() {
             className={`${styles.filterPill} ${styles.filterPillAll} ${filter === 'ALL' ? styles.filterPillActive : ''}`}
             onClick={() => handleFilterChange('ALL')}
           >
-            All domain
+            All TLDs
           </button>
 
           {PROVIDERS.map(provider => (

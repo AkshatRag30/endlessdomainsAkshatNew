@@ -6,11 +6,14 @@
   position: relative;
   width: 100%;
   background: var(--color-white-primary);
-  padding: var(--space-13) 0;
+  // design-specific: bottom padding trimmed well below the top padding — the pagination row
+  // already carries its own top spacing below the cards, so keeping both at the same generous
+  // value stacked up to a much bigger gap than the section actually needs beneath the cards
+  padding: var(--space-13) 0 var(--space-7);
   border-top: 1px solid var(--color-black-alpha-10);
 
-  @include tablet-down { padding: var(--space-11) 0; }
-  @include mobile { padding: var(--space-9) 0; }
+  @include tablet-down { padding: var(--space-11) 0 var(--space-6); }
+  @include mobile { padding: var(--space-9) 0 var(--space-5); }
 }
 
 // ── Title block ───────────────────────────────────────────────────────────────
@@ -105,12 +108,12 @@
   gap: var(--space-7);
   max-width: var(--container-max-width);
   margin: 0 auto;
-  padding: var(--space-9) var(--container-padding-x);
+  padding: var(--space-6) var(--container-padding-x);
 
   @include tablet-down {
     flex-direction: column;
     gap: var(--space-6);
-    padding: var(--space-7) var(--space-7);
+    padding: var(--space-5) var(--space-7);
   }
 
   // design-specific: the paginated 3-per-page row is desktop/tablet only — mobile shows
@@ -166,7 +169,7 @@
   flex-shrink: 0;
   // design-specific: negative vertical margin pulls the divider back out to touch .cardBand's
   // own top/bottom border, since .cardBand now carries vertical padding for the cards themselves
-  margin: calc(-1 * var(--space-9)) 0;
+  margin: calc(-1 * var(--space-6)) 0;
 
   @include tablet-down { display: none; }
 }
@@ -183,15 +186,16 @@
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  gap: var(--space-4);
+  gap: var(--space-3);
   min-width: 0;
   // design-specific: fixed min-height reserves the same space on every card (icon + gap + title
-  // line + gap + the 4-line clamped description + vertical padding) regardless of how long any
+  // line + gap + the 3-line clamped description + vertical padding) regardless of how long any
   // individual card's description actually is — this is what keeps .cardBand's row height
   // constant across pages, since align-items: stretch otherwise sizes the row to whichever
-  // page's tallest card happens to be
-  min-height: calc(56px + var(--space-4) + var(--text-h3) * 1.2 + var(--space-2) + var(--text-small-13) * 1.3 * 4 + var(--space-6) * 2);
-  padding: var(--space-6) var(--space-8);
+  // page's tallest card happens to be. Shortened from 4 to 3 clamped lines and tighter padding so
+  // the card reads wider and squatter rather than tall.
+  min-height: calc(56px + var(--space-3) + var(--text-h3) * 1.2 + var(--space-2) + var(--text-small-13) * 1.3 * 3 + var(--space-5) * 2);
+  padding: var(--space-5) var(--space-9);
   clip-path: polygon(24px 0, 100% 0, 100% 100%, 0 100%, 0 24px);
   background-color: var(--color-gray-light-bg);
   background-image: repeating-linear-gradient(
@@ -205,7 +209,7 @@
   transition: background-color 0.25s ease;
 
   @include tablet-down {
-    padding: var(--space-6) var(--space-6);
+    padding: var(--space-5) var(--space-6);
   }
 }
 
@@ -305,7 +309,7 @@
   // pages comes from that fixed card height, not from anything here, since min-height on a
   // -webkit-box (required for line-clamp) isn't reliably respected inside a centered flex parent
   display: -webkit-box;
-  -webkit-line-clamp: 4;
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 
