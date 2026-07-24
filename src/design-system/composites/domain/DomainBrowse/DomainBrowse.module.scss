@@ -190,16 +190,21 @@
   &:focus-visible {
     @include focus-ring;
   }
-}
 
-.filterPillAll {
-  background: linear-gradient(180deg, #404040 0%, #1a1a1a 100%);
-  color: var(--color-white-primary);
-  box-shadow: 3px 3px 3px 0px var(--color-black-alpha-15);
-}
+  // design-specific: "All TLDs" used to always render as a dark pill regardless of selection,
+  // which meant selected vs unselected looked identical for it — it now shares the same white
+  // default background as every other filter pill, and only &.filterPillActive below marks it
+  // (or any provider pill) as selected. Nested under .filterPill (not a standalone top-level
+  // rule) so it wins over .filterPill's own background-color without needing !important.
+  &.filterPillActive {
+    background-color: var(--color-black-primary);
+    color: var(--color-white-primary);
+    box-shadow: 3px 3px 3px 0px var(--color-black-alpha-15), var(--shadow-inset-glow);
 
-.filterPillActive:not(.filterPillAll) {
-  background-color: var(--color-blue-light);
+    &:hover {
+      background-color: var(--color-black-primary);
+    }
+  }
 }
 
 .filterAvatar {
