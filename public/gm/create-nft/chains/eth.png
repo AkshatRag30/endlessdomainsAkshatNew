@@ -1,0 +1,17 @@
+<svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display: block;" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Image (ETH)">
+<g clip-path="url(#clip0_0_27)">
+<path id="Vector" d="M9.99828 19.8886V14.9259L3.85938 11.3359L9.99828 19.8886Z" fill="#F0CDC2" stroke="#1616B4" stroke-width="0.10989"/>
+<path id="Vector_2" d="M10.0234 19.8886V14.9259L16.1624 11.3359L10.0234 19.8886Z" fill="#C9B3F5" stroke="#1616B4" stroke-width="0.10989"/>
+<path id="Vector_3" d="M9.99851 13.693V7.35938L3.78906 10.1397L9.99851 13.693Z" fill="#88AAF1" stroke="#1616B4" stroke-width="0.10989"/>
+<path id="Vector_4" d="M10.0234 13.693V7.35938L16.2329 10.1398L10.0234 13.693Z" fill="#C9B3F5" stroke="#1616B4" stroke-width="0.10989"/>
+<path id="Vector_5" d="M3.78906 10.1403L9.9984 0.109375V7.35981L3.78906 10.1403Z" fill="#F0CDC2" stroke="#1616B4" stroke-width="0.10989"/>
+<path id="Vector_6" d="M16.2328 10.1403L10.0234 0.109375V7.35981L16.2328 10.1403Z" fill="#B8FAF6" stroke="#1616B4" stroke-width="0.10989"/>
+</g>
+</g>
+<defs>
+<clipPath id="clip0_0_27">
+<path d="M0 10C0 4.47715 4.47715 0 10 0V0C15.5228 0 20 4.47715 20 10V10C20 15.5228 15.5228 20 10 20V20C4.47715 20 0 15.5228 0 10V10Z" fill="white"/>
+</clipPath>
+</defs>
+</svg>

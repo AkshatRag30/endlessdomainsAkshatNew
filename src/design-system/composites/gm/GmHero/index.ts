@@ -1,1 +1,1 @@
-export { GmHero } from './GmHero'
+export { GmHero, GmHeroAccent } from './GmHero'

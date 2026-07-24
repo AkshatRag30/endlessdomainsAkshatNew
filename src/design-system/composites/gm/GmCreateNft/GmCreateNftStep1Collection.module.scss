@@ -1,0 +1,210 @@
+@import '@newstyles/_mixins.scss';
+
+.form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.row {
+  display: flex;
+  gap: var(--space-6);
+  width: 100%;
+
+  @include mobile {
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  flex: 1;
+}
+
+.labelRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.label {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-black-primary);
+  text-transform: capitalize;
+}
+
+.infoIcon {
+  color: var(--color-black-alpha-25);
+}
+
+// ── Inputs ─────────────────────────────────────────────────────────────────────
+// design-specific: Figma's field background is a very light blue tint over a
+// thin black-alpha border — no exact token match, so the alpha values are kept
+// literal against --color-blue-primary / --color-black-primary per the
+// nearest-token rule for non-standard tints
+
+.input,
+.textarea {
+  width: 100%;
+  background: var(--color-blue-primary-alpha-07);
+  border: 1px solid var(--color-black-alpha-12);
+  border-radius: 0;
+  padding: 0 var(--space-3);
+  height: 40px;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  letter-spacing: -0.26px;
+  outline: none;
+  transition: border-color 0.15s ease;
+
+  &::placeholder {
+    color: var(--color-black-alpha-25);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  &:focus {
+    border-color: var(--color-blue-primary-alpha-50);
+  }
+}
+
+.textarea {
+  height: auto;
+  min-height: 82px;
+  padding: var(--space-2) var(--space-3);
+  resize: vertical;
+  line-height: 20px;
+}
+
+// ── Upload button ──────────────────────────────────────────────────────────────
+
+.uploadButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  width: 100%;
+  height: 96px;
+  background: var(--color-blue-primary-alpha-07);
+  border: 1px solid var(--color-black-alpha-12);
+  color: var(--color-gray-dark);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background: var(--color-blue-primary-alpha-13);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.uploadButton span {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-10);
+  letter-spacing: 0.065px;
+  color: var(--color-gray-dark);
+}
+
+.uploadFileName {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-13);
+  color: var(--color-black-primary);
+}
+
+.srOnlyInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// ── Chain grid ─────────────────────────────────────────────────────────────────
+
+.chainGrid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--space-3);
+  padding: var(--space-5) 0;
+
+  @include tablet-down {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  @include mobile {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-2);
+  }
+}
+
+.chainCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  height: 54px;
+  background: var(--color-white-primary);
+  border: 0.5px solid var(--color-gray-200);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+
+  &:hover {
+    background: var(--color-gray-light);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.chainCardActive {
+  background: var(--color-blue-light);
+  border: 1px solid var(--color-blue-primary);
+  box-shadow: var(--shadow-inset-glow);
+}
+
+.chainIcon {
+  border-radius: var(--radius-full);
+  object-fit: cover;
+}
+
+.chainLabel {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-9);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  white-space: nowrap;
+}
+
+// ── Actions ────────────────────────────────────────────────────────────────────
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding-top: var(--space-2);
+
+  @include mobile {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+}

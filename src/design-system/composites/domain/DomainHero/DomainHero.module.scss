@@ -5,19 +5,24 @@
 .hero {
   position: relative;
   width: 100%;
-  min-height: 100vh;
+  // design-specific: PerksNavBar sits in normal document flow above this section at a fixed
+  // 100px height on desktop, not fixed/sticky — subtracting it here is what actually centers the
+  // hero within the space the user sees on first load, since a plain 100vh overshoots by exactly
+  // the navbar's own height and reads as pushed down / off-center
+  min-height: calc(100vh - 100px);
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   background: var(--color-white-primary);
-  padding: var(--space-14) var(--container-padding-x) var(--space-11);
+  padding: var(--space-11) var(--container-padding-x) var(--space-11);
 
   // design-specific: reduced top/bottom padding on laptop-and-up widths so both marquees fit
   // inside the initial viewport instead of sitting just below the fold — combined with the
   // tighter .content gap and smaller marquee sizing below, this keeps the whole hero (text,
   // search bar, stats, both marquees) visible without scrolling on typical laptop screens
   @include desktop {
+    min-height: calc(100vh - 100px);
     padding: var(--space-9) var(--container-padding-x) var(--space-7);
   }
 
@@ -407,15 +412,3 @@
   background: linear-gradient(to left, var(--color-white-primary) 0%, transparent 100%);
 }
 
-.moreLink {
-  font-family: var(--font-space-grotesk);
-  font-weight: var(--font-weight-medium);
-  font-size: var(--text-nav);
-  color: var(--color-blue-primary);
-  text-transform: uppercase;
-  text-decoration: none;
-
-  &:focus-visible {
-    @include focus-ring;
-  }
-}

@@ -1,0 +1,164 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Section shell ─────────────────────────────────────────────────────────────
+// design-specific: same soft blue radial glow rising from the bottom as
+// AiAdvisorHero, reused here per the create-nft Figma reference which sits on
+// an identical white + glow background
+
+.section {
+  position: relative;
+  width: 100%;
+  padding: var(--space-9) var(--container-padding-x) var(--space-14);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+
+  @include tablet-down {
+    padding: var(--space-7) var(--space-6) var(--space-12);
+  }
+
+  @include mobile {
+    padding: var(--space-6) var(--space-4) var(--space-9);
+  }
+}
+
+.glow {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(circle at 55.6% 92.75%, rgba(137, 188, 255, 0.55) 0%, transparent 55%),
+    radial-gradient(circle at 44.7% 94.5%, var(--color-blue-primary-alpha-30) 0%, transparent 60%);
+  filter: blur(80px);
+}
+
+// ── Card ───────────────────────────────────────────────────────────────────────
+
+.card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 699px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  padding: var(--space-8) var(--space-6) var(--space-6);
+
+  @include mobile {
+    padding: var(--space-6) var(--space-4) var(--space-4);
+  }
+}
+
+// ── Card background shape ─────────────────────────────────────────────────────
+// design-specific: Figma's white card background — a rectangle with the
+// top-left and bottom-right corners cut off (699x785 reference), reproduced
+// with a CSS clip-path polygon instead of shipping an SVG. The shape fades in
+// from above via a linear-gradient mask so it dissolves into the page rather
+// than cutting off sharply at its own top edge.
+
+.cardBackground {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: var(--color-white-primary);
+  clip-path: polygon(100% 96.22%, 94.12% 100%, 6% 100%, 0% 96.15%, 0% 9.78%, 15.23% 0%, 100% 0%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 12%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 12%);
+}
+
+.cardHeader {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  text-align: center;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h3);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+
+  @include mobile {
+    font-size: var(--text-body);
+  }
+}
+
+.description {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-nav);
+  color: var(--color-gray-dark);
+  max-width: 480px;
+}
+
+// ── Step indicator ───────────────────────────────────────────────────────────
+
+.stepIndicator {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.stepContent {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+
+.stepDotWrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.stepDot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  background: var(--color-gray-light-bg);
+  border: 1px solid var(--color-black-alpha-12);
+  color: var(--color-gray-dark);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.stepDotActive {
+  background: var(--color-blue-primary);
+  border-color: var(--color-blue-primary);
+  color: var(--color-white-primary);
+  font-weight: var(--font-weight-bold);
+}
+
+.stepDotDone {
+  background: var(--color-blue-light);
+  border-color: var(--color-blue-primary);
+  color: var(--color-blue-primary);
+}
+
+.stepConnector {
+  width: 32px;
+  height: 1px;
+  background: var(--color-black-alpha-12);
+
+  @include mobile {
+    width: 16px;
+  }
+}

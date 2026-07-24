@@ -1,0 +1,84 @@
+@import '@newstyles/_mixins.scss';
+
+.review {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+// ── Collection preview banner ─────────────────────────────────────────────────
+// design-specific: Figma-exact 613x213 aspect ratio for the collection cover image
+
+.previewImageWrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 613 / 213;
+  overflow: hidden;
+}
+
+.previewImage {
+  object-fit: cover;
+}
+
+.summaryHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.collectionName {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-normal);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-alpha-60);
+  text-transform: capitalize;
+}
+
+.collectionDesc {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-nav);
+  color: var(--color-text-body);
+}
+
+// ── Review table ───────────────────────────────────────────────────────────────
+// design-specific: dt/dd pairs laid out as a two-column grid, each row separated
+// by a hairline border matching the Figma reference
+
+.table {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.tableLabel,
+.tableValue {
+  margin: 0;
+  padding: var(--space-4) 0;
+  border-top: 1px solid var(--color-gray-200);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  color: var(--color-black-primary);
+  text-transform: capitalize;
+}
+
+.tableValue {
+  text-align: right;
+}
+
+// ── Actions ────────────────────────────────────────────────────────────────────
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding-top: var(--space-2);
+
+  @include mobile {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+}

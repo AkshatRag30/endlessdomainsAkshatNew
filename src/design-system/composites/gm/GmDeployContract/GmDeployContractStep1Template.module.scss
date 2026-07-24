@@ -1,0 +1,181 @@
+@import '@newstyles/_mixins.scss';
+
+.step {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-9);
+
+  @include mobile {
+    gap: var(--space-6);
+  }
+}
+
+// ── Template grid ──────────────────────────────────────────────────────────────
+
+.templateGrid {
+  width: 100%;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: var(--space-7);
+
+  @include tablet-down {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+// design-specific: Figma path 369.286x131.187 — rectangle with top-left and
+// bottom-right corners cut, reproduced as a percentage clip-path so it scales
+// with the card instead of shipping the SVG asset
+
+.templateCardWrap {
+  position: relative;
+  width: 100%;
+  max-width: 369px;
+
+  @include mobile {
+    max-width: none;
+  }
+}
+
+// design-specific: a second copy of the same clipped shape, slightly larger and
+// blue, sitting behind the card — invisible at rest, faded in on hover, and
+// held visible once the card is selected (persists after the mouse leaves)
+.templateCardHalo {
+  position: absolute;
+  inset: -2px;
+  z-index: 0;
+  background: var(--color-blue-primary);
+  clip-path: polygon(100% 78.26%, 91.8% 100%, 0% 100%, 0% 16.16%, 6.1% 0%, 100% 0%);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.templateCardWrap:not(.templateCardWrapDisabled):hover .templateCardHalo,
+.templateCardWrapSelected .templateCardHalo {
+  opacity: 1;
+}
+
+.templateCard {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  min-height: 131px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-6) var(--space-6) var(--space-5) 35px;
+  // design-specific: fully opaque gray — must not be translucent, otherwise the
+  // blue hover halo behind the card bleeds through and tints the whole card blue
+  background: var(--color-gray-light-bg);
+  border: none;
+  clip-path: polygon(100% 78.26%, 91.8% 100%, 0% 100%, 0% 16.16%, 6.1% 0%, 100% 0%);
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background: var(--color-gray-light);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.templateCardDisabled {
+  cursor: not-allowed;
+}
+
+.templateCardWrapDisabled {
+  cursor: not-allowed;
+}
+
+.templateHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+// ── Icon circle ────────────────────────────────────────────────────────────────
+// design-specific: gray gradient at rest — the icon and title pick up the blue
+// "selected" treatment on hover, and it persists once the card is clicked/selected
+
+.iconCircle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(to bottom, var(--color-gray-dark), var(--color-gray-alpha-53));
+  box-shadow: var(--shadow-inset-glow);
+  transition: background-color 0.15s ease;
+}
+
+.templateCardWrap:not(.templateCardWrapDisabled):hover .iconCircle,
+.templateCardWrapSelected .iconCircle {
+  background: linear-gradient(to bottom, var(--color-blue-primary), var(--color-blue-primary-alpha-50));
+}
+
+.icon {
+  display: block;
+}
+
+.templateTitle {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-dark);
+  text-transform: capitalize;
+  transition: color 0.15s ease;
+}
+
+.templateCardWrap:not(.templateCardWrapDisabled):hover .templateTitle,
+.templateCardWrapSelected .templateTitle {
+  color: var(--color-blue-primary);
+}
+
+.templateDescription {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-13);
+  color: var(--color-gray-dark);
+  line-height: var(--leading-normal);
+}
+
+// ── Coming soon badge ──────────────────────────────────────────────────────────
+
+.comingSoonBadge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: var(--color-black-primary);
+  color: var(--color-white-primary);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-medium);
+  text-transform: capitalize;
+  padding: var(--space-1) var(--space-4) var(--space-1) var(--space-3);
+  border-bottom-left-radius: var(--radius-sm);
+}
+
+// ── Divider + actions ──────────────────────────────────────────────────────────
+
+.divider {
+  width: 100%;
+  height: 1px;
+  // design-specific: dashed divider matching the Figma reference
+  background-image: repeating-linear-gradient(90deg, var(--color-gray-200) 0px, var(--color-gray-200) 8px, transparent 8px, transparent 16px);
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+}

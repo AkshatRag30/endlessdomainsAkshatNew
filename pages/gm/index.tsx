@@ -1,7 +1,7 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import { PerksNavBar } from '@/design-system/composites/reputation/perks/PerksNavBar'
-import { GmTicker, GmHero, GmGrid } from '@/design-system/composites/gm'
+import { GmTicker, GmHero, GmSubTabs, GmGrid } from '@/design-system/composites/gm'
 import styles from './gm.module.scss'
 
 const GmPage: NextPage = () => {
@@ -20,6 +20,7 @@ const GmPage: NextPage = () => {
       <main className={styles.main}>
         <GmTicker />
         <GmHero />
+        <GmSubTabs activeTab="gm" />
         <GmGrid />
       </main>
     </>

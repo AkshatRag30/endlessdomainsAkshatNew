@@ -1,0 +1,133 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Section shell ─────────────────────────────────────────────────────────────
+// design-specific: same soft blue radial glow rising from the bottom used across
+// the GM create flows (ai-advisor reference background)
+
+.section {
+  position: relative;
+  width: 100%;
+  padding: var(--space-9) var(--container-padding-x) var(--space-14);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+
+  @include tablet-down {
+    padding: var(--space-7) var(--space-6) var(--space-12);
+  }
+
+  @include mobile {
+    padding: var(--space-6) var(--space-4) var(--space-9);
+  }
+}
+
+.glow {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(circle at 55.6% 92.75%, rgba(137, 188, 255, 0.55) 0%, transparent 55%),
+    radial-gradient(circle at 44.7% 94.5%, var(--color-blue-primary-alpha-30) 0%, transparent 60%);
+  filter: blur(80px);
+}
+
+// ── Step 1 card (template picker) ─────────────────────────────────────────────
+// design-specific: no white card background on this step per the Figma
+// reference — the template cards sit directly on the glow background
+
+.card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1163px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-9);
+  padding: var(--space-8) var(--space-6) var(--space-6);
+
+  @include mobile {
+    padding: var(--space-6) var(--space-4) var(--space-4);
+    gap: var(--space-6);
+  }
+}
+
+// ── Step 2 card (token configuration) ─────────────────────────────────────────
+// design-specific: same cut-corner white card as the create-nft steps, fading
+// in from above — this step alone carries that background per the Figma reference
+
+.tokenCard {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 699px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  padding: var(--space-8) var(--space-6) var(--space-6);
+
+  @include mobile {
+    padding: var(--space-6) var(--space-4) var(--space-4);
+  }
+}
+
+.tokenCardBackground {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: var(--color-white-primary);
+  clip-path: polygon(100% 96.22%, 94.12% 100%, 6% 100%, 0% 96.15%, 0% 9.78%, 15.23% 0%, 100% 0%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 12%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 12%);
+}
+
+.tokenStepContent {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+
+// ── Shared header ──────────────────────────────────────────────────────────────
+
+.cardHeader {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  text-align: center;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h3);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black-primary);
+
+  @include mobile {
+    font-size: var(--text-body);
+  }
+}
+
+// design-specific: step 2's "Configure Your Token" heading is blue in Figma,
+// matching the create-nft flow's step titles
+.titleAccent {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+}
+
+.description {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-nav);
+  color: var(--color-gray-dark);
+  max-width: 480px;
+}

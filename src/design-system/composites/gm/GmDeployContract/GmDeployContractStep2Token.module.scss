@@ -1,0 +1,176 @@
+@import '@newstyles/_mixins.scss';
+
+.form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.row {
+  display: flex;
+  gap: var(--space-6);
+  width: 100%;
+
+  @include mobile {
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  flex: 1;
+}
+
+.label {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-black-primary);
+  text-transform: capitalize;
+}
+
+// ── Inputs ─────────────────────────────────────────────────────────────────────
+// design-specific: same light blue tint field styling as the create-nft steps
+
+.input {
+  width: 100%;
+  background: var(--color-blue-primary-alpha-07);
+  border: 1px solid var(--color-black-alpha-12);
+  padding: 0 var(--space-3);
+  height: 40px;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  letter-spacing: -0.26px;
+  outline: none;
+  transition: border-color 0.15s ease;
+
+  &::placeholder {
+    color: var(--color-black-alpha-25);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  &:focus {
+    border-color: var(--color-blue-primary-alpha-50);
+  }
+}
+
+// ── Owner field ────────────────────────────────────────────────────────────────
+
+.ownerField {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 40px;
+  background: var(--color-blue-primary-alpha-07);
+  border: 1px solid var(--color-black-alpha-12);
+  padding: 0 var(--space-3);
+}
+
+.ownerAddress {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-13);
+  color: var(--color-blue-primary);
+  letter-spacing: -0.26px;
+}
+
+.copyButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--color-gray-dark);
+  cursor: pointer;
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: var(--color-black-primary);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// ── Chain grid ─────────────────────────────────────────────────────────────────
+
+.chainGrid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--space-3);
+  padding: var(--space-5) 0;
+
+  @include tablet-down {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  @include mobile {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-2);
+  }
+}
+
+.chainCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  height: 54px;
+  background: var(--color-white-primary);
+  border: 0.5px solid var(--color-gray-200);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+
+  &:hover {
+    background: var(--color-gray-light);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.chainCardActive {
+  background: var(--color-blue-light);
+  border: 1px solid var(--color-blue-primary);
+  box-shadow: var(--shadow-inset-glow);
+}
+
+.chainIcon {
+  border-radius: var(--radius-full);
+  object-fit: cover;
+}
+
+.chainLabel {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-9);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  white-space: nowrap;
+}
+
+// ── Actions ────────────────────────────────────────────────────────────────────
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding-top: var(--space-2);
+
+  @include mobile {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+}

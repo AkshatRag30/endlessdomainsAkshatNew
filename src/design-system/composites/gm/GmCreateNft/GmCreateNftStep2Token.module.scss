@@ -1,0 +1,95 @@
+@import '@newstyles/_mixins.scss';
+
+.form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.label {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-black-primary);
+  text-transform: capitalize;
+}
+
+.input {
+  width: 100%;
+  height: 40px;
+  background: var(--color-blue-primary-alpha-07);
+  border: 1px solid var(--color-black-alpha-12);
+  padding: 0 var(--space-3);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  color: var(--color-black-primary);
+  outline: none;
+
+  &::placeholder {
+    color: var(--color-black-alpha-25);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  &:focus {
+    border-color: var(--color-blue-primary-alpha-50);
+  }
+}
+
+.selectWrap {
+  position: relative;
+  width: 100%;
+}
+
+.select {
+  width: 100%;
+  height: 40px;
+  background: var(--color-blue-primary-alpha-07);
+  border: 1px solid var(--color-black-alpha-12);
+  padding: 0 var(--space-9) 0 var(--space-3);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  color: var(--color-black-primary);
+  outline: none;
+  appearance: none;
+  cursor: pointer;
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  &:focus {
+    border-color: var(--color-blue-primary-alpha-50);
+  }
+}
+
+.selectIcon {
+  position: absolute;
+  right: var(--space-3);
+  top: 50%;
+  transform: translateY(-50%) rotate(180deg);
+  color: var(--color-black-alpha-25);
+  pointer-events: none;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding-top: var(--space-2);
+
+  @include mobile {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+}

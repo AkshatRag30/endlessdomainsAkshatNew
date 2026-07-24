@@ -1,6 +1,5 @@
 import React from 'react'
 import Image from 'next/image'
-import Link from 'next/link'
 import { Input } from '@/design-system/primitives/input/Input'
 import { DomainProviders } from '../DomainProviders'
 
@@ -104,7 +103,8 @@ export function DomainHero() {
           <Image src="/og-tld/bottomright.svg" alt="" width={24} height={41} className={`${styles.cornerImgMobile} ${styles.cornerImgMobileRight}`} unoptimized />
         </div>
 
-        {/* TLD marquee */}
+        {/* TLD marquee — provider marquee sits directly below it in place of the removed
+            "+60 MORE" link, consolidating both into one wrap instead of two stacked sections */}
         <div className={styles.tldWrap}>
           <div className={styles.tldMarquee}>
             <ul className={styles.tldTrack}>
@@ -118,11 +118,8 @@ export function DomainHero() {
             <span className={styles.tldFadeLeft} aria-hidden="true" />
             <span className={styles.tldFadeRight} aria-hidden="true" />
           </div>
-          <Link href="/domain" className={styles.moreLink}>+60 MORE</Link>
+          <DomainProviders />
         </div>
-
-        {/* Provider marquee */}
-        <DomainProviders />
 
       </div>
     </section>

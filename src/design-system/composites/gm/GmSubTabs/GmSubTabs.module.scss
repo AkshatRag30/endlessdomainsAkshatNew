@@ -1,0 +1,78 @@
+@import '@newstyles/_mixins.scss';
+
+.subTabs {
+  width: 100%;
+  margin-top: var(--space-6);
+  margin-bottom: var(--space-2);
+}
+
+.list {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  @include mobile {
+    gap: var(--space-2);
+    flex-wrap: wrap;
+  }
+}
+
+.item {
+  display: flex;
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  height: 47px;
+  padding: 0 var(--space-8);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-15);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-dark);
+  background: linear-gradient(to bottom, #404040, #1a1a1a);
+  box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.15), inset 0px 1px 1px 0px rgba(255, 255, 255, 0.25);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: opacity 0.15s ease;
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  @include mobile {
+    height: 40px;
+    padding: 0 var(--space-4);
+    font-size: var(--text-nav);
+  }
+}
+
+.tabActive {
+  color: var(--color-white-primary);
+  background: var(--color-blue-primary);
+  // design-specific: Figma inset white glow on active tab
+  box-shadow: inset 0px 0px 17px 0px white;
+  font-weight: var(--font-weight-bold);
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+}
