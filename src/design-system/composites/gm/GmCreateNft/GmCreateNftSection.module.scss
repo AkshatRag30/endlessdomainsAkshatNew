@@ -53,6 +53,10 @@
   @include mobile {
     padding: var(--space-6) var(--space-4) var(--space-4);
   }
+
+  @include wide {
+    max-width: 780px;
+  }
 }
 
 // ── Card background shape ─────────────────────────────────────────────────────
@@ -86,7 +90,7 @@
   margin: 0;
   font-family: var(--font-satoshi);
   font-size: var(--text-h3);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-bold);
   color: var(--color-blue-primary);
 
   @include mobile {

@@ -35,7 +35,7 @@ export function GmSubTabs({ activeTab }: GmSubTabsProps) {
               className={`${styles.tab} ${activeTab === tab.key ? styles.tabActive : ''}`}
             >
               <span className={styles.icon}>{tab.icon}</span>
-              <span>{tab.label}</span>
+              <span className={styles.label}>{tab.label}</span>
             </Link>
           </li>
         ))}

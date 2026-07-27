@@ -32,7 +32,7 @@ const STEPS: Step[] = [
     mobileImage: '/domain-tld/pickmob.png',
     mobileImageWidth: 948,
     mobileImageHeight: 1044,
-    caption: 'Search across every supported TLD and add your name to the cart.',
+    caption: 'Search any Identity across 60+ TLDs and check availability instantly.',
   },
   {
     id: 'pay-once',
@@ -41,7 +41,7 @@ const STEPS: Step[] = [
     mobileImage: '/domain-tld/payoncemob.png',
     mobileImageWidth: 948,
     mobileImageHeight: 1038,
-    caption: 'Checkout once. No renewals, no recurring fees, ever.',
+    caption: 'One-time payment. No annual renewals. Minted to your wallet permanently.',
   },
   {
     id: 'connect-resolve',
@@ -50,7 +50,7 @@ const STEPS: Step[] = [
     mobileImage: '/domain-tld/connectmob.png',
     mobileImageWidth: 948,
     mobileImageHeight: 1038,
-    caption: 'Use your new identity to send, receive, and resolve across chains.',
+    caption: 'Connect your wallets and your identity resolves across 450+applications immediately.',
   },
 ]
 

@@ -1,5 +1,6 @@
 import { useCallback } from 'react'
-import { FiArrowLeft, FiChevronDown } from 'react-icons/fi'
+import { FiChevronDown } from 'react-icons/fi'
+import { IoReturnUpBackOutline } from 'react-icons/io5'
 import { PrimaryButton } from '@/design-system/primitives/button/PrimaryButton'
 import { SecondaryButton } from '@/design-system/primitives/secondary-button'
 import { GmCreateNftFormState, NFT_CATEGORIES } from './gmCreateNft.data'
@@ -52,13 +53,17 @@ export function GmCreateNftStep2Token({ form, onChange, onBack, onContinue }: Gm
       </div>
 
       <div className={styles.actions}>
-        <SecondaryButton type="button" onClick={onBack} icon={<FiArrowLeft size={18} />}>
-          Back
-        </SecondaryButton>
+        <div className={styles.secondaryBtnWrap}>
+          <SecondaryButton type="button" onClick={onBack} icon={<IoReturnUpBackOutline size={18} />}>
+            Back
+          </SecondaryButton>
+        </div>
 
-        <PrimaryButton type="submit" shape="octagon">
-          Continue To Preview
-        </PrimaryButton>
+        <div className={styles.primaryBtnWrap}>
+          <PrimaryButton type="submit" shape="octagon">
+            Continue To Preview
+          </PrimaryButton>
+        </div>
       </div>
 
     </form>

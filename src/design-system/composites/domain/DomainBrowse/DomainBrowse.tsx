@@ -110,6 +110,8 @@ export function DomainBrowse() {
           </div>
 
           <p className={styles.description}>
+            <span className={styles.descriptionBracketTL} aria-hidden="true" />
+            <span className={styles.descriptionBracketBR} aria-hidden="true" />
             Buying identities across multiple providers and chains was a hassle. Endless brings ENS, Unstoppable, Freename, and more into one unified marketplace. One search. Every identity.
           </p>
         </div>

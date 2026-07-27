@@ -1,0 +1,97 @@
+@import '@newstyles/_mixins.scss';
+
+.chainGrid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--space-3);
+  padding: var(--space-5) 0;
+
+  @include tablet-down {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  @include mobile {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-2);
+  }
+}
+
+.chainCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  height: 54px;
+  background: var(--color-white-primary);
+  border: 0.5px solid var(--color-gray-200);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+
+  &:hover {
+    background: var(--color-gray-light);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.chainCardActive {
+  background: var(--color-blue-light);
+  border: 1px solid var(--color-blue-primary);
+  box-shadow: var(--shadow-inset-glow);
+}
+
+.chainCardDisabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+
+  &:hover {
+    background: var(--color-white-primary);
+  }
+}
+
+.chainIcon {
+  border-radius: var(--radius-full);
+  object-fit: cover;
+}
+
+.chainLabel {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-9);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+// ── Loading skeleton ───────────────────────────────────────────────────────────
+
+.chainCardSkeleton {
+  height: 54px;
+  background: var(--color-gray-light);
+  border: 0.5px solid var(--color-gray-200);
+  animation: gm-chain-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes gm-chain-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+// ── Error state ────────────────────────────────────────────────────────────────
+
+.errorState {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: var(--color-gray-light-bg);
+  border: 1px solid var(--color-gray-200);
+  color: var(--color-gray-dark);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+}

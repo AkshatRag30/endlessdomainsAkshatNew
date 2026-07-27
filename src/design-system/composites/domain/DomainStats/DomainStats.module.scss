@@ -150,10 +150,10 @@
   @include mobile { display: block; }
 }
 
-.mobileCornerTL { @extend %mobile-corner-tick; top: 6px;    left: 6px;  border-width: 1.5px 0 0 1.5px; }
-.mobileCornerTR { @extend %mobile-corner-tick; top: 6px;    right: 6px; border-width: 1.5px 1.5px 0 0; }
-.mobileCornerBL { @extend %mobile-corner-tick; bottom: 6px; left: 6px;  border-width: 0 0 1.5px 1.5px; }
-.mobileCornerBR { @extend %mobile-corner-tick; bottom: 6px; right: 6px; border-width: 0 1.5px 1.5px 0; }
+.mobileCornerTL { @extend %mobile-corner-tick; top: 6px;    left: 6px;  border-width: 2px 0 0 2px; }
+.mobileCornerTR { @extend %mobile-corner-tick; top: 6px;    right: 6px; border-width: 2px 2px 0 0; }
+.mobileCornerBL { @extend %mobile-corner-tick; bottom: 6px; left: 6px;  border-width: 0 0 2px 2px; }
+.mobileCornerBR { @extend %mobile-corner-tick; bottom: 6px; right: 6px; border-width: 0 2px 2px 0; }
 
 .statBracketLeft {
   @extend %stat-bracket;

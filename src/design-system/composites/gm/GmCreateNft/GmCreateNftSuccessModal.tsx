@@ -1,8 +1,8 @@
-import { useEffect, useRef } from 'react'
-import { FiX, FiCheck } from 'react-icons/fi'
+import { FiCheck } from 'react-icons/fi'
 import { PrimaryButton } from '@/design-system/primitives/button/PrimaryButton'
+import { StatusModal } from '@/design-system/primitives/StatusModal'
+import parts from '@/design-system/primitives/StatusModal/StatusModalParts.module.scss'
 import { GmCreateNftFormState } from './gmCreateNft.data'
-import styles from './GmCreateNftSuccessModal.module.scss'
 
 interface GmCreateNftSuccessModalProps {
   form: GmCreateNftFormState
@@ -10,51 +10,24 @@ interface GmCreateNftSuccessModalProps {
 }
 
 export function GmCreateNftSuccessModal({ form, onClose }: GmCreateNftSuccessModalProps) {
-  const closeButtonRef = useRef<HTMLButtonElement>(null)
-
-  useEffect(() => {
-    closeButtonRef.current?.focus()
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [onClose])
-
   return (
-    <div className={styles.overlay} role="presentation" onClick={onClose}>
-      <div
-        className={styles.modal}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="create-nft-success-heading"
-        onClick={e => e.stopPropagation()}
-      >
-        <button ref={closeButtonRef} type="button" className={styles.closeButton} onClick={onClose} aria-label="Close">
-          <FiX size={20} aria-hidden="true" />
-        </button>
-
-        <div className={styles.iconRing}>
-          <div className={styles.iconCircle}>
-            <FiCheck size={24} aria-hidden="true" className={styles.checkIcon} />
-          </div>
-        </div>
-
-        <h2 id="create-nft-success-heading" className={styles.heading}>Collection Deployed</h2>
-        <p className={styles.description}>
-          {(form.collectionName.trim() || 'Your collection')} has been created and deployed on chain. It&apos;s ready to mint from.
-        </p>
-
-        <div className={styles.summaryCard}>
-          <span className={styles.summaryLabel}>Symbol</span>
-          <span className={styles.summaryValue}>{form.symbol.trim() || '-'}</span>
-        </div>
-
-        <PrimaryButton type="button" shape="octagon" fullWidth onClick={onClose}>
-          Done
-        </PrimaryButton>
+    <StatusModal
+      tone="success"
+      icon={<FiCheck size={24} aria-hidden="true" color="var(--color-white-primary)" />}
+      heading="Collection Deployed"
+      description={`${form.collectionName.trim() || 'Your collection'} has been created and deployed on chain. It's ready to mint from.`}
+      ariaLabelledBy="create-nft-success-heading"
+      onClose={onClose}
+    >
+      <div className={parts.summaryCard}>
+        <span className={parts.summaryLabel}>Symbol</span>
+        <span className={parts.summaryValue}>{form.symbol.trim() || '-'}</span>
       </div>
-    </div>
+
+      <PrimaryButton type="button" shape="octagon" fullWidth onClick={onClose}>
+        Done
+      </PrimaryButton>
+    </StatusModal>
   )
 }
 

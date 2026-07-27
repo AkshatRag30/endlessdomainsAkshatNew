@@ -1,9 +1,10 @@
 import { useCallback, useRef } from 'react'
-import Image from 'next/image'
-import { FiUpload, FiInfo, FiArrowLeft } from 'react-icons/fi'
+import { FiUpload, FiInfo } from 'react-icons/fi'
+import { IoReturnUpBackOutline } from 'react-icons/io5'
 import { PrimaryButton } from '@/design-system/primitives/button/PrimaryButton'
 import { SecondaryButton } from '@/design-system/primitives/secondary-button'
-import { GmCreateNftFormState, NFT_CHAINS } from './gmCreateNft.data'
+import { GmChainSelector } from '../GmChainSelector'
+import { GmCreateNftFormState } from './gmCreateNft.data'
 import styles from './GmCreateNftStep1Collection.module.scss'
 
 interface GmCreateNftStep1CollectionProps {
@@ -102,31 +103,21 @@ export function GmCreateNftStep1Collection({ form, onChange, onContinue }: GmCre
 
       <div className={styles.field}>
         <span className={styles.label}>Chain</span>
-        <div className={styles.chainGrid} role="radiogroup" aria-label="Select deployment chain">
-          {NFT_CHAINS.map(chain => (
-            <button
-              key={chain.id}
-              type="button"
-              role="radio"
-              aria-checked={form.chainId === chain.id}
-              className={`${styles.chainCard} ${form.chainId === chain.id ? styles.chainCardActive : ''}`}
-              onClick={() => onChange({ chainId: chain.id })}
-            >
-              <Image src={chain.icon} alt="" width={20} height={20} className={styles.chainIcon} unoptimized />
-              <span className={styles.chainLabel}>{chain.label}</span>
-            </button>
-          ))}
-        </div>
+        <GmChainSelector value={form.chainId} onChange={chainId => onChange({ chainId })} />
       </div>
 
       <div className={styles.actions}>
-        <SecondaryButton type="button" disabled icon={<FiArrowLeft size={18} />}>
-          Back
-        </SecondaryButton>
+        <div className={styles.secondaryBtnWrap}>
+          <SecondaryButton type="button" disabled icon={<IoReturnUpBackOutline size={18} />}>
+            Back
+          </SecondaryButton>
+        </div>
 
-        <PrimaryButton type="submit" shape="octagon" disabled={!canContinue}>
-          Continue To Preview
-        </PrimaryButton>
+        <div className={styles.primaryBtnWrap}>
+          <PrimaryButton type="submit" shape="octagon" disabled={!canContinue}>
+            Continue To Preview
+          </PrimaryButton>
+        </div>
       </div>
 
     </form>

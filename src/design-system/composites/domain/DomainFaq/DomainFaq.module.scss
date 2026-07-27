@@ -17,8 +17,8 @@
   height: 1px;
   background: repeating-linear-gradient(
     90deg,
-    var(--color-blue-primary-alpha-13) 0px,
-    var(--color-blue-primary-alpha-13) 6px,
+    var(--color-blue-primary-alpha-25) 0px,
+    var(--color-blue-primary-alpha-25) 6px,
     transparent 6px,
     transparent 12px
   );
@@ -137,10 +137,10 @@ $diagonal-strip-h: 75px;
   display: block;
 }
 
-.bracketTL { @extend %bracket-base; top: 0; left: 0; border-width: 1.5px 0 0 1.5px; }
-.bracketTR { @extend %bracket-base; top: 0; right: 0; border-width: 1.5px 1.5px 0 0; }
-.bracketBL { @extend %bracket-base; bottom: 0; left: 0; border-width: 0 0 1.5px 1.5px; }
-.bracketBR { @extend %bracket-base; bottom: 0; right: 0; border-width: 0 1.5px 1.5px 0; }
+.bracketTL { @extend %bracket-base; top: 0; left: 0; border-width: 2px 0 0 2px; }
+.bracketTR { @extend %bracket-base; top: 0; right: 0; border-width: 2px 2px 0 0; }
+.bracketBL { @extend %bracket-base; bottom: 0; left: 0; border-width: 0 0 2px 2px; }
+.bracketBR { @extend %bracket-base; bottom: 0; right: 0; border-width: 0 2px 2px 0; }
 
 // ── Heading ───────────────────────────────────────────────────────────────────
 
@@ -202,11 +202,29 @@ $diagonal-strip-h: 75px;
   flex: 1;
   display: flex;
   flex-direction: column;
-  border-left: 1px dashed var(--color-blue-primary-alpha-13);
+  // design-specific: a native 1px `dashed` border renders as tiny near-square dots rather than
+  // real elongated dashes — this repeating-gradient recipe draws proper dash segments instead
+  background-image: repeating-linear-gradient(
+    180deg,
+    var(--color-blue-primary-alpha-25) 0px,
+    var(--color-blue-primary-alpha-25) 6px,
+    transparent 6px,
+    transparent 12px
+  );
+  background-size: 1px 100%;
+  background-repeat: no-repeat;
+  background-position: left;
 
   @include tablet-down {
-    border-left: none;
-    border-top: 1px dashed var(--color-blue-primary-alpha-13);
+    background-image: repeating-linear-gradient(
+      90deg,
+      var(--color-blue-primary-alpha-25) 0px,
+      var(--color-blue-primary-alpha-25) 6px,
+      transparent 6px,
+      transparent 12px
+    );
+    background-size: 100% 1px;
+    background-position: top;
   }
 }
 
@@ -307,8 +325,8 @@ $diagonal-strip-h: 75px;
   height: 1px;
   background: repeating-linear-gradient(
     90deg,
-    var(--color-blue-primary-alpha-13) 0px,
-    var(--color-blue-primary-alpha-13) 6px,
+    var(--color-blue-primary-alpha-25) 0px,
+    var(--color-blue-primary-alpha-25) 6px,
     transparent 6px,
     transparent 12px
   );

@@ -9,6 +9,9 @@ const nextConfig = {
   images: {
     remotePatterns: [
       { hostname: 'cryptologos.cc' },
+      { hostname: 'raw.githubusercontent.com' },
+      { hostname: 'assets.coingecko.com' },
+      { hostname: 'icons.llamao.fi' },
     ],
   },
   sassOptions: {

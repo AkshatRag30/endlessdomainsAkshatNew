@@ -76,6 +76,10 @@
   &:focus {
     border-color: var(--color-blue-primary-alpha-50);
   }
+
+  @include mobile {
+    height: 44px;
+  }
 }
 
 .textarea {
@@ -136,64 +140,6 @@
   border: 0;
 }
 
-// ── Chain grid ─────────────────────────────────────────────────────────────────
-
-.chainGrid {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: var(--space-3);
-  padding: var(--space-5) 0;
-
-  @include tablet-down {
-    grid-template-columns: repeat(4, 1fr);
-  }
-
-  @include mobile {
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-2);
-  }
-}
-
-.chainCard {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  height: 54px;
-  background: var(--color-white-primary);
-  border: 0.5px solid var(--color-gray-200);
-  cursor: pointer;
-  transition: border-color 0.15s ease, background-color 0.15s ease;
-
-  &:hover {
-    background: var(--color-gray-light);
-  }
-
-  &:focus-visible {
-    @include focus-ring;
-  }
-}
-
-.chainCardActive {
-  background: var(--color-blue-light);
-  border: 1px solid var(--color-blue-primary);
-  box-shadow: var(--shadow-inset-glow);
-}
-
-.chainIcon {
-  border-radius: var(--radius-full);
-  object-fit: cover;
-}
-
-.chainLabel {
-  font-family: var(--font-satoshi);
-  font-size: var(--text-small-9);
-  font-weight: var(--font-weight-medium);
-  color: var(--color-black-primary);
-  white-space: nowrap;
-}
-
 // ── Actions ────────────────────────────────────────────────────────────────────
 
 .actions {
@@ -204,7 +150,31 @@
   padding-top: var(--space-2);
 
   @include mobile {
-    flex-direction: column-reverse;
-    align-items: stretch;
+    gap: var(--space-2);
+  }
+}
+
+// design-specific: SecondaryButton primitive hardcodes width: 200px — this
+// wrapper forces it to share the row equally with PrimaryButton on mobile
+// instead of overflowing to a second line
+.secondaryBtnWrap {
+  @include mobile {
+    flex: 1;
+    min-width: 0;
+
+    > * {
+      width: 100%;
+    }
+  }
+}
+
+.primaryBtnWrap {
+  @include mobile {
+    flex: 1;
+    min-width: 0;
+
+    > * {
+      width: 100%;
+    }
   }
 }

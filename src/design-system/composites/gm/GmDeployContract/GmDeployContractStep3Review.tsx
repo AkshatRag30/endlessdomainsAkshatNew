@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react'
-import { FiArrowLeft } from 'react-icons/fi'
+import { IoReturnUpBackOutline } from 'react-icons/io5'
 import { PrimaryButton } from '@/design-system/primitives/button/PrimaryButton'
 import { SecondaryButton } from '@/design-system/primitives/secondary-button'
-import { NFT_CHAINS } from '../GmCreateNft/gmCreateNft.data'
+import { useSupportedChains } from '../GmChainSelector'
 import { DeployTokenFormState } from './gmDeployContract.data'
 import styles from './GmDeployContractStep3Review.module.scss'
 
@@ -13,9 +13,10 @@ interface GmDeployContractStep3ReviewProps {
 }
 
 export function GmDeployContractStep3Review({ form, onBack, onCreate }: GmDeployContractStep3ReviewProps) {
+  const { chains } = useSupportedChains()
   const chainLabel = useMemo(
-    () => NFT_CHAINS.find(chain => chain.id === form.chainId)?.label ?? '-',
-    [form.chainId],
+    () => chains.find(chain => chain.chain === form.chainId)?.name ?? '-',
+    [chains, form.chainId],
   )
 
   const rows = [
@@ -46,13 +47,17 @@ export function GmDeployContractStep3Review({ form, onBack, onCreate }: GmDeploy
       </dl>
 
       <div className={styles.actions}>
-        <SecondaryButton type="button" onClick={onBack} icon={<FiArrowLeft size={18} />}>
-          Edit
-        </SecondaryButton>
+        <div className={styles.secondaryBtnWrap}>
+          <SecondaryButton type="button" onClick={onBack} icon={<IoReturnUpBackOutline size={18} />}>
+            Edit
+          </SecondaryButton>
+        </div>
 
-        <PrimaryButton type="button" shape="octagon" onClick={onCreate}>
-          Create
-        </PrimaryButton>
+        <div className={styles.primaryBtnWrap}>
+          <PrimaryButton type="button" shape="octagon" onClick={onCreate}>
+            Create
+          </PrimaryButton>
+        </div>
       </div>
 
     </div>

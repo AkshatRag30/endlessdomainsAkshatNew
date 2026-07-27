@@ -1,0 +1,235 @@
+@import '@newstyles/_mixins.scss';
+
+// Reusable body-content pieces slotted as children into StatusModal — notice
+// banners, tx hash rows, summary rows, and action rows. Kept separate from
+// StatusModal.module.scss so consumers only pull in the parts they use.
+
+// ── Loading spinner (used inside icon circles and hash-row status pills) ─────
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  border: 2px solid var(--color-white-alpha-40);
+  border-top-color: var(--color-white-primary);
+  animation: status-modal-spin 0.8s linear infinite;
+}
+
+@keyframes status-modal-spin {
+  to { transform: rotate(360deg); }
+}
+
+// ── Wave loader SVG — same animated wave as ScoreLoading / GmPendingModal ────
+
+.waveSvg {
+  width: 38px;
+  height: 38px;
+  display: block;
+}
+
+.waveBack {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: status-modal-wave-move-back 5s linear infinite;
+}
+
+.waveFront {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: status-modal-wave-move-front 3s linear infinite;
+}
+
+@keyframes status-modal-wave-move-front {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-33px); }
+}
+
+@keyframes status-modal-wave-move-back {
+  from { transform: translateX(-33px); }
+  to   { transform: translateX(0); }
+}
+
+// ── Notice banner ─────────────────────────────────────────────────────────────
+
+.notice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  width: 100%;
+  background: #fef9c3;
+  border: 1px solid #fef08a;
+  padding: var(--space-4);
+  text-align: left;
+}
+
+.noticeIcon {
+  flex-shrink: 0;
+  color: var(--color-black-alpha-60);
+}
+
+.noticeText {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-10);
+  color: var(--color-black-alpha-60);
+}
+
+// ── Hash row — tx hash / status pill / explorer link ──────────────────────────
+
+.hashRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: 100%;
+  background: var(--color-white-primary);
+  border: 1px solid var(--color-blue-primary-alpha-30);
+  padding: var(--space-4);
+}
+
+.hashText {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-nav);
+  color: var(--color-gray-dark);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hashStatus {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  color: var(--color-gray-dark);
+}
+
+.hashSpinner {
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-full);
+  border: 2px solid var(--color-gray-200);
+  border-top-color: var(--color-gray-dark);
+  animation: status-modal-spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+.hashLink {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-blue-primary);
+
+  &:hover {
+    color: var(--color-blue-primary-hover);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// ── Summary row — e.g. collection name / chain ────────────────────────────────
+
+.summaryRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-gray-200);
+}
+
+.summaryName {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black-primary);
+}
+
+.summaryChain {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  color: var(--color-gray-dark);
+}
+
+// ── Summary card — label/value pair, e.g. "Symbol: NCAT" ─────────────────────
+
+.summaryCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  width: 100%;
+  background: var(--color-gray-light-bg);
+  border: 1px solid var(--color-gray-200);
+  padding: var(--space-3) var(--space-4);
+}
+
+.summaryLabel {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  color: var(--color-gray-dark);
+  flex-shrink: 0;
+}
+
+.summaryValue {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-black-primary);
+  word-break: break-word;
+  text-align: right;
+}
+
+// ── Actions row — split link-button / primary-button row ─────────────────────
+
+.actionsRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  width: 100%;
+
+  @include mobile {
+    flex-direction: column-reverse;
+  }
+}
+
+.linkButton {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: none;
+  border: none;
+  padding: var(--space-3) 0;
+  cursor: pointer;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  white-space: nowrap;
+
+  &:hover {
+    color: var(--color-gray-dark);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.actionsRow > :global(button) {
+  flex: 1;
+}

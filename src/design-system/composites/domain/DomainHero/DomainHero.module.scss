@@ -108,10 +108,10 @@
   pointer-events: none;
 }
 
-.labelBracketTL { @extend %bracket-corner; top: 0; left: 0; border-width: 1.5px 0 0 1.5px; }
-.labelBracketTR { @extend %bracket-corner; top: 0; right: 0; border-width: 1.5px 1.5px 0 0; }
-.labelBracketBL { @extend %bracket-corner; bottom: 0; left: 0; border-width: 0 0 1.5px 1.5px; }
-.labelBracketBR { @extend %bracket-corner; bottom: 0; right: 0; border-width: 0 1.5px 1.5px 0; }
+.labelBracketTL { @extend %bracket-corner; top: 0; left: 0; border-width: 2px 0 0 2px; }
+.labelBracketTR { @extend %bracket-corner; top: 0; right: 0; border-width: 2px 2px 0 0; }
+.labelBracketBL { @extend %bracket-corner; bottom: 0; left: 0; border-width: 0 0 2px 2px; }
+.labelBracketBR { @extend %bracket-corner; bottom: 0; right: 0; border-width: 0 2px 2px 0; }
 
 .labelText {
   margin: 0;

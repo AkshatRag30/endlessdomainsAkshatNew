@@ -31,7 +31,7 @@
   margin: 0;
   font-family: var(--font-satoshi);
   font-size: var(--text-normal);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-bold);
   color: var(--color-black-alpha-60);
   text-transform: capitalize;
 }
@@ -51,6 +51,10 @@
   margin: 0;
   display: grid;
   grid-template-columns: 1fr 1fr;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
 }
 
 .tableLabel,
@@ -62,10 +66,17 @@
   font-size: var(--text-nav);
   color: var(--color-black-primary);
   text-transform: capitalize;
+  word-break: break-word;
 }
 
 .tableValue {
   text-align: right;
+
+  @include mobile {
+    text-align: left;
+    border-top: none;
+    padding-top: 0;
+  }
 }
 
 // ── Actions ────────────────────────────────────────────────────────────────────
@@ -78,7 +89,31 @@
   padding-top: var(--space-2);
 
   @include mobile {
-    flex-direction: column-reverse;
-    align-items: stretch;
+    gap: var(--space-2);
+  }
+}
+
+// design-specific: SecondaryButton primitive hardcodes width: 200px — this
+// wrapper forces it to share the row equally with PrimaryButton on mobile
+// instead of overflowing to a second line
+.secondaryBtnWrap {
+  @include mobile {
+    flex: 1;
+    min-width: 0;
+
+    > * {
+      width: 100%;
+    }
+  }
+}
+
+.primaryBtnWrap {
+  @include mobile {
+    flex: 1;
+    min-width: 0;
+
+    > * {
+      width: 100%;
+    }
   }
 }

@@ -59,7 +59,7 @@ export function GmDeployContractSection() {
       {step === 1 && (
         <div className={styles.card}>
           <div className={styles.cardHeader}>
-            <h2 id="deploy-contract-heading" className={styles.title}>What Do You Want To Deploy?</h2>
+            <h2 id="deploy-contract-heading" className={`${styles.title} ${styles.titleAccent}`}>What Do You Want To Deploy?</h2>
             <p className={styles.description}>Pick a template. Each one deploys an audited, unmodified contract — no code required.</p>
           </div>
 

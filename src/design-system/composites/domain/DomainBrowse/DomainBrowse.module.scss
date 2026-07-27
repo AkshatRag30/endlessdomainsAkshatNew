@@ -14,8 +14,14 @@
 
 .header {
   width: 100%;
-  border-top: 1px dashed var(--color-blue-primary-alpha-20);
-  border-bottom: 1px dashed var(--color-blue-primary-alpha-20);
+  // design-specific: a native 1px `dashed` border renders as tiny near-square dots rather than
+  // real elongated dashes — this repeating-gradient recipe draws proper dash segments instead
+  background-image:
+    repeating-linear-gradient(90deg, var(--color-blue-primary-alpha-30) 0px, var(--color-blue-primary-alpha-30) 6px, transparent 6px, transparent 12px),
+    repeating-linear-gradient(90deg, var(--color-blue-primary-alpha-30) 0px, var(--color-blue-primary-alpha-30) 6px, transparent 6px, transparent 12px);
+  background-size: 100% 1px, 100% 1px;
+  background-repeat: no-repeat;
+  background-position: top, bottom;
 }
 
 .headerInner {
@@ -62,10 +68,10 @@
   pointer-events: none;
 }
 
-.labelBracketTL { @extend %bracket-corner; top: 0; left: 0; border-width: 1.5px 0 0 1.5px; }
-.labelBracketTR { @extend %bracket-corner; top: 0; right: 0; border-width: 1.5px 1.5px 0 0; }
-.labelBracketBL { @extend %bracket-corner; bottom: 0; left: 0; border-width: 0 0 1.5px 1.5px; }
-.labelBracketBR { @extend %bracket-corner; bottom: 0; right: 0; border-width: 0 1.5px 1.5px 0; }
+.labelBracketTL { @extend %bracket-corner; top: 0; left: 0; border-width: 2px 0 0 2px; }
+.labelBracketTR { @extend %bracket-corner; top: 0; right: 0; border-width: 2px 2px 0 0; }
+.labelBracketBL { @extend %bracket-corner; bottom: 0; left: 0; border-width: 0 0 2px 2px; }
+.labelBracketBR { @extend %bracket-corner; bottom: 0; right: 0; border-width: 0 2px 2px 0; }
 
 .labelText {
   margin: 0;
@@ -111,7 +117,9 @@
 }
 
 .description {
+  position: relative;
   margin: 0;
+  padding: var(--space-3);
   font-family: var(--font-space-grotesk);
   font-size: var(--text-body);
   font-weight: var(--font-weight-regular);
@@ -123,6 +131,9 @@
   @include tablet-down { font-size: var(--text-body-small); max-width: 100%; text-align: left; }
   @include mobile { font-size: var(--text-small-15); }
 }
+
+.descriptionBracketTL { @extend %bracket-corner; top: 0; left: 0; border-width: 2px 0 0 2px; }
+.descriptionBracketBR { @extend %bracket-corner; bottom: 0; right: 0; border-width: 0 2px 2px 0; }
 
 // ── Provider filter row ───────────────────────────────────────────────────────
 

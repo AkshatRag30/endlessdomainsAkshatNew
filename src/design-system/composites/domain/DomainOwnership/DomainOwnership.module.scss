@@ -14,8 +14,14 @@
 
 .header {
   width: 100%;
-  border-top: 1px dashed var(--color-blue-primary-alpha-20);
-  border-bottom: 1px dashed var(--color-blue-primary-alpha-20);
+  // design-specific: a native 1px `dashed` border renders as tiny near-square dots rather than
+  // real elongated dashes — this repeating-gradient recipe draws proper dash segments instead
+  background-image:
+    repeating-linear-gradient(90deg, var(--color-blue-primary-alpha-30) 0px, var(--color-blue-primary-alpha-30) 6px, transparent 6px, transparent 12px),
+    repeating-linear-gradient(90deg, var(--color-blue-primary-alpha-30) 0px, var(--color-blue-primary-alpha-30) 6px, transparent 6px, transparent 12px);
+  background-size: 100% 1px, 100% 1px;
+  background-repeat: no-repeat;
+  background-position: top, bottom;
 }
 
 .titleBlock {
@@ -49,10 +55,10 @@
   pointer-events: none;
 }
 
-.labelBracketTL { @extend %bracket-corner; top: 0; left: 0; border-width: 1.5px 0 0 1.5px; }
-.labelBracketTR { @extend %bracket-corner; top: 0; right: 0; border-width: 1.5px 1.5px 0 0; }
-.labelBracketBL { @extend %bracket-corner; bottom: 0; left: 0; border-width: 0 0 1.5px 1.5px; }
-.labelBracketBR { @extend %bracket-corner; bottom: 0; right: 0; border-width: 0 1.5px 1.5px 0; }
+.labelBracketTL { @extend %bracket-corner; top: 0; left: 0; border-width: 2px 0 0 2px; }
+.labelBracketTR { @extend %bracket-corner; top: 0; right: 0; border-width: 2px 2px 0 0; }
+.labelBracketBL { @extend %bracket-corner; bottom: 0; left: 0; border-width: 0 0 2px 2px; }
+.labelBracketBR { @extend %bracket-corner; bottom: 0; right: 0; border-width: 0 2px 2px 0; }
 
 .labelText {
   margin: 0;
@@ -183,14 +189,19 @@
   width: 56px;
   height: 56px;
   flex-shrink: 0;
-  border-radius: var(--radius-lg);
+  // design-specific: Figma-exact radius/shadow stack — no exact token match, kept literal
+  border-radius: 18.1176px;
   color: var(--color-white-primary);
-  background: linear-gradient(180deg, var(--color-blue-primary) 0%, var(--color-blue-primary-faded) 100%);
+  background: linear-gradient(180deg, var(--color-blue-primary) 0%, rgba(38, 57, 237, 0.47) 100%);
   box-shadow:
-    0px 19px 49px 0px rgba(87, 177, 255, 0.34),
-    0px 11px 15px 0px rgba(87, 177, 255, 0.19),
-    0px 5px 6px 0px rgba(87, 177, 255, 0.22),
-    0px 2px 2px 0px rgba(87, 177, 255, 0.15);
+    0px 19.4091px 49.4471px rgba(87, 177, 255, 0.34),
+    0px 11.4239px 14.9069px rgba(87, 177, 255, 0.1867),
+    0px 4.74492px 6.19155px rgba(87, 177, 255, 0.22),
+    0px 1.71615px 2.23936px rgba(87, 177, 255, 0.153301),
+    0px 0px 0px 1.84849px #E0E9F2,
+    0px 0px 0px 2.31061px #FFFFFF,
+    inset 0px 0.462122px 8.3182px 0.924245px #D2EAFF,
+    inset 0px 0.462122px 1.84849px 0.924245px #D2EAFF;
 }
 
 .cardText {

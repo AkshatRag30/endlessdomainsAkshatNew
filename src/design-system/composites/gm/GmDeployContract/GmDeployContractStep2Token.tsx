@@ -1,9 +1,9 @@
 import { useCallback, useState } from 'react'
-import Image from 'next/image'
-import { FiCopy, FiCheck, FiArrowLeft } from 'react-icons/fi'
+import { FiCopy, FiCheck } from 'react-icons/fi'
+import { IoReturnUpBackOutline } from 'react-icons/io5'
 import { PrimaryButton } from '@/design-system/primitives/button/PrimaryButton'
 import { SecondaryButton } from '@/design-system/primitives/secondary-button'
-import { NFT_CHAINS } from '../GmCreateNft/gmCreateNft.data'
+import { GmChainSelector } from '../GmChainSelector'
 import { DeployTokenFormState } from './gmDeployContract.data'
 import styles from './GmDeployContractStep2Token.module.scss'
 
@@ -84,31 +84,21 @@ export function GmDeployContractStep2Token({ form, onChange, onBack, onContinue 
 
       <div className={styles.field}>
         <span className={styles.label}>Chain</span>
-        <div className={styles.chainGrid} role="radiogroup" aria-label="Select deployment chain">
-          {NFT_CHAINS.map(chain => (
-            <button
-              key={chain.id}
-              type="button"
-              role="radio"
-              aria-checked={form.chainId === chain.id}
-              className={`${styles.chainCard} ${form.chainId === chain.id ? styles.chainCardActive : ''}`}
-              onClick={() => onChange({ chainId: chain.id })}
-            >
-              <Image src={chain.icon} alt="" width={20} height={20} className={styles.chainIcon} unoptimized />
-              <span className={styles.chainLabel}>{chain.label}</span>
-            </button>
-          ))}
-        </div>
+        <GmChainSelector value={form.chainId} onChange={chainId => onChange({ chainId })} />
       </div>
 
       <div className={styles.actions}>
-        <SecondaryButton type="button" onClick={onBack} icon={<FiArrowLeft size={18} />}>
-          Back
-        </SecondaryButton>
+        <div className={styles.secondaryBtnWrap}>
+          <SecondaryButton type="button" onClick={onBack} icon={<IoReturnUpBackOutline size={18} />}>
+            Back
+          </SecondaryButton>
+        </div>
 
-        <PrimaryButton type="submit" shape="octagon" disabled={!canContinue}>
-          Continue To Preview
-        </PrimaryButton>
+        <div className={styles.primaryBtnWrap}>
+          <PrimaryButton type="submit" shape="octagon" disabled={!canContinue}>
+            Continue To Preview
+          </PrimaryButton>
+        </div>
       </div>
 
     </form>
