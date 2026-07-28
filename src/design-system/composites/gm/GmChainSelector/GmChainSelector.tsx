@@ -48,7 +48,7 @@ export function GmChainSelector({ value, onChange }: GmChainSelectorProps) {
             onClick={() => onChange(chain.chain)}
             title={!isActive ? `${chain.name} — unavailable` : chain.name}
           >
-            <Image src={chain.logo} alt="" width={20} height={20} className={styles.chainIcon} unoptimized />
+            <Image src={chain.logo} alt="" width={28} height={28} className={styles.chainIcon} unoptimized />
             <span className={styles.chainLabel}>{chain.name}</span>
           </button>
         )

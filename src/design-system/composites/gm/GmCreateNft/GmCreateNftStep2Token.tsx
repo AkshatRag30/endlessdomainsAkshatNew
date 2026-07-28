@@ -31,7 +31,7 @@ export function GmCreateNftStep2Token({ form, onChange, onBack, onContinue }: Gm
             value={form.category}
             onChange={e => onChange({ category: e.target.value })}
           >
-            <option value="" disabled>eg art</option>
+            <option value="" disabled>Select a category</option>
             {NFT_CATEGORIES.map(category => (
               <option key={category} value={category}>{category}</option>
             ))}
