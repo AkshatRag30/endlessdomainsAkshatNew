@@ -63,3 +63,21 @@ export const GM_STATS: GmStats = {
   chains:    '21',
   gmsToday:  '8.4K',
 }
+
+// ── Mock transaction hash ─────────────────────────────────────────────────────
+// Stands in for the hash a real wallet/contract call would return on confirmation.
+// Replace with the actual receipt hash once the flows call a real chain provider.
+
+const HEX_CHARS = '0123456789abcdef'
+
+function randomHex(length: number): string {
+  let out = ''
+  for (let i = 0; i < length; i++) {
+    out += HEX_CHARS[Math.floor(Math.random() * HEX_CHARS.length)]
+  }
+  return out
+}
+
+export function createMockTxHash(): string {
+  return `0x${randomHex(64)}`
+}

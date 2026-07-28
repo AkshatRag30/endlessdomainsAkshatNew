@@ -5,6 +5,7 @@ import { GmDeployContractStep2Token } from './GmDeployContractStep2Token'
 import { GmDeployContractStep3Review } from './GmDeployContractStep3Review'
 import { GmDeployContractSuccessModal } from './GmDeployContractSuccessModal'
 import { DeployContractTemplateId, DeployTokenFormState, INITIAL_DEPLOY_TOKEN_FORM } from './gmDeployContract.data'
+import { createMockTxHash } from '../gm.data'
 import styles from './GmDeployContractSection.module.scss'
 
 type FlowStep = 1 | 2 | 3
@@ -15,6 +16,7 @@ export function GmDeployContractSection() {
   const [tokenForm, setTokenForm] = useState<DeployTokenFormState>(INITIAL_DEPLOY_TOKEN_FORM)
   const [isConfirming, setIsConfirming] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+  const [txHash, setTxHash] = useState('')
 
   const handleSelect = useCallback((id: DeployContractTemplateId, comingSoon?: boolean) => {
     if (comingSoon) return
@@ -39,6 +41,7 @@ export function GmDeployContractSection() {
     // Simulate wallet signature + on-chain deploy — replace with real contract call
     window.setTimeout(() => {
       setIsConfirming(false)
+      setTxHash(createMockTxHash())
       setIsSuccess(true)
     }, 2200)
   }, [])
@@ -94,7 +97,7 @@ export function GmDeployContractSection() {
       )}
 
       {isConfirming && <GmCreateNftConfirmModal onClose={handleCloseConfirm} />}
-      {isSuccess && <GmDeployContractSuccessModal form={tokenForm} onClose={handleCloseSuccess} />}
+      {isSuccess && <GmDeployContractSuccessModal form={tokenForm} txHash={txHash} onClose={handleCloseSuccess} />}
     </section>
   )
 }

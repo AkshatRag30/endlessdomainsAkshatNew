@@ -1,9 +1,11 @@
 import { useState, useCallback } from 'react'
-import { FiStar } from 'react-icons/fi'
+import { FiCheck, FiCopy, FiStar } from 'react-icons/fi'
 import { HiOutlineClock } from 'react-icons/hi'
 import { IoSunnyOutline } from 'react-icons/io5'
 import { PrimaryButton } from '@/design-system/primitives/button/PrimaryButton'
-import { GmChain } from '../gm.data'
+import { StatusModal } from '@/design-system/primitives/StatusModal'
+import parts from '@/design-system/primitives/StatusModal/StatusModalParts.module.scss'
+import { GmChain, createMockTxHash } from '../gm.data'
 import styles from './GmChainCard.module.scss'
 
 function GasFeeIcon() {
@@ -35,6 +37,9 @@ interface GmChainCardProps {
 export function GmChainCard({ chain, onSayGm, onToggleFavorite }: GmChainCardProps) {
   const [loading, setLoading] = useState(false)
   const [done, setDone] = useState(false)
+  const [showSuccess, setShowSuccess] = useState(false)
+  const [txHash, setTxHash] = useState('')
+  const [copied, setCopied] = useState(false)
 
   const handleSayGm = useCallback(async () => {
     if (loading || done) return
@@ -43,6 +48,8 @@ export function GmChainCard({ chain, onSayGm, onToggleFavorite }: GmChainCardPro
     await new Promise(r => setTimeout(r, 1200))
     setLoading(false)
     setDone(true)
+    setTxHash(createMockTxHash())
+    setShowSuccess(true)
     onSayGm(chain.id)
   }, [loading, done, chain.id, onSayGm])
 
@@ -50,6 +57,14 @@ export function GmChainCard({ chain, onSayGm, onToggleFavorite }: GmChainCardPro
     e.stopPropagation()
     onToggleFavorite(chain.id)
   }, [chain.id, onToggleFavorite])
+
+  const handleCloseSuccess = useCallback(() => setShowSuccess(false), [])
+
+  const handleCopyHash = useCallback(() => {
+    navigator.clipboard.writeText(txHash)
+    setCopied(true)
+    window.setTimeout(() => setCopied(false), 1500)
+  }, [txHash])
 
   return (
     <article className={`${styles.card} ${done ? styles.cardDone : ''}`} aria-label={`Say GM on ${chain.name}`}>
@@ -104,6 +119,29 @@ export function GmChainCard({ chain, onSayGm, onToggleFavorite }: GmChainCardPro
           {loading ? 'Sending…' : done ? 'GM Sent ✓' : 'Say Gm'}
         </PrimaryButton>
       </div>
+
+      {showSuccess && (
+        <StatusModal
+          tone="success"
+          icon={<FiCheck size={24} aria-hidden="true" color="var(--color-white-primary)" />}
+          heading="GM Sent"
+          description={`Your GM on ${chain.name} has been confirmed on chain.`}
+          ariaLabelledBy={`gm-success-heading-${chain.id}`}
+          onClose={handleCloseSuccess}
+        >
+          <div className={parts.hashRow}>
+            <span className={parts.hashText}>{txHash}</span>
+            <button type="button" className={parts.hashLink} onClick={handleCopyHash} aria-label="Copy transaction hash">
+              {copied ? <FiCheck size={14} aria-hidden="true" /> : <FiCopy size={14} aria-hidden="true" />}
+              {copied ? 'copied' : 'copy'}
+            </button>
+          </div>
+
+          <PrimaryButton type="button" shape="octagon" fullWidth onClick={handleCloseSuccess}>
+            Done
+          </PrimaryButton>
+        </StatusModal>
+      )}
 
     </article>
   )

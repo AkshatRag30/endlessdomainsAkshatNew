@@ -5,6 +5,7 @@ import { GmCreateNftStep3Review } from './GmCreateNftStep3Review'
 import { GmCreateNftConfirmModal } from './GmCreateNftConfirmModal'
 import { GmCreateNftSuccessModal } from './GmCreateNftSuccessModal'
 import { GmCreateNftFormState, INITIAL_CREATE_NFT_FORM } from './gmCreateNft.data'
+import { createMockTxHash } from '../gm.data'
 import styles from './GmCreateNftSection.module.scss'
 
 type FlowStep = 1 | 2 | 3
@@ -20,6 +21,7 @@ export function GmCreateNftSection() {
   const [form, setForm] = useState<GmCreateNftFormState>(INITIAL_CREATE_NFT_FORM)
   const [isConfirming, setIsConfirming] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+  const [txHash, setTxHash] = useState('')
 
   const updateForm = useCallback((patch: Partial<GmCreateNftFormState>) => {
     setForm(prev => ({ ...prev, ...patch }))
@@ -35,6 +37,7 @@ export function GmCreateNftSection() {
     // Simulate wallet signature + on-chain deploy — replace with real contract call
     window.setTimeout(() => {
       setIsConfirming(false)
+      setTxHash(createMockTxHash())
       setIsSuccess(true)
     }, 2200)
   }, [])
@@ -91,7 +94,7 @@ export function GmCreateNftSection() {
       </div>
 
       {isConfirming && <GmCreateNftConfirmModal onClose={handleCloseConfirm} />}
-      {isSuccess && <GmCreateNftSuccessModal form={form} onClose={handleCloseSuccess} />}
+      {isSuccess && <GmCreateNftSuccessModal form={form} txHash={txHash} onClose={handleCloseSuccess} />}
     </section>
   )
 }
