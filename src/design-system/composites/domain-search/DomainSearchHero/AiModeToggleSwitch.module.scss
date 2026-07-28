@@ -1,0 +1,51 @@
+// Figma spec: "Group 2085666044" — exact px values, shadows, and colors from the design,
+// translated 1:1 rather than rounded to the token spacing scale, since this is a
+// pixel-precise recreation of a specific Figma component.
+
+.track {
+  position: relative;
+  width: 66.07px;
+  height: 27.4px;
+  border-radius: 8.05771px;
+  background: var(--color-blue-primary);
+  box-shadow:
+    inset 0px 2px 19.3px rgba(255, 255, 255, 0.96),
+    inset 0px -1.61154px 5.6px var(--color-white-primary),
+    inset 0px 0.805771px 0px rgba(255, 255, 255, 0.38);
+}
+
+// white knob-track pill the gray knob slides within
+.knobBg {
+  position: absolute;
+  width: 48.35px;
+  height: 16.12px;
+  left: 7.96px;
+  top: 5.64px;
+  background: var(--color-white-primary);
+  border-radius: 4.83463px;
+}
+
+// gray sliding knob — starts flush with the white pill's right edge (off), slides to the
+// pill's left edge (on)
+.knob {
+  position: absolute;
+  width: 14.5px;
+  height: 16.12px;
+  left: 41.81px;
+  top: 5.64px;
+  background: var(--color-toggle-knob);
+  border-radius: 4.83463px;
+  box-shadow:
+    9.66926px 14.5039px 4.83463px rgba(0, 0, 0, 0.02),
+    6.44617px 9.66926px 4.83463px rgba(0, 0, 0, 0.15),
+    3.22308px 4.83463px 3.22308px rgba(0, 0, 0, 0.5),
+    1.61154px 1.61154px 3.22308px rgba(0, 0, 0, 0.85),
+    0px 0px 1.61154px rgba(0, 0, 0, 0.98),
+    inset 0px -1.61154px 0px rgba(0, 0, 0, 0.55),
+    inset 0px 1.61154px 0px rgba(255, 255, 255, 0.55);
+  transition: transform 0.2s ease;
+}
+
+.knobOn {
+  transform: translateX(-33.85px);
+}

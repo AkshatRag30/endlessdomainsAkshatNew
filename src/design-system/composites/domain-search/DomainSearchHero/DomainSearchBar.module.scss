@@ -1,0 +1,314 @@
+@import '@newstyles/_mixins.scss';
+
+// ─── Animated border keyframe ─────────────────────────────────────────────────
+// duplicated from the Input primitive's hero variant so this bar matches it exactly
+
+@property --border-angle {
+  syntax: '<angle>';
+  inherits: true;
+  initial-value: 0deg;
+}
+
+@keyframes domain-search-border-angle-rotate {
+  to {
+    --border-angle: 360deg;
+  }
+}
+
+@keyframes domain-search-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ─── Outer wrapper ─────────────────────────────────────────────────────────────
+
+.searchWrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+// design-specific: sharp trapezoid (no rounding) — wider at the top, angled inward at the
+// bottom corners, instead of the previous fully-rounded pill shape
+.creditPill {
+  position: absolute;
+  top: -28px;
+  right: var(--space-6);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-4);
+  clip-path: polygon(8% 0, 92% 0, 100% 100%, 0 100%);
+  background: var(--color-blue-primary);
+  color: var(--color-white-primary);
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-small-12);
+  white-space: nowrap;
+  z-index: 3;
+
+  @include mobile {
+    right: var(--space-3);
+  }
+}
+
+// ─── Animated border container ─────────────────────────────────────────────────
+
+.searchContainer {
+  --border-angle: 0deg;
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  height: clamp(48px, 8vw, 65px);
+  margin: 0 auto;
+  border-radius: var(--radius-xl);
+  border: 3px solid transparent;
+  background:
+    linear-gradient(var(--color-white-primary), var(--color-white-primary)) padding-box,
+    conic-gradient(
+      from var(--border-angle),
+      var(--color-search-border-a) 0deg,
+      var(--color-search-border-b) 45deg,
+      var(--color-search-border-c) 90deg,
+      var(--color-search-border-d) 135deg,
+      var(--color-search-border-e) 180deg,
+      var(--color-search-border-f) 225deg,
+      var(--color-search-border-g) 270deg,
+      var(--color-search-border-h) 315deg,
+      var(--color-search-border-a) 360deg
+    ) border-box;
+  animation: domain-search-border-angle-rotate 3s linear infinite;
+
+  // outer glow
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -15px;
+    border-radius: inherit;
+    background: conic-gradient(
+      from var(--border-angle),
+      transparent 0deg,
+      var(--color-search-glow-a) 60deg,
+      var(--color-search-glow-b) 120deg,
+      var(--color-search-glow-c) 180deg,
+      var(--color-search-glow-d) 240deg,
+      var(--color-search-glow-a) 300deg,
+      transparent 360deg
+    );
+    filter: blur(25px);
+    opacity: 0.7;
+    z-index: -1;
+    animation: domain-search-border-angle-rotate 3s linear infinite;
+  }
+
+  @include mobile {
+    height: 48px;
+    border-radius: var(--radius-md);
+    border-width: 2px;
+  }
+}
+
+// ─── Inner form row ─────────────────────────────────────────────────────────────
+
+.inputContent {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0 var(--space-2) 0 var(--space-6);
+
+  @include mobile {
+    padding: 0 6px 0 var(--space-4);
+    gap: var(--space-2);
+  }
+}
+
+.leadingIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--color-blue-primary);
+
+  @include mobile {
+    display: none;
+  }
+}
+
+// ─── Text input ─────────────────────────────────────────────────────────────────
+
+.searchInput {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: var(--font-satoshi);
+  font-size: clamp(14px, 2vw, 16px);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+
+  &::placeholder {
+    color: var(--color-blue-primary);
+    font-weight: var(--font-weight-medium);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  @include mobile {
+    font-size: var(--text-nav);
+  }
+}
+
+.clearBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-gray-dark);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--color-gray-light);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// ─── Submit button ──────────────────────────────────────────────────────────────
+
+.searchButton {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  height: 48px;
+  background: var(--color-black-primary);
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  overflow: hidden;
+  isolation: isolate;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+
+  // glass shimmer on hover
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, var(--color-white-alpha-40), transparent);
+    transition: left 0.7s ease;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  &:not(:disabled):hover {
+    background: var(--color-black-hover);
+    box-shadow: 0 4px 12px var(--color-blue-primary-alpha-30);
+
+    &::after {
+      left: 100%;
+    }
+
+    .icon {
+      color: var(--color-white-primary);
+    }
+
+    .labelUp {
+      top: -100%;
+    }
+  }
+
+  &:not(:disabled):active {
+    transform: scale(0.98);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-white-primary);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  @include mobile {
+    padding: var(--space-3);
+    height: 40px;
+    gap: 0;
+  }
+}
+
+// ─── Button internals ───────────────────────────────────────────────────────────
+
+.spinner {
+  position: relative;
+  z-index: 2;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--color-white-alpha-30);
+  border-top-color: var(--color-white-primary);
+  border-radius: var(--radius-full);
+  animation: domain-search-spin 0.6s linear infinite;
+  flex-shrink: 0;
+}
+
+.icon {
+  position: relative;
+  z-index: 2;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: var(--color-gray-medium);
+  transition: color 0.3s ease;
+}
+
+.labelWrapper {
+  position: relative;
+  z-index: 2;
+  display: block;
+  height: 24px;
+  overflow: hidden;
+  line-height: 24px;
+
+  @include mobile {
+    display: none;
+  }
+}
+
+.labelUp {
+  display: block;
+  position: relative;
+  top: 0;
+  color: var(--color-gray-medium);
+  transition: top 0.3s ease;
+
+  &:last-child {
+    color: var(--color-white-primary);
+  }
+}

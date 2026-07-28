@@ -1,0 +1,37 @@
+@import '@newstyles/_mixins.scss';
+
+.wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.track {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  line-height: 0;
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-body-small);
+  color: var(--color-blue-primary);
+  white-space: nowrap;
+}
+
+.sparkle {
+  flex-shrink: 0;
+}

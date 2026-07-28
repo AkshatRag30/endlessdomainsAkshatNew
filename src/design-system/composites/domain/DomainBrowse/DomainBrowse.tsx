@@ -1,8 +1,9 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
-import { FiArrowRight } from 'react-icons/fi'
+import { FiArrowRight, FiChevronDown, FiChevronUp } from 'react-icons/fi'
 import { PrimaryButton } from '@/design-system/primitives/button/PrimaryButton'
+import { SecondaryButton } from '@/design-system/primitives/secondary-button/SecondaryButton'
 import { getAllDomainProviders, type DomainProviderKey } from '@helpers/chaincurrency/chaincurrency'
 import { getTldsByProvider, getTldHref, TLDS_PER_PAGE } from '@data/allTlds'
 
@@ -14,6 +15,11 @@ const PROVIDERS = getAllDomainProviders()
 // page 3x2 grid — decoupled from TLDS_PER_PAGE so each breakpoint paginates at its own natural
 // page size rather than mobile inheriting desktop's count and needing to hide 2 of every 6
 const MOBILE_TLDS_PER_PAGE = 4
+
+// design-specific: single-provider filters show one row of 3 cards with a "Load More" reveal
+// instead of pagination — only the "All TLDs" filter keeps numbered pagination, since that's the
+// only view large enough (70+ entries) to need it
+const SINGLE_PROVIDER_ROW_SIZE = 3
 
 type FilterKey = DomainProviderKey | 'ALL'
 
@@ -36,25 +42,45 @@ export function DomainBrowse() {
   const [filter, setFilter] = useState<FilterKey>('ALL')
   const [page, setPage] = useState(0)
   const [mobilePage, setMobilePage] = useState(0)
+  const [expanded, setExpanded] = useState(false)
+
+  const isAllFilter = filter === 'ALL'
 
   const filteredTlds = useMemo(() => getTldsByProvider(filter), [filter])
   const pageCount = Math.max(1, Math.ceil(filteredTlds.length / TLDS_PER_PAGE))
   const mobilePageCount = Math.max(1, Math.ceil(filteredTlds.length / MOBILE_TLDS_PER_PAGE))
 
-  const visibleTlds = useMemo(
-    () => filteredTlds.slice(page * TLDS_PER_PAGE, page * TLDS_PER_PAGE + TLDS_PER_PAGE),
-    [filteredTlds, page],
-  )
+  // design-specific: "All TLDs" keeps the existing 3x2 paginated grid; a single-provider filter
+  // instead shows one row of 3 cards, expanding to the provider's full list on "Load More"
+  const visibleTlds = useMemo(() => {
+    if (isAllFilter) {
+      return filteredTlds.slice(page * TLDS_PER_PAGE, page * TLDS_PER_PAGE + TLDS_PER_PAGE)
+    }
+    return expanded ? filteredTlds : filteredTlds.slice(0, SINGLE_PROVIDER_ROW_SIZE)
+  }, [filteredTlds, page, isAllFilter, expanded])
 
   const mobileVisibleTlds = useMemo(
     () => filteredTlds.slice(mobilePage * MOBILE_TLDS_PER_PAGE, mobilePage * MOBILE_TLDS_PER_PAGE + MOBILE_TLDS_PER_PAGE),
     [filteredTlds, mobilePage],
   )
 
+  const canToggleExpand = !isAllFilter && filteredTlds.length > SINGLE_PROVIDER_ROW_SIZE
+  const showLoadMore = canToggleExpand && !expanded
+  const showShowLess = canToggleExpand && expanded
+
   const handleFilterChange = useCallback((next: FilterKey) => {
     setFilter(next)
     setPage(0)
     setMobilePage(0)
+    setExpanded(false)
+  }, [])
+
+  const handleLoadMore = useCallback(() => {
+    setExpanded(true)
+  }, [])
+
+  const handleShowLess = useCallback(() => {
+    setExpanded(false)
   }, [])
 
   const handlePrev = useCallback(() => {
@@ -174,50 +200,78 @@ export function DomainBrowse() {
         ))}
       </div>
 
-      {/* Pagination — desktop/tablet only */}
-      <nav className={styles.pagination} aria-label="Browse identities pagination">
-        <button
-          type="button"
-          className={styles.pageNavBtn}
-          onClick={handlePrev}
-          disabled={page === 0}
-        >
-          <span aria-hidden="true">«</span> Previous
-        </button>
+      {/* Pagination — desktop/tablet only, "All TLDs" filter only */}
+      {isAllFilter && (
+        <nav className={styles.pagination} aria-label="Browse identities pagination">
+          <button
+            type="button"
+            className={styles.pageNavBtn}
+            onClick={handlePrev}
+            disabled={page === 0}
+          >
+            <span aria-hidden="true">«</span> Previous
+          </button>
 
-        <span className={styles.pageDivider} aria-hidden="true" />
+          <span className={styles.pageDivider} aria-hidden="true" />
 
-        <div className={styles.pageNumbers}>
-          {pageItems.map((item, index) =>
-            item === 'ellipsis' ? (
-              <span key={`ellipsis-${index}`} className={styles.pageEllipsis} aria-hidden="true">•••</span>
-            ) : (
-              <React.Fragment key={item}>
-                <button
-                  type="button"
-                  className={`${styles.pageNumberBtn} ${page === item ? styles.pageNumberBtnActive : ''}`}
-                  aria-current={page === item ? 'page' : undefined}
-                  onClick={() => handlePageClick(item)}
-                >
-                  {item + 1}
-                </button>
-                {index < pageItems.length - 1 && <span className={styles.pageDivider} aria-hidden="true" />}
-              </React.Fragment>
-            ),
-          )}
+          <div className={styles.pageNumbers}>
+            {pageItems.map((item, index) =>
+              item === 'ellipsis' ? (
+                <span key={`ellipsis-${index}`} className={styles.pageEllipsis} aria-hidden="true">•••</span>
+              ) : (
+                <React.Fragment key={item}>
+                  <button
+                    type="button"
+                    className={`${styles.pageNumberBtn} ${page === item ? styles.pageNumberBtnActive : ''}`}
+                    aria-current={page === item ? 'page' : undefined}
+                    onClick={() => handlePageClick(item)}
+                  >
+                    {item + 1}
+                  </button>
+                  {index < pageItems.length - 1 && <span className={styles.pageDivider} aria-hidden="true" />}
+                </React.Fragment>
+              ),
+            )}
+          </div>
+
+          <span className={styles.pageDivider} aria-hidden="true" />
+
+          <button
+            type="button"
+            className={styles.pageNavBtn}
+            onClick={handleNext}
+            disabled={page === pageCount - 1}
+          >
+            Next <span aria-hidden="true">»</span>
+          </button>
+        </nav>
+      )}
+
+      {/* Load More — desktop/tablet only, single-provider filters only */}
+      {showLoadMore && (
+        <div className={styles.loadMoreWrap}>
+          <SecondaryButton
+            icon={<FiChevronDown size={18} aria-hidden="true" />}
+            iconPosition="right"
+            onClick={handleLoadMore}
+          >
+            Load More
+          </SecondaryButton>
         </div>
+      )}
 
-        <span className={styles.pageDivider} aria-hidden="true" />
-
-        <button
-          type="button"
-          className={styles.pageNavBtn}
-          onClick={handleNext}
-          disabled={page === pageCount - 1}
-        >
-          Next <span aria-hidden="true">»</span>
-        </button>
-      </nav>
+      {/* Show Less — desktop/tablet only, shown after Load More has been clicked */}
+      {showShowLess && (
+        <div className={styles.loadMoreWrap}>
+          <SecondaryButton
+            icon={<FiChevronUp size={18} aria-hidden="true" />}
+            iconPosition="right"
+            onClick={handleShowLess}
+          >
+            Show Less
+          </SecondaryButton>
+        </div>
+      )}
 
       {/* Card list — mobile only: 4 cards stacked vertically per page */}
       <div className={styles.mobileCardGrid}>

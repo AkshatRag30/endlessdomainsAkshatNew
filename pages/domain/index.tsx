@@ -19,9 +19,9 @@ const DomainPage: NextPage = () => {
         <DomainHero />
         <DomainStats />
         <DomainHowItWorks />
+        <DomainBrowse />
         <DomainUnlocks />
         <DomainOwnership />
-        <DomainBrowse />
         <DomainWhy />
         <DomainReviews />
         <DomainFaq />

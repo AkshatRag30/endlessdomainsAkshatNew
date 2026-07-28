@@ -1,0 +1,55 @@
+.wings {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.wingLine {
+  fill: none;
+  stroke: var(--color-svg-line);
+  stroke-width: 2.31681;
+}
+
+.glowGroup {
+  mix-blend-mode: screen;
+}
+
+.glow {
+  filter: blur(4px);
+  offset-rotate: 0deg;
+  animation: domain-search-wing-glow 3s linear infinite;
+}
+
+// design-specific: offset-path pins each glow dot to the exact geometry of its wing line
+// (including the diagonal middle segment), so it travels precisely along the visible path
+// instead of drifting off it on a straight translateX. offset-distance then animates the
+// dot from the notch (0%) end of the path to the outer edge (100%) — a one-directional
+// loop that fades out just before the end, then resets instantly back to the notch for
+// the next pass, instead of easing back inward.
+.glowTopRight {
+  offset-path: path('M1224 0.000329971L1293.68 0.000336063L1312.14 18.5348L1519.39 18.5348');
+}
+
+.glowBottomRight {
+  offset-path: path('M1224 67.1444L1293.68 67.1445L1312.14 48.61L1519.39 48.61');
+}
+
+.glowTopLeft {
+  offset-path: path('M295 0.000207901L225.321 0.000201809L206.859 18.5347L-0.392943 18.5346');
+}
+
+.glowBottomLeft {
+  offset-path: path('M295 67.1443H225.321L206.859 48.6099H-0.392943');
+}
+
+@keyframes domain-search-wing-glow {
+  0%   { offset-distance: 0%; opacity: 0.55; }
+  80%  { opacity: 0.55; }
+  100% { offset-distance: 100%; opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glow {
+    animation: none;
+  }
+}

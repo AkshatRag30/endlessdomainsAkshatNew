@@ -409,6 +409,19 @@
   }
 }
 
+// design-specific: desktop/tablet-only reveal for single-provider filters — mobile keeps its
+// own independent pagination (.mobilePagination) untouched, so this is hidden there instead
+.loadMoreWrap {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 0 auto var(--space-11);
+
+  @include mobile {
+    display: none;
+  }
+}
+
 .pageNavBtn {
   display: inline-flex;
   align-items: center;

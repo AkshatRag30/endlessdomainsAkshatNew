@@ -1,0 +1,1 @@
+export { DomainSearchHero } from './DomainSearchHero'
