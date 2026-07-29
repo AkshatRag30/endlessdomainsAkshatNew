@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Endless Domains Marketplace — Codebase Map</title>
+<style>
+  @font-face {
+    font-family: 'Sect';
+    src: local('Söhne'), local('SF Pro Display');
+  }
+
+  :root {
+    --ink: #14171f;
+    --ink-soft: #3a4150;
+    --slate: #5b6472;
+    --paper: #f7f8fa;
+    --card: #ffffff;
+    --line: #e3e6eb;
+    --line-strong: #cbd1db;
+    --accent: #3457d5;
+    --accent-soft: #eef1fc;
+    --accent-ink: #23408f;
+    --signal: #9a5b17;
+    --signal-soft: #fbf1e3;
+    --signal-line: #ecd8b8;
+    --good: #1f7a4d;
+    --good-soft: #e9f6ef;
+    --mono: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, monospace;
+    --sans: -apple-system, "Segoe UI", system-ui, Roboto, sans-serif;
+    --display: 'Sect', -apple-system, "Segoe UI", system-ui, sans-serif;
+    --radius: 8px;
+    --content-w: 1080px;
+    --sidebar-w: 232px;
+  }
+
+  :root[data-theme="dark"] {
+    --ink: #eef0f4;
+    --ink-soft: #c4cad6;
+    --slate: #9099a8;
+    --paper: #12141a;
+    --card: #1a1d24;
+    --line: #262b36;
+    --line-strong: #333a48;
+    --accent: #7c93ff;
+    --accent-soft: #1c2340;
+    --accent-ink: #b7c3ff;
+    --signal: #d9a45f;
+    --signal-soft: #2c2417;
+    --signal-line: #4a3a20;
+    --good: #5cbf8e;
+    --good-soft: #163025;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ink: #eef0f4;
+      --ink-soft: #c4cad6;
+      --slate: #9099a8;
+      --paper: #12141a;
+      --card: #1a1d24;
+      --line: #262b36;
+      --line-strong: #333a48;
+      --accent: #7c93ff;
+      --accent-soft: #1c2340;
+      --accent-ink: #b7c3ff;
+      --signal: #d9a45f;
+      --signal-soft: #2c2417;
+      --signal-line: #4a3a20;
+      --good: #5cbf8e;
+      --good-soft: #163025;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 15.5px;
+    line-height: 1.6;
+  }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  a:focus-visible, button:focus-visible, input:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  code, .mono { font-family: var(--mono); }
+
+  /* ---------- shell layout ---------- */
+  .shell {
+    display: grid;
+    grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+    min-height: 100vh;
+  }
+
+  /* ---------- sidebar ---------- */
+  .sidebar {
+    border-right: 1px solid var(--line);
+    background: var(--card);
+    padding: 20px 0 40px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  .brand {
+    padding: 4px 20px 16px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 8px;
+  }
+  .brand-name {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: -0.01em;
+  }
+  .brand-sub {
+    font-size: 12px;
+    color: var(--slate);
+    margin-top: 2px;
+  }
+
+  .search-wrap { padding: 0 16px 14px; }
+  #nav-search {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--line-strong);
+    border-radius: 6px;
+    background: var(--paper);
+    color: var(--ink);
+    font-size: 13px;
+    font-family: var(--sans);
+  }
+  #nav-search::placeholder { color: var(--slate); }
+
+  .nav-group { margin-bottom: 2px; }
+  .nav-group-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--slate);
+    padding: 10px 16px 6px;
+    font-weight: 600;
+  }
+  .nav-link {
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+    padding: 6px 16px;
+    font-size: 13px;
+    color: var(--ink-soft);
+    border-left: 2px solid transparent;
+    cursor: pointer;
+  }
+  .nav-link .nav-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--slate);
+    flex-shrink: 0;
+  }
+  .nav-link:hover { color: var(--ink); background: var(--accent-soft); text-decoration: none; }
+  .nav-link.active {
+    color: var(--accent-ink);
+    border-left-color: var(--accent);
+    background: var(--accent-soft);
+    font-weight: 600;
+  }
+  .nav-link[data-hidden="true"] { display: none; }
+
+  .theme-toggle-row {
+    padding: 14px 20px 0;
+    margin-top: 8px;
+    border-top: 1px solid var(--line);
+  }
+  #theme-toggle {
+    font-family: var(--sans);
+    font-size: 12px;
+    color: var(--slate);
+    background: none;
+    border: 1px solid var(--line-strong);
+    border-radius: 6px;
+    padding: 6px 10px;
+    cursor: pointer;
+    width: 100%;
+  }
+  #theme-toggle:hover { color: var(--ink); border-color: var(--accent); }
+
+  /* ---------- main content ---------- */
+  main {
+    display: flex;
+    justify-content: center;
+    padding: 56px 24px 120px;
+    width: 100%;
+  }
+  .content-col { width: 100%; max-width: var(--content-w); }
+
+  .doc-head { margin-bottom: 48px; }
+  .doc-eyebrow {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  h1.doc-title {
+    font-family: var(--display);
+    font-size: clamp(28px, 4vw, 38px);
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    margin: 0 0 14px;
+    text-wrap: balance;
+  }
+  .doc-dek {
+    font-size: 16.5px;
+    color: var(--ink-soft);
+    max-width: 62ch;
+    margin: 0;
+  }
+  .doc-meta {
+    display: flex;
+    gap: 18px;
+    margin-top: 20px;
+    font-size: 12.5px;
+    color: var(--slate);
+    flex-wrap: wrap;
+  }
+  .doc-meta span { font-family: var(--mono); }
+
+  section.chapter {
+    margin-bottom: 64px;
+    scroll-margin-top: 24px;
+  }
+  section.chapter:target, section.chapter.flash {
+    animation: flash 1.4s ease;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    section.chapter:target, section.chapter.flash { animation: none; }
+  }
+  @keyframes flash {
+    0% { background: var(--accent-soft); }
+    100% { background: transparent; }
+  }
+
+  .chapter-head {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 6px;
+  }
+  .chapter-num {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  h2.chapter-title {
+    font-family: var(--display);
+    font-size: 24px;
+    letter-spacing: -0.01em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .chapter-lede {
+    color: var(--ink-soft);
+    max-width: 68ch;
+    margin: 10px 0 28px;
+  }
+
+  h3.sub-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 32px 0 10px;
+    letter-spacing: -0.005em;
+  }
+
+  p { margin: 0 0 14px; max-width: 70ch; }
+  ul.plain { margin: 0 0 14px; padding-left: 20px; max-width: 68ch; }
+  ul.plain li { margin-bottom: 6px; }
+
+  /* ---------- file card ---------- */
+  .file-card {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--card);
+    margin: 18px 0 26px;
+    overflow: hidden;
+  }
+  .file-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 14px;
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+    flex-wrap: wrap;
+  }
+  .file-path {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .file-path .sep { color: var(--slate); font-weight: 400; }
+  .file-tag {
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--slate);
+    border: 1px solid var(--line-strong);
+    border-radius: 4px;
+    padding: 2px 6px;
+    white-space: nowrap;
+  }
+  .file-card-body { padding: 14px 16px 4px; }
+  .file-card-note { color: var(--ink-soft); font-size: 14.5px; }
+
+  pre.code-block {
+    margin: 10px 0 14px;
+    padding: 14px 16px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+  pre.code-block code { font-family: var(--mono); white-space: pre; }
+  .tok-kw { color: var(--accent-ink); font-weight: 600; }
+  .tok-str { color: var(--good); }
+  .tok-com { color: var(--slate); font-style: italic; }
+  .tok-fn { color: var(--accent); }
+  .tok-tag { color: var(--signal); }
+
+  /* ---------- callouts ---------- */
+  .callout {
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin: 16px 0 22px;
+    background: var(--accent-soft);
+    font-size: 14.5px;
+    max-width: 68ch;
+  }
+  .callout.warn {
+    border-left-color: var(--signal);
+    background: var(--signal-soft);
+  }
+  .callout-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 4px;
+    color: var(--accent-ink);
+  }
+  .callout.warn .callout-label { color: var(--signal); }
+
+  /* ---------- flow diagram ---------- */
+  .flow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0;
+    margin: 20px 0 26px;
+    max-width: 72ch;
+  }
+  .flow-step {
+    border: 1px solid var(--line-strong);
+    border-radius: 6px;
+    background: var(--card);
+    padding: 9px 13px;
+    font-size: 13px;
+    font-family: var(--mono);
+    color: var(--ink);
+  }
+  .flow-arrow {
+    color: var(--slate);
+    padding: 0 8px;
+    font-size: 15px;
+  }
+
+  /* ---------- route table ---------- */
+  .route-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0 26px;
+    font-size: 13.5px;
+  }
+  .route-table th {
+    text-align: left;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--slate);
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--line-strong);
+  }
+  .route-table td {
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+  .route-table code { font-size: 12.5px; color: var(--accent-ink); }
+  .route-table tr:last-child td { border-bottom: none; }
+  .table-scroll { overflow-x: auto; }
+
+  .pill {
+    display: inline-block;
+    font-size: 10.5px;
+    padding: 1px 7px;
+    border-radius: 99px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .pill-auth { background: var(--good-soft); color: var(--good); }
+  .pill-public { background: var(--accent-soft); color: var(--accent-ink); }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+    margin: 18px 0 26px;
+  }
+  .mini-card {
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    padding: 13px 15px;
+    background: var(--card);
+  }
+  .mini-card h4 {
+    font-size: 13.5px;
+    margin: 0 0 5px;
+    font-family: var(--mono);
+    color: var(--ink);
+  }
+  .mini-card p { font-size: 13px; color: var(--slate); margin: 0; max-width: none; }
+
+  footer.doc-foot {
+    max-width: var(--content-w);
+    margin: 60px auto 0;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    color: var(--slate);
+    font-size: 13px;
+  }
+
+  /* mobile */
+  .sidebar-toggle { display: none; }
+  @media (max-width: 880px) {
+    .shell { grid-template-columns: 1fr; }
+    .sidebar {
+      position: fixed;
+      left: 0; top: 0; bottom: 0;
+      width: min(84vw, 320px);
+      transform: translateX(-100%);
+      transition: transform 0.25s ease;
+      z-index: 40;
+      box-shadow: 2px 0 24px rgba(0,0,0,0.18);
+    }
+    .sidebar.open { transform: translateX(0); }
+    .sidebar-toggle {
+      display: block;
+      position: fixed;
+      top: 14px; left: 14px;
+      z-index: 50;
+      background: var(--card);
+      border: 1px solid var(--line-strong);
+      border-radius: 6px;
+      padding: 8px 11px;
+      font-size: 13px;
+      color: var(--ink);
+      cursor: pointer;
+    }
+    .scrim {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.35);
+      z-index: 30;
+    }
+    .scrim.show { display: block; }
+    main { padding-top: 76px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle navigation">☰ Contents</button>
+  <div class="scrim" id="scrim"></div>
+
+  <nav class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-name">Endless Domains — Frontend Map</div>
+      <div class="brand-sub">Interactive companion to ONBOARDING.md</div>
+    </div>
+    <div class="search-wrap">
+      <input id="nav-search" type="text" placeholder="Filter sections…" autocomplete="off" />
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-title">Orientation</div>
+      <a class="nav-link" data-target="sec-what"><span class="nav-num">00</span>What this repo is</a>
+      <a class="nav-link" data-target="sec-stack"><span class="nav-num">01</span>The stack, in practice</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-title">Boot &amp; routing</div>
+      <a class="nav-link" data-target="sec-boot"><span class="nav-num">02</span>How the app boots</a>
+      <a class="nav-link" data-target="sec-routes"><span class="nav-num">03</span>Every route, mapped</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-title">src/ deep dive</div>
+      <a class="nav-link" data-target="sec-src-map"><span class="nav-num">04</span>Folder by folder</a>
+      <a class="nav-link" data-target="sec-redux"><span class="nav-num">05</span>Redux &amp; RTK Query</a>
+      <a class="nav-link" data-target="sec-api"><span class="nav-num">06</span>Talking to the backend</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-title">Auth &amp; wallet</div>
+      <a class="nav-link" data-target="sec-auth"><span class="nav-num">07</span>Login &amp; session state</a>
+      <a class="nav-link" data-target="sec-wallet"><span class="nav-num">08</span>Wallet connection</a>
+      <a class="nav-link" data-target="sec-guard"><span class="nav-num">09</span>Route protection</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-title">Ship it</div>
+      <a class="nav-link" data-target="sec-style"><span class="nav-num">10</span>Styling approach</a>
+      <a class="nav-link" data-target="sec-env"><span class="nav-num">11</span>Environment &amp; deploy</a>
+      <a class="nav-link" data-target="sec-rough"><span class="nav-num">12</span>Rough edges</a>
+      <a class="nav-link" data-target="sec-start"><span class="nav-num">13</span>Where to start</a>
+    </div>
+
+    <div class="theme-toggle-row">
+      <button id="theme-toggle">Toggle light / dark</button>
+    </div>
+  </nav>
+
+  <main>
+    <div class="content-col">
+
+      <header class="doc-head">
+        <div class="doc-eyebrow">Frontend codebase reference</div>
+        <h1 class="doc-title">Every part of this repo, explained where it lives</h1>
+        <p class="doc-dek">
+          This is the interactive version of ONBOARDING.md. Each section below quotes the actual file it's
+          describing, with a plain explanation next to the real code, so you can read this top to bottom once,
+          then come back and jump straight to the one file you need later.
+        </p>
+        <div class="doc-meta">
+          <span>endlessdomains-marketplace-frontend</span>
+          <span>Next.js 15 · Pages Router</span>
+          <span>Port 3002</span>
+        </div>
+      </header>
+
+      <!-- 00 -->
+      <section class="chapter" id="sec-what">
+        <div class="chapter-head"><span class="chapter-num">00</span><h2 class="chapter-title">What this repo actually is</h2></div>
+        <p class="chapter-lede">
+          A Next.js frontend, full stop. There is no backend code in this repository. Every screen you see here
+          calls out to a separate REST API hosted elsewhere. When people on the team say "the backend," they
+          mean that external service, not anything in this folder.
+        </p>
+        <p>
+          The product itself is a marketplace for web3 domains, ENS names and similar assets. Users browse
+          listings, connect a wallet or log in with email or Google, buy and sell domains, list in bulk, keep a
+          watchlist, and check their transaction history and analytics.
+        </p>
+      </section>
+
+      <!-- 01 -->
+      <section class="chapter" id="sec-stack">
+        <div class="chapter-head"><span class="chapter-num">01</span><h2 class="chapter-title">The stack, in practice</h2></div>
+        <p class="chapter-lede">
+          Not just what's in package.json, but what's actually being used versus what's dead weight sitting in
+          the dependency list.
+        </p>
+
+        <div class="card-grid">
+          <div class="mini-card"><h4>Framework</h4><p>Next.js 15, Pages Router (not the app folder convention). React 18.3.1, pinned via package.json overrides.</p></div>
+          <div class="mini-card"><h4>Data fetching</h4><p>Redux Toolkit + RTK Query does almost everything. React Query is installed and wired up but effectively unused for real data.</p></div>
+          <div class="mini-card"><h4>Web3</h4><p>wagmi + viem + Reown AppKit for wallet connect UI, ethers v5 for signing and address utilities.</p></div>
+          <div class="mini-card"><h4>UI</h4><p>Bootstrap 5 is the real design system. Tailwind is configured but fully commented out, it does nothing today.</p></div>
+        </div>
+
+        <div class="callout warn">
+          <span class="callout-label">Worth knowing</span>
+          Both <code>tailwind.config.ts</code> and <code>postcss.config.mjs</code> have their entire contents
+          commented out. Any Tailwind-looking class name you spot anywhere in this codebase will not apply any
+          styling. Don't reach for a Tailwind class expecting it to work.
+        </div>
+
+        <div class="callout">
+          <span class="callout-label">Also worth knowing</span>
+          The dev server always runs on port 3002, in both local dev and production, set directly in the npm
+          scripts (<code>next dev -p 3002</code>). Not the Next.js default of 3000.
+        </div>
+      </section>
+
+      <!-- 02 -->
+      <section class="chapter" id="sec-boot">
+        <div class="chapter-head"><span class="chapter-num">02</span><h2 class="chapter-title">How the app boots</h2></div>
+        <p class="chapter-lede">
+          Everything starts in <code>pages/_app.tsx</code>, the single wrapper around every page. The order
+          providers are nested in matters, anything you add that depends on auth or wallet state needs to sit
+          inside the right layer.
+        </p>
+
+        <div class="flow">
+          <div class="flow-step">GoogleOAuthProvider</div><span class="flow-arrow">→</span>
+          <div class="flow-step">AuthProvider</div><span class="flow-arrow">→</span>
+          <div class="flow-step">WagmiProvider</div><span class="flow-arrow">→</span>
+          <div class="flow-step">QueryClientProvider</div><span class="flow-arrow">→</span>
+          <div class="flow-step">Redux Provider</div>
+        </div>
+
+        <div class="file-card">
+          <div class="file-card-head">
+            <span class="file-path">pages<span class="sep">/</span>_app.tsx</span>
+            <span class="file-tag">entry point</span>
+          </div>
+          <div class="file-card-body">
+            <p class="file-card-note">
+              The provider stack, plus a background timer that checks every 60 seconds whether the login token
+              has expired and force-reloads the page if so.
+            </p>
+<pre class="code-block"><code>  <span class="tok-kw">useEffect</span>(() => {
+    <span class="tok-kw">const</span> interval = setInterval(() => {
+      <span class="tok-kw">const</span> expiry = getExpiryDateFromToken();
+      <span class="tok-kw">if</span> (expiry && Date.now() > parseInt(expiry) * 1000) {
+        deleteCookieAttribute(Cookie_Key.ACCESS_TOKEN);
+        deleteCookieAttribute(Cookie_Key.REFRESH_TOKEN);
+        <span class="tok-kw">if</span> (!sessionStorage.getItem(<span class="tok-str">"token_expired"</span>)) {
+          sessionStorage.setItem(<span class="tok-str">"token_expired"</span>, <span class="tok-str">"true"</span>);
+          window.location.reload();
+        }
+      }
+    }, 60000);
+    <span class="tok-kw">return</span> () => clearInterval(interval);
+  }, []);
+
+  <span class="tok-kw">return</span> (
+    &lt;<span class="tok-tag">GoogleOAuthProvider</span> clientId={clientId}&gt;
+      &lt;<span class="tok-tag">AuthProvider</span>&gt;
+        &lt;<span class="tok-tag">WagmiProvider</span> config={wagmiAdapter.wagmiConfig}&gt;
+          &lt;<span class="tok-tag">QueryClientProvider</span> client={queryClient}&gt;
+            &lt;<span class="tok-tag">Provider</span> store={store}&gt;
+              &lt;<span class="tok-tag">AutoLogoutHandler</span> /&gt;
+              &lt;<span class="tok-tag">InitProvider</span> /&gt;
+              &lt;<span class="tok-tag">AppContent</span> Component={Component} pageProps={pageProps} router={router} /&gt;
+              &lt;<span class="tok-tag">ToastContainer</span> hideProgressBar={<span class="tok-kw">true</span>} /&gt;
+            &lt;/<span class="tok-tag">Provider</span>&gt;
+          &lt;/<span class="tok-tag">QueryClientProvider</span>&gt;
+        &lt;/<span class="tok-tag">WagmiProvider</span>&gt;
+      &lt;/<span class="tok-tag">AuthProvider</span>&gt;
+    &lt;/<span class="tok-tag">GoogleOAuthProvider</span>&gt;
+  )</code></pre>
+          </div>
+        </div>
+
+        <div class="file-card">
+          <div class="file-card-head">
+            <span class="file-path">pages<span class="sep">/</span>initProvider.tsx</span>
+            <span class="file-tag">wallet bridge</span>
+          </div>
+          <div class="file-card-body">
+            <p class="file-card-note">
+              Mounted globally, this grabs whichever wallet is connected through Reown AppKit, wraps it in an
+              ethers <code>Web3Provider</code>, and stashes it in a small singleton so any component anywhere
+              can grab the live wallet connection without needing to be nested inside a specific context.
+            </p>
+<pre class="code-block"><code><span class="tok-kw">const</span> { walletProvider, walletProviderType } = useAppKitProvider(<span class="tok-str">"eip155"</span>);
+<span class="tok-kw">useEffect</span>(() => {
+  <span class="tok-kw">const</span> effectiveProvider = walletProvider ?? (
+    walletProviderType === <span class="tok-str">'INJECTED'</span> || walletProviderType === <span class="tok-kw">undefined</span>
+      ? window.ethereum : <span class="tok-kw">null</span>
+  );
+  <span class="tok-kw">if</span> (!effectiveProvider) <span class="tok-kw">return</span>;
+  <span class="tok-kw">const</span> provider = <span class="tok-kw">new</span> Web3Provider(effectiveProvider, <span class="tok-str">"any"</span>);
+  providerManager.setWeb3Provider(provider);
+}, [walletProvider, walletProviderType]);</code></pre>
+            <p class="file-card-note">Read it back anywhere with <code class="mono">providerManager.getWeb3Provider()</code>, defined in <code class="mono">src/lib/provider-manager.ts</code>.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 03 -->
+      <section class="chapter" id="sec-routes">
+        <div class="chapter-head"><span class="chapter-num">03</span><h2 class="chapter-title">Every route, mapped</h2></div>
+        <p class="chapter-lede">
+          Since this uses the Pages Router, every file under <code>pages/</code> becomes a URL automatically.
+          Here's what exists today, and whether it needs a login.
+        </p>
+
+        <div class="table-scroll">
+        <table class="route-table">
+          <thead><tr><th>Route</th><th>Renders</th><th>Access</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td><code>/</code></td><td><code>pages/index.tsx</code></td><td><span class="pill pill-public">Public</span></td><td>Home. Recent sales, listings by search, trending domains, live prices.</td></tr>
+            <tr><td><code>/login</code></td><td><code>pages/login/index.tsx</code></td><td><span class="pill pill-public">Public</span></td><td>Duplicated at <code>pages/(auth)/login/</code>, same component, likely leftover from an App Router experiment.</td></tr>
+            <tr><td><code>/register</code></td><td><code>pages/register/index.tsx</code></td><td><span class="pill pill-public">Public</span></td><td><code>getServerSideProps</code> redirects to <code>/</code> if already logged in.</td></tr>
+            <tr><td><code>/forgot-password</code></td><td><code>pages/forgot-password/index.tsx</code></td><td><span class="pill pill-public">Public</span></td><td>POSTs to <code>/auth/forgot-password</code>.</td></tr>
+            <tr><td><code>/reset-password/success</code></td><td><code>pages/reset-password/success/index.tsx</code></td><td><span class="pill pill-public">Public</span></td><td>Confirmation page, also fires a Facebook Pixel event.</td></tr>
+            <tr><td><code>/profile/*</code></td><td><code>pages/profile/…</code></td><td><span class="pill pill-auth">Authenticated</span></td><td>User, domains, watchlist, analytics, congrats, thanks. <code>domains</code> is the most complex page in the app.</td></tr>
+            <tr><td><code>/seller-portfolio/[slug]</code></td><td><code>pages/seller-portfolio/[slug].tsx</code></td><td><span class="pill pill-public">Public</span></td><td>Public storefront for one seller, keyed by a user hash. Anyone can buy from here.</td></tr>
+            <tr><td><code>/transaction-history</code></td><td><code>pages/transaction-history/index.tsx</code></td><td><span class="pill pill-auth">Authenticated</span></td><td>Filterable, paginated, sortable buy/sell/list history.</td></tr>
+            <tr><td><code>/web3-domain-item</code></td><td><code>pages/web3-domain-item/index.tsx</code></td><td><span class="pill pill-public">Public</span></td><td>"Load more" grid of all listings.</td></tr>
+            <tr><td><code>/ens-marketplace</code></td><td><code>pages/ens-marketplace/index.tsx</code></td><td><span class="pill pill-public">Public</span></td><td>Storefront hardcoded to <code>tlds: ["eth"]</code>, its own price-range filter UI.</td></tr>
+            <tr><td><code>/redirect</code></td><td><code>pages/redirect/index.tsx</code></td><td><span class="pill pill-public">Public</span></td><td>Headless, no UI. Handles SSO handoff with a separate main site.</td></tr>
+            <tr><td><code>/about-us</code>, <code>/contact-us</code>, <code>/privacy-policy</code></td><td>—</td><td><span class="pill pill-public">Public</span></td><td>Static. Contact Us has a real form wired to a mutation.</td></tr>
+          </tbody>
+        </table>
+        </div>
+
+        <div class="file-card">
+          <div class="file-card-head">
+            <span class="file-path">src<span class="sep">/</span>component<span class="sep">/</span>ProtectedRoute.tsx</span>
+            <span class="file-tag">access control</span>
+          </div>
+          <div class="file-card-body">
+            <p class="file-card-note">The full public-route allowlist that decides who gets redirected where. If you add a new public page, it needs to be added here.</p>
+<pre class="code-block"><code><span class="tok-kw">const</span> PUBLIC_ROUTES = [
+  <span class="tok-str">"/login"</span>, <span class="tok-str">"/"</span>, <span class="tok-str">"/register"</span>,
+  <span class="tok-str">"/forgot-password"</span>, <span class="tok-str">"/reset-password/success"</span>,
+  <span class="tok-str">"/seller-portfolio"</span>, <span class="tok-str">"/ens-marketplace"</span>
+];</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- 04 -->
+      <section class="chapter" id="sec-src-map">
+        <div class="chapter-head"><span class="chapter-num">04</span><h2 class="chapter-title">The src/ folder, piece by piece</h2></div>
+        <p class="chapter-lede">
+          Organized loosely by feature rather than strict atomic design. Here's what lives where, and where to
+          look first for a given kind of change.
+        </p>
+
+        <div class="card-grid">
+          <div class="mini-card"><h4>component/</h4><p>Nearly all UI. modals/, toast-message/, web3/ (contract ABIs), header/, footer/, wallet-connect/, and one folder per feature.</p></div>
+          <div class="mini-card"><h4>config/wagmi.ts</h4><p>The one file defining every blockchain network the wallet connector supports.</p></div>
+          <div class="mini-card"><h4>constants/</h4><p>Base API URL and a big list of fully-built endpoint URLs. Also a hardcoded API key, see the callout below.</p></div>
+          <div class="mini-card"><h4>context/AuthContext.tsx</h4><p>The single place the whole app checks "am I logged in."</p></div>
+          <div class="mini-card"><h4>core/</h4><p>The real backbone: enum/ (API paths, cookie keys), model/ (shared types), services/ (HTTP calls), redux/ (RTK Query + slices).</p></div>
+          <div class="mini-card"><h4>data/supportedTlds.ts</h4><p>Static reference list of every domain extension the platform recognizes.</p></div>
+          <div class="mini-card"><h4>helpers/</h4><p>Small utilities: turning any thrown error into a readable message, email validation.</p></div>
+          <div class="mini-card"><h4>hooks/ &amp; utils/</h4><p>Custom hooks, split inconsistently between both folders. Check both when hunting for one.</p></div>
+          <div class="mini-card"><h4>lib/</h4><p>AutoLogoutHandler and the wallet-provider singleton, both mounted globally in _app.tsx.</p></div>
+          <div class="mini-card"><h4>template/layout/</h4><p>The shared page shell every page wraps in: header, footer, global scripts.</p></div>
+          <div class="mini-card"><h4>types/</h4><p>Plain TypeScript interfaces describing API response and request shapes.</p></div>
+        </div>
+
+        <div class="callout warn">
+          <span class="callout-label">Security note</span>
+          <code>src/constants/BaseUrl.ts</code> has an <code>API_KEY</code> constant committed in plaintext.
+          Worth fixing, don't add more secrets alongside it.
+        </div>
+      </section>
+
+      <!-- 05 -->
+      <section class="chapter" id="sec-redux">
+        <div class="chapter-head"><span class="chapter-num">05</span><h2 class="chapter-title">Redux and RTK Query</h2></div>
+        <p class="chapter-lede">
+          This is where almost all page-level data comes from. One store, two separate RTK Query API instances,
+          and four plain slices for state that needs to live outside the query cache.
+        </p>
+
+        <div class="file-card">
+          <div class="file-card-head">
+            <span class="file-path">src<span class="sep">/</span>core<span class="sep">/</span>redux<span class="sep">/</span>store.ts</span>
+            <span class="file-tag">store</span>
+          </div>
+          <div class="file-card-body">
+<pre class="code-block"><code><span class="tok-kw">export const</span> store = configureStore({
+    reducer: {
+        [myApi.reducerPath]: myApi.reducer,
+        [authApi.reducerPath]: authApi.reducer,
+        domainSummary: domainSummaryReducer,
+        allDomainListing: allDomainListingSliceReducer,
+        userProfile: profileSliceReducer,
+        history: historySliceReducer
+    },
+    middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware().concat(myApi.middleware, authApi.middleware),
+});</code></pre>
+            <p class="file-card-note"><code class="mono">RootState</code> and <code class="mono">AppDispatch</code> are exported from here, used everywhere as <code class="mono">useSelector((state: RootState) =&gt; …)</code>.</p>
+          </div>
+        </div>
+
+        <div class="file-card">
+          <div class="file-card-head">
+            <span class="file-path">src<span class="sep">/</span>core<span class="sep">/</span>redux<span class="sep">/</span>api.ts</span>
+            <span class="file-tag">RTK Query base</span>
+          </div>
+          <div class="file-card-body">
+            <p class="file-card-note">The primary <code class="mono">myApi</code> instance. Endpoints start empty here and get attached later via <code class="mono">injectEndpoints</code> in domain.ts, domainListing.ts, userProfile.ts, watchlist.ts and others, the standard RTK Query "code splitting" pattern.</p>
+<pre class="code-block"><code><span class="tok-kw">export const</span> myApi = createApi({
+  reducerPath: <span class="tok-str">'myApi'</span>,
+  baseQuery: fetchBaseQuery({
+    baseUrl: baseUrl,
+    credentials: <span class="tok-str">"include"</span>,
+    prepareHeaders: <span class="tok-kw">async</span> (headers) => {
+      <span class="tok-kw">const</span> token = getCookieValue(Cookie_Key.ACCESS_TOKEN)
+      <span class="tok-kw">if</span> (!!token) headers.set(<span class="tok-str">'Authorization'</span>, <span class="tok-str">`Bearer ${token}`</span>);
+      <span class="tok-kw">return</span> headers;
+    },
+  }),
+  tagTypes: [<span class="tok-str">'faq'</span>, <span class="tok-str">'profile'</span>, <span class="tok-str">'domain'</span>, <span class="tok-str">'watchlist'</span>, <span class="tok-str">'domain_listing'</span> <span class="tok-com">/* …and more */</span>],
+  endpoints: (builder) => ({}),
+});</code></pre>
+          </div>
+        </div>
+
+        <div class="file-card">
+          <div class="file-card-head">
+            <span class="file-path">src<span class="sep">/</span>core<span class="sep">/</span>redux<span class="sep">/</span>domain.ts</span>
+            <span class="file-tag">example injected endpoints</span>
+          </div>
+          <div class="file-card-body">
+            <p class="file-card-note">One of the files that injects real endpoints into <code class="mono">myApi</code>. Every query here becomes an auto-generated hook, exported at the bottom of the file.</p>
+<pre class="code-block"><code><span class="tok-kw">export const</span> DomainApi = myApi.injectEndpoints({
+  endpoints: (builder) => ({
+    getDomainList: builder.query&lt;DomainResponse, {...}&gt;({
+      query: ({ limit = <span class="tok-str">12</span>, page = <span class="tok-str">1</span>, sort = <span class="tok-str">'ASC'</span>, search = <span class="tok-str">''</span>, tlds = [] }) => ({
+        url: <span class="tok-str">`${DomainDetailsApi}?${finalQuery}`</span>,
+        method: <span class="tok-str">'GET'</span>,
+      }),
+    }),
+    <span class="tok-com">// …getTrendingApi, getPremiumDomain, getPromotedDomain, GetDomainListedAndUnListedDomain</span>
+  })
+})
+
+<span class="tok-kw">export const</span> {
+  useGetDomainListQuery,
+  useGetTrendingApiQuery,
+  useGetPremiumDomainQuery,
+  useGetDomainListedAndUnListedDomainQuery,
+  <span class="tok-com">// …</span>
+} = DomainApi;</code></pre>
+            <p class="file-card-note">This is the pattern to copy for any new list of domains: define the query here, import the generated hook wherever you need it in a component.</p>
+          </div>
+        </div>
+
+        <div class="callout">
+          <span class="callout-label">Hybrid pattern to know about</span>
+          Several endpoints in domain.ts and domainListing.ts use <code>onQueryStarted</code> to manually copy
+          fetched data into the plain slices (<code>setDomainSummary</code>, <code>setAllDomainListing</code>).
+          That means some UI state bypasses RTK Query's own cache in favor of these plain Redux slices, worth
+          knowing before you assume a query's cache is the only source of truth for that data.
+        </div>
+      </section>
+
+      <!-- 06 -->
+      <section class="chapter" id="sec-api">
+        <div class="chapter-head"><span class="chapter-num">06</span><h2 class="chapter-title">Talking to the backend</h2></div>
+        <p class="chapter-lede">
+          There are genuinely two separate HTTP calling mechanisms in this codebase. Knowing which one handles
+          which kind of call will save you time when tracing a network issue.
+        </p>
+
+        <div class="flow">
+          <div class="flow-step">RTK Query</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-step" style="font-size:12px">listings, profile, watchlist, analytics, history</div>
+        </div>
+        <div class="flow">
+          <div class="flow-step">api.service.ts</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-step" style="font-size:12px">login, register, wallet auth, logout, one-off calls</div>
+        </div>
+
+        <div class="file-card">
+          <div class="file-card-head">
+            <span class="file-path">src<span class="sep">/</span>core<span class="sep">/</span>services<span class="sep">/</span>api.service.ts</span>
+            <span class="file-tag">the older layer</span>
+          </div>
+          <div class="file-card-body">
+            <p class="file-card-note">A global axios interceptor attaches the bearer token to every axios request app-wide, on top of the per-function header logic in getApi/postApi/putApi/deleteApi below it.</p>
+<pre class="code-block"><code>axios.interceptors.request.use(
+  (config) => {
+    <span class="tok-kw">const</span> authToken = getCookieValue(Cookie_Key.ACCESS_TOKEN)
+    <span class="tok-kw">if</span> (config.headers) {
+      <span class="tok-kw">if</span> (authToken) config.headers.Authorization = <span class="tok-str">`Bearer ${authToken}`</span>
+      config.headers[<span class="tok-str">'Content-Type'</span>] = <span class="tok-str">`application/json`</span>
+    }
+    <span class="tok-kw">return</span> config
+  },
+  (error) => Promise.reject(error)
+)
+
+<span class="tok-kw">export function</span> <span class="tok-fn">getApi</span>(url, local, cookie) {
+  <span class="tok-com">// builds headers, fetches, and on failure runs the response through ErrorHandler,</span>
+  <span class="tok-com">// which on a 401 tries a silent token refresh and retries the call</span>
+}</code></pre>
+            <p class="file-card-note">Also defined here: <code class="mono">postApiCall</code> (typed axios helper), <code class="mono">axiosInstance</code> (a plain <code class="mono">axios.create</code>), <code class="mono">logoutUserApi</code>, and <code class="mono">postRefreshToken</code>, the pre-emptive refresh used by AutoLogoutHandler.</p>
+          </div>
+        </div>
+
+        <div class="callout warn">
+          <span class="callout-label">Two refresh mechanisms exist</span>
+          <code>error.service.ts</code>'s reactive 401 handler and <code>api.service.ts</code>'s
+          <code>postRefreshToken</code>, used pre-emptively by AutoLogoutHandler, do overlapping jobs slightly
+          differently. If you're debugging an auth-related network issue, check both.
+        </div>
+
+        <h3 class="sub-title">How a URL actually gets built</h3>
+        <p>
+          Every request resolves to the same shape: <code class="mono">{NEXT_PUBLIC_API_URL}{path}</code>.
+          The path segments live as an enum in <code class="mono">src/core/enum/api-endpoint.enum.ts</code>
+          (about 90 raw strings like <code class="mono">/auth/login</code>), and
+          <code class="mono">src/constants/Api.ts</code> pre-builds full URL constants by concatenating
+          <code class="mono">baseUrl + API_ENDPOINT.X</code> for the ones used directly by the RTK Query slices.
+        </p>
+      </section>
+
+      <!-- 07 -->
+      <section class="chapter" id="sec-auth">
+        <div class="chapter-head"><span class="chapter-num">07</span><h2 class="chapter-title">Login and session state</h2></div>
+        <p class="chapter-lede">
+          Three ways in, email/password, Google, and wallet signature, all converging on the same result:
+          cookies get set, and <code>AuthContext</code> is told the user is logged in.
+        </p>
+
+        <div class="file-card">
+          <div class="file-card-head">
+            <span class="file-path">src<span class="sep">/</span>context<span class="sep">/</span>AuthContext.tsx</span>
+            <span class="file-tag">source of truth</span>
+          </div>
+          <div class="file-card-body">
+            <p class="file-card-note">Starts as <code class="mono">null</code>, meaning "haven't checked yet." Every consumer needs to handle that third state, not just true/false.</p>
+<pre class="code-block"><code><span class="tok-kw">const</span> [authenticated, setAuthenticated] = useState&lt;<span class="tok-kw">boolean</span> | <span class="tok-kw">null</span>&gt;(<span class="tok-kw">null</span>);
+
+<span class="tok-kw">useEffect</span>(() => {
+  <span class="tok-kw">const</span> accessToken = getCookieValue(Cookie_Key.ACCESS_TOKEN);
+  setAuthenticated(!!accessToken);
+}, []);
+
+<span class="tok-kw">const</span> login = () => {
+  setAuthenticated(<span class="tok-kw">true</span>);
+  <span class="tok-kw">if</span> (!router.pathname.startsWith(<span class="tok-str">"/seller-portfolio"</span>)) router.push(<span class="tok-str">"/"</span>);
+};
+
+<span class="tok-kw">const</span> logout = () => {
+  setAuthenticated(<span class="tok-kw">false</span>);
+  deleteCookieAttribute(Cookie_Key.ACCESS_TOKEN);
+  router.push(<span class="tok-str">"/login"</span>);
+};</code></pre>
+          </div>
+        </div>
+
+        <div class="file-card">
+          <div class="file-card-head">
+            <span class="file-path">src<span class="sep">/</span>core<span class="sep">/</span>enum<span class="sep">/</span>cookie.enum.ts</span>
+            <span class="file-tag">cookie keys</span>
+          </div>
+          <div class="file-card-body">
+            <p class="file-card-note">Notice the cookie <em>names</em> themselves are long hash-like strings, not readable names like "accessToken", presumably to obscure them from casual inspection in devtools.</p>
+<pre class="code-block"><code><span class="tok-kw">export enum</span> Cookie_Key {
+  ACCESS_TOKEN = <span class="tok-str">'86b3901eea37a04e8547cd912225f548d2e0a92078887682ce831a433072f9d1'</span>,
+  REFRESH_TOKEN = <span class="tok-str">'6c8a7d4aa21708a432174e4cb5c6cfaf0218f5f3e52f9a76a7d95d2aaade2c83'</span>,
+}</code></pre>
+          </div>
+        </div>
+
+        <h3 class="sub-title">Session expiry, handled proactively</h3>
+        <p>
+          <code class="mono">src/lib/AutoLogoutHandler.tsx</code>, mounted globally in _app.tsx, independently
+          tracks four things at once: JWT expiry with a 5-minute-before warning that offers to refresh the
+          token, a 30-minute inactivity timeout, tab-visibility-based away-time tracking, and cross-tab activity
+          sync through localStorage and the <code class="mono">storage</code> event.
+        </p>
+        <div class="callout">
+          <span class="callout-label">Note</span>
+          Middleware (<code>middleware.js</code>) plays no real role in auth today, its IP-restriction logic is
+          entirely commented out. All access control you see is client-side React state, plus a couple of
+          <code>getServerSideProps</code> guards on <code>/login</code> and <code>/register</code>.
+        </div>
+      </section>
+
+      <!-- 08 -->
+      <section class="chapter" id="sec-wallet">
+        <div class="chapter-head"><span class="chapter-num">08</span><h2 class="chapter-title">Wallet connection, step by step</h2></div>
+        <p class="chapter-lede">
+          Connecting a wallet doesn't by itself log anyone in. It kicks off a proper nonce-sign-verify challenge
+          to prove the user actually controls that address.
+        </p>
+
+        <div class="flow" style="max-width:100%">
+          <div class="flow-step">Open wallet modal</div><span class="flow-arrow">→</span>
+          <div class="flow-step">Fetch nonce</div><span class="flow-arrow">→</span>
+          <div class="flow-step">Sign nonce</div><span class="flow-arrow">→</span>
+          <div class="flow-step">POST signature</div><span class="flow-arrow">→</span>
+          <div class="flow-step">Backend authenticates</div>
+        </div>
+
+        <div class="file-card">
+          <div class="file-card-head">
+            <span class="file-path">src<span class="sep">/</span>component<span class="sep">/</span>wallet-connect<span class="sep">/</span>index.tsx</span>
+            <span class="file-tag">WalletConect (sic)</span>
+          </div>
+          <div class="file-card-body">
+            <p class="file-card-note">Once wagmi's <code class="mono">useSignMessage</code> returns a signature, it's forwarded to the backend along with the checksummed address and the chain name.</p>
+<pre class="code-block"><code><span class="tok-kw">const</span> getWalletNonce = <span class="tok-kw">async</span> () => {
+  <span class="tok-kw">let</span> wallAddress = ethers.utils.getAddress(address);
+  <span class="tok-kw">const</span> nonce = <span class="tok-kw">await</span> getNonce(API_ENDPOINT.WALLET_USER_API, wallAddress)
+  signMessage({ message: nonce })
+}
+
+<span class="tok-kw">const</span> handleWalletSignin = <span class="tok-kw">async</span> (signature) => {
+  <span class="tok-kw">const</span> checksummed = ethers.utils.getAddress(address);
+  <span class="tok-kw">const</span> response = <span class="tok-kw">await</span> connectWallet({
+    postSignatureApi: API_ENDPOINT.WALLET_AUTH_API,
+    address: checksummed,
+    signature,
+    network: networkName ?? EVM_NETWORK,
+    source: <span class="tok-str">'marketplace'</span>,
+  })
+}</code></pre>
+          </div>
+        </div>
+
+        <div class="callout warn">
+          <span class="callout-label">Worth flagging</span>
+          <code>createAppKit({...})</code> is called directly inside this component's render body,
+          rather than once at module scope like most AppKit integrations do. It appears to work because AppKit
+          guards against duplicate init internally, but it's an easy trap to copy into a new component without
+          realizing why it should live outside the render path.
+        </div>
+
+        <h3 class="sub-title">Supported networks</h3>
+        <p>
+          <code class="mono">src/config/wagmi.ts</code> lists mainnet, arbitrum, polygon (and its Mumbai
+          testnet), arbitrumGoerli, arbitrumSepolia, bsc, bscTestnet, goerli, sepolia, and base, together in one
+          adapter. That's a mix of live mainnets and several deprecated or testnet chains configured side by
+          side, worth confirming with the team which ones are actually meant to be live before you assume the
+          network picker reflects intentional product scope.
+        </p>
+      </section>
+
+      <!-- 09 -->
+      <section class="chapter" id="sec-guard">
+        <div class="chapter-head"><span class="chapter-num">09</span><h2 class="chapter-title">Route protection</h2></div>
+        <p class="chapter-lede">
+          <code>ProtectedRoute.tsx</code> reads <code>authenticated</code> from context and decides, on every
+          route change, whether to let the page render or redirect somewhere else.
+        </p>
+        <div class="file-card">
+          <div class="file-card-head">
+            <span class="file-path">src<span class="sep">/</span>component<span class="sep">/</span>ProtectedRoute.tsx</span>
+            <span class="file-tag">guard logic</span>
+          </div>
+          <div class="file-card-body">
+<pre class="code-block"><code><span class="tok-kw">useEffect</span>(() => {
+  <span class="tok-kw">if</span> (authenticated === <span class="tok-kw">null</span>) <span class="tok-kw">return</span>; <span class="tok-com">// still checking auth</span>
+
+  <span class="tok-kw">if</span> (!authenticated && !isPublicRoute(router.pathname)) {
+    router.replace(<span class="tok-str">"/login"</span>);
+  }
+  <span class="tok-kw">else if</span> (
+    authenticated &&
+    isPublicRoute(router.pathname) &&
+    router.pathname !== <span class="tok-str">"/"</span> &&
+    !router.pathname.startsWith(<span class="tok-str">"/seller-portfolio"</span>) &&
+    !router.pathname.startsWith(<span class="tok-str">"/ens-marketplace"</span>)
+  ) {
+    router.replace(<span class="tok-str">"/"</span>);
+  } <span class="tok-kw">else</span> {
+    setLoading(<span class="tok-kw">false</span>);
+  }
+}, [authenticated, router]);</code></pre>
+            <p class="file-card-note">The three states of <code class="mono">authenticated</code> (null, false, true) map to three different behaviors here, "not yet known," "logged out," and "logged in", so any new redirect rule needs to account for all three, not just true/false.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 10 -->
+      <section class="chapter" id="sec-style">
+        <div class="chapter-head"><span class="chapter-num">10</span><h2 class="chapter-title">Styling approach</h2></div>
+        <p class="chapter-lede">
+          Bootstrap 5 and large global stylesheets do essentially all the visual work. SCSS Modules are used
+          sparingly, and Tailwind, despite existing as a config file, does nothing.
+        </p>
+        <ul class="plain">
+          <li><code class="mono">bootstrap/dist/css/bootstrap.min.css</code> is imported in _app.tsx, and a second, locally vendored copy is linked again inside the Layout's Head, so Bootstrap CSS loads twice.</li>
+          <li>Most components use plain string classNames keyed into <code class="mono">public/assets/css/style.css</code>, <code class="mono">custom.css</code>, and <code class="mono">responsive.css</code>.</li>
+          <li>Real CSS Modules exist only in two places: <code class="mono">styles/Toast.module.scss</code> and <code class="mono">src/component/domain-item/skeleton.module.scss</code>.</li>
+          <li><code class="mono">styles/Auth-Component.module.scss</code> and similar files use the <code class="mono">.module.scss</code> naming convention but are written more like global BEM-style SCSS, worth checking scoping behavior before assuming a class name in one of these files is safely isolated.</li>
+        </ul>
+      </section>
+
+      <!-- 11 -->
+      <section class="chapter" id="sec-env">
+        <div class="chapter-head"><span class="chapter-num">11</span><h2 class="chapter-title">Environment and deploy</h2></div>
+        <p class="chapter-lede">
+          Deploys through AWS CodeDeploy onto an EC2 host managed by PM2, not Vercel, despite what the
+          boilerplate README still says.
+        </p>
+
+        <div class="callout warn">
+          <span class="callout-label">Double check this before you assume the app is pointed correctly</span>
+          The committed <code>.env</code> defines <code>NEXT_PUBLIC_API_ENDPOINT</code>, but
+          <code>next.config.ts</code> actually reads <code>NEXT_PUBLIC_API_URL</code>. As committed, this
+          specific file would not populate the app's base URL. Confirm whether a separate untracked
+          <code>.env.local</code> has the correct name before assuming requests are reaching the right backend.
+        </div>
+
+        <div class="flow" style="max-width:100%">
+          <div class="flow-step">CodeDeploy triggers</div><span class="flow-arrow">→</span>
+          <div class="flow-step">fetch_env.sh (pulls .env from S3)</div><span class="flow-arrow">→</span>
+          <div class="flow-step">install_dependencies.sh</div><span class="flow-arrow">→</span>
+          <div class="flow-step">build_frontend.sh</div><span class="flow-arrow">→</span>
+          <div class="flow-step">start_frontend.sh (pm2, port 3002)</div>
+        </div>
+
+        <p>
+          <code class="mono">ecosystem.config.js</code> bakes a specific EC2 public IP directly into the
+          <code class="mono">env_production</code> block. That'll need updating manually if the instance is ever
+          replaced. There's no Dockerfile and no automated test step in this pipeline.
+        </p>
+      </section>
+
+      <!-- 12 -->
+      <section class="chapter" id="sec-rough">
+        <div class="chapter-head"><span class="chapter-num">12</span><h2 class="chapter-title">Rough edges worth knowing about</h2></div>
+        <p class="chapter-lede">So they don't surprise you later, or cost you an hour of confused debugging.</p>
+        <ul class="plain">
+          <li>A hardcoded API key sits in plaintext in <code class="mono">src/constants/BaseUrl.ts</code>.</li>
+          <li>Two parallel HTTP calling mechanisms exist side by side, RTK Query and the hand-rolled fetch/axios layer, each handling different calls.</li>
+          <li><code class="mono">src/core/redux/reducer.ts</code> is an empty, unwired slice, safe to ignore or delete.</li>
+          <li>A couple of filenames have literal typos, including one with a trailing space (<code class="mono">CreateFileFromUrl .tsx</code>, <code class="mono">ReturnSessionDto '.ts'</code>), easy to trip over if typing an import path by hand instead of autocompleting.</li>
+          <li>The login page exists as two identical copies, <code class="mono">pages/login/</code> and <code class="mono">pages/(auth)/login/</code>.</li>
+        </ul>
+      </section>
+
+      <!-- 13 -->
+      <section class="chapter" id="sec-start">
+        <div class="chapter-head"><span class="chapter-num">13</span><h2 class="chapter-title">Where to actually start</h2></div>
+        <p class="chapter-lede">A suggested order, if you want to get productive quickly rather than trying to absorb everything at once.</p>
+        <ul class="plain">
+          <li><strong>Run the app and click through it</strong> as a real user would. Browse, search, open a listing, try connecting a test wallet.</li>
+          <li><strong>Read <a href="#sec-boot">pages/_app.tsx</a> slowly.</strong> The provider order explains almost everything else you'll encounter.</li>
+          <li><strong>Read <a href="#sec-auth">AuthContext.tsx</a> and <a href="#sec-guard">ProtectedRoute.tsx</a> together.</strong> This is the mental model you'll refer back to constantly.</li>
+          <li><strong>Trace one simple page end to end</strong>, About Us or Contact Us are good choices, from the page file, to the component, to the RTK Query hook, to the endpoint enum. Doing this once by hand teaches the whole data-fetching pattern faster than reading the Redux folder in isolation.</li>
+          <li><strong>Then trace a wallet-touching page</strong>, the buy-now flow or a listing page, using <a href="#sec-wallet">wallet-connect</a> and <a href="#sec-boot">initProvider.tsx</a> as anchors.</li>
+        </ul>
+        <p>From there you'll have enough context to pick up real tickets, since you'll already know where routing, state, API calls, and auth gating each live.</p>
+      </section>
+
+      <footer class="doc-foot">
+        Companion to ONBOARDING.md · generated from a direct read of the repository, not from assumptions about how a typical Next.js app is usually structured.
+      </footer>
+
+    </div>
+  </main>
+</div>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var toggleBtn = document.getElementById('theme-toggle');
+  toggleBtn.addEventListener('click', function () {
+    var current = root.getAttribute('data-theme');
+    var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var effectiveCurrent = current || (prefersDark ? 'dark' : 'light');
+    root.setAttribute('data-theme', effectiveCurrent === 'dark' ? 'light' : 'dark');
+  });
+
+  var sidebar = document.getElementById('sidebar');
+  var sidebarToggle = document.getElementById('sidebar-toggle');
+  var scrim = document.getElementById('scrim');
+  function closeSidebar() { sidebar.classList.remove('open'); scrim.classList.remove('show'); }
+  function openSidebar() { sidebar.classList.add('open'); scrim.classList.add('show'); }
+  sidebarToggle.addEventListener('click', function () {
+    sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+  });
+  scrim.addEventListener('click', closeSidebar);
+
+  var links = Array.prototype.slice.call(document.querySelectorAll('.nav-link'));
+  var sections = links.map(function (l) {
+    return document.getElementById(l.getAttribute('data-target'));
+  });
+
+  links.forEach(function (link) {
+    link.addEventListener('click', function () {
+      var target = document.getElementById(link.getAttribute('data-target'));
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        history.replaceState(null, '', '#' + link.getAttribute('data-target'));
+      }
+      if (window.matchMedia('(max-width: 880px)').matches) closeSidebar();
+    });
+  });
+
+  function setActive() {
+    var scrollPos = window.scrollY + 100;
+    var activeIndex = 0;
+    sections.forEach(function (sec, i) {
+      if (sec && sec.offsetTop <= scrollPos) activeIndex = i;
+    });
+    links.forEach(function (l, i) {
+      l.classList.toggle('active', i === activeIndex);
+    });
+  }
+  document.addEventListener('scroll', setActive, { passive: true });
+  setActive();
+
+  var searchInput = document.getElementById('nav-search');
+  searchInput.addEventListener('input', function () {
+    var q = searchInput.value.trim().toLowerCase();
+    links.forEach(function (link) {
+      var text = link.textContent.toLowerCase();
+      var match = !q || text.indexOf(q) !== -1;
+      link.setAttribute('data-hidden', match ? 'false' : 'true');
+    });
+  });
+
+  if (location.hash) {
+    var initial = document.getElementById(location.hash.slice(1));
+    if (initial) setTimeout(function () { initial.scrollIntoView({ block: 'start' }); }, 50);
+  }
+})();
+</script>
+</body>
+</html>
