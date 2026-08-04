@@ -1,0 +1,855 @@
+<title>Endless Domains Marketplace — Fix Log</title>
+<style>
+@font-face {
+  font-family: 'Source Serif';
+  src: local('Source Serif 4'), local('Source Serif Pro');
+}
+
+:root {
+  --ink: #1b2430;
+  --ink-soft: #3d4a5c;
+  --paper: #f7f5f0;
+  --paper-raised: #ffffff;
+  --line: #dcd6c9;
+  --accent: #b5651d;
+  --accent-soft: #e8dcc8;
+  --done: #4d6b53;
+  --done-bg: #e8f0e6;
+  --skip: #a3690a;
+  --skip-bg: #fbf0dc;
+  --caution: #9a2b1f;
+  --caution-bg: #fbe9e6;
+  --radius: 4px;
+  --shadow: 0 1px 2px rgba(27,36,48,0.06), 0 4px 12px rgba(27,36,48,0.05);
+}
+
+:root[data-theme="dark"] {
+  --ink: #eae6dc;
+  --ink-soft: #b8b2a4;
+  --paper: #16130f;
+  --paper-raised: #211c16;
+  --line: #3a3226;
+  --accent: #e0a458;
+  --accent-soft: #3a2f1e;
+  --done: #8fbf95;
+  --done-bg: #1e2c1f;
+  --skip: #e0ab5c;
+  --skip-bg: #3a2f1a;
+  --caution: #e5766a;
+  --caution-bg: #3a1f1c;
+  --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.25);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink: #eae6dc;
+    --ink-soft: #b8b2a4;
+    --paper: #16130f;
+    --paper-raised: #211c16;
+    --line: #3a3226;
+    --accent: #e0a458;
+    --accent-soft: #3a2f1e;
+    --done: #8fbf95;
+    --done-bg: #1e2c1f;
+    --skip: #e0ab5c;
+    --skip-bg: #3a2f1a;
+    --caution: #e5766a;
+    --caution-bg: #3a1f1c;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.25);
+  }
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+body {
+  font-family: -apple-system, 'Segoe UI', 'Inter', Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+  font-size: 16px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+@media (max-width: 880px) {
+  .layout { grid-template-columns: 1fr; }
+  .toc { position: static !important; height: auto !important; }
+}
+
+.toc {
+  background: #211a14;
+  color: #cfc6b8;
+  padding: 2rem 1.4rem 3rem;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  font-size: 0.84rem;
+}
+
+:root[data-theme="dark"] .toc, :root[data-theme="light"] .toc { background: #211a14; color: #cfc6b8; }
+
+.toc-brand {
+  font-family: 'Source Serif', Georgia, serif;
+  color: #f2ead9;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 0.15rem;
+}
+
+.toc-sub {
+  color: #8f8470;
+  font-size: 0.76rem;
+  margin: 0 0 1.6rem;
+}
+
+.toc-group-label {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.66rem;
+  color: #8f8470;
+  margin: 1.3rem 0 0.5rem;
+  font-weight: 600;
+}
+
+.toc a {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+  color: #cfc6b8;
+  text-decoration: none;
+  padding: 0.22rem 0;
+}
+.toc a:hover, .toc a:focus-visible { color: #f2ead9; }
+.toc a .dot {
+  flex-shrink: 0;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  margin-top: 0.4rem;
+}
+.dot.done { background: var(--done); }
+.dot.skip { background: var(--skip); }
+
+.toc-divider {
+  border: none;
+  border-top: 1px solid #3a2f24;
+  margin: 1.1rem 0;
+}
+
+.main {
+  padding: 2.6rem clamp(1.25rem, 5vw, 4rem) 5rem;
+  max-width: 800px;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.72rem;
+  color: var(--accent);
+  font-weight: 700;
+  margin: 0 0 0.6rem;
+}
+
+h1.title {
+  font-family: 'Source Serif', Georgia, serif;
+  font-size: clamp(1.7rem, 4vw, 2.2rem);
+  line-height: 1.15;
+  margin: 0 0 0.6rem;
+  text-wrap: balance;
+  font-weight: 600;
+}
+
+.dek {
+  font-size: 1rem;
+  color: var(--ink-soft);
+  max-width: 62ch;
+  margin: 0 0 1.3rem;
+}
+
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 0.7rem;
+  margin: 1.3rem 0 2rem;
+}
+
+.stat {
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.8rem 0.9rem;
+  box-shadow: var(--shadow);
+}
+
+.stat .n {
+  font-family: 'Source Serif', Georgia, serif;
+  font-size: 1.6rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  display: block;
+}
+.stat.done .n { color: var(--done); }
+.stat.skip .n { color: var(--skip); }
+.stat .l {
+  font-size: 0.74rem;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+section.group {
+  margin-top: 2.8rem;
+  scroll-margin-top: 1.5rem;
+}
+
+.group-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  border-bottom: 2px solid var(--ink);
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.3rem;
+}
+
+.group-heading h2 {
+  font-family: 'Source Serif', Georgia, serif;
+  font-size: 1.4rem;
+  margin: 0;
+  font-weight: 600;
+}
+
+.group-heading .count {
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
+
+.group-intro {
+  color: var(--ink-soft);
+  max-width: 66ch;
+  margin: 0.7rem 0 1.4rem;
+  font-size: 0.94rem;
+}
+
+.item {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--paper-raised);
+  margin-bottom: 0.9rem;
+  overflow: hidden;
+  scroll-margin-top: 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+.item-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  padding: 0.8rem 1.1rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.item-head h3 {
+  font-size: 1rem;
+  margin: 0;
+  font-weight: 600;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.badge.done { background: var(--done-bg); color: var(--done); }
+.badge.skip { background: var(--skip-bg); color: var(--skip); }
+.badge.partial { background: var(--caution-bg); color: var(--caution); }
+
+.side {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.side.frontend { background: #e4ecf3; color: #2c5b82; }
+.side.backend { background: #f0e6f3; color: #6b3d82; }
+.side.both { background: linear-gradient(90deg, #e4ecf3 50%, #f0e6f3 50%); color: #4a4470; }
+.side.infra { background: #ece7dd; color: #5c5240; }
+.side.content { background: #e6ede2; color: #4d6b3f; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .side.frontend { background: #1e2e3d; color: #8fb8dc; }
+  :root:not([data-theme="light"]) .side.backend { background: #2e2038; color: #cf9fe0; }
+  :root:not([data-theme="light"]) .side.both { background: linear-gradient(90deg, #1e2e3d 50%, #2e2038 50%); color: #c2c0e8; }
+  :root:not([data-theme="light"]) .side.infra { background: #2a2620; color: #b8ac94; }
+  :root:not([data-theme="light"]) .side.content { background: #202a1e; color: #a3c295; }
+}
+:root[data-theme="dark"] .side.frontend { background: #1e2e3d; color: #8fb8dc; }
+:root[data-theme="dark"] .side.backend { background: #2e2038; color: #cf9fe0; }
+:root[data-theme="dark"] .side.both { background: linear-gradient(90deg, #1e2e3d 50%, #2e2038 50%); color: #c2c0e8; }
+:root[data-theme="dark"] .side.infra { background: #2a2620; color: #b8ac94; }
+:root[data-theme="dark"] .side.content { background: #202a1e; color: #a3c295; }
+
+.item-body { padding: 0.9rem 1.1rem 1.1rem; }
+.item-body p { margin: 0.35rem 0; font-size: 0.94rem; }
+
+.file-list {
+  font-family: 'SF Mono', 'Cascadia Code', Consolas, monospace;
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  margin: 0 0 0.6rem;
+  word-break: break-word;
+}
+.file-list code {
+  background: var(--accent-soft);
+  color: var(--ink);
+  padding: 0.06rem 0.3rem;
+  border-radius: 3px;
+}
+
+.block-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  color: var(--ink-soft);
+  margin: 0.6rem 0 0.15rem;
+}
+.block-label.fixed { color: var(--done); }
+.block-label.skipped { color: var(--skip); }
+
+code.inline {
+  font-family: 'SF Mono', 'Cascadia Code', Consolas, monospace;
+  background: var(--accent-soft);
+  color: var(--ink);
+  padding: 0.05rem 0.3rem;
+  border-radius: 3px;
+  font-size: 0.86em;
+}
+
+footer.doc-footer {
+  margin-top: 3.5rem;
+  padding-top: 1.3rem;
+  border-top: 1px solid var(--line);
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+}
+
+a { color: var(--accent); }
+::selection { background: var(--accent-soft); }
+</style>
+
+<div class="layout">
+
+<nav class="toc" aria-label="Table of contents">
+  <p class="toc-brand">Fix Log</p>
+  <p class="toc-sub">What changed, where, and what's still open</p>
+
+  <hr class="toc-divider" />
+  <p class="toc-group-label">Fixed (25)</p>
+  <a href="#s2"><span class="dot done"></span> S2 · .env-cmdrc</a>
+  <a href="#s5"><span class="dot done"></span> S5 · Cookie names</a>
+  <a href="#s8"><span class="dot done"></span> S8 · Script integrity</a>
+  <a href="#s10"><span class="dot done"></span> S10 · Security headers</a>
+  <a href="#s12"><span class="dot done"></span> S12 · rel=noopener</a>
+  <a href="#s13"><span class="dot done"></span> S13 · console.* stripped</a>
+  <a href="#e3"><span class="dot done"></span> E3 · _document.tsx</a>
+  <a href="#e5"><span class="dot done"></span> E5 · h1 tags (3 pages)</a>
+  <a href="#e6"><span class="dot done"></span> E6 · keywords tag removed</a>
+  <a href="#p4"><span class="dot done"></span> P4 · PDF + SVGs</a>
+  <a href="#p10"><span class="dot done"></span> P10 · dead code removed</a>
+  <a href="#p1p2"><span class="dot done"></span> P1/P2 · duplicate CSS</a>
+  <a href="#p3"><span class="dot done"></span> P3 · unused fonts</a>
+  <a href="#p5"><span class="dot done"></span> P5 · next/image</a>
+  <a href="#p8"><span class="dot done"></span> P8 · Font Awesome</a>
+  <a href="#s9p9"><span class="dot done"></span> S9+P9 · jQuery / scripts</a>
+  <a href="#e2"><span class="dot done"></span> E2 · robots.txt + sitemap</a>
+  <a href="#e4"><span class="dot done"></span> E4 · canonical/OG/schema</a>
+  <a href="#e1"><span class="dot done"></span> E1 · SSR loading fix</a>
+  <a href="#p11"><span class="dot done"></span> P11 · broken API URL</a>
+  <a href="#p6"><span class="dot done"></span> P6 · code-splitting</a>
+  <a href="#s6"><span class="dot done"></span> S6 · /profile middleware</a>
+  <a href="#s11"><span class="dot done"></span> S11 · ESLint enforced</a>
+  <a href="#e7"><span class="dot done"></span> E7 · seller page metadata</a>
+
+  <hr class="toc-divider" />
+  <p class="toc-group-label">Left alone, on purpose</p>
+  <a href="#p7"><span class="dot skip"></span> P7 · Bootstrap JS</a>
+  <a href="#e5-scope"><span class="dot skip"></span> E5 · rest of the app</a>
+  <a href="#svg-ceiling"><span class="dot skip"></span> P4 · SVG ceiling</a>
+  <a href="#p10-feature"><span class="dot skip"></span> P10 · menu button</a>
+
+  <hr class="toc-divider" />
+  <p class="toc-group-label">Already fixed</p>
+  <a href="#e8-done"><span class="dot done"></span> E8 · Favicon/manifest</a>
+
+  <hr class="toc-divider" />
+  <p class="toc-group-label">Partially fixed</p>
+  <a href="#s3-partial"><span class="dot skip"></span> S3 · API key</a>
+
+  <hr class="toc-divider" />
+  <p class="toc-group-label">Not started (5)</p>
+  <a href="#s1-open"><span class="dot skip"></span> S1 · Google secret</a>
+  <a href="#s4-open"><span class="dot skip"></span> S4 · Unsafe cookies</a>
+  <a href="#s7-open"><span class="dot skip"></span> S7 · Refresh loop</a>
+  <a href="#e9-open"><span class="dot skip"></span> E9 · Staging clone</a>
+  <a href="#e10-open"><span class="dot skip"></span> E10 · Cross-linking</a>
+
+  <hr class="toc-divider" />
+  <a href="#next"><span class="dot skip"></span> Next steps</a>
+</nav>
+
+<main class="main">
+
+  <p class="eyebrow">Engineering changelog · marketplace.endlessdomains.io</p>
+  <h1 class="title">What got fixed, what didn't</h1>
+  <p class="dek">Every item below: where it lives, what got fixed, what's still left. No prose, just the facts.</p>
+
+  <div class="stat-row">
+    <div class="stat done"><span class="n">25</span><span class="l">Fixed</span></div>
+    <div class="stat done"><span class="n">1</span><span class="l">Already fixed</span></div>
+    <div class="stat skip"><span class="n">1</span><span class="l">Left alone</span></div>
+    <div class="stat skip"><span class="n">1</span><span class="l">Partial</span></div>
+    <div class="stat skip"><span class="n">5</span><span class="l">Not started</span></div>
+  </div>
+
+  <!-- ============ FIXED ============ -->
+  <section class="group">
+    <div class="group-heading"><h2>Fixed</h2><span class="count">25 issues</span></div>
+
+    <article class="item" id="s2">
+      <div class="item-head"><h3>S2 — .env-cmdrc was tracked in git</h3><span class="badge done">Fixed</span><span class="side frontend">Frontend</span></div>
+      <div class="item-body">
+        <p class="file-list">Where: <code>.env-cmdrc</code> · <code>.gitignore</code></p>
+        <p class="block-label fixed">Fixed</p>
+        <p>Removed <code class="inline">.env-cmdrc</code> from git tracking. Added a blank <code class="inline">.env-cmdrc.example</code> file. Fixed a gitignore rule that would have hidden that example file too.</p>
+        <p class="block-label skipped">Remaining</p>
+        <p>The old values (an internal IP and the staging URL, not real secrets) stay in git history until it's rewritten. Low priority.</p>
+      </div>
+    </article>
+
+    <article class="item" id="s5">
+      <div class="item-head"><h3>S5 — Cookie names were long hash strings</h3><span class="badge done">Fixed</span><span class="side frontend">Frontend</span></div>
+      <div class="item-body">
+        <p class="file-list">Where: <code>src/core/enum/cookie.enum.ts</code></p>
+        <p class="block-label fixed">Fixed</p>
+        <p>Renamed the access and refresh token cookies from SHA-256 hashes to plain names. All 24 files that use these cookies go through this one file, so nothing else needed to change.</p>
+        <p class="block-label skipped">Remaining</p>
+        <p>None. Heads up: this logs out every active session on deploy, users just log back in once.</p>
+      </div>
+    </article>
+
+    <article class="item" id="s8">
+      <div class="item-head"><h3>S8 — Third-party scripts had no integrity check</h3><span class="badge done">Fixed</span><span class="side frontend">Frontend</span></div>
+      <div class="item-body">
+        <p class="file-list">Where: <code>src/template/layout/index.tsx</code></p>
+        <p class="block-label fixed">Fixed</p>
+        <p>Deleted Chart.js and its plugin, confirmed unused. Added an integrity hash to Font Awesome and jQuery's script tags so the browser can verify it got the real file, not a tampered one.</p>
+        <p class="block-label skipped">Remaining</p>
+        <p>None. Both remaining scripts were later removed entirely by other fixes below (jQuery by S9+P9, Font Awesome's CDN link by P8), so this protection isn't even needed anymore.</p>
+      </div>
+    </article>
+
+    <article class="item" id="s10">
+      <div class="item-head"><h3>S10 — No security headers</h3><span class="badge done">Fixed</span><span class="side frontend">Frontend</span></div>
+      <div class="item-body">
+        <p class="file-list">Where: <code>next.config.ts</code></p>
+        <p class="block-label fixed">Fixed</p>
+        <p>Added 4 security headers to every page: clickjacking protection, MIME-type protection, referrer policy, and camera/mic/location lockdown.</p>
+        <p class="block-label skipped">Remaining</p>
+        <p>None.</p>
+      </div>
+    </article>
+
+    <article class="item" id="s12">
+      <div class="item-head"><h3>S12 — External links missing rel="noopener"</h3><span class="badge done">Fixed</span><span class="side frontend">Frontend</span></div>
+      <div class="item-body">
+        <p class="file-list">Where: <code>src/component/footer/index.tsx</code> · <code>src/component/header/index.tsx</code></p>
+        <p class="block-label fixed">Fixed</p>
+        <p>Added <code class="inline">rel="noopener noreferrer"</code> to 10 external links (social links, nav links) across both files.</p>
+        <p class="block-label skipped">Remaining</p>
+        <p>None. One link (ENS Marketplace) was skipped on purpose, it's an internal page, not an external site.</p>
+      </div>
+    </article>
+
+    <article class="item" id="s13">
+      <div class="item-head"><h3>S13 — console.* logs shipping to production</h3><span class="badge done">Fixed</span><span class="side frontend">Frontend</span></div>
+      <div class="item-body">
+        <p class="file-list">Where: <code>next.config.ts</code></p>
+        <p class="block-label fixed">Fixed</p>
+        <p>Turned on a build setting that strips all <code class="inline">console.*</code> calls in production except <code class="inline">console.error</code>. Covers all 48 call sites without editing any of them by hand.</p>
+        <p class="block-label skipped">Remaining</p>
+        <p>None.</p>
+      </div>
+    </article>
+
+    <article class="item" id="e3">
+      <div class="item-head"><h3>E3 — No _document.tsx</h3><span class="badge done">Fixed</span><span class="side frontend">Frontend</span></div>
+      <div class="item-body">
+        <p class="file-list">Where: <code>pages/_document.tsx</code> (new file)</p>
+        <p class="block-label fixed">Fixed</p>
+        <p>Created the file and set <code class="inline">lang="en"</code> on the page's html tag, needed for both SEO and accessibility.</p>
+        <p class="block-label skipped">Remaining</p>
+        <p>None.</p>
+      </div>
+    </article>
+
+    <article class="item" id="e5">
+      <div class="item-head"><h3>E5 — No h1 heading on 3 pages</h3><span class="badge done">Fixed</span><span class="side frontend">Frontend</span></div>
+      <div class="item-body">
+        <p class="file-list">Where: <code>pages/index.tsx</code> · <code>pages/about-us/index.tsx</code> · <code>pages/contact-us/index.tsx</code></p>
+        <p class="block-label fixed">Fixed</p>
+        <p>Changed the main heading on each page from <code class="inline">h2</code> to <code class="inline">h1</code>, the tag search engines look for first.</p>
+        <p class="block-label skipped">Remaining</p>
+        <p>Every other page in <code class="inline">pages/</code> still has the same gap, only these 3 named by the audit were fixed. See "E5 · rest of the app" below.</p>
+      </div>
+    </article>
+
+    <article class="item" id="e6">
+      <div class="item-head"><h3>E6 — Dead keywords meta tag</h3><span class="badge done">Fixed</span><span class="side frontend">Frontend</span></div>
+      <div class="item-body">
+        <p class="file-list">Where: <code>layout/index.tsx</code> · <code>meta-data.type.ts</code> · <code>pages/index.tsx</code> · <code>pages/ens-marketplace/index.tsx</code></p>
+        <p class="block-label fixed">Fixed</p>
+        <p>Removed the <code class="inline">&lt;meta name="keywords"&gt;</code> tag Google has ignored since 2009, plus the now-unused field it came from.</p>
+        <p class="block-label skipped">Remaining</p>
+        <p>None.</p>
+      </div>
+    </article>
+
+    <article class="item" id="p4">
+      <div class="item-head"><h3>P4 — Oversized PDF and SVG files</h3><span class="badge done">Fixed</span><span class="side frontend">Frontend</span></div>
+      <div class="item-body">
+        <p class="file-list">Where: <code>public/assets/img/</code></p>
+        <p class="block-label fixed">Fixed</p>
+        <p>Deleted an unused 1.3MB PDF. Compressed 5 oversized SVGs, about 24-25% smaller each.</p>
+        <p class="block-label skipped">Remaining</p>
+        <p>Can't get much smaller by automated compression alone, these are built from ~1,900 tiny shapes each, not embedded images. See "P4 · SVG ceiling" below.</p>
+      </div>
+    </article>
+
+    <article class="item" id="p10">
+      <div class="item-head"><h3>P10 — Hardcoded 1-second delay</h3><span class="badge done">Fixed</span><span class="side frontend">Frontend</span></div>
+      <div class="item-body">
+        <p class="file-list">Where: <code>src/template/layout/index.tsx</code></p>
+        <p class="block-label fixed">Fixed</p>
+        <p>Removed dead code, a timer and click handler that were wired to a menu button that doesn't exist anywhere in the app.</p>
+        <p class="block-label skipped">Remaining</p>
+        <p>Whether that button was supposed to exist is a design question, not a code fix. See "P10 · menu button" below.</p>
+      </div>
+    </article>
+
+    <article class="item" id="p1p2">
+      <div class="item-head"><h3>P1/P2 — Duplicate CSS files</h3><span class="badge done">Fixed</span><span class="side frontend">Frontend</span></div>
+      <div class="item-body">
+        <p class="file-list">Where: <code>pages/_app.tsx</code> · <code>src/template/layout/index.tsx</code></p>
+        <p class="block-label fixed">Fixed</p>
+        <p>Bootstrap, custom, style, and responsive CSS were each loading 2-3 times per page. Now each loads exactly once.</p>
+        <p class="block-label skipped">Remaining</p>
+        <p>None.</p>
+      </div>
+    </article>
+
+    <article class="item" id="p3">
+      <div class="item-head"><h3>P3 — 22MB of font files</h3><span class="badge done">Fixed</span><span class="side frontend">Frontend</span></div>
+      <div class="item-body">
+        <p class="file-list">Where: <code>public/assets/fonts/</code></p>
+        <p class="block-label fixed">Fixed</p>
+        <p>Deleted 18 unused <code class="inline">.ttf</code> font files, confirmed nothing in the app references them. Folder size dropped from 21.5MB to 10.2MB.</p>
+        <p class="block-label skipped">Remaining</p>
+        <p>None for this fix. Separately, some font weights are barely used at all and could be trimmed further later, a design call, not done today.</p>
+      </div>
+    </article>
+
+    <article class="item" id="p5">
+      <div class="item-head"><h3>P5 — Raw img tags instead of next/image</h3><span class="badge done">Fixed</span><span class="side frontend">Frontend</span></div>
+      <div class="item-body">
+        <p class="file-list">Where: 12 files across <code>pages/</code> and <code>src/component/</code></p>
+        <p class="block-label fixed">Fixed</p>
+        <p>Converted every static image in these files to <code class="inline">next/image</code>, which auto-shrinks and lazy-loads images instead of loading everything at full size immediately.</p>
+        <p class="block-label skipped">Remaining</p>
+        <p>A few images were deliberately left as-is: remote URLs, a low-value upload preview, small icons. Also found, unrelated: one image reference points to a file that doesn't exist.</p>
+      </div>
+    </article>
+
+    <article class="item" id="p8">
+      <div class="item-head"><h3>P8 — Font Awesome loaded from a CDN</h3><span class="badge done">Fixed</span><span class="side frontend">Frontend</span></div>
+      <div class="item-body">
+        <p class="file-list">Where: <code>layout/index.tsx</code> · <code>pages/_app.tsx</code> · 10 component files</p>
+        <p class="block-label fixed">Fixed</p>
+        <p>Replaced the CDN link (which loaded every icon style Font Awesome has) with the proper React package, converting all 21 real icon usages to it.</p>
+        <p class="block-label skipped">Remaining</p>
+        <p>None.</p>
+      </div>
+    </article>
+
+    <article class="item" id="s9p9">
+      <div class="item-head"><h3>S9+P9 — jQuery loaded twice; scripts blocking the page</h3><span class="badge done">Fixed</span><span class="side frontend">Frontend</span></div>
+      <div class="item-body">
+        <p class="file-list">Where: <code>layout/index.tsx</code> · <code>public/assets/js/script.js</code> · <code>pages/reset-password/success/index.tsx</code></p>
+        <p class="block-label fixed">Fixed</p>
+        <p>Removed jQuery entirely, nothing real depends on it. Converted Bootstrap's JS, <code class="inline">script.js</code>, and the Facebook Pixel snippet to <code class="inline">next/script</code> so they don't block the page from loading.</p>
+        <p class="block-label skipped">Remaining</p>
+        <p>Found along the way: the site's image carousels have never actually worked, the plugin that runs them was never loaded (confirmed on the live staging site too). Removed the broken carousel code rather than fix a feature nobody was using. Some unused leftover carousel class names still sit in <code class="inline">testimonial-slider.tsx</code>, harmless.</p>
+      </div>
+    </article>
+
+    <article class="item" id="e2">
+      <div class="item-head"><h3>E2 — No robots.txt or sitemap</h3><span class="badge done">Fixed</span><span class="side frontend">Frontend</span></div>
+      <div class="item-body">
+        <p class="file-list">Where: <code>next-sitemap.config.js</code> (new) · <code>package.json</code></p>
+        <p class="block-label fixed">Fixed</p>
+        <p>Both files now generate automatically on every build, covering 7 real public pages.</p>
+        <p class="block-label skipped">Remaining</p>
+        <p>Seller portfolio pages can't be added yet, there's no endpoint that lists all real sellers. Also found: two duplicate login page files, one broke the sitemap build and was excluded, the duplicate itself is still there.</p>
+      </div>
+    </article>
+
+    <article class="item" id="e4">
+      <div class="item-head"><h3>E4 — No canonical links, social tags, or structured data</h3><span class="badge done">Fixed</span><span class="side frontend">Frontend</span></div>
+      <div class="item-body">
+        <p class="file-list">Where: <code>layout/index.tsx</code> · <code>structuredData.ts</code> (new) · <code>seller-portfolio/[slug].tsx</code></p>
+        <p class="block-label fixed">Fixed</p>
+        <p>Every page now automatically gets a canonical link, social preview tags (Open Graph + Twitter card), and structured data search engines can read. Seller portfolio pages also get breadcrumb data.</p>
+        <p class="block-label skipped">Remaining</p>
+        <p>None now, this used to depend on E1 being fixed first, which it now is. A real 1200x630 social preview image still needs designing, currently using the logo as a stand-in.</p>
+      </div>
+    </article>
+
+    <article class="item" id="e1">
+      <div class="item-head"><h3>E1 — Every page showed "Loading..." to search engines</h3><span class="badge done">Fixed — highest-value item in the audit</span><span class="side frontend">Frontend</span></div>
+      <div class="item-body">
+        <p class="file-list">Where: <code>pages/_app.tsx</code> · <code>AuthContext.tsx</code> · <code>AppContent.tsx</code> · <code>ProtectedRoute.tsx</code> · <code>pages/index.tsx</code></p>
+        <p class="block-label fixed">Fixed</p>
+        <p>The app now checks login status on the server, before the page is sent to the browser, so real content shows up immediately instead of a loading screen. This is what search engines actually see now.</p>
+        <p class="block-label skipped">Remaining</p>
+        <p>None, but there's a real tradeoff, accepted on purpose: every page is now built fresh per visit instead of some pages being pre-built and cached, meaning somewhat more server load.</p>
+      </div>
+    </article>
+
+    <article class="item" id="p11">
+      <div class="item-head"><h3>P11 — Broken API URLs</h3><span class="badge done">Fixed</span><span class="side both">Both</span></div>
+      <div class="item-body">
+        <p class="file-list">Where: <code>src/core/services/error.service.ts</code></p>
+        <p class="block-label fixed">Fixed</p>
+        <p>Most of what the audit flagged was already fixed before this session. One real broken piece remained: the token-refresh call was building its URL from settings that don't exist, always resulting in a broken link. Pointed it at the same working URL the rest of the app already uses.</p>
+        <p class="block-label skipped">Remaining</p>
+        <p>A separate broken function still exists but is dead code, nothing calls it. Also open: confirming what URL the live production site actually uses, and whether the staging API accepts requests from the production domain, both backend/deploy questions, not fixable from this repo.</p>
+      </div>
+    </article>
+
+    <article class="item" id="p6">
+      <div class="item-head"><h3>P6 — Heavy libraries loading on every page</h3><span class="badge done">Fixed</span><span class="side frontend">Frontend</span></div>
+      <div class="item-body">
+        <p class="file-list">Where: 8 files, including <code>wallet-connect/index.tsx</code> and 5 modal popups</p>
+        <p class="block-label fixed">Fixed</p>
+        <p>All modal popups, the charting library, and the wallet-connection code now only load on the pages that actually use them. Page sizes dropped a lot, e.g. the analytics page's extra weight went from 101KB to 4.7KB.</p>
+        <p class="block-label skipped">Remaining</p>
+        <p>A real click-through test with an actual crypto wallet on staging is still needed, everything checkable without one is confirmed clean. Also found 3 built components that are never used anywhere, safe to delete later.</p>
+      </div>
+    </article>
+
+    <article class="item" id="s6">
+      <div class="item-head"><h3>S6 — Route protection only happens in the browser</h3><span class="badge done">Fixed, narrow scope</span><span class="side frontend">Frontend</span></div>
+      <div class="item-body">
+        <p class="file-list">Where: <code>middleware.js</code> · <code>auth-component/index.tsx</code> · <code>forgot-password/index.tsx</code></p>
+        <p class="block-label fixed">Fixed</p>
+        <p>Unauthenticated visits to any <code class="inline">/profile/*</code> page now get redirected before the page ever renders, not after. Also deleted 2 dead, unused pieces of code found while doing this.</p>
+        <p class="block-label skipped">Remaining</p>
+        <p>Only <code class="inline">/profile/*</code> is covered. The rest of the site's protected pages still rely on the browser-only check, a bigger change that needs more testing, deliberately left for later. One page's redirect target changed slightly (now goes to /login instead of home), a minor, likely-fine side effect.</p>
+      </div>
+    </article>
+
+    <article class="item" id="s11">
+      <div class="item-head"><h3>S11 — Linting was turned off for builds</h3><span class="badge done">Fixed</span><span class="side frontend">Frontend</span></div>
+      <div class="item-body">
+        <p class="file-list">Where: <code>next.config.ts</code> · <code>eslint.config.mjs</code> · 7 other files with real errors</p>
+        <p class="block-label fixed">Fixed</p>
+        <p>Fixed all 9 real lint errors first (one was a genuine bug, not just style). Downgraded the loose "any" type check to a warning so it doesn't block builds, then turned linting back on for every build.</p>
+        <p class="block-label skipped">Remaining</p>
+        <p>104 places in the code still use the loose "any" type, now visible as warnings instead of hidden. Worth a cleanup project later, not blocking anything today.</p>
+      </div>
+    </article>
+
+    <article class="item" id="e7">
+      <div class="item-head"><h3>E7 — Seller pages couldn't have their own title</h3><span class="badge done">Fixed</span><span class="side frontend">Frontend</span></div>
+      <div class="item-body">
+        <p class="file-list">Where: <code>pages/seller-portfolio/[slug].tsx</code></p>
+        <p class="block-label fixed">Fixed</p>
+        <p>Seller portfolio pages now get their own title and description, generated on the server. Also fixed a real bug found along the way: the "Hi I'm {name}" heading never worked because its data was never actually fetched.</p>
+        <p class="block-label skipped">Remaining</p>
+        <p>Confirmed the fallback (no seller found) works on a live build. Couldn't confirm a real seller's name showing up correctly, none of the sample IDs tested resolved to a real seller in this environment. Worth a real test with an actual seller's page.</p>
+      </div>
+    </article>
+  </section>
+
+  <!-- ============ LEFT ALONE ============ -->
+  <section class="group">
+    <div class="group-heading"><h2>Left alone, on purpose</h2><span class="count">4 notes</span></div>
+    <p class="group-intro">Checked directly, not just skipped. Acting on the audit's suggestion as written would have broken something real.</p>
+
+    <article class="item" id="p7">
+      <div class="item-head"><h3>P7 — Bootstrap JS "duplicate"</h3><span class="badge skip">Checked, left alone</span><span class="side frontend">Frontend</span></div>
+      <div class="item-body">
+        <p class="file-list">Where: <code>src/template/layout/index.tsx</code></p>
+        <p class="block-label skipped">Why</p>
+        <p>The audit said this script loads twice. It only loads once. The one copy is needed, the analytics page's tabs depend on it and would break without it.</p>
+        <p class="block-label skipped">Remaining</p>
+        <p>Rebuilding that tab feature without the old script would remove the dependency for good, a bigger job for another session.</p>
+      </div>
+    </article>
+
+    <article class="item" id="e5-scope">
+      <div class="item-head"><h3>E5 — Missing h1 on the rest of the app</h3><span class="badge skip">Scoped out</span><span class="side frontend">Frontend</span></div>
+      <div class="item-body">
+        <p class="block-label skipped">Why</p>
+        <p>Only the 3 pages the audit named by example were fixed. Nearly every other page has the same gap.</p>
+        <p class="block-label skipped">Remaining</p>
+        <p>A dedicated pass across the rest of <code class="inline">pages/</code>, low risk, just a bigger job than 3 pages.</p>
+      </div>
+    </article>
+
+    <article class="item" id="svg-ceiling">
+      <div class="item-head"><h3>P4 — SVG size ceiling</h3><span class="badge skip">Limit reached</span><span class="side frontend">Frontend</span></div>
+      <div class="item-body">
+        <p class="block-label skipped">Why</p>
+        <p>Automated compression already got these 5 SVGs about 24-25% smaller, that's the real ceiling since they're built from ~1,900 tiny shapes each, not embedded images like the audit assumed.</p>
+        <p class="block-label skipped">Remaining</p>
+        <p>A design tool would need to re-export these properly. Not a code task.</p>
+      </div>
+    </article>
+
+    <article class="item" id="p10-feature">
+      <div class="item-head"><h3>P10 — Should a menu button exist?</h3><span class="badge skip">Design question</span><span class="side frontend">Frontend</span></div>
+      <div class="item-body">
+        <p class="block-label skipped">Why</p>
+        <p>The dead code removed above pointed at a button that doesn't exist anywhere in the app. Whether it was supposed to exist is a design call, not something the code can answer.</p>
+        <p class="block-label skipped">Remaining</p>
+        <p>Confirm with whoever owns the header/nav design.</p>
+      </div>
+    </article>
+  </section>
+
+  <!-- ============ ALREADY FIXED ============ -->
+  <section class="group">
+    <div class="group-heading"><h2>Already fixed</h2><span class="count">1 issue</span></div>
+
+    <article class="item" id="e8-done">
+      <div class="item-head"><h3>E8 — Missing favicon and manifest</h3><span class="badge done">Already fixed, found on recheck</span><span class="side frontend">Frontend</span></div>
+      <div class="item-body">
+        <p class="file-list">Where: <code>public/favicon.ico</code> · <code>public/site.webmanifest</code></p>
+        <p class="block-label fixed">Status</p>
+        <p>Both files already exist and are wired in correctly. Done by someone else, outside this session, before this doc was written.</p>
+        <p class="block-label skipped">Remaining</p>
+        <p><code class="inline">next-pwa</code> is still an installed but unconfigured dependency. Decide whether to set it up or remove it.</p>
+      </div>
+    </article>
+  </section>
+
+  <!-- ============ PARTIAL ============ -->
+  <section class="group">
+    <div class="group-heading"><h2>Partially fixed</h2><span class="count">1 issue</span></div>
+
+    <article class="item" id="s3-partial">
+      <div class="item-head"><h3>S3 — Hardcoded API key</h3><span class="badge partial">Partial</span><span class="side both">Both</span></div>
+      <div class="item-body">
+        <p class="file-list">Where: <code>src/constants/BaseUrl.ts</code> (fixed) · <code>src/component/domain-self-item/index.tsx:104</code> (found, not fixed)</p>
+        <p class="block-label fixed">Fixed</p>
+        <p>Removed a dead, unused copy of the key from <code class="inline">BaseUrl.ts</code>. The audit's other file reference (<code class="inline">DomainListingModal.tsx</code>) no longer touches the key at all, that part of the audit is stale.</p>
+        <p class="block-label skipped">Remaining</p>
+        <p>The real, live copy of the same key is hardcoded in a different file than the audit named, and still ships to every browser today. Needs a backend proxy to hold the key server-side, then the key itself needs to be rotated since it's already been exposed.</p>
+      </div>
+    </article>
+  </section>
+
+  <!-- ============ NOT STARTED ============ -->
+  <section class="group">
+    <div class="group-heading"><h2>Not started</h2><span class="count">5 issues</span></div>
+
+    <article class="item" id="s1-open">
+      <div class="item-head"><h3>S1 — Google OAuth secret exposed in the browser</h3><span class="badge skip">Not started · Critical</span><span class="side both">Both</span></div>
+      <div class="item-body">
+        <p class="file-list">Where: <code>.env</code> · <code>next.config.ts</code> · <code>pages/_app.tsx</code></p>
+        <p class="block-label skipped">Needed</p>
+        <p>Rotate the secret in Google Cloud Console first, outside of any coding session, then come back for the code-side fix.</p>
+      </div>
+    </article>
+
+    <article class="item" id="s4-open">
+      <div class="item-head"><h3>S4 — Auth cookies are readable by JavaScript</h3><span class="badge skip">Not started · Critical</span><span class="side both">Both, backend-led</span></div>
+      <div class="item-body">
+        <p class="file-list">Where: <code>src/core/services/cookies.service.ts</code> and related auth files</p>
+        <p class="block-label skipped">Needed</p>
+        <p>The backend needs to set these cookies as httpOnly, something the frontend can't do on its own.</p>
+      </div>
+    </article>
+
+    <article class="item" id="s7-open">
+      <div class="item-head"><h3>S7 — Refresh-token flow can loop or crash</h3><span class="badge skip">Not started · High</span><span class="side both">Both</span></div>
+      <div class="item-body">
+        <p class="file-list">Where: <code>src/core/services/error.service.ts</code></p>
+        <p class="block-label skipped">Needed</p>
+        <p>Add a retry guard and handle unexpected response shapes. Now testable, since P11 fixed the broken URL this depends on.</p>
+      </div>
+    </article>
+
+    <article class="item" id="e9-open">
+      <div class="item-head"><h3>E9 — Is the staging site publicly crawlable?</h3><span class="badge skip">Not started · High</span><span class="side infra">Infra / DevOps</span></div>
+      <div class="item-body">
+        <p class="block-label skipped">Needed</p>
+        <p>Not a code task. Whoever owns deployment needs to confirm and add <code class="inline">noindex</code> or auth if it's publicly reachable.</p>
+      </div>
+    </article>
+
+    <article class="item" id="e10-open">
+      <div class="item-head"><h3>E10 — Cross-linking with the main site</h3><span class="badge skip">Not started · Medium</span><span class="side content">Content / Marketing</span></div>
+      <div class="item-body">
+        <p class="block-label skipped">Needed</p>
+        <p>Not a code task. A content decision for whoever runs the main site's blog.</p>
+      </div>
+    </article>
+  </section>
+
+  <section id="next" class="group">
+    <div class="group-heading"><h2>Next steps</h2></div>
+    <p class="group-intro">Rough priority order.</p>
+    <p><strong>1.</strong> Rotate the S1 secret, then fix the code side. For S3, decide the shape of a backend proxy for the appraisal-key call in <code class="inline">domain-self-item/index.tsx:104</code>, then rotate that key too.</p>
+    <p><strong>2.</strong> Confirm whether the missing left-menu-toggle button (P10) should exist.</p>
+    <p><strong>3.</strong> Pick up S7, now testable since P11 gave it a real URL to work against.</p>
+    <p><strong>4.</strong> Confirm what URL production actually uses, and check the staging API's CORS settings (P11).</p>
+    <p><strong>5.</strong> Decide whether the rest of <code class="inline">pages/</code> should get the same h1 treatment as E5's 3 pages.</p>
+    <p><strong>6.</strong> Do a real wallet click-through test on staging for P6's wallet-SDK change.</p>
+    <p><strong>7.</strong> Dependency cleanup flagged by P6: consolidate overlapping web3 libraries, not a code task by itself.</p>
+    <p><strong>8.</strong> From S6: decide whether to widen the middleware guard beyond <code class="inline">/profile/*</code>.</p>
+    <p><strong>9.</strong> From S6: resolve the duplicate login page files (<code class="inline">pages/login</code> vs <code class="inline">pages/(auth)/login</code>).</p>
+    <p><strong>10.</strong> From S11: a dedicated cleanup pass on the 104 "any" type usages, whenever there's time.</p>
+    <p><strong>11.</strong> From E7: verify the success-path title with a real seller's page on staging.</p>
+    <p><strong>12.</strong> Low priority: delete confirmed-dead code, unused carousel classes, 3 unused components from P6, and the unused endpoint from E7.</p>
+  </section>
+
+  <footer class="doc-footer">
+    Built from the current state of the repository, cross-checked file by file before writing.
+  </footer>
+
+</main>
+</div>

@@ -1,0 +1,1565 @@
+<title>Endless Domains Marketplace — Audit Walkthrough & Fix Plan</title>
+<style>
+@font-face {
+  font-family: 'Source Serif';
+  src: local('Source Serif 4'), local('Source Serif Pro');
+}
+
+:root {
+  --ink: #1b2430;
+  --ink-soft: #3d4a5c;
+  --paper: #f7f5f0;
+  --paper-raised: #ffffff;
+  --line: #dcd6c9;
+  --accent: #b5651d;
+  --accent-soft: #e8dcc8;
+  --critical: #9a2b1f;
+  --critical-bg: #fbe9e6;
+  --high: #a3690a;
+  --high-bg: #fbf0dc;
+  --medium: #4d6b53;
+  --medium-bg: #e8f0e6;
+  --mono-bg: #232a35;
+  --mono-fg: #e8e6df;
+  --mono-accent: #e0a458;
+  --sidebar-bg: #211a14;
+  --sidebar-fg: #cfc6b8;
+  --sidebar-line: #3a2f24;
+  --radius: 4px;
+  --shadow: 0 1px 2px rgba(27,36,48,0.06), 0 4px 12px rgba(27,36,48,0.05);
+}
+
+:root[data-theme="dark"] {
+  --ink: #eae6dc;
+  --ink-soft: #b8b2a4;
+  --paper: #16130f;
+  --paper-raised: #211c16;
+  --line: #3a3226;
+  --accent: #e0a458;
+  --accent-soft: #3a2f1e;
+  --critical: #e5766a;
+  --critical-bg: #3a1f1c;
+  --high: #e0ab5c;
+  --high-bg: #3a2f1a;
+  --medium: #8fbf95;
+  --medium-bg: #1e2c1f;
+  --mono-bg: #0f1115;
+  --mono-fg: #e8e6df;
+  --mono-accent: #e0a458;
+  --sidebar-bg: #0f0c09;
+  --sidebar-fg: #b8ae9c;
+  --sidebar-line: #2a2117;
+  --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.25);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink: #eae6dc;
+    --ink-soft: #b8b2a4;
+    --paper: #16130f;
+    --paper-raised: #211c16;
+    --line: #3a3226;
+    --accent: #e0a458;
+    --accent-soft: #3a2f1e;
+    --critical: #e5766a;
+    --critical-bg: #3a1f1c;
+    --high: #e0ab5c;
+    --high-bg: #3a2f1a;
+    --medium: #8fbf95;
+    --medium-bg: #1e2c1f;
+    --mono-bg: #0f1115;
+    --mono-fg: #e8e6df;
+    --mono-accent: #e0a458;
+    --sidebar-bg: #0f0c09;
+    --sidebar-fg: #b8ae9c;
+    --sidebar-line: #2a2117;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.25);
+  }
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Source Serif', Georgia, 'Iowan Old Style', serif;
+}
+
+body {
+  font-family: -apple-system, 'Segoe UI', 'Inter', Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+  font-size: 16px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  .toc { position: static !important; height: auto !important; }
+}
+
+/* ---- Sidebar TOC ---- */
+.toc {
+  background: var(--sidebar-bg);
+  color: var(--sidebar-fg);
+  padding: 2rem 1.5rem 3rem;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  font-size: 0.86rem;
+}
+
+.toc-brand {
+  font-family: 'Source Serif', Georgia, serif;
+  color: #f2ead9;
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 0 0 0.15rem;
+  letter-spacing: 0.01em;
+}
+
+.toc-sub {
+  color: #8f8470;
+  font-size: 0.78rem;
+  margin: 0 0 2rem;
+}
+
+.toc-group-label {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.7rem;
+  color: #8f8470;
+  margin: 1.6rem 0 0.6rem;
+  font-weight: 600;
+}
+
+.toc a {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+  color: var(--sidebar-fg);
+  text-decoration: none;
+  padding: 0.28rem 0;
+  border-bottom: 1px solid transparent;
+}
+
+.toc a:hover, .toc a:focus-visible {
+  color: #f2ead9;
+}
+
+.toc a .tag {
+  flex-shrink: 0;
+  font-family: 'SF Mono', 'Cascadia Code', Consolas, monospace;
+  font-size: 0.72rem;
+  color: #8f8470;
+  min-width: 2.1rem;
+}
+
+.toc-divider {
+  border: none;
+  border-top: 1px solid var(--sidebar-line);
+  margin: 1.4rem 0;
+}
+
+/* ---- Main content ---- */
+.main {
+  padding: 3.5rem clamp(1.25rem, 5vw, 5rem) 6rem;
+  max-width: 880px;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.75rem;
+  color: var(--accent);
+  font-weight: 700;
+  margin: 0 0 0.8rem;
+}
+
+h1.title {
+  font-family: 'Source Serif', Georgia, serif;
+  font-size: clamp(2rem, 4vw, 2.7rem);
+  line-height: 1.15;
+  margin: 0 0 0.9rem;
+  text-wrap: balance;
+  font-weight: 600;
+}
+
+.dek {
+  font-size: 1.1rem;
+  color: var(--ink-soft);
+  max-width: 62ch;
+  margin: 0 0 1.6rem;
+}
+
+.meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.2rem;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 0.9rem 0;
+  margin-bottom: 2.4rem;
+}
+
+.meta-row strong { color: var(--ink); font-weight: 600; }
+
+.callout {
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.3rem;
+  margin: 1.6rem 0 2.4rem;
+  box-shadow: var(--shadow);
+}
+
+.callout p { margin: 0.4rem 0 0; }
+.callout p:first-child { margin-top: 0; }
+.callout-title {
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Top-three table */
+.top3 {
+  display: grid;
+  gap: 0.9rem;
+  margin: 1.6rem 0 2.6rem;
+}
+
+.top3-item {
+  display: grid;
+  grid-template-columns: 2.4rem 1fr;
+  gap: 1rem;
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1rem 1.2rem;
+  box-shadow: var(--shadow);
+}
+
+.top3-num {
+  font-family: 'Source Serif', Georgia, serif;
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.top3-item h4 {
+  margin: 0 0 0.25rem;
+  font-size: 1rem;
+}
+
+.top3-item p {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+}
+
+section.group {
+  margin-top: 4rem;
+  scroll-margin-top: 1.5rem;
+}
+
+.group-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 0.8rem;
+  border-bottom: 2px solid var(--ink);
+  padding-bottom: 0.6rem;
+  margin-bottom: 0.4rem;
+}
+
+.group-heading h2 {
+  font-family: 'Source Serif', Georgia, serif;
+  font-size: 1.7rem;
+  margin: 0;
+  font-weight: 600;
+}
+
+.group-heading .count {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+
+.group-intro {
+  color: var(--ink-soft);
+  max-width: 68ch;
+  margin: 0.9rem 0 2rem;
+}
+
+.issue {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--paper-raised);
+  margin-bottom: 1.8rem;
+  overflow: hidden;
+  scroll-margin-top: 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+.issue-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 1.1rem 1.4rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.issue-head h3 {
+  font-size: 1.12rem;
+  margin: 0;
+  font-weight: 600;
+  font-family: -apple-system, 'Segoe UI', sans-serif;
+}
+
+.sev {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.sev.critical { background: var(--critical-bg); color: var(--critical); }
+.sev.high { background: var(--high-bg); color: var(--high); }
+.sev.medium { background: var(--medium-bg); color: var(--medium); }
+
+.status-pill {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+.status-pill.fixed { color: var(--medium); border-color: var(--medium); }
+.status-pill.partial { color: var(--high); border-color: var(--high); }
+.status-pill.open { color: var(--critical); border-color: var(--critical); }
+
+.side {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+.side.frontend { background: #e4ecf3; color: #2c5b82; }
+.side.backend { background: #f0e6f3; color: #6b3d82; }
+.side.both { background: linear-gradient(90deg, #e4ecf3 50%, #f0e6f3 50%); color: #4a4470; }
+.side.infra { background: #ece7dd; color: #5c5240; }
+.side.content { background: #e6ede2; color: #4d6b3f; }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .side.frontend { background: #1e2e3d; color: #8fb8dc; }
+  :root:not([data-theme="light"]) .side.backend { background: #2e2038; color: #cf9fe0; }
+  :root:not([data-theme="light"]) .side.both { background: linear-gradient(90deg, #1e2e3d 50%, #2e2038 50%); color: #c2c0e8; }
+  :root:not([data-theme="light"]) .side.infra { background: #2a2620; color: #b8ac94; }
+  :root:not([data-theme="light"]) .side.content { background: #202a1e; color: #a3c295; }
+}
+:root[data-theme="dark"] .side.frontend { background: #1e2e3d; color: #8fb8dc; }
+:root[data-theme="dark"] .side.backend { background: #2e2038; color: #cf9fe0; }
+:root[data-theme="dark"] .side.both { background: linear-gradient(90deg, #1e2e3d 50%, #2e2038 50%); color: #c2c0e8; }
+:root[data-theme="dark"] .side.infra { background: #2a2620; color: #b8ac94; }
+:root[data-theme="dark"] .side.content { background: #202a1e; color: #a3c295; }
+
+
+.issue-body {
+  padding: 1.3rem 1.4rem 1.5rem;
+}
+
+.file-list {
+  font-family: 'SF Mono', 'Cascadia Code', Consolas, monospace;
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  margin: 0 0 1rem;
+  word-break: break-word;
+}
+
+.file-list code {
+  background: var(--accent-soft);
+  color: var(--ink);
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+}
+
+.block-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-weight: 700;
+  color: var(--ink-soft);
+  margin: 1.1rem 0 0.4rem;
+}
+
+.block-label.fix { color: var(--accent); }
+
+.issue-body p {
+  margin: 0.5rem 0;
+}
+
+pre {
+  background: var(--mono-bg);
+  color: var(--mono-fg);
+  padding: 0.9rem 1.1rem;
+  border-radius: var(--radius);
+  overflow-x: auto;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  margin: 0.5rem 0 0.9rem;
+  font-family: 'SF Mono', 'Cascadia Code', Consolas, monospace;
+}
+
+pre .cm { color: #8a92a3; }
+pre .kw { color: var(--mono-accent); }
+
+.inline-code, code.inline {
+  font-family: 'SF Mono', 'Cascadia Code', Consolas, monospace;
+  background: var(--accent-soft);
+  color: var(--ink);
+  padding: 0.08rem 0.35rem;
+  border-radius: 3px;
+  font-size: 0.88em;
+}
+
+.claude-box {
+  background: var(--accent-soft);
+  border: 1px dashed var(--accent);
+  border-radius: var(--radius);
+  padding: 0.9rem 1.1rem;
+  margin-top: 0.9rem;
+}
+
+.claude-box .block-label {
+  margin-top: 0;
+}
+
+.claude-box p:last-child { margin-bottom: 0; }
+
+table.data {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  margin: 0.8rem 0 1rem;
+}
+
+table.data th, table.data td {
+  text-align: left;
+  padding: 0.5rem 0.7rem;
+  border-bottom: 1px solid var(--line);
+}
+
+table.data th {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+
+table.data td.num {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.tbl-wrap { overflow-x: auto; }
+
+.divider-note {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  font-style: italic;
+  border-top: 1px solid var(--line);
+  margin-top: 1rem;
+  padding-top: 0.8rem;
+}
+
+.roadmap {
+  display: grid;
+  gap: 1rem;
+  margin: 1.5rem 0 2rem;
+}
+
+.roadmap-step {
+  display: grid;
+  grid-template-columns: 2.6rem 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+.roadmap-step .step-badge {
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: 50%;
+  width: 2.6rem;
+  height: 2.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+  font-family: 'Source Serif', Georgia, serif;
+}
+
+.roadmap-step h4 { margin: 0.15rem 0 0.3rem; font-size: 1.02rem; }
+.roadmap-step p { margin: 0; color: var(--ink-soft); font-size: 0.92rem; }
+
+.verified-note {
+  background: var(--medium-bg);
+  border: 1px solid var(--medium);
+  border-radius: var(--radius);
+  padding: 0.9rem 1.1rem;
+  font-size: 0.9rem;
+  margin: 1.4rem 0;
+}
+
+.verified-note strong { color: var(--medium); }
+
+footer.doc-footer {
+  margin-top: 5rem;
+  padding-top: 1.6rem;
+  border-top: 1px solid var(--line);
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+}
+
+a { color: var(--accent); }
+
+::selection { background: var(--accent-soft); }
+</style>
+
+<div class="layout">
+
+<nav class="toc" aria-label="Table of contents">
+  <p class="toc-brand">Marketplace Audit Guide</p>
+  <p class="toc-sub">A plain-language walkthrough, issue by issue</p>
+
+  <a href="#do-first"><span class="tag">→</span> Do these three first</a>
+  <a href="#how-to-use"><span class="tag">→</span> How to use this with Claude Code</a>
+  <a href="#current-state"><span class="tag">→</span> What's already changed</a>
+
+  <hr class="toc-divider" />
+  <p class="toc-group-label">Security — 13 issues</p>
+  <a href="#s1"><span class="tag">S1</span> Google secret exposed</a>
+  <a href="#s2"><span class="tag">S2</span> .env committed to git</a>
+  <a href="#s3"><span class="tag">S3</span> Hardcoded API key</a>
+  <a href="#s4"><span class="tag">S4</span> Unsafe auth cookies</a>
+  <a href="#s5"><span class="tag">S5</span> Hashed cookie names</a>
+  <a href="#s6"><span class="tag">S6</span> Client-only route guards</a>
+  <a href="#s7"><span class="tag">S7</span> Refresh-token loop risk</a>
+  <a href="#s8"><span class="tag">S8</span> Unpinned third-party scripts</a>
+  <a href="#s9"><span class="tag">S9</span> jQuery loaded twice</a>
+  <a href="#s10"><span class="tag">S10</span> No security headers</a>
+  <a href="#s11"><span class="tag">S11</span> ESLint disabled on build</a>
+  <a href="#s12"><span class="tag">S12</span> Missing rel=noopener</a>
+  <a href="#s13"><span class="tag">S13</span> console.* in production</a>
+
+  <hr class="toc-divider" />
+  <p class="toc-group-label">SEO — 10 issues</p>
+  <a href="#e1"><span class="tag">E1</span> Loading… served to crawlers</a>
+  <a href="#e2"><span class="tag">E2</span> No robots.txt / sitemap</a>
+  <a href="#e3"><span class="tag">E3</span> No _document.tsx</a>
+  <a href="#e4"><span class="tag">E4</span> No canonical / OG / schema</a>
+  <a href="#e5"><span class="tag">E5</span> No h1 on any page</a>
+  <a href="#e6"><span class="tag">E6</span> Dead keywords meta tag</a>
+  <a href="#e7"><span class="tag">E7</span> No per-page metadata</a>
+  <a href="#e8"><span class="tag">E8</span> Missing favicon / manifest</a>
+  <a href="#e9"><span class="tag">E9</span> Crawlable staging clone?</a>
+  <a href="#e10"><span class="tag">E10</span> Lost cross-link equity</a>
+
+  <hr class="toc-divider" />
+  <p class="toc-group-label">Performance — 11 issues</p>
+  <a href="#p1"><span class="tag">P1</span> Bootstrap CSS × 3</a>
+  <a href="#p2"><span class="tag">P2</span> Every CSS file × 2</a>
+  <a href="#p3"><span class="tag">P3</span> 22 MB of fonts</a>
+  <a href="#p4"><span class="tag">P4</span> Stray PDF + huge SVGs</a>
+  <a href="#p5"><span class="tag">P5</span> Raw img tags</a>
+  <a href="#p6"><span class="tag">P6</span> No code splitting</a>
+  <a href="#p7"><span class="tag">P7</span> Bootstrap JS twice</a>
+  <a href="#p8"><span class="tag">P8</span> Render-blocking CSS</a>
+  <a href="#p9"><span class="tag">P9</span> Raw script tags</a>
+  <a href="#p10"><span class="tag">P10</span> Hardcoded setTimeout</a>
+  <a href="#p11"><span class="tag">P11</span> Staging URL + undefined env</a>
+
+  <hr class="toc-divider" />
+  <p class="toc-group-label">Wrap-up</p>
+  <a href="#roadmap"><span class="tag">→</span> Suggested order of attack</a>
+  <a href="#claude-workflow"><span class="tag">→</span> Session-by-session plan</a>
+</nav>
+
+<main class="main">
+
+  <p class="eyebrow">Internal engineering reference · marketplace.endlessdomains.io</p>
+  <h1 class="title">Understanding the audit, one issue at a time</h1>
+  <p class="dek">This walks through every finding from the security, SEO, and performance audit in plain language: what's actually wrong, why it matters, and how you'd talk Claude Code through fixing it. Nothing in this document changes any code. It's meant to be read first, so you go into the fix work with a clear head instead of guessing at jargon.</p>
+
+  <div class="meta-row">
+    <span><strong>Audit scope:</strong> main @ 9e581ad</span>
+    <span><strong>Reviewed:</strong> 2026-07-31</span>
+    <span><strong>Total findings:</strong> 34</span>
+    <span><strong>Critical:</strong> 8 · <strong>High:</strong> 7 · <strong>Medium/Low:</strong> 19</span>
+  </div>
+
+  <section id="current-state" class="group" style="margin-top:0;">
+    <div class="verified-note">
+      <strong>Checked against your repo just now —</strong> a few things have already moved since the audit was written. <code class="inline">.env</code> is no longer tracked in git (only <code class="inline">.env-cmdrc</code> still is, and <code class="inline">.gitignore</code> now has an <code class="inline">.env*</code> rule), and <code class="inline">AppContent.tsx</code> now has a partial fix for the loading-screen problem. Everything else in the audit — the hardcoded API key, missing robots.txt and sitemap, missing _document.tsx, and the 21.5 MB of fonts — is still exactly as described. I've flagged the status on each issue below so you know what's real right now, not just what was true when the audit ran.
+    </div>
+  </section>
+
+  <section id="do-first" class="group">
+    <div class="group-heading"><h2>Do these three first</h2></div>
+    <p class="group-intro">Before touching anything else, these three need answers. Two are live security exposures, one might mean your production users are quietly talking to a staging server.</p>
+
+    <div class="top3">
+      <div class="top3-item">
+        <div class="top3-num">1</div>
+        <div>
+          <h4>Rotate the Google OAuth secret and stop shipping it to the browser</h4>
+          <p>A real client secret is sitting in <code class="inline">.env</code> and getting baked into every page your users load. See <a href="#s1">S1</a>.</p>
+        </div>
+      </div>
+      <div class="top3-item">
+        <div class="top3-num">2</div>
+        <div>
+          <h4>Fix the loading gate so pages actually render</h4>
+          <p>Right now, most pages hand crawlers and slow-loading users a blank <code class="inline">"Loading..."</code> instead of real content. See <a href="#e1">E1</a>.</p>
+        </div>
+      </div>
+      <div class="top3-item">
+        <div class="top3-num">3</div>
+        <div>
+          <h4>Confirm production isn't calling the staging API</h4>
+          <p>If this is true, real user data is passing through a system that isn't meant to hold it. See <a href="#p11">P11</a>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how-to-use" class="group">
+    <div class="group-heading"><h2>How to work through this with Claude Code</h2></div>
+    <p class="group-intro">You asked to understand things first and not touch code yet — good instinct, this list has some load-bearing wires in it. Here's the approach I'd suggest once you're ready to start fixing.</p>
+
+    <div class="callout">
+      <p class="callout-title">The general pattern</p>
+      <p>For almost every issue below, you'll open a session with Claude Code, point it at the specific file and line the audit names, describe the one issue in your own words, and ask it to propose the fix before writing anything. Claude Code is very good at small, surgical, well-scoped changes like these — the risk isn't that it can't do the work, it's doing five unrelated fixes in one sitting and losing track of what changed. One issue, one commit, one clear message.</p>
+    </div>
+
+    <p>A few habits that will keep this safe given how sensitive some of these are:</p>
+    <p><strong>Rotate secrets outside of Claude Code entirely.</strong> Issues S1, S2, and S3 involve real credentials. Claude Code can remove them from the code and tighten <code class="inline">.gitignore</code>, but the actual rotation happens in the Google Cloud console and whatever dashboard issued the API key. Do that part yourself first, then bring Claude Code in to clean up the code side.</p>
+    <p><strong>Ask "what does this break" before applying anything touching auth or the API base URL.</strong> S6, S7, and P11 all sit close to how your users log in and how the app finds its backend. Have Claude Code explain the blast radius in plain words before you approve the change.</p>
+    <p><strong>Group by theme, not by severity.</strong> Severity tells you what's urgent. But S4 and S5 are really one conversation about cookies; P1, P2, and P7 are really one conversation about duplicate assets. Fixing them together in the same session means Claude Code isn't re-reading the same files three times.</p>
+    <p><strong>Let it show you a diff before committing.</strong> For anything in the Critical or High rows, read the actual diff. These are small changes, so this costs you two minutes and saves you from a silent regression.</p>
+
+    <p class="block-label" style="margin-top:1.6rem;">Who actually fixes each issue</p>
+    <p>Every issue below is now tagged with where the real fix lives, since that's what decides who picks it up and whether Claude Code can do the whole thing alone or only half of it.</p>
+    <p style="display:flex; flex-wrap:wrap; gap:0.6rem; margin-top:0.9rem;">
+      <span class="side frontend">Frontend</span>
+      <span class="side backend">Backend</span>
+      <span class="side both">Both</span>
+      <span class="side infra">Infra / DevOps</span>
+      <span class="side content">Content / Marketing</span>
+    </p>
+    <p style="margin-top:0.9rem;"><strong>Frontend</strong> means this repo, and Claude Code can carry the whole fix. <strong>Backend</strong> means the real fix lives in the API or auth service this app talks to, so this repo can only work around it, not resolve it. <strong>Both</strong> means the two sides need to move together, usually the frontend removes an exposure while the backend closes the gap it was covering for. <strong>Infra / DevOps</strong> means it's a hosting, DNS, or deployment config question, not application code either side. <strong>Content / Marketing</strong> means it's a decision about what gets published where, not a code change at all.</p>
+  </section>
+
+  <!-- ============ SECURITY ============ -->
+  <section class="group">
+    <div class="group-heading"><h2>Security</h2><span class="count">13 findings</span></div>
+    <p class="group-intro">These are about what an attacker — or just an overly curious user with devtools open — could see or do. Four are marked critical because they involve real secrets sitting in places anyone can read.</p>
+
+    <article class="issue" id="s1">
+      <div class="issue-head">
+        <h3>S1 — The Google OAuth secret is exposed to every browser</h3>
+        <span class="sev critical">Critical</span>
+        <span class="side both">Both</span>
+      </div>
+      <div class="issue-body">
+        <p class="file-list">Files: <code>.env</code> · <code>next.config.ts:7</code> · <code>pages/_app.tsx:23</code></p>
+        <p><strong>In plain words:</strong> Google gives you two different things when you set up sign-in: a client ID, which is meant to be public, and a client secret, which is meant to stay on your server and never be seen by users. Somewhere along the way, the secret got put into the variable meant for the public ID. You can tell because it starts with <code class="inline">GOCSPX-</code>, which is Google's marker for a secret — a real client ID always ends in <code class="inline">.apps.googleusercontent.com</code>.</p>
+        <p>Because this value flows through <code class="inline">next.config.ts</code> into the app's public env block, and then into a component that runs in the browser, that secret is sitting in plain text inside every page your users load. Anyone can open devtools and read it.</p>
+        <p class="block-label">Why it matters</p>
+        <p>Whoever has this secret can potentially impersonate your app when talking to Google's OAuth servers. It also means your Google sign-in flow was probably never wired correctly in the first place, since a secret doesn't work where a client ID is expected.</p>
+        <p class="block-label fix">How to fix it</p>
+        <p>1. Go rotate this secret in Google Cloud Console right now, outside of any coding session — treat it as already leaked, because it is.<br>
+        2. Put the real client ID in a variable named <code class="inline">NEXT_PUBLIC_GOOGLE_CLIENT_ID</code>.<br>
+        3. Keep the actual secret only on your backend — it should never be referenced in <code class="inline">next.config.ts</code>'s public env block at all.<br>
+        4. After the swap, actually click through Google sign-in once and confirm it still works.</p>
+        <div class="claude-box">
+          <p class="block-label">Prompting Claude Code</p>
+          <p>Once you've rotated the secret yourself, tell Claude Code something like: "In next.config.ts and pages/_app.tsx, we're passing a Google OAuth client secret into the public env block where a client ID belongs. Replace it with NEXT_PUBLIC_GOOGLE_CLIENT_ID reading the real client ID, and make sure nothing server-side leaks into the client bundle. Show me the diff before applying."</p>
+        </div>
+        <p class="divider-note">Split: the frontend side (Claude Code's job) is removing the secret from the public env block and swapping in the real client ID. The backend side is making sure whatever server-side flow needs the actual secret — token exchange, if you use one — reads it from a server-only environment variable that never touches next.config.ts's public block. If your OAuth flow is entirely client-side today with no backend token exchange at all, that's worth a separate conversation about whether it should be.</p>
+      </div>
+    </article>
+
+    <article class="issue" id="s2">
+      <div class="issue-head">
+        <h3>S2 — The .env file itself is tracked in git</h3>
+        <span class="sev critical">Critical</span>
+        <span class="status-pill fixed">Mostly resolved already</span>
+        <span class="side frontend">Frontend</span>
+      </div>
+      <div class="issue-body">
+        <p class="file-list">Files: <code>.env</code> · <code>.env-cmdrc</code> · <code>.gitignore</code></p>
+        <p><strong>In plain words:</strong> Any file tracked by git gets saved into the project's permanent history — every commit, forever, even if you delete the file tomorrow. The audit found that both <code class="inline">.env</code> and <code class="inline">.env-cmdrc</code> were tracked, and that <code class="inline">.gitignore</code> had no rule to stop it.</p>
+        <p><strong>What's changed since the audit:</strong> checking the repo directly, <code class="inline">.env</code> is no longer tracked, and <code class="inline">.gitignore</code> now includes an <code class="inline">.env*</code> rule. <code class="inline">.env-cmdrc</code>, however, is still tracked — that one's still open.</p>
+        <p class="block-label">Why it matters</p>
+        <p>Even after removing a file from the current commit, it's still recoverable from git history unless that history is rewritten — which is a separate, more involved conversation. The safest assumption is that every value that was ever in a tracked env file should be treated as seen and rotated.</p>
+        <p class="block-label fix">How to fix it</p>
+        <p>Remove <code class="inline">.env-cmdrc</code> from tracking the same way <code class="inline">.env</code> already was, and add a <code class="inline">.env.example</code> file that lists the variable names with no real values, so new developers know what to set without any secrets living in git.</p>
+        <div class="claude-box">
+          <p class="block-label">Prompting Claude Code</p>
+          <p>"`.env-cmdrc` is still tracked in git even though `.env` was already removed. Untrack it with `git rm --cached`, confirm the gitignore rule covers it, and generate a `.env.example` with the same keys as `.env-cmdrc` but blank values." Then separately, decide with your team whether the old committed values are sensitive enough to justify rewriting git history — that's worth a standalone conversation, not a quick fix.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="issue" id="s3">
+      <div class="issue-head">
+        <h3>S3 — A real API key is hardcoded directly in the source code</h3>
+        <span class="sev critical">Critical</span>
+        <span class="status-pill open">Still present</span>
+        <span class="side both">Both</span>
+      </div>
+      <div class="issue-body">
+        <p class="file-list">Files: <code>src/constants/BaseUrl.ts:5</code> · <code>src/component/modals/DomainListingModal.tsx:28</code></p>
+        <pre>export const API_KEY: string | undefined = 'b077ef14b737bc4294a322a0be8848b443c6963a58cc21ba6b5e07628246ce9b'</pre>
+        <p><strong>In plain words:</strong> This is a plain text password-like string, typed directly into a source file. It's confirmed still there right now. Whatever service checks this key to authenticate requests will accept it from literally anyone who reads your bundle or your repo.</p>
+        <p class="block-label">Why it matters</p>
+        <p>This key is currently doing double duty as a secret and as public bundle content, which are contradictory. Whatever it protects isn't really protected.</p>
+        <p class="block-label fix">How to fix it</p>
+        <p>The real fix is architectural: instead of the browser calling that service directly with this key attached, your own backend should sit in between. The browser calls your backend, your backend (which never ships to users) attaches the key and calls the real service. Then rotate the key since it's already been exposed.</p>
+        <div class="claude-box">
+          <p class="block-label">Prompting Claude Code</p>
+          <p>"API_KEY in src/constants/BaseUrl.ts is a hardcoded secret used in DomainListingModal.tsx. Show me every place this key is used, and describe what a backend proxy endpoint would need to look like to keep this key server-side instead. Don't write the backend for me yet — I want to see the shape of the change first." This one is bigger than a line edit, so let it scope the work before doing it.</p>
+        </div>
+        <p class="divider-note">Split: the frontend side is deleting the hardcoded key and pointing the call at a new proxy endpoint instead. The backend side is actually building that proxy endpoint, since that's where the key needs to live now. Neither half is complete without the other — the frontend change is unsafe to ship until the backend endpoint exists.</p>
+      </div>
+    </article>
+
+    <article class="issue" id="s4">
+      <div class="issue-head">
+        <h3>S4 — Login tokens are stored where any script on the page can read them</h3>
+        <span class="sev critical">Critical</span>
+        <span class="status-pill open">Still present</span>
+        <span class="side both">Both, backend-led</span>
+      </div>
+      <div class="issue-body">
+        <p class="file-list">Files: <code>src/core/services/cookies.service.ts</code> · used in auth-component, wallet-signup, google-signup</p>
+        <pre>export const setCookieValue = (key: string, value: string) => {
+  setCookie(key, value) <span class="cm">// no httpOnly, no secure, no sameSite, no expiry</span>
+}</pre>
+        <p><strong>In plain words:</strong> There are two tokens that keep a user logged in: a short-lived access token, and a long-lived refresh token that can mint new access tokens for a long time. Right now both are stored in a way that any JavaScript running on the page — including a script injected through some unrelated bug, or a compromised third-party script like the ones in S8 — can read directly.</p>
+        <p>The safe version of a cookie has a flag called <code class="inline">httpOnly</code>, which means JavaScript literally cannot read it, only the browser can send it along with requests. That flag is missing here.</p>
+        <p class="block-label">Why it matters</p>
+        <p>If any script on the page ever misbehaves, it can walk away with the refresh token — meaning a persistent, long-lived session hijack, not just a one-time nuisance.</p>
+        <p class="block-label fix">How to fix it</p>
+        <p><strong>Best fix:</strong> have the backend set these cookies directly on the auth response with <code class="inline">httpOnly; Secure; SameSite=Lax</code>. The frontend then never touches the token values at all — it just relies on the browser to send the cookie automatically.</p>
+        <p><strong>If the backend can't change quickly:</strong> at minimum add <code class="inline">secure</code> and <code class="inline">sameSite: 'strict'</code> when setting the cookie from the frontend, plus a short expiry on the access token.</p>
+        <p><strong>One important guardrail:</strong> don't set the cookie's domain to cover the whole <code class="inline">.endlessdomains.io</code> apex to make cross-subdomain login easier. Sibling subdomains count as "same site" for cookie purposes, so a bug on any other subdomain could then steal your marketplace tokens too.</p>
+        <div class="claude-box">
+          <p class="block-label">Prompting Claude Code</p>
+          <p>"cookies.service.ts sets auth cookies with no httpOnly, secure, or sameSite flags. I want to move cookie-setting to the backend response instead of the frontend calling setCookie directly — walk me through what changes on the frontend once the backend sets httpOnly cookies, and what becomes dead code here." Treat this as a two-sided change and loop in whoever owns the API before applying anything.</p>
+        </div>
+        <p class="divider-note">Split: the real fix — setting httpOnly cookies on the auth response — can only happen on the backend, since httpOnly cookies are set through server response headers, not by frontend JavaScript. Claude Code's job here is the frontend cleanup once that's live: removing the manual setCookieValue calls for tokens and letting the browser handle the cookie automatically. The interim frontend-only fix (secure + sameSite: 'strict') is a real improvement but doesn't fully close the gap on its own — flag that to whoever owns the backend as the priority conversation.</p>
+      </div>
+    </article>
+
+    <article class="issue" id="s5">
+      <div class="issue-head">
+        <h3>S5 — Cookie names are hashed, which doesn't actually protect anything</h3>
+        <span class="sev medium">Medium</span>
+        <span class="side frontend">Frontend</span>
+      </div>
+      <div class="issue-body">
+        <p class="file-list">File: <code>src/core/enum/cookie.enum.ts</code></p>
+        <p><strong>In plain words:</strong> Instead of naming the cookies <code class="inline">access_token</code> and <code class="inline">refresh_token</code>, they're named things like <code class="inline">86b3901eea37a04e8547cd912225f548d2e0a92078887682ce831a433072f9d1</code>. This looks like it's hiding something, but it isn't — anyone can open devtools, look at the cookies tab, and see exactly what each one holds regardless of its name.</p>
+        <p class="block-label">Why it matters</p>
+        <p>It buys zero real protection and makes your own debugging harder every time someone needs to inspect a cookie.</p>
+        <p class="block-label fix">How to fix it</p>
+        <p>Rename these back to plain, readable names as part of the same work as S4.</p>
+        <div class="claude-box">
+          <p class="block-label">Prompting Claude Code</p>
+          <p>"Rename the hashed cookie key names in cookie.enum.ts to plain names like access_token and refresh_token, and update every reference across the codebase." Good candidate to bundle into the same session as S4 since it touches the same enum.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="issue" id="s6">
+      <div class="issue-head">
+        <h3>S6 — Protected pages are only guarded in the browser, and inconsistently</h3>
+        <span class="sev high">High</span>
+        <span class="side frontend">Frontend</span>
+      </div>
+      <div class="issue-body">
+        <p class="file-list">Files: <code>src/component/ProtectedRoute.tsx</code> · <code>pages/profile/*</code></p>
+        <p><strong>In plain words:</strong> There are two ways to check "is this user allowed to see this page." One happens on the server before anything is sent to the browser — fast, and the unauthorized content never leaves your server. The other happens in React after the page has already loaded in the browser, and just redirects away once it notices the user isn't logged in.</p>
+        <p>Right now, most of <code class="inline">/profile/*</code> only has the second kind. That means the page's HTML and JavaScript are sent to anyone who requests them; the redirect only happens after the page has already rendered once, for a moment.</p>
+        <p>Two pages do this correctly already — <code class="inline">pages/register/index.tsx</code> and <code class="inline">pages/profile/domains/index.tsx</code> — using a server-side cookie check. The rest of <code class="inline">/profile/*</code> don't. There are also two <code class="inline">getServerSideProps</code> functions written for exactly this purpose that are silently dead code, because Next.js only runs that function from files inside <code class="inline">pages/</code>, and these live in component files instead.</p>
+        <p class="block-label">Why it matters</p>
+        <p>Assuming your actual API still checks permissions correctly server-side, this isn't a full break-in — but it is an unnecessary exposure and a confusing user experience (briefly seeing a page you shouldn't).</p>
+        <p class="block-label fix">How to fix it</p>
+        <p>A single <code class="inline">middleware.ts</code> file at the project root, checking for the access token cookie and redirecting to login, replaces all of the scattered per-page logic in one place:</p>
+        <pre><span class="kw">import</span> { NextResponse } <span class="kw">from</span> 'next/server'
+<span class="kw">import type</span> { NextRequest } <span class="kw">from</span> 'next/server'
+<span class="kw">import</span> { Cookie_Key } <span class="kw">from</span> '@/core/enum/cookie.enum'
+
+<span class="kw">export function</span> middleware(req: NextRequest) {
+  if (!req.cookies.get(Cookie_Key.ACCESS_TOKEN)) {
+    return NextResponse.redirect(new URL('/login', req.url))
+  }
+  return NextResponse.next()
+}
+
+<span class="kw">export const</span> config = { matcher: ['/profile/:path*'] }</pre>
+        <p>Then delete the two dead <code class="inline">getServerSideProps</code> exports that never run.</p>
+        <div class="claude-box">
+          <p class="block-label">Prompting Claude Code</p>
+          <p>"We only guard /profile/* routes client-side through ProtectedRoute.tsx, and two getServerSideProps exports in component files are dead code since Next.js ignores them outside pages/. Add a root middleware.ts that redirects unauthenticated requests to /profile/* before they render, matching the pattern already used correctly in pages/register/index.tsx. Then remove the dead exports." This is a well-contained, single-purpose change — good first real fix to try.</p>
+        </div>
+        <p class="divider-note">This entire fix lives in the frontend repo — middleware.ts is a Next.js concept, no backend change needed. The one assumption worth double-checking with whoever owns the API is that it still enforces its own authorization independently of this cookie check — the middleware stops the page from rendering, but it shouldn't be the only thing standing between a request and the data it returns.</p>
+      </div>
+    </article>
+
+    <article class="issue" id="s7">
+      <div class="issue-head">
+        <h3>S7 — The "log back in automatically" flow can loop forever or crash</h3>
+        <span class="sev high">High</span>
+        <span class="side both">Both</span>
+      </div>
+      <div class="issue-body">
+        <p class="file-list">File: <code>src/core/services/error.service.ts:38-52</code></p>
+        <p><strong>In plain words:</strong> When a request fails because your session expired, the app is supposed to quietly fetch a new access token using the refresh token, then retry the original request so the user never notices. Two things are missing: nothing stops the app from retrying endlessly if the refresh call itself keeps failing, and nothing checks that the refresh response actually has the shape it expects before reading a field off it — so a failed refresh can throw a confusing crash instead of a clean "please log in again."</p>
+        <p>There's a deeper problem underneath this one: the URL this refresh call hits is built from environment variables that are never actually defined anywhere (see <a href="#p11">P11</a>), so the URL literally comes out as <code class="inline">undefined/undefined/undefined/...</code>. This flow has likely never worked at all.</p>
+        <p class="block-label">Why it matters</p>
+        <p>Right now users probably just get logged out when their session expires, rather than experiencing an infinite loop — but only because the URL is broken. Fixing P11 without also fixing this could introduce the loop for the first time.</p>
+        <p class="block-label fix">How to fix it</p>
+        <p>Fix the URL problem in P11 first. Then add a flag so a refresh is only attempted once per failed request, validate that the response actually contains what you expect before reading it, and if it doesn't, send the user to a clean logout instead of letting an error bubble up.</p>
+        <div class="claude-box">
+          <p class="block-label">Prompting Claude Code</p>
+          <p>"Once P11's env vars are fixed, error.service.ts's 401 refresh-and-retry logic needs a single-retry guard and a shape check on the refresh response before touching .accessToken. Walk me through the current flow first, then propose the fix." Sequence this strictly after P11 — fixing it first would just move where things break.</p>
+        </div>
+        <p class="divider-note">Split: the retry guard and response validation are entirely frontend work, Claude Code can do this alone. But it only matters once the refresh endpoint itself is reachable — that depends on P11's env vars (frontend) resolving to a real URL, and on the backend's refresh endpoint actually returning the shape the frontend expects. If the refresh endpoint has never been hit successfully, it's worth confirming with the backend team what a real response from it looks like before writing the validation logic.</p>
+      </div>
+    </article>
+
+    <article class="issue" id="s8">
+      <div class="issue-head">
+        <h3>S8 — Outside scripts are loaded with no safety pin</h3>
+        <span class="sev high">High</span>
+        <span class="side frontend">Frontend</span>
+      </div>
+      <div class="issue-body">
+        <p class="file-list">File: <code>src/template/layout/index.tsx:114-119</code></p>
+        <p><strong>In plain words:</strong> The site loads jQuery, Font Awesome, and Chart.js straight from third-party CDNs. Each of these is a full script that runs with full access to your page, the same as your own code. There's a browser feature called Subresource Integrity that lets you say "only run this file if it matches this exact fingerprint" — none of these scripts have it. One of them, Chart.js, isn't even pinned to a version, so the exact code it loads can change without any deploy on your side.</p>
+        <p class="block-label">Why it matters</p>
+        <p>If any of those CDNs is ever compromised, or that unpinned Chart.js URL starts serving something different, it runs with the same trust as your own code — on a site where users sign real wallet transactions.</p>
+        <p class="block-label fix">How to fix it</p>
+        <p>Best option: install these as normal npm packages so they're versioned and reviewed like everything else in your dependency tree. If any must stay on a CDN, pin an exact version and add the integrity and crossorigin attributes. Chart.js specifically looks removable outright since you already use Recharts elsewhere (see <a href="#p6">P6</a>).</p>
+        <div class="claude-box">
+          <p class="block-label">Prompting Claude Code</p>
+          <p>"layout/index.tsx loads jQuery, Font Awesome, and Chart.js from CDNs with no integrity attribute and Chart.js has no version pin at all. Check whether Chart.js is used anywhere real or if Recharts already covers it, then propose replacing these CDN tags with npm installs or pinned+integrity CDN tags." Good to pair with S9 since they touch the same file.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="issue" id="s9">
+      <div class="issue-head">
+        <h3>S9 — jQuery is loaded twice, and may not be needed at all</h3>
+        <span class="sev medium">Medium</span>
+        <span class="side frontend">Frontend</span>
+      </div>
+      <div class="issue-body">
+        <p class="file-list">File: <code>src/template/layout/index.tsx:61 and :126</code></p>
+        <p><strong>In plain words:</strong> jQuery gets loaded twice, once by a React effect injecting a script tag, and again by a plain script tag elsewhere in the same file. It also attaches itself to the global <code class="inline">window</code> object as <code class="inline">window.jQuery</code> and <code class="inline">window.$</code>, old-school style.</p>
+        <p class="block-label">Why it matters</p>
+        <p>Beyond the wasted download, this is a React 19 codebase — jQuery generally isn't needed at all in an app built this way. It's worth asking whether it's used for anything that couldn't be done in React directly.</p>
+        <p class="block-label fix">How to fix it</p>
+        <p>Find what actually depends on jQuery being present (likely the <code class="inline">setTimeout</code> DOM wiring in <a href="#p10">P10</a>), rebuild that in React, and remove jQuery entirely.</p>
+        <div class="claude-box">
+          <p class="block-label">Prompting Claude Code</p>
+          <p>"jQuery is loaded twice in layout/index.tsx — once via a useEffect script injection and once via a static script tag. Find every place in the codebase that actually uses window.jQuery or window.$, and tell me whether we can remove jQuery entirely by rewriting those usages in React." Let it report back before you commit to removing it — there may be more callers than expected.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="issue" id="s10">
+      <div class="issue-head">
+        <h3>S10 — No basic security headers are set at all</h3>
+        <span class="sev high">High</span>
+        <span class="side frontend">Frontend</span>
+      </div>
+      <div class="issue-body">
+        <p class="file-list">File: <code>next.config.ts</code> — no <code class="inline">headers()</code> function exists</p>
+        <p><strong>In plain words:</strong> There's a small set of response headers that tell the browser things like "don't let this page be embedded inside another site's frame" and "don't guess file types, trust what the server says." None of them are set right now.</p>
+        <p>The framing one matters specifically here: users sign wallet transactions on this site. A convincing lookalike page that frames your buy flow inside an invisible iframe — a classic clickjacking setup — would be dangerous precisely because the transaction looks legitimate to the user.</p>
+        <p class="block-label">Why it matters</p>
+        <p>These headers cost nothing to add and close off a real, well-known attack category.</p>
+        <p class="block-label fix">How to fix it</p>
+        <p>This is close to a five-minute, zero-risk change:</p>
+        <pre>async headers() {
+  return [{
+    source: '/:path*',
+    headers: [
+      { key: 'X-Content-Type-Options', value: 'nosniff' },
+      { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+      { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+      { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+    ],
+  }]
+}</pre>
+        <p>A stricter Content-Security-Policy is worth doing too, but needs more testing given the CDN scripts and wallet SDKs in play — start it in report-only mode rather than enforcing mode.</p>
+        <div class="claude-box">
+          <p class="block-label">Prompting Claude Code</p>
+          <p>"Add a headers() function to next.config.ts setting X-Content-Type-Options, X-Frame-Options, Referrer-Policy, and Permissions-Policy across all routes." This one is safe enough to just ask for directly — low risk, well-defined, good first change to build confidence with.</p>
+        </div>
+        <p class="divider-note">Fully doable in the frontend repo through next.config.ts. If you're sitting behind a CDN or reverse proxy in front of Next.js, that's a second, optional place these headers could also be set at the infra layer — but it's not required if next.config.ts handles it.</p>
+      </div>
+    </article>
+
+    <article class="issue" id="s11">
+      <div class="issue-head">
+        <h3>S11 — Linting is turned off during builds</h3>
+        <span class="sev medium">Medium</span>
+        <span class="side frontend">Frontend</span>
+      </div>
+      <div class="issue-body">
+        <p class="file-list">File: <code>next.config.ts:24-26</code></p>
+        <pre>eslint: { ignoreDuringBuilds: true }</pre>
+        <p><strong>In plain words:</strong> ESLint is a tool that catches common mistakes automatically before code ships. This line tells the build to ignore whatever it finds. There are also <code class="inline">/* eslint-disable */</code> comments at the top of a few service files, turning it off there too.</p>
+        <p class="block-label">Why it matters</p>
+        <p>Several issues in this audit likely would have been caught automatically if linting had been active. It's the cheapest ongoing defense available.</p>
+        <p class="block-label fix">How to fix it</p>
+        <p>Re-enable it. Expect some noise the first time — that's the point, it's surfacing real things.</p>
+        <div class="claude-box">
+          <p class="block-label">Prompting Claude Code</p>
+          <p>"Remove ignoreDuringBuilds from next.config.ts and the eslint-disable comments in api.service.ts, error.service.ts, and redux/api.ts, then run the linter and show me what it flags — don't auto-fix everything, let's triage the list together first." Expect this to open a small backlog of its own; treat that as a feature, not a side effect.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="issue" id="s12">
+      <div class="issue-head">
+        <h3>S12 — External links don't say "don't trust the page that opens"</h3>
+        <span class="sev medium">Medium</span>
+        <span class="side frontend">Frontend</span>
+      </div>
+      <div class="issue-body">
+        <p class="file-list">Files: <code>src/component/footer/index.tsx:54-83</code> · <code>src/component/header/index.tsx:32</code></p>
+        <p><strong>In plain words:</strong> About 10 links that open in a new tab are missing <code class="inline">rel="noopener noreferrer"</code>. Without it, the page that opens can, in older browsers, get a reference back to your original tab and manipulate it. Modern browsers already block this by default, so the real-world risk today is low, but it's a one-line fix and also affects how search engines interpret the link.</p>
+        <p class="block-label fix">How to fix it</p>
+        <p>Add <code class="inline">rel="noopener noreferrer"</code> to every <code class="inline">target="_blank"</code> link.</p>
+        <div class="claude-box">
+          <p class="block-label">Prompting Claude Code</p>
+          <p>"Find every target=\"_blank\" link across the codebase missing rel=\"noopener noreferrer\" and add it." Safe to batch across the whole repo in one pass.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="issue" id="s13">
+      <div class="issue-head">
+        <h3>S13 — Nearly 50 console logs are shipping to production</h3>
+        <span class="sev medium">Medium</span>
+        <span class="side frontend">Frontend</span>
+      </div>
+      <div class="issue-body">
+        <p><strong>In plain words:</strong> There are 48 places where the code prints something to the browser's developer console, several of them inside error handling where they print the full contents of a failed API response — which could include more detail than you'd want a curious visitor to see.</p>
+        <p class="block-label fix">How to fix it</p>
+        <p>Rather than hunting these down by hand, Next.js has a built-in compiler option that strips them automatically at build time, while still letting you keep error-level logs if you want:</p>
+        <pre>compiler: { removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error'] } : false }</pre>
+        <div class="claude-box">
+          <p class="block-label">Prompting Claude Code</p>
+          <p>"Add the removeConsole compiler option to next.config.ts so console logs are stripped in production builds except console.error." One line, no need to touch the 48 call sites individually.</p>
+        </div>
+        <p class="divider-note">One genuinely good sign from the audit: a search across the whole codebase for <code class="inline">dangerouslySetInnerHTML</code>, <code class="inline">innerHTML</code>, <code class="inline">eval(</code>, and <code class="inline">document.write</code> turned up zero matches. Your own code doesn't introduce any script-injection openings — which is exactly why S4 is a "tighten the storage" problem rather than an active break-in.</p>
+      </div>
+    </article>
+  </section>
+
+  <!-- ============ SEO ============ -->
+  <section class="group">
+    <div class="group-heading"><h2>SEO</h2><span class="count">10 findings</span></div>
+    <p class="group-intro">These affect whether Google, Bing, and social previews can actually see and understand your pages. One of them — E1 — is described as the single highest-impact fix in the whole audit, and it's roughly five lines of code.</p>
+
+    <article class="issue" id="e1">
+      <div class="issue-head">
+        <h3>E1 — Every page can serve just "Loading..." to anyone who isn't already logged in</h3>
+        <span class="sev critical">Critical</span>
+        <span class="status-pill partial">Partially patched</span>
+        <span class="side frontend">Frontend</span>
+      </div>
+      <div class="issue-body">
+        <p class="file-list">File: <code>src/component/AppContent.tsx:7</code></p>
+        <p><strong>In plain words:</strong> Next.js can render a page in two places: once on the server, before it's ever sent to the browser, and then again in the browser once React "wakes up." Search engines mostly rely on getting real, meaningful HTML from that first server render.</p>
+        <p>The app tracks whether a user is logged in using a value that starts out as <code class="inline">null</code> and only gets set to something real inside a <code class="inline">useEffect</code> — and effects never run on the server. So on the very first server render, for every page, that value is still <code class="inline">null</code>, and the code responds by throwing away the entire page and rendering just <code class="inline">&lt;p&gt;Loading...&lt;/p&gt;</code> instead. No title, no headings, no content — for anyone, including search engine crawlers, on the very first paint.</p>
+        <p>There were originally three separate places doing a version of this: <code class="inline">AppContent.tsx</code>, <code class="inline">ProtectedRoute.tsx</code>, and a manual <code class="inline">isClient</code> check wrapping the entire body of <code class="inline">pages/index.tsx</code>.</p>
+        <p><strong>What's changed since the audit:</strong> looking at the current file, <code class="inline">AppContent.tsx</code> now has an escape hatch — <code class="inline">isAlwaysRenderableRoute(ROUTER.pathname)</code> — that skips the loading gate for certain routes. That's real progress, but it means the fix is route-by-route rather than structural: any route not on that exempt list still gets blanked out on first render. The underlying pattern (waiting on a client-only effect before rendering anything) is still there.</p>
+        <p class="block-label">Why it matters</p>
+        <p>Google does execute JavaScript eventually, so you're not completely invisible to it — but JavaScript-rendered indexing is slower and less reliable than getting real HTML immediately. Every other crawler — Bing, link-preview bots for social platforms, AI crawlers — typically doesn't wait around the way Google sometimes does, and sees nothing but "Loading...".</p>
+        <p class="block-label fix">How to fix it properly</p>
+        <p>The durable fix is to read the authentication cookie during server-side rendering, so <code class="inline">authenticated</code> has a real value the very first time the page renders — never <code class="inline">null</code>. Then the page itself should always render its real content; only small, auth-dependent widgets inside the page (like a "welcome back" banner) should have their own tiny loading state, not the entire page tree.</p>
+        <div class="claude-box">
+          <p class="block-label">Prompting Claude Code</p>
+          <p>"AppContent.tsx currently only renders real content for routes in isAlwaysRenderableRoute, and blanks every other route to just Loading... until a client-side effect resolves authenticated. I want to fix this at the root instead of exempting more routes one at a time — read the auth cookie during SSR so authenticated has a real value on the first render everywhere, then remove the route exemption list entirely since it becomes unnecessary. Show me the plan before changing anything." This is the single highest-value fix in the whole list — worth a focused session on its own, not squeezed in alongside something else.</p>
+        </div>
+        <p class="divider-note">Entirely a frontend fix — reading a cookie during getServerSideProps and deciding what to render is all Next.js code in this repo. No backend change is required, since the access token cookie already exists; the frontend just needs to check for it earlier, on the server, instead of waiting for a client effect.</p>
+      </div>
+    </article>
+
+    <article class="issue" id="e2">
+      <div class="issue-head">
+        <h3>E2 — There's no robots.txt and no sitemap</h3>
+        <span class="sev critical">Critical</span>
+        <span class="status-pill open">Still missing</span>
+        <span class="side frontend">Frontend</span>
+      </div>
+      <div class="issue-body">
+        <p><strong>In plain words:</strong> Confirmed directly — neither file exists in <code class="inline">public/</code>. A <code class="inline">robots.txt</code> tells crawlers what they're allowed to look at, and a sitemap is essentially a list of every page you want indexed. Without either, search engines have to discover your pages by accident, through links, rather than being handed a clear map — and your domain listing and seller portfolio pages, which are the pages that actually matter for organic traffic, have no discovery path at all.</p>
+        <p>Worth noting: a <code class="inline">robots.txt</code> living on your main apex domain doesn't cover this marketplace subdomain — each host needs its own.</p>
+        <p class="block-label fix">How to fix it</p>
+        <p>Add a <code class="inline">public/robots.txt</code> pointing at <code class="inline">https://marketplace.endlessdomains.io/sitemap.xml</code>, generate an actual sitemap (a library like <code class="inline">next-sitemap</code>, or a dynamic route, both work) including your seller portfolio and domain detail pages, and register this subdomain as its own property in Google Search Console.</p>
+        <div class="claude-box">
+          <p class="block-label">Prompting Claude Code</p>
+          <p>"There's no robots.txt or sitemap anywhere in this project. Add a public/robots.txt pointing at our sitemap, and set up next-sitemap (or a dynamic sitemap route) that includes /seller-portfolio/[slug] pages and domain detail pages." Straightforward, low-risk, high-value — good candidate to do right after E1.</p>
+        </div>
+        <p class="divider-note">The robots.txt and sitemap files themselves are frontend work. Registering the property in Google Search Console isn't a code change at all — it's an account-level step, usually done by whoever manages your marketing or SEO tooling, and can happen independently of the code fix.</p>
+      </div>
+    </article>
+
+    <article class="issue" id="e3">
+      <div class="issue-head">
+        <h3>E3 — There's no _document.tsx file</h3>
+        <span class="sev medium">Medium</span>
+        <span class="status-pill open">Still missing</span>
+        <span class="side frontend">Frontend</span>
+      </div>
+      <div class="issue-body">
+        <p><strong>In plain words:</strong> Confirmed — the file doesn't exist. In a Next.js Pages Router app, <code class="inline">_document.tsx</code> is the one place you can set attributes on the actual <code class="inline">&lt;html&gt;</code> tag, like declaring the page's language. Without it, there's no <code class="inline">lang="en"</code> anywhere, which is both an SEO signal and an accessibility requirement — screen readers use it to choose pronunciation rules.</p>
+        <p class="block-label fix">How to fix it</p>
+        <p>Add <code class="inline">pages/_document.tsx</code> with <code class="inline">lang="en"</code> set, and use it as the home for any <code class="inline">preconnect</code> hints for remaining third-party origins.</p>
+        <div class="claude-box">
+          <p class="block-label">Prompting Claude Code</p>
+          <p>"Create pages/_document.tsx with html lang=\"en\" set, following standard Next.js Pages Router conventions." Small, self-contained, safe to do anytime.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="issue" id="e4">
+      <div class="issue-head">
+        <h3>E4 — No canonical links, social preview tags, or structured data anywhere</h3>
+        <span class="sev critical">Critical</span>
+        <span class="side frontend">Frontend</span>
+      </div>
+      <div class="issue-body">
+        <p><strong>In plain words:</strong> A search across the whole codebase for canonical tags, Open Graph tags (what makes a nice preview card when you share a link on X or Discord), Twitter card tags, and structured data (JSON-LD, which helps Google show rich results) turned up nothing at all.</p>
+        <p>Practically, this means sharing a domain listing link anywhere produces a bare, ugly URL with no preview image or description. It also means there's no defense against a duplicate-content problem if the staging host is ever publicly crawlable (see <a href="#e9">E9</a>).</p>
+        <p>One subdomain-specific trap to watch for: Google treats <code class="inline">marketplace.endlessdomains.io</code> and <code class="inline">endlessdomains.io</code> as two entirely separate sites with separate ranking authority. Every canonical URL, Open Graph URL, and sitemap entry must point at the full <code class="inline">marketplace.</code> host — pointing them at the apex domain instead would actively remove the marketplace from search results.</p>
+        <p class="block-label fix">How to fix it</p>
+        <p>Extend the shared metadata setup and the <code class="inline">&lt;Head&gt;</code> block in the layout to emit, in one place: a canonical link using the full absolute marketplace URL, the full Open Graph tag set, the Twitter summary-large-image card, and JSON-LD for Product and Offer on listing pages, BreadcrumbList on portfolios, and Organization plus WebSite site-wide.</p>
+        <div class="claude-box">
+          <p class="block-label">Prompting Claude Code</p>
+          <p>"We have zero canonical tags, Open Graph tags, Twitter cards, or JSON-LD anywhere in the codebase. Extend our MetaData setup and the layout's Head block to emit all of these, always using the full https://marketplace.endlessdomains.io host, never the apex domain. Start with the homepage and one listing page as examples before we roll it out everywhere." This benefits from being scoped to a couple of pages first so you can see the shape before applying it broadly.</p>
+        </div>
+        <p class="divider-note">Almost entirely frontend — the tags themselves are markup. The one place this touches the backend is the Product and Offer JSON-LD on listing pages, which needs accurate price, availability, and image data. If the API response for a listing already includes all of that, this stays frontend-only; if it's missing a field like availability status, that's a small backend addition to request.</p>
+      </div>
+    </article>
+
+    <article class="issue" id="e5">
+      <div class="issue-head">
+        <h3>E5 — No page has a proper top-level heading</h3>
+        <span class="sev medium">Medium</span>
+        <span class="side frontend">Frontend</span>
+      </div>
+      <div class="issue-body">
+        <div class="tbl-wrap">
+        <table class="data">
+          <thead><tr><th>Page</th><th>h1 count</th><th>h2 count</th></tr></thead>
+          <tbody>
+            <tr><td>pages/index.tsx</td><td class="num">0</td><td class="num">5</td></tr>
+            <tr><td>pages/about-us/index.tsx</td><td class="num">0</td><td class="num">4</td></tr>
+            <tr><td>pages/contact-us/index.tsx</td><td class="num">0</td><td class="num">2</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p><strong>In plain words:</strong> Every page is supposed to have exactly one main heading, marked as <code class="inline">&lt;h1&gt;</code>, that tells both users and search engines what the page is fundamentally about. Right now every page checked skips straight to <code class="inline">&lt;h2&gt;</code> and below. The heading text itself already exists on the page — it's just tagged at the wrong level.</p>
+        <p class="block-label fix">How to fix it</p>
+        <p>Find the main heading on each page and change its tag to <code class="inline">&lt;h1&gt;</code>, adjusting the levels below it if needed so the hierarchy doesn't skip (never jump from h2 straight to h4, for instance).</p>
+        <div class="claude-box">
+          <p class="block-label">Prompting Claude Code</p>
+          <p>"Check every page in pages/ for missing h1 tags — several currently start at h2. For each one, identify the intended main heading and retag it as h1, keeping the rest of the heading hierarchy intact underneath it." Pure content/markup fix, no visual change, safe to batch.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="issue" id="e6">
+      <div class="issue-head">
+        <h3>E6 — A meta keywords tag is still being generated</h3>
+        <span class="sev medium">Medium</span>
+        <span class="side frontend">Frontend</span>
+      </div>
+      <div class="issue-body">
+        <p class="file-list">File: <code>src/template/layout/index.tsx:102</code></p>
+        <p><strong>In plain words:</strong> There's a <code class="inline">&lt;meta name="keywords"&gt;</code> tag still being output on every page. Google has publicly ignored this tag since 2009 — it does nothing for ranking. Its only real effect today is handing your keyword list to anyone (including competitors) who views the page source.</p>
+        <p class="block-label fix">How to fix it</p>
+        <p>Delete the tag and remove the <code class="inline">keywords</code> field from wherever your metadata object defines it.</p>
+        <div class="claude-box">
+          <p class="block-label">Prompting Claude Code</p>
+          <p>"Remove the meta keywords tag from layout/index.tsx and the keywords field from the MetaData type/object entirely." One-line cleanup.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="issue" id="e7">
+      <div class="issue-head">
+        <h3>E7 — Dynamic listing pages can't produce their own title or description</h3>
+        <span class="sev high">High</span>
+        <span class="side frontend">Frontend</span>
+      </div>
+      <div class="issue-body">
+        <p class="file-list">File: <code>pages/seller-portfolio/[slug].tsx</code></p>
+        <p><strong>In plain words:</strong> This page figures out which seller it's showing by reading <code class="inline">router.query</code>, which is only available in the browser, after the page has already loaded. That means the server can never know, at render time, whose portfolio this is — so it can't generate a real page title like "Domains for sale by Jane" or a matching description. Combined with E1, these pages are effectively invisible to anything that doesn't fully execute JavaScript.</p>
+        <p class="block-label fix">How to fix it</p>
+        <p>Move this page to <code class="inline">getServerSideProps</code>, or <code class="inline">getStaticProps</code> with incremental regeneration, so the slug is known on the server and a real, specific title and description can be generated per seller.</p>
+        <div class="claude-box">
+          <p class="block-label">Prompting Claude Code</p>
+          <p>"pages/seller-portfolio/[slug].tsx reads its slug from router.query client-side, so it can't produce server-rendered titles or descriptions. Convert it to use getServerSideProps so the slug is available at render time, and generate a real per-seller title and meta description from it." Pairs naturally with the E4 metadata work.</p>
+        </div>
+        <p class="divider-note">Frontend work — getServerSideProps runs on your Next.js server, not the API's. It does call out to the existing backend endpoint that already returns seller data, but that endpoint should already exist since the client-side version of this page presumably calls it too. No new backend work needed unless that endpoint is missing fields you need for the title or description.</p>
+      </div>
+    </article>
+
+    <article class="issue" id="e8">
+      <div class="issue-head">
+        <h3>E8 — The favicon 404s, and there's a manifest reference with no file behind it</h3>
+        <span class="sev medium">Medium</span>
+        <span class="side frontend">Frontend</span>
+      </div>
+      <div class="issue-body">
+        <p><strong>In plain words:</strong> The layout links <code class="inline">/favicon.ico</code>, but no such file exists in <code class="inline">public/</code> — only an SVG version does. That means every single page load quietly triggers a 404 request. Separately, the metadata object references a <code class="inline">site.webmanifest</code> file that also doesn't exist, and there's a <code class="inline">next-pwa</code> package installed with no actual PWA configuration wired up — dead weight either way.</p>
+        <p class="block-label fix">How to fix it</p>
+        <p>Add the missing favicon file. Then make a call on the manifest and PWA package: either finish wiring them up properly, or remove both since an unused dependency and a broken reference don't help anyone.</p>
+        <div class="claude-box">
+          <p class="block-label">Prompting Claude Code</p>
+          <p>"favicon.ico is referenced in the layout but doesn't exist in public/ — only Favicon.svg does. Generate a proper favicon.ico from it. Separately, next-pwa is installed but has no config, and site.webmanifest is referenced but doesn't exist — tell me what it'd take to wire up the manifest properly versus just removing both, and I'll decide." Let it lay out the tradeoff rather than picking for you — this one's a product decision as much as a technical one.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="issue" id="e9">
+      <div class="issue-head">
+        <h3>E9 — A staging clone of the site might be publicly crawlable</h3>
+        <span class="sev high">High</span>
+        <span class="side infra">Infra / DevOps</span>
+      </div>
+      <div class="issue-body">
+        <p><strong>In plain words:</strong> <code class="inline">stagemarketplace.endlessdomains.io</code> is referenced twice in the code. If that address is reachable by anyone, not just your team, then it's an identical copy of your site competing against the real one for search rankings — and because there's no <code class="inline">robots.txt</code> anywhere yet (E2), nothing currently stops it from being indexed. Google sometimes picks the staging copy to rank instead of production, which is exactly backwards.</p>
+        <p class="block-label fix">How to fix it</p>
+        <p>This one isn't a code fix so much as a quick check: try loading that staging URL from outside your office network, or search <code class="inline">site:endlessdomains.io</code> to see what's indexed. If it's reachable, add either an <code class="inline">X-Robots-Tag: noindex</code> header or basic HTTP authentication in front of it.</p>
+        <div class="claude-box">
+          <p class="block-label">Prompting Claude Code</p>
+          <p>Not really a Claude Code task — this is a quick manual check (try the URL yourself, or run the site: search) followed by an infrastructure change (adding noindex headers or auth) that likely lives in your hosting config rather than this repo. This is a DevOps/infra fix, not backend application code — it's about who can reach that host at all, not about anything the API does. Worth flagging to whoever owns deployment.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="issue" id="e10">
+      <div class="issue-head">
+        <h3>E10 — Links to the main site aren't sending any ranking credit back</h3>
+        <span class="sev medium">Medium</span>
+        <span class="side content">Content / Marketing</span>
+      </div>
+      <div class="issue-body">
+        <p><strong>In plain words:</strong> Subdomains don't automatically inherit the ranking strength of the main domain the way a subfolder would. Right now the footer links out to the main site's blog, community page, and vision/mission page, sending value outward, with nothing flowing back in the other direction.</p>
+        <p class="block-label fix">How to fix it</p>
+        <p>This isn't really a code change in this repo — it's a content decision. Getting blog posts on the main site to link back into marketplace listing pages costs nothing and provides a real ranking benefit over time.</p>
+        <div class="claude-box">
+          <p class="block-label">Prompting Claude Code</p>
+          <p>Not a code task for this repo — flag it to whoever manages the main site's blog content as a linking opportunity.</p>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <!-- ============ PERFORMANCE ============ -->
+  <section class="group">
+    <div class="group-heading"><h2>Performance</h2><span class="count">11 findings</span></div>
+    <p class="group-intro">These are mostly about shipping far more bytes than necessary — the same CSS file linked multiple ways, 22 megabytes of fonts, and images that never got optimized. Several of these are just deletions.</p>
+
+    <article class="issue" id="p1">
+      <div class="issue-head">
+        <h3>P1 — Bootstrap's CSS is loaded three separate times on every page</h3>
+        <span class="sev critical">Critical</span>
+        <span class="side frontend">Frontend</span>
+      </div>
+      <div class="issue-body">
+        <div class="tbl-wrap">
+        <table class="data">
+          <thead><tr><th>Location</th><th>What it loads</th></tr></thead>
+          <tbody>
+            <tr><td><code class="inline">_app.tsx:20</code></td><td>import '../public/assets/css/bootstrap.min.css'</td></tr>
+            <tr><td><code class="inline">_app.tsx:21</code></td><td>import 'bootstrap/dist/css/bootstrap.min.css' — a second copy of the same framework</td></tr>
+            <tr><td><code class="inline">layout:108</code></td><td>&lt;link rel="stylesheet" href="/assets/css/bootstrap.min.css" /&gt; — a third copy</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p><strong>In plain words:</strong> The exact same CSS framework is being loaded three different ways on every single page load. Two of the three are pure waste.</p>
+        <p class="block-label">Why it matters</p>
+        <p>Roughly 470 KB of CSS gets downloaded where 156 KB would fully cover it — on every page, for every visitor.</p>
+        <p class="block-label fix">How to fix it</p>
+        <p>Pick one loading mechanism (the <code class="inline">_app.tsx</code> imports are the right one to keep) and delete the other two.</p>
+        <div class="claude-box">
+          <p class="block-label">Prompting Claude Code</p>
+          <p>"Bootstrap CSS is loaded three separate ways: two imports in _app.tsx and one link tag in layout/index.tsx. Keep only one import in _app.tsx and remove the duplicate import and the link tag." Good to pair with P2 and P7, since they're the same root habit repeated across CSS and JS.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="issue" id="p2">
+      <div class="issue-head">
+        <h3>P2 — Every stylesheet in the app is linked twice</h3>
+        <span class="sev critical">Critical</span>
+        <span class="side frontend">Frontend</span>
+      </div>
+      <div class="issue-body">
+        <p class="file-list">File: <code>src/template/layout/index.tsx:108-121</code></p>
+        <p><strong>In plain words:</strong> Beyond Bootstrap, four more stylesheets — <code class="inline">custom.css</code>, <code class="inline">style.css</code>, <code class="inline">responsive.css</code>, and two owl-carousel files — are linked directly in the layout's <code class="inline">&lt;Head&gt;</code>, even though <code class="inline">_app.tsx</code> already imports three of them as proper JS modules. Two of the owl-carousel files are linked a second time completely outside the <code class="inline">&lt;Head&gt;</code> tag, which isn't even valid placement for a stylesheet link.</p>
+        <div class="tbl-wrap">
+        <table class="data">
+          <thead><tr><th>File</th><th>Size</th></tr></thead>
+          <tbody>
+            <tr><td>bootstrap.min.css</td><td class="num">156 KB</td></tr>
+            <tr><td>custom.css</td><td class="num">72 KB</td></tr>
+            <tr><td>style.css</td><td class="num">44 KB</td></tr>
+            <tr><td>responsive.css</td><td class="num">16 KB</td></tr>
+            <tr><td>owl.carousel.min.css</td><td class="num">4 KB</td></tr>
+            <tr><td>owl.theme.default.min.css</td><td class="num">4 KB</td></tr>
+            <tr><td><strong>Total</strong></td><td class="num"><strong>296 KB (loaded 2–3× over)</strong></td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="block-label fix">How to fix it</p>
+        <p>Pick one mechanism — the <code class="inline">_app.tsx</code> imports — and delete every <code class="inline">&lt;link rel="stylesheet"&gt;</code> from the layout entirely.</p>
+        <div class="claude-box">
+          <p class="block-label">Prompting Claude Code</p>
+          <p>"layout/index.tsx links custom.css, style.css, responsive.css, and both owl-carousel files via link tags, but _app.tsx already imports most of these as modules — and two of the link tags sit outside the Head tag entirely, which is invalid. Remove all the redundant link tags and keep only the _app.tsx imports." Do this in the same pass as P1 since it's the identical pattern.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="issue" id="p3">
+      <div class="issue-head">
+        <h3>P3 — 22 megabytes of font files, almost none of it needed</h3>
+        <span class="sev critical">Critical</span>
+        <span class="status-pill open">Confirmed still 21.5 MB</span>
+        <span class="side frontend">Frontend</span>
+      </div>
+      <div class="issue-body">
+        <p class="file-list">Directory: <code>public/assets/fonts/</code></p>
+        <p><strong>In plain words:</strong> Checked directly — this folder is still 21.5 MB. It contains all 18 weights of the Lato font family, and each weight is duplicated across three file formats: <code class="inline">.ttf</code>, <code class="inline">.woff</code>, and <code class="inline">.woff2</code>. The <code class="inline">.ttf</code> versions specifically are dead weight — every browser you need to support today handles <code class="inline">.woff2</code> just fine, which is also the smallest format.</p>
+        <p class="block-label">Why it matters</p>
+        <p>Realistically, most sites use two or three font weights, not eighteen. Every font file a browser has to download before it can show text is time the user spends looking at invisible or fallback text.</p>
+        <p class="block-label fix">How to fix it</p>
+        <p>Figure out which 2 to 3 weights are actually used in the design, keep only the <code class="inline">.woff2</code> versions of those, and delete the rest. Even better long-term: Next.js's built-in <code class="inline">next/font</code> can self-host and automatically subset fonts, and it eliminates the layout shift that happens when a fallback font swaps to the real one.</p>
+        <div class="claude-box">
+          <p class="block-label">Prompting Claude Code</p>
+          <p>"public/assets/fonts/ has all 18 Lato weights in ttf, woff, and woff2 — 21.5 MB total. Search the SCSS and CSS for which font-weight values are actually referenced, tell me which weights are truly in use, and then propose deleting the unused weights and all .ttf files, keeping only .woff2 for what's left." Let it report the actual usage before deleting anything — don't guess which weights are safe to drop.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="issue" id="p4">
+      <div class="issue-head">
+        <h3>P4 — A 1.3 MB PDF sitting in the images folder, plus several oversized SVGs</h3>
+        <span class="sev critical">Critical</span>
+        <span class="side frontend">Frontend</span>
+      </div>
+      <div class="issue-body">
+        <p class="file-list"><code>public/assets/img/male1 (1).pdf</code> — 1.3 MB, referenced nowhere in the code</p>
+        <div class="tbl-wrap">
+        <table class="data">
+          <thead><tr><th>File</th><th>Size</th></tr></thead>
+          <tbody>
+            <tr><td>thankyou.svg</td><td class="num">1.3 MB</td></tr>
+            <tr><td>promot-bg.svg</td><td class="num">1.3 MB</td></tr>
+            <tr><td>domain-bg.svg</td><td class="num">1.3 MB</td></tr>
+            <tr><td>f-graphic-a.svg</td><td class="num">644 KB</td></tr>
+            <tr><td>f-graphic-b.svg</td><td class="num">636 KB</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p><strong>In plain words:</strong> A stray PDF is sitting in the images folder, unused. Meanwhile, several files that should be lightweight vector graphics (SVGs are normally a few kilobytes) are over a megabyte — a strong sign they actually contain an embedded photo or raster image wrapped inside SVG markup, rather than real vector paths.</p>
+        <p class="block-label fix">How to fix it</p>
+        <p>Delete the unused PDF outright. For the oversized SVGs, run them through an SVG optimizer (SVGO), or better, re-export them properly from whatever design tool created them so they're genuinely vector-based. Expect a 90%+ size reduction.</p>
+        <div class="claude-box">
+          <p class="block-label">Prompting Claude Code</p>
+          <p>"There's an unused PDF at public/assets/img/male1 (1).pdf — confirm nothing references it, then delete it. Also, thankyou.svg, promot-bg.svg, domain-bg.svg, f-graphic-a.svg, and f-graphic-b.svg are all 600KB–1.3MB, which suggests embedded raster data. Run them through SVGO and show me the before/after sizes." Quick, low-risk, good candidate to do in the same session as P3.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="issue" id="p5">
+      <div class="issue-head">
+        <h3>P5 — 106 images are loaded the old way, with none of the built-in optimizations</h3>
+        <span class="sev critical">Critical</span>
+        <span class="side frontend">Frontend</span>
+      </div>
+      <div class="issue-body">
+        <p><strong>In plain words:</strong> Next.js ships an <code class="inline">&lt;Image&gt;</code> component that automatically handles lazy loading (not downloading images until they're about to be visible), modern formats like WebP or AVIF, and serving the right image size for each device. Only 7 files in the whole app use it. The other 106 use a plain <code class="inline">&lt;img&gt;</code> tag, which gets none of that — and without explicit width and height, each one also contributes to layout shift as the page jumps around while images finish loading.</p>
+        <p>A few specific offenders called out: <code class="inline">why-banner.png</code> at 544 KB, <code class="inline">why-domain.png</code> at 400 KB, <code class="inline">arch.png</code> at 356 KB, and <code class="inline">about-us.png</code> at 340 KB — these are likely your single biggest contributor to slow "largest visible content" load times.</p>
+        <p class="block-label fix">How to fix it</p>
+        <p>Don't try to convert all 106 at once. Start with whatever appears above the fold on the homepage — that's where the improvement is most visible and most measurable — then work outward from there.</p>
+        <div class="claude-box">
+          <p class="block-label">Prompting Claude Code</p>
+          <p>"pages/index.tsx uses raw img tags for its above-the-fold images, including why-banner.png and why-domain.png. Convert just the homepage's above-the-fold images to next/image with proper width, height, and priority props, following the import-as-module pattern from CLAUDE.md. Let's verify this one page works well before doing the rest of the app." Treat this as an ongoing, page-by-page project, not a single sweep — 106 tags is a lot of surface area to change at once.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="issue" id="p6">
+      <div class="issue-head">
+        <h3>P6 — Almost nothing is code-split; heavy libraries load on every page</h3>
+        <span class="sev high">High</span>
+        <span class="side frontend">Frontend</span>
+      </div>
+      <div class="issue-body">
+        <p><strong>In plain words:</strong> Code-splitting means only loading the JavaScript a page actually needs, when it needs it, instead of bundling everything together upfront. Right now there's exactly one place in the entire app doing this. Everything else — including some genuinely heavy libraries — loads on every single page, whether that page uses them or not.</p>
+        <div class="tbl-wrap">
+        <table class="data">
+          <thead><tr><th>Library</th><th>Files using it</th><th>Note</th></tr></thead>
+          <tbody>
+            <tr><td>web3 (v1)</td><td class="num">12</td><td>One of the heaviest packages in the whole ecosystem</td></tr>
+            <tr><td>react-bootstrap</td><td class="num">23</td><td>—</td></tr>
+            <tr><td>ethers (v6)</td><td class="num">4</td><td>—</td></tr>
+            <tr><td>wagmi</td><td class="num">4</td><td>—</td></tr>
+            <tr><td>@reown/appkit</td><td class="num">2</td><td>Plus both Solana and Wagmi wallet adapters</td></tr>
+            <tr><td>recharts</td><td class="num">3</td><td>Only actually needed on the analytics page</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p class="block-label">Why it matters</p>
+        <p>You also have three different libraries — <code class="inline">web3</code> v1, <code class="inline">ethers</code> v6, and <code class="inline">wagmi</code> — all doing overlapping wallet-connection work. Consolidating onto just <code class="inline">ethers</code> and <code class="inline">wagmi</code> removes a large, redundant dependency entirely. There are also a few packages that look like leftovers from an earlier approach: <code class="inline">@walletconnect/web3-provider</code> (an old, deprecated version), and <code class="inline">@web3modal/wagmi</code> (superseded by <code class="inline">@reown/appkit</code>, which is already installed alongside it).</p>
+        <p class="block-label fix">How to fix it</p>
+        <p>Three groups to dynamically import, roughly in order of impact: wallet SDKs (nobody needs those parsed before someone actually clicks "connect wallet"), Recharts (only needed on the analytics page), and the 20-plus modal components, which are all conditionally rendered anyway and don't need to be in the initial bundle.</p>
+        <div class="claude-box">
+          <p class="block-label">Prompting Claude Code</p>
+          <p>"We have almost no code-splitting — wallet libraries (web3, wagmi, @reown/appkit), Recharts, and all our modal components load in the initial bundle on every page. Start with the modals in src/component/modals/ since they're the lowest-risk group — convert them to next/dynamic imports. Once that's verified working, we'll do Recharts, then the wallet SDKs last since those need the most care." Sequence this from least to most risky — modals are cosmetic and safe to get wrong; wallet connection code is not.</p>
+        </div>
+        <p class="divider-note">Separately worth a conversation with whoever owns dependencies: consolidating web3 v1 + ethers v6 + wagmi down to just ethers + wagmi, and checking whether @walletconnect/web3-provider and @web3modal/wagmi are still actually needed now that @reown/appkit is in place.</p>
+      </div>
+    </article>
+
+    <article class="issue" id="p7">
+      <div class="issue-head">
+        <h3>P7 — Bootstrap's JavaScript is also loaded twice</h3>
+        <span class="sev medium">Medium</span>
+        <span class="side frontend">Frontend</span>
+      </div>
+      <div class="issue-body">
+        <p class="file-list">Files: <code>_app.tsx:27</code> · <code>layout:129</code></p>
+        <pre>useEffect(() => { require('bootstrap/dist/js/bootstrap.bundle.min.js') }, [])</pre>
+        <p><strong>In plain words:</strong> Bootstrap's JavaScript bundle gets loaded once through an old-style <code class="inline">require()</code> call inside a React effect, and again through a plain script tag in the layout. The <code class="inline">require()</code> form specifically also prevents the bundler from tree-shaking it — meaning even unused parts of the bundle can't be trimmed out.</p>
+        <p class="block-label fix">How to fix it</p>
+        <p>Keep one loading path, remove the other, and prefer a proper import over a runtime <code class="inline">require()</code> call.</p>
+        <div class="claude-box">
+          <p class="block-label">Prompting Claude Code</p>
+          <p>"Bootstrap JS loads twice — via a runtime require() in a useEffect in _app.tsx, and via a script tag in layout/index.tsx. Keep one loading mechanism, ideally a proper import instead of require(), and remove the duplicate." Bundle with P1 and P2 as one "duplicate assets" cleanup session.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="issue" id="p8">
+      <div class="issue-head">
+        <h3>P8 — A third-party stylesheet blocks the page from painting anything</h3>
+        <span class="sev medium">Medium</span>
+        <span class="side frontend">Frontend</span>
+      </div>
+      <div class="issue-body">
+        <p class="file-list">File: <code>src/template/layout/index.tsx:114</code></p>
+        <p><strong>In plain words:</strong> Font Awesome is loaded from an external CDN in a way that blocks the browser from painting anything on screen until that request — to a different domain, with no early connection hint — finishes.</p>
+        <p class="block-label fix">How to fix it</p>
+        <p>Either self-host the Font Awesome files, or better, generate a subset containing only the specific icons actually used in the app, which removes both the blocking round-trip and most of the file size.</p>
+        <div class="claude-box">
+          <p class="block-label">Prompting Claude Code</p>
+          <p>"Font Awesome loads render-blocking from cdnjs in layout/index.tsx. Find which icons are actually used across the codebase, and propose either self-hosting a subset of just those icons or adding a preconnect hint if we keep the CDN." Pairs naturally with S8, since it's the same script tag being discussed from a different angle.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="issue" id="p9">
+      <div class="issue-head">
+        <h3>P9 — Scripts are loaded the plain HTML way instead of Next.js's optimized way</h3>
+        <span class="sev medium">Medium</span>
+        <span class="side frontend">Frontend</span>
+      </div>
+      <div class="issue-body">
+        <p class="file-list">File: <code>src/template/layout/index.tsx:118-130</code></p>
+        <p><strong>In plain words:</strong> Chart.js, its datalabels plugin, jQuery, and a couple of local scripts are all loaded using plain HTML <code class="inline">&lt;script&gt;</code> tags. Next.js has its own <code class="inline">next/script</code> component built specifically to load third-party scripts without them competing with your page's own critical rendering work. A Facebook Pixel script on the password-reset success page is another candidate for the same treatment.</p>
+        <p class="block-label fix">How to fix it</p>
+        <p>Switch these to <code class="inline">next/script</code> using <code class="inline">strategy="lazyOnload"</code> for anything non-critical. And since you already use Recharts elsewhere, Chart.js itself looks safe to delete outright rather than just optimize.</p>
+        <div class="claude-box">
+          <p class="block-label">Prompting Claude Code</p>
+          <p>"Convert the plain script tags in layout/index.tsx (Chart.js, chartjs-datalabels, jQuery, and the local scripts) to next/script with strategy=\"lazyOnload\" where appropriate. First confirm Chart.js has no real usage left now that Recharts is in place, and if so remove it entirely instead of just converting the tag." Natural continuation of the S8/S9 conversation about the same file.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="issue" id="p10">
+      <div class="issue-head">
+        <h3>P10 — A hardcoded one-second delay wires up a button click</h3>
+        <span class="sev medium">Medium</span>
+        <span class="side frontend">Frontend</span>
+      </div>
+      <div class="issue-body">
+        <p class="file-list">File: <code>src/template/layout/index.tsx:79</code></p>
+        <pre>const timerId = setTimeout(() => {
+  const button = document.getElementById("left-menu-toggle");
+  if (button) button.addEventListener("click", handleToggle);
+}, 1000);</pre>
+        <p><strong>In plain words:</strong> Instead of directly wiring a click handler to a button through React, the code waits a flat one second, then reaches into the raw DOM to find the button by its ID and attach a listener manually. This has two separate problems: on a slow device, the button might not even exist yet after one second, so the click handler silently never attaches. And on a fast device, there's a guaranteed one-second window where clicking that button does nothing at all, for no real reason.</p>
+        <p class="block-label fix">How to fix it</p>
+        <p>Use a normal React ref and an <code class="inline">onClick</code> prop directly on the button. This removes the <code class="inline">getElementById</code> call, the timeout, and the cleanup logic that goes with it, all at once.</p>
+        <div class="claude-box">
+          <p class="block-label">Prompting Claude Code</p>
+          <p>"layout/index.tsx wires up the left-menu-toggle button's click handler using a hardcoded 1-second setTimeout and getElementById instead of a React ref. Replace it with a ref and a direct onClick handler, and remove the associated cleanup code." Small, contained, good quick win.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="issue" id="p11">
+      <div class="issue-head">
+        <h3>P11 — The app may be pointed at the staging API, and several endpoints resolve to literally nothing</h3>
+        <span class="sev critical">Critical</span>
+        <span class="status-pill partial">Partially resolved</span>
+        <span class="side both">Both</span>
+      </div>
+      <div class="issue-body">
+        <p class="file-list">Files: <code>src/constants/BaseUrl.ts:4</code> · <code>src/core/services/api.service.ts:92</code> · <code>api.service.ts:8-9</code> · <code>error.service.ts:5</code></p>
+        <p><strong>What's changed since the audit:</strong> checking the file directly right now, <code class="inline">baseUrl</code> in <code class="inline">BaseUrl.ts</code> no longer has the staging URL hardcoded as a literal string — it now reads from <code class="inline">process.env.BASE_URL</code> instead. That's a real improvement over what the audit found. It's still worth confirming that whatever value <code class="inline">BASE_URL</code> is actually set to in your production deploy points at the real production API, not staging — the audit's original concern (production traffic silently hitting a staging host) can still exist if the environment variable itself is misconfigured, even though the code no longer forces it.</p>
+        <p><strong>In plain words, the part that's still there:</strong> Beyond the base URL, there's a second URL built like this:</p>
+        <pre>const apiEndpoint = `${process.env.apiDomainUrl}/${process.env.apiUrl}/${process.env.apiVersion}`</pre>
+        <p>None of <code class="inline">apiDomainUrl</code>, <code class="inline">apiUrl</code>, <code class="inline">apiVersion</code>, <code class="inline">version</code>, <code class="inline">apiType</code>, <code class="inline">resellerID</code>, or <code class="inline">udDomainUrl</code> are ever declared in <code class="inline">next.config.ts</code>'s env block. Every one of them evaluates to the string <code class="inline">"undefined"</code>, which means the built URL is literally <code class="inline">undefined/undefined/undefined/...</code>. This directly affects several real functions: <code class="inline">putApi</code>, <code class="inline">putApiCall</code>, <code class="inline">deleteApi</code>, <code class="inline">deleteBulkApi</code>, <code class="inline">getCryptoAddress</code>, and — importantly — the token refresh call discussed in <a href="#s7">S7</a>, which explains why that flow has likely never actually worked.</p>
+        <p class="block-label">Why it matters</p>
+        <p>A subdomain calling a different subdomain for its API (like <code class="inline">marketplace.</code> calling <code class="inline">apistage.</code>) is a cross-origin request, which requires the staging server to explicitly allow production's origin through CORS. If that's happening, it's worth confirming that configuration is intentional and not just permissive by accident.</p>
+        <p class="block-label fix">How to fix it</p>
+        <p>Establish one single, clearly named source of truth for API configuration — something like <code class="inline">NEXT_PUBLIC_API_URL</code>, set per environment — and remove every reference to the undeclared environment variables listed above.</p>
+        <div class="claude-box">
+          <p class="block-label">Prompting Claude Code</p>
+          <p>"api.service.ts and error.service.ts build an apiEndpoint from process.env.apiDomainUrl, apiUrl, and apiVersion, none of which are declared anywhere in next.config.ts — they all resolve to undefined. Find every usage of these undeclared env vars, and consolidate them into a single documented NEXT_PUBLIC_API_URL-style variable declared properly in next.config.ts. Also confirm what BASE_URL actually resolves to in each of our deploy environments, since that's what baseUrl in BaseUrl.ts now reads from." This is foundational — fix it before touching S7, since S7's refresh loop fix depends on this URL being real first.</p>
+        </div>
+        <p class="divider-note">Split: cleaning up the undeclared env vars and consolidating them into one variable is frontend work, entirely inside this repo. But confirming what value BASE_URL is actually set to in production, and whether the API's CORS configuration correctly and intentionally allows the marketplace subdomain's origin, is a backend/infra question — it depends on your deployment pipeline's environment configuration and the API server's CORS setup, neither of which lives in this codebase. Get that confirmation from whoever manages deploys and the backend before assuming the frontend fix alone resolves this.</p>
+      </div>
+    </article>
+  </section>
+
+  <section id="roadmap" class="group">
+    <div class="group-heading"><h2>Suggested order of attack</h2></div>
+    <p class="group-intro">Not every issue needs to happen in isolation, and severity alone isn't the right sequencing signal — a few things need to happen before others make sense. Here's the order that avoids rework.</p>
+
+    <div class="roadmap">
+      <div class="roadmap-step">
+        <div class="step-badge">1</div>
+        <div>
+          <h4>Rotate secrets outside of any coding session <span class="side both" style="vertical-align:middle;">Both</span></h4>
+          <p>Google OAuth secret (S1) and the hardcoded API key (S3), plus anything that was ever in the committed .env or .env-cmdrc (S2). This happens in Google Cloud Console and whatever service issued the API key — not in Claude Code. The frontend cleanup and the backend proxy work (for S3) follow after rotation, not before.</p>
+        </div>
+      </div>
+      <div class="roadmap-step">
+        <div class="step-badge">2</div>
+        <div>
+          <h4>Verify the two open unknowns <span class="side infra" style="vertical-align:middle;">Infra</span></h4>
+          <p>Confirm what BASE_URL actually resolves to in production (P11), and check whether the staging clone is publicly crawlable (E9). Both are quick manual checks, owned by whoever manages deployment and hosting, that tell you whether anything else is on fire.</p>
+        </div>
+      </div>
+      <div class="roadmap-step">
+        <div class="step-badge">3</div>
+        <div>
+          <h4>Fix the environment and API foundation <span class="side both" style="vertical-align:middle;">Both</span></h4>
+          <p>P11's undeclared env vars (frontend, plus a backend/infra check on CORS and the real env value), then S7's refresh-retry guard (frontend, but validate the response shape against what the backend's refresh endpoint actually returns) once the URL underneath it is real, then untrack .env-cmdrc and finish S2 (frontend).</p>
+        </div>
+      </div>
+      <div class="roadmap-step">
+        <div class="step-badge">4</div>
+        <div>
+          <h4>Fix the SSR loading gate <span class="side frontend" style="vertical-align:middle;">Frontend</span></h4>
+          <p>E1 is the single highest-leverage fix in the whole audit — it unblocks proper SEO for every page at once, and it's entirely a frontend change. Do this as its own focused session, then layer E2 (robots/sitemap, frontend), E4 (canonical/OG/schema, frontend with a possible small backend data need for Product schema), and E7 (per-page metadata, frontend) on top of a codebase that finally renders real HTML.</p>
+        </div>
+      </div>
+      <div class="roadmap-step">
+        <div class="step-badge">5</div>
+        <div>
+          <h4>Tighten cookies and route protection <span class="side both" style="vertical-align:middle;">Both, backend-led</span></h4>
+          <p>S4 (backend needs to set httpOnly cookies, frontend then simplifies), S5 (frontend rename), and S6 (frontend middleware) together — these all touch how a logged-in session is represented and protected. Loop in the backend owner before starting S4 specifically, since the durable fix isn't available from this repo alone.</p>
+        </div>
+      </div>
+      <div class="roadmap-step">
+        <div class="step-badge">6</div>
+        <div>
+          <h4>Clean up duplicate assets <span class="side frontend" style="vertical-align:middle;">Frontend</span></h4>
+          <p>P1, P2, P7 (duplicate CSS and JS), P3 and P4 (fonts, stray files, oversized SVGs) — mostly deletions, low risk, immediately visible in page weight, entirely contained in this repo.</p>
+        </div>
+      </div>
+      <div class="roadmap-step">
+        <div class="step-badge">7</div>
+        <div>
+          <h4>Everything else, roughly by convenience <span class="side frontend" style="vertical-align:middle;">Mostly frontend</span></h4>
+          <p>S8–S13, E3, E5, E6, E8, P5, P6, P8, P9, P10 are all frontend and don't block each other, so pick them up whenever it's convenient, grouped by which files they touch (the layout-file cluster of S8, S9, P8, P9 is a natural single session). E10 is a content/marketing conversation with whoever runs the main site's blog, not a code task at all.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="claude-workflow" class="group">
+    <div class="group-heading"><h2>A session-by-session plan, if it helps to have one</h2></div>
+    <p class="group-intro">If you'd rather work in discrete sittings instead of one long push, here's roughly how the above breaks down into standalone Claude Code sessions. Each one is scoped tightly enough that you can review the whole diff in one sitting.</p>
+    <div class="tbl-wrap">
+    <table class="data">
+      <thead><tr><th>Session</th><th>Covers</th><th>Who's involved</th><th>Why grouped together</th></tr></thead>
+      <tbody>
+        <tr><td class="num">1</td><td>P11 env cleanup + S7 refresh guard</td><td>Frontend, confirm with backend</td><td>Same root cause, strict dependency order</td></tr>
+        <tr><td class="num">2</td><td>E1 SSR loading gate</td><td>Frontend only</td><td>High-value, deserves undivided attention</td></tr>
+        <tr><td class="num">3</td><td>E2, E4, E7 metadata and sitemap</td><td>Frontend, minor backend data check for E4</td><td>All depend on E1 being fixed first</td></tr>
+        <tr><td class="num">4</td><td>S4, S5, S6 cookies and route guards</td><td>Backend-led (S4), frontend (S5, S6)</td><td>Same subsystem: session and auth</td></tr>
+        <tr><td class="num">5</td><td>P1, P2, P7 duplicate CSS/JS</td><td>Frontend only</td><td>Same file, same pattern, same fix shape</td></tr>
+        <tr><td class="num">6</td><td>P3, P4 fonts and oversized assets</td><td>Frontend only</td><td>Pure deletion and optimization, no logic risk</td></tr>
+        <tr><td class="num">7</td><td>S8, S9, P8, P9 the layout script cluster</td><td>Frontend only</td><td>All touch the same third-party script block</td></tr>
+        <tr><td class="num">8</td><td>P5 image conversion, page by page</td><td>Frontend only</td><td>Large surface area — ongoing, not one sitting</td></tr>
+        <tr><td class="num">9</td><td>P6 code splitting, wallet SDKs last</td><td>Frontend only</td><td>Sequenced from lowest to highest risk</td></tr>
+        <tr><td class="num">10</td><td>Remaining small items — S11, S12, S13, E3, E5, E6, E8, P10</td><td>Frontend only</td><td>Low risk, fit wherever there's spare time</td></tr>
+        <tr><td class="num">—</td><td>E9 staging exposure check, E10 apex cross-linking</td><td>Infra/DevOps and Content/Marketing</td><td>Not code tasks — hand off to the right owner directly</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+
+  <footer class="doc-footer">
+    Built from a full read-through of <em>endlessdomains-marketplace-audit.pdf</em> (34 findings, audited against main @ 9e581ad, 2026-07-31), cross-checked against the current state of the repository. No code was changed in producing this document.
+  </footer>
+
+</main>
+</div>
