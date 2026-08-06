@@ -1,0 +1,58 @@
+@import '@newstyles/_mixins.scss';
+
+.page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding-bottom: var(--space-13);
+  background: var(--color-white-primary);
+}
+
+.content {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-9);
+  width: 100%;
+  max-width: 1010px;
+  margin: var(--space-11) auto 0;
+  padding: 0 var(--container-padding-x);
+
+  @include tablet-down {
+    flex-direction: column;
+    padding: 0 var(--space-5);
+    gap: var(--space-9);
+    margin-top: var(--space-9);
+  }
+
+  @include tablet {
+    align-items: center;
+  }
+
+  @include mobile {
+    gap: var(--space-7);
+    margin-top: var(--space-7);
+  }
+
+  @include small-mobile {
+    padding: 0 var(--space-4);
+    gap: var(--space-6);
+    margin-top: var(--space-6);
+  }
+}
+
+.mainColumn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  flex: 1;
+  min-width: 0;
+
+  @include tablet-down {
+    gap: var(--space-9);
+  }
+
+  @include mobile {
+    gap: var(--space-7);
+  }
+}

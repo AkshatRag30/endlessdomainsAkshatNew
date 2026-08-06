@@ -1,0 +1,196 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Section shell ───────────────────────────────────────────────────────────────
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  width: 100%;
+  max-width: 665px;
+}
+
+.heading {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: 25px; // design-specific: Figma-exact section heading size
+  line-height: 1.2;
+  text-transform: capitalize;
+  // design-specific: Figma section-heading gradient sweep, no gradient token exists
+  background-image: linear-gradient(166deg, var(--color-blue-primary) 70%, var(--color-blue-primary-faded) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+
+  @include mobile {
+    font-size: var(--text-h3);
+  }
+}
+
+// ── Owner-view header controls ──────────────────────────────────────────────────
+
+.headingRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+
+  @include small-mobile {
+    flex-wrap: wrap;
+    row-gap: var(--space-3);
+  }
+}
+
+.createControl {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+}
+
+.createIconBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(180deg, var(--color-blue-primary) 0%, var(--color-blue-dark) 100%);
+  box-shadow:
+    0px 17px 32px 0px rgba(0, 42, 254, 0.25),
+    0px 5px 9px 0px rgba(0, 42, 254, 0.11),
+    inset 0px 1px 0px 0px rgba(255, 255, 255, 0.6);
+  color: var(--color-white-primary);
+  font-size: 24px;
+  cursor: pointer;
+
+  &:hover {
+    background: linear-gradient(180deg, var(--color-blue-dark) 0%, var(--color-blue-dark-hover) 100%);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.createLabelBtn {
+  padding: var(--space-3) var(--space-5);
+  border: 1px solid var(--color-blue-primary-alpha-13);
+  border-radius: var(--radius-sm);
+  background: var(--color-gray-light-bg);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  text-transform: capitalize;
+  color: var(--color-blue-primary);
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    background: var(--color-white-dark);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// ── Card list ──────────────────────────────────────────────────────────────────
+
+.list {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5) var(--space-5);
+  background: #fbfbfb; // design-specific: near-white card background, no token match
+
+  @include small-mobile {
+    padding: var(--space-4);
+  }
+}
+
+.divider {
+  height: 1px;
+  margin: var(--space-3) 0;
+  background: var(--color-border-black-subtle);
+}
+
+.cardTitle {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-regular);
+  font-size: 22px; // design-specific: Figma-exact card title size
+  color: #1c1a15; // design-specific: near-black warm text, no exact token
+}
+
+.cardDescription {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-nav);
+  line-height: 1.5;
+  color: var(--color-black-primary);
+}
+
+// ── Link pills ─────────────────────────────────────────────────────────────────
+
+.linkRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2-5);
+}
+
+.linkPill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 6px 11px; // design-specific: Figma-exact pill padding
+  border-radius: var(--radius-sm);
+  background: linear-gradient(180deg, #404040 0%, #1a1a1a 100%); // design-specific: dark pill sweep, no token match
+  box-shadow:
+    2.7px 2.7px 1.35px 0px rgba(0, 0, 0, 0.15),
+    inset 0px 0.9px 0.9px 0px rgba(255, 255, 255, 0.25);
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-nav);
+  color: var(--color-white-primary);
+  text-decoration: none;
+
+  &:hover {
+    background: linear-gradient(180deg, #4a4a4a 0%, #222222 100%); // design-specific: subtle hover lift
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// ── Show more ──────────────────────────────────────────────────────────────────
+
+.showMoreBtn {
+  align-self: center;
+  padding: var(--space-2) var(--space-6);
+  border: none;
+  background: linear-gradient(180deg, #404040 0%, #1a1a1a 100%); // design-specific: dark pill sweep, no token match
+  box-shadow:
+    2.7px 2.7px 1.35px 0px rgba(0, 0, 0, 0.15),
+    inset 0px 0.9px 0.9px 0px rgba(255, 255, 255, 0.25);
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-nav);
+  text-transform: capitalize;
+  color: var(--color-white-primary);
+  cursor: pointer;
+
+  &:hover {
+    background: linear-gradient(180deg, #4a4a4a 0%, #222222 100%); // design-specific: subtle hover lift
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}

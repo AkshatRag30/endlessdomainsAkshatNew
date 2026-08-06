@@ -1,0 +1,197 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Sidebar shell ───────────────────────────────────────────────────────────────
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  width: 100%;
+  max-width: 296px;
+  padding: var(--space-5) var(--space-4);
+  border: 1px solid var(--color-blue-primary-alpha-20);
+  background: var(--color-white-primary);
+  @include stripe-bg;
+
+  @include tablet-down {
+    max-width: 100%;
+  }
+
+  @include small-mobile {
+    padding: var(--space-4) var(--space-3);
+  }
+}
+
+.divider {
+  height: 1px;
+  background: var(--color-border-black-subtle);
+}
+
+// ── Skills block ───────────────────────────────────────────────────────────────
+
+.skillsBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.headingRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.editBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex-shrink: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  opacity: 0.7;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-15);
+  color: var(--color-black-primary);
+  cursor: pointer;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.heading {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: 25px; // design-specific: Figma-exact section heading size, matches other sections
+  line-height: 1.2;
+  text-transform: capitalize;
+  // design-specific: Figma section-heading gradient sweep, no gradient token exists
+  background-image: linear-gradient(148deg, var(--color-blue-primary) 70%, var(--color-blue-primary-faded) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+
+  @include mobile {
+    font-size: var(--text-h3);
+  }
+}
+
+.skillList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.skillPill {
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  background: linear-gradient(180deg, #404040 0%, #1a1a1a 100%); // design-specific: dark pill sweep, no token match
+  box-shadow:
+    3.9px 3.9px 2px 0px rgba(0, 0, 0, 0.15),
+    inset 0px 1.3px 1.3px 0px rgba(255, 255, 255, 0.25);
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-nav);
+  color: var(--color-white-primary);
+  white-space: nowrap;
+}
+
+.skillsNote {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-nav);
+  line-height: 1.5;
+  color: var(--color-blue-primary);
+}
+
+// ── Links block ────────────────────────────────────────────────────────────────
+
+.linksBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.linksHeading {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-body-small);
+  letter-spacing: 2.8px; // design-specific: Figma-exact wide tracking
+  color: var(--color-black-primary);
+}
+
+.linkList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.socialLink {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.platformIconBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 29px;
+  height: 29px;
+  border-radius: var(--radius-full);
+  background: #e8ebfe; // design-specific: light blue icon-badge background, no token match
+  font-size: 14px;
+}
+
+// design-specific: per-platform brand colors for the react-icons glyph
+.facebook  { color: #1877f2; }
+.twitter   { color: #000000; }
+.instagram { color: #e4405f; }
+.linkedin  { color: #0a66c2; }
+
+.linkText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.linkName {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-nav);
+  color: var(--color-black-primary);
+}
+
+.linkHandle {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  color: var(--color-gray-primary); // #7C7C7C ≈ #737373 Figma value, nearest token
+}
+
+.externalIcon {
+  flex-shrink: 0;
+  margin-left: auto;
+  font-size: 16px;
+  color: var(--color-black-primary);
+  opacity: 0.6;
+}
