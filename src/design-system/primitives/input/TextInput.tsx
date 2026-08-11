@@ -11,6 +11,8 @@ export interface TextInputProps {
   id?: string
   name?: string
   readOnly?: boolean
+  /** Set false for contexts (e.g. modal forms) whose Figma spec calls for a medium-weight label instead of bold */
+  boldLabel?: boolean
 }
 
 export const TextInput: React.FC<TextInputProps> = ({
@@ -23,10 +25,11 @@ export const TextInput: React.FC<TextInputProps> = ({
   id,
   name,
   readOnly,
+  boldLabel = true,
 }) => (
   <div className={styles.wrapper}>
     {label && (
-      <label className={styles.label} htmlFor={id}>
+      <label className={`${styles.label} ${boldLabel ? '' : styles.labelMedium}`} htmlFor={id}>
         {icon}
         {label}
       </label>

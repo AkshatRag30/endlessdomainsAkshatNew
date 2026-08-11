@@ -1,0 +1,84 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Header "Remove" action ────────────────────────────────────────────────────
+
+.removeBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex-shrink: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-nav);
+  color: var(--color-error);
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// ── Project preview card (mirrors ProjectsSection's card styling) ────────────
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+  max-width: 536px;
+  padding: var(--space-5);
+  background: #fbfbfb; // design-specific: matches ProjectsSection card background
+}
+
+.cardTitle {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-regular);
+  font-size: 22px; // design-specific: matches ProjectsSection card title size
+  color: #1c1a15; // design-specific: near-black warm text, no exact token
+}
+
+.cardDescription {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-nav);
+  line-height: 1.5;
+  color: var(--color-black-primary);
+}
+
+.linkRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2-5);
+}
+
+.linkPill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 6px 11px; // design-specific: matches ProjectsSection pill padding
+  border-radius: var(--radius-sm);
+  background: linear-gradient(180deg, #404040 0%, #1a1a1a 100%);
+  box-shadow:
+    2.7px 2.7px 1.35px 0px rgba(0, 0, 0, 0.15),
+    inset 0px 0.9px 0.9px 0px rgba(255, 255, 255, 0.25);
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-nav);
+  color: var(--color-white-primary);
+  text-decoration: none;
+
+  &:hover {
+    background: linear-gradient(180deg, #4a4a4a 0%, #222222 100%);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}

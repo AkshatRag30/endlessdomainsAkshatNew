@@ -1,13 +1,23 @@
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import Head from 'next/head'
 
 import { BuilderHero } from '@/design-system/composites/builder-profile/BuilderHero'
 import { ProjectsSection } from '@/design-system/composites/builder-profile/ProjectsSection'
 import { AchievementsSection } from '@/design-system/composites/builder-profile/AchievementsSection'
 import { BuilderSidebar } from '@/design-system/composites/builder-profile/BuilderSidebar'
+import {
+  EditProfileModal,
+  EditSocialLinksModal,
+  CreateProjectModal,
+  RemoveProjectModal,
+  type EditProfileFormValues,
+  type SocialLinksFormValues,
+  type CreateProjectFormValues,
+} from '@/design-system/composites/builder-profile/modals'
 import type {
   BuilderProfileHero,
   BuilderProject,
+  BuilderProjectLink,
   BuilderAchievement,
   BuilderSocialLink,
 } from '@/design-system/composites/builder-profile/types'
@@ -15,11 +25,12 @@ import styles from './builder-profile-owner.module.scss'
 
 // ── Placeholder data — replace with the signed-in user's live profile data once wired up ──
 
-const HERO: BuilderProfileHero = {
+const INITIAL_HERO: BuilderProfileHero = {
   avatarSrc: '/builder-profile/avatar-placeholder.png',
   avatarAlt: "Erin Vetrovs's avatar",
   eyebrow: "Builder's Profile",
   name: 'Erin Vetrovs',
+  primaryDomain: 'Erin Vetrovs.og',
   tier: 'gold',
   tierLabel: 'Gold',
   tierIconSrc: '/builder-profile/tier-badge-gold.svg',
@@ -33,7 +44,7 @@ const HERO: BuilderProfileHero = {
   profileUrl: 'endless.domains/endlessid/yogesh.og',
 }
 
-const PROJECTS: BuilderProject[] = [
+const INITIAL_PROJECTS: BuilderProject[] = [
   {
     id: 'vault-router-1',
     title: 'Vault Router',
@@ -61,7 +72,7 @@ const ACHIEVEMENTS: BuilderAchievement[] = [
   { id: 'ach-4', title: 'Contract Deployed', subtitle: 'StakingPool.sol', badgeLabel: 'Base · verified' },
 ]
 
-const SKILLS = ['Solidity', 'Frontend', 'DeFi', 'Security', 'Rust', 'NFTs']
+const INITIAL_SKILLS = ['Solidity', 'Frontend', 'DeFi', 'Security', 'Rust', 'NFTs']
 
 const SOCIAL_LINKS: BuilderSocialLink[] = [
   { id: 'facebook', platform: 'facebook', displayName: 'debielily', handle: 'debielily', href: 'https://facebook.com' },
@@ -70,13 +81,74 @@ const SOCIAL_LINKS: BuilderSocialLink[] = [
   { id: 'linkedin', platform: 'linkedin', displayName: 'debielily', handle: 'debielily', href: 'https://linkedin.com' },
 ]
 
+function buildProjectLinks(githubUrl: string, websiteUrl: string): BuilderProjectLink[] {
+  const links: BuilderProjectLink[] = []
+  if (githubUrl.trim()) links.push({ label: 'Repo', href: `http://${githubUrl.trim()}`, icon: 'repo' })
+  if (websiteUrl.trim()) links.push({ label: 'live', href: `http://${websiteUrl.trim()}`, icon: 'live' })
+  return links
+}
+
 export default function BuilderProfileOwnerPage() {
+  const [heroProfile, setHeroProfile] = useState({
+    name: INITIAL_HERO.name,
+    bio: INITIAL_HERO.bio,
+    avatarSrc: INITIAL_HERO.avatarSrc,
+  })
+  const [skills, setSkills] = useState(INITIAL_SKILLS)
+  const [projects, setProjects] = useState(INITIAL_PROJECTS)
+  const [socialLinksValues, setSocialLinksValues] = useState<SocialLinksFormValues | undefined>(undefined)
+
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
+  const [isSocialModalOpen, setIsSocialModalOpen] = useState(false)
+  const [isCreateProjectModalOpen, setIsCreateProjectModalOpen] = useState(false)
+  const [removingProjectId, setRemovingProjectId] = useState<string | null>(null)
+
+  const hero: BuilderProfileHero = { ...INITIAL_HERO, ...heroProfile }
+  const removingProject = projects.find(project => project.id === removingProjectId) ?? null
+
   const handleEditUrl = useCallback(() => {
     // TODO: open the profile-URL edit modal once it's built
   }, [])
 
-  const handleCreateProject = useCallback(() => {
-    // TODO: open the create-project modal once it's built
+  const handleEditName = useCallback(() => setIsProfileModalOpen(true), [])
+  const handleCloseProfileModal = useCallback(() => setIsProfileModalOpen(false), [])
+
+  const handleSaveProfile = useCallback((values: EditProfileFormValues) => {
+    setHeroProfile(prev => ({
+      name: values.username.trim() || prev.name,
+      bio: values.bio.trim() || prev.bio,
+      avatarSrc: values.avatarFile ? URL.createObjectURL(values.avatarFile) : prev.avatarSrc,
+    }))
+    setSkills(values.skills)
+  }, [])
+
+  const handleEditLinks = useCallback(() => setIsSocialModalOpen(true), [])
+  const handleCloseSocialModal = useCallback(() => setIsSocialModalOpen(false), [])
+
+  const handleSaveSocialLinks = useCallback((values: SocialLinksFormValues) => {
+    setSocialLinksValues(values)
+  }, [])
+
+  const handleCreateProject = useCallback(() => setIsCreateProjectModalOpen(true), [])
+  const handleCloseCreateProjectModal = useCallback(() => setIsCreateProjectModalOpen(false), [])
+
+  const handleCreateProjectSubmit = useCallback((values: CreateProjectFormValues) => {
+    setProjects(prev => [
+      ...prev,
+      {
+        id: `project-${prev.length}-${values.title.trim().toLowerCase().replace(/\s+/g, '-')}`,
+        title: values.title.trim(),
+        description: values.description.trim(),
+        links: buildProjectLinks(values.githubUrl, values.websiteUrl),
+      },
+    ])
+  }, [])
+
+  const handleOpenRemoveProjectModal = useCallback((projectId: string) => setRemovingProjectId(projectId), [])
+  const handleCloseRemoveProjectModal = useCallback(() => setRemovingProjectId(null), [])
+
+  const handleConfirmRemoveProject = useCallback((projectId: string) => {
+    setProjects(prev => prev.filter(project => project.id !== projectId))
   }, [])
 
   const handleShowMoreProjects = useCallback(() => {
@@ -87,14 +159,6 @@ export default function BuilderProfileOwnerPage() {
     // TODO: wire up pagination once the achievements API is connected
   }, [])
 
-  const handleEditSkills = useCallback(() => {
-    // TODO: open the skills editor once it's built
-  }, [])
-
-  const handleEditLinks = useCallback(() => {
-    // TODO: open the links editor once it's built
-  }, [])
-
   return (
     <>
       <Head>
@@ -102,14 +166,15 @@ export default function BuilderProfileOwnerPage() {
         <meta name="description" content="Manage your builder profile — edit your projects, achievements, and skills." />
       </Head>
       <main className={styles.page}>
-        <BuilderHero data={HERO} editable onEditUrl={handleEditUrl} />
+        <BuilderHero data={hero} editable onEditUrl={handleEditUrl} onEditName={handleEditName} />
         <div className={styles.content}>
           <div className={styles.mainColumn}>
             <ProjectsSection
-              projects={PROJECTS}
+              projects={projects}
               onShowMore={handleShowMoreProjects}
               editable
               onCreateProject={handleCreateProject}
+              onRemoveProject={handleOpenRemoveProjectModal}
             />
             <AchievementsSection
               achievements={ACHIEVEMENTS}
@@ -118,15 +183,42 @@ export default function BuilderProfileOwnerPage() {
             />
           </div>
           <BuilderSidebar
-            skills={SKILLS}
+            skills={skills}
             skillsNote="Chosen from a curated set — keeps profiles filterable."
             socialLinks={SOCIAL_LINKS}
             editable
-            onEditSkills={handleEditSkills}
             onEditLinks={handleEditLinks}
           />
         </div>
       </main>
+
+      {isProfileModalOpen && (
+        <EditProfileModal
+          initialValues={{ username: hero.name, bio: hero.bio, skills, published: true }}
+          onClose={handleCloseProfileModal}
+          onSave={handleSaveProfile}
+        />
+      )}
+
+      {isSocialModalOpen && (
+        <EditSocialLinksModal
+          initialValues={socialLinksValues}
+          onClose={handleCloseSocialModal}
+          onSave={handleSaveSocialLinks}
+        />
+      )}
+
+      {isCreateProjectModalOpen && (
+        <CreateProjectModal onClose={handleCloseCreateProjectModal} onCreate={handleCreateProjectSubmit} />
+      )}
+
+      {removingProject && (
+        <RemoveProjectModal
+          project={removingProject}
+          onClose={handleCloseRemoveProjectModal}
+          onConfirmRemove={handleConfirmRemoveProject}
+        />
+      )}
     </>
   )
 }

@@ -15,6 +15,8 @@ export interface BuilderProfileHero {
   avatarAlt: string
   eyebrow: string
   name: string
+  /** Primary .og domain — shown as a small identity line below the name */
+  primaryDomain: string
   tier: BuilderTier
   tierLabel: string
   tierIconSrc: string

@@ -1,5 +1,7 @@
 import Link from 'next/link'
-import { FiGithub, FiRadio, FiPlus } from 'react-icons/fi'
+import { useCallback } from 'react'
+import type { MouseEvent } from 'react'
+import { FiGithub, FiRadio, FiPlus, FiTrash2 } from 'react-icons/fi'
 import type { IconType } from 'react-icons'
 
 import type { BuilderProject } from '../types'
@@ -14,9 +16,10 @@ interface ProjectsSectionProps {
   projects: BuilderProject[]
   onShowMore?: () => void
   showMoreVisible?: boolean
-  /** Owner view — shows the "Create project" control in the section header */
+  /** Owner view — shows the "Create project" control in the section header and a remove icon per card */
   editable?: boolean
   onCreateProject?: () => void
+  onRemoveProject?: (projectId: string) => void
 }
 
 export default function ProjectsSection({
@@ -25,7 +28,16 @@ export default function ProjectsSection({
   showMoreVisible = true,
   editable = false,
   onCreateProject,
+  onRemoveProject,
 }: ProjectsSectionProps) {
+  const handleRemoveClick = useCallback(
+    (e: MouseEvent<HTMLButtonElement>) => {
+      const projectId = e.currentTarget.dataset.projectId
+      if (projectId) onRemoveProject?.(projectId)
+    },
+    [onRemoveProject],
+  )
+
   return (
     <section className={styles.section} aria-labelledby="builder-projects-heading">
       <div className={styles.headingRow}>
@@ -47,7 +59,20 @@ export default function ProjectsSection({
       <div className={styles.list}>
         {projects.map((project, i) => (
           <div key={project.id} className={styles.card}>
-            <h3 className={styles.cardTitle}>{project.title}</h3>
+            <div className={styles.cardHeader}>
+              <h3 className={styles.cardTitle}>{project.title}</h3>
+              {editable && (
+                <button
+                  type="button"
+                  className={styles.deleteBtn}
+                  data-project-id={project.id}
+                  onClick={handleRemoveClick}
+                  aria-label={`Remove ${project.title}`}
+                >
+                  <FiTrash2 aria-hidden="true" />
+                </button>
+              )}
+            </div>
             <p className={styles.cardDescription}>{project.description}</p>
             {project.links.length > 0 && (
               <div className={styles.linkRow}>

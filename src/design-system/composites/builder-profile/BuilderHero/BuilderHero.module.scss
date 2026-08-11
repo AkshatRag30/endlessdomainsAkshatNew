@@ -116,6 +116,12 @@
   color: var(--color-blue-primary);
 }
 
+.nameGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
 .nameRow {
   display: flex;
   flex-wrap: wrap;
@@ -128,6 +134,37 @@
 
   @include small-mobile {
     justify-content: center;
+  }
+}
+
+.primaryDomain {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-small-15);
+  color: var(--color-blue-primary);
+}
+
+.editNameBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex-shrink: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  opacity: 0.7;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-15);
+  color: var(--color-black-primary);
+  cursor: pointer;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
   }
 }
 
@@ -156,6 +193,7 @@
 .tierPill {
   display: inline-flex;
   align-items: center;
+  align-self: flex-start;
   gap: var(--space-1-5);
   padding: 6px 13px; // design-specific: Figma-exact pill padding
   border-radius: 4px; // design-specific: Figma-exact 3.576px, no token this small
@@ -167,6 +205,14 @@
   letter-spacing: 0.5px; // design-specific
   text-transform: uppercase;
   color: #9a7b1f; // design-specific: gold-brown label, no token match
+
+  @include tablet {
+    align-self: center;
+  }
+
+  @include small-mobile {
+    align-self: center;
+  }
 }
 
 .tierIcon {

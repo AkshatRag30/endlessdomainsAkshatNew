@@ -10,10 +10,11 @@ interface BuilderHeroProps {
   /** Owner view — swaps the "Copy link" action for an "Edit url" action */
   editable?: boolean
   onEditUrl?: () => void
+  onEditName?: () => void
 }
 
-export default function BuilderHero({ data, editable = false, onEditUrl }: BuilderHeroProps) {
-  const { avatarSrc, avatarAlt, eyebrow, name, tierLabel, tierIconSrc, bio, stats, disclaimer, profileUrl } = data
+export default function BuilderHero({ data, editable = false, onEditUrl, onEditName }: BuilderHeroProps) {
+  const { avatarSrc, avatarAlt, eyebrow, name, primaryDomain, tierLabel, tierIconSrc, bio, stats, disclaimer, profileUrl } = data
   const [copied, setCopied] = useState(false)
   const copyTimeoutRef = useRef<ReturnType<typeof setTimeout>>()
 
@@ -45,8 +46,17 @@ export default function BuilderHero({ data, editable = false, onEditUrl }: Build
           <div className={styles.info}>
             <p className={styles.eyebrow}>{eyebrow}</p>
 
-            <div className={styles.nameRow}>
-              <h1 className={styles.name}>{name}</h1>
+            <div className={styles.nameGroup}>
+              <div className={styles.nameRow}>
+                <h1 className={styles.name}>{name}</h1>
+                {editable && (
+                  <button type="button" className={styles.editNameBtn} onClick={onEditName}>
+                    <FiEdit2 aria-hidden="true" />
+                    <span>Edit</span>
+                  </button>
+                )}
+              </div>
+              <p className={styles.primaryDomain}>{primaryDomain}</p>
               <div className={styles.tierPill}>
                 <Image src={tierIconSrc} alt="" width={20} height={20} className={styles.tierIcon} aria-hidden="true" />
                 <span>{tierLabel}</span>

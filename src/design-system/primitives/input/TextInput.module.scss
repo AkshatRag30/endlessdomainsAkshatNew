@@ -19,6 +19,10 @@
   text-transform: capitalize;
 }
 
+.labelMedium {
+  font-weight: var(--font-weight-medium); // Figma: Satoshi Medium 14px — used by modal form contexts
+}
+
 .input {
   width: 100%;
   height: var(--space-8); // 40px — Figma exact

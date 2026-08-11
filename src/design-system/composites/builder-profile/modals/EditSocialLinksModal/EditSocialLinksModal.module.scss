@@ -1,0 +1,7 @@
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  width: 100%;
+  max-width: 536px; // design-specific: Figma-exact field column width
+}

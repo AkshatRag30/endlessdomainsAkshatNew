@@ -17,9 +17,8 @@ interface BuilderSidebarProps {
   skills: string[]
   skillsNote: string
   socialLinks: BuilderSocialLink[]
-  /** Owner view — shows an "Edit" control next to the Skills and Links headings */
+  /** Owner view — shows an "Edit" control next to the Links heading */
   editable?: boolean
-  onEditSkills?: () => void
   onEditLinks?: () => void
 }
 
@@ -28,7 +27,6 @@ export default function BuilderSidebar({
   skillsNote,
   socialLinks,
   editable = false,
-  onEditSkills,
   onEditLinks,
 }: BuilderSidebarProps) {
   return (
@@ -36,12 +34,6 @@ export default function BuilderSidebar({
       <div className={styles.skillsBlock}>
         <div className={styles.headingRow}>
           <h2 className={styles.heading}>Skills</h2>
-          {editable && (
-            <button type="button" className={styles.editBtn} onClick={onEditSkills}>
-              <FiEdit2 aria-hidden="true" />
-              <span>Edit</span>
-            </button>
-          )}
         </div>
         <ul className={styles.skillList}>
           {skills.map(skill => (
