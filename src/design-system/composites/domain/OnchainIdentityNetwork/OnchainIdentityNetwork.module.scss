@@ -1,0 +1,440 @@
+@import '_mixins.scss';
+
+.section {
+  position: relative;
+  height: 550vh;
+  background: var(--color-white-primary);
+}
+
+.sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: var(--space-9) var(--space-3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-6);
+
+  @include tablet-up {
+    padding: var(--space-9) var(--space-6);
+  }
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
+
+.header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  text-align: center;
+  max-width: 1100px;
+}
+
+.eyebrowWrap {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-2);
+}
+
+.eyebrowBracketL,
+.eyebrowBracketR {
+  width: 9px;
+  height: 16px;
+  border: 1px solid var(--color-gray-darker);
+}
+
+.eyebrowBracketL {
+  border-right: 0;
+}
+
+.eyebrowBracketR {
+  border-left: 0;
+}
+
+.eyebrowText {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-small-13);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-gray-darker);
+}
+
+.heading {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  // 55px matches --text-h2 exactly
+  font-size: var(--text-h2);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-h1);
+  text-transform: capitalize;
+}
+
+.headingLine1 {
+  display: block;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+}
+
+.headingLine2 {
+  display: block;
+  font-weight: var(--font-weight-regular);
+  background: linear-gradient(132deg, var(--color-blue-primary) 80%, var(--color-blue-primary-alpha-30) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.description {
+  margin: 0;
+  max-width: 920px;
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-normal);
+  line-height: var(--leading-body);
+  color: var(--color-text-body);
+}
+
+// ── Network canvas ────────────────────────────────────────────────────────────
+
+// aspect-ratio is shorter than the SVG's own 1000×600 viewBox on purpose — the actual
+// node/path content only spans the middle ~40% of that viewBox vertically, so a 1:1 box
+// left a large empty band above and below it. preserveAspectRatio="none" on the <svg>
+// means it stretches to fill whatever height this box actually is, so shrinking it here
+// pulls the header and the visible diagram together without touching any coordinates.
+.network {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1150px;
+  aspect-ratio: 1000 / 430;
+  // Floors the canvas's real height regardless of width — the row text blocks are fixed
+  // real pixels, not percentage-scaled, so a canvas squeezed too short by the aspect
+  // ratio at narrow widths was letting one row's text run into the next.
+  min-height: 380px;
+  flex-shrink: 0;
+
+  @include mobile {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+    gap: var(--space-6) var(--space-3);
+    aspect-ratio: auto;
+    max-width: 420px;
+  }
+}
+
+.connections {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+
+  @include mobile {
+    display: none;
+  }
+}
+
+// No CSS filter here on purpose — drop-shadow is expensive to repaint, and with the
+// stroke-dashoffset changing on every scroll frame across 6+ paths simultaneously it
+// was the main cause of the scroll lag. The white glow layer already gives the soft
+// look without needing a per-frame filter recompute.
+.connectionPath {
+  opacity: 0;
+  stroke-dashoffset: 2000; // design-specific: safe pre-JS default, overwritten by the measured path length once GSAP mounts
+  will-change: opacity;
+}
+
+// The dotted centerline layer — its dasharray is the fixed "2 2" decorative pattern
+// (set in JSX), not the reveal-length one, so only opacity is scroll-driven here.
+.connectionDash {
+  opacity: 0;
+  will-change: opacity;
+}
+
+// ── Central identity core ─────────────────────────────────────────────────────
+
+.core {
+  position: absolute;
+  left: 50%;
+  top: 50%; // matches the middle row's yPercent in OnchainIdentityNetwork.tsx
+  transform: translate(-50%, -50%);
+  width: 400px;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+
+  @include tablet-up {
+    width: 580px;
+    height: 580px;
+  }
+
+  @include mobile {
+    position: static;
+    transform: none;
+    grid-column: 1 / -1;
+    margin: 0 auto var(--space-4);
+  }
+}
+
+// No frame, ring, or glow shape around it — just the mark itself. Rotation, scale, and
+// position are fully GSAP-owned (see OnchainIdentityNetworkAnimation.ts) since GSAP
+// replaces the whole transform once it touches any transform property on an element.
+.coreMark {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform, opacity;
+}
+
+// Fixed px (not core-relative) and matched exactly in OwnershipComparison's .coreLogo,
+// so the mark is the same physical size on both sides of the handoff between the two
+// sections rather than jumping in size right at the transition.
+.coreLogo {
+  width: 380px;
+  height: 380px;
+  object-fit: contain;
+
+  @include tablet-up {
+    width: 560px;
+    height: 560px;
+  }
+}
+
+// A laptop screen often has noticeably less vertical viewport height than an external
+// monitor even at the same or greater width, so the stage content (header + core +
+// network) can end up taller than 100vh there. Since .stage centers that content and
+// .sticky clips overflow, the topmost element — the eyebrow label — is what gets pushed
+// off-screen first. This targets viewport HEIGHT directly, which is the axis that was
+// actually overflowing; width-based breakpoints alone couldn't fix this. Placed last so
+// it wins over the width-based rules above at any width/short-height combination.
+@media (max-height: 820px) {
+  .stage {
+    gap: var(--space-3);
+    padding-top: var(--space-5);
+    padding-bottom: var(--space-5);
+  }
+
+  .header {
+    gap: var(--space-2);
+  }
+
+  .core {
+    width: 500px;
+    height: 500px;
+  }
+
+  .coreLogo {
+    width: 460px;
+    height: 460px;
+  }
+}
+
+// A real MacBook browser viewport (after the address bar and tab strip) commonly lands
+// well under 820px tall — the block above alone still leaves the header plus the network
+// diagram taller than that remaining space, which is what was clipping the bottom row
+// against .sticky's overflow: hidden. This tier shrinks the heading and the network's own
+// height too, on top of the rules above, so the whole diagram actually fits.
+@media (max-height: 760px) {
+  .heading {
+    font-size: var(--text-h3);
+  }
+
+  .description {
+    font-size: var(--text-small-15);
+  }
+
+  .network {
+    min-height: 300px;
+  }
+
+  .core {
+    width: 380px;
+    height: 380px;
+  }
+
+  .coreLogo {
+    width: 340px;
+    height: 340px;
+  }
+}
+
+// ── Identity nodes ────────────────────────────────────────────────────────────
+
+.node {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+
+  @include mobile {
+    position: static;
+    transform: none;
+    text-align: center;
+    gap: var(--space-2);
+  }
+}
+
+// order (not flex-direction: row-reverse) swaps the visual sequence — this keeps the
+// flex-direction and cross-axis (align-items) computation completely identical between
+// the two sides, which row-reverse was apparently not doing: the hex was centering
+// against a different vertical reference than the text on the left, throwing it visibly
+// off from the text block's true center.
+.node[data-side='left'] {
+  text-align: right;
+}
+
+.node[data-side='left'] .nodeHex {
+  order: 2;
+}
+
+.node[data-side='left'] .nodeText {
+  order: 1;
+}
+
+// Matches [data-side='left']'s attribute-selector specificity so this mobile override
+// wins by source order alone — no !important needed. Also resets the order set above —
+// at mobile both sides already share one uniform column-reverse stack (hex below text),
+// so the left-only order swap needs to be neutralized or it would fight column-reverse
+// and put left's hex above its text while right's stays below.
+@include mobile {
+  .node[data-side='left'],
+  .node[data-side='right'] {
+    flex-direction: column-reverse;
+    text-align: center;
+  }
+
+  .node[data-side='left'] .nodeHex,
+  .node[data-side='left'] .nodeText {
+    order: 0;
+  }
+}
+
+.nodeHex {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center; // explicit, not just inherited from .node's align-items — see .nodeText below
+  width: 50px;
+  height: 50px;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  color: var(--color-blue-primary);
+  background: var(--color-white-primary);
+  box-shadow:
+    0 10px 26px var(--color-blue-primary-alpha-18),
+    0 0 0 1px var(--color-blue-primary-alpha-13),
+    inset 0 1px 3px 1px var(--color-white-alpha-70);
+}
+
+.nodeHexGlow {
+  position: absolute;
+  inset: -30%;
+  border-radius: var(--radius-full);
+  background: radial-gradient(circle, var(--color-blue-primary-alpha-13) 0%, var(--color-purple-glow-0) 75%);
+  animation: node-breathe 4.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes node-breathe {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.75;
+  }
+}
+
+// Explicit flex column + justify-content: center (rather than leaning on the parent
+// .node's align-items: center alone) so the title+desc block centers on its own real
+// content height the same way on both sides, instead of depending on how the browser
+// happens to size a plain block child within the row's cross axis.
+.nodeText {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 190px;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.nodeTitle {
+  margin: 0 0 var(--space-1);
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-body);
+  color: var(--color-blue-primary);
+}
+
+.nodeDesc {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-small-15);
+  line-height: var(--leading-body);
+  color: var(--color-text-light);
+}
+
+// ── Bottom status readout ─────────────────────────────────────────────────────
+
+.statusReadout {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-ibm-plex-mono);
+  font-size: var(--text-small-10);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-gray-darkest);
+}
+
+.statusDot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-gray-medium);
+
+  &[data-live] {
+    background: var(--color-blue-primary);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nodeHexGlow {
+    animation: none;
+    opacity: 0.5;
+  }
+}
