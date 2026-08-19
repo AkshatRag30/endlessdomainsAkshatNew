@@ -104,7 +104,7 @@ export function createProgressController(gsap: typeof GsapType, { sectionEl, ref
     if (reducedMotion) {
       gsap.set(refs.coreMark, { opacity: 1, scale: 1, rotation: 0, y: 0 })
       refs.nodes.forEach((el, i) => {
-        gsap.set(el, { opacity: 1, scale: 1, y: 0 })
+        gsap.set(el, { opacity: 1, scale: 1, xPercent: -50, yPercent: -50, y: 0 })
         gsap.set(refs.nodeTexts[i], { opacity: 1, y: 0 })
         gsap.set(refs.paths[i], { opacity: 1, strokeDashoffset: 0 })
         gsap.set(refs.glowPaths[i], { opacity: 1, strokeDashoffset: 0 })
@@ -122,7 +122,15 @@ export function createProgressController(gsap: typeof GsapType, { sectionEl, ref
         // and the dotted centerline (fixed "2 2" pattern, so only opacity follows here).
         gsap.set(refs.glowPaths[i], { opacity: state.pathOpacity, strokeDashoffset: state.pathDashOffset })
         gsap.set(refs.dashPaths[i], { opacity: state.pathOpacity })
-        gsap.set(refs.nodes[i], { opacity: state.nodeOpacity, scale: state.nodeScale, y: state.nodeY })
+        // xPercent/yPercent (not plain CSS translate) is how the -50%/-50% centering
+        // anchor from .node's own CSS transform has to be expressed to GSAP — once GSAP
+        // owns the transform, a plain `y` in px REPLACES the CSS translateY instead of
+        // adding to it, since GSAP never learns about the missing -50% otherwise. That
+        // silently turned every node's anchor from its center into its top edge once
+        // nodeY settled at 0, dropping each node by half of its OWN rendered height —
+        // which differs left vs right whenever their description text wraps to a
+        // different line count, producing a visible vertical mismatch within a row.
+        gsap.set(refs.nodes[i], { opacity: state.nodeOpacity, scale: state.nodeScale, xPercent: -50, yPercent: -50, y: state.nodeY })
         gsap.set(refs.nodeTexts[i], { opacity: state.textOpacity, y: state.textY })
       })
     }

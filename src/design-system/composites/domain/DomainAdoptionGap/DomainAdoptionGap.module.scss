@@ -1,0 +1,474 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Section shell ─────────────────────────────────────────────────────────────
+
+.section {
+  position: relative;
+  width: 100%;
+  background: var(--color-white-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-11); // 64px ≈ Figma's ~61-74px inter-block rhythow, nearest token
+  padding: var(--space-13) var(--container-padding-x);
+
+  @include tablet-down { padding: var(--space-9) var(--space-7); gap: var(--space-9); }
+  @include mobile { padding: var(--space-7) var(--space-5); gap: var(--space-7); }
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4); // 16px ≈ 15px Figma value, nearest token
+  text-align: center;
+  max-width: var(--container-max-width);
+}
+
+.eyebrowWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 20px;
+  margin-bottom: var(--space-5); // 20px ≈ 19px Figma value, nearest token
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.section[data-active] .eyebrowWrap {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+%adoption-bracket-corner {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-style: solid;
+  border-color: var(--color-blue-primary-alpha-30);
+  pointer-events: none;
+}
+
+.eyebrowBracketTL { @extend %adoption-bracket-corner; top: 0; left: 0; border-width: 2px 0 0 2px; }
+.eyebrowBracketTR { @extend %adoption-bracket-corner; top: 0; right: 0; border-width: 2px 2px 0 0; }
+.eyebrowBracketBL { @extend %adoption-bracket-corner; bottom: 0; left: 0; border-width: 0 0 2px 2px; }
+.eyebrowBracketBR { @extend %adoption-bracket-corner; bottom: 0; right: 0; border-width: 0 2px 2px 0; }
+
+.eyebrowText {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-body-small);
+  color: var(--color-gray-darkest); // #6e6e6e ≈ #4a4a4a Figma value, nearest token
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.heading {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.5s ease 0.08s, transform 0.5s ease 0.08s;
+}
+
+.section[data-active] .heading {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.headingLine1,
+.headingLine2 {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2); // 55px, matches Figma value exactly
+  line-height: 1.2;
+  letter-spacing: -0.024em; // -1.356px at 55px, Figma-exact tracking
+  text-transform: capitalize;
+
+  @include tablet-down { font-size: 40px; }
+  @include mobile { font-size: 30px; }
+}
+
+.headingLine1 {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  // design-specific: Figma-exact soft drop shadow on the headline glyphs
+  text-shadow: 0 1px 1.3px var(--color-black-alpha-25);
+}
+
+.headingLine2 {
+  font-weight: var(--font-weight-regular);
+  background: linear-gradient(143deg, var(--color-blue-primary) 70%, var(--color-blue-primary-faded) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.description {
+  margin: 0;
+  max-width: 780px; // design-specific: Figma-exact paragraph measure (776px)
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-body); // 22px, matches Figma value exactly
+  line-height: 1.3;
+  color: var(--color-black-alpha-60); // rgba(0,0,0,0.6), matches Figma value exactly
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.5s ease 0.16s, transform 0.5s ease 0.16s;
+
+  @include tablet-down { font-size: var(--text-body-small); max-width: 600px; }
+  @include mobile { font-size: var(--text-small-15); max-width: 100%; }
+}
+
+.section[data-active] .description {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+// ── Visualization ─────────────────────────────────────────────────────────────
+
+.visualization {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5); // 20px ≈ 19px Figma value, nearest token
+  width: 100%;
+  max-width: 1381px; // design-specific: Figma-exact visualization measure
+}
+
+.barLabels {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-h3); // 30px, matches Figma value exactly
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.5s ease 0.24s, transform 0.5s ease 0.24s;
+
+  @include tablet-down { font-size: 22px; }
+  @include mobile { font-size: var(--text-body-small); flex-wrap: wrap; gap: var(--space-2); }
+}
+
+.section[data-active] .barLabels {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.labelIdentity {
+  position: relative;
+  display: inline-block;
+  color: var(--color-blue-primary);
+  opacity: 0.45;
+  transition: opacity 0.5s ease;
+
+  // Phase 5 — a thin line draws in underneath, then a brief glow sweeps through it once.
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -6px;
+    height: 1.5px;
+    width: 0;
+    background: var(--color-blue-primary-alpha-30);
+    transition: width 0.55s ease;
+  }
+
+  &[data-reveal] {
+    opacity: 1;
+
+    &::after {
+      width: 100%;
+      background: linear-gradient(90deg, var(--color-blue-primary-alpha-30) 0%, var(--color-blue-primary) 50%, var(--color-blue-primary-alpha-30) 100%);
+      background-size: 250% 100%;
+      animation: adoption-label-glow 1.1s ease 0.55s 1;
+    }
+  }
+}
+
+@keyframes adoption-label-glow {
+  from { background-position: 120% 0; }
+  to { background-position: -20% 0; }
+}
+
+.labelTotal {
+  color: var(--color-black-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+// ── The bar ───────────────────────────────────────────────────────────────────
+
+.barTrack {
+  position: relative;
+  width: 100%;
+  height: 66px;
+  border-radius: var(--radius-lg); // 16px ≈ 17px Figma value, nearest token
+  background: rgba(217, 217, 217, 0.5); // design-specific: Figma-exact gray fill, no token match
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.5s ease 0.3s, transform 0.5s ease 0.3s;
+
+  @include mobile { height: 44px; }
+}
+
+.section[data-active] .barTrack {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+// Extremely subtle ambient life in the untapped-market region (phase 8) — a slow
+// background sweep plus a couple of faint ambient address markers. A single background-
+// position animation on a fixed gradient, not a per-frame JS loop, so it stays cheap.
+.barGrayAmbient {
+  position: absolute;
+  inset: 0;
+  left: 20%;
+  background-image: repeating-linear-gradient(90deg, transparent 0px, transparent 34px, var(--color-black-alpha-03) 34px, var(--color-black-alpha-03) 35px);
+  background-size: 200% 100%;
+  animation: adoption-gray-scan 22s linear infinite;
+  transition: filter 0.3s ease;
+
+  @include mobile { display: none; }
+}
+
+.barGrayAmbient[data-pulse] {
+  filter: brightness(1.06);
+}
+
+@keyframes adoption-gray-scan {
+  from { background-position: 0 0; }
+  to { background-position: -400px 0; }
+}
+
+// The identity-adoption segment. Rendered at its final ~20% width already; the "grow"
+// motion is a one-time scaleX(0 → 1) on mount, which is transform-only (no layout
+// thrash) rather than animating width. The repeating tick pattern is a background-image
+// on the same element, so as it scales in, more ticks simply become visible left→right —
+// that reads as "segments activating in sequence" for free, with zero extra DOM nodes.
+.barFill {
+  position: absolute;
+  inset: 0;
+  width: 20%;
+  min-width: 60px;
+  border-radius: var(--radius-lg); // 16px ≈ 17px Figma value, nearest token
+  background-image:
+    repeating-linear-gradient(90deg, var(--color-white-alpha-30) 0px, var(--color-white-alpha-30) 1.5px, transparent 1.5px, transparent 13px),
+    linear-gradient(180deg, var(--color-blue-primary) 0%, rgba(38, 57, 237, 0.47) 100%); // design-specific: Figma-exact fill, no alpha-47 token
+  box-shadow:
+    0 19.6px 49.9px rgba(87, 177, 255, 0.34),
+    0 11.5px 15px rgba(87, 177, 255, 0.19),
+    0 4.8px 6.2px rgba(87, 177, 255, 0.22),
+    0 1.7px 2.3px rgba(87, 177, 255, 0.15),
+    0 0 0 2.3px var(--color-white-primary);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 1.1s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.barFill[data-built] {
+  transform: scaleX(1);
+}
+
+.barFillInner {
+  position: absolute;
+  inset: 0;
+}
+
+// Phase 10 — the boundary between adoption and the gap briefly activates once the fill
+// settles, then returns to its normal quiet appearance.
+.barBoundary {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  right: 0;
+  width: 3px;
+  border-radius: var(--radius-full);
+  background: var(--color-white-primary);
+  box-shadow: 0 0 0 1px var(--color-blue-primary-alpha-30);
+  transition: box-shadow 0.25s ease, filter 0.25s ease;
+}
+
+.barBoundary[data-pulse] {
+  box-shadow: 0 0 14px 2px var(--color-blue-primary-alpha-50);
+  filter: brightness(1.2);
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+// ── Wallet-address markers (phases 6-8) ──────────────────────────────────────
+
+.marker {
+  position: absolute;
+  pointer-events: none;
+  max-width: 140px;
+
+  @include mobile { display: none; }
+}
+
+.markerText {
+  display: inline-block;
+  font-family: var(--font-ibm-plex-mono);
+  font-size: var(--text-small-10);
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(2px);
+  transition: opacity 0.4s ease, transform 0.4s ease, color 0.3s ease;
+}
+
+.marker[data-variant='ambient'] .markerText {
+  color: var(--color-gray-dark);
+}
+
+.marker[data-variant='transform'] .markerText {
+  color: var(--color-white-alpha-90);
+  font-weight: var(--font-weight-medium);
+}
+
+.markerText[data-visible] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.marker[data-variant='transform'] .markerText[data-resolved] {
+  color: var(--color-white-primary);
+  // brief "resolving" flicker instead of a plain crossfade — quick, stepped, not a
+  // continuous glitch loop
+  animation: adoption-resolve-flicker 0.4s steps(4, end) 1;
+}
+
+@keyframes adoption-resolve-flicker {
+  0%, 100% { opacity: 1; }
+  25% { opacity: 0.55; }
+  50% { opacity: 0.9; }
+  75% { opacity: 0.65; }
+}
+
+// ── Large statistic ───────────────────────────────────────────────────────────
+
+.statistic {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6); // 24px ≈ 26px Figma value, nearest token
+  width: 100%;
+  max-width: 1381px; // design-specific: Figma-exact measure
+}
+
+.statisticRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-9);
+  width: 100%;
+
+  @include tablet-down { flex-direction: column; align-items: flex-start; gap: var(--space-4); }
+}
+
+.statValue {
+  flex-shrink: 0;
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-medium);
+  // design-specific: Figma-exact hero metric size — no h1/h2/h3 token comes close
+  font-size: 90px;
+  line-height: 1.2;
+  text-transform: lowercase;
+  font-variant-numeric: tabular-nums;
+  background: linear-gradient(128deg, var(--color-blue-primary) 5%, var(--color-blue-primary-faded) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+
+  @include tablet-down { font-size: 60px; }
+  @include mobile { font-size: 44px; }
+}
+
+.statDesc {
+  margin: 0;
+  max-width: 645px; // design-specific: Figma-exact measure
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-body); // 22px, matches Figma value exactly
+  line-height: 1.3;
+  color: var(--color-black-alpha-60); // rgba(0,0,0,0.6), matches Figma value exactly
+
+  @include tablet-down { font-size: var(--text-body-small); }
+}
+
+.sourceNote {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.sourceIcon {
+  flex-shrink: 0;
+  width: 15px;
+  height: 15px;
+  color: var(--color-black-alpha-60); // ≈ rgba(0,0,0,0.78) Figma value, nearest available alpha
+}
+
+.sourceText {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-nav); // 14px, matches Figma value exactly
+  text-transform: capitalize;
+  text-align: center;
+  color: var(--color-black-alpha-60); // ≈ rgba(0,0,0,0.78) Figma value, nearest available alpha
+
+  @include mobile { font-size: var(--text-small-13); }
+}
+
+// ── Reduced motion ────────────────────────────────────────────────────────────
+
+@media (prefers-reduced-motion: reduce) {
+  .eyebrowWrap,
+  .heading,
+  .description,
+  .barLabels,
+  .barTrack {
+    transition: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .barFill {
+    transition: none;
+  }
+
+  .barGrayAmbient {
+    animation: none;
+  }
+
+  .labelIdentity::after {
+    transition: none;
+  }
+
+  .labelIdentity[data-reveal]::after {
+    animation: none;
+  }
+
+  .markerText,
+  .marker[data-variant='transform'] .markerText[data-resolved] {
+    transition: none;
+    animation: none;
+  }
+}

@@ -1,0 +1,606 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Section shell / header ──────────────────────────────────────────────────────
+
+.section {
+  position: relative;
+  width: 100%;
+  background: var(--color-white-primary);
+  padding: var(--space-13) var(--container-padding-x);
+  overflow: hidden;
+
+  @include tablet-down { padding: var(--space-9) var(--space-7); }
+  @include mobile { padding: var(--space-7) var(--space-5); }
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4); // 16px ≈ 15px Figma value, nearest token
+  text-align: center;
+  max-width: var(--container-max-width);
+  margin: 0 auto var(--space-11);
+}
+
+.eyebrowWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 20px;
+}
+
+%living-bracket-corner {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-style: solid;
+  border-color: var(--color-blue-primary-alpha-30);
+  pointer-events: none;
+}
+
+.eyebrowBracketTL { @extend %living-bracket-corner; top: 0; left: 0; border-width: 2px 0 0 2px; }
+.eyebrowBracketTR { @extend %living-bracket-corner; top: 0; right: 0; border-width: 2px 2px 0 0; }
+.eyebrowBracketBL { @extend %living-bracket-corner; bottom: 0; left: 0; border-width: 0 0 2px 2px; }
+.eyebrowBracketBR { @extend %living-bracket-corner; bottom: 0; right: 0; border-width: 0 2px 2px 0; }
+
+.eyebrowText {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-body-small); // 17px, matches Figma value exactly
+  color: var(--color-gray-darkest); // #6e6e6e ≈ #4a4a4a Figma value, nearest token
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.heading {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.headingLine1,
+.headingLine2 {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2); // 55px, matches Figma value exactly
+  line-height: 1.2;
+  letter-spacing: -0.024em; // -1.356px at 55px, Figma-exact tracking
+  text-transform: capitalize;
+
+  @include tablet-down { font-size: 40px; }
+  @include mobile { font-size: 30px; }
+}
+
+.headingLine1 {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+}
+
+.headingLine2 {
+  font-weight: var(--font-weight-regular);
+  background: linear-gradient(137deg, var(--color-blue-primary) 75%, var(--color-blue-primary-faded) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.description {
+  margin: 0;
+  max-width: 854px; // design-specific: Figma-exact measure
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-body); // 22px, matches Figma value exactly
+  line-height: 1.3;
+  color: var(--color-black-alpha-60); // rgba(0,0,0,0.6), matches Figma value exactly
+
+  @include tablet-down { font-size: var(--text-body-small); }
+}
+
+// ── The system row ───────────────────────────────────────────────────────────
+
+.system {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-9);
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+
+  @include tablet-down {
+    flex-direction: column;
+    gap: var(--space-7);
+  }
+}
+
+// ── Left: identity network ───────────────────────────────────────────────────
+
+.network {
+  position: relative;
+  width: 340px;
+  height: 340px;
+  flex-shrink: 0;
+
+  @include tablet-down { width: 280px; height: 280px; }
+  @include mobile { width: 240px; height: 240px; }
+}
+
+.networkHalo {
+  position: absolute;
+  inset: -20%;
+  border-radius: var(--radius-full);
+  background: radial-gradient(circle, var(--color-blue-primary-alpha-13) 0%, var(--color-purple-glow-0) 70%);
+  pointer-events: none;
+}
+
+.networkRing {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-blue-primary-alpha-13);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+
+  &[data-ring='outer'] { width: 100%; height: 100%; }
+  &[data-ring='mid'] { width: 78%; height: 78%; }
+  &[data-ring='inner'] { width: 52%; height: 52%; opacity: 0.6; }
+}
+
+// Each orbit slot swings a few degrees around its own fixed base angle rather than
+// rotating a full circle — that oscillation, not rotation, is what keeps this from
+// reading as a loading spinner (requirement: "DO NOT MAKE IT LOOK LIKE A LOADING
+// SPINNER"). Every node gets its own duration (from --sway-duration), so they drift out
+// of phase with each other instead of moving as one mechanical unit.
+.orbitSlot {
+  position: absolute;
+  inset: 0;
+  // Static fallback — the keyframes below override this while the animation runs, but
+  // if the animation is ever disabled (prefers-reduced-motion), this is what's left, and
+  // it must still place the node at its correct angle rather than collapsing to identity.
+  transform: rotate(var(--base-angle));
+  animation: orbit-sway var(--sway-duration, 16s) ease-in-out infinite;
+}
+
+@keyframes orbit-sway {
+  0%, 100% { transform: rotate(calc(var(--base-angle) - 4deg)); }
+  50% { transform: rotate(calc(var(--base-angle) + 4deg)); }
+}
+
+// The arm places the node at its radius, then independently breathes that radius in and
+// out a few px (requirement: "subtly change their distance from the center") — a second,
+// differently-timed motion layered on top of the slot's own sway.
+//
+// This is a pure translate, deliberately with no rotate() of its own. An earlier version
+// used `rotate(90deg) translateX(-radius)` here, but that rotation pivots around the
+// arm's OWN transform-origin — the arm's own box center, offset from the true ring
+// center by roughly half the node's size — not around the ring's actual center. Once the
+// parent .orbitSlot's rotation swept that mispositioned pivot around, each node traced a
+// slightly skewed, off-axis loop instead of a clean arc, which is what read as the ring
+// visibly "moving the wrong way" instead of orbiting cleanly. Plain translate has no
+// pivot of its own, so the only rotation happening is .orbitSlot's, around the one
+// correct center — which is what actually produces a clean circular sweep.
+.orbitArm {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  --radius: 140px; // half the .network box minus roughly half a node — kept in sync with .network's own responsive sizing below
+  // Static fallback — see the note on .orbitSlot above; same reasoning applies here.
+  transform: translate(-50%, calc(-50% - var(--radius)));
+  animation: orbit-breathe var(--breathe-duration, 10s) ease-in-out infinite;
+
+  @include tablet-down { --radius: 113px; }
+  @include mobile { --radius: 95px; }
+}
+
+@keyframes orbit-breathe {
+  0%, 100% { transform: translate(-50%, calc(-50% - var(--radius))); }
+  50% { transform: translate(-50%, calc(-50% - var(--radius) - 6px)); }
+}
+
+.orbitNode {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 62px;
+  height: 62px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(180deg, #6d6e72 0%, var(--color-blue-primary-faded) 100%); // design-specific: Figma-exact node fill
+  box-shadow:
+    0 8px 20px var(--color-blue-primary-alpha-25),
+    0 0 0 3px var(--color-white-alpha-30),
+    0 0 0 5px var(--color-white-primary),
+    inset 0 1px 8px 1px var(--color-white-alpha-70);
+  color: var(--color-white-primary);
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: 15px;
+
+  @include tablet-down { width: 50px; height: 50px; font-size: 13px; }
+  @include mobile { width: 42px; height: 42px; font-size: 11px; }
+}
+
+.orbitNodeFlash {
+  position: absolute;
+  inset: -6px;
+  border-radius: var(--radius-full);
+  border: 1.5px solid var(--color-blue-primary-alpha-50);
+  animation: orbit-node-flash 0.9s ease-out 1;
+  pointer-events: none;
+}
+
+@keyframes orbit-node-flash {
+  0% { opacity: 0; transform: scale(0.85); }
+  35% { opacity: 1; transform: scale(1.08); }
+  100% { opacity: 0; transform: scale(1.35); }
+}
+
+.identityCore {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 108px;
+  height: 108px;
+  border-radius: var(--radius-full);
+  background: var(--color-blue-primary);
+  box-shadow: 0 0 0 2px var(--color-blue-primary-alpha-18), 0 10px 30px var(--color-blue-primary-alpha-25);
+  animation: identity-core-breathe 6s ease-in-out infinite;
+
+  @include tablet-down { width: 88px; height: 88px; }
+  @include mobile { width: 76px; height: 76px; }
+}
+
+@keyframes identity-core-breathe {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.02); }
+}
+
+.identityCoreCaption {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px;
+  text-align: center;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-13);
+  color: var(--color-blue-primary-alpha-18);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.identityCoreGlow {
+  position: absolute;
+  inset: -30%;
+  border-radius: var(--radius-full);
+  background: radial-gradient(circle, var(--color-blue-primary-alpha-25) 0%, var(--color-purple-glow-0) 70%);
+  pointer-events: none;
+}
+
+.identityCoreIcon {
+  position: relative;
+  z-index: 1;
+  color: var(--color-white-primary);
+  font-size: 34px;
+}
+
+// ── Middle: connector + core bridge ──────────────────────────────────────────
+
+.bridge {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex: 1;
+  min-width: 120px;
+  max-width: 220px;
+
+  @include tablet-down {
+    flex-direction: column;
+    max-width: none;
+    height: 160px;
+  }
+}
+
+.connector {
+  position: relative;
+  flex: 1;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, var(--color-blue-primary-alpha-30) 50%, transparent 100%);
+
+  @include tablet-down {
+    flex: 1;
+    width: 2px;
+    height: auto;
+    background: linear-gradient(180deg, transparent 0%, var(--color-blue-primary-alpha-30) 50%, transparent 100%);
+  }
+}
+
+.connectorPulseAmbient,
+.connectorPulseEvent {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-blue-primary);
+  box-shadow: 0 0 8px 2px var(--color-blue-primary-alpha-50);
+  transform: translate(0, -50%);
+
+  @include tablet-down {
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, 0);
+  }
+}
+
+.connectorPulseAmbient {
+  animation: connector-travel-x 3.2s ease-in-out infinite;
+
+  @include tablet-down { animation: connector-travel-y 3.2s ease-in-out infinite; }
+}
+
+.connectorPulseEvent {
+  animation: connector-travel-x 0.9s cubic-bezier(0.4, 0, 0.2, 1) 1;
+
+  @include tablet-down { animation: connector-travel-y 0.9s cubic-bezier(0.4, 0, 0.2, 1) 1; }
+}
+
+@keyframes connector-travel-x {
+  0% { left: 0; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { left: 100%; opacity: 0; }
+}
+
+@keyframes connector-travel-y {
+  0% { top: 0; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+.core {
+  position: relative;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 76px;
+  height: 76px;
+  border-radius: var(--radius-xl);
+  background: linear-gradient(180deg, var(--color-blue-primary) 0%, rgba(38, 57, 237, 0.47) 100%);
+  box-shadow:
+    0 16px 40px var(--color-blue-primary-alpha-25),
+    0 0 0 3px var(--color-white-alpha-30),
+    0 0 0 5px var(--color-white-primary),
+    inset 0 1px 8px 1px var(--color-white-alpha-70);
+  animation: core-float 7s ease-in-out infinite;
+}
+
+@keyframes core-float {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-4px) rotate(1deg); }
+}
+
+.coreIcon {
+  position: relative;
+  z-index: 1;
+  color: var(--color-white-primary);
+  font-size: 30px;
+}
+
+.coreGlowFlash {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 0 0 var(--color-blue-primary-alpha-50);
+  animation: core-glow-flash 1.1s ease-out 1;
+  pointer-events: none;
+}
+
+@keyframes core-glow-flash {
+  0% { box-shadow: 0 0 0 0 var(--color-blue-primary-alpha-50); }
+  30% { box-shadow: 0 0 22px 6px var(--color-blue-primary-alpha-50); }
+  100% { box-shadow: 0 0 0 0 var(--color-blue-primary-alpha-50); }
+}
+
+// ── Right: living identity activity panel ────────────────────────────────────
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 480px;
+  flex-shrink: 0;
+
+  @include tablet-down { width: 100%; max-width: 480px; }
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.panelHeaderIcon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(180deg, var(--color-blue-primary) 0%, rgba(38, 57, 237, 0.47) 100%);
+  box-shadow: 0 8px 20px var(--color-blue-primary-alpha-25), 0 0 0 2px var(--color-white-primary);
+  color: var(--color-white-primary);
+  font-size: 18px;
+}
+
+.panelHeaderText {
+  flex: 1;
+  min-width: 0;
+}
+
+.panelTitle {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-normal); // 20px ≈ 15.9px Figma value at this element's own scale
+  color: var(--color-blue-primary);
+}
+
+.panelSubtitle {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  color: var(--color-black-alpha-60);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.liveBadge {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  background: var(--color-white-primary);
+  box-shadow: 0 1px 3px var(--color-black-alpha-12);
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-small-12);
+  color: rgba(0, 183, 55, 0.7); // design-specific: Figma-exact status green, no token match
+  white-space: nowrap;
+
+  @include mobile { display: none; }
+}
+
+.liveDot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: #27ff00; // design-specific: Figma-exact status green, no token match
+  animation: live-dot-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes live-dot-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+.activityList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-2xl);
+  background: linear-gradient(180deg, var(--color-white-primary) 0%, var(--color-white-alpha-90) 100%);
+  box-shadow: 0 1px 3px var(--color-blue-primary-alpha-13);
+}
+
+.activityRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: transparent;
+  opacity: 0.62;
+  transition: opacity 0.6s ease, background-color 0.6s ease;
+
+  &[data-active] {
+    opacity: 1;
+    background-color: var(--color-blue-primary-alpha-07);
+  }
+}
+
+.activityIcon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(180deg, var(--color-blue-primary) 0%, rgba(38, 57, 237, 0.47) 100%);
+  box-shadow: 0 6px 14px var(--color-blue-primary-alpha-25);
+  color: var(--color-white-primary);
+  font-size: 15px;
+  transition: box-shadow 0.6s ease;
+}
+
+.activityRow[data-active] .activityIcon {
+  box-shadow: 0 0 0 3px var(--color-blue-primary-alpha-18), 0 6px 14px var(--color-blue-primary-alpha-25);
+}
+
+.activityText {
+  flex: 1;
+  min-width: 0;
+}
+
+.activityTitle {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-small-13); // 14px active / 12.5px inactive in Figma — kept uniform for a cleaner transition
+  color: var(--color-black-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.activityDesc {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-10);
+  color: var(--color-black-alpha-60);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.activityValue {
+  flex-shrink: 0;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-small-13);
+  color: var(--color-black-alpha-60);
+}
+
+// ── Reduced motion ────────────────────────────────────────────────────────────
+
+@media (prefers-reduced-motion: reduce) {
+  .orbitSlot,
+  .orbitArm,
+  .identityCore,
+  .core,
+  .connectorPulseAmbient,
+  .connectorPulseEvent,
+  .liveDot,
+  .orbitNodeFlash,
+  .coreGlowFlash {
+    animation: none;
+  }
+
+  .connectorPulseAmbient,
+  .connectorPulseEvent {
+    opacity: 0;
+  }
+
+  .activityRow {
+    transition: none;
+  }
+}

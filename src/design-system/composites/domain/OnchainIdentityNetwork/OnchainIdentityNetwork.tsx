@@ -101,18 +101,23 @@ const NODES: IdentityNode[] = [
   },
 ]
 
-// The top/bottom connector shape is reverse-engineered from the exported topconnector.svg
-// / bottomconnector.svg: each is M(core) → L(diagonal launch) → C(bend that arrives dead
-// flat) → L(horizontal run to the hex). These fractions are that exact curve's proportions
-// (measured off its own path data). Everything here runs on REAL, MEASURED pixel
+// The top/bottom connector shape is parsed directly off the raw path commands in the
+// exported topconnector.svg / bottomconnector.svg (both files agree to 5+ significant
+// figures once normalized, confirming one shared shape mirrored per side/row):
+// M(core) → L(diagonal launch) → C(bend that arrives dead flat) → L(horizontal run to
+// the hex). Each fraction below is (measured point − core) / (bend − core or launch),
+// taken straight from those files' own coordinates — e.g. topconnector.svg's left curve
+// is M296,107 L238.541,48.2446 C228.382,37.8559 214.464,32 199.934,32 H-85, which is
+// exactly core=(296,107), launch=(238.541,48.2446), control1=(228.382,37.8559),
+// bend=(199.934,32), hex=(-85,32). Everything here still runs on REAL, MEASURED pixel
 // coordinates — core and hex centers read straight from the DOM via getBoundingClientRect
 // — instead of assumed positions in an abstract coordinate system, so there is no unit
 // mismatch left to produce a gap: the path always starts and ends exactly where the core
 // and hex actually are, at any screen size.
-const LAUNCH_FRACTION = { x: 0.598, y: 0.7834 }
-const CURVE_C1_FRACTION = { x: 0.263, y: 0.6396 }
-const CURVE_C2_FRACTION_X = 0.6237
-const BEND_X_FRACTION = 0.72 // how far across the real core→hex distance the curve straightens out
+const LAUNCH_FRACTION = { x: 0.5981, y: 0.7834 }
+const CURVE_C1_FRACTION = { x: 0.2631, y: 0.6395 }
+const CURVE_C2_FRACTION_X = 0.6236
+const BEND_X_FRACTION = 0.2521 // how far across the real core→hex distance the curve straightens out
 
 interface CurveGeometry {
   launch: Point
@@ -159,6 +164,9 @@ export function OnchainIdentityNetwork() {
   const [activePhase, setActivePhase] = useState(-1)
   const [canvas, setCanvas] = useState({ width: 1000, height: 430 })
   const [paths, setPaths] = useState<string[]>(() => NODES.map(() => ''))
+  const [gradientEndpoints, setGradientEndpoints] = useState<{ core: Point; hex: Point }[]>(() =>
+    NODES.map(() => ({ core: { x: 0, y: 0 }, hex: { x: 0, y: 0 } })),
+  )
 
   // Measures the real, rendered positions of the core and every hex icon and rebuilds
   // every path from those exact points — see the comment above buildCurveGeometry.
@@ -185,6 +193,7 @@ export function OnchainIdentityNetwork() {
       }
 
       const nextPaths: string[] = NODES.map(() => '')
+      const nextGradientEndpoints = NODES.map(() => ({ core, hex: core }))
       const rows: IdentityNode['row'][] = ['top', 'mid', 'bottom']
 
       rows.forEach(row => {
@@ -193,6 +202,9 @@ export function OnchainIdentityNetwork() {
         const leftHex = hexCenter(leftIndex)
         const rightHex = hexCenter(rightIndex)
         if (!leftHex || !rightHex) return
+
+        nextGradientEndpoints[leftIndex] = { core, hex: leftHex }
+        nextGradientEndpoints[rightIndex] = { core, hex: rightHex }
 
         if (row === 'mid') {
           nextPaths[leftIndex] = `M ${core.x} ${core.y} L ${leftHex.x} ${leftHex.y}`
@@ -211,6 +223,7 @@ export function OnchainIdentityNetwork() {
 
       setCanvas({ width: containerRect.width, height: containerRect.height })
       setPaths(nextPaths)
+      setGradientEndpoints(nextGradientEndpoints)
     }
 
     recompute()
@@ -305,12 +318,32 @@ export function OnchainIdentityNetwork() {
           <div className={styles.network} ref={networkRef}>
             <svg className={styles.connections} viewBox={`0 0 ${canvas.width} ${canvas.height}`} aria-hidden="true">
               <defs>
-                {/* Matches topconnector.svg / bottomconnector.svg's own gradient stops exactly */}
-                <linearGradient id="identityPathGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="var(--color-blue-primary-alpha-70)" />
-                  <stop offset="30.9%" stopColor="var(--color-blue-primary-alpha-25)" />
-                  <stop offset="100%" stopColor="var(--color-purple-glow-0)" />
-                </linearGradient>
+                {/* One gradient per node, anchored to that node's own real core/hex points in
+                    userSpaceOnUse coordinates — matches topconnector.svg / bottomconnector.svg,
+                    which likewise define a separate gradient per side. A single shared gradient
+                    in the default objectBoundingBox space flips direction depending on whether
+                    a path's core sits at the left or right edge of its own bounding box, which is
+                    exactly why the left side used to read as faded near the core while the right
+                    side (whose bbox happens to put core at the low-x edge) looked correct: the
+                    opaque stop was landing on the hex end instead of the core end on the left. */}
+                {NODES.map((node, i) => {
+                  const { core, hex } = gradientEndpoints[i]
+                  return (
+                    <linearGradient
+                      key={node.id}
+                      id={`identityPathGradient-${node.id}`}
+                      gradientUnits="userSpaceOnUse"
+                      x1={core.x}
+                      y1={core.y}
+                      x2={hex.x}
+                      y2={hex.y}
+                    >
+                      <stop offset="0%" stopColor="var(--color-blue-primary-alpha-70)" />
+                      <stop offset="30.9%" stopColor="var(--color-blue-primary-alpha-25)" />
+                      <stop offset="100%" stopColor="var(--color-purple-glow-0)" />
+                    </linearGradient>
+                  )
+                })}
               </defs>
               {NODES.map((node, i) => (
                 <g key={node.id}>
@@ -320,7 +353,7 @@ export function OnchainIdentityNetwork() {
                     }}
                     d={paths[i]}
                     fill="none"
-                    stroke="url(#identityPathGradient)"
+                    stroke={`url(#identityPathGradient-${node.id})`}
                     strokeWidth={9}
                     strokeLinecap="round"
                     className={styles.connectionPath}
