@@ -1,0 +1,409 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Section shell ─────────────────────────────────────────────────────────────
+
+.section {
+  position: relative;
+  width: 100%;
+  background: var(--color-white-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-9);
+  padding: var(--space-13) var(--container-padding-x);
+
+  @include tablet-down { padding: var(--space-9) var(--space-7); gap: var(--space-7); }
+  @include mobile { padding: var(--space-7) var(--space-5); gap: var(--space-6); }
+}
+
+// design-specific: the white background must span full viewport width (hence
+// no max-width on .section itself) — only the content inside is capped, same
+// pattern used by the other domain sections either side of this one
+.header,
+.frame {
+  width: 100%;
+  max-width: var(--container-max-width);
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-13); // ≈255px Figma gap, nearest token
+  width: 100%;
+
+  @include tablet-down { flex-direction: column; gap: var(--space-5); }
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 600px;
+}
+
+.eyebrowWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 20px;
+}
+
+%journey-bracket-corner {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-style: solid;
+  border-color: var(--color-blue-primary-alpha-30);
+  pointer-events: none;
+}
+
+.eyebrowBracketTL { @extend %journey-bracket-corner; top: 0; left: 0; border-width: 2px 0 0 2px; }
+.eyebrowBracketTR { @extend %journey-bracket-corner; top: 0; right: 0; border-width: 2px 2px 0 0; }
+.eyebrowBracketBL { @extend %journey-bracket-corner; bottom: 0; left: 0; border-width: 0 0 2px 2px; }
+.eyebrowBracketBR { @extend %journey-bracket-corner; bottom: 0; right: 0; border-width: 0 2px 2px 0; }
+
+.eyebrowText {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-body-small); // 17px, matches Figma value exactly
+  color: var(--color-faq-bracket); // #4a4a4a, matches Figma value exactly
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.heading {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2); // 55px, matches Figma value exactly
+  line-height: 1.2;
+  letter-spacing: -0.024em; // -1.356px at 55px, Figma-exact tracking
+  text-transform: capitalize;
+
+  @include tablet-down { font-size: 40px; }
+  @include mobile { font-size: 30px; }
+}
+
+.headingPlain {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+}
+
+.headingAccent {
+  font-weight: var(--font-weight-regular);
+  background: linear-gradient(125deg, var(--color-blue-primary) 80%, var(--color-blue-primary-faded) 96%); // ≈124.9deg Figma value, rounded
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.headerDescription {
+  margin: 0;
+  max-width: 545px; // matches Figma value exactly
+  padding-top: var(--space-1);
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-body); // 22px, matches Figma value exactly
+  line-height: 1.3;
+  color: var(--color-black-alpha-60); // rgba(0,0,0,0.6), matches Figma value exactly
+
+  @include tablet-down { max-width: 100%; padding-top: 0; }
+  @include mobile { font-size: var(--text-body-small); }
+}
+
+// ── Journey tabs ──────────────────────────────────────────────────────────────
+
+.tabBar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2); // ≈7px Figma gap, nearest token
+  width: 100%;
+  max-width: 886px; // matches Figma value exactly
+  padding: var(--space-1);
+  background: var(--color-gray-light-bg); // #f8f8f8 ≈ #faf8f8 Figma value, nearest token
+  border: 0.5px solid var(--color-black-alpha-12); // rgba(0,0,0,0.11) ≈ 0.12 Figma value, nearest token
+  border-radius: var(--radius-xl); // 18px, matches Figma value exactly
+
+  @include mobile {
+    overflow-x: auto;
+    justify-content: flex-start;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar { display: none; }
+  }
+}
+
+.tab {
+  flex: 1;
+  min-width: 150px;
+  height: 49px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-lg); // 14px ≈ 16px Figma value, nearest token
+  background: transparent;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-body-small); // 17px, matches Figma value exactly
+  color: var(--color-black-alpha-60); // rgba(0,0,0,0.63) ≈ 0.6 Figma value, nearest token
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.35s ease, color 0.35s ease, box-shadow 0.35s ease;
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  @include mobile { flex: none; padding: 0 var(--space-5); }
+}
+
+.tabActive {
+  background: linear-gradient(145deg, var(--color-black-primary) 0%, var(--color-surface-card-dark) 100%); // ≈ Figma's dark radial gradient
+  color: var(--color-white-primary);
+  font-weight: var(--font-weight-bold);
+  // design-specific: Figma-exact drop shadow + glass-edge inset highlights, no matching tokens
+  box-shadow:
+    2px 2px 3.5px 0 rgba(0, 0, 0, 0.4),
+    0 0 0 0.5px var(--color-black-primary),
+    inset 0.5px 0.7px 0.4px 0 var(--color-white-alpha-55),
+    inset -0.5px -0.5px 0.2px 0 var(--color-black-alpha-60);
+}
+
+// ── Journey frame ─────────────────────────────────────────────────────────────
+
+.frame {
+  position: relative;
+  width: 100%;
+  border-radius: var(--radius-2xl);
+
+  @include tablet-down {
+    border: 1px solid var(--color-blue-primary-alpha-20);
+  }
+}
+
+.frameBg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  @include tablet-down { display: none; }
+}
+
+.frameBgImg {
+  // no object-fit override — the SVG's own preserveAspectRatio="none" export
+  // expects to stretch independently on both axes to fill whatever height
+  // the actual content settles at, exactly like the source frame in Figma
+}
+
+.frameContent {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-14); // ≈162px Figma gap, nearest token
+  padding: var(--space-13) var(--space-9);
+
+  @include tablet-down {
+    flex-direction: column;
+    gap: var(--space-7);
+    padding: var(--space-9) var(--space-5);
+  }
+}
+
+// ── Left content — stays fixed across every screen in a journey ─────────────
+
+.leftContent {
+  flex-shrink: 0;
+  width: 242px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition: opacity 0.32s ease, transform 0.32s ease;
+
+  &[data-phase='exit'] {
+    opacity: 0;
+    transform: translateY(-14px) scale(0.98);
+    transition-duration: 0.22s;
+  }
+
+  &[data-phase='enter-start'] {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+    transition: none;
+  }
+
+  @include tablet-down {
+    width: 100%;
+    align-items: center;
+    text-align: center;
+  }
+}
+
+.leftTitle {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-h3); // 30px ≈ 35px Figma value, nearest token
+  line-height: 1.2;
+  color: var(--color-black-primary);
+}
+
+.leftTitleLine {
+  display: block;
+}
+
+.leftDescription {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-body); // 22px, matches Figma value exactly
+  color: var(--color-gray-dark); // #6B7280 ≈ rgba(33,37,41,0.7) Figma value, nearest token
+}
+
+// ── Right content — screen number, image, title, description ────────────────
+
+.screenVisual {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-14); // ≈162px Figma gap, nearest token
+  min-width: 0;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+
+  &[data-phase='exit'] {
+    opacity: 0;
+    transform: translateY(-16px) scale(0.97);
+    transition-duration: 0.24s;
+  }
+
+  &[data-phase='enter-start'] {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+    transition: none;
+  }
+
+  @include tablet-down {
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+}
+
+.screenImageWrap {
+  flex-shrink: 0;
+  width: 420px;
+  max-width: 100%;
+  aspect-ratio: 840 / 546;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-black-alpha-04); // rgba(0,0,0,0.06) ≈ 0.04 Figma value, nearest token
+  overflow: hidden;
+  background: var(--color-white-dark); // #f0f0f0, neutral fallback surface while an image loads
+
+  @include mobile { width: 100%; }
+}
+
+.screenImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.screenPlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, var(--color-gray-light) 0%, var(--color-blue-light) 100%);
+}
+
+.screenPlaceholderLabel {
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-small-15);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--color-blue-primary-alpha-50);
+}
+
+.screenText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4); // ≈14px Figma gap, nearest token
+  max-width: 323px; // matches Figma value exactly
+
+  @include tablet-down { align-items: center; text-align: center; max-width: 100%; }
+}
+
+.screenNumber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--avatar-size-md); // 36px ≈ 33.43px Figma value, nearest token
+  height: var(--avatar-size-md);
+  border-radius: var(--radius-sm); // 8px ≈ 8.9px Figma value, nearest token
+  background: linear-gradient(180deg, var(--color-blue-primary) 0%, var(--color-blue-primary-faded) 100%);
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-normal); // 20px, matches Figma value exactly
+  color: var(--color-white-primary);
+  // design-specific: Figma-exact soft blue glow stack, no matching tokens for this sky-blue tone
+  box-shadow:
+    0 7.145px 7.413px 0 var(--color-blue-primary-alpha-25),
+    0 22.597px 57.57px 0 rgba(87, 177, 255, 0.34),
+    0 13.3px 17.356px 0 rgba(87, 177, 255, 0.19),
+    0 5.524px 7.209px 0 rgba(87, 177, 255, 0.22),
+    0 1.998px 2.607px 0 rgba(87, 177, 255, 0.15),
+    0 0 0 1.786px rgba(224, 233, 242, 0.34),
+    0 0 0 2.69px var(--color-white-primary),
+    inset 0 0.538px 9.685px 1.076px #d2eaff,
+    inset 0 0.538px 2.152px 1.076px #d2eaff;
+}
+
+.screenTitle {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-display-md); // 48px ≈ 40px Figma value, nearest token
+  line-height: 1.2;
+  background: linear-gradient(122deg, var(--color-blue-primary) 5%, var(--color-blue-primary-faded) 100%); // matches Figma angle
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+
+  @include tablet-down { font-size: var(--text-h3); }
+}
+
+.screenDescription {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-body-small); // 17px, matches Figma value exactly
+  line-height: 1.3;
+  color: var(--color-black-alpha-60); // rgba(0,0,0,0.6), matches Figma value exactly
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .leftContent,
+  .screenVisual {
+    transition: none;
+  }
+}

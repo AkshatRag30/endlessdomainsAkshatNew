@@ -153,6 +153,10 @@ function pathFromGeometry(core: Point, geo: CurveGeometry, hex: Point) {
 export function OnchainIdentityNetwork() {
   const sectionRef = useRef<HTMLElement>(null)
   const networkRef = useRef<HTMLDivElement>(null)
+  // Static, never-animated wrapper — always centered via CSS alone. Path geometry measures
+  // from this instead of coreMarkRef, since coreMarkRef is GSAP's own animation target and
+  // can still be mid-transform (translated up out of position) at measurement time.
+  const coreContainerRef = useRef<HTMLDivElement>(null)
   const coreMarkRef = useRef<HTMLDivElement>(null)
   const nodeHexRefs = useRef<(HTMLElement | null)[]>([])
   const pathRefs = useRef<(SVGPathElement | null)[]>([])
@@ -171,12 +175,12 @@ export function OnchainIdentityNetwork() {
   // Measures the real, rendered positions of the core and every hex icon and rebuilds
   // every path from those exact points — see the comment above buildCurveGeometry.
   useEffect(() => {
-    if (typeof window === 'undefined' || !networkRef.current || !coreMarkRef.current) return
+    if (typeof window === 'undefined' || !networkRef.current || !coreContainerRef.current) return
     const networkEl = networkRef.current
 
     function recompute() {
       const containerRect = networkEl.getBoundingClientRect()
-      const coreEl = coreMarkRef.current
+      const coreEl = coreContainerRef.current
       if (!coreEl || containerRect.width === 0 || containerRect.height === 0) return
 
       const coreRect = coreEl.getBoundingClientRect()
@@ -384,7 +388,7 @@ export function OnchainIdentityNetwork() {
               ))}
             </svg>
 
-            <div className={styles.core}>
+            <div className={styles.core} ref={coreContainerRef}>
               <div className={styles.coreMark} ref={coreMarkRef}>
                 <Image
                   src="/landing/centerlogo2.svg"

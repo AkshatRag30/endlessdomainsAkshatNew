@@ -1,7 +1,7 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import { PerksNavBar } from '@/design-system/composites/reputation/perks/PerksNavBar'
-import { DomainHero, DomainStats, DomainHowItWorks, DomainUnlocks, DomainOwnership, OwnershipComparison, OnchainIdentityNetwork, DomainOnchainStats, DomainAdoptionGap, DomainGrowthComparison, DomainLivingIdentity, DomainBrowse, DomainWhy, DomainReviews, DomainFaq } from '@/design-system/composites/domain'
+import { DomainHero, DomainStats, DomainHowItWorks, DomainUnlocks, DomainOwnership, DomainBrowse, DomainWhy, DomainReviews, DomainFaq } from '@/design-system/composites/domain'
 import styles from './domain.module.scss'
 
 const DomainPage: NextPage = () => {
@@ -21,12 +21,6 @@ const DomainPage: NextPage = () => {
         <DomainHowItWorks />
         <DomainBrowse />
         <DomainUnlocks />
-        <OwnershipComparison />
-        <OnchainIdentityNetwork />
-        <DomainOnchainStats />
-        <DomainAdoptionGap />
-        <DomainGrowthComparison />
-        <DomainLivingIdentity />
         <DomainOwnership />
         <DomainWhy />
         <DomainReviews />

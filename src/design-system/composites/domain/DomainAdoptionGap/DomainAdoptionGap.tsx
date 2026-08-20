@@ -100,6 +100,12 @@ const PERCENT_STEPS = [0, 7, 12, 16, 19]
 export function DomainAdoptionGap() {
   const sectionRef = useRef<HTMLElement>(null)
   const [active, setActive] = useState(false)
+  // Flips false → true the first time the section is seen and never resets — unlike
+  // `active`, which toggles back to false the moment the section scrolls out of view
+  // again. The reveal effect below depends on THIS, not `active`, so a fast scroll that
+  // crosses the 30% threshold and back out within a couple of seconds can't cancel the
+  // timers it already scheduled (see the bug this fixes, below).
+  const [triggered, setTriggered] = useState(false)
   const [revealed, setRevealed] = useState(false)
   const hasRunRef = useRef(false)
   const [reducedMotion, setReducedMotion] = useState(false)
@@ -112,7 +118,10 @@ export function DomainAdoptionGap() {
   const [percentRun, setPercentRun] = useState(false)
 
   const total = useQuickCount(countRun, TOTAL_STEPS, 130, reducedMotion)
-  const percent = useQuickCount(percentRun, PERCENT_STEPS, 110, reducedMotion)
+  // stepDelayMs (275) × the 4 intervals between PERCENT_STEPS' 5 values = 1100ms — tuned
+  // to match .barFill's own 1.1s CSS transition exactly, so the number finishes counting
+  // at the same instant the bar finishes filling instead of trailing it by a second.
+  const percent = useQuickCount(percentRun, PERCENT_STEPS, 275, reducedMotion)
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -126,15 +135,27 @@ export function DomainAdoptionGap() {
     return () => observer.disconnect()
   }, [])
 
+  // Latches `active` into a one-way flag — see the `triggered` declaration above for why
+  // the reveal effect needs this instead of depending on `active` directly.
+  useEffect(() => {
+    if (active) setTriggered(true)
+  }, [active])
+
   // The one-shot reveal sequence — runs exactly once, the first time the section enters
   // the viewport. Scrolling in and out again afterward never replays it (requirement:
   // "animate once → settle into ambient activity", not a scrubbed/repeating animation).
+  //
+  // BUG THIS FIXES: this effect used to depend on `active` directly. A fast scroll that
+  // carries the section past the 30% visibility threshold and back out again within the
+  // ~3.3s reveal window flips `active` true→false, which re-runs this effect — and its
+  // cleanup unconditionally cleared every timer just scheduled, before most of them ever
+  // fired. Since `hasRunRef` was already set, the effect's guard then blocked it from ever
+  // rescheduling them, permanently freezing the bar/percent at their pre-reveal 0% state.
+  // Depending on `triggered` (which only ever flips false → true once) instead means this
+  // effect runs exactly once for the whole lifetime of the section, so nothing can tear
+  // its timers down mid-flight.
   useEffect(() => {
-    // hasRunRef, not state — this guard must never itself be a reactive dependency of
-    // this effect. It was state originally, and setting it inside the effect made React
-    // tear the effect down (running its cleanup, which cleared every timer just
-    // scheduled) on the very next render, before any of them could fire.
-    if (!active || hasRunRef.current) return
+    if (!triggered || hasRunRef.current) return
     hasRunRef.current = true
     setRevealed(true)
 
@@ -151,17 +172,20 @@ export function DomainAdoptionGap() {
     const at = (ms: number, fn: () => void) => timers.push(setTimeout(fn, ms))
 
     at(500, () => setCountRun(true))
+    // Bar starts filling and the percent counter starts climbing together — both tuned to
+    // land at t=2000 (900 + the bar's 1.1s transition), so the fill and the number always
+    // finish as one connected motion instead of drifting apart.
     at(900, () => setBarBuilt(true))
-    at(2150, () => setBoundaryPulse(true))
-    at(2400, () => setBoundaryPulse(false))
-    at(2200, () => setPercentRun(true))
-    at(2200 + PERCENT_STEPS.length * 110 + 250, () => setPercentSettled(true))
-    at(2500, () => setLabelReveal(true))
-    at(2700, () => setGrayPulse(true))
-    at(3300, () => setGrayPulse(false))
+    at(900, () => setPercentRun(true))
+    at(2000, () => setBoundaryPulse(true))
+    at(2050, () => setPercentSettled(true))
+    at(2250, () => setBoundaryPulse(false))
+    at(2350, () => setLabelReveal(true))
+    at(2550, () => setGrayPulse(true))
+    at(3150, () => setGrayPulse(false))
 
     return () => timers.forEach(clearTimeout)
-  }, [active, reducedMotion])
+  }, [triggered, reducedMotion])
 
   // Reduced motion means no continuous ambient activity — the wallet-address markers
   // never start cycling at all, and the section holds at its plain settled state.

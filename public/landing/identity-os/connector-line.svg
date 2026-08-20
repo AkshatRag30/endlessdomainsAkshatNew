@@ -1,0 +1,18 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="1470" height="68" viewBox="0 0 1470 68" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Frame 2147239557">
+<path id="Vector 4121" opacity="0.55" d="M691.5 0.5H595L569 26.5H418.5L391.5 53.5H201L185.412 26.5H88L47 67.5H0" stroke="url(#paint0_linear_0_20)"/>
+<path id="Vector 4119" opacity="0.55" d="M778.5 0.5H875L901 26.5H1051.5L1078.5 53.5H1269L1284.59 26.5H1382L1423 67.5H1470" stroke="url(#paint1_linear_0_20)"/>
+</g>
+<defs>
+<linearGradient id="paint0_linear_0_20" x1="31" y1="68" x2="378.747" y2="338.663" gradientUnits="userSpaceOnUse">
+<stop stop-color="#2639ED" stop-opacity="0"/>
+<stop offset="0.334007" stop-color="#2639ED"/>
+<stop offset="1" stop-color="#2639ED" stop-opacity="0"/>
+</linearGradient>
+<linearGradient id="paint1_linear_0_20" x1="1439" y1="68" x2="1091.25" y2="338.663" gradientUnits="userSpaceOnUse">
+<stop stop-color="#2639ED" stop-opacity="0"/>
+<stop offset="0.334007" stop-color="#2639ED"/>
+<stop offset="1" stop-color="#2639ED" stop-opacity="0"/>
+</linearGradient>
+</defs>
+</svg>

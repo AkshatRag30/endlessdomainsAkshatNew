@@ -1,0 +1,229 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Section shell ─────────────────────────────────────────────────────────────
+// design-specific: background must stay full-bleed edge-to-edge — only the
+// content below is capped at --container-max-width — otherwise the page's
+// surrounding background shows through on wide viewports
+
+.section {
+  position: relative;
+  width: 100%;
+  background: var(--color-white-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-13);
+  padding: var(--space-13) var(--container-padding-x);
+
+  @include tablet-down { padding: var(--space-9) var(--space-7); gap: var(--space-9); }
+  @include mobile { padding: var(--space-7) var(--space-5); gap: var(--space-7); }
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  text-align: center;
+  max-width: var(--container-max-width);
+}
+
+.eyebrowWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 20px;
+  margin-bottom: var(--space-5);
+}
+
+%roadmap-bracket-corner {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-style: solid;
+  border-color: var(--color-blue-primary-alpha-30);
+  pointer-events: none;
+}
+
+.eyebrowBracketTL { @extend %roadmap-bracket-corner; top: 0; left: 0; border-width: 2px 0 0 2px; }
+.eyebrowBracketTR { @extend %roadmap-bracket-corner; top: 0; right: 0; border-width: 2px 2px 0 0; }
+.eyebrowBracketBL { @extend %roadmap-bracket-corner; bottom: 0; left: 0; border-width: 0 0 2px 2px; }
+.eyebrowBracketBR { @extend %roadmap-bracket-corner; bottom: 0; right: 0; border-width: 0 2px 2px 0; }
+
+.eyebrowText {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-body-small); // 17px, matches Figma value exactly
+  color: var(--color-faq-bracket); // #4a4a4a, matches Figma value exactly
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.heading {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2); // 55px, matches Figma value exactly
+  line-height: 1.2;
+  letter-spacing: -0.024em; // -1.356px at 55px, Figma-exact tracking
+
+  @include tablet-down { font-size: 40px; }
+  @include mobile { font-size: 30px; }
+}
+
+.headingLine1 {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+}
+
+.headingLine2 {
+  font-weight: var(--font-weight-regular);
+  text-transform: capitalize;
+  background: linear-gradient(126deg, var(--color-blue-primary) 70%, var(--color-blue-primary-faded) 96%); // ≈126deg Figma value, rounded
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.description {
+  margin: 0;
+  max-width: 854px; // matches Figma value exactly
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-body); // 22px, matches Figma value exactly
+  line-height: 1.3;
+  color: var(--color-black-alpha-60); // rgba(0,0,0,0.6), matches Figma value exactly
+
+  @include tablet-down { font-size: var(--text-body-small); max-width: 600px; }
+  @include mobile { font-size: var(--text-small-15); max-width: 100%; }
+}
+
+// ── Timeline ──────────────────────────────────────────────────────────────────
+
+.timeline {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 100%;
+  max-width: var(--container-max-width);
+  margin: 0;
+  padding: 0;
+
+  @include tablet-down {
+    flex-direction: column;
+    gap: var(--space-9);
+  }
+}
+
+// design-specific: Figma-exact thin divider marking each column boundary,
+// spanning the full alternating top/bottom envelope of the timeline
+.dividerLine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--color-black-alpha-15); // rgba(0,0,0,0.2) ≈ 0.15 Figma value, nearest token
+  pointer-events: none;
+
+  &[data-position='1'] { left: 20%; }
+  &[data-position='2'] { left: 40%; }
+  &[data-position='3'] { left: 60%; }
+  &[data-position='4'] { left: 80%; }
+
+  @include tablet-down { display: none; }
+}
+
+.milestone {
+  position: relative;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4); // ≈14px Figma gap, nearest token
+  width: 241px;
+  flex-shrink: 0;
+
+  // design-specific: Figma's alternating top/bottom stagger — odd items (2nd, 4th)
+  // drop down to create the zigzag timeline silhouette
+  &[data-offset] {
+    margin-top: 182px;
+  }
+
+  @include tablet-down {
+    width: 100%;
+    padding-bottom: var(--space-7);
+    border-bottom: 1px solid var(--color-black-alpha-10);
+
+    &[data-offset] { margin-top: 0; }
+    &:last-child { border-bottom: none; padding-bottom: 0; }
+  }
+}
+
+.year {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-h3); // 30px, matches Figma value exactly
+  line-height: 1.2;
+  color: var(--color-black-primary);
+}
+
+.milestoneTitle {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-h3); // 30px, matches Figma value exactly
+  line-height: 1.2;
+  background: linear-gradient(130deg, var(--color-blue-primary) 70%, var(--color-blue-primary-faded) 96%); // ≈121-141deg Figma range, averaged
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.milestoneDescription {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-nav); // 14px, matches Figma value exactly
+  line-height: 1.3;
+  color: var(--color-black-alpha-60); // rgba(0,0,0,0.65) ≈ 0.6 Figma value, nearest token
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px; // matches Figma value exactly
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-2xl); // 20px, matches Figma value exactly
+  background: linear-gradient(180deg, var(--color-blue-primary) 0%, var(--color-blue-primary-alpha-50) 100%);
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-small-12); // 12px, matches Figma value exactly
+  color: var(--color-white-primary);
+  white-space: nowrap;
+  // design-specific: Figma-exact soft blue glow stack + glass-edge inset highlights, no matching tokens for this sky-blue tone
+  box-shadow:
+    0 25.301px 64.458px 0 rgba(87, 177, 255, 0.34),
+    0 14.892px 19.432px 0 rgba(87, 177, 255, 0.19),
+    0 6.185px 8.071px 0 rgba(87, 177, 255, 0.22),
+    0 2.237px 2.919px 0 rgba(87, 177, 255, 0.15),
+    0 0 0 2.41px #e0e9f2,
+    0 0 0 3.012px var(--color-white-primary),
+    inset 0 0.602px 10.843px 1.205px #d2eaff,
+    inset 0 0.602px 2.41px 1.205px #d2eaff;
+}

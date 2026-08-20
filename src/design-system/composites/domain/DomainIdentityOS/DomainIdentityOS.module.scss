@@ -1,0 +1,247 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Section shell ─────────────────────────────────────────────────────────────
+
+.section {
+  position: relative;
+  width: 100%;
+  background: var(--color-white-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-12); // 80px ≈ Figma's ~78px header-to-row gap, nearest token
+  padding: var(--space-13) var(--container-padding-x);
+
+  @include tablet-down { padding: var(--space-9) var(--space-7); gap: var(--space-9); }
+  @include mobile { padding: var(--space-7) var(--space-5); gap: var(--space-7); }
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4); // 16px ≈ 15px Figma value, nearest token
+  text-align: center;
+  max-width: var(--container-max-width);
+}
+
+.eyebrowWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 20px;
+  margin-bottom: var(--space-5); // 20px ≈ 19px Figma value, nearest token
+}
+
+// ── Shared corner-bracket mark — reused for the eyebrow badge and each stat box,
+// matching the bracket treatment already used for eyebrow labels across the domain page ──
+
+%identity-bracket-corner {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-style: solid;
+  border-color: var(--color-blue-primary-alpha-30);
+  pointer-events: none;
+}
+
+.eyebrowBracketTL { @extend %identity-bracket-corner; top: 0; left: 0; border-width: 2px 0 0 2px; }
+.eyebrowBracketTR { @extend %identity-bracket-corner; top: 0; right: 0; border-width: 2px 2px 0 0; }
+.eyebrowBracketBL { @extend %identity-bracket-corner; bottom: 0; left: 0; border-width: 0 0 2px 2px; }
+.eyebrowBracketBR { @extend %identity-bracket-corner; bottom: 0; right: 0; border-width: 0 2px 2px 0; }
+
+.eyebrowText {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-body-small); // 17px, matches Figma value exactly
+  color: var(--color-faq-bracket); // #4a4a4a, matches Figma value exactly
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.heading {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h2); // 55px, matches Figma value exactly
+  line-height: 1.2;
+  letter-spacing: -0.024em; // -1.356px at 55px, Figma-exact tracking
+
+  @include tablet-down { font-size: 40px; }
+  @include mobile { font-size: 30px; }
+}
+
+.headingPlain {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  // design-specific: Figma-exact soft drop shadow on the headline glyphs
+  text-shadow: 0 1px 1.3px var(--color-black-alpha-25);
+}
+
+.headingAccent {
+  font-weight: var(--font-weight-regular);
+  background: linear-gradient(147deg, var(--color-blue-primary) 70%, var(--color-blue-primary-faded) 96%); // ≈146.6deg Figma value, rounded
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.description {
+  margin: 0;
+  max-width: 830px; // design-specific: Figma-exact paragraph measure (827px)
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-normal); // 20px, matches Figma value exactly
+  line-height: 1.3;
+  color: var(--color-black-alpha-55); // rgba(0,0,0,0.55) ≈ rgba(0,0,0,0.5) Figma value, nearest token
+
+  @include tablet-down { font-size: var(--text-body-small); max-width: 600px; }
+  @include mobile { font-size: var(--text-small-15); max-width: 100%; }
+}
+
+// ── Stats block ───────────────────────────────────────────────────────────────
+
+.statsBlock {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: var(--container-max-width);
+}
+
+.connector {
+  position: relative;
+  display: block;
+  width: 100%;
+  margin-bottom: var(--space-5); // 20px ≈ Figma's ~19px gap to the row, nearest token
+
+  @include tablet-down { display: none; }
+}
+
+.connectorImg {
+  width: 100%;
+  height: auto;
+}
+
+.statsRow {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  width: 100%;
+
+  @include mobile {
+    flex-direction: column;
+  }
+}
+
+.statCol {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-9) 0;
+
+  @include tablet-down { padding: var(--space-7) 0; }
+
+  @include mobile {
+    padding: var(--space-6) 0;
+    border-bottom: 1px solid var(--color-black-alpha-15);
+
+    &:last-child { border-bottom: none; }
+  }
+}
+
+// ── Column dividers — a thin vertical rule with a small node dot capping each end,
+// matching the connector line's junction points in the Figma reference ───────────
+
+.divider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 1px;
+  background: var(--color-black-alpha-15); // rgba(0,0,0,0.15) ≈ rgba(0,0,0,0.2) Figma value, nearest token
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 7px;
+    height: 7px;
+    border-radius: var(--radius-full);
+    background: var(--color-gray-200); // #ebebeb ≈ #e9e7e7 Figma value, nearest token
+  }
+
+  &::before { top: -3.5px; }
+  &::after { bottom: -3.5px; }
+
+  @include mobile { display: none; }
+}
+
+.dividerEnd {
+  left: auto;
+  right: 0;
+}
+
+.statBox {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3); // 12px ≈ 14px Figma value, nearest token
+  padding: var(--space-5) var(--space-7);
+}
+
+.statCornerTL,
+.statCornerTR,
+.statCornerBL,
+.statCornerBR {
+  @extend %identity-bracket-corner;
+}
+
+.statCornerTL { top: 0; left: 0; border-width: 2px 0 0 2px; }
+.statCornerTR { top: 0; right: 0; border-width: 2px 2px 0 0; }
+.statCornerBL { bottom: 0; left: 0; border-width: 0 0 2px 2px; }
+.statCornerBR { bottom: 0; right: 0; border-width: 0 2px 2px 0; }
+
+.statValue {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--text-display-md); // 48px ≈ 44px Figma value, nearest token
+  line-height: 1.2;
+  color: var(--color-black-primary);
+  text-shadow: 0 0.8px 1.039px var(--color-black-alpha-25); // design-specific: Figma-exact soft drop shadow
+  white-space: nowrap;
+
+  @include mobile { font-size: var(--text-h3); }
+}
+
+.statValueAccent {
+  background: linear-gradient(117deg, var(--color-blue-primary) 70%, var(--color-blue-primary-faded) 96%); // matches Figma angle
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  text-shadow: none;
+}
+
+.statLabel {
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-nav); // 14px, matches Figma value exactly
+  letter-spacing: -0.015em; // -0.21px at 14px, Figma-exact tracking
+  color: var(--color-black-alpha-60); // rgba(0,0,0,0.6), matches Figma value exactly
+  text-align: center;
+  white-space: nowrap;
+
+  @include mobile { white-space: normal; }
+}
