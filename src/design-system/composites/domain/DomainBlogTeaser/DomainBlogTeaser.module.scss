@@ -1,4 +1,4 @@
-@import '@newstyles/_mixins.scss';
+@import '../../../styles/_mixins.scss';
 
 // ── Section shell ─────────────────────────────────────────────────────────────
 // design-specific: background must stay full-bleed edge-to-edge — only the
@@ -13,10 +13,9 @@
   flex-direction: column;
   align-items: center;
   gap: var(--space-9);
-  padding: var(--space-13) var(--container-padding-x);
+  padding: calc(var(--section-spacing) / 2) var(--container-padding-x) var(--space-13);
 
-  @include tablet-down { padding: var(--space-9) var(--space-7); gap: var(--space-7); }
-  @include mobile { padding: var(--space-7) var(--space-5); gap: var(--space-6); }
+  @include tablet-down { padding: calc(var(--section-spacing) / 2) var(--space-5) var(--space-7); gap: var(--space-6); }
 }
 
 // ── Header ────────────────────────────────────────────────────────────────────
@@ -35,6 +34,7 @@
 .headerLeft {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: var(--space-4);
   max-width: 600px;
 }
@@ -74,13 +74,17 @@
 
 .heading {
   margin: 0;
+  // .headerLeft now uses align-items: flex-start (so .eyebrowWrap shrinks to fit its
+  // own text instead of stretching) — this restores this heading's own full-width
+  // stretch specifically, since unlike HowItWorksJourney's, its two spans are plain
+  // inline text that wraps naturally against the available width, not hard line breaks.
+  align-self: stretch;
   font-family: var(--font-satoshi);
   font-size: var(--text-h2); // 55px, matches Figma value exactly
   line-height: 1.2;
   letter-spacing: -0.024em; // -1.356px at 55px, Figma-exact tracking
 
-  @include tablet-down { font-size: 40px; }
-  @include mobile { font-size: 30px; }
+  @include tablet-down { font-size: 30px; }
 }
 
 .headingPlain {
@@ -108,8 +112,81 @@
   text-align: justify;
   color: var(--color-text-body); // #474747, matches Figma value exactly
 
-  @include tablet-down { max-width: 100%; padding-top: 0; text-align: left; }
-  @include mobile { font-size: var(--text-body-small); }
+  @include tablet-down { max-width: 100%; padding-top: 0; text-align: left; font-size: var(--text-body-small); }
+}
+
+// ── Scroll controls ───────────────────────────────────────────────────────────
+// Same prev/next-arrow-over-a-scrollable-row pattern as the blog post page's
+// "More Articles" slider (pages/blog/slug.module.scss's .sliderBtns/.sliderBtn).
+
+.controlsRow {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  max-width: var(--container-max-width);
+}
+
+.sliderBtns {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-shrink: 0;
+}
+
+.sliderProgress {
+  position: relative;
+  width: 80px;
+  height: 2px;
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--color-border-black-subtle) 0px,
+    var(--color-border-black-subtle) 22px,
+    transparent 22px,
+    transparent 28px,
+    var(--color-border-black-subtle) 28px,
+    var(--color-border-black-subtle) 50px,
+    transparent 50px,
+    transparent 56px,
+    var(--color-border-black-subtle) 56px,
+    var(--color-border-black-subtle) 80px
+  );
+}
+
+.sliderProgressFill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background: var(--color-black-primary);
+  transition: width 0.3s ease;
+  min-width: 0;
+}
+
+.sliderBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: var(--color-white-primary);
+  border: none;
+  color: var(--color-black-primary);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background: var(--color-black-primary);
+    color: var(--color-white-primary);
+  }
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
 }
 
 // ── Card row ──────────────────────────────────────────────────────────────────
@@ -144,6 +221,5 @@
     background: var(--color-black-alpha-15); // rgba(0,0,0,0.2) ≈ 0.15 Figma value, nearest token
   }
 
-  @include tablet-down { width: 360px; }
-  @include mobile { width: 85%; }
+  @include tablet-down { width: 85%; }
 }

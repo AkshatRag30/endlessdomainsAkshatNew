@@ -1,0 +1,558 @@
+@import '@newstyles/_mixins.scss';
+
+// ─── Dashed Border Helpers ────────────────────────────────────────────────────
+
+$dash-len: 10px;
+$gap-len: 6px;
+
+$h-dash: repeating-linear-gradient(90deg,
+    var(--color-border-muted) 0px,
+    var(--color-border-muted) #{$dash-len},
+    transparent #{$dash-len},
+    transparent #{$dash-len + $gap-len});
+
+$v-dash: repeating-linear-gradient(0deg,
+    var(--color-border-muted) 0px,
+    var(--color-border-muted) #{$dash-len},
+    transparent #{$dash-len},
+    transparent #{$dash-len + $gap-len});
+
+@mixin dashed-border($sides...) {
+  $images: (
+  );
+$sizes: (
+);
+$positions: (
+);
+
+@each $side in $sides {
+  @if $side ==top {
+    $images: append($images, $h-dash, comma);
+    $sizes: append($sizes, 100% 1px, comma);
+    $positions: append($positions, top, comma);
+  }
+
+  @if $side ==bottom {
+    $images: append($images, $h-dash, comma);
+    $sizes: append($sizes, 100% 1px, comma);
+    $positions: append($positions, bottom, comma);
+  }
+
+  @if $side ==left {
+    $images: append($images, $v-dash, comma);
+    $sizes: append($sizes, 1px 100%, comma);
+    $positions: append($positions, left, comma);
+  }
+
+  @if $side ==right {
+    $images: append($images, $v-dash, comma);
+    $sizes: append($sizes, 1px 100%, comma);
+    $positions: append($positions, right, comma);
+  }
+}
+
+border: none;
+background-image: $images;
+background-size: $sizes;
+background-position: $positions;
+background-repeat: no-repeat;
+}
+
+// ─── Wrapper ──────────────────────────────────────────────────────────────────
+
+.custom_border {
+  position: relative;
+  background-color: var(--color-black-primary);
+  margin-top: var(--space-7);
+  padding-top: 60px;
+  overflow: hidden;
+
+  @include mobile-up {
+    padding-bottom: var(--footer-padding-bottom);
+  }
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    top: -70px;
+    background-color: var(--color-white-primary);
+    transition: transform 0.4s ease, opacity 0.4s ease;
+  }
+
+  &::before {
+    clip-path: polygon(0 56%, 100% 55%, 55% 100%, 0% 100%);
+    left: 0;
+  }
+
+  &::after {
+    clip-path: polygon(0 56%, 100% 55%, 100% 100%, 42% 100%);
+    right: 0;
+  }
+
+  @include mobile-up {
+    margin-top: 130px;
+    padding-top: 100px;
+  }
+}
+
+// ─── Logo ─────────────────────────────────────────────────────────────────────
+
+.footer_logo {
+  width: 180px;
+  height: auto;
+
+  @include mobile-up {
+    width: 260px;
+  }
+}
+
+// ─── Section ──────────────────────────────────────────────────────────────────
+
+.footer_section {
+
+  padding-left: 0;
+
+  @include mobile-up {
+    padding-left: var(--container-padding-x);
+    @include dashed-border(top);
+  }
+}
+
+.footer_inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  @include mobile-up {
+    flex-direction: row;
+    gap: clamp(var(--space-8), 4vw, var(--gap-section));
+    align-items: flex-start;
+  }
+}
+
+// ─── Brand Column ─────────────────────────────────────────────────────────────
+
+.footer_brand {
+  flex: 0 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-top: var(--space-7);
+
+  @include mobile-up {
+    width: clamp(220px, 30%, 340px);
+    padding: var(--space-10) 0 var(--space-8);
+  }
+
+  img {
+    @include mobile {
+      padding: 0 var(--space-5);
+    }
+
+  }
+}
+
+.btn_help {
+  @include mobile {
+    padding-top: var(--space-7);
+    padding-left: var(--space-5);
+  }
+}
+
+.footer_tagline {
+  margin: 0;
+  color: var(--color-white-primary);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  line-height: var(--leading-body);
+
+  @include mobile {
+    padding: 0 var(--space-5);
+  }
+}
+
+// ─── Nav Wrapper ──────────────────────────────────────────────────────────────
+
+.footer_nav_wrapper {
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--space-7);
+
+  @include mobile-up {
+    margin-top: 0;
+    flex: 1;
+  }
+}
+
+.footer_nav_row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+
+  @include desktop {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+// ─── Nav Links ────────────────────────────────────────────────────────────────
+
+.footer_nav_links {
+  padding: var(--space-7) var(--space-5);
+
+  @include mobile-up {
+    padding: var(--space-10) var(--space-5) var(--space-8);
+  }
+}
+
+// ─── Nav Heading ─────────────────────────────────────────────────────────────
+
+.nav_heading {
+  color: var(--color-white-primary);
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-body);
+  font-weight: var(--font-weight-semibold);
+  margin: 0 0 var(--space-5) 0;
+  line-height: 1.2;
+}
+
+// ─── Nav Column ───────────────────────────────────────────────────────────────
+
+.nav_column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+// ─── Nav Link Styles ──────────────────────────────────────────────────────────
+
+.media_link {
+  color: var(--color-gray-medium);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-regular);
+  text-decoration: none;
+  position: relative;
+  width: fit-content;
+  transition: color 0.25s ease;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background-color: var(--color-white-primary);
+    transition: width 0.3s ease;
+  }
+
+  &:hover {
+    color: var(--color-white-primary);
+
+    &::after {
+      width: 100%;
+    }
+  }
+}
+
+// ─── Socials ──────────────────────────────────────────────────────────────────
+
+.footer_socials {
+  display: flex;
+  justify-content: flex-start;
+  width: fit-content;
+  align-self: flex-start;
+  margin-top: var(--space-5);
+  margin-left: var(--space-4);
+  background-color: var(--color-white-primary);
+  list-style: none;
+  padding: 0;
+    position: relative;
+    z-index: 99;
+    
+  @include mobile-up {
+    align-self: flex-end;
+    justify-content: flex-end;
+    margin-left: 0;
+    margin-right: var(--space-12);
+  }
+
+  a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-black-primary);
+    padding: 10px 18px;
+    margin: 1px;
+    border-radius: var(--radius-sm);
+    color: var(--color-white-primary);
+    font-size: var(--text-body-small);
+
+    @media (max-width: 425px) {
+      padding: 8px 12px;
+    }
+
+    @include mobile-up {
+      padding: var(--space-3) var(--space-6);
+    }
+
+    &:focus-visible {
+      @include focus-ring;
+    }
+  }
+}
+
+// ─── Bottom Area ──────────────────────────────────────────────────────────────
+
+.footer_bottom {
+  position: relative;
+  z-index: 99;
+}
+
+// ─── Subscribe ────────────────────────────────────────────────────────────────
+
+.subscribe_wrapper {
+  padding: 0 var(--container-padding-x);
+  position: relative;
+  z-index: 999;
+}
+
+.hide_on_events_mobile {
+  display: none;
+
+  @include mobile-up {
+    display: block;
+  }
+}
+
+.subscribe_banner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-9);
+  margin-bottom: var(--space-9);
+
+  // ✅ Tablet / Desktop
+  @include mobile-up {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-6);
+    background: var(--color-black-primary);
+    border: 1px solid var(--color-gray-medium);
+    padding: var(--space-2);
+    flex-wrap: wrap;
+  }
+
+  .newsletter_heading {
+    color: var(--color-white-primary);
+    font-family: var(--font-space-grotesk);
+    font-size: var(--text-body);
+    font-weight: var(--font-weight-regular);
+    flex-shrink: 0;
+    margin-bottom: 0;
+  }
+}
+
+.subscribe_form_wrap {
+  width: 100%;
+  max-width: 100%;
+  flex-shrink: 0;
+
+  @include mobile-up {
+    max-width: 420px;
+  }
+}
+
+.subscribe_form {
+  display: flex;
+  background: var(--color-white-primary);
+  gap: 0;
+  position: relative;
+
+  input {
+    flex: 1;
+    background: var(--color-white-primary);
+    border: none;
+    border-radius: 0;
+    color: var(--color-gray-dark-hover);
+    font-family: var(--font-satoshi);
+    font-size: var(--text-small-13);
+    outline: none;
+    transition: box-shadow 0.25s ease;
+    padding-left: var(--space-4);
+
+    &.input_error {
+      border: 1px solid var(--color-error)
+    }
+  }
+
+  button {
+    flex-shrink: 0;
+    border: 1px solid var(--color-gray-darkest);
+    background: var(--color-black-primary);
+    padding: var(--space-2) var(--space-8);
+    margin: var(--space-1);
+    color: var(--color-white-primary);
+    font-family: var(--font-satoshi);
+    font-size: var(--text-small-13);
+    font-weight: var(--font-weight-medium);
+    border-radius: 0;
+    cursor: pointer;
+    transition: background 0.25s ease, border-color 0.25s ease, transform 0.2s ease;
+
+    &:hover:not(:disabled) {
+      background: var(--color-surface-hover);
+      border-color: var(--color-purple-glow-border);
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+
+    &:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    &:focus-visible {
+      @include focus-ring;
+    }
+  }
+}
+
+// ─── Form Feedback ────────────────────────────────────────────────────────────
+
+.success_msg {
+  color: var(--color-black-primary);
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-body);
+  font-weight: var(--font-weight-regular);
+  margin: 0;
+  padding: var(--space-4) var(--space-3);
+}
+
+.error_msg {
+  position: absolute;
+  bottom: -15px;
+  left: var(--gap-inline-sm);
+  color: var(--color-error);
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-12);
+  font-weight: 500;
+  margin: 0;
+}
+
+// ─── Copyright Bar ────────────────────────────────────────────────────────────
+
+.footer_copyright {
+  // Mobile: flow in the document, no clip-path clipping
+  position: relative;
+  left: auto;
+  right: auto;
+  bottom: auto;
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 48px;
+  background: var(--color-white-primary);
+  text-align: center;
+  clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
+  padding: var(--space-3) 0;
+
+  span,
+  a {
+    color: var(--color-gray-dark);
+    font-family: var(--font-space-grotesk);
+    font-size: var(--text-nav);
+    text-decoration: none;
+    font-weight: var(--font-weight-medium);
+    transition: color 0.2s ease;
+  }
+
+  a:hover {
+    color: var(--color-black-primary);
+    text-decoration: underline;
+  }
+
+  @include mobile-up {
+    position: absolute;
+    left: var(--space-9);
+    right: var(--space-9);
+    bottom: 0;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 0;
+    padding: 0 var(--space-9);
+    height: 48px;
+    margin: 0;
+    clip-path: polygon(3% 0%, 97% 0%, 100% 100%, 0% 100%);
+    text-align: left;
+  }
+}
+
+// ─── Big Text Watermark ───────────────────────────────────────────────────────
+
+.endless_txt {
+  display: block;
+  width: 100%;
+  font-family: var(--font-satoshi);
+  font-size: clamp(3rem, 11vw, 12rem);
+  font-weight: var(--font-weight-medium);
+  text-transform: uppercase;
+  white-space: nowrap;
+  line-height: 1.1;
+  color: var(--color-gray-dark-hover);
+  -webkit-text-stroke: 1px var(--color-gray-dark-hover);
+  text-align: center;
+  margin-bottom: -55px;
+  user-select: none;
+}
+
+// ─── Gradient Overlay ─────────────────────────────────────────────────────────
+
+.gradient_overlay {
+  position: absolute;
+  bottom: -150px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 165%;
+  height: 300px;
+  background: radial-gradient(circle at center,
+      var(--color-purple-glow-light) 0%,
+      var(--color-purple-glow-strong) 30%,
+      var(--color-purple-glow-fade) 55%,
+      var(--color-purple-glow-0) 80%);
+  filter: blur(100px);
+  pointer-events: none;
+
+  @include mobile-up {
+    height: 245px;
+    bottom: -150px;
+  }
+}
+
+// ─── Spinner ──────────────────────────────────────────────────────────────────
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  animation: spin 0.8s linear infinite;
+  vertical-align: middle;
+}

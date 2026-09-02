@@ -1,0 +1,260 @@
+@import '../../../styles/_mixins.scss';
+
+.section {
+  position: relative;
+  width: 100%;
+  border-top: 1px solid var(--color-black-alpha-10);
+  border-bottom: 1px solid var(--color-black-alpha-10);
+  background: var(--color-white-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: calc(var(--section-spacing) / 2);
+  padding-bottom: calc(var(--section-spacing) / 2);
+
+  @include mobile {
+    padding-top: calc(var(--section-spacing) / 2);
+    padding-bottom: calc(var(--section-spacing) / 2);
+  }
+}
+
+.heading {
+  margin: 0 0 var(--space-5);
+  padding: 0 var(--container-padding-x);
+  // Wide enough that the full line fits without wrapping on laptop-width viewports —
+  // at --text-h3's 30px the copy needs roughly 1000px of clear text width, plus this
+  // element's own left/right padding (--container-padding-x, 48-80px per side here).
+  max-width: 1300px;
+  text-align: center;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h3);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.3;
+  background: linear-gradient(106deg, var(--color-blue-primary) 70%, var(--color-blue-primary-faded) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  @include tablet-down {
+    font-size: var(--text-heading-sm);
+    margin-bottom: var(--space-4);
+  }
+}
+
+// ── Marquee frame ─────────────────────────────────────────────────────────────
+// design-specific: a chamfered (top-corners-cut) bracket around the provider marquee.
+// Each side drops a short distance from its diagonal corner, then bends 90° into a
+// flare that runs outward past the frame's own edge toward the section's gutter —
+// no closing bottom line. Pure CSS, no image/SVG: separately-positioned hairline spans
+// (top bar, two diagonals, two short drops, two outward flares) rather than a clipped
+// shape, since there's no closed bottom edge to fake a border against.
+
+.marqueeFrame {
+  --frame-chamfer: 28px;
+  --frame-diag: calc(var(--frame-chamfer) * 1.41421);
+  --frame-drop: 20px;
+  --frame-flare: 32px;
+  position: relative;
+  width: calc(100% - var(--container-padding-x) * 2);
+  max-width: var(--container-max-width);
+
+  @include tablet-down {
+    --frame-chamfer: 16px;
+    --frame-drop: 14px;
+    --frame-flare: 16px;
+  }
+}
+
+%frame-line {
+  position: absolute;
+  background: var(--color-black-alpha-10);
+  pointer-events: none;
+}
+
+.frameTopBar {
+  @extend %frame-line;
+  top: 0;
+  left: var(--frame-chamfer);
+  right: var(--frame-chamfer);
+  height: 1px;
+}
+
+.frameDiagLeft {
+  @extend %frame-line;
+  top: 0;
+  left: var(--frame-chamfer);
+  width: var(--frame-diag);
+  // A rotated 1px line anti-aliases across two pixel rows along its whole length and
+  // all but disappears at this low an opacity — 1.5px keeps it a hairline but visible.
+  height: 1.5px;
+  transform-origin: left top;
+  transform: rotate(135deg);
+}
+
+.frameDiagRight {
+  @extend %frame-line;
+  top: 0;
+  left: calc(100% - var(--frame-chamfer));
+  width: var(--frame-diag);
+  height: 1.5px;
+  transform-origin: left top;
+  transform: rotate(45deg);
+}
+
+.frameSideLeft {
+  @extend %frame-line;
+  top: var(--frame-chamfer);
+  left: 0;
+  height: var(--frame-drop);
+  width: 1px;
+}
+
+.frameSideRight {
+  @extend %frame-line;
+  top: var(--frame-chamfer);
+  right: 0;
+  height: var(--frame-drop);
+  width: 1px;
+}
+
+// Picks up where the short drop above ends and runs outward past the frame's own
+// left/right edge, into the section's side gutter, instead of continuing straight down.
+.frameFlareLeft {
+  @extend %frame-line;
+  top: calc(var(--frame-chamfer) + var(--frame-drop));
+  left: calc(-1 * var(--frame-flare));
+  width: var(--frame-flare);
+  height: 1px;
+}
+
+.frameFlareRight {
+  @extend %frame-line;
+  top: calc(var(--frame-chamfer) + var(--frame-drop));
+  right: calc(-1 * var(--frame-flare));
+  width: var(--frame-flare);
+  height: 1px;
+}
+
+// Insets the marquee off the frame's side lines so the icons visibly scroll inside the
+// frame rather than running edge-to-edge flush against it. Vertical padding shifts the
+// whole marquee (its left/right fade edges included, since they span its full height)
+// down clear of the frame's top bar and diagonal chamfer lines, which it was flush
+// against and visually overlapping before.
+.marqueeSlot {
+  padding: var(--space-6) var(--space-11);
+
+  @include tablet-down {
+    padding: var(--space-4) var(--space-5);
+  }
+}
+
+// ── Stats row ─────────────────────────────────────────────────────────────────
+// design-specific: each stat sits in its own bordered box with 4-corner tick marks,
+// matching the reference image's crop-mark styling — not just a divider line, an
+// actual box per stat with shared borders between adjacent items.
+
+.statsRow {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  width: 100%;
+  max-width: var(--container-max-width);
+  margin-top: var(--space-6);
+  border-top: 1px solid var(--color-black-alpha-10);
+  border-bottom: 1px solid var(--color-black-alpha-10);
+
+  @include tablet-down {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.statItem {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-11) var(--space-5);
+  border-right: 1px solid var(--color-black-alpha-10);
+
+  &:last-child {
+    border-right: none;
+  }
+
+  @include tablet-down {
+    padding: var(--space-9) var(--space-4);
+
+    &:nth-child(odd) {
+      border-right: 1px solid var(--color-black-alpha-10);
+    }
+
+    &:last-child {
+      border-right: none;
+    }
+
+    &:nth-child(1),
+    &:nth-child(2) {
+      border-bottom: 1px solid var(--color-black-alpha-10);
+    }
+  }
+}
+
+// Corner ticks anchor to this tightly-padded wrapper instead of .statItem, so they
+// frame the number + label directly rather than sitting out at the box's own edges.
+.statContent {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-5) var(--space-6);
+}
+
+%corner-tick {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-style: solid;
+  border-color: var(--color-black-alpha-25);
+  pointer-events: none;
+}
+
+.cornerTL { @extend %corner-tick; top: 8px;    left: 8px;  border-width: 2px 0 0 2px; }
+.cornerTR { @extend %corner-tick; top: 8px;    right: 8px; border-width: 2px 2px 0 0; }
+.cornerBL { @extend %corner-tick; bottom: 8px; left: 8px;  border-width: 0 0 2px 2px; }
+.cornerBR { @extend %corner-tick; bottom: 8px; right: 8px; border-width: 0 2px 2px 0; }
+
+.statValue {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--text-display-sm);
+  line-height: 1.2;
+  color: var(--color-black-primary);
+  white-space: nowrap;
+  transition: color 0.2s ease;
+
+  @include tablet-down {
+    font-size: var(--text-h3);
+  }
+}
+
+.statItem:hover .statValue {
+  color: var(--color-blue-primary);
+}
+
+.statLabel {
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-small-13);
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: var(--color-black-alpha-60);
+  text-align: center;
+  white-space: nowrap;
+
+  @include tablet-down {
+    font-size: var(--text-small-12);
+  }
+}

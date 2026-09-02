@@ -1,0 +1,455 @@
+@import '../../../styles/_mixins.scss';
+
+.banner_search_section {
+  width: 100%;
+}
+
+// Widens just this hero's search input, without touching the shared Input primitive's
+// default width used on the other 5 pages that render it — Input.module.scss's
+// .searchContainer reads this custom property (falling back to its own default when
+// it isn't set), so setting it here only affects instances rendered inside this class.
+.wideSearch {
+  --search-container-max-width: 780px;
+}
+
+.bottom_bg_wrapper {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: clamp(100px, 18vw, 200px);
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: 0;
+
+  @include desktop-down {
+    display: none;
+  }
+}
+
+.bottom_bg_img {
+  object-fit: cover;
+  object-position: center;
+}
+
+.search_bg {
+  position: relative;
+  z-index: 1;
+  // width: clamp(320px, 90%, 760px);
+      width: clamp(320px, 95%, 850px);
+  // height: clamp(180px, 19vw, 333px);
+  height: clamp(180px, 25vw, 350px);
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;    transform: translateY(-20%);
+  @include desktop-down {
+      transform: translateY(20%);
+  }
+
+  // Below tablet the pills can wrap onto two rows, so a fixed height + translateY hack
+  // (tuned for a single row) no longer clears the button underneath. Sized to its actual
+  // content instead — the fill background images below size to whatever height this
+  // resolves to, so the art still fills the box exactly.
+  @include tablet-down {
+    width: 100%;
+    height: auto;
+    min-height: 220px;
+    padding: var(--space-6) 0 var(--space-4);
+    transform: none;
+  }
+
+  @include small-mobile {
+    min-height: 200px;
+    padding: var(--space-5) 0 var(--space-4);
+  }
+
+  // The 25vw-scaled height balloons past 300px on wide desktop viewports, well
+  // beyond what the actual search input + pills need — capped here to keep the
+  // hero compact enough to fit one screen at desktop/wide.
+  @include desktop {
+    height: clamp(180px, 14vw, 230px);
+  }
+
+  @include wide {
+    height: 230px;
+  }
+}
+
+.search_bg_img {
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+
+  @include small-mobile {
+    display: none;
+  }
+}
+
+.search_bg_img_mobile {
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+
+  @include small-mobile-up {
+    display: none;
+  }
+}
+
+
+@keyframes borderAngleRotate {
+  0% {
+    --border-angle: 0deg;
+  }
+
+  100% {
+    --border-angle: 360deg;
+  }
+}
+
+@property --border-angle {
+  syntax: '<angle>';
+  inherits: true;
+  initial-value: 0deg;
+}
+
+.searchWrapper {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.searchContainer {
+  --border-angle: 0deg;
+  position: relative;
+  width: clamp(280px, 85%, 580px);
+  height: clamp(48px, 8vw, 60px);
+  margin: auto;
+  border-radius: var(--radius-xl);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 3px solid transparent;
+  background: var(--color-white-primary);
+      top: 15px;
+    position: relative;
+
+  @include tablet-down {
+    width: 85%;
+    height: 48px;
+    border-radius: var(--radius-md);
+  }
+  @include small-mobile{
+    width: 90%;
+    height: 65px;
+  }
+
+
+  background: linear-gradient(var(--color-white-primary), var(--color-white-primary)) padding-box,
+  conic-gradient(from var(--border-angle),
+    var(--color-search-border-a) 0deg,
+    var(--color-search-border-b) 45deg,
+    var(--color-search-border-c) 90deg,
+    var(--color-search-border-d) 135deg,
+    var(--color-search-border-e) 180deg,
+    var(--color-search-border-f) 225deg,
+    var(--color-search-border-g) 270deg,
+    var(--color-search-border-h) 315deg,
+    var(--color-search-border-a) 360deg
+  ) border-box;
+
+  animation: borderAngleRotate 3s linear infinite;
+
+  box-shadow: -29.891px 225.25px 64.052px 0 rgba(0, 0, 0, 0.00),
+  -19.216px 144.118px 58.715px 0 rgba(0, 0, 0, 0.01),
+  -10.675px 81.133px 49.107px 0 rgba(0, 0, 0, 0.03),
+  -4.27px 36.296px 36.296px 0 rgba(0, 0, 0, 0.04),
+  -1.068px 8.54px 20.283px 0 rgba(0, 0, 0, 0.05);
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -15px;
+    border-radius: inherit;
+    background: conic-gradient(from var(--border-angle),
+        transparent 0deg,
+        var(--color-search-glow-a) 60deg,
+        var(--color-search-glow-b) 120deg,
+        var(--color-search-glow-c) 180deg,
+        var(--color-search-glow-d) 240deg,
+        var(--color-search-glow-a) 300deg,
+        transparent 360deg);
+    filter: blur(25px);
+    opacity: 0.7;
+    z-index: -1;
+    animation: borderAngleRotate 3s linear infinite;
+  }
+
+  @include tablet-down {
+    height: 50px;
+    border: 2px solid transparent;
+  }
+}
+
+.inputContent {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0 var(--space-2) 0 var(--space-6);
+
+  @include tablet-down {
+    padding: 0 var(--space-2) 0 var(--space-4);
+    gap: var(--space-2);
+  }
+}
+
+.searchInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: var(--font-satoshi);
+  font-size: clamp(14px, 2vw, 16px);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+  padding: clamp(8px, 1.5vw, 12px);
+
+  &::placeholder {
+    font-weight: var(--font-weight-medium);
+    color: var(--color-blue-primary);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+    background-color: var(--color-gray-light);
+  }
+
+  @include tablet-down {
+    font-size: var(--text-nav);
+    padding: var(--space-2);
+  }
+}
+
+
+.searchButton {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: var(--color-black-primary);
+  color: var(--color-gray-medium);
+  border: none;
+  border-radius: var(--radius-md);
+  gap: var(--space-2);
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: box-shadow 0.3s ease, background 0.3s ease, opacity 0.3s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+  overflow: hidden;
+  isolation: isolate;
+  padding: var(--space-3) var(--space-4-5);
+  height: 48px;
+
+  // Disabled state
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+    pointer-events: none;
+
+    &::after {
+      display: none; // Disable glass effect when loading
+    }
+  }
+
+  // Glass effect overlay
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.4),
+      transparent
+    );
+    transition: left 0.7s ease;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  // Spinner animation
+  .spinner {
+    position: relative;
+    z-index: 2;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: var(--color-white-primary);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    flex-shrink: 0;
+  }
+
+  // Icon stays above glass effect
+  .icon {
+    position: relative;
+    z-index: 2;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    transition: color 0.3s ease;
+    color: var(--color-gray-medium);
+  }
+
+  // Label wrapper for the slide-up effect
+  .labelWrapper {
+    position: relative;
+    z-index: 2;
+    display: block;
+    height: 100%;
+    overflow: hidden;
+    line-height: 24px;
+  }
+
+  // Duplicate labels for slide-up animation
+  .labelUp {
+    display: block;
+    position: relative;
+    top: 0;
+    transition: top 0.3s ease;
+    color: var(--color-gray-medium);
+
+    &:last-child {
+      color: var(--color-white-primary);
+    }
+  }
+
+  // Hover state (only when not disabled)
+  &:not(:disabled):hover {
+    background: var(--color-black-hover);
+    box-shadow: 0 4px 12px var(--color-blue-primary-alpha-30);
+
+    &::after {
+      left: 100%;
+    }
+
+    .icon {
+      color: var(--color-white-primary);
+    }
+
+    .labelUp {
+      top: -100%;
+    }
+  }
+
+  // Active state
+  &:not(:disabled):active {
+    transform: scale(0.98);
+  }
+
+  // Focus state for accessibility
+  &:focus-visible {
+    outline: 2px solid var(--color-white-primary);
+    outline-offset: 2px;
+  }
+
+  @include tablet-down {
+    padding: var(--space-3);
+    height: 40px;
+    gap: 0;
+
+    .labelWrapper {
+      display: none;
+    }
+
+    .icon,
+    .spinner {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+// Spinner keyframes
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+.domainList {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-2);
+  position: relative;
+  transform: translate(0px, 35px);
+  padding: 0 var(--container-padding-x);
+  width: 100%;
+
+  // Below desktop, .search_bg now sizes to its actual content instead of a fixed
+  // height, so this list just needs a normal top gap under the search box —
+  // the old fixed-pixel translate assumed a single row and drifted once it wrapped.
+  // Was mobile-only; widened to tablet-down so tablet gets the same treatment
+  // instead of the desktop-ish translate/width:auto below.
+  @include tablet-down {
+    transform: none;
+    margin-top: var(--space-4);
+    padding: 0 var(--space-4);
+  }
+
+  @include tablet-up {
+    transform: translate(0px, 20px);
+    padding: 0;
+    width: auto;
+  }
+
+  span:not(.domainMore) {
+    border-radius: var(--radius-full);
+    background: var(--color-white-primary);
+    box-shadow: 0 1px 1px 0 rgb(0 0 0 / 16%) inset, 0 1px 2.2px 0 rgb(0 0 0 / 6%);
+    color: var(--color-black-primary);
+    text-align: center;
+    font-family: var(--font-space-grotesk);
+    font-size: var(--text-small-12);
+    font-style: normal;
+    font-weight: var(--font-weight-medium);
+    text-transform: lowercase;
+    padding: var(--space-1-5) var(--space-4);
+    flex-shrink: 0;
+
+    @include tablet-up {
+      padding: var(--space-1-5) var(--space-5);
+    }
+  }
+}
+
+.domainMore {
+  border-radius: var(--radius-full);
+  background: var(--color-blue-light);
+  box-shadow: 0 0 10px var(--color-blue-primary-alpha-13);
+  color: var(--color-blue-primary);
+  text-align: center;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-12);
+  font-style: normal;
+  font-weight: var(--font-weight-semibold);
+  text-transform: none;
+  letter-spacing: 0.01em;
+  padding: var(--space-1-5) var(--space-4);
+  flex-shrink: 0;
+
+  @include mobile-up {
+    padding: var(--space-1-5) var(--space-5);
+  }
+}

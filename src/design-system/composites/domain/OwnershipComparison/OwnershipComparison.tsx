@@ -1,25 +1,27 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
-import {
-  PiKeyBold,
-  PiFingerprintBold,
-  PiUserCircleBold,
-  PiStackBold,
-  PiLockKeyOpenBold,
-  PiWalletBold,
-  PiPlugsConnectedBold,
-  PiInfinityBold,
-} from 'react-icons/pi'
 
 import { createProgressController, STATE_COUNT } from './OwnershipComparisonAnimation'
 import styles from './OwnershipComparison.module.scss'
 
-interface ComparisonCardCopy {
+const ICON_DIR = '/landing/ownership%20comparision%20icons'
+
+// The 8 card icons are static SVG assets rather than react-icons components, so this
+// wraps each one in a component with the same size-driven API the cards already call
+// (<state.left.Icon size={18} />), instead of reshaping the card-rendering JSX for them.
+function svgIcon(fileName: string): React.ComponentType<{ size?: number }> {
+  function SvgIcon({ size = 18 }: { size?: number }) {
+    return <Image src={`${ICON_DIR}/${fileName}`} alt="" width={size} height={size} unoptimized style={{ display: 'block' }} />
+  }
+  return SvgIcon
+}
+
+export interface ComparisonCardCopy {
   id: string
   label: string
   headline: string
   desc: string
-  Icon: typeof PiKeyBold
+  Icon: React.ComponentType<{ size?: number }>
 }
 
 interface ComparisonState {
@@ -28,73 +30,73 @@ interface ComparisonState {
   right: ComparisonCardCopy
 }
 
-const STATES: ComparisonState[] = [
+export const STATES: ComparisonState[] = [
   {
-    id: 'problem',
+    id: 'identity',
     left: {
-      id: 'renting',
+      id: 'own-identity',
       label: 'Renting',
-      headline: "Your identity is still on someone else's terms.",
-      desc: "Most digital identities live inside platforms you don't truly control. Access, portability and value remain tied to the platform.",
-      Icon: PiKeyBold,
+      headline: 'They Own Your Identity',
+      desc: "Your email, social media, and payment accounts live on their servers. You're just a tenant paying with your data.",
+      Icon: svgIcon('Vector-1.svg'),
     },
     right: {
-      id: 'old-model',
-      label: 'The Old Model',
-      headline: "You use an identity. You don't own it.",
-      desc: 'Platforms decide how your identity works, where it can be used and what happens when you leave.',
-      Icon: PiLockKeyOpenBold,
-    },
-  },
-  {
-    id: 'shift',
-    left: {
-      id: 'ownership',
+      id: 'no-one-can-take-it',
       label: 'Ownership',
-      headline: 'Your identity should belong to you.',
-      desc: 'Web3 changes the model by making identity something you can actually own, hold in your wallet and carry across the ecosystem.',
-      Icon: PiFingerprintBold,
-    },
-    right: {
-      id: 'on-chain',
-      label: 'On-Chain',
-      headline: 'One identity. Held by your wallet.',
-      desc: 'Your identity becomes a blockchain-owned asset instead of another account locked inside a platform.',
-      Icon: PiWalletBold,
+      headline: 'No One Can Take It Away',
+      desc: 'Not a company, not a government. Mint it once and it stays yours for life.',
+      Icon: svgIcon('fi_9065181.svg'),
     },
   },
   {
-    id: 'utility',
+    id: 'banning',
     left: {
-      id: 'one-identity',
-      label: 'One Identity',
-      headline: 'Use one identity everywhere.',
-      desc: 'Turn a human-readable domain into a persistent identity for payments, applications, communities and the on-chain ecosystem.',
-      Icon: PiUserCircleBold,
+      id: 'delete-overnight',
+      label: 'Renting',
+      headline: 'They Can Delete You Overnight',
+      desc: 'Suspended or banned with no appeal. It happens to people every day.',
+      Icon: svgIcon('Vector.svg'),
     },
     right: {
-      id: 'utility',
-      label: 'Utility',
-      headline: 'Ownership is only the beginning.',
-      desc: 'Your identity can connect to wallets, dApps, profiles, reputation and future on-chain experiences.',
-      Icon: PiPlugsConnectedBold,
+      id: 'never-banned',
+      label: 'Ownership',
+      headline: 'You Can Never Be Banned Or Deleted',
+      desc: 'There is no account to suspend. Your name lives on-chain, not on their servers.',
+      Icon: svgIcon('fi_2354573.svg'),
     },
   },
   {
-    id: 'future',
+    id: 'access',
     left: {
-      id: 'identity-os',
-      label: 'Identity OS',
-      headline: 'Build something that grows with you.',
-      desc: 'Your identity becomes a foundation for reputation, ownership, discovery, earning and everything you build on-chain.',
-      Icon: PiStackBold,
+      id: 'access-revoked',
+      label: 'Renting',
+      headline: 'Access Can Be Revoked Anytime',
+      desc: 'One policy change or takedown and your login simply stops working.',
+      Icon: svgIcon('fi_7214281.svg'),
     },
     right: {
-      id: 'endless-domains',
-      label: 'Endless Domains',
-      headline: 'One identity. Everything it unlocks.',
-      desc: 'Own your identity once. Carry it across chains, platforms and experiences as the Web3 ecosystem evolves.',
-      Icon: PiInfinityBold,
+      id: 'data-stays',
+      label: 'Ownership',
+      headline: 'Your Data Stays With You',
+      desc: 'You decide what to share and who sees it. Nothing is sold behind your back.',
+      Icon: svgIcon('fi_10536486.svg'),
+    },
+  },
+  {
+    id: 'reputation',
+    left: {
+      id: 'reputation-trapped',
+      label: 'Renting',
+      headline: 'Your Reputation Is Trapped',
+      desc: 'Years of followers and history vanish the moment you leave, or they push you out.',
+      Icon: svgIcon('fi_7852774.svg'),
+    },
+    right: {
+      id: 'reputation-yours',
+      label: 'Ownership',
+      headline: 'Your Reputation Is Permanently Yours',
+      desc: 'Your followers, history, and trust move with you. No platform holding them hostage.',
+      Icon: svgIcon('fi_879169.svg'),
     },
   },
 ]
@@ -203,6 +205,7 @@ export function OwnershipComparison() {
         <div className={styles.stage}>
           <div className={styles.ambientGlowLeft} aria-hidden="true" />
           <div className={styles.ambientGlowRight} aria-hidden="true" />
+          <div className={styles.centerLine} aria-hidden="true" />
 
           <div className={styles.headerRow}>
             <div className={styles.headerBlock}>
@@ -214,8 +217,6 @@ export function OwnershipComparison() {
               <p className={styles.headerHeadline}>Yours. Forever.</p>
             </div>
           </div>
-
-          <div className={styles.connectorBeam} aria-hidden="true" />
 
           <div className={styles.body}>
             <div className={styles.cardColumn} data-side="left">

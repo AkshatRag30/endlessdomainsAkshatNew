@@ -1,4 +1,4 @@
-@import '@newstyles/_mixins.scss';
+@import '../../../styles/_mixins.scss';
 
 // ── Section shell ─────────────────────────────────────────────────────────────
 
@@ -10,10 +10,9 @@
   flex-direction: column;
   align-items: center;
   gap: var(--space-11); // 64px ≈ Figma's ~61-74px inter-block rhythow, nearest token
-  padding: var(--space-13) var(--container-padding-x);
+  padding: calc(var(--section-spacing) / 2) var(--container-padding-x) calc(var(--section-spacing) / 2);
 
-  @include tablet-down { padding: var(--space-9) var(--space-7); gap: var(--space-9); }
-  @include mobile { padding: var(--space-7) var(--space-5); gap: var(--space-7); }
+  @include tablet-down { padding: calc(var(--section-spacing) / 2) var(--space-5) calc(var(--section-spacing) / 2); gap: var(--space-7); }
 }
 
 // ── Header ────────────────────────────────────────────────────────────────────
@@ -92,8 +91,7 @@
   letter-spacing: -0.024em; // -1.356px at 55px, Figma-exact tracking
   text-transform: capitalize;
 
-  @include tablet-down { font-size: 40px; }
-  @include mobile { font-size: 30px; }
+  @include tablet-down { font-size: 30px; }
 }
 
 .headingLine1 {
@@ -123,8 +121,7 @@
   transform: translateY(6px);
   transition: opacity 0.5s ease 0.16s, transform 0.5s ease 0.16s;
 
-  @include tablet-down { font-size: var(--text-body-small); max-width: 600px; }
-  @include mobile { font-size: var(--text-small-15); max-width: 100%; }
+  @include tablet-down { font-size: var(--text-small-15); max-width: 100%; }
 }
 
 .section[data-active] .description {
@@ -155,8 +152,7 @@
   transform: translateY(6px);
   transition: opacity 0.5s ease 0.24s, transform 0.5s ease 0.24s;
 
-  @include tablet-down { font-size: 22px; }
-  @include mobile { font-size: var(--text-body-small); flex-wrap: wrap; gap: var(--space-2); }
+  @include tablet-down { font-size: var(--text-body-small); flex-wrap: wrap; gap: var(--space-2); }
 }
 
 .section[data-active] .barLabels {
@@ -218,7 +214,7 @@
   transform: translateY(6px);
   transition: opacity 0.5s ease 0.3s, transform 0.5s ease 0.3s;
 
-  @include mobile { height: 44px; }
+  @include tablet-down { height: 44px; }
 }
 
 .section[data-active] .barTrack {
@@ -237,12 +233,23 @@
   background-size: 200% 100%;
   animation: adoption-gray-scan 22s linear infinite;
   transition: filter 0.3s ease;
-
-  @include mobile { display: none; }
 }
 
 .barGrayAmbient[data-pulse] {
   filter: brightness(1.06);
+}
+
+.barGrayLabel {
+  position: absolute;
+  top: 50%;
+  right: var(--space-5);
+  transform: translateY(-50%);
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-13);
+  color: var(--color-gray-dark);
+  white-space: nowrap;
+
+  @include tablet-down { display: none; }
 }
 
 @keyframes adoption-gray-scan {
@@ -258,8 +265,8 @@
 .barFill {
   position: absolute;
   inset: 0;
-  width: 20%;
-  min-width: 60px;
+  width: 5%;
+  min-width: 28px;
   border-radius: var(--radius-lg); // 16px ≈ 17px Figma value, nearest token
   background-image:
     repeating-linear-gradient(90deg, var(--color-white-alpha-30) 0px, var(--color-white-alpha-30) 1.5px, transparent 1.5px, transparent 13px),
@@ -279,9 +286,26 @@
   transform: scaleX(1);
 }
 
-.barFillInner {
+// Sits just outside the (now proportionally-thin) fill rather than inside it — at the
+// bar's true ~1.3% scale there's no room inside the segment itself for this text.
+.barFillLabel {
   position: absolute;
-  inset: 0;
+  top: 50%;
+  left: calc(5% + var(--space-3));
+  transform: translateY(-50%);
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-small-13);
+  color: var(--color-blue-primary);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+
+  &[data-reveal] {
+    opacity: 1;
+  }
+
+  @include tablet-down { display: none; }
 }
 
 // Phase 10 — the boundary between adoption and the gap briefly activates once the fill
@@ -310,55 +334,6 @@
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
-}
-
-// ── Wallet-address markers (phases 6-8) ──────────────────────────────────────
-
-.marker {
-  position: absolute;
-  pointer-events: none;
-  max-width: 140px;
-
-  @include mobile { display: none; }
-}
-
-.markerText {
-  display: inline-block;
-  font-family: var(--font-ibm-plex-mono);
-  font-size: var(--text-small-10);
-  letter-spacing: 0.03em;
-  white-space: nowrap;
-  opacity: 0;
-  transform: translateY(2px);
-  transition: opacity 0.4s ease, transform 0.4s ease, color 0.3s ease;
-}
-
-.marker[data-variant='ambient'] .markerText {
-  color: var(--color-gray-dark);
-}
-
-.marker[data-variant='transform'] .markerText {
-  color: var(--color-white-alpha-90);
-  font-weight: var(--font-weight-medium);
-}
-
-.markerText[data-visible] {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.marker[data-variant='transform'] .markerText[data-resolved] {
-  color: var(--color-white-primary);
-  // brief "resolving" flicker instead of a plain crossfade — quick, stepped, not a
-  // continuous glitch loop
-  animation: adoption-resolve-flicker 0.4s steps(4, end) 1;
-}
-
-@keyframes adoption-resolve-flicker {
-  0%, 100% { opacity: 1; }
-  25% { opacity: 0.55; }
-  50% { opacity: 0.9; }
-  75% { opacity: 0.65; }
 }
 
 // ── Large statistic ───────────────────────────────────────────────────────────
@@ -396,8 +371,7 @@
   -webkit-background-clip: text;
   color: transparent;
 
-  @include tablet-down { font-size: 60px; }
-  @include mobile { font-size: 44px; }
+  @include tablet-down { font-size: 44px; }
 }
 
 .statDesc {
@@ -434,7 +408,7 @@
   text-align: center;
   color: var(--color-black-alpha-60); // ≈ rgba(0,0,0,0.78) Figma value, nearest available alpha
 
-  @include mobile { font-size: var(--text-small-13); }
+  @include tablet-down { font-size: var(--text-small-13); }
 }
 
 // ── Reduced motion ────────────────────────────────────────────────────────────
@@ -463,12 +437,6 @@
   }
 
   .labelIdentity[data-reveal]::after {
-    animation: none;
-  }
-
-  .markerText,
-  .marker[data-variant='transform'] .markerText[data-resolved] {
-    transition: none;
     animation: none;
   }
 }

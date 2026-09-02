@@ -168,9 +168,9 @@ export function DomainOnchainStats() {
           <Image src="/landing/onchain-stats/line-wide-top.svg" alt="" fill className={styles.lineWideTop} unoptimized />
         </span>
 
-        {DATA_SLOTS.map(slot => (
-          <DataSlot key={slot.id} top={slot.top} side={slot.side} offset={slot.offset} align={slot.align} tier={slot.tier} active={active} />
-        ))}
+        {DATA_SLOTS.map(({ id, ...slotProps }) =>
+          React.createElement(DataSlot, { key: id, ...slotProps, active })
+        )}
       </div>
 
       <div className={styles.content}>
@@ -216,7 +216,6 @@ export function DomainOnchainStats() {
         </div>
 
         <div className={styles.ctaBar}>
-          <Image src="/landing/onchain-stats/cta-bg.png" alt="" fill className={styles.ctaBg} unoptimized priority={false} />
           <span className={styles.ctaShimmer} />
           <p className={styles.ctaText}>
             Over 80% Of All Minted Web3 Identities Have Zero Earning Or Utility Activity In The Last 12 Months.

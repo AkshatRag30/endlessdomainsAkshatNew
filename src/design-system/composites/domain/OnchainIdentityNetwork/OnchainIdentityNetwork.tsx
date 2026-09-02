@@ -1,20 +1,31 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
-import { PiWalletBold, PiShareNetworkBold, PiPlugsConnectedBold, PiEnvelopeBold, PiKeyholeBold, PiSealCheckBold } from 'react-icons/pi'
 
 import { createProgressController, PHASES } from './OnchainIdentityNetworkAnimation'
 import styles from './OnchainIdentityNetwork.module.scss'
+
+const ICON_DIR = '/landing/network%20section%20icons'
+
+// The 6 node icons are static SVG assets rather than react-icons components, so this
+// wraps each one in a component with the same size-driven API the nodes already call
+// (<node.Icon size={20} />), instead of reshaping the node-rendering JSX for them.
+function svgIcon(fileName: string): React.ComponentType<{ size?: number }> {
+  function SvgIcon({ size = 20 }: { size?: number }) {
+    return <Image src={`${ICON_DIR}/${fileName}`} alt="" width={size} height={size} unoptimized style={{ display: 'block' }} />
+  }
+  return SvgIcon
+}
 
 interface Point {
   x: number
   y: number
 }
 
-interface IdentityNode {
+export interface IdentityNode {
   id: string
   title: string
   desc: string
-  Icon: typeof PiWalletBold
+  Icon: React.ComponentType<{ size?: number }>
   xPercent: number
   yPercent: number
   side: 'left' | 'right'
@@ -26,12 +37,12 @@ interface IdentityNode {
 // Rows spaced 32 percentage points apart (18/50/82) — generous enough that a two-line
 // description in one row never runs into the next row's title, with the core aligned
 // on the middle row per the original design intent.
-const NODES: IdentityNode[] = [
+export const NODES: IdentityNode[] = [
   {
     id: 'wallet',
     title: 'Wallet Identity',
     desc: 'Replace 0x7f3c9a2… with one human-readable name.',
-    Icon: PiWalletBold,
+    Icon: svgIcon('Vector-1.svg'),
     xPercent: 9,
     yPercent: 18,
     side: 'left',
@@ -43,7 +54,7 @@ const NODES: IdentityNode[] = [
     id: 'social',
     title: 'Social Identity',
     desc: 'One verified handle across every social. Your reputation follows you.',
-    Icon: PiShareNetworkBold,
+    Icon: svgIcon('fi_10210961.svg'),
     xPercent: 91,
     yPercent: 18,
     side: 'right',
@@ -55,7 +66,7 @@ const NODES: IdentityNode[] = [
     id: 'dapp',
     title: 'DApp Identity',
     desc: 'Your passport into DeFi, DAOs and games. Connect once, known everywhere.',
-    Icon: PiPlugsConnectedBold,
+    Icon: svgIcon('Vector.svg'),
     xPercent: 9,
     yPercent: 50,
     side: 'left',
@@ -67,7 +78,7 @@ const NODES: IdentityNode[] = [
     id: 'mail',
     title: 'Mail Identity',
     desc: 'Send and receive mail at your name. No Gmail landlord.',
-    Icon: PiEnvelopeBold,
+    Icon: svgIcon('fi_3781605.svg'),
     xPercent: 91,
     yPercent: 50,
     side: 'right',
@@ -79,7 +90,7 @@ const NODES: IdentityNode[] = [
     id: 'login',
     title: 'Login Identity',
     desc: 'Passwordless sign-in. Your identity is the key.',
-    Icon: PiKeyholeBold,
+    Icon: svgIcon('Layer_x0020_1.svg'),
     xPercent: 9,
     yPercent: 82,
     side: 'left',
@@ -91,7 +102,7 @@ const NODES: IdentityNode[] = [
     id: 'brand',
     title: 'Brand Identity',
     desc: 'Your name is your brand. Own it outright, no landlord.',
-    Icon: PiSealCheckBold,
+    Icon: svgIcon('id-card.svg'),
     xPercent: 91,
     yPercent: 82,
     side: 'right',
@@ -320,6 +331,13 @@ export function OnchainIdentityNetwork() {
           </header>
 
           <div className={styles.network} ref={networkRef}>
+            <div className={styles.ambientRings} aria-hidden="true">
+              <span className={`${styles.ambientRing} ${styles.ambientRingSm}`} />
+              <span className={`${styles.ambientRing} ${styles.ambientRingMd}`} />
+              <span className={`${styles.ambientRing} ${styles.ambientRingLg}`} />
+              <span className={`${styles.ambientRing} ${styles.ambientRingXl}`} />
+            </div>
+
             <svg className={styles.connections} viewBox={`0 0 ${canvas.width} ${canvas.height}`} aria-hidden="true">
               <defs>
                 {/* One gradient per node, anchored to that node's own real core/hex points in

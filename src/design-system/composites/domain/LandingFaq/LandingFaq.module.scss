@@ -1,0 +1,242 @@
+@import '@newstyles/_mixins.scss';
+
+// ── Section wrapper ───────────────────────────────────────────────────────────
+.section {
+  background: var(--color-white-primary);
+  position: relative;
+  padding: var(--section-spacing, 80px) 0;
+  overflow: hidden;
+  border-top: 0.5px solid var(--color-border-black-subtle);
+  border-bottom: 0.5px solid var(--color-border-black-subtle);
+}
+
+// ── Two-column container ──────────────────────────────────────────────────────
+.container {
+  max-width: 1430px;
+  margin: 0 auto;
+  padding: 0 var(--container-padding-x);
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: var(--space-7);
+
+  @include mobile-up {
+    gap: var(--gap-section);
+  }
+
+  @include desktop {
+    flex-direction: row;
+    gap: var(--space-9);
+  }
+}
+
+// ── Left column ───────────────────────────────────────────────────────────────
+.left {
+  flex-shrink: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding-top: 0;
+
+  @include desktop {
+    width: 450px;
+    padding-top: var(--space-8);
+  }
+}
+
+// ── Eyebrow: [ FAQ ] ──────────────────────────────────────────────────────────
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.bracketWrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 28px;
+  gap: var(--space-5);
+}
+
+.bracketTL,
+.bracketBL,
+.bracketTR,
+.bracketBR {
+  display: block;
+  width: 9px;
+  height: 9px;
+  border-color: var(--color-faq-bracket);
+  border-style: solid;
+}
+
+.bracketTL { border-width: 1.5px 0 0 1.5px; }
+.bracketBL { border-width: 0 0 1.5px 1.5px; }
+.bracketTR { border-width: 1.5px 1.5px 0 0; }
+.bracketBR { border-width: 0 1.5px 1.5px 0; }
+
+.eyebrowText {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-faq-bracket);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+// ── Heading ───────────────────────────────────────────────────────────────────
+.heading {
+  font-family: var(--font-satoshi);
+  font-size: clamp(36px, 3.8vw, 55px);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.2;
+  letter-spacing: -1.36px;
+  text-transform: capitalize;
+  margin: 0;
+}
+
+.headingDark { color: var(--color-black-primary); }
+.headingLight { color: var(--color-text-light); }
+
+// ── Description ───────────────────────────────────────────────────────────────
+.description {
+  font-family: var(--font-space-grotesk);
+  font-size: clamp(16px, 1.5vw, 22px);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-body);
+  line-height: 1.3;
+  margin: 0;
+}
+
+// ── Right column (accordion) ──────────────────────────────────────────────────
+.right {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+// ── Divider between items ─────────────────────────────────────────────────────
+.divider {
+  width: 100%;
+  height: 0.5px;
+  background: var(--color-border-black-subtle);
+  transition: opacity 0.3s ease;
+}
+
+// ── FAQ item wrapper ──────────────────────────────────────────────────────────
+.faqItem {
+  background: transparent;
+  transition:
+    background 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.faqItemOpen {
+  background: linear-gradient(180deg, var(--color-slider-card-from) 0%, var(--color-slider-card-to) 100%);
+  box-shadow: inset 0 0 12.6px 0 var(--color-white-alpha-40);
+}
+
+// ── Row: question + caret ─────────────────────────────────────────────────────
+.faqRow {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-7);
+  padding: var(--space-7) var(--space-5) var(--space-7) var(--space-4);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+
+  &:focus-visible {
+    outline: 2px solid var(--color-faq-focus);
+    outline-offset: -2px;
+  }
+}
+
+.faqQuestion {
+  font-family: var(--font-satoshi);
+  font-size: clamp(18px, 1.7vw, 25px);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-light);
+  line-height: 1;
+  margin: 0;
+  transition: color 0.35s cubic-bezier(0.4, 0, 0.2, 1), font-weight 0.35s ease;
+}
+
+.faqItemOpen .faqQuestion {
+  color: var(--color-white-primary);
+  font-weight: 500;
+}
+
+.caretIcon {
+  flex-shrink: 0;
+  color: var(--color-text-light);
+  transition: color 0.35s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.faqItemOpen .caretIcon {
+  color: var(--color-white-primary);
+  transform: rotate(180deg);
+}
+
+// ── Answer panel (height + opacity driven by GSAP) ───────────────────────────
+.answerInner {
+  padding: 0 var(--space-5) var(--space-7) var(--space-4);
+  overflow: hidden;
+  height: 0;
+  opacity: 0;
+}
+
+.expandedAnswer {
+  font-family: var(--font-satoshi);
+  font-size: 15.5px;
+  font-weight: var(--font-weight-regular);
+  color: var(--color-white-primary);
+  line-height: 1.3;
+  letter-spacing: 0.16px;
+  margin: 0;
+}
+
+// ── View More button ──────────────────────────────────────────────────────────
+.viewMoreBtn {
+  margin-top: var(--space-6);
+  align-self: flex-start;
+  background: none;
+  border: none;
+  padding: var(--space-3) var(--space-6);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-body);
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+
+  &:hover {
+    background: var(--color-black-primary);
+    color: var(--color-white-primary);
+    border-color: var(--color-black-primary);
+  }
+}
+
+.viewMoreArrow {
+  transition: transform 0.3s ease;
+  transform: rotate(0deg);
+}
+
+.viewMoreArrowOpen {
+  transition: transform 0.3s ease;
+  transform: rotate(180deg);
+}
+
+// ── Loading state ─────────────────────────────────────────────────────────────
+.spinner {
+  align-self: center;
+  color: var(--color-slider-card-from);
+}

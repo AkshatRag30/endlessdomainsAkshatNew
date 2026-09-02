@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 import styles from './DomainRoadmap.module.scss'
 
@@ -49,6 +49,29 @@ const MILESTONES: Milestone[] = [
 ]
 
 export function DomainRoadmap() {
+  const timelineRef = useRef<HTMLOListElement>(null)
+  // Fires once, the first time the timeline scrolls into view — the cards then stay
+  // revealed rather than replaying every time it re-enters the viewport.
+  const [active, setActive] = useState(false)
+  // Which milestone is currently hovered — drives which divider line gets its
+  // traveling spark. null means nothing is hovered.
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !timelineRef.current) return
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries.some(entry => entry.isIntersecting)) {
+          setActive(true)
+          observer.disconnect()
+        }
+      },
+      { threshold: 0.2 },
+    )
+    observer.observe(timelineRef.current)
+    return () => observer.disconnect()
+  }, [])
+
   return (
     <section className={styles.section} aria-labelledby="domain-roadmap-heading">
       <div className={styles.header}>
@@ -71,21 +94,29 @@ export function DomainRoadmap() {
         </p>
       </div>
 
-      <ol className={styles.timeline}>
-        <span className={styles.dividerLine} data-position="1" aria-hidden="true" />
-        <span className={styles.dividerLine} data-position="2" aria-hidden="true" />
-        <span className={styles.dividerLine} data-position="3" aria-hidden="true" />
-        <span className={styles.dividerLine} data-position="4" aria-hidden="true" />
+      <ol className={styles.timeline} ref={timelineRef} data-active={active || undefined}>
+        {/* Nearest divider to a hovered milestone — the last two milestones share the
+            rightmost one, since there's one fewer divider than there are milestones. */}
+        <span className={styles.dividerLine} data-position="1" data-spark={hoveredIndex === 0 || undefined} aria-hidden="true" />
+        <span className={styles.dividerLine} data-position="2" data-spark={hoveredIndex === 1 || undefined} aria-hidden="true" />
+        <span className={styles.dividerLine} data-position="3" data-spark={hoveredIndex === 2 || undefined} aria-hidden="true" />
+        <span className={styles.dividerLine} data-position="4" data-spark={hoveredIndex === 3 || hoveredIndex === 4 || undefined} aria-hidden="true" />
 
         {MILESTONES.map((milestone, index) => (
-          <li key={milestone.id} className={styles.milestone} data-offset={index % 2 === 1 || undefined}>
+          <li
+            key={milestone.id}
+            className={styles.milestone}
+            data-offset={index % 2 === 1 || undefined}
+            onMouseEnter={() => setHoveredIndex(index)}
+            onMouseLeave={() => setHoveredIndex(null)}
+          >
             <span className={styles.year}>{milestone.year}</span>
             <h3 className={styles.milestoneTitle}>{milestone.title}</h3>
             <p className={styles.milestoneDescription}>{milestone.description}</p>
             {milestone.tags.length > 0 && (
               <div className={styles.tags}>
-                {milestone.tags.map(tag => (
-                  <span className={styles.tag} key={tag}>
+                {milestone.tags.map((tag, tagIndex) => (
+                  <span className={styles.tag} key={tag} style={{ transitionDelay: `${tagIndex * 60}ms` }}>
                     {tag}
                   </span>
                 ))}

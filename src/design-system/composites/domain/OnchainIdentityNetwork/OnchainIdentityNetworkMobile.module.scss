@@ -1,0 +1,204 @@
+@import '../../../styles/_mixins.scss';
+
+.section {
+  position: relative;
+  width: 100%;
+  background: var(--color-white-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-7);
+  padding: calc(var(--section-spacing) / 2) var(--space-5);
+
+  // OnchainIdentityNetwork (the sticky/scrubbed desktop version) takes over from here up.
+  @include tablet-up {
+    display: none;
+  }
+}
+
+// ── Header — same recipe as the desktop section's .header ───────────────────────────
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  text-align: center;
+}
+
+.eyebrowWrap {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-2);
+}
+
+.eyebrowBracketL,
+.eyebrowBracketR {
+  width: 9px;
+  height: 16px;
+  border: 1px solid var(--color-gray-darker);
+}
+
+.eyebrowBracketL {
+  border-right: 0;
+}
+
+.eyebrowBracketR {
+  border-left: 0;
+}
+
+.eyebrowText {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-small-13);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-gray-darker);
+}
+
+.heading {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-h3);
+  line-height: 1.2;
+  letter-spacing: -0.024em;
+  text-transform: capitalize;
+}
+
+.headingLine1 {
+  display: block;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+}
+
+.headingLine2 {
+  display: block;
+  font-weight: var(--font-weight-regular);
+  background: linear-gradient(132deg, var(--color-blue-primary) 80%, var(--color-blue-primary-alpha-30) 96%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.description {
+  margin: 0;
+  max-width: 355px;
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-small-15);
+  line-height: var(--leading-body);
+  color: var(--color-text-body);
+}
+
+// ── Diagram: core mark + connector thread + identity list ────────────────────────────
+
+// No gap here — the core-to-list spacing is provided entirely by the "core" connector
+// segment inside .list below, so the logo's bottom edge sits flush against it.
+.diagram {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.core {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+// Same identity mark asset as the desktop core (OnchainIdentityNetwork's .coreLogo /
+// OwnershipComparison's .coreLogo). The source SVG carries a lot of transparent
+// padding around the actual mark (room for its own drop-shadow filter), so the box
+// needs to be sized well past what the visible glyph alone would suggest, or a
+// change here reads as barely different.
+.coreLogo {
+  width: 300px;
+  height: 300px;
+  object-fit: contain;
+}
+
+// ── Identity list ─────────────────────────────────────────────────────────────────
+
+// No gap here either — every bit of vertical spacing between the logo, each card, and
+// the next is one of the explicit .connector segments below, not a flex gap, so the
+// thread only ever occupies real empty space instead of running behind content.
+.list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 320px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+// One straight segment of the connector thread, exactly as tall as the gap it fills —
+// from the logo down to the first card by default, or the shorter card-to-card gap
+// when nested between two .item entries.
+.connector {
+  width: 24px;
+  height: var(--space-8); // matches the card-to-card gap this normally fills
+  flex-shrink: 0;
+  pointer-events: none;
+
+  &[data-variant='core'] {
+    height: var(--space-7); // the shorter logo-to-first-card gap
+    // .coreLogo's 300px box has the mark itself sitting well inside it (the source SVG
+    // bakes in transparent padding for its own drop-shadow filter), so this segment
+    // starting flush with the box's own bottom edge left a visible gap before it
+    // actually touched the drawn diamond. Measured directly off the rendered image:
+    // the real glyph's bottom edge sits ~74px above the box's bottom edge.
+    margin-top: -74px;
+  }
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  text-align: center;
+}
+
+.itemHex {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  color: var(--color-white-primary);
+  background: linear-gradient(180deg, var(--color-blue-primary) 0%, rgba(38, 57, 237, 0.47) 100%);
+  box-shadow:
+    0 10px 26px var(--color-blue-primary-alpha-18),
+    0 0 0 1px var(--color-blue-primary-alpha-13),
+    inset 0 1px 3px 1px var(--color-white-alpha-70);
+}
+
+.itemTitle {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-body); // 22px ≈ 24px Figma value, nearest token
+  color: var(--color-blue-primary);
+}
+
+.itemDesc {
+  margin: 0;
+  max-width: 280px;
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-small-15);
+  line-height: var(--leading-body);
+  color: var(--color-text-light);
+}

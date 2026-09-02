@@ -6,7 +6,7 @@ import { useCrossfade } from './useCrossfade'
 import { JourneyScreenVisual } from './JourneyScreenVisual'
 import styles from './HowItWorksJourney.module.scss'
 
-const SCREEN_DURATION = 4000
+const SCREEN_DURATION = 1200
 
 export function HowItWorksJourney() {
   const [activeJourneyIndex, setActiveJourneyIndex] = useState(0)
@@ -53,7 +53,7 @@ export function HowItWorksJourney() {
   const handleResume = useCallback(() => setIsPaused(false), [])
 
   return (
-    <section className={styles.section} aria-labelledby="how-it-works-journey-heading">
+    <section id="how-it-works" className={styles.section} aria-labelledby="how-it-works-journey-heading">
       <div className={styles.header}>
         <div className={styles.headerLeft}>
           <div className={styles.eyebrowWrap}>
@@ -102,31 +102,33 @@ export function HowItWorksJourney() {
         })}
       </div>
 
-      <div
-        className={styles.frame}
-        id={`journey-panel-${journey.id}`}
-        role="tabpanel"
-        aria-labelledby={`journey-tab-${journey.id}`}
-        onMouseEnter={handlePause}
-        onMouseLeave={handleResume}
-      >
-        <span className={styles.frameBg} aria-hidden="true">
-          <Image src="/landing/how-it-works/journey-frame.svg" alt="" fill unoptimized className={styles.frameBgImg} />
-        </span>
+      <div className={styles.frameWrap}>
+        <div
+          className={styles.frame}
+          id={`journey-panel-${journey.id}`}
+          role="tabpanel"
+          aria-labelledby={`journey-tab-${journey.id}`}
+          onMouseEnter={handlePause}
+          onMouseLeave={handleResume}
+        >
+          <span className={styles.frameBg} aria-hidden="true">
+            <Image src="/landing/how-it-works/journey-frame.svg" alt="" fill unoptimized className={styles.frameBgImg} />
+          </span>
 
-        <div className={styles.frameContent}>
-          <div className={styles.leftContent} data-phase={leftPhase}>
-            <h3 className={styles.leftTitle}>
-              {displayJourney.leftTitle.map((line, index) => (
-                <span className={styles.leftTitleLine} key={`${displayJourney.id}-line-${index}`}>
-                  {line}
-                </span>
-              ))}
-            </h3>
-            <p className={styles.leftDescription}>{displayJourney.leftDescription}</p>
+          <div className={styles.frameContent}>
+            <div className={styles.leftContent} data-phase={leftPhase}>
+              <h3 className={styles.leftTitle}>
+                {displayJourney.leftTitle.map((line, index) => (
+                  <span className={styles.leftTitleLine} key={`${displayJourney.id}-line-${index}`}>
+                    {line}
+                  </span>
+                ))}
+              </h3>
+              <p className={styles.leftDescription}>{displayJourney.leftDescription}</p>
+            </div>
+
+            <JourneyScreenVisual screen={displayScreen} phase={screenPhase} />
           </div>
-
-          <JourneyScreenVisual screen={displayScreen} phase={screenPhase} />
         </div>
       </div>
     </section>

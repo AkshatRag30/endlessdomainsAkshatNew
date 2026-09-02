@@ -3,11 +3,10 @@ import Image from 'next/image'
 
 import styles from './DomainGrowthComparison.module.scss'
 
-// Historical-looking growth data for the left bar chart — a general upward trend with one
-// standout peak, not a perfectly smooth ramp, so it reads as "real" history rather than a
-// generic progress bar. Percent of the chart's own max height.
-const BAR_HEIGHTS = [15, 21, 18, 29, 26, 39, 34, 51, 47, 72]
-const DOMINANT_BAR_INDEX = 7
+// Matches the Figma frame's own 4-bar chart exactly — a short-medium-tallest-medium
+// silhouette, not an invented trend line. Percent of the chart's own max height,
+// derived from the source frame's own bar heights (97 / 115 / 187 / 142 px).
+const BAR_HEIGHTS = [52, 62, 100, 76]
 
 // The two data points the growth line passes through, extracted from the Figma frame's
 // own marker positions, expressed as a fraction of the chart's viewBox so the curve is
@@ -15,7 +14,10 @@ const DOMINANT_BAR_INDEX = 7
 const LINE_VIEWBOX = { width: 564, height: 220 }
 const LINE_PATH = 'M 4 202 C 90 196, 170 190, 232 166 C 292 140, 352 122, 407 103 C 452 87, 500 48, 540 12'
 const LINE_POINTS: Array<{ x: number; y: number; label: string; value: string; side: 'above' | 'below'; align: 'center' | 'end' }> = [
-  { x: 407, y: 103, label: 'Web3 Identity', value: '+36$', side: 'above', align: 'center' },
+  // Right-aligned onto its own point (instead of centered) so its pill sits further left,
+  // clear of the second point's callout right next to it — centered, the two pills
+  // overlapped since the points themselves are close together near the chart's top-right.
+  { x: 407, y: 103, label: 'Web3 Identity', value: '+36$', side: 'above', align: 'end' },
   // This point sits right at the top-right corner of the chart — a callout floating
   // above and centered on it would clip against both the top and right edges of the
   // card, so it drops below the point and right-aligns onto it instead.
@@ -30,15 +32,37 @@ function useHoverOrViewportActive() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return
-    setSupportsHover(window.matchMedia('(hover: hover) and (pointer: fine)').matches)
+    // (hover: hover) alone isn't reliable — some mobile browsers report it as true even
+    // on a plain touchscreen, which would route mobile down the hover-only path below and
+    // require a tap before anything shows. Below the same tablet breakpoint the rest of
+    // the site treats as "mobile" (992px), always force viewport activation instead.
+    const hasFineHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches
+    const isMobileWidth = window.matchMedia('(max-width: 991px)').matches
+    setSupportsHover(hasFineHover && !isMobileWidth)
     setReducedMotion(window.matchMedia('(prefers-reduced-motion: reduce)').matches)
   }, [])
 
   // Touch/tablet has no reliable hover, so the whole comparison activates once when it
-  // enters the viewport instead (requirement: "mobile = viewport activation").
+  // enters the viewport instead (requirement: "mobile = viewport activation") — a one-way
+  // latch, not a toggle: on mobile the two cards stack into one ~1250px-tall group, so a
+  // 40%-of-the-whole-group threshold needs ~500px of it on screen at once, which a user
+  // can easily scroll past (or pause just short of) without ever seeing it satisfied.
+  // Latching on the first, much smaller intersection and then disconnecting means the
+  // charts reveal as soon as the group starts coming into view and then just stay
+  // revealed, instead of flickering hidden again whenever the ratio dips back below 40%.
   useEffect(() => {
     if (supportsHover || typeof window === 'undefined' || !groupRef.current) return
-    const observer = new IntersectionObserver(entries => entries.forEach(entry => setActive(entry.isIntersecting)), { threshold: 0.4 })
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            setActive(true)
+            observer.disconnect()
+          }
+        })
+      },
+      { threshold: 0.15 },
+    )
     observer.observe(groupRef.current)
     return () => observer.disconnect()
   }, [supportsHover])
@@ -63,8 +87,7 @@ function BarChart({ active }: BarChartProps) {
         <span
           key={i}
           className={styles.bar}
-          data-dominant={i === DOMINANT_BAR_INDEX || undefined}
-          style={{ height: `${height}%`, transitionDelay: active ? `${i * 55}ms` : `${(BAR_HEIGHTS.length - i) * 25}ms` }}
+          style={{ height: `${height}%`, transitionDelay: active ? `${i * 90}ms` : `${(BAR_HEIGHTS.length - i) * 40}ms` }}
         />
       ))}
     </div>
@@ -88,6 +111,7 @@ function GrowthLine({ active }: GrowthLineProps) {
 
   return (
     <div className={styles.lineChart} data-active={active || undefined} aria-hidden="true">
+      <span className={styles.lineGrid} />
       <svg className={styles.lineSvg} viewBox={`0 0 ${LINE_VIEWBOX.width} ${LINE_VIEWBOX.height}`} preserveAspectRatio="none" fill="none">
         <defs>
           <linearGradient id="growthLineFill" x1="0" y1="0" x2="0" y2="1">
@@ -217,7 +241,7 @@ export function DomainGrowthComparison() {
 
           <p className={styles.cardLabel} data-on-blue>
             <span className={styles.cardLabelBullet} aria-hidden="true" />
-            Web3 identity resale &middot; ground floor
+            Web3 identity resale &middot; growing market
           </p>
 
           <div className={styles.chartArea}>

@@ -1,9 +1,17 @@
-@import '_mixins.scss';
+@import '../../../styles/_mixins.scss';
 
 .section {
   position: relative;
   height: 550vh;
   background: var(--color-white-primary);
+  padding-top: calc(var(--section-spacing) / 2);
+  padding-bottom: calc(var(--section-spacing) / 2);
+
+  // Below desktop, OnchainIdentityNetworkMobile takes over with a plain stacked list —
+  // the sticky/scrubbed, path-drawing reveal below has no room to work with on a phone or tablet.
+  @include tablet-down {
+    display: none;
+  }
 }
 
 .sticky {
@@ -131,15 +139,47 @@
   // ratio at narrow widths was letting one row's text run into the next.
   min-height: 380px;
   flex-shrink: 0;
+}
 
-  @include mobile {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    align-items: start;
-    gap: var(--space-6) var(--space-3);
-    aspect-ratio: auto;
-    max-width: 420px;
-  }
+// ── Ambient background rings ─────────────────────────────────────────────────
+// design-specific: faint concentric circles centered on the same point as .core, sitting
+// behind the network diagram only — the header above stays on plain white, not framed
+// by the rings, so this is anchored to .network's own center rather than the whole stage.
+
+.ambientRings {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.ambientRing {
+  position: absolute;
+  left: 50%;
+  top: 50%; // matches .core's own centering, so the rings share its exact center point
+  transform: translate(-50%, -50%);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-blue-primary-alpha-07);
+}
+
+.ambientRingSm {
+  width: 220px;
+  height: 220px;
+}
+
+.ambientRingMd {
+  width: 300px;
+  height: 300px;
+}
+
+.ambientRingLg {
+  width: 380px;
+  height: 380px;
+}
+
+.ambientRingXl {
+  width: 460px;
+  height: 460px;
 }
 
 .connections {
@@ -148,10 +188,6 @@
   width: 100%;
   height: 100%;
   pointer-events: none;
-
-  @include mobile {
-    display: none;
-  }
 }
 
 // No CSS filter here on purpose — drop-shadow is expensive to repaint, and with the
@@ -188,13 +224,6 @@
   @include tablet-up {
     width: 580px;
     height: 580px;
-  }
-
-  @include mobile {
-    position: static;
-    transform: none;
-    grid-column: 1 / -1;
-    margin: 0 auto var(--space-4);
   }
 }
 
@@ -258,29 +287,32 @@
 // A real MacBook browser viewport (after the address bar and tab strip) commonly lands
 // well under 820px tall — the block above alone still leaves the header plus the network
 // diagram taller than that remaining space, which is what was clipping the bottom row
-// against .sticky's overflow: hidden. This tier shrinks the heading and the network's own
-// height too, on top of the rules above, so the whole diagram actually fits.
+// against .sticky's overflow: hidden. Shrinking the heading/description text here used to
+// be part of the fix, but that made this section's title read noticeably smaller than
+// every other section's on exactly the common laptop-height viewports where this tier
+// fires — the diagram and spacing below take back that same room instead, so the type
+// scale stays consistent with the rest of the page.
 @media (max-height: 760px) {
-  .heading {
-    font-size: var(--text-h3);
+  .stage {
+    gap: var(--space-2);
   }
 
-  .description {
-    font-size: var(--text-small-15);
+  .header {
+    gap: var(--space-1);
   }
 
   .network {
-    min-height: 300px;
+    min-height: 260px;
   }
 
   .core {
-    width: 380px;
-    height: 380px;
+    width: 320px;
+    height: 320px;
   }
 
   .coreLogo {
-    width: 340px;
-    height: 340px;
+    width: 300px;
+    height: 300px;
   }
 }
 
@@ -295,13 +327,6 @@
   opacity: 0;
   pointer-events: none;
   will-change: transform, opacity;
-
-  @include mobile {
-    position: static;
-    transform: none;
-    text-align: center;
-    gap: var(--space-2);
-  }
 }
 
 // order (not flex-direction: row-reverse) swaps the visual sequence — this keeps the
@@ -321,24 +346,6 @@
   order: 1;
 }
 
-// Matches [data-side='left']'s attribute-selector specificity so this mobile override
-// wins by source order alone — no !important needed. Also resets the order set above —
-// at mobile both sides already share one uniform column-reverse stack (hex below text),
-// so the left-only order swap needs to be neutralized or it would fight column-reverse
-// and put left's hex above its text while right's stays below.
-@include mobile {
-  .node[data-side='left'],
-  .node[data-side='right'] {
-    flex-direction: column-reverse;
-    text-align: center;
-  }
-
-  .node[data-side='left'] .nodeHex,
-  .node[data-side='left'] .nodeText {
-    order: 0;
-  }
-}
-
 .nodeHex {
   position: relative;
   display: flex;
@@ -349,8 +356,8 @@
   height: 50px;
   flex-shrink: 0;
   border-radius: var(--radius-sm);
-  color: var(--color-blue-primary);
-  background: var(--color-white-primary);
+  color: var(--color-white-primary);
+  background: linear-gradient(180deg, var(--color-blue-primary) 0%, rgba(38, 57, 237, 0.47) 100%);
   box-shadow:
     0 10px 26px var(--color-blue-primary-alpha-18),
     0 0 0 1px var(--color-blue-primary-alpha-13),
@@ -414,7 +421,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  font-family: var(--font-ibm-plex-mono);
+  font-family: 'IBM Plex Mono', monospace;
   font-size: var(--text-small-10);
   letter-spacing: 0.1em;
   text-transform: uppercase;

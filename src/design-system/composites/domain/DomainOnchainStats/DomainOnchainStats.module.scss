@@ -1,4 +1,4 @@
-@import '@newstyles/_mixins.scss';
+@import '../../../styles/_mixins.scss';
 
 // ── Section shell ─────────────────────────────────────────────────────────────
 
@@ -6,7 +6,7 @@
   position: relative;
   width: 100%;
   background: var(--color-white-primary);
-  padding: var(--space-13) 0 var(--space-14);
+  padding: calc(var(--section-spacing) / 2) 0 calc(var(--section-spacing) / 2);
   overflow: hidden;
 }
 
@@ -26,7 +26,7 @@
   opacity: 0;
   transition: opacity 0.6s ease;
 
-  @include mobile {
+  @include tablet-down {
     display: none;
   }
 }
@@ -109,7 +109,7 @@
   opacity: 0;
   transition: opacity 0.6s ease;
 
-  @include mobile { display: none; }
+  @include tablet-down { display: none; }
 }
 
 .section[data-active] .ctaDecor {
@@ -224,7 +224,7 @@
 }
 
 .dataText {
-  font-family: var(--font-ibm-plex-mono);
+  font-family: 'IBM Plex Mono', monospace;
   font-size: var(--text-small-10);
   letter-spacing: 0.04em;
   white-space: nowrap;
@@ -268,7 +268,7 @@
   margin: 0 auto;
   padding: 0 var(--container-padding-x);
 
-  @include mobile { padding: 0 var(--space-5); }
+  @include tablet-down { padding: 0 var(--space-5); }
 }
 
 .titleBlock {
@@ -323,7 +323,7 @@
   letter-spacing: 0.04em;
   white-space: nowrap;
 
-  @include mobile { font-size: var(--text-small-13); white-space: normal; text-align: center; }
+  @include tablet-down { font-size: var(--text-small-13); white-space: normal; text-align: center; }
 }
 
 // ── The live counter ──────────────────────────────────────────────────────────
@@ -345,8 +345,7 @@
   font-variant-numeric: tabular-nums; // keeps every digit the same advance width so the reel never jitters the layout
   transition: filter 0.15s ease;
 
-  @include tablet-down { font-size: 84px; }
-  @include mobile { font-size: 48px; }
+  @include tablet-down { font-size: 48px; }
 }
 
 .counterWrap[data-pulse] {
@@ -435,10 +434,31 @@
   max-width: 1128px;
   width: calc(100% - var(--container-padding-x) * 2);
 
-  @include tablet-down { width: calc(100% - var(--space-7) * 2); }
-  @include mobile { width: calc(100% - var(--space-5) * 2); }
+  @include tablet-down {
+    // matches BugBountyReportingBody's .bannerWrap: block instead of flex so .ctaBar's
+    // margin-left: 50% + translateX(-50%) centers it against this box's own width the
+    // same way it does there, and overflow: hidden clips the bar's 130vw bleed below.
+    // Full width, not an inset calc() — overflow: hidden clips at THIS box's own
+    // edges, so any inset here shortens the visible bleed and the diagonal above it,
+    // clipping both well short of the true screen edge instead of flush against it.
+    // Applied from tablet width down so tablet gets the same centered mobile treatment.
+    width: 100%;
+    display: block;
+    overflow: hidden;
+  }
 }
 
+// design-specific: same noise-texture-over-gradient recipe as OwnershipComparison's
+// badge fills — a synthesized inline SVG (feTurbulence), not a downloaded asset,
+// layered over the blue gradient the same way Figma's own grain sits over a fill.
+$cta-noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+
+// design-specific: trapezoid via clip-path — same "sign board" recipe as
+// BugBountyReportingBody's .banner (slightly narrower at the top than the bottom on
+// desktop/tablet; a steeper cut plus 130vw overscan on mobile so the bottom vertices
+// run off past the viewport edges instead of landing flush inside it). The fill is
+// pure CSS too — a blue gradient with the noise texture above blended over it, no
+// downloadable background image.
 .ctaBar {
   position: relative;
   z-index: 1;
@@ -449,18 +469,49 @@
   justify-content: center;
   flex-wrap: wrap;
   gap: var(--space-3);
-  padding: var(--space-4) var(--space-7);
-  overflow: hidden;
+  padding: var(--space-4) var(--space-9);
+  // Pushed down away from .ctaDecor's lines/dots above — .ctaZone has no gap between
+  // them, so the bar was sitting flush against that decor with no breathing room.
+  @include desktop { margin-top: var(--space-9); }
+  clip-path: polygon(2.5% 0%, 97.5% 0%, 100% 100%, 0% 100%);
+  background-image:
+    linear-gradient(180deg, var(--color-blue-primary) 0%, var(--color-blue-primary-alpha-50) 100%),
+    #{$cta-noise};
+  background-blend-mode: normal, plus-lighter;
+  background-size: cover, 120px 120px;
+  background-position: center, top left;
+  box-shadow:
+    inset 0px 0.5px 16px 0px rgba(210, 234, 255, 0.6),
+    inset 0px 0.5px 2px 0px rgba(210, 234, 255, 0.6);
 
-  @include mobile { padding: var(--space-4) var(--space-5); }
-}
+  // design-specific: glow shadow behind the bar — box-shadow doesn't follow a clip-path,
+  // so this rides along as its own layer instead, same recipe as .banner's own ::before
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 10px -10px -24px -10px;
+    z-index: -1;
+    background: rgba(87, 177, 255, 0.34);
+    filter: blur(28px);
+  }
 
-.ctaBg {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  object-fit: cover;
-  border-radius: var(--radius-sm);
+  @include tablet-down {
+    // A trapezoid's slant is a fixed horizontal distance regardless of the box's
+    // height, so a short bar (the 44px pill this was originally sized for) makes it
+    // read as barely-cut corners instead of a real sign-board shape — stacking the
+    // content and padding it out generously is what actually makes the slant visible.
+    // Applied from tablet width down so tablet gets the same stacked, centered layout.
+    flex-direction: column;
+    gap: var(--space-5);
+    min-height: 0;
+    // fixed calc(), not a percentage — a percentage padding would scale up along with
+    // the 130vw box, same reasoning as .banner's own mobile padding override
+    padding: var(--space-6) calc(var(--space-5) + 9vw);
+    width: 130vw;
+    max-width: 130vw;
+    margin-left: 50%;
+    transform: translateX(-50%);
+  }
 }
 
 // A slow, near-imperceptible highlight sweep across the CTA surface — requirement #11
@@ -469,7 +520,13 @@
 // else via .section[data-active].
 .ctaShimmer {
   position: absolute;
-  inset: 0;
+  // Shifted down off the top edge — .ctaDecor's lineNarrowWrap overflows -6px past its
+  // own box right above .ctaBar, so a flush inset: 0 here let the shimmer sweep collide
+  // with that decorative line. This clears it without touching .ctaBar's own layout.
+  top: 8px;
+  right: 0;
+  bottom: 0;
+  left: 0;
   z-index: -1;
   background: linear-gradient(100deg, transparent 35%, var(--color-white-alpha-25) 50%, transparent 65%);
   background-size: 260% 100%;
@@ -496,6 +553,12 @@
   text-transform: capitalize;
   text-align: center;
   color: var(--color-white-alpha-70); // rgba(255,255,255,0.7) ≈ rgba(255,255,255,0.78) Figma value, nearest token
+
+  @include tablet-down {
+    font-size: var(--text-body-small); // 17px — reads clearly at the bar's now much larger mobile/tablet scale
+    font-weight: var(--font-weight-bold);
+    max-width: 320px;
+  }
 }
 
 .ctaLink {

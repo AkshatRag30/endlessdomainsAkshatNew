@@ -1,0 +1,392 @@
+@import '../../../styles/_mixins.scss';
+
+// ─── StripeAnimation ─────────────────────────────────────────────────────────
+
+.animationContainer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  left: 0;
+  right: 0;
+  height: 100vh;
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.animationTrack {
+  fill: none;
+  stroke: var(--color-gray-light);
+  stroke-width: 0.8;
+}
+
+// ─── BoxLoader ────────────────────────────────────────────────────────────────
+
+.wrapper {
+  @include tablet-down {
+    display: none;
+  }
+}
+
+.left {
+  position: relative;
+  width: 100%;
+  height: 44px;
+  top: 10vh; // shifted up above the bottom two StripeAnimation circles' visible dip
+
+  svg {
+    left: 0;
+    bottom: -6px;
+    height: 56px;
+    width: 325px;
+  }
+}
+
+.right {
+  position: relative;
+  width: 100%;
+  height: 44px;
+  top: 15vh; // shifted up above the bottom two StripeAnimation circles' visible dip
+
+  svg {
+    right: 45px;
+    bottom: 0px;
+    height: 56px;
+    position: absolute;
+    width: 325px;
+  }
+}
+
+// ─── SVG stroke path ─────────────────────────────────────────────────────────
+
+.strokePath {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+// ─── Boxes container ─────────────────────────────────────────────────────────
+
+.boxesContainer {
+  position: absolute;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.loader {
+  display: flex;
+  align-items: center;
+}
+
+.box {
+  border-radius: 3px;
+  background: var(--color-purple-light-active, var(--color-purple-light));
+  opacity: 0.4;
+  will-change: transform, opacity;
+  width: 15px;
+  height: 30px;
+  box-shadow: 0 0 9.6px 0 var(--color-white-primary) inset;
+  flex-shrink: 0;
+}
+
+// ─── Left position variant ───────────────────────────────────────────────────
+
+.left {
+  .boxesContainer {
+    left: 0;
+    bottom: -6px;
+    height: 28px;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    border-radius: 0 0 6px 6px;
+  }
+
+  .loader {
+    margin-left: auto;
+    padding: 0 12px;
+  }
+
+  .box {
+    transform: skewX(30deg);
+
+    &.active {
+      background: var(--color-blue-primary);
+      opacity: 1;
+    }
+  }
+}
+
+// ─── Right position variant ──────────────────────────────────────────────────
+
+.right {
+  .boxesContainer {
+    right: 0;
+    bottom: 2px;
+    height: 36px;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
+
+  .loader {
+    margin-right: auto;
+    padding: 0 12px;
+  }
+
+  .box {
+    transform: skewX(-30deg);
+
+    &.active {
+      background: var(--color-blue-primary);
+      opacity: 1;
+      animation: popRight 0.3s ease-out;
+    }
+  }
+}
+
+// ─── Hero Section ─────────────────────────────────────────────────────────────
+
+.heroSection {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  // Top spacing is intentionally untouched — this section sits directly below the page
+  // header, a different boundary case handled elsewhere. Only the bottom half of the
+  // shared --section-spacing gap belongs here, to meet IdentityOsProvidersStats halfway.
+  padding-bottom: calc(var(--section-spacing) / 2);
+
+  // On tall narrow phones (e.g. iPhone 16 Pro Max) the hero's own content is shorter
+  // than the viewport, so the next section peeks in on first load instead of the hero
+  // filling the screen. 100dvh (not 100vh) so mobile browser chrome showing/hiding
+  // doesn't leave a gap or force extra scroll. Desktop/tablet are left as pure
+  // content-driven height, unchanged.
+  @include tablet-down {
+    min-height: calc(100dvh - var(--header-height));
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+}
+
+// Wraps StripeAnimation + content_wrapper; needs position so absolute children anchor here
+.animationBg {
+  position: relative;
+  width: 100%;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: var(--space-6);
+  // No padding-bottom here — .heroSection's own padding-bottom (calc(--section-spacing / 2))
+  // already provides the breathing room below the button; stacking another one here would
+  // make this boundary bigger than every other equal inter-section gap on the page.
+}
+
+.ctaWrap {
+  display: flex;
+  justify-content: center;
+  // .search_bg centers its content inside a taller box (so its decorative background
+  // renders correctly), which leaves dead space below the visible pills before this
+  // wrapper even starts. Pulling up over that dead space instead of touching .search_bg.
+  margin-top: -30px;
+
+  // Below tablet, .search_bg now sizes to its own content instead of a fixed height
+  // with pills pushed down via transform, so this button just needs a normal top
+  // gap under the (possibly two-row) pill list rather than a pull-up.
+  @include tablet-down {
+    margin-top: var(--space-5);
+  }
+}
+
+// ─── Content wrapper ──────────────────────────────────────────────────────────
+
+.content_wrapper {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: column;
+  gap: var(--space-4);
+  // Header is in normal document flow at the top of the page (not fixed), so it
+  // already reserves its own height — this padding is just the extra breathing
+  // room below it, not a second copy of --header-height.
+  padding: 8px var(--container-padding-x) 16px;
+
+  @include mobile-up {
+    padding-top: 16px;
+    padding-bottom: var(--space-6);
+    gap: var(--space-5);
+  }
+
+  @include tablet-up {
+    padding-top: 0;
+    padding-bottom: 16px; // tightened further to shift the search bar up
+    gap: 16px; // tightened further to shift title/description up
+  }
+
+  @include desktop {
+    padding-top: 0;
+    padding-bottom: 16px; // tightened further to shift the search bar up
+    gap: 16px; // tightened further to shift title/description up
+  }
+
+
+  h4 {
+    color: var(--color-gray-primary);
+    text-align: center;
+    font-family: var(--font-satoshi);
+    font-size: var(--text-body-small);
+    font-style: normal;
+    font-weight: 500;
+    text-transform: uppercase;
+  }
+
+  h1 {
+    color: var(--color-black-primary);
+    font-family: var(--font-satoshi);
+    font-size: var(--text-h1);
+    font-weight: 500;
+    font-style: normal;
+    text-transform: capitalize;
+    text-align: center;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    max-width: 900px;
+
+    @include mobile-up {
+      line-height: var(--leading-tight);
+      letter-spacing: var(--tracking-h1);
+    }
+  }
+
+  p {
+    color: var(--color-gray-dark-active);
+    text-align: center;
+    font-family: var(--font-space-grotesk);
+    font-size: var(--text-body-small);
+    font-style: normal;
+    font-weight: 400;
+    line-height: var(--leading-normal);
+    max-width: 100%;
+    margin: 0;
+
+    @include mobile-up {
+      font-size: var(--text-body);
+      max-width: 917px; // design-specific: Figma-exact width so the copy sits on 2 lines
+    }
+
+    @include desktop {
+      max-width: 1000px;
+    }
+  }
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// ─── Gradient / solid text ────────────────────────────────────────────────────
+
+.txt_gradient {
+  background: var(--color-blue-primary);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.txt_solid {
+  background: var(--color-blue-primary);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+// ─── Subheading bracket decoration ───────────────────────────────────────────
+
+.subheading {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3) var(--space-7);
+  overflow: hidden;
+
+  h4 {
+    font-size: var(--text-nav);
+    text-transform: uppercase;
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    font-family: var(--font-satoshi);
+  }
+
+  &::before,
+  &::after,
+  span::before,
+  span::after {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border: 1px solid var(--color-purple-primary);
+  }
+
+  &::before {
+    top: 0;
+    left: 0;
+    border-right: none;
+    border-bottom: none;
+  }
+
+  &::after {
+    top: 0;
+    right: 0;
+    border-left: none;
+    border-bottom: none;
+  }
+
+  span {
+    position: absolute;
+    inset: 0;
+
+    &::before {
+      bottom: 0;
+      left: 0;
+      border-top: none;
+      border-right: none;
+    }
+
+    &::after {
+      bottom: 0;
+      right: 0;
+      border-top: none;
+      border-left: none;
+    }
+  }
+
+  @include mobile-up {
+    padding: var(--space-1-5) var(--space-5);
+
+    h4 {
+      font-size: var(--text-body-small);
+    }
+  }
+}

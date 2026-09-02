@@ -1,0 +1,227 @@
+@import '@newstyles/_mixins.scss';
+.container_toast{
+  background-color: var(--color-white-primary);
+  width: 320px;
+
+}
+// ─── Base bordered toast ──────────────────────────────────────────────────────
+
+.toast {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border: 2px solid;
+}
+
+// ─── Leading icon ─────────────────────────────────────────────────────────────
+
+.icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+}
+
+// ─── Avatar circle (info-success) ────────────────────────────────────────────
+// design-specific: light slate bg for success avatar — Figma-exact
+
+.avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-full);
+  background: #e8eaf0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+// ─── Body ─────────────────────────────────────────────────────────────────────
+
+.body {
+  flex: 1;
+  min-width: 0;
+}
+
+// ─── Title ────────────────────────────────────────────────────────────────────
+
+.title {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--leading-normal);
+  margin: 0;
+}
+
+// ─── Message / description ────────────────────────────────────────────────────
+
+.message {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--leading-body);
+  margin: 0;
+}
+
+.title+.message {
+  margin-top: 2px;
+}
+
+// ─── Bullet list (error items) ────────────────────────────────────────────────
+
+.list {
+  margin: var(--space-1-5) 0 0 0;
+  padding-left: var(--space-5);
+  list-style: disc;
+
+  li {
+    font-family: var(--font-satoshi);
+    font-size: var(--text-body-small);
+    font-weight: var(--font-weight-regular);
+    line-height: var(--leading-body);
+
+    &+li {
+      margin-top: 2px;
+    }
+  }
+}
+
+// ─── Dismiss button ───────────────────────────────────────────────────────────
+
+.close {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--space-1);
+  border-radius: var(--radius-sm);
+  color: inherit;
+  opacity: 0.55;
+  margin-top: -1px;
+  transition: opacity 150ms ease;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// ─── Error variant ────────────────────────────────────────────────────────────
+
+.toast_error {
+  border-color: var(--color-toast-error);
+  color: var(--color-toast-error);
+  background: repeating-linear-gradient(45deg, #ef444430 , #EF444430 6px, #f4545440, #f4545440 7px);
+}
+
+// ─── Success variant ──────────────────────────────────────────────────────────
+// design-specific: light green bg — no token for success soft bg
+
+.toast_success {
+ border: 1px solid #0F1;
+ background: repeating-linear-gradient(45deg, rgba(0, 255, 17, 0.20), rgba(0, 255, 17, 0.20) 6px, rgba(0, 255, 17, 0.323), rgba(0, 255, 17, 0.323) 7px);
+.title,svg,.message {
+  color: #0f5e59;
+}}
+
+// ─── Info success variant ─────────────────────────────────────────────────────
+// design-specific: same green bg as success
+
+.toast_info_success {
+ border: 1px solid #0F1;
+ background: repeating-linear-gradient(45deg, rgba(0, 255, 17, 0.20), rgba(0, 255, 17, 0.20) 6px, rgba(0, 255, 17, 0.323), rgba(0, 255, 17, 0.323) 7px);
+.title,svg,.message {
+  color: #0f5e59;
+}}
+
+// ─── Warning / bordered alert variant ────────────────────────────────────────
+// Figma "Bordered styles alert" example uses error/red styling
+
+.toast_warning {
+  border: 1px solid #FEF08A;
+  background: repeating-linear-gradient(45deg, #FEF9C3, #FEF9C3 6px, #FEF08A, #FEF08A 7px);
+  color: var(--color-gray-darker); // design-specific: dark charcoal text on yellow bg — Figma-exact
+
+  .title,
+  svg,
+  .message {
+    color: #864d0f;
+  }
+}
+
+// ─── Info / notification variant ──────────────────────────────────────────────
+// design-specific: light gray bg — no token for notification soft bg
+
+.toast_info {
+  border-color: var(--color-gray-300);
+  background: rgba(71, 71, 71, 0.05);
+  color: var(--color-text-body);
+}
+
+// ─── Primary variant ──────────────────────────────────────────────────────────
+// design-specific: light blue bg — no token for primary soft bg
+
+.toast_primary {
+  border-color: var(--color-toast-primary);
+  background: rgba(0, 112, 224, 0.08);
+  color: var(--color-toast-primary);
+}
+
+// ─── Secondary variant ────────────────────────────────────────────────────────
+// design-specific: light teal bg — no token for secondary soft bg
+
+.toast_secondary {
+  border-color: var(--color-toast-secondary);
+  background: rgba(78, 141, 124, 0.08);
+  color: var(--color-toast-secondary);
+}
+
+// ─── react-toastify container override ────────────────────────────────────────
+
+.toast_container {
+  background: transparent;
+  padding: 0;
+  border: 0;
+  outline: transparent;
+  margin: 0;
+  box-shadow: none;
+  width: 460px;
+
+  @media (max-width: 600px) {
+    width: 100%;
+  }
+}
+
+.successIcon {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+
+  background: #dbeafe; // design-specific: SVG fill
+  border: 5px solid #eff6ff; // design-specific: SVG stroke
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+}
+
+.checkmark {
+  width: 12px;
+  height: 7px;
+
+  border-left: 2px solid #1e40af; // design-specific: SVG check color
+  border-bottom: 2px solid #1e40af;
+
+  transform: rotate(-45deg) translateY(-1px);
+  transform-origin: center;
+}

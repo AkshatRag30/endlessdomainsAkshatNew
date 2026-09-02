@@ -1,0 +1,853 @@
+@import '@newstyles/_mixins.scss';
+
+// ─── Animations ───────────────────────────────────────────────────────────────
+
+@keyframes slideInFromRight {
+  from { transform: translateX(30px); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+@keyframes slideInFromLeft {
+  from { transform: translateX(-30px); opacity: 0; }
+  to   { transform: translateX(0);     opacity: 1; }
+}
+
+@keyframes slideOutToRight {
+  from { transform: translateX(0);    opacity: 1; }
+  to   { transform: translateX(30px); opacity: 0; }
+}
+
+@keyframes slideOutToLeft {
+  from { transform: translateX(0);     opacity: 1; }
+  to   { transform: translateX(-30px); opacity: 0; }
+}
+
+@keyframes fadeOutDown {
+  from { transform: translateY(0);    opacity: 1; }
+  to   { transform: translateY(20px); opacity: 0; }
+}
+
+@keyframes fadeInScale {
+  from { transform: scale(0.95); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+@keyframes borderPulse {
+  0%, 100% { opacity: 1;   transform: scale(1);   }
+  50%      { opacity: 0.5; transform: scale(1.1); }
+}
+
+@keyframes textGlow {
+  from { text-shadow: 0 0 0px transparent; }
+  to   { text-shadow: 0 0 10px var(--color-blue-primary-faded); }
+}
+
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to   { background-position:  200% 0; }
+}
+
+// ─── Navbar ───────────────────────────────────────────────────────────────────
+
+.nav {
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  padding: var(--header-padding-y) var(--header-padding-x);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, background-color, box-shadow;
+  z-index: 9999;
+  justify-content: space-between;
+
+  @include mobile {
+    padding-top: var(--space-2);
+    padding-bottom: var(--space-2);
+  }
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  z-index: 999;
+
+  @include tablet-down {
+    display: none; // hidden on mobile/tablet
+  }
+}
+
+.navbar_center {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.nav_item {
+  display: inline-flex;
+  align-items: center;
+}
+
+.is_sticky {
+  background-color: var(--color-white-primary);
+  top: 0 ;
+  left: 0 ;
+  width: 100% ;
+  z-index: 1030 ;
+  position: fixed ; 
+}
+
+.animated {
+  animation-duration: 1s;
+  animation-fill-mode: both;
+}
+
+.fadeInDown {
+  animation-name: fadeInDown;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -20%, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.fadeOutUp {
+  animation-name: fadeOutUp;
+}
+
+@keyframes fadeOutUp {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate3d(0, -100%, 0);
+  }
+}
+// ─── Nav Link ─────────────────────────────────────────────────────────────────
+
+.media_link {
+  color: var(--color-gray-darkest);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+  cursor: pointer;
+  padding: 0 var(--gap-inline-sm);
+  margin: 0 var(--gap-inline-sm);
+  transition: color 0.3s ease;
+  position: relative;
+
+  &::before,
+  &::after {
+    position: relative;
+    display: inline-block;
+    // transition: transform 0.3s ease;
+    // opacity: 0;
+  }
+
+  &::before {
+    content: '[';
+    margin-right: var(--space-5);
+  }
+
+  &::after {
+    content: ']';
+    margin-left: var(--space-5);
+  }
+
+  &:hover {
+    color: var(--color-blue-primary);
+  }
+}
+
+// ─── CTA nav link (e.g. "Join the Waitlist") ─────────────────────────────────
+
+.media_link_cta {
+  color: var(--color-blue-primary);
+  background: var(--color-blue-primary-alpha-07);
+  border-radius: var(--radius-full);
+  // Override the bracket pseudo-elements that .media_link adds
+  &::before { content: none; }
+  &::after  { content: none; }
+  // Gentle always-on pulse
+  animation: ctaGlowPulse 2.8s ease-in-out infinite;
+
+  &:hover {
+    color: var(--color-blue-dark);
+    background: var(--color-blue-primary-alpha-13);
+  }
+}
+
+@keyframes ctaGlowPulse {
+  0%, 100% { box-shadow: 0 0 6px 1px var(--color-blue-primary-alpha-13); }
+  50%       { box-shadow: 0 0 12px 3px var(--color-blue-primary-alpha-20); }
+}
+
+// ─── Nav Buttons ──────────────────────────────────────────────────────────────
+
+.nav_btns {
+  display: flex;
+  gap: var(--gap-inline-sm);
+  align-items: center;
+  position: relative;
+  z-index: 999;
+
+  @include mobile {
+    gap: var(--space-1);
+    --button-height-mobile: 38px;
+    --button-height-sm-mobile: 34px;
+  }
+}
+
+.header_icon {
+  width: 150px;
+  height: auto;
+
+  @include tablet-down {
+    width: 120px;
+  }
+
+  @include mobile {
+    width: 90px;
+  }
+}
+
+// ─── Cart Badge ───────────────────────────────────────────────────────────────
+
+.cart_badge {
+  height: 22px;
+  width: 22px;
+  border-radius: 50%;
+  background: var(--color-blue-primary);
+  color: var(--color-white-primary);
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  font-size: var(--text-small-12);
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+// ─── Overlay ──────────────────────────────────────────────────────────────────
+
+.menuOverlay {
+  position: fixed;
+  inset: 0;
+  background: var(--color-black-alpha-55);
+  z-index: 99999998;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+
+  &.overlayVisible {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+// ─── Menu Sidebar ─────────────────────────────────────────────────────────────
+
+.menuItems_wrapper {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 35%;
+  background: var(--color-white-primary);
+  box-shadow: -5px 0 30px var(  --color-blue-primary-alpha-13);
+  z-index: 999999999;
+  overscroll-behavior: contain;
+  transform: translateX(100%);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+  display: flex;
+  flex-direction: column;
+
+  &.menuOpen {
+    transform: translateX(0);
+
+    .menuItems_header img,
+    .menuItems_header > div,
+    .menuItems_header button {
+      animation: slideInFromRight 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    .menuItems_header img    { animation-delay: 0.05s; }
+    .menuItems_header > div  { animation-delay: 0.10s; }
+    .menuItems_header button { animation-delay: 0.15s; }
+
+    .navigation_bar { animation: fadeInScale 0.5s ease-out 0.2s both; }
+    .accounts_bar   { animation: fadeInScale 0.5s ease-out 0.2s both; }
+
+    .navigation_bar ul li,
+    .accounts_bar ul li {
+      animation: slideInFromLeft 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      opacity: 0;
+
+      @for $i from 1 through 10 {
+        &:nth-child(#{$i}) {
+          animation-delay: #{0.25 + ($i * 0.05)}s;
+        }
+      }
+    }
+  }
+
+  &.menuClose {
+    transform: translateX(100%);
+
+    .menuItems_header img,
+    .menuItems_header > div,
+    .menuItems_header button {
+      animation: slideOutToRight 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    .navigation_bar ul li,
+    .accounts_bar ul li {
+      animation: slideOutToLeft 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    .heading_txt,
+    .navigation_bar,
+    .accounts_bar {
+      animation: fadeOutDown 0.3s ease-out forwards;
+    }
+  }
+
+  width: 100%;
+
+  @include tablet {
+    width: 75%;
+  }
+  @include desktop{
+    width: 40%;
+  }
+
+  @include between($breakpoint-tablet, 1024px) {
+    width: 65%;
+  }
+}
+
+// ─── Menu Header ──────────────────────────────────────────────────────────────
+
+.menuItems_header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  overflow: hidden;
+  flex-shrink: 0;
+
+  // Initial hidden state (revealed by open animation)
+  img, > div, button { opacity: 0; }
+}
+
+.user_info {
+  display: flex;
+  align-items: center;
+  padding: var(--space-3);
+  gap: var(--space-3);
+}
+
+.user_img {
+  width: 46px;
+  height: 46px;
+  border: 2px solid var(--color-purple-light-hover);
+  border-radius: 50%;
+  object-fit: contain;
+  flex-shrink: 0;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+
+  &:hover {
+    transform: scale(1.05);
+    border-color: var(--color-blue-primary);
+  }
+}
+
+.user_details_desktop,
+.user_details_mobile {
+  display: flex;
+  flex-direction: column;
+}
+
+.user_details_desktop {
+  display: none;
+
+  @include mobile-up {
+    display: flex;
+  }
+}
+
+.user_details_mobile {
+  @include mobile-up {
+    display: none;
+  }
+}
+
+.user_email {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-bold);
+  margin: 0;
+}
+
+.user_wallet {
+  color: var(--color-gray-darkest);
+  font-size: var(--text-small-12);
+  font-family: var(--font-satoshi);
+}
+
+.close_btn {
+  background-image: url('/new-assets/header/menuitem-bg.png');
+  font-size: var(--text-h3);
+  border: none;
+  outline: none;
+  padding: 25px 29px;
+  cursor: pointer;
+  background-color: transparent;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+  flex-shrink: 0;
+  color: var(--color-gray-darkest);
+
+  &:hover  { 
+    transform: rotate(90deg); 
+    background-color: var(--color-purple-glow-mid); 
+  }
+  
+  &:active { 
+    transform: rotate(180deg); 
+  }
+}
+
+// ─── Menu Body ────────────────────────────────────────────────────────────────
+
+.menu_body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+
+  @include mobile-up {
+    flex-direction: row;
+  }
+}
+
+.menu_left {
+  flex: 1;
+  padding-left: 0;
+
+  @include mobile-up {
+    flex: 0 0 41.666667%;
+    padding-left: var(--space-4);
+  }
+
+  @include tablet-up {
+    display: none;
+  }
+}
+
+.menu_right {
+  flex: 1;
+
+  @include mobile-up {
+    // flex: 0 0 58.333333%;
+    flex: 1;
+  }
+}
+
+.auth_btn_wrapper {
+  padding-top: var(--space-3);
+}
+
+
+// ─── Section Heading ──────────────────────────────────────────────────────────
+
+.heading_txt {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3) var(--space-7);
+  margin-bottom: var(--space-8);
+  overflow: hidden;
+
+  h4 {
+    font-size: var(--text-nav);
+    text-transform: uppercase;
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    transition: transform 0.3s ease;
+  }
+
+  // Corner brackets
+  &::before, &::after,
+  span::before, span::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border: 2px solid var(--color-blue-primary);
+    transition: all 0.3s ease;
+  }
+
+  &::before { top: 0; left: 0;  border-right: none; border-bottom: none; }
+  &::after  { top: 0; right: 0; border-left: none;  border-bottom: none; }
+
+  span {
+    position: absolute;
+    inset: 0;
+
+    &::before { bottom: 0; left: 0;  border-top: none; border-right: none; }
+    &::after  { bottom: 0; right: 0; border-top: none; border-left: none;  }
+  }
+
+  &:hover {
+    h4 { transform: scale(1.05); }
+
+    &::before, &::after,
+    span::before, span::after {
+      animation: borderPulse 0.6s ease-out;
+    }
+  }
+
+  @include mobile-up {
+    padding: 14px 40px;
+    h4 { font-size: var(--text-body-small); }
+  }
+  @include mobile{
+    margin-bottom: 0;
+  }
+}
+
+// ─── Navigation Bar ───────────────────────────────────────────────────────────
+
+.navigation_bar,
+.accounts_bar {
+  padding: 20px 15px;
+  margin-top: var(--space-3);
+
+  ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  li {
+    padding: var(--space-3) 0;
+    position: relative;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='2'%3E%3Cline x1='0' y1='1' x2='100%25' y2='1' stroke='%23ebebeb' stroke-width='2' stroke-dasharray='12 8' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: bottom;
+    background-size: 100% 1px;
+    transition: padding-left 0.3s ease;
+    @include mobile{
+      padding: var(--space-2) 0;
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--color-blue-primary);
+      transition: width 0.3s ease;
+    }
+
+    &:hover {
+      padding-left: var(--gap-inline-sm);
+
+      &::after { width: 100%; }
+    }
+  }
+
+    a {
+      color: var(--color-gray-darkest);
+      font-family: var(--font-satoshi);
+      font-size: var(--text-body);
+      font-weight: var(--font-weight-medium);
+      text-transform: uppercase;
+      text-decoration: none;
+      display: inline-block;
+      transition: transform 0.3s ease, color 0.3s ease;
+  
+      @include mobile {
+        font-size: var(--text-small-15);
+      }
+
+    &:hover {
+      transform: translateX(5px);
+      color: var(--color-blue-primary);
+      animation: textGlow 0.3s ease-out forwards;
+    }
+  }
+
+  @include mobile-up {
+    padding: 30px 15px;
+    margin-top: 0;
+
+    li { padding: var(--space-4) 0; }
+  }
+}
+
+// ─── Accounts Bar ─────────────────────────────────────────────────────────────
+
+.accounts_bar {
+  background-image: url('/new-assets/header/menuitem-bg.png');
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, var(--color-white-alpha-25), transparent);
+    transition: left 0.5s ease;
+    pointer-events: none;
+  }
+
+  &:hover::before { left: 100%; }
+}
+
+// ─── Cart Auth (right side, cart variant) ─────────────────────────────────────
+
+.cart_login_text {
+  @include max-width(600px) {
+    display: none;
+  }
+}
+
+.cart_login_icon {
+  display: none;
+  line-height: 0;
+
+  @include max-width(600px) {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.cart_auth_skeleton {
+  height: 48px;
+  width: 132px;
+  background: var(--color-gray-200);
+  border-radius: var(--radius-sm);
+  animation: shimmer 1.5s infinite;
+
+  @include max-width(600px) {
+    height: 30px;
+    width: 44px;
+  }
+}
+
+// ─── Header Gold Button ───────────────────────────────────────────────────────
+
+// design-specific: same asymmetric octagon as PrimaryButton primitive
+$clip-btn-gold: polygon(7px 0px, calc(100% - 15px) 0px, 100% 18px, 100% calc(100% - 7px), calc(100% - 7.5px) 100%, 5px 100%, 0px calc(100% - 7px), 0px 9px);
+
+.headerGoldWrap {
+  position: relative;
+  z-index: 10001;
+}
+
+.headerGoldBtn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--button-height);
+  padding: 0 var(--space-5);
+  border: none;
+  cursor: pointer;
+  clip-path: $clip-btn-gold;
+  overflow: hidden;
+  transition: opacity 0.18s ease;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 1.2px;
+    clip-path: $clip-btn-gold;
+    box-shadow: inset 0 0 20px 0 var(--color-white-alpha-40);
+    z-index: 0;
+  }
+
+  > * { position: relative; z-index: 1; }
+  img { mix-blend-mode: multiply; }
+
+  &:hover { opacity: 0.88; }
+
+  @include focus-ring;
+
+  @include mobile {
+    height: var(--button-height-sm);
+    padding: 0 var(--space-2);
+    gap: var(--space-1);
+  }
+
+  // hide tier label text on mobile — number + icon only
+  @include mobile {
+    .headerGoldBtnLabel { display: none; }
+  }
+}
+
+.headerGoldBtnLabel {}
+
+.headerGoldDropdown {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-6px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  z-index: 10000;
+}
+
+.headerGoldDropdownVisible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+// ─── Header Enable Rep Button ─────────────────────────────────────────────────
+
+.headerEnableRepBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  height: var(--button-height);
+  padding: 0 var(--space-5);
+  clip-path: $clip-btn-gold;
+  // design-specific: orange dashed border matching PerksNavBar enable-rep variant
+  border: 1.5px dashed #e8944a;
+  background: rgba(220, 100, 30, 0.07);
+  cursor: pointer;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-button);
+  font-weight: var(--font-weight-medium);
+  color: #d96020;
+  white-space: nowrap;
+  transition: background 0.18s ease, border-color 0.18s ease;
+
+  // pin icon to 18px so it matches the visual weight of the gold button's 22px gif
+  svg { width: 18px; height: 18px; flex-shrink: 0; color: #d96020; }
+
+  &:hover {
+    background: rgba(220, 100, 30, 0.13);
+    border-color: #d96020;
+  }
+
+  @include focus-ring;
+
+  // Header copy hides below tablet — the same CTA reappears inside the mobile menu drawer instead
+  @include tablet-down {
+    display: none;
+  }
+}
+
+.headerEnableRepLabel {
+  @include tablet-down { display: none; }
+}
+
+.headerEnableRepLabelSecond{
+  margin-top: -7px;
+}
+
+// ─── Menu Drawer Enable Rep Button (tablet-down mirror of the header CTA) ─────
+
+.menuEnableRepWrapper {
+  display: none;
+  padding-top: var(--space-3);
+
+  // Mirrors the header CTA, which is visible above this breakpoint instead
+  @include tablet-down {
+    display: block;
+  }
+}
+
+.menuEnableRepBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  width: fit-content;
+  height: var(--button-height-sm);
+  clip-path: $clip-btn-gold;
+  border: 1.5px dashed #e8944a;
+  background: rgba(220, 100, 30, 0.07);
+  cursor: pointer;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-button);
+  font-weight: var(--font-weight-medium);
+  color: #d96020;
+  white-space: nowrap;
+  transition: background 0.18s ease, border-color 0.18s ease;
+
+  svg { width: 18px; height: 18px; flex-shrink: 0; color: #d96020; }
+
+  &:hover {
+    background: rgba(220, 100, 30, 0.13);
+    border-color: #d96020;
+  }
+
+  @include focus-ring;
+}
+
+// ─── Desktop Login / Mobile Hamburger Toggle ─────────────────────────────────
+
+.desktop_login_btn {
+  @include tablet-down {
+    display: none;
+  }
+}
+
+.mobile_menu_btn {
+  display: none;
+
+  @include tablet-down {
+    display: flex;
+  }
+}
+
+// ─── Stripes Footer ───────────────────────────────────────────────────────────
+
+.stripes {
+  background-image: url('/new-assets/header/stripes.png');
+  width: 100%;
+  height: 70px;
+  background-repeat: no-repeat;
+  background-size: cover;
+  position: relative;
+  overflow: hidden;
+  margin-top: auto;
+  flex-shrink: 0;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, var(--color-white-alpha-30), transparent);
+    animation: shimmer 3s infinite;
+  }
+}

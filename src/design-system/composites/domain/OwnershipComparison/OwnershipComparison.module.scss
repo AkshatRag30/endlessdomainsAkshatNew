@@ -1,4 +1,4 @@
-@import '_mixins.scss';
+@import '../../../styles/_mixins.scss';
 
 // design-specific: standard 1px sr-only clip technique, not part of the spacing scale
 .srHeading {
@@ -17,6 +17,16 @@
   position: relative;
   height: 400vh;
   background: var(--color-white-primary);
+  // Tightened vs. the standard halfway-meet — this section should read as connected
+  // to IdentityOsProvidersStats right above it, not separately spaced from it.
+  padding-top: calc(var(--section-spacing) / 4);
+  padding-bottom: calc(var(--section-spacing) / 2);
+
+  // Below desktop, OwnershipComparisonMobile takes over with a plain stacked layout —
+  // this sticky/scrubbed 400vh version doesn't translate to a phone or tablet viewport.
+  @include tablet-down {
+    display: none;
+  }
 }
 
 .sticky {
@@ -70,6 +80,29 @@
   right: -6%;
 }
 
+// design-specific: thin vertical glow running the full height of the stage, centered
+// behind the identity core — reads as one continuous thread linking the section's top
+// edge (where DomainIdentityOS's stats row hands off) down through the logo to the
+// bottom edge (above the scrollbar), rather than the core sitting in isolation.
+.centerLine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    180deg,
+    var(--color-blue-primary-alpha-07) 0%,
+    var(--color-blue-primary-alpha-30) 20%,
+    var(--color-blue-primary-alpha-30) 80%,
+    var(--color-blue-primary-alpha-07) 100%
+  );
+  box-shadow: 0 0 12px var(--color-blue-primary-alpha-30);
+  pointer-events: none;
+  z-index: 0;
+}
+
 // ── Header row ────────────────────────────────────────────────────────────────
 
 .headerRow {
@@ -92,31 +125,52 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-3);
+  gap: 15px; // Figma-exact
   text-align: center;
 }
 
+// design-specific: Figma-exact pill — fixed size, soft blue glow + white ring around the
+// outside, a light-blue inset highlight along the top edge, and a faint grain over the
+// gradient fill. The grain is a synthesized inline SVG (feTurbulence), not a downloaded
+// asset, blended over the fill the same way Figma's own noise layer sits over it.
+$badge-noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+
 .badge {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-full);
+  justify-content: center;
+  width: 244px;
+  max-width: 100%;
+  height: 34px;
+  padding: 0 var(--space-3);
+  border-radius: 5.133px;
+  overflow: hidden;
   font-family: var(--font-satoshi);
   font-weight: var(--font-weight-medium);
-  font-size: var(--text-small-13);
-  letter-spacing: var(--tracking-nav);
+  font-size: 17.581px;
   color: var(--color-white-primary);
   text-transform: capitalize;
-  // design-specific: white cutout halo matching the Figma badge treatment
-  box-shadow: 0 0 0 3px var(--color-white-primary);
+  white-space: nowrap;
+  background-blend-mode: normal, plus-lighter;
+  background-size: cover, 120px 120px;
+  background-position: center, top left;
+  box-shadow:
+    0 39.613px 100.919px 0 rgba(87, 177, 255, 0.34),
+    0 23.316px 30.424px 0 rgba(87, 177, 255, 0.19),
+    0 9.684px 12.637px 0 rgba(87, 177, 255, 0.22),
+    0 3.503px 4.57px 0 rgba(87, 177, 255, 0.15),
+    0 0 0 4.716px var(--color-white-primary),
+    inset 0 0.943px 16.977px 1.886px #d2eaff,
+    inset 0 0.943px 3.773px 1.886px #d2eaff;
 }
 
 .badgeDark {
-  background: linear-gradient(180deg, var(--color-black-primary) 0%, var(--color-gray-darker) 100%);
+  background-image: linear-gradient(180deg, var(--color-black-primary) 0%, rgba(0, 0, 0, 0.47) 100%), #{$badge-noise};
 }
 
 .badgeBlue {
-  background: linear-gradient(180deg, var(--color-blue-primary) 0%, var(--color-blue-primary-alpha-50) 100%);
+  background-image: linear-gradient(180deg, var(--color-blue-primary) 0%, rgba(38, 57, 237, 0.47) 100%), #{$badge-noise};
 }
 
 .headerHeadline {
@@ -124,26 +178,11 @@
   font-weight: var(--font-weight-regular);
   // 35px in Figma ≈ nearest token --text-h3 (30px); bumped via clamp to stay close to source
   font-size: clamp(var(--text-h3), 2.4vw, 35px);
-  line-height: var(--leading-tight);
+  line-height: 1.2; // Figma-exact, doesn't land on --leading-tight (1.1) or --leading-normal (1.3)
   color: var(--color-black-primary);
   text-transform: capitalize;
+  text-shadow: 0 1px 1.3px rgba(0, 0, 0, 0.25); // Figma-exact soft drop shadow
   margin: 0;
-}
-
-// ── Connector beam ────────────────────────────────────────────────────────────
-
-// design-specific: fixed max-width beam sized to the header composition, not a spacing-scale value
-.connectorBeam {
-  position: relative;
-  z-index: 1;
-  width: min(100%, 760px);
-  height: 1px;
-  background: linear-gradient(90deg, var(--color-blue-primary-alpha-07) 0%, var(--color-blue-primary-alpha-25) 50%, var(--color-blue-primary-alpha-07) 100%);
-  display: none;
-
-  @include tablet-up {
-    display: block;
-  }
 }
 
 // ── Body: cards + core ────────────────────────────────────────────────────────
@@ -239,7 +278,7 @@
 
 .cardEyebrow {
   display: block;
-  font-family: var(--font-ibm-plex-mono);
+  font-family: 'IBM Plex Mono', monospace;
   font-size: var(--text-small-10);
   font-weight: var(--font-weight-medium);
   letter-spacing: 0.12em;

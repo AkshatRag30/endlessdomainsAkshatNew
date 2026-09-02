@@ -7,12 +7,11 @@ interface IdentityStat {
   id: string
   value: string
   label: string
-  accent?: boolean
 }
 
 const STATS: IdentityStat[] = [
   { id: 'rented', value: '401.6M', label: 'Domain Names Rented Worldwide' },
-  { id: 'aftermarket', value: '$290M', label: 'In Annual Aftermarket Sales', accent: true },
+  { id: 'aftermarket', value: '$290M', label: 'In Annual Aftermarket Sales' },
   { id: 'revoke', value: 'Zero', label: 'Platforms That Can Revoke It' },
 ]
 
@@ -25,17 +24,17 @@ export function DomainIdentityOS() {
           <span className={styles.eyebrowBracketTR} aria-hidden="true" />
           <span className={styles.eyebrowBracketBL} aria-hidden="true" />
           <span className={styles.eyebrowBracketBR} aria-hidden="true" />
-          <p className={styles.eyebrowText}>Endless Domains</p>
+          <p className={styles.eyebrowText}>Why Ownership Matters</p>
         </div>
 
         <h2 id="identity-os-heading" className={styles.heading}>
-          <span className={styles.headingPlain}>How Identity </span>
-          <span className={styles.headingAccent}>OS Works</span>
+          <span className={styles.headingPlain}>You&apos;re Renting an Identity </span>
+          <span className={styles.headingAccent}>You Should Truly Own</span>
         </h2>
 
         <p className={styles.description}>
-          Identity OS goes beyond ownership. Your .og is the key that unlocks reputation, real-world use cases, and an ecosystem built around who you
-          are on-chain. Permanent. No renewals. No expiry. No limits on what your identity can become
+          Your email, social handles, logins, and wallets all live in a rental model. Platforms hold them and can take them back, and zero of it is
+          actually yours.
         </p>
       </div>
 
@@ -55,7 +54,7 @@ export function DomainIdentityOS() {
                 <span className={styles.statCornerBL} aria-hidden="true" />
                 <span className={styles.statCornerBR} aria-hidden="true" />
 
-                <span className={`${styles.statValue} ${stat.accent ? styles.statValueAccent : ''}`}>{stat.value}</span>
+                <span className={styles.statValue}>{stat.value}</span>
                 <p className={styles.statLabel}>{stat.label}</p>
               </div>
             </div>

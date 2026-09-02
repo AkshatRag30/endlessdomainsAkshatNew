@@ -1,4 +1,4 @@
-@import '@newstyles/_mixins.scss';
+@import '../../../styles/_mixins.scss';
 
 // ── Section shell ─────────────────────────────────────────────────────────────
 
@@ -10,10 +10,11 @@
   flex-direction: column;
   align-items: center;
   gap: var(--space-12); // 80px ≈ Figma's ~78px header-to-row gap, nearest token
-  padding: var(--space-13) var(--container-padding-x);
+  // Bottom tightened vs. the standard halfway-meet — this section and OwnershipComparison
+  // right after it should read as one connected block, not two separately-spaced ones.
+  padding: calc(var(--section-spacing) / 2) var(--container-padding-x) calc(var(--section-spacing) / 4);
 
-  @include tablet-down { padding: var(--space-9) var(--space-7); gap: var(--space-9); }
-  @include mobile { padding: var(--space-7) var(--space-5); gap: var(--space-7); }
+  @include tablet-down { padding: calc(var(--section-spacing) / 2) var(--space-5) calc(var(--section-spacing) / 4); gap: var(--space-7); }
 }
 
 // ── Header ────────────────────────────────────────────────────────────────────
@@ -71,8 +72,7 @@
   line-height: 1.2;
   letter-spacing: -0.024em; // -1.356px at 55px, Figma-exact tracking
 
-  @include tablet-down { font-size: 40px; }
-  @include mobile { font-size: 30px; }
+  @include tablet-down { font-size: 30px; }
 }
 
 .headingPlain {
@@ -99,8 +99,7 @@
   line-height: 1.3;
   color: var(--color-black-alpha-55); // rgba(0,0,0,0.55) ≈ rgba(0,0,0,0.5) Figma value, nearest token
 
-  @include tablet-down { font-size: var(--text-body-small); max-width: 600px; }
-  @include mobile { font-size: var(--text-small-15); max-width: 100%; }
+  @include tablet-down { font-size: var(--text-small-15); max-width: 100%; }
 }
 
 // ── Stats block ───────────────────────────────────────────────────────────────
@@ -120,7 +119,7 @@
   width: 100%;
   margin-bottom: var(--space-5); // 20px ≈ Figma's ~19px gap to the row, nearest token
 
-  @include tablet-down { display: none; }
+  @include tablet-down { display: block; }
 }
 
 .connectorImg {
@@ -134,9 +133,16 @@
   align-items: stretch;
   justify-content: center;
   width: 100%;
+  border-top: 1px solid var(--color-black-alpha-10);
+  border-bottom: 1px solid var(--color-black-alpha-10);
 
-  @include mobile {
-    flex-direction: column;
+  // Figma's mobile reference stacks the first two stats side by side and centers
+  // the third beneath them, rather than one column per row like desktop.
+  @include tablet-down {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: var(--space-2);
+    row-gap: var(--space-5);
   }
 }
 
@@ -148,13 +154,15 @@
   justify-content: center;
   padding: var(--space-9) 0;
 
-  @include tablet-down { padding: var(--space-7) 0; }
+  @include tablet-down {
+    padding: 0;
+    border-bottom: none;
 
-  @include mobile {
-    padding: var(--space-6) 0;
-    border-bottom: 1px solid var(--color-black-alpha-15);
-
-    &:last-child { border-bottom: none; }
+    // :last-child would never match — .statsRow's actual last child is the
+    // trailing .dividerEnd span after the three .statCol divs, not this one.
+    &:last-of-type {
+      grid-column: 1 / -1;
+    }
   }
 }
 
@@ -184,7 +192,7 @@
   &::before { top: -3.5px; }
   &::after { bottom: -3.5px; }
 
-  @include mobile { display: none; }
+  @include tablet-down { display: none; }
 }
 
 .dividerEnd {
@@ -199,6 +207,12 @@
   align-items: center;
   gap: var(--space-3); // 12px ≈ 14px Figma value, nearest token
   padding: var(--space-5) var(--space-7);
+
+  // The 2-up grid above only leaves ~half the row width per box, so the side
+  // padding needs to shrink to keep the value/label from cramping or wrapping oddly.
+  @include tablet-down {
+    padding: var(--space-3) var(--space-2);
+  }
 }
 
 .statCornerTL,
@@ -221,16 +235,16 @@
   color: var(--color-black-primary);
   text-shadow: 0 0.8px 1.039px var(--color-black-alpha-25); // design-specific: Figma-exact soft drop shadow
   white-space: nowrap;
+  transition: color 0.2s ease;
 
-  @include mobile { font-size: var(--text-h3); }
+  // Pure black bold text reads noticeably heavier at this smaller mobile size than it
+  // does at the full desktop size, so it's softened here — nearest available token to
+  // 80% black, not a full return to the label's much lighter 60%.
+  @include tablet-down { font-size: var(--text-h3); color: var(--color-black-alpha-74); }
 }
 
-.statValueAccent {
-  background: linear-gradient(117deg, var(--color-blue-primary) 70%, var(--color-blue-primary-faded) 96%); // matches Figma angle
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  text-shadow: none;
+.statBox:hover .statValue {
+  color: var(--color-blue-primary);
 }
 
 .statLabel {
@@ -243,5 +257,5 @@
   text-align: center;
   white-space: nowrap;
 
-  @include mobile { white-space: normal; }
+  @include tablet-down { white-space: normal; }
 }

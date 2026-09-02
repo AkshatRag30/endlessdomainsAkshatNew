@@ -1,4 +1,4 @@
-@import '@newstyles/_mixins.scss';
+@import '../../../styles/_mixins.scss';
 
 // ── Section shell ─────────────────────────────────────────────────────────────
 
@@ -10,10 +10,14 @@
   flex-direction: column;
   align-items: center;
   gap: var(--space-9);
-  padding: var(--space-13) var(--container-padding-x);
+  // Bottom tightened vs. the standard halfway-meet — this section already has its own
+  // generous internal card padding above/below the mockup, so the full section-spacing
+  // gap on top of that read as excessive before DomainRoadmap right after it.
+  padding: calc(var(--section-spacing) / 2) var(--container-padding-x) calc(var(--section-spacing) / 4);
+  // clears the fixed header when jumped to via the hero's "see how it works" anchor link
+  scroll-margin-top: var(--header-height);
 
-  @include tablet-down { padding: var(--space-9) var(--space-7); gap: var(--space-7); }
-  @include mobile { padding: var(--space-7) var(--space-5); gap: var(--space-6); }
+  @include tablet-down { padding: calc(var(--section-spacing) / 2) var(--space-5) calc(var(--section-spacing) / 4); gap: var(--space-6); }
 }
 
 // design-specific: the white background must span full viewport width (hence
@@ -40,6 +44,7 @@
 .headerLeft {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: var(--space-4);
   max-width: 600px;
 }
@@ -87,8 +92,7 @@
   letter-spacing: -0.024em; // -1.356px at 55px, Figma-exact tracking
   text-transform: capitalize;
 
-  @include tablet-down { font-size: 40px; }
-  @include mobile { font-size: 30px; }
+  @include tablet-down { font-size: 30px; }
 }
 
 .headingPlain {
@@ -114,8 +118,7 @@
   line-height: 1.3;
   color: var(--color-black-alpha-60); // rgba(0,0,0,0.6), matches Figma value exactly
 
-  @include tablet-down { max-width: 100%; padding-top: 0; }
-  @include mobile { font-size: var(--text-body-small); }
+  @include tablet-down { max-width: 100%; padding-top: 0; font-size: var(--text-body-small); }
 }
 
 // ── Journey tabs ──────────────────────────────────────────────────────────────
@@ -131,7 +134,7 @@
   border: 0.5px solid var(--color-black-alpha-12); // rgba(0,0,0,0.11) ≈ 0.12 Figma value, nearest token
   border-radius: var(--radius-xl); // 18px, matches Figma value exactly
 
-  @include mobile {
+  @include tablet-down {
     overflow-x: auto;
     justify-content: flex-start;
     scrollbar-width: none;
@@ -162,7 +165,7 @@
     @include focus-ring;
   }
 
-  @include mobile { flex: none; padding: 0 var(--space-5); }
+  @include tablet-down { flex: none; padding: 0 var(--space-5); }
 }
 
 .tabActive {
@@ -178,6 +181,16 @@
 }
 
 // ── Journey frame ─────────────────────────────────────────────────────────────
+.frameWrap {
+  position: relative;
+  width: 100%;
+  max-width: var(--container-max-width);
+  // Pulls the frame up out of .section's flex gap, which is shared with the
+  // header-to-tabBar gap above and was leaving too much space here specifically.
+  margin-top: calc(-1 * var(--space-7)); // 48px section gap → 16px
+
+  @include tablet-down { margin-top: calc(-1 * var(--space-4)); } // 24px section gap → 8px
+}
 
 .frame {
   position: relative;
@@ -314,13 +327,17 @@
   overflow: hidden;
   background: var(--color-white-dark); // #f0f0f0, neutral fallback surface while an image loads
 
-  @include mobile { width: 100%; }
+  @include tablet-down { width: 100%; }
 }
 
 .screenImage {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  // These screenshots are tall dashboard/app captures — anchoring the crop to the
+  // top keeps the meaningful nav/header content in frame instead of a center-crop
+  // that can cut into it, matching how the source designs cropped each one.
+  object-position: top;
 }
 
 .screenPlaceholder {

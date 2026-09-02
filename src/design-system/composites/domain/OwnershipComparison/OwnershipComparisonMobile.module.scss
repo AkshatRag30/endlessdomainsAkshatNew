@@ -1,0 +1,202 @@
+@import '../../../styles/_mixins.scss';
+
+// design-specific: standard 1px sr-only clip technique, not part of the spacing scale
+.srHeading {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.section {
+  position: relative;
+  width: 100%;
+  background: var(--color-white-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  // Tightened vs. the standard halfway-meet — this section should read as connected
+  // to IdentityOsProvidersStats right above it, not separately spaced from it.
+  padding: calc(var(--section-spacing) / 4) var(--space-5) calc(var(--section-spacing) / 2);
+
+  // OwnershipComparison (the sticky/scrubbed desktop version) takes over from here up.
+  @include tablet-up {
+    display: none;
+  }
+}
+
+// ── Header blocks — same badge/headline recipe as the desktop section's .headerBlock,
+// duplicated here since this is a fully separate mobile layout ──────────────────────
+
+.headerBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px; // Figma-exact
+  text-align: center;
+}
+
+$badge-noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+
+.badge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 244px;
+  max-width: 100%;
+  height: 34px;
+  padding: 0 var(--space-3);
+  border-radius: 5.133px;
+  overflow: hidden;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: 15px;
+  color: var(--color-white-primary);
+  text-transform: capitalize;
+  white-space: nowrap;
+  background-blend-mode: normal, plus-lighter;
+  background-size: cover, 120px 120px;
+  background-position: center, top left;
+  box-shadow:
+    0 39.613px 100.919px 0 rgba(87, 177, 255, 0.34),
+    0 23.316px 30.424px 0 rgba(87, 177, 255, 0.19),
+    0 9.684px 12.637px 0 rgba(87, 177, 255, 0.22),
+    0 3.503px 4.57px 0 rgba(87, 177, 255, 0.15),
+    0 0 0 4.716px var(--color-white-primary),
+    inset 0 0.943px 16.977px 1.886px #d2eaff,
+    inset 0 0.943px 3.773px 1.886px #d2eaff;
+}
+
+.badgeDark {
+  background-image: linear-gradient(180deg, var(--color-black-primary) 0%, rgba(0, 0, 0, 0.47) 100%), #{$badge-noise};
+}
+
+.badgeBlue {
+  background-image: linear-gradient(180deg, var(--color-blue-primary) 0%, rgba(38, 57, 237, 0.47) 100%), #{$badge-noise};
+}
+
+.headerHeadline {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-h3);
+  line-height: 1.2; // Figma-exact, doesn't land on --leading-tight (1.1) or --leading-normal (1.3)
+  color: var(--color-black-primary);
+  text-transform: capitalize;
+  text-shadow: 0 1px 1.3px rgba(0, 0, 0, 0.25); // Figma-exact soft drop shadow
+  margin: 0;
+}
+
+// ── Center logo — mobile's stand-in for the desktop core between the two columns ──
+
+.coreLogoWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 160px;
+  height: 160px;
+  flex-shrink: 0;
+}
+
+.coreLogoGlow {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-full);
+  background: radial-gradient(circle, var(--color-blue-primary-alpha-18) 0%, var(--color-purple-glow-08) 55%, var(--color-purple-glow-0) 80%);
+  filter: blur(6px);
+  pointer-events: none;
+}
+
+.coreLogo {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+}
+
+// ── Card stack ────────────────────────────────────────────────────────────────
+
+.cardStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+  max-width: 420px;
+}
+
+.card {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  background: var(--color-white-primary);
+  border-radius: var(--radius-md);
+  box-shadow: 0 0 20.65px var(--color-black-alpha-10);
+}
+
+.cardHeadRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+// design-specific: same gradient/glow recipe as the desktop section's .cardIconBadge
+.cardIconBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  color: var(--color-white-primary);
+  box-shadow:
+    0 12px 30px rgba(87, 177, 255, 0.3),
+    0 0 0 2px var(--color-white-primary),
+    inset 0 1px 3px 1px #d2eaff;
+}
+
+.card[data-side='left'] .cardIconBadge {
+  background: linear-gradient(180deg, #4d4d4d 0%, rgba(77, 77, 77, 0.47) 100%);
+}
+
+.card[data-side='right'] .cardIconBadge {
+  background: linear-gradient(180deg, var(--color-blue-primary) 0%, var(--color-blue-primary-alpha-50) 100%);
+}
+
+.cardHeadline {
+  flex: 1;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-normal);
+  line-height: var(--leading-snug);
+  color: var(--color-black-primary);
+  margin: 0;
+}
+
+.cardDesc {
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-small-15);
+  line-height: var(--leading-body);
+  color: var(--color-text-light);
+  text-align: center;
+  margin: 0;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border-black-subtle);
+}
+
+// Figma's mobile reference right-aligns the "owning" card copy against the left-aligned icon,
+// mirroring the "renting" side's centered treatment rather than repeating it.
+.card[data-side='right'] .cardDesc {
+  text-align: right;
+}

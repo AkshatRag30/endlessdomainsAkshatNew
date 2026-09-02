@@ -1,0 +1,221 @@
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+// design-specific: Figma-exact asymmetric octagon — large diagonal cut at top-right only.
+// Derived from SVG path (381×49 viewBox). Top-right cut ≈ 15px wide × 18px tall;
+// all other corners ≈ 7–9px. Do not normalise to a symmetric shape.
+$clip: polygon(
+  7px 0px,
+  calc(100% - 15px) 0px,
+  100% 18px,
+  100% calc(100% - 7px),
+  calc(100% - 7.5px) 100%,
+  5px 100%,
+  0px calc(100% - 7px),
+  0px 9px
+);
+
+// Proportionally scaled version for sm size (≈60% of corner cuts)
+$clip-sm: polygon(
+  5px 0px,
+  calc(100% - 10px) 0px,
+  100% 12px,
+  100% calc(100% - 5px),
+  calc(100% - 5px) 100%,
+  3px 100%,
+  0px calc(100% - 5px),
+  0px 6px
+);
+
+.button {
+  position: relative;
+  min-height: 50px;
+  width: fit-content;
+  padding: 0 16px;
+  border: none;
+  cursor: pointer;
+  clip-path: #{$clip};
+  background: #DADADA;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  color: #ffffff;
+
+  transition: all 0.3s ease;
+
+  @media (min-width: 768px) {
+    height: 57px;
+    padding: 0 24px;
+  }
+
+  &.fullWidth {
+    width: 100%;
+  }
+
+  &.disabled {
+    cursor: not-allowed;
+    background: #f5f5f5;
+    color: #d4d4d4;
+  }
+
+  &.transparent {
+    background: #ebebeb;
+    color: #000000;
+  }
+
+  &.dark {
+    background: #090909;
+    color: #ffffff;
+  }
+
+  &.error {
+    background: #dc3545;
+    color: #ffffff;
+  }
+
+  &.sm {
+    height: 38px;
+    padding: 0 16px;
+    clip-path: #{$clip-sm};
+    font-size: 14px;
+    gap: 8px;
+
+    @media (min-width: 768px) {
+      height: 44px;
+      padding: 0 20px;
+    }
+
+    &::before {
+      clip-path: #{$clip-sm};
+    }
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 1.2px; // design-specific: matches Figma stroke-width 1.206px
+    clip-path: #{$clip};
+    // Figma fill: linear-gradient(181deg, #2639ED 15.43%, rgba(38,57,237,0.33) 133.94%)
+    background: linear-gradient(
+      181deg,
+      #2639ED 15.43%,
+      rgba(38, 57, 237, 0.3) 133.94%
+    );
+    box-shadow: inset 0 0 20px 0 rgba(255, 255, 255, 0.4);
+    z-index: 0;
+    transition: all 0.3s ease;
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  &:not(.disabled):hover::before {
+    background: linear-gradient(
+      180deg,
+      #2639ED 0%,
+      rgba(38, 57, 237, 0.5) 140%
+    );
+    box-shadow:
+      0 0 16px rgba(38, 57, 237, 0.7),
+      inset 0 0 12px rgba(255, 255, 255, 0.4);
+  }
+
+  &:not(.disabled):active::before {
+    background: #1d2bb2;
+    box-shadow:
+      inset 0 2px 4px rgba(0, 0, 0, 0.55),
+      inset 0 0 6px rgba(255, 255, 255, 0.3);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #2639ED;
+    outline-offset: 2px;
+  }
+
+  &.disabled::before {
+    background: #ebebeb;
+    box-shadow: none;
+  }
+
+  &.transparent::before {
+    background: #ffffff;
+  }
+
+  &.transparent:not(.disabled):hover::before {
+    background: #f5f5f5;
+  }
+
+  &.transparent.disabled::before {
+    background: transparent;
+  }
+
+  &.dark::before {
+    background: #121212;
+  }
+
+  &.dark:not(.disabled):hover::before {
+    background: #1a1a1a;
+    box-shadow:
+      0 0 16px rgba(0, 0, 0, 0.55),
+      inset 0 0 12px rgba(255, 255, 255, 0.26);
+  }
+
+  &.dark:not(.disabled):active::before {
+    background: #000000;
+    box-shadow:
+      inset 0 2px 4px rgba(0, 0, 0, 0.55),
+      inset 0 0 6px rgba(255, 255, 255, 0.3);
+  }
+
+  &.dark.disabled::before {
+    background: #0d0d0d;
+  }
+
+  &.error::before {
+    background: #dc3545;
+  }
+
+  &.error:not(.disabled):hover::before {
+    background: #dc3545;
+    box-shadow: none;
+  }
+
+  &.error:not(.disabled):active::before {
+    background: #dc3545;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  &.error.disabled::before {
+    background: #dc3545;
+  }
+
+  &.error:focus-visible {
+    outline-color: #2639ED;
+  }
+}
+
+.spinner {
+  width: 18px; // design-specific: Figma-exact spinner size — smaller than 24px btn-icon-size by intent
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.iconRight { margin-left: 10px; }
+
+.iconRight,
+.iconLeft {
+  font-size: 22px;
+}

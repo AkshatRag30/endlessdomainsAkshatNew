@@ -12,6 +12,11 @@ const nextConfig = {
       { hostname: 'raw.githubusercontent.com' },
       { hostname: 'assets.coingecko.com' },
       { hostname: 'icons.llamao.fi' },
+      // Landing page blog teaser — static Ghost CMS content snapshot (see
+      // src/data/landingBlogSummary.ts); this project has no Ghost credentials of
+      // its own, so the images are still served straight from Ghost's own hosts.
+      { hostname: 'endless-domains.ghost.io' },
+      { hostname: 'storage.ghost.io' },
     ],
   },
   sassOptions: {

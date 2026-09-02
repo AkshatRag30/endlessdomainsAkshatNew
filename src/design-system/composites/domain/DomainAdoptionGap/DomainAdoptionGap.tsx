@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { PiWarningCircleLight } from 'react-icons/pi'
 
-import { TRANSFORM_PAIRS, pickAmbientAddress, randomInt } from './DomainAdoptionGapData'
 import styles from './DomainAdoptionGap.module.scss'
 
 // Quick, one-time step reveals for the two headline numbers — not a live ticker like the
@@ -29,73 +28,8 @@ function useQuickCount(run: boolean, steps: number[], stepDelayMs: number, insta
   return value
 }
 
-interface MarkerProps {
-  top: string
-  side: 'left' | 'right'
-  offset: string
-  active: boolean
-  variant: 'ambient' | 'transform'
-}
-
-// One fixed background wallet-address slot. 'ambient' markers just cycle plain addresses
-// (the unresolved gray market — phase 8). 'transform' markers hold on an address, then
-// resolve it into its paired human-readable identity before cycling to the next pair
-// (phase 7) — the moment this whole section is built around.
-function Marker({ top, side, offset, active, variant }: MarkerProps) {
-  const [text, setText] = useState('')
-  const [resolved, setResolved] = useState(false)
-  const [visible, setVisible] = useState(false)
-  const timeoutRef = useRef<ReturnType<typeof setTimeout>>()
-  const pairIndexRef = useRef(0)
-
-  useEffect(() => {
-    if (!active) {
-      clearTimeout(timeoutRef.current)
-      setVisible(false)
-      return
-    }
-
-    function showAmbient() {
-      setText(pickAmbientAddress())
-      setResolved(false)
-      setVisible(true)
-      timeoutRef.current = setTimeout(() => {
-        setVisible(false)
-        timeoutRef.current = setTimeout(showAmbient, randomInt(2200, 5200))
-      }, randomInt(2600, 4200))
-    }
-
-    function showTransform() {
-      const pair = TRANSFORM_PAIRS[pairIndexRef.current % TRANSFORM_PAIRS.length]
-      pairIndexRef.current += 1
-      setText(pair.address)
-      setResolved(false)
-      setVisible(true)
-      timeoutRef.current = setTimeout(() => {
-        setText(pair.identity)
-        setResolved(true)
-        timeoutRef.current = setTimeout(() => {
-          setVisible(false)
-          timeoutRef.current = setTimeout(showTransform, randomInt(3200, 5600))
-        }, 2600)
-      }, 1500)
-    }
-
-    timeoutRef.current = setTimeout(variant === 'transform' ? showTransform : showAmbient, randomInt(300, 2400))
-    return () => clearTimeout(timeoutRef.current)
-  }, [active, variant])
-
-  return (
-    <div className={styles.marker} data-variant={variant} style={{ top, [side]: offset }}>
-      <span className={styles.markerText} data-visible={visible || undefined} data-resolved={resolved || undefined}>
-        {text}
-      </span>
-    </div>
-  )
-}
-
 const TOTAL_STEPS = [0, 174, 421, 741]
-const PERCENT_STEPS = [0, 7, 12, 16, 19]
+const PERCENT_STEPS = [0, 1, 2]
 
 export function DomainAdoptionGap() {
   const sectionRef = useRef<HTMLElement>(null)
@@ -187,10 +121,6 @@ export function DomainAdoptionGap() {
     return () => timers.forEach(clearTimeout)
   }, [triggered, reducedMotion])
 
-  // Reduced motion means no continuous ambient activity — the wallet-address markers
-  // never start cycling at all, and the section holds at its plain settled state.
-  const markersActive = active && !reducedMotion
-
   return (
     <section className={styles.section} ref={sectionRef} data-active={revealed || undefined} aria-labelledby="adoption-gap-heading">
       <div className={styles.header}>
@@ -215,34 +145,31 @@ export function DomainAdoptionGap() {
       <div className={styles.visualization}>
         <div className={styles.barLabels}>
           <span className={styles.labelIdentity} data-reveal={labelReveal || undefined}>
-            No one can take it away
+            Crypto Owners vs. Holders With a Readable Identity
           </span>
           <span className={styles.labelTotal}>{total}M total</span>
         </div>
 
         <div className={styles.barTrack} aria-hidden="true">
           <div className={styles.barGrayAmbient} data-pulse={grayPulse || undefined}>
-            <Marker top="30%" side="left" offset="8%" active={markersActive} variant="ambient" />
-            <Marker top="65%" side="left" offset="34%" active={markersActive} variant="ambient" />
-            <Marker top="30%" side="left" offset="58%" active={markersActive} variant="ambient" />
+            <span className={styles.barGrayLabel}>730M+ still anonymous hex</span>
           </div>
 
           <div className={styles.barFill} data-built={barBuilt || undefined}>
-            <div className={styles.barFillInner}>
-              <Marker top="50%" side="right" offset="6%" active={markersActive} variant="transform" />
-            </div>
             <span className={styles.barBoundary} data-pulse={boundaryPulse || undefined} />
           </div>
+
+          <span className={styles.barFillLabel} data-reveal={labelReveal || undefined}>10M+ with an identity</span>
         </div>
 
         <span className={styles.srOnly}>
-          {total} million on-chain users total. {percentSettled ? 'Under 20%' : `${percent}%`} carry a human-readable identity.
+          {total} million on-chain users total. {percentSettled ? 'Under 2%' : `${percent}%`} carry a human-readable identity.
         </span>
       </div>
 
       <div className={styles.statistic}>
         <div className={styles.statisticRow}>
-          <span className={styles.statValue}>{percentSettled ? 'Under 20%' : `${percent}%`}</span>
+          <span className={styles.statValue}>{percentSettled ? 'Under 2%' : `${percent}%`}</span>
           <p className={styles.statDesc}>of crypto&apos;s 741 million owners carry a human-readable identity. The other 98%+ are the market we are building for.</p>
         </div>
 

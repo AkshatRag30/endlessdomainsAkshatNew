@@ -1,4 +1,4 @@
-@import '@newstyles/_mixins.scss';
+@import '../../../styles/_mixins.scss';
 
 // ── Section shell ─────────────────────────────────────────────────────────────
 // design-specific: background must stay full-bleed edge-to-edge — only the
@@ -13,10 +13,12 @@
   flex-direction: column;
   align-items: center;
   gap: var(--space-13);
-  padding: var(--space-13) var(--container-padding-x);
+  // Top tightened vs. the standard halfway-meet — HowItWorksJourney right above this
+  // already carries its own generous internal card padding, so the full section-spacing
+  // gap on top of that read as excessive.
+  padding: calc(var(--section-spacing) / 4) var(--container-padding-x) calc(var(--section-spacing) / 2);
 
-  @include tablet-down { padding: var(--space-9) var(--space-7); gap: var(--space-9); }
-  @include mobile { padding: var(--space-7) var(--space-5); gap: var(--space-7); }
+  @include tablet-down { padding: calc(var(--section-spacing) / 4) var(--space-5) calc(var(--section-spacing) / 2); gap: var(--space-7); }
 }
 
 // ── Header ────────────────────────────────────────────────────────────────────
@@ -74,8 +76,7 @@
   line-height: 1.2;
   letter-spacing: -0.024em; // -1.356px at 55px, Figma-exact tracking
 
-  @include tablet-down { font-size: 40px; }
-  @include mobile { font-size: 30px; }
+  @include tablet-down { font-size: 30px; }
 }
 
 .headingLine1 {
@@ -101,8 +102,7 @@
   line-height: 1.3;
   color: var(--color-black-alpha-60); // rgba(0,0,0,0.6), matches Figma value exactly
 
-  @include tablet-down { font-size: var(--text-body-small); max-width: 600px; }
-  @include mobile { font-size: var(--text-small-15); max-width: 100%; }
+  @include tablet-down { font-size: var(--text-small-15); max-width: 100%; }
 }
 
 // ── Timeline ──────────────────────────────────────────────────────────────────
@@ -117,14 +117,30 @@
   margin: 0;
   padding: 0;
 
+  // At tablet and below, keep the desktop row layout intact (same cards, same zigzag
+  // stagger) instead of stacking into a column — this scrolls horizontally instead.
   @include tablet-down {
-    flex-direction: column;
-    gap: var(--space-9);
+    flex-direction: row;
+    gap: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
 }
 
 // design-specific: Figma-exact thin divider marking each column boundary,
-// spanning the full alternating top/bottom envelope of the timeline
+// spanning the full alternating top/bottom envelope of the timeline.
+// .timeline lays out 5 fixed-241px-wide .milestone items with justify-content:
+// space-between, so the actual gap between items is (100% - 5×241px) / 4 — NOT an
+// even 1/5 of the row — and a flat 20/40/60/80% left position lands at a different
+// offset from each gap's true center. These are that same gap-center formula solved
+// per divider index i (1-indexed): i×241px + (i − 0.5) × gap, gap substituted in terms
+// of the container's own 100% — so each line tracks its actual gap center exactly, at
+// any container width, instead of 4 slightly different fixed guesses.
 .dividerLine {
   position: absolute;
   top: 0;
@@ -133,12 +149,41 @@
   background: var(--color-black-alpha-15); // rgba(0,0,0,0.2) ≈ 0.15 Figma value, nearest token
   pointer-events: none;
 
-  &[data-position='1'] { left: 20%; }
-  &[data-position='2'] { left: 40%; }
-  &[data-position='3'] { left: 60%; }
-  &[data-position='4'] { left: 80%; }
+  &[data-position='1'] { left: calc(12.5% + 90.375px); }
+  &[data-position='2'] { left: calc(37.5% + 30.125px); }
+  &[data-position='3'] { left: calc(62.5% - 30.125px); }
+  &[data-position='4'] { left: calc(87.5% - 90.375px); }
 
   @include tablet-down { display: none; }
+}
+
+// Timeline spark — a small glowing dot travels up the divider line nearest the hovered
+// milestone (set via [data-spark] in the component, driven by hover state). Idle state
+// just sits invisible at the bottom; the animation only plays while [data-spark] is set,
+// so it replays fresh from the bottom on every hover rather than looping continuously.
+.dividerLine::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-blue-primary);
+  box-shadow: 0 0 8px 2px var(--color-blue-primary-alpha-50);
+  opacity: 0;
+}
+
+.dividerLine[data-spark]::after {
+  animation: divider-spark 0.9s ease-out;
+}
+
+@keyframes divider-spark {
+  0% { bottom: 0; opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { bottom: 100%; opacity: 0; }
 }
 
 .milestone {
@@ -157,13 +202,91 @@
     margin-top: 182px;
   }
 
+  // Restores the desktop card: fixed width, zigzag stagger, no stacked-list divider —
+  // same design as desktop, just scrolling horizontally within the row above.
   @include tablet-down {
-    width: 100%;
-    padding-bottom: var(--space-7);
-    border-bottom: 1px solid var(--color-black-alpha-10);
+    width: 241px;
+    padding-bottom: 0;
+    border-bottom: none;
 
-    &[data-offset] { margin-top: 0; }
+    &[data-offset] { margin-top: 182px; }
     &:last-child { border-bottom: none; padding-bottom: 0; }
+  }
+}
+
+// ── Entrance animation ────────────────────────────────────────────────────────
+// design-specific: cards enter one by one, left to right (2020 → 2027 & Beyond), each
+// dropping in from the same side its resting row already sits on — top-row cards fall
+// from above, the offset/bottom-row cards rise from below — so the motion echoes the
+// zigzag layout instead of fighting it. .timeline[data-active] is set once, on the
+// section's first entry into view (see the component's IntersectionObserver).
+
+.milestone {
+  opacity: 0;
+  transform: translateY(-56px);
+  transition: opacity 0.6s ease, transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  &[data-offset] {
+    transform: translateY(56px);
+  }
+
+  // Row layout all the way down from tablet through mobile, so the zigzag entrance
+  // direction (top row falls from above, offset row rises from below) applies at
+  // both widths instead of collapsing to a single stacked-column direction.
+  @include tablet-down {
+    transform: translateY(-56px);
+
+    &[data-offset] {
+      transform: translateY(56px);
+    }
+  }
+}
+
+.timeline[data-active] .milestone {
+  opacity: 1;
+  transform: translateY(0);
+
+  &[data-offset] {
+    transform: translateY(0);
+  }
+}
+
+// Focus dimming — hovering one milestone fades the other four back, narrowing
+// attention to the one being read. Overrides the base active opacity above.
+.timeline[data-active] .milestone[data-dimmed] {
+  opacity: 0.45;
+}
+
+// Staggered by DOM position among the <li> siblings only — :nth-of-type ignores the
+// four <span> dividers that precede them, so this stays correct without needing an
+// inline per-item delay from the component.
+.milestone:nth-of-type(1) { transition-delay: 0s; }
+.milestone:nth-of-type(2) { transition-delay: 0.15s; }
+.milestone:nth-of-type(3) { transition-delay: 0.3s; }
+.milestone:nth-of-type(4) { transition-delay: 0.45s; }
+.milestone:nth-of-type(5) { transition-delay: 0.6s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .milestone {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .year,
+  .milestoneTitle,
+  .tag {
+    transition: none;
+  }
+
+  .milestone:hover .year,
+  .milestone:hover .milestoneTitle {
+    transform: none;
+    filter: none;
+  }
+
+  .dividerLine[data-spark]::after {
+    animation: none;
   }
 }
 
@@ -173,6 +296,7 @@
   font-size: var(--text-h3); // 30px, matches Figma value exactly
   line-height: 1.2;
   color: var(--color-black-primary);
+  transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1), filter 0.35s ease;
 }
 
 .milestoneTitle {
@@ -185,6 +309,15 @@
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
+  transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1), filter 0.35s ease;
+}
+
+// Year and title glow — the hovered card's year and title lift slightly and pick up a
+// soft blue glow, so the hovered era reads as coming forward off the timeline.
+.milestone:hover .year,
+.milestone:hover .milestoneTitle {
+  transform: translateY(-4px);
+  filter: drop-shadow(0 4px 10px var(--color-blue-primary-alpha-30));
 }
 
 .milestoneDescription {
@@ -216,6 +349,11 @@
   font-size: var(--text-small-12); // 12px, matches Figma value exactly
   color: var(--color-white-primary);
   white-space: nowrap;
+  // Tag pop — idles slightly scaled down and dimmed, then switches fully on with a
+  // staggered delay (set inline per-tag in the component) when its card is hovered.
+  transform: scale(0.9);
+  opacity: 0.8;
+  transition: transform 0.35s cubic-bezier(0.34, 1.4, 0.64, 1), opacity 0.3s ease;
   // design-specific: Figma-exact soft blue glow stack + glass-edge inset highlights, no matching tokens for this sky-blue tone
   box-shadow:
     0 25.301px 64.458px 0 rgba(87, 177, 255, 0.34),
@@ -226,4 +364,9 @@
     0 0 0 3.012px var(--color-white-primary),
     inset 0 0.602px 10.843px 1.205px #d2eaff,
     inset 0 0.602px 2.41px 1.205px #d2eaff;
+}
+
+.milestone:hover .tag {
+  transform: scale(1);
+  opacity: 1;
 }
