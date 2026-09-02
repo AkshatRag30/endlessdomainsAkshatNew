@@ -14,7 +14,7 @@ export default function AboutSection() {
   const headingRef = useRef<HTMLHeadingElement>(null)
   const descRef = useRef<HTMLParagraphElement>(null)
   const statsRef = useRef<HTMLDivElement>(null)
-  const quoteRef = useRef<HTMLElement>(null)
+  const quoteRef = useRef<HTMLQuoteElement>(null)
 
   useEntranceAnimation([subtitleRef, headingRef, descRef, statsRef, quoteRef])
 

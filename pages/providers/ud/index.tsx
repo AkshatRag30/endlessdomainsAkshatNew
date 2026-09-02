@@ -14,7 +14,7 @@ const UdPage: NextPage = () => {
           content="Access 55 Web3-native TLDs from Unstoppable Domains, the world's largest decentralized naming provider. Permanent ownership. No renewal fees. Starting from $5."
         />
       </Head>
-      <PerksNavBar />
+      <PerksNavBar onGoldClick={() => {}} />
       <main className={styles.main}>
         <UdHero />
         <UdBanner />

@@ -5,6 +5,7 @@ import { BsCheck2 } from 'react-icons/bs'
 import { AiOutlineLoading3Quarters } from 'react-icons/ai'
 import { RiCopperCoinLine } from 'react-icons/ri'
 import { LuSquarePlus } from 'react-icons/lu'
+import { TbCurrencyBitcoin } from 'react-icons/tb'
 
 import { PrimaryButton } from '@/design-system/primitives/button'
 import CurrencyModal from '@/components/manage-ud/CurrencyModal'

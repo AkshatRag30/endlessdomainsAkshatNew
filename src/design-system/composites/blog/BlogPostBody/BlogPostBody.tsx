@@ -5,7 +5,7 @@ import { FiEye, FiClock } from 'react-icons/fi'
 import { PrimaryButton } from '@/design-system/primitives/button/PrimaryButton'
 import styles from './BlogPostBody.module.scss'
 import type { BlogSummary } from '@/data/blogs'
-import type { TocItem } from '@/pages/blog/[slug]'
+import type { TocItem } from '@/lib/blog-utils'
 
 export interface BlogPostBodyProps {
   content: string

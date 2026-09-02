@@ -8,17 +8,13 @@ import { BLOG_DETAILS } from '@/data/blogDetails'
 import { getAuthorById } from '@/data/authors'
 import type { Author } from '@/data/authors'
 import { getBlogBySlug, paginateBlogs, getAllBlogs, formatDate } from '@/lib/blog-utils'
+import type { TocItem } from '@/lib/blog-utils'
 import { BlogPostHeader } from '@/design-system/composites/blog/BlogPostHeader'
 import { BlogPostBody } from '@/design-system/composites/blog/BlogPostBody'
 import { BlogGrid } from '@/design-system/composites/blog/BlogGrid'
 import type { BlogSummary } from '@/data/blogs'
 import type { BlogDetail } from '@/data/blogDetails'
 import styles from './slug.module.scss'
-
-export interface TocItem {
-  id: string
-  text: string
-}
 
 interface BlogPostPageProps {
   post: BlogSummary
@@ -49,7 +45,7 @@ function injectHeadingIds(html: string, toc: TocItem[]): string {
 
 const BlogPostPage: NextPage<BlogPostPageProps> = ({ post, detail, author, relatedPosts, toc = [], popularPosts = [] }) => {
   const contentWithIds = injectHeadingIds(detail.content, toc)
-  const gridRef = useRef<HTMLUListElement>(null)
+  const gridRef = useRef<HTMLUListElement | null>(null)
   const roRef = useRef<ResizeObserver | null>(null)
   const [canPrev, setCanPrev] = useState(false)
   const [canNext, setCanNext] = useState(false)

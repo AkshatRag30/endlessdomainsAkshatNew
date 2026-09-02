@@ -2,6 +2,11 @@ import { BLOGS, type BlogSummary } from '@/data/blogs'
 import { FEATURED_BLOG } from '@/data/featuredBlog'
 import { PAGINATION_CONFIG } from '@/data/pagination'
 
+export interface TocItem {
+  id: string
+  text: string
+}
+
 export interface PaginatedResult<T> {
   items: T[]
   total: number

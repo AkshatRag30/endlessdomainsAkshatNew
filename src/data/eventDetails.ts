@@ -85,7 +85,6 @@ export const EVENT_DETAILS: EventDetail[] = [
     heroImage: '/events/Frame 1.jpg',
     status: 'upcoming',
     statusLabel: 'Registration is open. Secure your spot now.',
-    recapUrl: undefined,
     shareUrl: '#',
     details: {
       date: '12 Mar 2025',

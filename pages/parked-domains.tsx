@@ -13,7 +13,7 @@ const ParkedDomainsPage: NextPage = () => {
           content="Park your idle Web3 domains and earn passive revenue. Link .crypto, .x, .wallet domains to our ad network via IPFS. No developer needed. No annual fees."
         />
       </Head>
-      <PerksNavBar />
+      <PerksNavBar onGoldClick={() => {}} />
       <main>
         <ParkedHero />
         <ParkedStats />

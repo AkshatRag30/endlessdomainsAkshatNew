@@ -2,7 +2,6 @@ import { useEffect } from 'react'
 
 export function useSmoothScroll() {
   useEffect(() => {
-    let rafId: number
     let lenis: import('@studio-freight/lenis').default | null = null
     let destroyed = false
 
@@ -58,7 +57,6 @@ export function useSmoothScroll() {
 
     return () => {
       destroyed = true
-      cancelAnimationFrame(rafId)
       lenis?.destroy()
       ;(window as any).__lenis = null
     }

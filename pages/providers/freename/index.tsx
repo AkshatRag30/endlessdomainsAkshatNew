@@ -14,7 +14,7 @@ const FreenamePage: NextPage = () => {
           content="Access 8 Web3-native TLDs from Freename, one of the leading decentralized naming providers. Permanent ownership. Custom namespaces. Starting from $5."
         />
       </Head>
-      <PerksNavBar />
+      <PerksNavBar onGoldClick={() => {}} />
       <main className={styles.main}>
         <FreenameHero />
         <FreenameBanner />

@@ -14,7 +14,7 @@ const EventsPage: NextPage = () => {
           content="From global conferences to curated community meetups, Endless Domains shapes the future of Web3 identity, ownership, and digital culture — one event at a time."
         />
       </Head>
-      <PerksNavBar />
+      <PerksNavBar onGoldClick={() => {}} />
       <main className={styles.main}>
         <EventsHero />
         <EventsGallery />

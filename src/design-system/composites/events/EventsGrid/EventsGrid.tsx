@@ -8,7 +8,7 @@ type FilterTab = 'all' | 'global' | 'regional' | 'virtual'
 
 const LOCATION_OPTIONS = ['All Location', 'India', 'Dubai', 'Singapore', 'New Delhi', 'Mumbai', 'Bangalore']
 
-interface EventsGridProps {
+export interface EventsGridProps {
   events?: EventCardData[]
 }
 
