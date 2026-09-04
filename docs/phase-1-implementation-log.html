@@ -1,0 +1,458 @@
+<title>Phase 1 Paper Trail</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root{
+    color-scheme: light;
+    --paper:#F2F4F6;
+    --paper-raised:#FFFFFF;
+    --ink:#1A2233;
+    --ink-soft:#55606E;
+    --ink-faint:#8A93A0;
+    --line:#DCE1E6;
+    --line-strong:#C3CBD3;
+    --accent:#2455A4;
+    --accent-ink:#163B73;
+    --accent-soft:#E4ECF7;
+    --c-red:#B23A2E;      --c-red-bg:#F7E2DE;
+    --c-amber:#9C6B12;    --c-amber-bg:#F5E8CC;
+    --c-plum:#6E4A8C;     --c-plum-bg:#EFE4F3;
+    --c-green:#227A5B;    --c-green-bg:#DFF0E7;
+    --shadow: 0 1px 2px rgba(26,34,51,0.06), 0 6px 20px rgba(26,34,51,0.06);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+    font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{font-family:"Fraunces",Georgia,serif; font-weight:600; color:var(--ink); text-wrap:balance; margin:0;}
+  code, .mono{font-family:"IBM Plex Mono","SFMono-Regular",monospace;}
+  a{color:var(--accent);}
+  p{margin:0;}
+
+  .topnav{
+    position:sticky; top:0; z-index:20;
+    background:color-mix(in srgb, var(--paper) 88%, transparent);
+    backdrop-filter:blur(10px); border-bottom:1px solid var(--line);
+  }
+  .topnav-inner{
+    max-width:960px; margin:0 auto; display:flex; align-items:center; gap:18px;
+    padding:12px 24px; overflow-x:auto;
+  }
+  .topnav-title{
+    font-family:"Fraunces",serif; font-weight:600; font-size:0.95rem;
+    color:var(--ink); white-space:nowrap; flex:none;
+    padding-right:6px; border-right:1px solid var(--line);
+  }
+  .topnav-links{display:flex; gap:4px; flex:none;}
+  .topnav-links a{
+    display:flex; align-items:center; gap:6px; font-size:0.76rem; font-weight:500;
+    color:var(--ink-soft); text-decoration:none; white-space:nowrap;
+    padding:6px 10px; border-radius:100px; transition:background 0.15s, color 0.15s;
+  }
+  .topnav-links a:hover, .topnav-links a.active{background:var(--accent-soft); color:var(--accent-ink);}
+
+  main{max-width:900px; margin:0 auto; padding:0 24px 120px;}
+
+  .hero{padding:52px 0 36px; border-bottom:1px solid var(--line);}
+  .eyebrow{
+    font-family:"IBM Plex Mono",monospace; font-size:0.75rem; letter-spacing:0.08em;
+    text-transform:uppercase; color:var(--accent); font-weight:500;
+    margin-bottom:16px; display:block;
+  }
+  .hero h1{font-size:clamp(2.2rem,5.5vw,3.1rem); line-height:1.06; letter-spacing:-0.01em;}
+  .hero-sub{margin-top:18px; font-size:1.05rem; color:var(--ink-soft); max-width:68ch; line-height:1.65;}
+  .hero-meta{
+    margin-top:22px; display:flex; gap:18px; flex-wrap:wrap;
+    font-family:"IBM Plex Mono",monospace; font-size:0.76rem; color:var(--ink-faint);
+  }
+
+  .glance{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:1px;
+    background:var(--line); border:1px solid var(--line); border-radius:10px;
+    overflow:hidden; margin-top:32px;
+  }
+  .glance-card{background:var(--paper-raised); padding:18px 16px;}
+  .glance-num{font-family:"Fraunces",serif; font-weight:600; font-size:1.7rem; color:var(--accent); line-height:1;}
+  .glance-label{
+    display:block; margin-top:6px; font-family:"IBM Plex Mono",monospace; font-size:0.7rem;
+    color:var(--ink-faint); text-transform:uppercase; letter-spacing:0.04em;
+  }
+  @media (max-width:640px){ .glance{grid-template-columns:1fr 1fr;} }
+
+  .tablewrap{margin-top:22px; overflow-x:auto; border:1px solid var(--line); border-radius:8px;}
+  table{width:100%; border-collapse:collapse; font-size:0.86rem; min-width:560px;}
+  thead th{
+    text-align:left; font-family:"IBM Plex Mono",monospace; font-size:0.68rem;
+    text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-faint); font-weight:500;
+    background:var(--paper); padding:10px 14px; border-bottom:1px solid var(--line);
+  }
+  tbody td{padding:11px 14px; border-bottom:1px solid var(--line); color:var(--ink-soft); vertical-align:top;}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody td.file{font-family:"IBM Plex Mono",monospace; font-size:0.78rem; color:var(--ink);}
+  .tag-new{color:var(--c-green); font-weight:600; font-family:"IBM Plex Mono",monospace; font-size:0.72rem; text-transform:uppercase;}
+  .tag-mod{color:var(--accent); font-weight:600; font-family:"IBM Plex Mono",monospace; font-size:0.72rem; text-transform:uppercase;}
+
+  section{padding:52px 0; border-bottom:1px solid var(--line);}
+  section:last-of-type{border-bottom:none;}
+  .section-head{display:flex; align-items:baseline; gap:14px; margin-bottom:8px;}
+  .section-num{font-family:"IBM Plex Mono",monospace; font-size:0.9rem; font-weight:500; color:var(--accent); flex:none;}
+  .section-head h2{font-size:1.55rem;}
+  .section-kicker{color:var(--ink-soft); font-size:0.98rem; margin-top:14px; max-width:70ch; line-height:1.65;}
+  .section-kicker + .section-kicker{margin-top:10px;}
+  .file-tag{
+    display:inline-flex; align-items:center; gap:8px; font-family:"IBM Plex Mono",monospace;
+    font-size:0.8rem; color:var(--accent-ink); background:var(--accent-soft);
+    padding:5px 12px; border-radius:6px; margin-top:16px;
+  }
+
+  .box{
+    margin-top:18px; padding:18px 20px; background:var(--paper-raised);
+    border:1px solid var(--line); border-left:3px solid var(--box-c, var(--ink-faint));
+    border-radius:8px; box-shadow:var(--shadow);
+  }
+  .box-tag{
+    display:inline-block; font-family:"IBM Plex Mono",monospace; font-size:0.66rem;
+    font-weight:600; letter-spacing:0.05em; text-transform:uppercase; padding:3px 9px;
+    border-radius:5px; background:var(--box-bg); color:var(--box-c); margin-bottom:10px;
+  }
+  .box h4{font-family:"IBM Plex Sans",sans-serif; font-weight:600; font-size:0.98rem; color:var(--ink); margin-bottom:8px;}
+  .box p{color:var(--ink-soft); font-size:0.93rem; line-height:1.65;}
+  .box p + p{margin-top:9px;}
+  .box .ref{
+    margin-top:12px; font-family:"IBM Plex Mono",monospace; font-size:0.74rem;
+    color:var(--ink-faint); padding-top:11px; border-top:1px dashed var(--line);
+  }
+  .box.decision{--box-c:var(--accent-ink); --box-bg:var(--accent-soft);}
+  .box.correction{--box-c:var(--c-amber); --box-bg:var(--c-amber-bg);}
+  .box.checked{--box-c:var(--c-plum); --box-bg:var(--c-plum-bg);}
+  .box.verify{--box-c:var(--c-green); --box-bg:var(--c-green-bg);}
+
+  .filecard{
+    margin-top:20px; padding:20px 22px; background:var(--paper-raised);
+    border:1px solid var(--line); border-radius:10px; box-shadow:var(--shadow);
+  }
+  .filecard-head{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px;}
+  .filecard-head .file{
+    font-family:"IBM Plex Mono",monospace; font-size:0.92rem; color:var(--ink); font-weight:500;
+  }
+  .filecard ul{margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:9px;}
+  .filecard li{
+    position:relative; padding-left:22px; font-size:0.92rem; color:var(--ink-soft); line-height:1.55;
+  }
+  .filecard li::before{content:"→"; color:var(--accent); font-weight:600; position:absolute; left:0; top:0;}
+  .filecard li strong{color:var(--ink); font-weight:600;}
+  .filecard li.removed::before{content:"✕"; color:var(--c-plum);}
+  .verifystrip{
+    margin-top:14px; padding-top:12px; border-top:1px dashed var(--line);
+    display:flex; align-items:center; gap:8px; font-family:"IBM Plex Mono",monospace;
+    font-size:0.78rem; color:var(--c-green); font-weight:500;
+  }
+
+  .footer{
+    margin-top:36px; padding-top:22px; border-top:1px solid var(--line);
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;
+    font-family:"IBM Plex Mono",monospace; font-size:0.74rem; color:var(--ink-faint);
+  }
+  ::selection{background:var(--accent-soft); color:var(--accent-ink);}
+</style>
+
+<nav class="topnav">
+  <div class="topnav-inner">
+    <span class="topnav-title">Phase 1 Paper Trail</span>
+    <div class="topnav-links" id="pillnav">
+      <a href="#overview">Overview</a>
+      <a href="#step0">0 Verify</a>
+      <a href="#step1">1 Decide</a>
+      <a href="#step2">2 Hook</a>
+      <a href="#step3">3 Host</a>
+      <a href="#step4-8">4-8 Migrate</a>
+      <a href="#step9">9 Sweep</a>
+      <a href="#testing">Testing</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+
+  <div class="hero" id="overview">
+    <span class="eyebrow">Phase 1 · consolidate the buy gate · executed, not just planned</span>
+    <h1>Every change, and why it happened</h1>
+    <p class="hero-sub">This is the record of actually doing phase 1 of the build order, step by step, in the same order it was worked through. Not a redo of the plan, a log of what was found, what was decided, what got corrected along the way, and exactly which file each thing happened in. Read it top to bottom the first time, or use it later to answer "why does this file look like this."</p>
+    <div class="hero-meta">
+      <span>Companion to: docs/phase-1-consolidate-buy-gate-plan.md</span>
+      <span>Companion to: the Settlement Gap review</span>
+    </div>
+
+    <div class="glance">
+      <div class="glance-card"><span class="glance-num">2</span><span class="glance-label">New files</span></div>
+      <div class="glance-card"><span class="glance-num">7</span><span class="glance-label">Files edited</span></div>
+      <div class="glance-card"><span class="glance-num">2</span><span class="glance-label">Historical corrections found</span></div>
+      <div class="glance-card"><span class="glance-num">1</span><span class="glance-label">Real bug fixed as a side effect</span></div>
+    </div>
+
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>File</th><th>Status</th><th>One line reason</th></tr></thead>
+        <tbody>
+          <tr><td class="file">src/context/BuyIntentContext.tsx</td><td><span class="tag-new">New</span></td><td>The shared switch, owns the buy gate decision and the tracking call.</td></tr>
+          <tr><td class="file">src/component/buy-intent-modal-host/index.tsx</td><td><span class="tag-new">New</span></td><td>The one place the buy window and wallet window actually render now.</td></tr>
+          <tr><td class="file">src/types/BuyModal.ts</td><td><span class="tag-mod">Edited</span></td><td>Added one shape every file normalizes its domain data into.</td></tr>
+          <tr><td class="file">pages/_app.tsx</td><td><span class="tag-mod">Edited</span></td><td>Mounted the new provider and host, next to the app's other root level helpers.</td></tr>
+          <tr><td class="file">src/component/domain-item/page.tsx</td><td><span class="tag-mod">Edited</span></td><td>The reference file. Straight swap to the shared hook.</td></tr>
+          <tr><td class="file">src/component/slider/slider.tsx</td><td><span class="tag-mod">Edited</span></td><td>Same swap, plus two dead helper functions removed.</td></tr>
+          <tr><td class="file">src/component/watchlist/page.tsx</td><td><span class="tag-mod">Edited</span></td><td>Same swap. Found its wallet popup wasn't actually shared like assumed.</td></tr>
+          <tr><td class="file">pages/index.tsx</td><td><span class="tag-mod">Edited</span></td><td>Same swap. This is the one that picks up the missing wallet check.</td></tr>
+          <tr><td class="file">pages/seller-portfolio/[slug].tsx</td><td><span class="tag-mod">Edited</span></td><td>Same swap. Dropped one file specific side effect, explained below.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- STEP 0 -->
+  <section id="step0">
+    <div class="section-head"><span class="section-num">0</span><h2>Verify before touching anything</h2></div>
+    <p class="section-kicker">Before any file was edited, the plan document's claims were checked directly against the live code, since the plan was written a little earlier and code moves. <code>git status</code> also confirmed nothing had changed since, only two review PDFs and a docs folder were untracked, no source files had drifted.</p>
+
+    <div class="box verify">
+      <span class="box-tag">Confirmed as written</span>
+      <p><strong>domain-item/page.tsx</strong> had the four step ladder exactly where expected, lines 144 to 170, with its own BuyNowModal and WalletConect mounted per card at lines 176 to 197.</p>
+      <p><strong>pages/index.tsx</strong> was confirmed still missing the wallet provider check entirely, and still had no WalletConect import anywhere in the file. This is the real bug the later migration ends up fixing.</p>
+      <p><strong>pages/seller-portfolio/[slug].tsx</strong> was confirmed to check the wallet correctly and to use lowercase <code>router</code>, the one file out of five that does.</p>
+      <p>All three supporting pieces were confirmed present and unchanged: the <code>provider-manager</code> singleton, the <code>useOnScreen</code> hook, and the Redux store with its <code>userProfile</code> slice.</p>
+    </div>
+
+    <div class="box correction">
+      <span class="box-tag">Correction found</span>
+      <h4>slider.tsx already had the full gate ladder, the plan undersold it</h4>
+      <p>The plan document said this file had "no gate checks at all." Reading the actual file showed that was wrong, it has the exact same token, wallet address, and provider check duplicated at lines 158 to 182, identical in shape to domain-item's version. The only real difference is it never fires the tracking call at the end. The plan document was corrected on the spot before moving on, rather than carrying the wrong assumption into the migration.</p>
+    </div>
+  </section>
+
+  <!-- STEP 1 -->
+  <section id="step1">
+    <div class="section-head"><span class="section-num">1</span><h2>Decide where the shared state lives</h2></div>
+    <p class="section-kicker">Five unrelated files and one modal host all need to read and write "which domain is being bought, is a popup open." That state has to live somewhere all of them can reach. Two candidates existed in this codebase already, and the choice mattered enough to check properly rather than default to whichever felt more familiar.</p>
+
+    <div class="box checked">
+      <span class="box-tag">What was checked</span>
+      <p><code>src/context/AuthContext.tsx</code>, the one place this app already does exactly this kind of thing, a single piece of session state with actions exposed through a custom hook, <code>useAuth</code>, backed by a provider mounted once in <code>pages/_app.tsx</code>.</p>
+      <p><code>src/core/redux/slice/userProfileSlice.ts</code> and <code>src/core/redux/store.ts</code>, to see what Redux is actually used for in this app, real server backed data: the profile, the wallet address, domain listings, analytics mutations.</p>
+    </div>
+
+    <div class="box decision">
+      <span class="box-tag">Decision</span>
+      <h4>Use a Context, following AuthContext.tsx, not a Redux slice</h4>
+      <p>"Which domain is mid purchase and is a popup open" isn't server data and doesn't need to survive a reload, it's a flow control flag. That's exactly the shape <code>AuthContext</code> already exists for in this app, and there's no equivalent pattern for it in Redux, everything in Redux here is real fetched or cached application data. Copying the existing pattern beats inventing a new one or bending Redux to a job it isn't used for anywhere else in this codebase.</p>
+      <p><strong>One placement flag raised here, resolved in step 3:</strong> <code>AuthProvider</code> sits outside the Redux <code>Provider</code> in <code>_app.tsx</code>. The new buy intent provider can't sit in that same spot, because it needs <code>evmWalletAddress</code> from Redux via <code>useSelector</code>, so it has to be mounted inside the Redux <code>Provider</code> instead.</p>
+    </div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section id="step2">
+    <div class="section-head"><span class="section-num">2</span><h2>Build the hook</h2></div>
+    <p class="section-kicker">New file: <code>src/context/BuyIntentContext.tsx</code>. Exports <code>useBuyIntent()</code> and a <code>BuyIntentProvider</code>, following the exact shape of <code>AuthContext</code>/<code>useAuth</code> from step 1.</p>
+
+    <div class="box decision">
+      <span class="box-tag">What it does</span>
+      <p>Reproduces the four step gate ladder pulled directly from <code>domain-item/page.tsx</code> lines 144 to 170, the reference implementation: check the login token, check the saved wallet address, check the wallet is actually connected, and either open the wallet popup or open the buy popup and fire the tracking call. One function, <code>buy(domain)</code>, runs the whole thing.</p>
+      <p>Added <code>onWalletConfirmed()</code>, which resumes the buy flow for whichever domain was selected once the wallet actually connects, matching what every one of the five files did today through <code>WalletConect</code>'s <code>onConfirm</code> callback.</p>
+    </div>
+
+    <div class="verifystrip">✓ Typecheck clean immediately after creating this one file, before touching anything else.</div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section id="step3">
+    <div class="section-head"><span class="section-num">3</span><h2>Build the single modal host</h2></div>
+    <p class="section-kicker">New file: <code>src/component/buy-intent-modal-host/index.tsx</code>. One <code>BuyNowModal</code>, one <code>WalletConect</code>, driven entirely by <code>useBuyIntent()</code>.</p>
+
+    <div class="box decision">
+      <span class="box-tag">Decision</span>
+      <h4>Added a BuyableDomain type, in src/types/BuyModal.ts</h4>
+      <p>The five files don't agree on what a domain looks like: one calls the id field <code>id</code>, another calls it <code>domain_id</code>; one calls the network field <code>currency</code>, others call it <code>assetContract</code>; keywords show up as a raw array in some places and already joined into a string in others. Rather than have the shared host guess which name applies, one clear shape was defined once, and each file maps its own local names into it at the call site during migration.</p>
+    </div>
+
+    <div class="box checked">
+      <span class="box-tag">Safety check performed before consolidating</span>
+      <p>Mounting <code>WalletConect</code> once instead of once per card is the actual fix for the performance finding in the review, but that only works if nothing else depends on it remounting. Searched every usage first: it's actually used in <strong>six</strong> places, not five, the sixth being <code>domain-self-item/index.tsx</code>, the seller's own listing management page, which uses it for confirming a delist, a completely different action. That file is outside this phase's scope and was left untouched.</p>
+      <p>Also checked whether calling <code>createAppKit(...)</code> only once was safe. It's already called independently in three other unrelated places in this app today, <code>wallet-signup/index.tsx</code>, <code>wallet-connect/index.tsx</code> itself, and <code>profile-form/AddWalletAddress.tsx</code>, which means the app already tolerates it being called more than once. Going from five calls down to one for the buy flow specifically has no hidden coupling.</p>
+    </div>
+
+    <div class="box decision">
+      <span class="box-tag">Wired into pages/_app.tsx</span>
+      <p><code>BuyIntentProvider</code> and <code>BuyIntentModalHost</code> were mounted right next to the two other app wide helpers already sitting there, <code>AutoLogoutHandler</code> and <code>InitProvider</code>, and placed inside the Redux <code>Provider</code>, resolving the placement flag from step 1.</p>
+    </div>
+
+    <div class="verifystrip">✓ Typecheck clean. Lint clean, only pre-existing "any" warnings matching the style already used in BuyNowModalProps.</div>
+  </section>
+
+  <!-- STEP 4-8 -->
+  <section id="step4-8">
+    <div class="section-head"><span class="section-num">4–8</span><h2>Migrate the five files</h2></div>
+    <p class="section-kicker">Same pattern every time: replace the button's onClick with <code>buy({...})</code> mapping this file's own field names into <code>BuyableDomain</code>, delete the file's own modal instances, delete whatever state and handlers only existed to drive those modals, then check the type checker and linter for anything left dangling rather than guessing what's still needed.</p>
+
+    <div class="filecard">
+      <div class="filecard-head"><span class="file">src/component/domain-item/page.tsx</span></div>
+      <ul>
+        <li>The reference file the hook was built from, so this migration was close to a direct swap.</li>
+        <li class="removed">Deleted its own BuyNowModal and WalletConect, plus the state and handlers that only existed for them: showModal, isModalOpen, selectedDomainId, toggleModal, handleShow, handleClose, closeModel.</li>
+        <li class="removed">Removed now unused imports: the two dynamic modal imports, useAppKitProvider, useSelector/RootState, useGetUserProfileQuery, useRouter.</li>
+        <li>Left untouched: the watchlist heart button, save/unsave tracking, and the view on scroll tracking, none of that is part of the buy gate.</li>
+      </ul>
+      <div class="verifystrip">✓ Typecheck clean, lint clean.</div>
+    </div>
+
+    <div class="filecard">
+      <div class="filecard-head"><span class="file">src/component/slider/slider.tsx</span></div>
+      <ul>
+        <li>Same swap. Network is mapped from <code>assetContract</code> here, this file's own name for the field domain-item calls <code>currency</code>.</li>
+        <li class="removed">Also removed two helper functions, <code>getUsdPrice</code> and <code>getProviderKey</code>. They existed only to compute a <code>usdPrice</code> value for the old modal call, and checking BuyNowModal.tsx directly confirmed that prop is accepted by its type but never actually read inside the component, so nothing was lost by dropping it.</li>
+        <li class="removed">That in turn orphaned the <code>PROVIDER_NETWORKS</code> and <code>useGetCryptoPriceQuery</code> imports, removed those too.</li>
+      </ul>
+      <div class="verifystrip">✓ Typecheck clean, lint clean after removing the two orphaned imports it flagged.</div>
+    </div>
+
+    <div class="filecard">
+      <div class="filecard-head"><span class="file">src/component/watchlist/page.tsx</span></div>
+      <ul>
+        <li>id is mapped from <code>item.domain_id</code> here, not <code>item.id</code>, this file's own naming.</li>
+        <li class="removed">Deleted both modal instances and the state/handlers behind them.</li>
+      </ul>
+      <div class="box correction" style="margin-top:14px;">
+        <span class="box-tag">Correction found</span>
+        <p>Both the original review and the earlier verification pass said this file's WalletConect was already hoisted and shared, same as its BuyNowModal. Reading the file directly before editing showed that was wrong, WalletConect was actually rendered once per row, inside the <code>.map()</code>, the same per card pattern as slider.tsx, just for one of the two modals instead of both. Only BuyNowModal was genuinely shared. Flagged here rather than silently fixed, since it changes what "already shared" meant for this file.</p>
+      </div>
+      <div class="verifystrip">✓ Typecheck clean, lint clean, only pre-existing warnings unrelated to this change.</div>
+    </div>
+
+    <div class="filecard">
+      <div class="filecard-head"><span class="file">pages/index.tsx</span></div>
+      <ul>
+        <li><strong>This is the one that fixes a real bug, not just a cleanup.</strong> Its buy handler never checked whether a wallet was actually connected, and never rendered a WalletConect at all. Because the shared hook always runs the full four step ladder, migrating this file to it adds the missing connect prompt automatically, as a side effect of consolidating rather than a separate patch.</li>
+        <li class="removed">Removed dead code left over once the modal was gone: <code>ROUTER</code>/useRouter, the <code>evmWalletAddress</code> selector, the <code>TrendingDomain</code> type import, <code>getCookieValue</code>, and the now unused dynamic import.</li>
+      </ul>
+      <div class="verifystrip">✓ Typecheck clean, lint clean after removing the orphaned dynamic import.</div>
+    </div>
+
+    <div class="filecard">
+      <div class="filecard-head"><span class="file">pages/seller-portfolio/[slug].tsx</span></div>
+      <ul>
+        <li>Network mapped from <code>assetContract</code>, same as slider.tsx and pages/index.tsx.</li>
+        <li class="removed">Deleted both modal instances and their supporting state/handlers, plus now dead imports: dynamic, useAppKitProvider, useSelector/RootState, useGetUserProfileQuery, useRouter, and the Domain type.</li>
+      </ul>
+      <div class="box decision" style="margin-top:14px;">
+        <span class="box-tag">Decision, flagged before editing</span>
+        <h4>Dropped an extra refetchProfile() call this one file had</h4>
+        <p>This file's <code>toggleModal()</code> also refetched the user's profile before opening the wallet popup, a side effect none of the other four files had. Checking <code>wallet-connect/index.tsx</code> directly showed <code>WalletConect</code> already runs its own profile query internally, making this extra refetch redundant rather than load bearing. Replicating one file's extra behavior into the shared hook would have undermined the point of consolidating, so it was dropped, not carried forward as a special case.</p>
+      </div>
+      <div class="verifystrip">✓ Typecheck clean, lint clean.</div>
+    </div>
+  </section>
+
+  <!-- STEP 9 -->
+  <section id="step9">
+    <div class="section-head"><span class="section-num">9</span><h2>Final sweep</h2></div>
+    <p class="section-kicker">Searched the whole app for anything still referencing the old modals directly, to confirm nothing was missed and nothing was over reached.</p>
+
+    <div class="box verify">
+      <span class="box-tag">Result</span>
+      <p>Only four things still mention <code>BuyNowModal</code> or <code>WalletConect</code> anywhere in the codebase: the new modal host itself, the two modal components' own definitions, one code comment, and <code>domain-self-item/index.tsx</code>, the delist file that was correctly left alone in step 3. Every one of the five original call sites is clean.</p>
+      <p>The full project typecheck stayed clean through every single step above, not just at the end, each file was verified the moment it was changed rather than in one batch at the finish.</p>
+    </div>
+  </section>
+
+  <!-- TESTING -->
+  <section id="testing">
+    <div class="section-head"><span class="section-num">→</span><h2>Testing this phase</h2></div>
+    <p class="section-kicker">The migration above was verified by the type checker and linter as it was built, but none of that proves the app actually works in a browser. This section covers what came out of actually running it, first three local blockers that had nothing to do with the buy gate at all, then what got confirmed working, then a handful of real findings that turned out to belong to other parts of the app, not this one.</p>
+
+    <h3 style="margin-top:36px; font-size:1.15rem; font-family:'IBM Plex Sans'; font-weight:600;">Local environment blockers, found before any of this could even be tested</h3>
+
+    <div class="box correction">
+      <span class="box-tag">Blocker 1, fixed</span>
+      <h4>Every single API call was 404ing, homepage and grid both showed nothing</h4>
+      <p><code>NEXT_PUBLIC_API_URL</code> in the local <code>.env</code> was missing a <code>/v1</code> segment. Confirmed by loading the app in a headless browser and watching every network call fail, then confirmed the fix by comparing against the actual working staging deployment, which calls the same host with <code>/v1</code> in the path. Not caused by phase 1, this value was already wrong before this session started.</p>
+    </div>
+
+    <div class="box correction">
+      <span class="box-tag">Blocker 2, fixed</span>
+      <h4>Three of five top nav links pointed nowhere</h4>
+      <p><code>MAIN_SITE_URL</code> was missing from <code>.env</code> entirely, so Domains, Parked Domains, and Domain Appraisal all resolved to <code>undefined/...</code>. Fixed with the real value confirmed against the working deployment's actual link hrefs, <code>https://stage.endlessdomains.io</code>, rather than guessed.</p>
+    </div>
+
+    <div class="box correction">
+      <span class="box-tag">Blocker 3, added then removed</span>
+      <h4>SITE_URL turned out not to be the actual problem</h4>
+      <p>Added briefly to fix a missing "Portfolio URL" line on the Profile page, then removed once testing showed the real cause was something else entirely, see the user hash finding below. Kept out of <code>.env</code> since it wasn't proven necessary.</p>
+    </div>
+
+    <h3 style="margin-top:36px; font-size:1.15rem; font-family:'IBM Plex Sans'; font-weight:600;">Confirmed working</h3>
+
+    <div class="box verify">
+      <span class="box-tag">Verified</span>
+      <p>Real domains render on the homepage and grid once the env blockers above were fixed, and every API call lands on <code>/v1</code> with normal 200 or 401 responses, no more 404s.</p>
+      <p>No JavaScript errors anywhere on page load, checked with a headless browser's console output, not just visually.</p>
+      <p>Clicking Buy Now on a grid card while logged out shows "Please log in to purchase the domain." and nothing else happens, confirmed in a real browser, proving the migrated hook's login check works end to end, not just in the type checker.</p>
+      <p>The homepage inline trending section, the one file that used to skip the wallet check entirely, was specifically retested and now behaves the same as the other four surfaces.</p>
+    </div>
+
+    <h3 style="margin-top:36px; font-size:1.15rem; font-family:'IBM Plex Sans'; font-weight:600;">Found while testing, confirmed not this phase's problem</h3>
+    <p class="section-kicker" style="margin-top:10px; margin-bottom:0;">Each of these came up while working through the test checklist. Every one was traced to an actual cause rather than assumed, and every one lands outside phase 1, either a different file entirely, the backend, or the untouched transaction handler that phase 2 covers.</p>
+
+    <div class="box checked">
+      <span class="box-tag">Backend, account state</span>
+      <h4>Your account's user hash comes back null, blocking your own seller portfolio</h4>
+      <p>The <code>/users/user-hash</code> call returns <code>{"result": null}</code> for this account, on stage as well as locally. That's why the "Portfolio URL" row never shows in your own Profile page, the code is doing exactly what it should given what the backend sent. No <code>/seller-portfolio/...</code> URL exists for this account until the backend assigns it a hash, nothing fixable from this repository.</p>
+    </div>
+
+    <div class="box checked">
+      <span class="box-tag">Backend bug, different file</span>
+      <h4>"Unlisted" showing 0 domains on the My Domains page</h4>
+      <p>Traced to <code>pages/profile/domains/index.tsx</code>, the "My Domains" page from the header dropdown, a file phase 1 never touched. The <code>get-domains-summary-by-user</code> response itself is contradictory: <code>"totalUnlisted": 5</code> right next to <code>"data": []</code>. The backend's own count logic and its own list logic disagree with each other inside one response. Confirmed this isn't the frontend's double filter causing it, filtering an empty array just gives an empty array either way.</p>
+    </div>
+
+    <div class="box checked">
+      <span class="box-tag">Backend hygiene</span>
+      <h4>A debug string leaking into a real error message</h4>
+      <p>The session check endpoint returned <code>"User not authenticated sdgsdgsdgf"</code>, a placeholder string that shouldn't be in a production-facing message. Worth reporting alongside the finding above, same backend, same staging deploy.</p>
+    </div>
+
+    <div class="box checked">
+      <span class="box-tag">Confirmed harmless</span>
+      <h4>add-analytics returning 429 during testing</h4>
+      <p>Traced via its own stack trace to <code>BuyIntentContext.tsx</code>'s tracking call, fired from the grid card. It's fire and forget, nothing awaits it or checks its result, so a rate limited tracking call can't and doesn't block the buy flow, confirmed the popup still opened normally when this happened. Most likely caused by the volume of automated and manual testing hitting the same staging API today, not a logic bug.</p>
+    </div>
+
+    <div class="box checked">
+      <span class="box-tag">Real bug, but phase 2's file</span>
+      <h4>The actual purchase fails with an on chain revert</h4>
+      <p>Clicking Buy inside the popup throws <code>call revert exception ... method="getRequiredNativeAmount(uint256)"</code>, caught by <code>BuyNowModal.tsx</code>'s single generic catch block and shown as "Something went wrong. Please try again.", the exact "every failure reads the same" finding the original review already documented. This file was not touched by phase 1. Most likely cause: this domain's listing exists in the backend's database but not, or not correctly, on the actual smart contract for the connected chain, a data mismatch common on staging environments where backend and on chain state are seeded separately. Phase 2 would make the error message honest instead of generic, it would not make a listing that doesn't really exist on chain purchasable.</p>
+    </div>
+  </section>
+
+  <div class="footer">
+    <span>Endless Domains · phase 1 implementation record, consolidate the buy gate</span>
+    <span>Migration verified and tested · purchase flow itself blocked on phase 2 and backend data, not this phase</span>
+  </div>
+
+</main>
+
+<script>
+  (function(){
+    var links = Array.prototype.slice.call(document.querySelectorAll('#pillnav a'));
+    var sections = links.map(function(a){ return document.querySelector(a.getAttribute('href')); }).filter(Boolean);
+    if(!('IntersectionObserver' in window)) return;
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        var idx = sections.indexOf(entry.target);
+        if(idx === -1) return;
+        if(entry.isIntersecting){
+          links.forEach(function(l){ l.classList.remove('active'); });
+          links[idx].classList.add('active');
+        }
+      });
+    }, { rootMargin: '-40% 0px -50% 0px', threshold: 0 });
+    sections.forEach(function(s){ io.observe(s); });
+  })();
+</script>

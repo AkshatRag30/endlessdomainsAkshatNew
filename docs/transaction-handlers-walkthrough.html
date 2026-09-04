@@ -1,0 +1,1042 @@
+<title>Transaction Handlers Walkthrough</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root{
+    color-scheme: light;
+    --paper:#F2F4F6;
+    --paper-raised:#FFFFFF;
+    --ink:#1A2233;
+    --ink-soft:#55606E;
+    --ink-faint:#8A93A0;
+    --line:#DCE1E6;
+    --line-strong:#C3CBD3;
+    --accent:#2455A4;
+    --accent-ink:#163B73;
+    --accent-soft:#E4ECF7;
+    --c-red:#B23A2E;      --c-red-bg:#F7E2DE;
+    --c-amber:#9C6B12;    --c-amber-bg:#F5E8CC;
+    --c-plum:#6E4A8C;     --c-plum-bg:#EFE4F3;
+    --c-green:#227A5B;    --c-green-bg:#DFF0E7;
+    --c-teal:#1B7A76;     --c-teal-bg:#DCEEEC;
+    --shadow: 0 1px 2px rgba(26,34,51,0.06), 0 6px 20px rgba(26,34,51,0.06);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+    font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{font-family:"Fraunces",Georgia,serif; font-weight:600; color:var(--ink); text-wrap:balance; margin:0;}
+  code, .mono{font-family:"IBM Plex Mono","SFMono-Regular",monospace;}
+  a{color:var(--accent);}
+  p{margin:0;}
+
+  .topnav{
+    position:sticky; top:0; z-index:20;
+    background:color-mix(in srgb, var(--paper) 88%, transparent);
+    backdrop-filter:blur(10px); border-bottom:1px solid var(--line);
+  }
+  .topnav-inner{
+    max-width:980px; margin:0 auto; display:flex; align-items:center; gap:18px;
+    padding:12px 24px; overflow-x:auto;
+  }
+  .topnav-title{
+    font-family:"Fraunces",serif; font-weight:600; font-size:0.95rem;
+    color:var(--ink); white-space:nowrap; flex:none;
+    padding-right:6px; border-right:1px solid var(--line);
+  }
+  .topnav-links{display:flex; gap:4px; flex:none;}
+  .topnav-links a{
+    display:flex; align-items:center; gap:6px; font-size:0.76rem; font-weight:500;
+    color:var(--ink-soft); text-decoration:none; white-space:nowrap;
+    padding:6px 10px; border-radius:100px; transition:background 0.15s, color 0.15s;
+  }
+  .topnav-links a:hover, .topnav-links a.active{background:var(--accent-soft); color:var(--accent-ink);}
+
+  main{max-width:940px; margin:0 auto; padding:0 24px 120px;}
+
+  .hero{padding:52px 0 36px; border-bottom:1px solid var(--line);}
+  .eyebrow{
+    font-family:"IBM Plex Mono",monospace; font-size:0.75rem; letter-spacing:0.08em;
+    text-transform:uppercase; color:var(--accent); font-weight:500;
+    margin-bottom:16px; display:block;
+  }
+  .hero h1{font-size:clamp(2.2rem,5.5vw,3.1rem); line-height:1.06; letter-spacing:-0.01em;}
+  .hero-sub{margin-top:18px; font-size:1.05rem; color:var(--ink-soft); max-width:72ch; line-height:1.65;}
+  .hero-sub + .hero-sub{margin-top:12px;}
+
+  .glossary{
+    margin-top:28px; display:grid; grid-template-columns:repeat(3,1fr); gap:1px;
+    background:var(--line); border:1px solid var(--line); border-radius:10px; overflow:hidden;
+  }
+  .glossary-item{background:var(--paper-raised); padding:14px 16px;}
+  .glossary-item .term{
+    font-family:"IBM Plex Mono",monospace; font-size:0.82rem; font-weight:500; color:var(--accent-ink);
+    display:block; margin-bottom:5px;
+  }
+  .glossary-item .def{font-size:0.85rem; color:var(--ink-soft); line-height:1.5;}
+  @media (max-width:700px){ .glossary{grid-template-columns:1fr 1fr;} }
+  @media (max-width:480px){ .glossary{grid-template-columns:1fr;} }
+
+  section{padding:52px 0; border-bottom:1px solid var(--line);}
+  section:last-of-type{border-bottom:none;}
+  .section-head{display:flex; align-items:baseline; gap:14px; margin-bottom:8px;}
+  .section-num{font-family:"IBM Plex Mono",monospace; font-size:0.9rem; font-weight:500; color:var(--accent); flex:none;}
+  .section-head h2{font-size:1.6rem;}
+  .section-kicker{color:var(--ink-soft); font-size:0.98rem; margin-top:14px; max-width:74ch; line-height:1.65;}
+  .section-kicker + .section-kicker{margin-top:10px;}
+  .file-tag{
+    display:inline-flex; align-items:center; gap:8px; font-family:"IBM Plex Mono",monospace;
+    font-size:0.8rem; color:var(--accent-ink); background:var(--accent-soft);
+    padding:5px 12px; border-radius:6px; margin-top:16px;
+  }
+  h3.sub{margin-top:36px; font-size:1.1rem; font-family:'IBM Plex Sans'; font-weight:600;}
+  h4.sub{margin-top:22px; font-size:0.98rem; font-family:'IBM Plex Sans'; font-weight:600; color:var(--ink);}
+
+  /* code table */
+  .codewrap{
+    margin-top:16px; border:1px solid var(--line); border-radius:8px; overflow:hidden;
+    background:var(--paper-raised); box-shadow:var(--shadow);
+  }
+  .codewrap .head{
+    padding:8px 14px; border-bottom:1px solid var(--line); background:var(--paper);
+    font-family:"IBM Plex Mono",monospace; font-size:0.72rem; color:var(--ink-faint);
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+  }
+  .codewrap .head .tag{
+    font-size:0.62rem; letter-spacing:0.05em; text-transform:uppercase; font-weight:600;
+    color:var(--c-teal); background:var(--c-teal-bg); padding:2px 7px; border-radius:5px; flex:none;
+  }
+  .codewrap .scroll{overflow-x:auto;}
+  table.code{width:100%; border-collapse:collapse; font-family:"IBM Plex Mono",monospace; font-size:0.8rem;}
+  table.code td{padding:1px 10px; vertical-align:top; white-space:pre;}
+  table.code td.ln{
+    width:1%; text-align:right; color:var(--ink-faint); user-select:none;
+    border-right:1px solid var(--line); padding-right:10px;
+  }
+  table.code td.src{color:var(--ink-soft); padding-left:12px;}
+  table.code tr.hl{background:var(--accent-soft);}
+  table.code tr.hl td.src{color:var(--accent-ink);}
+  table.code tr.hl td.ln{color:var(--accent-ink); font-weight:500;}
+
+  .linetag{
+    display:inline-block; font-family:"IBM Plex Mono",monospace; font-size:0.74rem;
+    font-weight:600; color:var(--accent-ink); background:var(--accent-soft);
+    padding:2px 8px; border-radius:5px; margin-right:8px;
+  }
+  .note{margin-top:12px; padding-top:0;}
+  .note p{color:var(--ink-soft); font-size:0.92rem; line-height:1.65;}
+  .note + .note{margin-top:14px;}
+
+  .box{
+    margin-top:18px; padding:16px 20px; background:var(--paper-raised);
+    border:1px solid var(--line); border-left:3px solid var(--box-c, var(--ink-faint));
+    border-radius:8px; box-shadow:var(--shadow);
+  }
+  .box-tag{
+    display:inline-block; font-family:"IBM Plex Mono",monospace; font-size:0.66rem;
+    font-weight:600; letter-spacing:0.05em; text-transform:uppercase; padding:3px 9px;
+    border-radius:5px; background:var(--box-bg); color:var(--box-c); margin-bottom:9px;
+  }
+  .box h4{font-family:"IBM Plex Sans",sans-serif; font-weight:600; font-size:0.95rem; color:var(--ink); margin-bottom:7px;}
+  .box p{color:var(--ink-soft); font-size:0.9rem; line-height:1.62;}
+  .box p + p{margin-top:8px;}
+  .box.concept{--box-c:var(--accent-ink); --box-bg:var(--accent-soft);}
+  .box.why{--box-c:var(--c-amber); --box-bg:var(--c-amber-bg);}
+  .box.recipe{--box-c:var(--c-green); --box-bg:var(--c-green-bg);}
+  .box.diff{--box-c:var(--c-plum); --box-bg:var(--c-plum-bg);}
+  .box.basics{--box-c:var(--c-teal); --box-bg:var(--c-teal-bg);}
+
+  .plain{
+    margin-top:10px; padding:11px 15px; background:var(--paper);
+    border-left:2px solid var(--line-strong); border-radius:6px;
+    font-size:0.88rem; color:var(--ink-soft); font-style:italic; line-height:1.6;
+  }
+  .plain b{color:var(--ink); font-style:normal;}
+  .plain .plain-tag{
+    display:block; font-family:"IBM Plex Mono",monospace; font-style:normal; font-size:0.62rem;
+    letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:5px;
+  }
+
+  .recap-list{margin:16px 0 0; padding:0; list-style:none; display:flex; flex-direction:column; gap:10px;}
+  .recap-list li{position:relative; padding-left:26px; font-size:0.94rem; color:var(--ink-soft); line-height:1.6;}
+  .recap-list li::before{content:"→"; color:var(--accent); font-weight:600; position:absolute; left:0; top:0;}
+  .recap-list li strong{color:var(--ink);}
+
+  .footer{
+    margin-top:36px; padding-top:22px; border-top:1px solid var(--line);
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;
+    font-family:"IBM Plex Mono",monospace; font-size:0.74rem; color:var(--ink-faint);
+  }
+  .footer span{max-width:48%;}
+  @media (max-width:600px){ .footer span{max-width:100%;} }
+  ::selection{background:var(--accent-soft); color:var(--accent-ink);}
+</style>
+
+<nav class="topnav">
+  <div class="topnav-inner">
+    <span class="topnav-title">Transaction Handlers Walkthrough</span>
+    <div class="topnav-links" id="pillnav">
+      <a href="#foundations">Start here</a>
+      <a href="#overview">Overview</a>
+      <a href="#buy">1 Buy</a>
+      <a href="#listing">2 Listing</a>
+      <a href="#submitbutton">3 Button</a>
+      <a href="#delist">4 Delist</a>
+      <a href="#recipe">The recipe</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+
+  <div class="hero" id="overview">
+    <span class="eyebrow">Every line of new code from phase 2, explained from zero</span>
+    <h1>How the buy and listing transactions were actually rewritten</h1>
+    <p class="hero-sub">This is the companion to the Buy Gate Walkthrough, same purpose, different subject. That one explained how five files became one shared hook. This one explains how the two places that actually move money and sign transactions, buying a domain and listing one, went from "tell everyone it worked before checking" to "only tell anyone once the chain has actually confirmed it." It stops at every piece of new or changed code, explains what it does, why it's written that way, and what the underlying idea is, assuming nothing about prior experience with async code or blockchain transactions.</p>
+    <p class="hero-sub">Four files changed, none of them new: <code>src/component/modals/BuyNowModal.tsx</code>, <code>src/component/modals/DomainListingModal.tsx</code>, <code>src/component/modals/SubmitButton.tsx</code>, and <code>src/component/domain-self-item/index.tsx</code>. This phase is different from the last one in one important way worth saying plainly up front: this code sends real transactions to a real wallet and a real smart contract, so testing it properly takes a funded wallet and a listing that genuinely exists on chain, and at the time of writing that live testing hadn't been run yet, only the type checker and linter had. That's covered honestly in the Phase 2 Paper Trail, this document is about the code itself, not the test results.</p>
+    <p class="hero-sub">If words like "Promise," "await," "try/catch," or "gas" feel unfamiliar, start with <a href="#foundations">Start here</a> below. It builds the ideas this phase leans on that the Buy Gate Walkthrough never needed. Everyone else can jump straight to <a href="#buy">the buy handler</a>.</p>
+
+    <div class="glossary">
+      <div class="glossary-item"><span class="term">Promise</span><span class="def">JavaScript's placeholder for "a value that isn't ready yet, but will be." An async function always hands one back, whether or not its code says so.</span></div>
+      <div class="glossary-item"><span class="term">await</span><span class="def">Pauses an async function at that exact line until a Promise settles, then hands back the real value, without blocking anything else on the page.</span></div>
+      <div class="glossary-item"><span class="term">try / catch / throw</span><span class="def">try runs code that might fail, catch runs only if it did, throw is how any piece of code hands an error up to whichever catch is listening for it.</span></div>
+      <div class="glossary-item"><span class="term">Smart contract</span><span class="def">Code that lives on a blockchain instead of a server. Calling one of its functions from this app either reads its stored data for free, or writes to it via a real transaction.</span></div>
+      <div class="glossary-item"><span class="term">BigNumber</span><span class="def">A special object ethers.js uses instead of a plain JavaScript number, because token amounts need more digits of precision than JavaScript numbers can safely hold.</span></div>
+      <div class="glossary-item"><span class="term">Transaction hash</span><span class="def">The transaction's ID, known the instant it's sent, before anyone knows whether it will actually succeed.</span></div>
+      <div class="glossary-item"><span class="term">Receipt</span><span class="def">What a transaction turns into once a block includes it. Carries a status field, the only reliable way to know if it truly succeeded.</span></div>
+      <div class="glossary-item"><span class="term">Gas</span><span class="def">The fee paid, in the network's native currency, for a transaction to actually run. Has to be budgeted for on top of whatever the transaction itself is paying for.</span></div>
+      <div class="glossary-item"><span class="term">Event log</span><span class="def">A permanent, searchable note a smart contract can attach to a transaction, recording exactly what happened, readable back out of the transaction's receipt.</span></div>
+    </div>
+  </div>
+
+  <!-- FOUNDATIONS -->
+  <section id="foundations">
+    <div class="section-head"><span class="section-num">0</span><h2>Start here: seven ideas this phase leans on</h2></div>
+    <p class="section-kicker">The Buy Gate Walkthrough's "start here" section covered components, props, state, and TypeScript basics. None of that is repeated here. This section covers what's specific to this phase instead: code that waits for things, code that can genuinely fail in ways a login check never could, and code that talks to a blockchain instead of a normal server. If these are already familiar, skip to <a href="#buy">the buy handler</a>. Every example here is a short, made up snippet built only to demonstrate the idea, clearly marked, and not part of this codebase.</p>
+
+    <h4 class="sub">0.1 &nbsp;Synchronous code runs in order, asynchronous code waits</h4>
+    <div class="note"><p>Most of the code in a typical function runs the instant the line before it finishes, top to bottom, with no gaps. Some operations can't work that way: asking a wallet to sign something, or asking a blockchain for data, take real time, sometimes several seconds, and the browser can't just freeze the whole page waiting. JavaScript's answer is the <code>async</code> and <code>await</code> keywords. A function marked <code>async</code> is allowed to pause and resume itself without blocking anything else running on the page while it waits.</p></div>
+    <div class="codewrap">
+      <div class="head">a tiny made up example<span class="tag">illustrative example</span></div>
+      <div class="scroll">
+        <table class="code">
+          <tr><td class="ln">1</td><td class="src">async function getBalance() {</td></tr>
+          <tr class="hl"><td class="ln">2</td><td class="src">  const balance = await wallet.getBalance();</td></tr>
+          <tr><td class="ln">3</td><td class="src">  console.log(balance);</td></tr>
+          <tr><td class="ln">4</td><td class="src">}</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="plain"><span class="plain-tag">in plain english</span>Line 2 doesn't move on to line 3 the instant it's read. It pauses this function right there, lets the rest of the page keep working normally, and only continues once the wallet actually answers. <code>await</code> is only legal inside a function marked <code>async</code>, that's the deal, in exchange for being allowed to pause, the function has to admit up front that it might take a while.</div>
+
+    <h4 class="sub">0.2 &nbsp;A Promise is a placeholder for a value that isn't ready yet</h4>
+    <div class="note"><p>Every <code>async</code> function, whether it says so or not, actually hands back a Promise, not the real value directly. A Promise is an object with exactly one job: eventually settle into either a real value, or an error. <code>await</code> is what unwraps a Promise back into the plain value underneath it, that's the entire relationship between the two, <code>async</code> functions produce Promises, <code>await</code> consumes them.</p></div>
+    <div class="box basics">
+      <span class="box-tag">Basics: why this matters for reading this phase's code</span>
+      <p>Every line in this phase that starts with <code>await</code>, connecting to a wallet, reading a contract's data, sending a transaction, waiting for it to confirm, is a Promise being unwrapped. Seeing <code>await</code> is the signal "this line takes real time, and everything after it only runs once this specific thing finishes," it's the single most repeated pattern in both rewritten files.</p>
+    </div>
+
+    <h4 class="sub">0.3 &nbsp;try, catch, and throw, and why throw is different from returning false</h4>
+    <div class="note"><p><code>try { ... }</code> marks a block of code that might fail. <code>catch (error) { ... }</code> only runs if something inside that <code>try</code> block actually failed, and it receives whatever went wrong as <code>error</code>. <code>throw</code> is how a piece of code, anywhere, at any depth, hands an error up to the nearest <code>catch</code> that's listening for it, even if that catch lives in a completely different function that called this one.</p></div>
+    <div class="codewrap">
+      <div class="head">a tiny made up example<span class="tag">illustrative example</span></div>
+      <div class="scroll">
+        <table class="code">
+          <tr><td class="ln">1</td><td class="src">async function riskyStep() {</td></tr>
+          <tr class="hl"><td class="ln">2</td><td class="src">  throw new Error("something broke");</td></tr>
+          <tr><td class="ln">3</td><td class="src">}</td></tr>
+          <tr><td class="ln">4</td><td class="src"></td></tr>
+          <tr><td class="ln">5</td><td class="src">async function run() {</td></tr>
+          <tr><td class="ln">6</td><td class="src">  try {</td></tr>
+          <tr><td class="ln">7</td><td class="src">    await riskyStep();</td></tr>
+          <tr class="hl"><td class="ln">8</td><td class="src">  } catch (error) {</td></tr>
+          <tr><td class="ln">9</td><td class="src">    console.log("caught it:", error.message);</td></tr>
+          <tr><td class="ln">10</td><td class="src">  }</td></tr>
+          <tr><td class="ln">11</td><td class="src">}</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="box why">
+      <span class="box-tag">Why this distinction mattered in this actual rewrite</span>
+      <p>Before this phase, one function in <code>DomainListingModal.tsx</code>, <code>approval()</code>, handled a cancelled wallet prompt by quietly returning <code>false</code> instead of throwing. That meant the code calling it had to remember to check for that specific <code>false</code> value, and it didn't, it just kept going as if approval had succeeded. Changing that one function to <code>throw</code> instead means the mistake becomes structurally impossible, code that calls an async function without handling what it throws doesn't silently continue, it stops, right there, exactly where the failure happened. That's the real, practical reason "throw, don't return false" is one of this phase's central fixes, not a style preference.</p>
+    </div>
+
+    <h4 class="sub">0.4 &nbsp;A smart contract call is either a free read or a real transaction</h4>
+    <div class="note"><p>Every interaction with the marketplace contract in this codebase falls into one of two very different categories. Reading its stored data, like asking "what's the required payment for this listing," costs nothing and returns instantly, it's just asking a question. Actually changing something it stores, buying a listing or creating one, is a real transaction: it needs a signature from the connected wallet, it costs a fee, and the result isn't known instantly, it has to be confirmed by the network first.</p></div>
+    <div class="box concept">
+      <span class="box-tag">Concept: same JavaScript syntax, two very different operations</span>
+      <p><code>contract.getRequiredNativeAmount(priceInUSD)</code> and <code>contract.buy(...)</code> look almost identical in the code, both are just <code>await contract.someFunction(...)</code>. The difference is entirely in what that function does on chain, one is defined as a read in the contract's own code, the other as a write. Nothing in the JavaScript syntax marks that difference, it has to be known about the specific contract function being called.</p>
+    </div>
+
+    <h4 class="sub">0.5 &nbsp;BigNumber: why this code can't just use normal JavaScript numbers for money</h4>
+    <div class="note"><p>JavaScript's built in number type starts silently losing precision past about 9 quadrillion, and token amounts are usually expressed in tiny fractional units, wei, the smallest possible unit of native currency, where 1 whole token equals 1 followed by 18 zeros of these units. A price like "2.5 tokens" becomes an 18 digit integer once converted to wei, comfortably past where plain JavaScript numbers can be trusted. ethers.js works around this with its own <code>BigNumber</code> type, which can represent numbers of any size exactly, at the cost of needing its own methods, <code>.add()</code>, <code>.mul()</code>, <code>.lt()</code>, instead of the normal <code>+</code>, <code>*</code>, <code>&lt;</code> operators.</p></div>
+    <div class="codewrap">
+      <div class="head">a tiny made up example<span class="tag">illustrative example</span></div>
+      <div class="scroll">
+        <table class="code">
+          <tr><td class="ln">1</td><td class="src">// wrong: silently loses precision for large enough values</td></tr>
+          <tr><td class="ln">2</td><td class="src">const total = price + fee;</td></tr>
+          <tr><td class="ln">3</td><td class="src"></td></tr>
+          <tr><td class="ln">4</td><td class="src">// right: BigNumber's own method, exact no matter how large</td></tr>
+          <tr class="hl"><td class="ln">5</td><td class="src">const total = price.add(fee);</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="plain"><span class="plain-tag">in plain english</span>Anywhere this phase's code writes <code>.mul(102).div(100)</code> instead of <code>* 1.02</code>, or <code>.lt(...)</code> instead of <code>&lt;</code>, or <code>.add(...)</code> instead of <code>+</code>, that's this exact reason, the values involved are BigNumbers, not plain numbers, and BigNumbers only understand their own method names.</div>
+
+    <h4 class="sub">0.6 &nbsp;A transaction hash, a receipt, and a confirmation are three different moments</h4>
+    <div class="note"><p>It's easy to assume "the transaction was sent" and "the transaction succeeded" are the same moment. They aren't, and conflating them is exactly what this phase's rewrite fixes in both files. Sending a transaction returns a hash almost immediately, that's just proof it was broadcast, not proof it worked. Only once a block actually includes it does a receipt exist, and only that receipt's <code>status</code> field says whether it truly succeeded or reverted. A transaction can be mined, meaning included in a block, and still have failed on chain, that's exactly what a status of <code>0</code> means.</p></div>
+    <div class="box why">
+      <span class="box-tag">Why this is the single most repeated fix across this whole phase</span>
+      <p>Every one of the four files touched in this phase had some version of the same bug: treating "the transaction was sent" as if it meant "the transaction succeeded," and telling the backend, or the user, before actually checking. The fix, everywhere it appears, is the same three step shape: send the transaction, <code>await</code> its receipt, then check <code>receipt.status === 1</code> before doing anything that can't be undone, like saving to a database or showing a success message.</p>
+    </div>
+
+    <h4 class="sub">0.7 &nbsp;Gas, in one paragraph</h4>
+    <div class="note"><p>Every transaction that changes something on a blockchain costs a fee, called gas, paid in that network's native currency, separately from whatever the transaction itself is sending or paying for. Buying a domain for, say, 0.5 of a token also costs some additional, smaller amount of that same native currency just for the transaction to run at all. A wallet needs enough balance to cover both, the price and the gas, or the transaction can't go through, and checking a wallet's balance against only the price, ignoring gas, is exactly the kind of check that looks correct until the numbers are close.</p></div>
+
+    <h4 class="sub">0.8 &nbsp;Event logs: a permanent note a contract attaches to a transaction</h4>
+    <div class="note"><p>A smart contract can declare that whenever a certain thing happens, creating a new listing, for instance, it will emit an event, a small, permanent, structured note recorded alongside the transaction. That note ends up inside the transaction's own receipt, in a list called <code>logs</code>. Anyone with the contract's ABI, its description of what functions and events it has, can decode those logs back into readable data afterward, including data that was never returned directly from the function call itself.</p></div>
+    <div class="box concept">
+      <span class="box-tag">Concept: why bother reading a log instead of just asking again</span>
+      <p>Once a listing is created, its id could be looked up with a second, separate call asking the contract "what's the id for this token now." But that second call reads whatever the contract's current, live state is, at the exact moment it's asked, which can be a fraction of a second after the creating transaction, a small window where the answer can be stale or not yet consistent. The transaction's own receipt, on the other hand, is a fixed, permanent record of exactly what that specific transaction did, including whatever it emitted. Reading the id from there is asking "what did this exact transaction record," not "what does the contract currently say," a meaningfully different, more reliable question.</p>
+    </div>
+  </section>
+
+  <!-- BUY -->
+  <section id="buy">
+    <div class="section-head"><span class="section-num">1</span><h2>BuyNowModal.tsx, the purchase handler</h2></div>
+    <p class="section-kicker">domainBuyHandler is the function every Buy button in the app ultimately calls. Before this phase, it told the backend a purchase happened before ever checking whether the transaction actually succeeded on chain, and treated every possible failure, a cancelled wallet prompt, an on chain revert, an unrelated bug, with the exact same flat message.</p>
+    <span class="file-tag">src/component/modals/BuyNowModal.tsx</span>
+
+    <div class="box basics">
+      <span class="box-tag">The whole function in one paragraph, no jargon</span>
+      <p>Picture a cashier at checkout who used to hand over the receipt and tell the warehouse "sold!" the instant the customer swiped their card, before the bank had actually approved the charge. If the charge later bounced, the item was already gone and the sale was already logged. The rewritten version waits for the bank's actual approval first, only then hands over the receipt and tells the warehouse. It also stopped writing "card declined" on every single kind of problem, a bounced charge, a cancelled swipe, and a broken card reader now each get their own honest message instead of one shrug.</p>
+    </div>
+
+    <h4 class="sub">Guarding against a second click</h4>
+    <div class="codewrap">
+      <div class="head">lines 73 to 76</div>
+      <div class="scroll">
+        <table class="code">
+          <tr><td class="ln">73</td><td class="src">  async function domainBuyHandler(token_id: any, domainProvider: string) {</td></tr>
+          <tr class="hl"><td class="ln">74-76</td><td class="src">    // Guard against a submission already in flight, a double click can no
+    // longer start a second, overlapping purchase attempt.
+    if (isTransactionLoading) return;</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="note"><p>This is the very first thing the function does, before anything else runs. If a purchase is already in progress, <code>isTransactionLoading</code> is already <code>true</code>, and this line stops a second call in its tracks. Without it, clicking Buy twice quickly could start two overlapping transactions.</p></div>
+
+    <h4 class="sub">Switching networks inline, instead of bailing</h4>
+    <div class="codewrap">
+      <div class="head">lines 136 to 163</div>
+      <div class="scroll">
+        <table class="code">
+          <tr><td class="ln">136</td><td class="src">      let network = await provider.getNetwork();          // number in v5</td></tr>
+          <tr><td class="ln">137</td><td class="src">      if (network.chainId !== Number(expectedChainId)) {</td></tr>
+          <tr><td class="ln">138</td><td class="src">        setIsWrongNetwork(true);</td></tr>
+          <tr><td class="ln">139</td><td class="src">        try {</td></tr>
+          <tr class="hl"><td class="ln">140-143</td><td class="src">          await (provider.provider as any).request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: expectedChainId }],
+          });</td></tr>
+          <tr><td class="ln">144</td><td class="src">        } catch (switchError: any) {</td></tr>
+          <tr><td class="ln">145-152</td><td class="src">          setIsTransactionLoading(false);
+          if (switchError?.code === 4001) { ... }
+          else if (switchError?.code === 4902) { ... }
+          else { ... }
+          return;</td></tr>
+          <tr><td class="ln">153</td><td class="src">        }</td></tr>
+          <tr><td class="ln">154</td><td class="src"></td></tr>
+          <tr class="hl"><td class="ln">156-161</td><td class="src">        network = await provider.getNetwork();
+        if (network.chainId !== Number(expectedChainId)) {
+          setIsTransactionLoading(false);
+          ToastMessage(TOAST_TYPE.ERROR, "", "Please switch to the correct network.");
+          return;
+        }</td></tr>
+          <tr><td class="ln">162</td><td class="src">      }</td></tr>
+          <tr><td class="ln">163</td><td class="src">      setIsWrongNetwork(false);</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="note">
+      <p><span class="linetag">Line 136</span> <code>let</code>, not <code>const</code>, on purpose, this variable gets reassigned once at line 156, after attempting a switch, so it can't be declared as a constant.</p>
+    </div>
+    <div class="note">
+      <p><span class="linetag">Lines 140-143</span> This is the actual request to MetaMask, or whatever wallet is connected, asking it to switch the active network. It's an <code>await</code>, so this line genuinely pauses until the wallet either approves or the user dismisses the prompt.</p>
+    </div>
+    <div class="box basics">
+      <span class="box-tag">Basics: why check the network again at line 156 instead of trusting the switch worked</span>
+      <p>The call at line 140 not throwing doesn't strictly guarantee the wallet is now on the right network, wallet extensions can behave inconsistently across versions and browsers. Re-reading the network with <code>provider.getNetwork()</code> right after, and comparing it again, is the difference between assuming a step worked and actually confirming it did, before spending the rest of this function's effort, and the user's time, on a purchase that would fail anyway.</p>
+    </div>
+    <div class="box why">
+      <span class="box-tag">Why this whole block replaces a second click</span>
+      <p>Before this phase, this exact wrong network situation just set a flag and stopped, showing a "Switch Network" button that had to be clicked separately, and then Buy Domain clicked again afterward. Now, the switch attempt happens right here, inside the same click, and if it succeeds, the code simply continues downward into the rest of the purchase, nothing about the code below this block knows or cares that a network switch just happened first.</p>
+    </div>
+
+    <h4 class="sub">Checking the balance against what will actually be sent</h4>
+    <div class="codewrap">
+      <div class="head">lines 172 to 211</div>
+      <div class="scroll">
+        <table class="code">
+          <tr><td class="ln">172</td><td class="src">      const contract = new ethers.Contract(marketplace, abi, signer);</td></tr>
+          <tr><td class="ln">173</td><td class="src">      const priceInUSD = ethers.utils.parseUnits(usdAmount.toString(), 6);</td></tr>
+          <tr><td class="ln">174</td><td class="src"></td></tr>
+          <tr class="hl"><td class="ln">175</td><td class="src">      const requiredNativeAmount = await contract.getRequiredNativeAmount(priceInUSD);</td></tr>
+          <tr><td class="ln">176-179</td><td class="src">      // Optional native-token buffer, left exactly as in the original
+      // implementation. Whether this 2% is refunded on chain if unused, or
+      // simply kept, is still an open question from the original review,
+      // not resolved here, don't guess at it.</td></tr>
+          <tr class="hl"><td class="ln">180</td><td class="src">      const safeEthAmount = requiredNativeAmount.mul(102).div(100);</td></tr>
+          <tr><td class="ln">...</td><td class="src"></td></tr>
+          <tr><td class="ln">191</td><td class="src">      const nativeTokenSentinel = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";</td></tr>
+          <tr><td class="ln">192-196</td><td class="src">      // The balance check now compares against the exact amount that will
+      // actually be sent, safeEthAmount, with an estimate of gas added on
+      // top, instead of the unrelated priceInWei figure the original check
+      // used.</td></tr>
+          <tr class="hl"><td class="ln">197-202</td><td class="src">      const gasEstimate = await contract.estimateGas.buy(
+        listingId.toString(),
+        userAddr,
+        nativeTokenSentinel,
+        { value: safeEthAmount }
+      );</td></tr>
+          <tr class="hl"><td class="ln">203</td><td class="src">      const gasPrice = await provider.getGasPrice();</td></tr>
+          <tr class="hl"><td class="ln">204</td><td class="src">      const estimatedGasCost = gasEstimate.mul(gasPrice);</td></tr>
+          <tr><td class="ln">205</td><td class="src"></td></tr>
+          <tr><td class="ln">206</td><td class="src">      const balance = await provider.getBalance(userAddr);</td></tr>
+          <tr class="hl"><td class="ln">207-211</td><td class="src">      if (balance.lt(safeEthAmount.add(estimatedGasCost))) {
+        ToastMessage(TOAST_TYPE.ERROR, "", "Insufficient funds in wallet to cover the price and network fees.");
+        setIsTransactionLoading(false);
+        return;
+      }</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="note">
+      <p><span class="linetag">Line 175</span> A read only call, asking the contract "given this USD price, how much of the network's native currency does that actually require right now." Costs nothing, returns instantly relative to a real transaction, this is the "free question" kind of contract call from idea 0.4 above.</p>
+    </div>
+    <div class="note">
+      <p><span class="linetag">Line 180</span> The 2% buffer, unchanged from before this phase, using BigNumber's own <code>.mul()</code> and <code>.div()</code> instead of <code>* 1.02</code>, exactly the reason covered in idea 0.5. Left alone deliberately, with a comment explaining why, rather than resolved by guessing whether that extra amount ever comes back to the buyer.</p>
+    </div>
+    <div class="note">
+      <p><span class="linetag">Lines 197-202</span> <code>contract.estimateGas.buy(...)</code> asks the network "if I were to actually call <code>buy</code> with these exact arguments right now, roughly how much gas would that cost," without actually sending anything. Every contract function ethers.js knows about automatically gets this <code>estimateGas</code> version for free, it's not something specific to this one function.</p>
+    </div>
+    <div class="note">
+      <p><span class="linetag">Line 203</span> The current price of one unit of gas, in the network's native currency. Multiplying the two together, <code>gasEstimate.mul(gasPrice)</code> on line 204, turns "roughly this many units of gas" into "roughly this much actual currency," which is the number that matters for a balance check.</p>
+    </div>
+    <div class="box why">
+      <span class="box-tag">Why this specific check was broken before, and what changed</span>
+      <p>The balance check used to compare the wallet's balance against <code>priceInWei</code>, a number computed from <code>pricePerToken</code>, an entirely different figure from <code>safeEthAmount</code>, the actual amount the transaction sends as its <code>value</code>. A wallet could pass that old check and still fail the real transaction, or the reverse. The rewritten check compares against <code>safeEthAmount.add(estimatedGasCost)</code>, the literal sum of what the transaction spends and what it costs to run, which is the only version of this check that actually answers the question "can this wallet afford to do this."</p>
+    </div>
+
+    <h4 class="sub">Sending the transaction and showing where to track it</h4>
+    <div class="codewrap">
+      <div class="head">lines 213 to 228</div>
+      <div class="scroll">
+        <table class="code">
+          <tr><td class="ln">213-219</td><td class="src">      const tx =
+        await contract.buy(
+          listingId.toString(),
+          userAddr,
+          nativeTokenSentinel,
+          { value: safeEthAmount }
+        );</td></tr>
+          <tr><td class="ln">220</td><td class="src"></td></tr>
+          <tr class="hl"><td class="ln">221-228</td><td class="src">      const explorerBase = EXPLORER_TX_BASE_URLS[expectedChainId];
+      ToastMessage(
+        TOAST_TYPE.INFO,
+        "",
+        explorerBase
+          ? `Transaction submitted. Track it here: ${explorerBase}${tx.hash}`
+          : `Transaction submitted: ${tx.hash}`
+      );</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="note">
+      <p><span class="linetag">Lines 213-219</span> This is the real, write transaction, the one that costs gas and needs a signature. The moment this <code>await</code> resolves, <code>tx</code> exists and has a <code>.hash</code>, but that only means the transaction was broadcast, not that it succeeded, exactly the distinction idea 0.6 covers.</p>
+    </div>
+    <div class="note">
+      <p><span class="linetag">Lines 221-228</span> <code>EXPLORER_TX_BASE_URLS</code> is a small lookup table added near the top of this file, mapping each chain id to its public block explorer's "view transaction" URL prefix, Etherscan, BscScan, and so on. This is genuinely new code in this rewrite, nothing like it existed elsewhere in the app to copy from.</p>
+    </div>
+    <div class="box basics">
+      <span class="box-tag">Basics: a limitation worth knowing about</span>
+      <p>This message is shown through the same shared <code>ToastMessage</code> component every toast in this app uses, and that component only ever renders its message as plain text, it has no support for a clickable link. So this shows up as a real, copyable URL, not a link someone can tap directly. Making it clickable would mean changing that shared component, which is used everywhere in the app, well outside what this file's rewrite touches.</p>
+    </div>
+
+    <h4 class="sub">Confirming before trusting, then telling the backend</h4>
+    <div class="codewrap">
+      <div class="head">lines 230 to 258</div>
+      <div class="scroll">
+        <table class="code">
+          <tr><td class="ln">230-233</td><td class="src">      // Same receipt.status check already used correctly in
+      // src/component/domain-self-item/index.tsx around line 289, a mined
+      // but reverted transaction is a failure, not a success.</td></tr>
+          <tr class="hl"><td class="ln">234-239</td><td class="src">      const receipt = await tx.wait(1);
+      if (receipt.status !== 1) {
+        setIsTransactionLoading(false);
+        ToastMessage(TOAST_TYPE.ERROR, "", "The transaction reverted on chain. You have not been charged for a completed purchase.");
+        return;
+      }</td></tr>
+          <tr><td class="ln">240</td><td class="src"></td></tr>
+          <tr><td class="ln">241-243</td><td class="src">      // Only reached once the chain has actually confirmed. A failure here
+      // now throws into the outer catch instead of being swallowed.</td></tr>
+          <tr><td class="ln">244-252</td><td class="src">      const payload = {
+        listingId: listingId.toString(),
+        domainId,
+        domainName: domain,
+        buyer: userAddr,
+        currency: domainProvider,
+        price: pricePerToken,
+        blockchainTxHash: tx.hash,
+      };</td></tr>
+          <tr class="hl"><td class="ln">253</td><td class="src">      await setBuyDomain(payload);</td></tr>
+          <tr><td class="ln">254</td><td class="src"></td></tr>
+          <tr><td class="ln">255-258</td><td class="src">      setIsTransactionLoading(false);
+      ToastMessage(TOAST_TYPE.SUCCESS, "", "Purchase confirmed.");
+      handleClose();</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="note">
+      <p><span class="linetag">Line 234</span> <code>tx.wait(1)</code> is the function pausing again, this time for the network to actually include the transaction in a block and return one confirmation. What comes back, <code>receipt</code>, is the permanent record from idea 0.6, the one thing in this entire flow that can actually be trusted about what happened.</p>
+    </div>
+    <div class="note">
+      <p><span class="linetag">Line 235</span> <code>receipt.status</code> is either <code>1</code>, succeeded, or <code>0</code>, reverted. This single comparison is the fix idea 0.6 called the most repeated one in this whole phase, and it's copied here from the exact same check already working correctly in <code>domain-self-item/index.tsx</code>, not invented fresh.</p>
+    </div>
+    <div class="box diff">
+      <span class="box-tag">Before and after, the ordering that actually changed</span>
+      <p><strong>Before:</strong> the backend was told about the purchase, <code>setBuyDomain(payload)</code>, and a success message was shown, before <code>tx.wait(1)</code> ever ran, meaning both happened even if the transaction was about to fail on chain. A separate <code>try/catch</code> around the backend call also caught and swallowed any failure there, silently.</p>
+      <p><strong>After:</strong> line 253, telling the backend, only runs after the receipt check on line 235 has already passed. And that call is no longer wrapped in its own silencing <code>try/catch</code>, if it fails now, it throws, and the function's one outer <code>catch</code>, described next, handles it like any other failure instead of hiding it.</p>
+    </div>
+
+    <h4 class="sub">One catch block, three honest outcomes instead of one flat message</h4>
+    <div class="codewrap">
+      <div class="head">lines 259 to 286</div>
+      <div class="scroll">
+        <table class="code">
+          <tr><td class="ln">259</td><td class="src">    } catch (err: any) {</td></tr>
+          <tr><td class="ln">260-261</td><td class="src">      console.error(err);
+      setIsTransactionLoading(false);</td></tr>
+          <tr><td class="ln">262</td><td class="src"></td></tr>
+          <tr><td class="ln">263-264</td><td class="src">      // A cancelled wallet prompt is not a failure state, it gets its own
+      // honest message rather than falling into the generic catch below.</td></tr>
+          <tr class="hl"><td class="ln">265-268</td><td class="src">      if (err?.code === 4001) {
+        ToastMessage(TOAST_TYPE.INFO, "", "You cancelled the transaction.");
+        return;
+      }</td></tr>
+          <tr><td class="ln">269</td><td class="src"></td></tr>
+          <tr><td class="ln">270-274</td><td class="src">      // A mined-but-reverted call, or a pre-flight revert like the
+      // "call revert exception ... method=getRequiredNativeAmount" failure
+      // this app actually hit during phase 1 testing, comes back from
+      // ethers as CALL_EXCEPTION, this gets an honest message too rather
+      // than the same flat string as every other failure.</td></tr>
+          <tr><td class="ln">275</td><td class="src">      const reason = err?.reason || err?.message || "";</td></tr>
+          <tr class="hl"><td class="ln">276-283</td><td class="src">      if (err?.code === "CALL_EXCEPTION" || /revert/i.test(reason)) {
+        ToastMessage(
+          TOAST_TYPE.ERROR,
+          "",
+          "The transaction reverted on chain. The listing may have changed or is no longer available."
+        );
+        return;
+      }</td></tr>
+          <tr><td class="ln">284</td><td class="src"></td></tr>
+          <tr class="hl"><td class="ln">285</td><td class="src">      ToastMessage(TOAST_TYPE.ERROR, "", "Something went wrong. Please try again.");</td></tr>
+          <tr><td class="ln">286</td><td class="src">    }</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="note">
+      <p><span class="linetag">Line 265</span> <code>4001</code> is a standard code wallets like MetaMask use specifically for "the user rejected this request." Checking <code>err?.code === 4001</code> is how this code tells a deliberate cancellation apart from an actual failure, the <code>?.</code> is optional chaining, already covered in the Buy Gate Walkthrough, protecting against <code>err</code> not having a <code>code</code> field at all.</p>
+    </div>
+    <div class="note">
+      <p><span class="linetag">Line 275</span> Different kinds of errors from ethers.js carry their message in different places, sometimes <code>.reason</code>, sometimes only <code>.message</code>. This line picks whichever one actually exists, falling back to an empty string if neither does, so the check on the next line always has something safe to test.</p>
+    </div>
+    <div class="note">
+      <p><span class="linetag">Line 276</span> <code>CALL_EXCEPTION</code> is the specific error code ethers.js uses for a contract call that reverted, whether that happened during a real transaction or during a read call like <code>getRequiredNativeAmount</code>. The regular expression <code>/revert/i</code> is a second, looser safety net, catching any error whose message happens to mention "revert" even if its <code>code</code> doesn't exactly match, case insensitively thanks to the <code>i</code> flag.</p>
+    </div>
+    <div class="box why">
+      <span class="box-tag">Why three branches instead of one</span>
+      <p>Before this phase, every single kind of failure in this function, a bounced signature request, a genuine on chain revert, a bug nobody anticipated, produced the exact same message: "Something went wrong. Please try again." That's technically true in all three cases and useful in none of them. A user who cancelled on purpose doesn't need to be told to try again, and a user whose transaction genuinely reverted deserves to know that, not to wonder if the app is just broken. Line 285 is still there, but now it's reached only by the third category, the truly unexpected one, exactly what a fallback message should be for.</p>
+    </div>
+
+    <h4 class="sub">The button itself</h4>
+    <div class="codewrap">
+      <div class="head">lines 340 to 346</div>
+      <div class="scroll">
+        <table class="code">
+          <tr><td class="ln">340</td><td class="src">          &lt;button</td></tr>
+          <tr class="hl"><td class="ln">341</td><td class="src">            className="buy-btn"</td></tr>
+          <tr class="hl"><td class="ln">342</td><td class="src">            disabled={isTransactionLoading}</td></tr>
+          <tr class="hl"><td class="ln">343</td><td class="src">            onClick={() => domainBuyHandler(tokenId, network)}</td></tr>
+          <tr><td class="ln">344</td><td class="src">          &gt;</td></tr>
+          <tr class="hl"><td class="ln">345</td><td class="src">            {isTransactionLoading ? "Processing..." : isWrongNetwork ? "Switch Network" : "Buy Domain"}</td></tr>
+          <tr><td class="ln">346</td><td class="src">          &lt;/button&gt;</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="box diff">
+      <span class="box-tag">What changed here, specifically</span>
+      <p>This button used to call one of two different functions, <code>handleSwitchNetwork()</code> or <code>domainBuyHandler(...)</code>, chosen by a ternary based on <code>isWrongNetwork</code>. It now always calls <code>domainBuyHandler</code>, the one function handling both cases internally as covered above, that separate <code>handleSwitchNetwork</code> function doesn't exist in this file anymore at all. <code>disabled={isTransactionLoading}</code> is new too, a real HTML disabled attribute, not just a loading spinner rendered next to a button that still secretly works if clicked.</p>
+    </div>
+  </section>
+
+  <!-- LISTING -->
+  <section id="listing">
+    <div class="section-head"><span class="section-num">2</span><h2>DomainListingModal.tsx, the listing handler</h2></div>
+    <p class="section-kicker">Three separate problems lived in this file: a cancelled approval prompt was swallowed instead of stopping the flow, a successful network switch stopped the submission instead of continuing it, and creating a listing told the backend before confirming the transaction and never checked whether that save actually worked.</p>
+    <span class="file-tag">src/component/modals/DomainListingModal.tsx</span>
+
+    <h4 class="sub">approval(), throwing instead of swallowing a cancellation</h4>
+    <div class="codewrap">
+      <div class="head">lines 179 to 209</div>
+      <div class="scroll">
+        <table class="code">
+          <tr><td class="ln">179-184</td><td class="src"> const approval = async (
+  tokenId: number,
+  nftAbi: any,
+  nftAddress: any,
+  marketplaceAddress: any
+) => {</td></tr>
+          <tr><td class="ln">185</td><td class="src">  try {</td></tr>
+          <tr><td class="ln">186-187</td><td class="src">    setModalState(0);
+    setIsSubmitting(true);</td></tr>
+          <tr><td class="ln">188-190</td><td class="src">    // handleClose() used to run here, closing the listing form before the
+    // wallet prompt even appeared. Removed, so the form stays mounted and
+    // visible while the approval transaction is in flight.</td></tr>
+          <tr><td class="ln">191</td><td class="src"></td></tr>
+          <tr><td class="ln">192-193</td><td class="src">    const signer = await provider.getSigner();
+    const contract = new ethers.Contract(nftAddress, nftAbi, signer);</td></tr>
+          <tr><td class="ln">194</td><td class="src"></td></tr>
+          <tr class="hl"><td class="ln">195-196</td><td class="src">    const tx = await contract.approve(marketplaceAddress, tokenId);
+    await tx.wait();</td></tr>
+          <tr><td class="ln">197</td><td class="src"></td></tr>
+          <tr><td class="ln">198-199</td><td class="src">    setModalState(1);
+    return true;</td></tr>
+          <tr><td class="ln">200</td><td class="src">  } catch (error: any) {</td></tr>
+          <tr><td class="ln">201</td><td class="src">    setIsSubmitting(false);</td></tr>
+          <tr><td class="ln">202-206</td><td class="src">    // A cancelled prompt now throws too, same as any other failure here,
+    // instead of returning false. The message is shown by the caller,
+    // which already distinguishes a cancelled prompt (error.code === 4001)
+    // from a genuine approval failure, showing it here too would double
+    // up on the same event.</td></tr>
+          <tr class="hl"><td class="ln">207</td><td class="src">    throw error;</td></tr>
+          <tr><td class="ln">208</td><td class="src">  }</td></tr>
+          <tr><td class="ln">209</td><td class="src">};</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="note">
+      <p><span class="linetag">Lines 195-196</span> <code>contract.approve(...)</code> is a real transaction, giving the marketplace contract permission to move this specific NFT on the owner's behalf, a standard step before any marketplace can list something it doesn't itself own. <code>await tx.wait()</code> waits for that specific transaction to confirm before this function considers approval done.</p>
+    </div>
+    <div class="box diff">
+      <span class="box-tag">Before and after</span>
+      <p><strong>Before:</strong> the <code>catch</code> block checked <code>error?.code === 4001</code>, showed its own message, and <code>return false</code>d, no <code>throw</code> at all for that case. Every other kind of error still threw. That asymmetry, one failure type returning a value, every other type throwing, is exactly the kind of inconsistency idea 0.3 above warned about.</p>
+      <p><strong>After:</strong> line 207, every failure throws, no exceptions. This function's return type effectively simplified too, it only ever resolves to <code>true</code> on real success, or throws, nothing calling it needs to check for a special <code>false</code> case anymore.</p>
+    </div>
+    <div class="box why">
+      <span class="box-tag">Why the internal toast messages disappeared, not just the return value</span>
+      <p>Simply swapping <code>return false</code> for <code>throw error</code> while leaving this function's own <code>ToastMessage</code> calls in place would have caused two messages to stack for the same event, this function's own message, immediately followed by the caller's, at line 587 to 597 below, which already shows its own distinct message for a cancelled prompt versus a real failure. Removing the messaging from here and leaving it to the single place that already handles both cases correctly avoids that duplication, one event, one message.</p>
+    </div>
+
+    <h4 class="sub">A successful network switch now continues, instead of stopping</h4>
+    <div class="codewrap">
+      <div class="head">lines 487 to 524</div>
+      <div class="scroll">
+        <table class="code">
+          <tr><td class="ln">487</td><td class="src">      // —————————————————————— 2.  NETWORK MATCH  ——————————————————————</td></tr>
+          <tr><td class="ln">488</td><td class="src">let network = await provider.getNetwork();</td></tr>
+          <tr><td class="ln">489</td><td class="src"></td></tr>
+          <tr><td class="ln">490-491</td><td class="src">if (network.chainId !== Number(expectedChainId)) {
+  setIsWrongNetwork(true);</td></tr>
+          <tr><td class="ln">492</td><td class="src"></td></tr>
+          <tr><td class="ln">493-499</td><td class="src">  try {
+    setIsNetworkLoading(true); // start loader
+
+    await (provider.provider as any).request({
+      method: "wallet_switchEthereumChain",
+      params: [{ chainId: expectedChainId }],
+    });</td></tr>
+          <tr><td class="ln">500</td><td class="src"></td></tr>
+          <tr><td class="ln">501-503</td><td class="src">    // Re-check the network actually landed before trusting it, then fall
+    // through into the rest of the submission below instead of returning,
+    // so a successful switch no longer requires a second click on Submit.</td></tr>
+          <tr class="hl"><td class="ln">504-508</td><td class="src">    network = await provider.getNetwork();
+    if (network.chainId !== Number(expectedChainId)) {
+      return ToastMessage(TOAST_TYPE.ERROR, "", "Please switch to the correct network.");
+    }
+    setIsWrongNetwork(false);</td></tr>
+          <tr><td class="ln">509</td><td class="src"></td></tr>
+          <tr><td class="ln">510-518</td><td class="src">  } catch (switchError: any) {
+    ToastMessage( ... );
+    return;
+</td></tr>
+          <tr><td class="ln">519-523</td><td class="src">  } finally {
+    setIsNetworkLoading(false); // stop loader
+  }</td></tr>
+          <tr><td class="ln">524</td><td class="src">}</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="box concept">
+      <span class="box-tag">Concept: what finally actually guarantees</span>
+      <p>A <code>finally</code> block runs no matter how the <code>try</code> block above it ends, whether it finished normally, hit a <code>return</code>, or threw into the <code>catch</code>. That's exactly why <code>setIsNetworkLoading(false)</code> lives there instead of being repeated in every individual branch, it's the one place guaranteed to run regardless of which path was taken, so the loading spinner can never get stuck on by accident.</p>
+    </div>
+    <div class="box diff">
+      <span class="box-tag">The one line that actually changed the behavior</span>
+      <p>Before this phase, a successful switch, right where line 504 now sits, was immediately followed by <code>return;</code>, a comment next to it literally said "stop flow, user must click submit again." The entire rest of this function, approval, creating the listing, never ran in the same click. Now, after re-confirming the switch actually landed, the code simply keeps going, there's no early exit here anymore, execution falls through the bottom of this <code>if</code> block and continues into the validation and listing steps below it.</p>
+    </div>
+
+    <h4 class="sub">isSubmitting could get stuck true, or never get set at all</h4>
+    <div class="codewrap">
+      <div class="head">lines 599 to 605</div>
+      <div class="scroll">
+        <table class="code">
+          <tr><td class="ln">599</td><td class="src">      }</td></tr>
+          <tr><td class="ln">600</td><td class="src"></td></tr>
+          <tr class="hl"><td class="ln">601-605</td><td class="src">      // isSubmitting is otherwise only ever set inside approval(), which
+      // is skipped entirely when the NFT is already approved, e.g. a
+      // re-listing. Set it here too so the Submit button is reliably
+      // disabled for this phase either way, not just on a first listing.
+      setIsSubmitting(true);</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="note"><p>The line right above this comment closes an <code>if (approvedAddr !== marketPlaceAddr) { ... }</code> block, <code>approval()</code> is only called inside that block, meaning only when the NFT genuinely needs approving. If it's already approved, that whole block, and the only place <code>setIsSubmitting(true)</code> used to live, never runs at all. This line was added right after that block closes, so the submitting state is set either way, whether or not approval happened.</p></div>
+    <div class="box why">
+      <span class="box-tag">A second half of this same bug, found in both catch blocks</span>
+      <p>Neither of this function's two outer <code>catch</code> blocks, at line 711 and line 729, used to call <code>setIsSubmitting(false)</code> at all. Combined with the gap above, a real failure during listing creation could leave the submit button permanently disabled, with no path back to a working state short of reloading the page. Both catches now call <code>setIsSubmitting(false)</code> as their first action.</p>
+    </div>
+
+    <h4 class="sub">Confirming the receipt, then reading the listing id from its own event log</h4>
+    <div class="codewrap">
+      <div class="head">lines 623 to 639</div>
+      <div class="scroll">
+        <table class="code">
+          <tr class="hl"><td class="ln">623-629</td><td class="src">        const receipt = await tx.wait(1);
+        // Same receipt.status check already used correctly in
+        // src/component/domain-self-item/index.tsx around line 289, a
+        // mined but reverted transaction is a failure, not a success.
+        if (receipt.status !== 1) {
+          throw new Error("Transaction reverted on chain.");
+        }</td></tr>
+          <tr><td class="ln">630</td><td class="src">        setModalState(2);</td></tr>
+          <tr><td class="ln">631</td><td class="src"></td></tr>
+          <tr><td class="ln">632-634</td><td class="src">        // Read the listing id from this transaction's own event log
+        // first, only falling back to the second getListingId() contract
+        // call, which can race the node, if the event log didn't have it.</td></tr>
+          <tr class="hl"><td class="ln">635-639</td><td class="src">        let listingId: string | null = getListingIdFromReceipt(receipt, contract);
+        if (!listingId) {
+          const fallbackId = await getListingId(tokenIdBN, abi, marketplace);
+          listingId = fallbackId ? fallbackId.toString() : null;
+        }</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="note"><p>Same receipt status check as the buy handler, same reasoning from idea 0.6. <code>throw new Error(...)</code> here is caught by this same try block's own <code>catch</code> further down, reusing the existing error handling instead of duplicating it.</p></div>
+
+    <div class="codewrap">
+      <div class="head">the helper this calls, lines 36 to 56</div>
+      <div class="scroll">
+        <table class="code">
+          <tr><td class="ln">36-39</td><td class="src">// Reads the new listing's id straight out of this transaction's own
+// ListingAdded event (present in every network's marketplace ABI, first
+// indexed arg is listingId), instead of always making a second contract
+// call that can race the node right after the listing was just created.</td></tr>
+          <tr><td class="ln">40-43</td><td class="src">const getListingIdFromReceipt = (
+  receipt: ethers.providers.TransactionReceipt,
+  contract: ethers.Contract
+): string | null => {</td></tr>
+          <tr class="hl"><td class="ln">44</td><td class="src">  for (const log of receipt.logs) {</td></tr>
+          <tr><td class="ln">45</td><td class="src">    try {</td></tr>
+          <tr class="hl"><td class="ln">46-49</td><td class="src">      const parsed = contract.interface.parseLog(log);
+      if (parsed.name === "ListingAdded" && parsed.args?.listingId) {
+        return parsed.args.listingId.toString();
+      }</td></tr>
+          <tr><td class="ln">50</td><td class="src">    } catch {</td></tr>
+          <tr><td class="ln">51-52</td><td class="src">      // Not a log this contract's ABI recognizes, e.g. an ERC20/NFT
+      // transfer event from the same transaction, skip it.</td></tr>
+          <tr><td class="ln">53</td><td class="src">    }</td></tr>
+          <tr><td class="ln">54</td><td class="src">  }</td></tr>
+          <tr><td class="ln">55</td><td class="src">  return null;</td></tr>
+          <tr><td class="ln">56</td><td class="src">};</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="note">
+      <p><span class="linetag">Line 44</span> <code>receipt.logs</code> is the list of every event any contract emitted during this transaction, this specific transaction, potentially several, an NFT transfer, a fee payment, the actual listing creation, exactly the concept from idea 0.8.</p>
+    </div>
+    <div class="note">
+      <p><span class="linetag">Line 46</span> <code>contract.interface.parseLog(log)</code> tries to decode one raw log entry using this specific contract's ABI. Not every log in the list will match, some belong to other contracts or other event types entirely, which is exactly why this is wrapped in its own <code>try/catch</code> right where it's called, a log that doesn't match just gets silently skipped rather than crashing the whole loop.</p>
+    </div>
+    <div class="note">
+      <p><span class="linetag">Line 47</span> Once a log successfully decodes, checking its <code>.name</code> confirms it's specifically the <code>ListingAdded</code> event and not some other event this same contract might also emit. <code>parsed.args.listingId</code> is then the actual decoded value, exactly the field name confirmed to exist by checking the raw ABI files directly before writing this, across all three networks this file supports.</p>
+    </div>
+    <div class="box why">
+      <span class="box-tag">Why the fallback still exists at all</span>
+      <p>If the event log genuinely doesn't have the id, for any reason, this function returns <code>null</code>, and the code that called it, back in the main handler, falls back to the older <code>getListingId()</code> contract call. The event log is the better, more reliable source, covered in idea 0.8, but keeping the fallback means a listing still has a path to succeed even if that specific read ever comes back empty.</p>
+    </div>
+
+    <h4 class="sub">A missing id, or a failed save, gets queued instead of lost</h4>
+    <div class="codewrap">
+      <div class="head">lines 656 to 704</div>
+      <div class="scroll">
+        <table class="code">
+          <tr><td class="ln">653-655</td><td class="src">        // A missing or zero listing id means the chain has confirmed the
+        // listing but it hasn't synced anywhere this app can read yet.
+        // That's not treated as success, and not as failure either.</td></tr>
+          <tr class="hl"><td class="ln">656-666</td><td class="src">        if (!listingId || listingId === "0") {
+          setIsSubmitting(false);
+          queuePendingListingSave({ ...listingFields, listingId: null, reason: "listing-id-not-synced" });
+          ToastMessage(
+            TOAST_TYPE.INFO,
+            "",
+            "Listing confirmed on chain, still syncing. This can take a moment, no need to submit again."
+          );
+          handleClose();
+          return;
+        }</td></tr>
+          <tr><td class="ln">...</td><td class="src"></td></tr>
+          <tr><td class="ln">674-678</td><td class="src">        const formData = new FormData();
+        Object.entries(listingFields).forEach(([key, value]) => formData.append(key, value));
+        formData.append("listingId", listingId);
+        if (selectedFile) formData.append("image", selectedFile);</td></tr>
+          <tr><td class="ln">679</td><td class="src"></td></tr>
+          <tr class="hl"><td class="ln">680-687</td><td class="src">        let res: any;
+        let saveSucceeded = false;
+        try {
+          res = await setDomainListing(formData);
+          saveSucceeded = !!res?.data?.success;
+        } catch {
+          saveSucceeded = false;
+        }</td></tr>
+          <tr><td class="ln">688</td><td class="src"></td></tr>
+          <tr><td class="ln">689</td><td class="src">        setIsSubmitting(false);</td></tr>
+          <tr><td class="ln">690</td><td class="src"></td></tr>
+          <tr><td class="ln">691-694</td><td class="src">        // Checked for every listing now, not just premium ones. A failed
+        // save no longer closes the modal as if nothing went wrong, the
+        // on-chain part already succeeded, so this is queued instead of
+        // dropped.</td></tr>
+          <tr class="hl"><td class="ln">695-704</td><td class="src">        if (!saveSucceeded) {
+          queuePendingListingSave({ ...listingFields, listingId });
+          ToastMessage(
+            TOAST_TYPE.INFO,
+            "",
+            "Listing confirmed on chain, finishing sync to the marketplace. No need to submit again."
+          );
+          handleClose();
+          return;
+        }</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="note">
+      <p><span class="linetag">Line 676</span> <code>Object.entries(listingFields)</code> turns a plain object into an array of <code>[key, value]</code> pairs, and <code>.forEach</code> walks that array, appending each one to <code>formData</code>. This replaced eighteen nearly identical, repeated <code>formData.append("fieldName", value)</code> lines with one loop over a single object defined just above it, <code>listingFields</code>, the same data, described once.</p>
+    </div>
+    <div class="note">
+      <p><span class="linetag">Lines 682-684</span> <code>res?.data?.success</code> reads as "if <code>res</code> exists, and its <code>data</code> exists, give me <code>.success</code>, otherwise stop and give me <code>undefined</code>," using optional chaining twice in a row. The <code>!!</code> in front converts whatever comes back, including <code>undefined</code>, into a genuine <code>true</code> or <code>false</code>. This one line safely handles three different shapes: a real success response, a response that came back but reports failure, and no usable response at all.</p>
+    </div>
+    <div class="codewrap">
+      <div class="head">the queue itself, lines 58 to 76</div>
+      <div class="scroll">
+        <table class="code">
+          <tr><td class="ln">58</td><td class="src">const PENDING_LISTING_SAVES_KEY = "pendingListingSaves";</td></tr>
+          <tr><td class="ln">59</td><td class="src"></td></tr>
+          <tr><td class="ln">60-66</td><td class="src">// A minimal local queue for a listing that's confirmed on chain but hasn't
+// been saved to the backend yet, either the save call itself failed, or
+// the listing id wasn't readable yet right after creation. Nothing reads
+// from this queue automatically today, that's a deliberate scope
+// boundary: building a retry worker or a "pending listings" screen is a
+// separate product decision, not guessed at here. This only guarantees
+// the data isn't silently lost the moment the save fails.</td></tr>
+          <tr class="hl"><td class="ln">67</td><td class="src">const queuePendingListingSave = (entry: Record&lt;string, any&gt;) =&gt; {</td></tr>
+          <tr><td class="ln">68-69</td><td class="src">  try {
+    const raw = localStorage.getItem(PENDING_LISTING_SAVES_KEY);</td></tr>
+          <tr class="hl"><td class="ln">70-72</td><td class="src">    const queue = raw ? JSON.parse(raw) : [];
+    queue.push({ ...entry, queuedAt: Date.now() });
+    localStorage.setItem(PENDING_LISTING_SAVES_KEY, JSON.stringify(queue));</td></tr>
+          <tr><td class="ln">73-75</td><td class="src">  } catch (storageError) {
+    console.error("Failed to queue pending listing save:", storageError);
+  }</td></tr>
+          <tr><td class="ln">76</td><td class="src">};</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="note"><p><code>localStorage</code> is the browser's own small, simple storage that survives a page reload, unlike a normal variable. Everything stored in it has to be a plain string, which is exactly why line 70 parses it back out of JSON on the way in, and line 72 turns the updated array back into a JSON string on the way out, <code>{ ...entry, queuedAt: Date.now() }</code> is the spread syntax from the Buy Gate Walkthrough, copying every field already in <code>entry</code> into a new object and adding one more, a timestamp.</p></div>
+    <div class="box basics">
+      <span class="box-tag">Basics: an honest boundary, stated plainly</span>
+      <p>This function guarantees a failed or unsynced listing's data survives, sitting in the browser's storage with everything needed to retry it later, its full field data and its transaction hash. It does not guarantee anything ever actually retries it, nothing in this codebase currently reads this queue back out. Building that piece, an automatic retry worker or a screen listing pending saves, is a real decision about how that should work, not something to invent by guessing while rewriting a transaction handler.</p>
+    </div>
+  </section>
+
+  <!-- SUBMIT BUTTON -->
+  <section id="submitbutton">
+    <div class="section-head"><span class="section-num">3</span><h2>SubmitButton.tsx, one prop added</h2></div>
+    <p class="section-kicker">The smallest change in this phase, but it's what actually makes the isSubmitting fix from the previous section visible to a real user.</p>
+    <span class="file-tag">src/component/modals/SubmitButton.tsx</span>
+
+    <div class="codewrap">
+      <div class="head">the full file, 24 lines</div>
+      <div class="scroll">
+        <table class="code">
+          <tr><td class="ln">1</td><td class="src">import { Button } from "react-bootstrap";</td></tr>
+          <tr><td class="ln">2</td><td class="src"></td></tr>
+          <tr><td class="ln">3</td><td class="src">interface SubmitButtonProps {</td></tr>
+          <tr><td class="ln">4</td><td class="src">  domainListingHandler: () =&gt; void | Promise&lt;void&gt;;</td></tr>
+          <tr><td class="ln">5</td><td class="src">  isWrongNetwork: boolean;</td></tr>
+          <tr><td class="ln">6</td><td class="src">  disabled: boolean;</td></tr>
+          <tr class="hl"><td class="ln">7</td><td class="src">  isSubmitting?: boolean;</td></tr>
+          <tr><td class="ln">8</td><td class="src">}</td></tr>
+          <tr><td class="ln">9</td><td class="src"></td></tr>
+          <tr><td class="ln">10-14</td><td class="src">export const SubmitButton: React.FC&lt;SubmitButtonProps&gt; = ({
+  domainListingHandler,
+  isWrongNetwork,
+  disabled,
+  isSubmitting,
+}) =&gt; (</td></tr>
+          <tr><td class="ln">15</td><td class="src">  &lt;div className="profile-submit text-center mt-3 list-unstyled"&gt;</td></tr>
+          <tr><td class="ln">16</td><td class="src">    &lt;Button</td></tr>
+          <tr><td class="ln">17</td><td class="src">      variant="primary"</td></tr>
+          <tr><td class="ln">18</td><td class="src">      onClick={domainListingHandler}</td></tr>
+          <tr class="hl"><td class="ln">19</td><td class="src">      disabled={isSubmitting ? true : isWrongNetwork ? false : disabled}</td></tr>
+          <tr><td class="ln">20</td><td class="src">    &gt;</td></tr>
+          <tr class="hl"><td class="ln">21</td><td class="src">      {isSubmitting ? "Processing..." : isWrongNetwork ? "Switch Network" : "Publish Listing"}</td></tr>
+          <tr><td class="ln">22</td><td class="src">    &lt;/Button&gt;</td></tr>
+          <tr><td class="ln">23</td><td class="src">  &lt;/div&gt;</td></tr>
+          <tr><td class="ln">24</td><td class="src">);</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="box concept">
+      <span class="box-tag">Concept: reading a chained ternary</span>
+      <p>Line 19 is two ternaries chained together, read it one condition at a time, in order: if <code>isSubmitting</code> is true, the result is <code>true</code>, full stop, nothing else matters. Otherwise, if <code>isWrongNetwork</code> is true, the result is <code>false</code>, the button stays clickable so a network switch can be triggered. Otherwise, fall back to whatever <code>disabled</code> was passed in, the original form validity check. The first matching condition wins, exactly like a chain of <code>if / else if / else</code>.</p>
+    </div>
+    <div class="note"><p>The <code>?</code> after <code>isSubmitting</code> in the interface on line 7 makes this prop optional, so nothing else that might ever use this component is forced to pass it. Every place that does pass it, just <code>DomainListingModal.tsx</code> today, gets the new behavior, anything that doesn't would simply treat a missing <code>isSubmitting</code> as <code>undefined</code>, which is falsy, and fall through to the existing behavior unchanged.</p></div>
+  </section>
+
+  <!-- DELIST -->
+  <section id="delist">
+    <div class="section-head"><span class="section-num">4</span><h2>domain-self-item/index.tsx, fixing only the ordering</h2></div>
+    <p class="section-kicker">This file's delistHandler already checked receipt.status === 1 correctly, it was the reference pattern the buy and listing rewrites both copied from. The one bug here was purely about order: the backend was told before the chain had confirmed anything.</p>
+    <span class="file-tag">src/component/domain-self-item/index.tsx</span>
+
+    <div class="codewrap">
+      <div class="head">before, lines roughly 259 to 300 of the original file</div>
+      <div class="scroll">
+        <table class="code">
+          <tr><td class="ln"></td><td class="src">const txResponse = await contract.cancelListing(listingId);
+
+const payload = { domainName, tokenId, ... };
+try {
+  await setCancelDomainListing(payload);   // ← told before confirmation
+} catch (error: any) { ... }
+
+const receipt = await txResponse.wait();
+
+if (receipt.status === 1) {
+  ToastMessage(TOAST_TYPE.SUCCESS, '', 'Transaction confirmed on blockchain!');
+} else {
+  throw new Error('Transaction failed.');
+}</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="codewrap">
+      <div class="head">after, lines 259 to 306</div>
+      <div class="scroll">
+        <table class="code">
+          <tr><td class="ln">259-260</td><td class="src">      console.log(listingId, "listingId")
+      const txResponse = await contract.cancelListing(listingId);</td></tr>
+          <tr><td class="ln">261</td><td class="src"></td></tr>
+          <tr class="hl"><td class="ln">262</td><td class="src">      const receipt = await txResponse.wait();</td></tr>
+          <tr><td class="ln">263</td><td class="src"></td></tr>
+          <tr class="hl"><td class="ln">264</td><td class="src">      if (receipt.status === 1) {</td></tr>
+          <tr><td class="ln">265-267</td><td class="src">        // The backend is only told now, after the chain has actually
+        // confirmed the cancellation, not before. Same ordering principle
+        // BuyNowModal.tsx and DomainListingModal.tsx now follow too.</td></tr>
+          <tr><td class="ln">268-278</td><td class="src">        const payload = { domainName, tokenId, blockchainTxHash: txResponse.hash, listingId, ... };
+        try {
+          await setCancelDomainListing(payload);</td></tr>
+          <tr><td class="ln">281-293</td><td class="src">        } catch (error: any) {
+          console.log(error.message, "error===")
+          setIsTransactionLoading(false);
+          // The on-chain delist already succeeded by this point, only the
+          // backend save failed, so this can no longer honestly say
+          // "Transaction failed" the way it did when this call used to
+          // happen before confirmation.
+          if (error instanceof Error) {
+            ToastMessage(TOAST_TYPE.ERROR, '', `Delisted on chain, but failed to update our records: ${error.message}`);
+          } else {
+            ToastMessage(TOAST_TYPE.ERROR, '', 'Delisted on chain, but failed to update our records.');
+          }
+          return;
+        }</td></tr>
+          <tr><td class="ln">296-301</td><td class="src">
+        setIsTransactionLoading(false)
+        ToastMessage(TOAST_TYPE.SUCCESS, '', 'Transaction confirmed on blockchain!');</td></tr>
+          <tr><td class="ln">303-306</td><td class="src">      } else {
+        setIsTransactionLoading(false)
+        throw new Error('Transaction failed.');
+      }</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="note">
+      <p><span class="linetag">Line 264</span> This exact comparison, <code>receipt.status === 1</code>, never moved and never changed, it's the same line that was already correct before this phase, and the one this document's earlier sections kept referring back to as the pattern being copied.</p>
+    </div>
+    <div class="note">
+      <p><span class="linetag">Lines 268-278</span> The entire <code>payload</code> object and the <code>setCancelDomainListing</code> call now live inside the <code>if (receipt.status === 1)</code> block, which is the whole fix, structurally, this code simply cannot run anymore unless the chain has already confirmed success on the line directly above it.</p>
+    </div>
+    <div class="box why">
+      <span class="box-tag">Why the error message itself had to change too</span>
+      <p>This is a case where fixing one thing correctly created a second, smaller problem that also needed fixing. Once the backend call moved to after confirmation, its failure message could no longer honestly say "Transaction failed", the transaction had, by definition, already succeeded to even reach this code. Leaving the old wording in place would have turned a successful on chain delist into a message that sounds like the whole thing failed. The new message, "Delisted on chain, but failed to update our records", says specifically what's true: the chain is fine, only the app's own record of it isn't yet.</p>
+    </div>
+    <div class="box recipe">
+      <span class="box-tag">Worth noticing what this file's fix didn't do</span>
+      <p>Unlike the listing save in the previous section, this backend failure isn't queued anywhere, it just shows a message and stops. That's a deliberate difference, not an oversight, this fix was scoped specifically to reordering two existing lines, not to adding a new retry mechanism to a file whose only known bug was ordering.</p>
+    </div>
+  </section>
+
+  <!-- RECIPE -->
+  <section id="recipe">
+    <div class="section-head"><span class="section-num">→</span><h2>The general recipe, for next time</h2></div>
+    <p class="section-kicker">Strip away the specifics of buying and listing domains, and this is a reusable shape for rewriting any function that performs a real, hard to undo action, a payment, a database write, anything that can't just be quietly retried without a person noticing.</p>
+
+    <ol class="recap-list">
+      <li><strong>Guard against a second call before anything else runs.</strong> One flag, checked and set at the very top of the function, before it does anything, is enough to make a double click structurally impossible instead of just unlikely.</li>
+      <li><strong>Handle a wrong precondition inline, and confirm it actually changed</strong> rather than stopping and asking the user to retry manually. After fixing it, whether that's a network switch or something else entirely, check the fixed state again before trusting it and moving on.</li>
+      <li><strong>Never confirm success from the act of sending, only from the result of waiting.</strong> A hash, an id, a submitted flag, none of them mean the same thing as a checked, confirmed outcome. Get the real result first, always.</li>
+      <li><strong>Tell anyone external, a backend, a database, a different system, only after that confirmation</strong>, and let that call's own failure surface for real instead of getting caught and silently ignored.</li>
+      <li><strong>Replace one flat catch with real classification.</strong> A deliberate cancellation, a known kind of failure, and a genuinely unexpected error are three different situations, and they deserve three different messages, not one that's technically true and practically useless.</li>
+      <li><strong>When something confirmed can't yet be fully recorded, say so honestly and hold onto it,</strong> rather than either lying that it worked or discarding it. It's fine to leave the retry mechanism itself for a separate, deliberate decision, as long as the data survives long enough to make that decision later.</li>
+      <li><strong>Prefer reading a result from the actual record of what happened</strong>, a transaction's own receipt and its logs, over asking again afterward, a second, separate question can race the very event it's trying to observe.</li>
+      <li><strong>Leave a genuinely open question open</strong>, marked clearly in a comment, rather than resolving it by guessing. Not knowing whether a fee is refunded, or exactly how retried data should be replayed, is honest, quietly assuming an answer either way isn't.</li>
+    </ol>
+  </section>
+
+  <div class="footer">
+    <span>Endless Domains · transaction handlers, line by line · companion to the Phase 2 Paper Trail</span>
+    <span>Every code sample tied to a real file on this page is the actual, current code, verified fresh. The short examples in the Start Here section exist only to teach an idea, they're clearly labeled "illustrative example" and are not part of this codebase.</span>
+  </div>
+
+</main>
+
+<script>
+  (function(){
+    var links = Array.prototype.slice.call(document.querySelectorAll('#pillnav a'));
+    var sections = links.map(function(a){ return document.querySelector(a.getAttribute('href')); }).filter(Boolean);
+    if(!('IntersectionObserver' in window)) return;
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        var idx = sections.indexOf(entry.target);
+        if(idx === -1) return;
+        if(entry.isIntersecting){
+          links.forEach(function(l){ l.classList.remove('active'); });
+          links[idx].classList.add('active');
+        }
+      });
+    }, { rootMargin: '-40% 0px -50% 0px', threshold: 0 });
+    sections.forEach(function(s){ io.observe(s); });
+  })();
+</script>

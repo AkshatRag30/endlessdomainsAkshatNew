@@ -1,0 +1,1000 @@
+<title>Buy Gate Walkthrough</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root{
+    color-scheme: light;
+    --paper:#F2F4F6;
+    --paper-raised:#FFFFFF;
+    --ink:#1A2233;
+    --ink-soft:#55606E;
+    --ink-faint:#8A93A0;
+    --line:#DCE1E6;
+    --line-strong:#C3CBD3;
+    --accent:#2455A4;
+    --accent-ink:#163B73;
+    --accent-soft:#E4ECF7;
+    --c-red:#B23A2E;      --c-red-bg:#F7E2DE;
+    --c-amber:#9C6B12;    --c-amber-bg:#F5E8CC;
+    --c-plum:#6E4A8C;     --c-plum-bg:#EFE4F3;
+    --c-green:#227A5B;    --c-green-bg:#DFF0E7;
+    --c-teal:#1B7A76;     --c-teal-bg:#DCEEEC;
+    --shadow: 0 1px 2px rgba(26,34,51,0.06), 0 6px 20px rgba(26,34,51,0.06);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+    font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{font-family:"Fraunces",Georgia,serif; font-weight:600; color:var(--ink); text-wrap:balance; margin:0;}
+  code, .mono{font-family:"IBM Plex Mono","SFMono-Regular",monospace;}
+  a{color:var(--accent);}
+  p{margin:0;}
+
+  .topnav{
+    position:sticky; top:0; z-index:20;
+    background:color-mix(in srgb, var(--paper) 88%, transparent);
+    backdrop-filter:blur(10px); border-bottom:1px solid var(--line);
+  }
+  .topnav-inner{
+    max-width:980px; margin:0 auto; display:flex; align-items:center; gap:18px;
+    padding:12px 24px; overflow-x:auto;
+  }
+  .topnav-title{
+    font-family:"Fraunces",serif; font-weight:600; font-size:0.95rem;
+    color:var(--ink); white-space:nowrap; flex:none;
+    padding-right:6px; border-right:1px solid var(--line);
+  }
+  .topnav-links{display:flex; gap:4px; flex:none;}
+  .topnav-links a{
+    display:flex; align-items:center; gap:6px; font-size:0.76rem; font-weight:500;
+    color:var(--ink-soft); text-decoration:none; white-space:nowrap;
+    padding:6px 10px; border-radius:100px; transition:background 0.15s, color 0.15s;
+  }
+  .topnav-links a:hover, .topnav-links a.active{background:var(--accent-soft); color:var(--accent-ink);}
+
+  main{max-width:940px; margin:0 auto; padding:0 24px 120px;}
+
+  .hero{padding:52px 0 36px; border-bottom:1px solid var(--line);}
+  .eyebrow{
+    font-family:"IBM Plex Mono",monospace; font-size:0.75rem; letter-spacing:0.08em;
+    text-transform:uppercase; color:var(--accent); font-weight:500;
+    margin-bottom:16px; display:block;
+  }
+  .hero h1{font-size:clamp(2.2rem,5.5vw,3.1rem); line-height:1.06; letter-spacing:-0.01em;}
+  .hero-sub{margin-top:18px; font-size:1.05rem; color:var(--ink-soft); max-width:72ch; line-height:1.65;}
+  .hero-sub + .hero-sub{margin-top:12px;}
+
+  .glossary{
+    margin-top:28px; display:grid; grid-template-columns:repeat(3,1fr); gap:1px;
+    background:var(--line); border:1px solid var(--line); border-radius:10px; overflow:hidden;
+  }
+  .glossary-item{background:var(--paper-raised); padding:14px 16px;}
+  .glossary-item .term{
+    font-family:"IBM Plex Mono",monospace; font-size:0.82rem; font-weight:500; color:var(--accent-ink);
+    display:block; margin-bottom:5px;
+  }
+  .glossary-item .def{font-size:0.85rem; color:var(--ink-soft); line-height:1.5;}
+  @media (max-width:700px){ .glossary{grid-template-columns:1fr 1fr;} }
+  @media (max-width:480px){ .glossary{grid-template-columns:1fr;} }
+
+  section{padding:52px 0; border-bottom:1px solid var(--line);}
+  section:last-of-type{border-bottom:none;}
+  .section-head{display:flex; align-items:baseline; gap:14px; margin-bottom:8px;}
+  .section-num{font-family:"IBM Plex Mono",monospace; font-size:0.9rem; font-weight:500; color:var(--accent); flex:none;}
+  .section-head h2{font-size:1.6rem;}
+  .section-kicker{color:var(--ink-soft); font-size:0.98rem; margin-top:14px; max-width:74ch; line-height:1.65;}
+  .section-kicker + .section-kicker{margin-top:10px;}
+  .file-tag{
+    display:inline-flex; align-items:center; gap:8px; font-family:"IBM Plex Mono",monospace;
+    font-size:0.8rem; color:var(--accent-ink); background:var(--accent-soft);
+    padding:5px 12px; border-radius:6px; margin-top:16px;
+  }
+  h3.sub{margin-top:36px; font-size:1.1rem; font-family:'IBM Plex Sans'; font-weight:600;}
+  h4.sub{margin-top:22px; font-size:0.98rem; font-family:'IBM Plex Sans'; font-weight:600; color:var(--ink);}
+
+  /* code table */
+  .codewrap{
+    margin-top:16px; border:1px solid var(--line); border-radius:8px; overflow:hidden;
+    background:var(--paper-raised); box-shadow:var(--shadow);
+  }
+  .codewrap .head{
+    padding:8px 14px; border-bottom:1px solid var(--line); background:var(--paper);
+    font-family:"IBM Plex Mono",monospace; font-size:0.72rem; color:var(--ink-faint);
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+  }
+  .codewrap .head .tag{
+    font-size:0.62rem; letter-spacing:0.05em; text-transform:uppercase; font-weight:600;
+    color:var(--c-teal); background:var(--c-teal-bg); padding:2px 7px; border-radius:5px; flex:none;
+  }
+  .codewrap .scroll{overflow-x:auto;}
+  table.code{width:100%; border-collapse:collapse; font-family:"IBM Plex Mono",monospace; font-size:0.8rem;}
+  table.code td{padding:1px 10px; vertical-align:top; white-space:pre;}
+  table.code td.ln{
+    width:1%; text-align:right; color:var(--ink-faint); user-select:none;
+    border-right:1px solid var(--line); padding-right:10px;
+  }
+  table.code td.src{color:var(--ink-soft); padding-left:12px;}
+  table.code tr.hl{background:var(--accent-soft);}
+  table.code tr.hl td.src{color:var(--accent-ink);}
+  table.code tr.hl td.ln{color:var(--accent-ink); font-weight:500;}
+
+  .linetag{
+    display:inline-block; font-family:"IBM Plex Mono",monospace; font-size:0.74rem;
+    font-weight:600; color:var(--accent-ink); background:var(--accent-soft);
+    padding:2px 8px; border-radius:5px; margin-right:8px;
+  }
+  .note{margin-top:12px; padding-top:0;}
+  .note p{color:var(--ink-soft); font-size:0.92rem; line-height:1.65;}
+  .note + .note{margin-top:14px;}
+
+  .box{
+    margin-top:18px; padding:16px 20px; background:var(--paper-raised);
+    border:1px solid var(--line); border-left:3px solid var(--box-c, var(--ink-faint));
+    border-radius:8px; box-shadow:var(--shadow);
+  }
+  .box-tag{
+    display:inline-block; font-family:"IBM Plex Mono",monospace; font-size:0.66rem;
+    font-weight:600; letter-spacing:0.05em; text-transform:uppercase; padding:3px 9px;
+    border-radius:5px; background:var(--box-bg); color:var(--box-c); margin-bottom:9px;
+  }
+  .box h4{font-family:"IBM Plex Sans",sans-serif; font-weight:600; font-size:0.95rem; color:var(--ink); margin-bottom:7px;}
+  .box p{color:var(--ink-soft); font-size:0.9rem; line-height:1.62;}
+  .box p + p{margin-top:8px;}
+  .box.concept{--box-c:var(--accent-ink); --box-bg:var(--accent-soft);}
+  .box.why{--box-c:var(--c-amber); --box-bg:var(--c-amber-bg);}
+  .box.recipe{--box-c:var(--c-green); --box-bg:var(--c-green-bg);}
+  .box.diff{--box-c:var(--c-plum); --box-bg:var(--c-plum-bg);}
+  .box.basics{--box-c:var(--c-teal); --box-bg:var(--c-teal-bg);}
+
+  .plain{
+    margin-top:10px; padding:11px 15px; background:var(--paper);
+    border-left:2px solid var(--line-strong); border-radius:6px;
+    font-size:0.88rem; color:var(--ink-soft); font-style:italic; line-height:1.6;
+  }
+  .plain b{color:var(--ink); font-style:normal;}
+  .plain .plain-tag{
+    display:block; font-family:"IBM Plex Mono",monospace; font-style:normal; font-size:0.62rem;
+    letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:5px;
+  }
+
+  .recap-list{margin:16px 0 0; padding:0; list-style:none; display:flex; flex-direction:column; gap:10px;}
+  .recap-list li{position:relative; padding-left:26px; font-size:0.94rem; color:var(--ink-soft); line-height:1.6;}
+  .recap-list li::before{content:"→"; color:var(--accent); font-weight:600; position:absolute; left:0; top:0;}
+  .recap-list li strong{color:var(--ink);}
+
+  .stepnum-list{margin:14px 0 0; padding:0; list-style:none; display:flex; flex-direction:column; gap:8px;}
+  .stepnum-list li{
+    position:relative; padding-left:30px; font-size:0.9rem; color:var(--ink-soft); line-height:1.6;
+  }
+  .stepnum-list{counter-reset: stepnum;}
+  .stepnum-list li::before{
+    counter-increment: stepnum; content: counter(stepnum);
+    position:absolute; left:0; top:1px; width:19px; height:19px; border-radius:50%;
+    background:var(--c-teal-bg); color:var(--c-teal); font-family:"IBM Plex Mono",monospace;
+    font-size:0.68rem; font-weight:600; display:flex; align-items:center; justify-content:center;
+  }
+
+  .idea-grid{margin-top:8px;}
+  .idea-grid h4.sub{margin-top:34px;}
+
+  .footer{
+    margin-top:36px; padding-top:22px; border-top:1px solid var(--line);
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;
+    font-family:"IBM Plex Mono",monospace; font-size:0.74rem; color:var(--ink-faint);
+  }
+  .footer span{max-width:48%;}
+  @media (max-width:600px){ .footer span{max-width:100%;} }
+  ::selection{background:var(--accent-soft); color:var(--accent-ink);}
+</style>
+
+<nav class="topnav">
+  <div class="topnav-inner">
+    <span class="topnav-title">Buy Gate Walkthrough</span>
+    <div class="topnav-links" id="pillnav">
+      <a href="#foundations">Start here</a>
+      <a href="#overview">Overview</a>
+      <a href="#context">The hook</a>
+      <a href="#host">The host</a>
+      <a href="#type">The type</a>
+      <a href="#wiring">Wiring it in</a>
+      <a href="#migration">Migrating a file</a>
+      <a href="#variants">The other four</a>
+      <a href="#recipe">The recipe</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+
+  <div class="hero" id="overview">
+    <span class="eyebrow">Every line of new code from phase 1, explained from zero</span>
+    <h1>How the buy gate was actually built</h1>
+    <p class="hero-sub">This isn't another summary of what changed, that's what the Paper Trail document is for. This one stops at every piece of new code and explains what it does, why it's written that way, and what the underlying idea is, so the pattern is reusable the next time five files need to become one. This version goes further than a normal walkthrough: it assumes nothing, it stops for every symbol and keyword that a working programmer would skim past without noticing, and it explains those too. Read it top to bottom once, then come back to any section as a reference.</p>
+    <p class="hero-sub">Two files were built from nothing: <code>src/context/BuyIntentContext.tsx</code> and <code>src/component/buy-intent-modal-host/index.tsx</code>. One type was added to an existing file. One file, <code>pages/_app.tsx</code>, got a small but important edit. And five existing files were migrated to use the new pieces, one pattern repeated five times with small variations.</p>
+    <p class="hero-sub">If any of the words "component," "hook," "prop," or "TypeScript" feel unfamiliar, don't skip ahead, start with the <a href="#foundations">Start here</a> section first. It builds the eight small ideas that everything after it leans on. Everyone else can jump straight to <a href="#context">the hook</a>.</p>
+
+    <div class="glossary">
+      <div class="glossary-item"><span class="term">Component</span><span class="def">A JavaScript function whose job is to describe one piece of the screen. React calls it, and whatever it hands back gets drawn.</span></div>
+      <div class="glossary-item"><span class="term">Prop</span><span class="def">A piece of data a parent component hands down to a component it renders, exactly like an argument handed to a function.</span></div>
+      <div class="glossary-item"><span class="term">Hook</span><span class="def">A function whose name starts with <code>use</code>, that's allowed to hold state and tap into React's machinery. Only callable from inside a component or another hook.</span></div>
+      <div class="glossary-item"><span class="term">Context</span><span class="def">React's built in way to make one piece of data readable by any component underneath it in the tree, without passing it down through every layer by hand.</span></div>
+      <div class="glossary-item"><span class="term">Provider</span><span class="def">The component that actually holds a Context's live value and makes it available to everything nested inside it.</span></div>
+      <div class="glossary-item"><span class="term">State</span><span class="def">A value a component remembers between renders, created with <code>useState</code>, that causes a re-render whenever it's changed.</span></div>
+      <div class="glossary-item"><span class="term">Closure</span><span class="def">A function that "remembers" variables from the scope it was defined in, even after that scope has technically finished running.</span></div>
+      <div class="glossary-item"><span class="term">Type / Interface</span><span class="def">TypeScript's way of describing the exact shape a piece of data must have, so a mistake gets caught while writing code instead of while running it.</span></div>
+      <div class="glossary-item"><span class="term">Destructuring</span><span class="def">A shortcut for pulling values out of an object or array straight into their own named variables, in one step instead of one line each.</span></div>
+      <div class="glossary-item"><span class="term">Generic (<code>&lt;T&gt;</code>)</span><span class="def">A blank that gets filled in with a specific type, so one piece of reusable code can be told "for this call, only allow this exact shape."</span></div>
+      <div class="glossary-item"><span class="term">Optional chaining <code>?.</code></span><span class="def">A safety check built into the dot. If the thing on the left is missing, the whole expression quietly becomes <code>undefined</code> instead of crashing.</span></div>
+      <div class="glossary-item"><span class="term">Import / Export</span><span class="def">How one file hands a piece of code to another file. <code>export</code> makes something available to be borrowed, <code>import</code> is the borrowing.</span></div>
+    </div>
+  </div>
+
+  <!-- FOUNDATIONS -->
+  <section id="foundations" class="idea-grid">
+    <div class="section-head"><span class="section-num">0</span><h2>Start here: eight ideas everything else depends on</h2></div>
+    <p class="section-kicker">Nothing on this page requires prior React or TypeScript experience, but it does assume these eight ideas. They're small, and once they click, the rest of the document reads like plain English instead of a foreign language. If they're already familiar, skip straight to <a href="#context">the hook</a>. Every example in this section is a short, made up snippet built only to demonstrate the idea, it isn't from this codebase, it's marked "illustrative example" so it's never confused with the real, verified code that fills the rest of the page.</p>
+
+    <h4 class="sub">0.1 &nbsp;A component is just a function that draws part of the screen</h4>
+    <div class="note"><p>Everything visible in this app, a button, a card, an entire page, is built out of components. A component is a normal JavaScript function, with one rule: it has to hand back a description of what should appear on screen. React takes that description and turns it into real, visible pixels.</p></div>
+    <div class="codewrap">
+      <div class="head">a tiny made up example<span class="tag">illustrative example</span></div>
+      <div class="scroll">
+        <table class="code">
+          <tr><td class="ln">1</td><td class="src">function Greeting() {</td></tr>
+          <tr><td class="ln">2</td><td class="src">  return &lt;h1&gt;Hello there&lt;/h1&gt;;</td></tr>
+          <tr><td class="ln">3</td><td class="src">}</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="plain"><span class="plain-tag">in plain english</span><b>Greeting</b> is a function like any other. Instead of returning a number or a string, it returns a description of an on screen heading. Somewhere else, React will call this function and put that heading on the page.</div>
+
+    <h4 class="sub">0.2 &nbsp;JSX: writing tags inside JavaScript</h4>
+    <div class="note"><p>That <code>&lt;h1&gt;Hello there&lt;/h1&gt;</code> above looks like HTML, but it's sitting directly inside a JavaScript function. That combination is called JSX. It's not a separate language, it's a shorthand that gets converted into plain JavaScript before it ever runs. The one thing worth knowing early: curly braces, <code>{ }</code>, are the escape hatch. Anywhere inside JSX, wrapping something in <code>{ }</code> means "stop treating this as a tag, this is real JavaScript, evaluate it and show the result."</p></div>
+    <div class="codewrap">
+      <div class="head">a tiny made up example<span class="tag">illustrative example</span></div>
+      <div class="scroll">
+        <table class="code">
+          <tr><td class="ln">1</td><td class="src">function Greeting() {</td></tr>
+          <tr><td class="ln">2</td><td class="src">  const name = "Akshat";</td></tr>
+          <tr class="hl"><td class="ln">3</td><td class="src">  return &lt;h1&gt;Hello, {name}&lt;/h1&gt;;</td></tr>
+          <tr><td class="ln">4</td><td class="src">}</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="plain"><span class="plain-tag">in plain english</span>The word <code>name</code> inside those braces is not text on the page, it's a real variable. React runs it, gets back the string <code>"Akshat"</code>, and drops that into the sentence. If it had been written without the braces, as literal text <code>name</code>, the page would show the word "name," not the value.</div>
+
+    <h4 class="sub">0.3 &nbsp;Props: data handed down from parent to child</h4>
+    <div class="note"><p>A component can accept input, the same way a function accepts arguments. In React, that input is called a prop, short for "property." Whoever renders the component decides what to hand it, and the component reads it back out through destructuring, which is covered in 0.6 below.</p></div>
+    <div class="codewrap">
+      <div class="head">a tiny made up example<span class="tag">illustrative example</span></div>
+      <div class="scroll">
+        <table class="code">
+          <tr><td class="ln">1</td><td class="src">function Greeting({ name }: { name: string }) {</td></tr>
+          <tr><td class="ln">2</td><td class="src">  return &lt;h1&gt;Hello, {name}&lt;/h1&gt;;</td></tr>
+          <tr><td class="ln">3</td><td class="src">}</td></tr>
+          <tr><td class="ln">4</td><td class="src"></td></tr>
+          <tr class="hl"><td class="ln">5</td><td class="src">&lt;Greeting name="Akshat" /&gt;</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="plain"><span class="plain-tag">in plain english</span>Line 5 is where <code>Greeting</code> actually gets used, and <code>name="Akshat"</code> is the prop being handed in, exactly the way an argument gets handed into a normal function call. Inside the component on line 1, that same value shows up as the variable <code>name</code>. This is the entire relationship between a parent component and a child component: the parent writes the tag with some attributes, the child receives those attributes as props.</div>
+
+    <h4 class="sub">0.4 &nbsp;State: a value a component remembers, and re-renders when it changes</h4>
+    <div class="note"><p>A plain variable inside a function forgets itself the moment the function finishes running. That's a problem for a component, because React calls a component's function over and over, once per render, and a normal variable would reset to its starting value every single time. <code>useState</code> is React's way around that: it gives a component a value that survives between renders, and a way to change that value that automatically tells React "something changed, please redraw this."</p></div>
+    <div class="codewrap">
+      <div class="head">a tiny made up example<span class="tag">illustrative example</span></div>
+      <div class="scroll">
+        <table class="code">
+          <tr><td class="ln">1</td><td class="src">function Counter() {</td></tr>
+          <tr class="hl"><td class="ln">2</td><td class="src">  const [count, setCount] = useState(0);</td></tr>
+          <tr><td class="ln">3</td><td class="src">  return (</td></tr>
+          <tr><td class="ln">4</td><td class="src">    &lt;button onClick={() =&gt; setCount(count + 1)}&gt;</td></tr>
+          <tr><td class="ln">5</td><td class="src">      Clicked {count} times</td></tr>
+          <tr><td class="ln">6</td><td class="src">    &lt;/button&gt;</td></tr>
+          <tr><td class="ln">7</td><td class="src">  );</td></tr>
+          <tr><td class="ln">8</td><td class="src">}</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="box basics">
+      <span class="box-tag">Basics: reading <code>const [a, b] = useState(0)</code></span>
+      <p><code>useState(0)</code> starts a stored value at <code>0</code> and hands back exactly two things, always in this order: the current value, and a function for changing it. The square brackets on the left, <code>[count, setCount]</code>, are array destructuring, a shortcut for pulling items out of an array by position instead of writing <code>const count = result[0]; const setCount = result[1];</code> on two separate lines. The names <code>count</code> and <code>setCount</code> aren't special keywords, they're just the names chosen for this particular pair, any two names would work, but "value" and "setValue" is the convention this whole codebase follows, for example <code>selectedDomain</code> and <code>setSelectedDomain</code> later in this document.</p>
+      <p>Calling <code>setCount(count + 1)</code> does two things: it updates the remembered value, and it tells React to run this component's function again so the screen catches up. That second part is the entire difference from a plain variable, plain variables never trigger a redraw.</p>
+    </div>
+
+    <h4 class="sub">0.5 &nbsp;Arrow functions: the <code>() =&gt; {}</code> shorthand</h4>
+    <div class="note"><p>JavaScript has more than one way to write a function. This codebase almost always uses the arrow function style, <code>() =&gt; { ... }</code>, instead of the older <code>function () { ... }</code> style. They do the same job, an arrow function is just shorter to write and reads naturally as "given these inputs, produce this output."</p></div>
+    <div class="codewrap">
+      <div class="head">the same function, two styles<span class="tag">illustrative example</span></div>
+      <div class="scroll">
+        <table class="code">
+          <tr><td class="ln">1</td><td class="src">// older style</td></tr>
+          <tr><td class="ln">2</td><td class="src">function add(a, b) {</td></tr>
+          <tr><td class="ln">3</td><td class="src">  return a + b;</td></tr>
+          <tr><td class="ln">4</td><td class="src">}</td></tr>
+          <tr><td class="ln">5</td><td class="src"></td></tr>
+          <tr><td class="ln">6</td><td class="src">// arrow function style, used throughout this codebase</td></tr>
+          <tr class="hl"><td class="ln">7</td><td class="src">const add = (a, b) =&gt; {</td></tr>
+          <tr><td class="ln">8</td><td class="src">  return a + b;</td></tr>
+          <tr><td class="ln">9</td><td class="src">};</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="plain"><span class="plain-tag">in plain english</span>Read <code>const add = (a, b) =&gt; { ... }</code> as "make a variable called <code>add</code>, and its value is a function that takes <code>a</code> and <code>b</code>." Every time this document shows something like <code>const buy = (domain) =&gt; { ... }</code>, it's the exact same shape, a variable that holds a function.</div>
+
+    <h4 class="sub">0.6 &nbsp;Destructuring: unpacking an object in one step</h4>
+    <div class="note"><p>0.4 showed destructuring an array. The far more common version in this codebase is destructuring an object, pulling named fields straight out of it instead of writing <code>const x = someObject.x</code> on a separate line for every field.</p></div>
+    <div class="codewrap">
+      <div class="head">without destructuring, then with it<span class="tag">illustrative example</span></div>
+      <div class="scroll">
+        <table class="code">
+          <tr><td class="ln">1</td><td class="src">const domain = { id: 12, domainName: "example.com" };</td></tr>
+          <tr><td class="ln">2</td><td class="src"></td></tr>
+          <tr><td class="ln">3</td><td class="src">// without destructuring</td></tr>
+          <tr><td class="ln">4</td><td class="src">const id = domain.id;</td></tr>
+          <tr><td class="ln">5</td><td class="src">const domainName = domain.domainName;</td></tr>
+          <tr><td class="ln">6</td><td class="src"></td></tr>
+          <tr><td class="ln">7</td><td class="src">// with destructuring, same result, one line</td></tr>
+          <tr class="hl"><td class="ln">8</td><td class="src">const { id, domainName } = domain;</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="plain"><span class="plain-tag">in plain english</span>Line 8 says "look inside <code>domain</code>, and give me two new variables named <code>id</code> and <code>domainName</code>, filled with whatever those fields hold." This shows up constantly in this walkthrough, including in every component's own function signature, the <code>({ children }: { children: ReactNode })</code> pattern in section 1 is exactly this, destructuring happening right where the props arrive.</div>
+
+    <h4 class="sub">0.7 &nbsp;Import and export: how files share code</h4>
+    <div class="note"><p>Every file in this project is its own little world, isolated by default. <code>export</code> is how a file marks something as available to be used elsewhere, and <code>import</code> is how another file asks to borrow it. Without these two keywords, no two files could ever talk to each other.</p></div>
+    <div class="codewrap">
+      <div class="head">two files, one sharing with the other<span class="tag">illustrative example</span></div>
+      <div class="scroll">
+        <table class="code">
+          <tr><td class="ln">1</td><td class="src">// file: math.ts</td></tr>
+          <tr class="hl"><td class="ln">2</td><td class="src">export const double = (n: number) =&gt; n * 2;</td></tr>
+          <tr><td class="ln">3</td><td class="src"></td></tr>
+          <tr><td class="ln">4</td><td class="src">// file: app.ts</td></tr>
+          <tr class="hl"><td class="ln">5</td><td class="src">import { double } from "./math";</td></tr>
+          <tr><td class="ln">6</td><td class="src">console.log(double(4)); // 8</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="box basics">
+      <span class="box-tag">Basics: named export vs. the <code>@/</code> path</span>
+      <p>Writing <code>export const</code>, as on line 2, is a named export, the file is sharing something under a specific name, <code>double</code>, and the importer must ask for that exact name inside curly braces, as on line 5. Every piece of shared code in this walkthrough, <code>useBuyIntent</code>, <code>BuyIntentProvider</code>, <code>BuyableDomain</code>, is a named export, which is why every import of them uses that same curly brace form.</p>
+      <p>The path on line 5, <code>"./math"</code>, means "the file called math, in this same folder." Real files in this codebase instead import using paths like <code>"@/core/redux/store"</code>. The <code>@/</code> isn't a real folder, it's an alias set up once in <code>tsconfig.json</code> that always means "start from the <code>src</code> folder," no matter how deeply nested the importing file is. It exists purely so imports don't turn into long chains of <code>../../../</code> as files get nested deeper.</p>
+    </div>
+
+    <h4 class="sub">0.8 &nbsp;TypeScript: describing a shape before the code runs</h4>
+    <div class="note"><p>Plain JavaScript never checks what shape a piece of data has until the moment the code actually runs, by which point a mistake is a live bug. TypeScript is JavaScript with an extra layer on top: it lets a file describe the exact shape something must have, and then a separate tool, the type checker, reads the whole project and flags anywhere that shape is violated, before the app ever runs. Every file in this codebase ending in <code>.ts</code> or <code>.tsx</code> (rather than plain <code>.js</code> or <code>.jsx</code>) is written in TypeScript.</p></div>
+    <div class="codewrap">
+      <div class="head">a shape, and a mistake it catches<span class="tag">illustrative example</span></div>
+      <div class="scroll">
+        <table class="code">
+          <tr class="hl"><td class="ln">1</td><td class="src">interface Domain {</td></tr>
+          <tr><td class="ln">2</td><td class="src">  id: number;</td></tr>
+          <tr><td class="ln">3</td><td class="src">  name: string;</td></tr>
+          <tr><td class="ln">4</td><td class="src">}</td></tr>
+          <tr><td class="ln">5</td><td class="src"></td></tr>
+          <tr><td class="ln">6</td><td class="src">const good: Domain = { id: 1, name: "example.com" }; // fine</td></tr>
+          <tr class="hl"><td class="ln">7</td><td class="src">const bad: Domain = { id: 1 }; // error: missing "name"</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="plain"><span class="plain-tag">in plain english</span>An <code>interface</code> is not a real, running value, it never appears in the finished JavaScript at all. It's purely a promise checked ahead of time: "anything typed as <code>Domain</code> must have an <code>id</code> that's a number and a <code>name</code> that's a string." Line 7 never gets a chance to run and fail in front of a real user, the mistake gets caught the moment the code is written, underlined in the editor, the same way a red squiggly line flags a misspelled word.</div>
+
+    <div class="box why">
+      <span class="box-tag">Why this matters for the hook rule ahead</span>
+      <p>One React rule shows up constantly starting in the very next section: hooks, any function starting with <code>use</code>, must always be called in the same order, every single render, and only from the top level of a component, never inside an <code>if</code>, a loop, or a function defined inside the component. React keeps track of hooks purely by the order they were called in, not by name, so calling one conditionally would make React lose track of which stored value belongs to which <code>useState</code> call between one render and the next, corrupting state in a way that's genuinely confusing to debug. Every hook call in this walkthrough sits at the very top of its component specifically because of this rule.</p>
+    </div>
+  </section>
+
+  <!-- CONTEXT FILE -->
+  <section id="context">
+    <div class="section-head"><span class="section-num">1</span><h2>The Context file, built from nothing</h2></div>
+    <p class="section-kicker">This is the file that owns the whole decision of what happens when someone clicks Buy. Everything else in this phase either feeds it or reads from it.</p>
+    <span class="file-tag">src/context/BuyIntentContext.tsx</span>
+
+    <div class="box basics">
+      <span class="box-tag">The whole file in one paragraph, no jargon</span>
+      <p>Picture a bouncer standing at the door of a club called Buy Now. Before this file existed, the app hired five separate bouncers, one for each place a Buy button appeared, and each one checked IDs slightly differently, some forgot to check for a saved wallet, one forgot to log the click at all. This file fires all five bouncers and hires exactly one, who stands at the door and runs the exact same three checks every single time, no matter which entrance someone walked up to: are you logged in, do you have a wallet address on file, is your wallet actually connected right now. Only after all three pass does anyone get waved through to the actual purchase popup.</p>
+    </div>
+
+    <div class="codewrap">
+      <div class="head">the full file, 109 lines</div>
+      <div class="scroll">
+        <table class="code">
+          <tr><td class="ln">1</td><td class="src">import { createContext, useContext, useState, ReactNode } from "react";</td></tr>
+          <tr><td class="ln">2</td><td class="src">import { useRouter } from "next/router";</td></tr>
+          <tr><td class="ln">3</td><td class="src">import { useSelector } from "react-redux";</td></tr>
+          <tr><td class="ln">4</td><td class="src">import { useAppKitProvider } from "@reown/appkit/react";</td></tr>
+          <tr><td class="ln">5</td><td class="src">import { RootState } from "@/core/redux/store";</td></tr>
+          <tr><td class="ln">6</td><td class="src">import { getCookieValue } from "@/core/services/cookies.service";</td></tr>
+          <tr><td class="ln">7</td><td class="src">import { Cookie_Key } from "@/core/enum/cookie.enum";</td></tr>
+          <tr><td class="ln">8</td><td class="src">import { useSetAnalyticsMutation } from "@/core/redux/userProfile";</td></tr>
+          <tr><td class="ln">9</td><td class="src">import ToastMessage from "@/component/toast-message";</td></tr>
+          <tr><td class="ln">10</td><td class="src">import { TOAST_TYPE } from "@/core/enum/toast-type.enum";</td></tr>
+          <tr><td class="ln">11</td><td class="src">import { BuyableDomain } from "@/types/BuyModal";</td></tr>
+          <tr><td class="ln">12</td><td class="src"></td></tr>
+          <tr class="hl"><td class="ln">13</td><td class="src">interface BuyIntentContextType {</td></tr>
+          <tr><td class="ln">14</td><td class="src">  selectedDomain: BuyableDomain | null;</td></tr>
+          <tr><td class="ln">15</td><td class="src">  isBuyModalOpen: boolean;</td></tr>
+          <tr><td class="ln">16</td><td class="src">  isWalletModalOpen: boolean;</td></tr>
+          <tr><td class="ln">17</td><td class="src">  walletAddress: string | null;</td></tr>
+          <tr><td class="ln">18</td><td class="src">  buy: (domain: BuyableDomain) => void;</td></tr>
+          <tr><td class="ln">19</td><td class="src">  closeBuyModal: () => void;</td></tr>
+          <tr><td class="ln">20</td><td class="src">  closeWalletModal: () => void;</td></tr>
+          <tr><td class="ln">21</td><td class="src">  onWalletConfirmed: () => void;</td></tr>
+          <tr><td class="ln">22</td><td class="src">}</td></tr>
+          <tr><td class="ln">23</td><td class="src"></td></tr>
+          <tr class="hl"><td class="ln">24</td><td class="src">const BuyIntentContext = createContext&lt;BuyIntentContextType | null&gt;(null);</td></tr>
+          <tr><td class="ln">25</td><td class="src"></td></tr>
+          <tr class="hl"><td class="ln">26</td><td class="src">export const useBuyIntent = () => {</td></tr>
+          <tr><td class="ln">27</td><td class="src">  const context = useContext(BuyIntentContext);</td></tr>
+          <tr><td class="ln">28</td><td class="src">  if (!context) {</td></tr>
+          <tr><td class="ln">29</td><td class="src">    throw new Error("useBuyIntent must be used within a BuyIntentProvider");</td></tr>
+          <tr><td class="ln">30</td><td class="src">  }</td></tr>
+          <tr><td class="ln">31</td><td class="src">  return context;</td></tr>
+          <tr><td class="ln">32</td><td class="src">};</td></tr>
+          <tr><td class="ln">33</td><td class="src"></td></tr>
+          <tr><td class="ln">34-38</td><td class="src">// (comment explaining what this replaces, see the annotation below)</td></tr>
+          <tr class="hl"><td class="ln">39</td><td class="src">export const BuyIntentProvider = ({ children }: { children: ReactNode }) => {</td></tr>
+          <tr><td class="ln">40</td><td class="src">  const router = useRouter();</td></tr>
+          <tr><td class="ln">41</td><td class="src">  const { walletProvider, walletProviderType } = useAppKitProvider("eip155");</td></tr>
+          <tr><td class="ln">42</td><td class="src">  const [setAnalytics] = useSetAnalyticsMutation();</td></tr>
+          <tr><td class="ln">43</td><td class="src">  const evmWalletAddress = useSelector(</td></tr>
+          <tr><td class="ln">44</td><td class="src">    (state: RootState) =&gt; state.userProfile.evmWalletAddress</td></tr>
+          <tr><td class="ln">45</td><td class="src">  );</td></tr>
+          <tr><td class="ln">46</td><td class="src"></td></tr>
+          <tr class="hl"><td class="ln">47</td><td class="src">  const [selectedDomain, setSelectedDomain] = useState&lt;BuyableDomain | null&gt;(null);</td></tr>
+          <tr><td class="ln">48</td><td class="src">  const [isBuyModalOpen, setIsBuyModalOpen] = useState(false);</td></tr>
+          <tr><td class="ln">49</td><td class="src">  const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);</td></tr>
+          <tr><td class="ln">50</td><td class="src"></td></tr>
+          <tr class="hl"><td class="ln">51</td><td class="src">  const trackBuyClick = (domain: BuyableDomain) =&gt; {</td></tr>
+          <tr><td class="ln">52</td><td class="src">    setAnalytics({ domainId: domain.id, clicks: "clicks", views: "views" });</td></tr>
+          <tr><td class="ln">53</td><td class="src">  };</td></tr>
+          <tr><td class="ln">54</td><td class="src"></td></tr>
+          <tr class="hl"><td class="ln">55</td><td class="src">  const buy = (domain: BuyableDomain) =&gt; {</td></tr>
+          <tr><td class="ln">56</td><td class="src">    const token = getCookieValue(Cookie_Key.ACCESS_TOKEN);</td></tr>
+          <tr><td class="ln">57</td><td class="src">    if (!token) {</td></tr>
+          <tr><td class="ln">58</td><td class="src">      ToastMessage(TOAST_TYPE.INFO, "", "Please log in to purchase the domain.");</td></tr>
+          <tr><td class="ln">59</td><td class="src">      return;</td></tr>
+          <tr><td class="ln">60</td><td class="src">    }</td></tr>
+          <tr><td class="ln">61</td><td class="src"></td></tr>
+          <tr><td class="ln">62</td><td class="src">    if (!evmWalletAddress) {</td></tr>
+          <tr><td class="ln">63</td><td class="src">      ToastMessage(TOAST_TYPE.INFO, "", "Please add your Wallet Address in Profile to buy domains.");</td></tr>
+          <tr><td class="ln">64</td><td class="src">      router.push("/profile/userProfile");</td></tr>
+          <tr><td class="ln">65</td><td class="src">      return;</td></tr>
+          <tr><td class="ln">66</td><td class="src">    }</td></tr>
+          <tr><td class="ln">67</td><td class="src"></td></tr>
+          <tr><td class="ln">68</td><td class="src">    setSelectedDomain(domain);</td></tr>
+          <tr><td class="ln">69</td><td class="src"></td></tr>
+          <tr><td class="ln">70</td><td class="src">    if (!walletProvider || !walletProviderType) {</td></tr>
+          <tr><td class="ln">71</td><td class="src">      setIsWalletModalOpen(true);</td></tr>
+          <tr><td class="ln">72</td><td class="src">      return;</td></tr>
+          <tr><td class="ln">73</td><td class="src">    }</td></tr>
+          <tr><td class="ln">74</td><td class="src"></td></tr>
+          <tr><td class="ln">75</td><td class="src">    trackBuyClick(domain);</td></tr>
+          <tr><td class="ln">76</td><td class="src">    setIsBuyModalOpen(true);</td></tr>
+          <tr><td class="ln">77</td><td class="src">  };</td></tr>
+          <tr><td class="ln">78</td><td class="src"></td></tr>
+          <tr class="hl"><td class="ln">79-87</td><td class="src">  const onWalletConfirmed = () =&gt; { ... };  // see annotation</td></tr>
+          <tr><td class="ln">88</td><td class="src"></td></tr>
+          <tr><td class="ln">89</td><td class="src">  const closeBuyModal = () =&gt; setIsBuyModalOpen(false);</td></tr>
+          <tr><td class="ln">90</td><td class="src">  const closeWalletModal = () =&gt; setIsWalletModalOpen(false);</td></tr>
+          <tr><td class="ln">91</td><td class="src"></td></tr>
+          <tr class="hl"><td class="ln">92</td><td class="src">  return (</td></tr>
+          <tr><td class="ln">93</td><td class="src">    &lt;BuyIntentContext.Provider</td></tr>
+          <tr><td class="ln">94</td><td class="src">      value={{</td></tr>
+          <tr><td class="ln">95</td><td class="src">        selectedDomain, isBuyModalOpen, isWalletModalOpen,</td></tr>
+          <tr><td class="ln">98</td><td class="src">        walletAddress: evmWalletAddress,</td></tr>
+          <tr><td class="ln">99</td><td class="src">        buy, closeBuyModal, closeWalletModal, onWalletConfirmed,</td></tr>
+          <tr><td class="ln">103</td><td class="src">      }}</td></tr>
+          <tr><td class="ln">104</td><td class="src">    &gt;</td></tr>
+          <tr><td class="ln">105</td><td class="src">      {children}</td></tr>
+          <tr><td class="ln">106</td><td class="src">    &lt;/BuyIntentContext.Provider&gt;</td></tr>
+          <tr><td class="ln">107</td><td class="src">  );</td></tr>
+          <tr><td class="ln">108</td><td class="src">};</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <h3 class="sub">Going through it in the order it runs</h3>
+
+    <div class="note">
+      <p><span class="linetag">Lines 1-11</span> Every <code>import</code> pulls in one thing this file needs from somewhere else. This is exactly how JavaScript modules share code, nothing here is special to React, it's the same mechanism from idea 0.7 above. The last one, line 11, imports the shared shape defined in part 3 below, <code>BuyableDomain</code>, that's what lets this file describe exactly what a "domain" object must look like.</p>
+    </div>
+
+    <div class="box concept">
+      <span class="box-tag">Concept: the <code>@/</code> path</span>
+      <p>Paths like <code>@/core/redux/store</code> aren't relative file paths (<code>../../core/redux/store</code>), they're an alias configured once in <code>tsconfig.json</code> that always means "start from the <code>src</code> folder." It exists purely so imports don't turn into long chains of <code>../../../</code> as files get nested deeper.</p>
+    </div>
+
+    <div class="note">
+      <p><span class="linetag">Lines 13-22</span> This is a TypeScript <code>interface</code>, a description of a shape, not real code that runs, exactly as introduced in idea 0.8. It says: anything claiming to be a <code>BuyIntentContextType</code> must have exactly these nine fields, with exactly these types. Nothing is created yet, this is a contract that gets enforced everywhere the type is used later in the file. Read each field's type as a small English sentence: line 15, <code>isBuyModalOpen: boolean</code>, means "this must be exactly <code>true</code> or exactly <code>false</code>, nothing else." Line 18, <code>buy: (domain: BuyableDomain) =&gt; void</code>, means "this must be a function that accepts one argument shaped like <code>BuyableDomain</code>, and doesn't hand anything back," <code>void</code> is TypeScript's word for "returns nothing."</p>
+    </div>
+
+    <div class="box concept">
+      <span class="box-tag">Concept: why describe the shape first</span>
+      <p>Writing the interface before the logic is a deliberate order. It forces answering "what does this actually need to expose to the rest of the app" before writing a single line of the real behavior. Every field on line 14 to 21 became a field because some other file, the modal host or one of the five migrated files, genuinely needed to read or call it. Nothing extra got added "just in case."</p>
+    </div>
+
+    <div class="note">
+      <p><span class="linetag">Line 24</span> <code>createContext</code> is the one React function that actually creates a Context. Think of it as creating an empty radio channel that doesn't broadcast anything yet. The <code>&lt;BuyIntentContextType | null&gt;</code> part is a generic, the blank introduced in the glossary above, it tells TypeScript "whatever gets broadcast on this channel will either match that interface, or be <code>null</code>." The starting value, the thing in the parentheses, is <code>null</code>, because nothing is actually being provided yet at this point in the file, that only happens later, inside the Provider.</p>
+    </div>
+
+    <div class="box basics">
+      <span class="box-tag">Basics: reading <code>BuyIntentContextType | null</code></span>
+      <p>The vertical bar <code>|</code> in TypeScript means "or." <code>BuyIntentContextType | null</code> reads as "either a real object matching that interface, or the literal value <code>null</code>, and nothing else is allowed." This shows up constantly in this codebase, for example <code>walletAddress: string | null</code> on line 17 means the wallet address is either a real string or <code>null</code>, never, say, a number or <code>undefined</code>.</p>
+    </div>
+
+    <div class="note">
+      <p><span class="linetag">Lines 26-32</span> This is the custom hook every other file actually calls. <code>useContext(BuyIntentContext)</code> tunes in to the channel created above and returns whatever the nearest <code>Provider</code> is currently broadcasting. If nothing above this component in the tree is providing it, <code>useContext</code> returns the fallback from <code>createContext</code>, which was <code>null</code>. That's exactly what the <code>if (!context)</code> check is for.</p>
+    </div>
+
+    <div class="box basics">
+      <span class="box-tag">Basics: what the <code>!</code> means</span>
+      <p>In JavaScript, <code>!</code> means "not," it flips a value to its opposite boolean. <code>!context</code> reads as "is <code>context</code> falsy," true when <code>context</code> is <code>null</code>, <code>undefined</code>, <code>false</code>, <code>0</code>, or an empty string, and false otherwise. This exact pattern, <code>if (!something) { handle it; return; }</code>, appears so many times in this file that it's worth memorizing once here: it always means "if this thing is missing or empty, deal with that and stop."</p>
+    </div>
+
+    <div class="box why">
+      <span class="box-tag">Why throw instead of just returning null</span>
+      <p>A simpler version of this hook could just return <code>context</code> directly and let every caller deal with the possibility of <code>null</code>. That would mean every single one of the five migrated files would need its own <code>if (!buy) return null</code> style guard, or risk a confusing crash three components away from the actual mistake. Throwing here, loudly, the moment the hook is misused, turns "forgot to wrap this page in the Provider" into an error message that points straight at the real problem, immediately, in development, instead of a silent bug discovered later.</p>
+    </div>
+
+    <div class="note">
+      <p><span class="linetag">Line 39</span> This is the actual component that will wrap the app. <code>{ children }: { children: ReactNode }</code> is destructuring the one prop this component accepts, and typing it, <code>ReactNode</code> is TypeScript's built in type for "anything React can render," which is exactly what a component that just wraps other components needs to accept.</p>
+    </div>
+
+    <div class="box concept">
+      <span class="box-tag">Concept: components that just wrap other components</span>
+      <p>A <code>Provider</code> component's whole job is usually to set some data up, and then render whatever was passed inside it, untouched. That's what <code>{children}</code> on line 105 does, it's the placeholder for "whatever JSX was nested between the opening and closing <code>&lt;BuyIntentProvider&gt;</code> tags in <code>_app.tsx</code>."</p>
+    </div>
+
+    <div class="note">
+      <p><span class="linetag">Lines 40-45</span> Four hooks called right at the top, before any of this component's own logic, exactly matching the ordering rule explained at the end of the Start Here section. This is a hard rule in React, not a style choice, hooks must always run in the same order on every render, so they always go at the top of a component, never inside an <code>if</code> or a loop. Three of these, <code>useRouter</code>, <code>useAppKitProvider</code>, and <code>useSelector</code>, aren't new, they're the exact same hooks the five files used to call individually, just called here once instead of five times.</p>
+    </div>
+
+    <div class="note">
+      <p><span class="linetag">Lines 47-49</span> Three separate <code>useState</code> calls, one each for the domain being bought, whether the buy popup is open, and whether the wallet popup is open. Each call returns a pair, the current value and a function to change it, that's why the syntax is <code>const [value, setValue] = useState(...)</code>, the array destructuring pattern from idea 0.4. Whenever one of the setter functions runs, React re-renders this component and everything reading from its Context.</p>
+    </div>
+
+    <div class="box why">
+      <span class="box-tag">Why three separate values instead of one object</span>
+      <p>These three pieces of state are logically related but change independently, closing the buy popup shouldn't touch which domain is selected, for instance. Three small, named <code>useState</code> calls read clearly and each update is simple. One combined object would mean every update has to spread the rest of the object to avoid wiping out the other fields, more ceremony for no real benefit at this size.</p>
+    </div>
+
+    <div class="note">
+      <p><span class="linetag">Lines 51-53</span> A small helper function, defined right inside the component. It exists purely so the actual tracking call, line 52, doesn't have to be written out twice, once for the normal path and once for the "just connected a wallet" path. This is what a closure looks like in practice: <code>trackBuyClick</code> can see <code>setAnalytics</code> from line 42 even though it's defined below it, because both live inside the same <code>BuyIntentProvider</code> function.</p>
+    </div>
+
+    <h4 class="sub">buy(), the function every single call site actually calls</h4>
+
+    <div class="box basics">
+      <span class="box-tag">The same function, told as a story with no code at all</span>
+      <p>Imagine <code>buy</code> as a single receptionist standing between every "Buy Now" button in the app and the actual purchase screen. Someone clicks a button somewhere. The receptionist asks question one: are you logged in? If not, she tells you to log in, and the conversation ends right there, nothing else happens. If yes, she asks question two: do you have a wallet address saved to your account? If not, she tells you, sends you to your profile page to add one, and the conversation ends there too. If yes, she writes down which domain you wanted, in case she needs to remember it later. Then question three: is your wallet actually connected right now, in this browser, at this moment? If not, she opens the "connect your wallet" popup and waits, she still remembers which domain you wanted. If yes, she logs that you clicked, and finally opens the real purchase popup. Every single check happens in that exact order, every single time, no matter which button was clicked.</p>
+    </div>
+
+    <div class="note">
+      <p><span class="linetag">Lines 56-60</span> Read the login cookie. If it's missing, show a message and <code>return</code>, which in a function with no return type just means "stop running this function right here." Nothing after this line executes.</p>
+    </div>
+
+    <div class="note">
+      <p><span class="linetag">Lines 62-66</span> Same shape, second check: does this account have a wallet address saved. If not, show a different message and send the browser to the profile page with <code>router.push</code>, then stop.</p>
+    </div>
+
+    <div class="box concept">
+      <span class="box-tag">Concept: the early return pattern</span>
+      <p>Every check in this function follows the same shape: check a condition, and if it fails, handle it and <code>return</code> immediately, rather than nesting the rest of the function inside an <code>else</code>. This is called an early return or guard clause. The benefit shows up as the function gets longer, each check reads top to bottom as "rule out this problem, then this one, then this one," instead of a pyramid of nested <code>if</code> blocks getting narrower with every check.</p>
+    </div>
+
+    <div class="note">
+      <p><span class="linetag">Line 68</span> This line runs unconditionally once both checks above have passed, <code>setSelectedDomain(domain)</code> remembers which domain is being bought no matter what happens next, because both possible next steps, opening the wallet popup or opening the buy popup, need to know which domain it was.</p>
+    </div>
+
+    <div class="note">
+      <p><span class="linetag">Lines 70-73</span> The third check: is a wallet actually connected right now. If not, open the wallet popup and stop, this domain stays remembered from line 68, waiting for <code>onWalletConfirmed</code> to pick the flow back up.</p>
+    </div>
+
+    <div class="note">
+      <p><span class="linetag">Lines 75-76</span> Only reached if every check above passed. Fire the tracking call, then open the buy popup. This is the one path where analytics gets recorded, which is the entire point of this hook existing, every surface that calls <code>buy()</code> gets this for free, instead of five separate places remembering to add it themselves.</p>
+    </div>
+
+    <h4 class="sub">onWalletConfirmed(), resuming the flow after connecting</h4>
+
+    <div class="codewrap">
+      <div class="head">lines 79 to 87</div>
+      <div class="scroll">
+        <table class="code">
+          <tr><td class="ln">79</td><td class="src">  // WalletConect calls this once the wallet is actually connected, resuming</td></tr>
+          <tr><td class="ln">80</td><td class="src">  // the buy flow for whichever domain was selected when the wallet modal opened.</td></tr>
+          <tr><td class="ln">81</td><td class="src">  const onWalletConfirmed = () =&gt; {</td></tr>
+          <tr><td class="ln">82</td><td class="src">    setIsWalletModalOpen(false);</td></tr>
+          <tr><td class="ln">83</td><td class="src">    if (selectedDomain) {</td></tr>
+          <tr><td class="ln">84</td><td class="src">      trackBuyClick(selectedDomain);</td></tr>
+          <tr><td class="ln">85</td><td class="src">    }</td></tr>
+          <tr><td class="ln">86</td><td class="src">    setIsBuyModalOpen(true);</td></tr>
+          <tr><td class="ln">87</td><td class="src">  };</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="note">
+      <p>This is another closure in action: <code>selectedDomain</code> here is the exact same state variable from line 47, remembered from whenever <code>buy()</code> last ran. That's the entire mechanism that makes "connect your wallet, then automatically see the right domain's buy popup" work, no domain id has to be passed back in from wherever this function gets called, it's already sitting in this component's memory.</p>
+    </div>
+
+    <div class="plain"><span class="plain-tag">in plain english</span>Nobody has to tell this function which domain to reopen. It just checks "do I still remember one from earlier," and if so, logs the click and shows the popup for that same one. That's the whole trick behind the wallet connect popup handing control back smoothly.</div>
+
+    <h4 class="sub">The return statement, actually broadcasting the value</h4>
+
+    <div class="note">
+      <p><span class="linetag">Lines 92-107</span> This is the payoff of everything above it. <code>&lt;BuyIntentContext.Provider&gt;</code> is a component that comes for free with every Context, its one job is to take a <code>value</code> prop and make it readable by <code>useContext</code> anywhere inside it. The object literal passed as <code>value</code>, lines 94 to 103, is exactly the shape promised back in the interface on line 13, every field listed there shows up here.</p>
+    </div>
+
+    <div class="box concept">
+      <span class="box-tag">Concept: shorthand property names</span>
+      <p><code>{ selectedDomain, isBuyModalOpen }</code> is shorthand for <code>{ selectedDomain: selectedDomain, isBuyModalOpen: isBuyModalOpen }</code>. When a variable's name already matches the property name you want, JavaScript lets you skip repeating it. <code>walletAddress: evmWalletAddress</code> on line 98 is the one field that couldn't use the shorthand, because the outside facing name, <code>walletAddress</code>, deliberately doesn't match the internal variable name, <code>evmWalletAddress</code>, that renaming is what makes the Context's own vocabulary consistent even though it's reading from a Redux field with a different name.</p>
+    </div>
+
+    <div class="box basics">
+      <span class="box-tag">Basics: the radio channel analogy, one step further</span>
+      <p>Back on line 24, <code>createContext</code> was described as an empty radio channel. This is the moment that channel actually starts broadcasting: <code>&lt;BuyIntentContext.Provider value={{ ... }}&gt;</code> is the transmitter turning on, and everything nested inside it, meaning everything written between line 105's <code>{children}</code> placeholder, is "in range" and can tune in with <code>useBuyIntent()</code>. Anything outside that range, not nested inside a <code>&lt;BuyIntentProvider&gt;</code> anywhere in the app, gets static, which is exactly the <code>null</code> that made <code>useBuyIntent</code> throw its error back on line 29.</p>
+    </div>
+  </section>
+
+  <!-- HOST -->
+  <section id="host">
+    <div class="section-head"><span class="section-num">2</span><h2>The modal host, the other new file</h2></div>
+    <p class="section-kicker">If the Context file is the decision maker, this is the one place that actually renders anything on screen because of that decision.</p>
+    <span class="file-tag">src/component/buy-intent-modal-host/index.tsx</span>
+
+    <div class="codewrap">
+      <div class="head">the full file, 51 lines</div>
+      <div class="scroll">
+        <table class="code">
+          <tr><td class="ln">1</td><td class="src">import dynamic from "next/dynamic";</td></tr>
+          <tr><td class="ln">2</td><td class="src">import { useBuyIntent } from "@/context/BuyIntentContext";</td></tr>
+          <tr><td class="ln">3</td><td class="src"></td></tr>
+          <tr class="hl"><td class="ln">4</td><td class="src">const BuyNowModal = dynamic(() =&gt; import("@/component/modals/BuyNowModal"), { ssr: false });</td></tr>
+          <tr class="hl"><td class="ln">5</td><td class="src">const WalletConect = dynamic(() =&gt; import("@/component/wallet-connect"), { ssr: false });</td></tr>
+          <tr><td class="ln">6</td><td class="src"></td></tr>
+          <tr><td class="ln">10</td><td class="src">const BuyIntentModalHost = () =&gt; {</td></tr>
+          <tr class="hl"><td class="ln">11-19</td><td class="src">  const {
+    selectedDomain, isBuyModalOpen, isWalletModalOpen, walletAddress,
+    closeBuyModal, closeWalletModal, onWalletConfirmed,
+  } = useBuyIntent();</td></tr>
+          <tr><td class="ln">20</td><td class="src"></td></tr>
+          <tr><td class="ln">21</td><td class="src">  return (</td></tr>
+          <tr><td class="ln">22</td><td class="src">    &lt;&gt;</td></tr>
+          <tr class="hl"><td class="ln">23</td><td class="src">      {selectedDomain && (</td></tr>
+          <tr><td class="ln">24</td><td class="src">        &lt;BuyNowModal</td></tr>
+          <tr><td class="ln">25</td><td class="src">          domainId={selectedDomain.id}</td></tr>
+          <tr><td class="ln">26</td><td class="src">          show={isBuyModalOpen}</td></tr>
+          <tr><td class="ln">27</td><td class="src">          handleClose={closeBuyModal}</td></tr>
+          <tr><td class="ln">28</td><td class="src">          domain={selectedDomain.domainName}</td></tr>
+          <tr><td class="ln">29</td><td class="src">          network={selectedDomain.network}</td></tr>
+          <tr><td class="ln">30</td><td class="src">          tokenId={selectedDomain.tokenId}</td></tr>
+          <tr><td class="ln">31</td><td class="src">          pricePerToken={selectedDomain.pricePerToken}</td></tr>
+          <tr><td class="ln">32</td><td class="src">          description={selectedDomain.description}</td></tr>
+          <tr class="hl"><td class="ln">33</td><td class="src">          keywords={selectedDomain.keywords.join(", ")}</td></tr>
+          <tr><td class="ln">34</td><td class="src">          endTime={selectedDomain.endTime}</td></tr>
+          <tr><td class="ln">35</td><td class="src">          usdAmount={selectedDomain.usdAmount}</td></tr>
+          <tr><td class="ln">36</td><td class="src">        /&gt;</td></tr>
+          <tr><td class="ln">37</td><td class="src">      )}</td></tr>
+          <tr><td class="ln">38</td><td class="src">      &lt;WalletConect</td></tr>
+          <tr><td class="ln">39</td><td class="src">        isOpen={isWalletModalOpen}</td></tr>
+          <tr><td class="ln">40</td><td class="src">        toggle={closeWalletModal}</td></tr>
+          <tr><td class="ln">41</td><td class="src">        onConfirm={onWalletConfirmed}</td></tr>
+          <tr><td class="ln">42</td><td class="src">        walletAddress={walletAddress}</td></tr>
+          <tr><td class="ln">43</td><td class="src">        closeModel={closeWalletModal}</td></tr>
+          <tr class="hl"><td class="ln">44</td><td class="src">        domainId={selectedDomain?.id}</td></tr>
+          <tr><td class="ln">45</td><td class="src">      /&gt;</td></tr>
+          <tr><td class="ln">46</td><td class="src">    &lt;/&gt;</td></tr>
+          <tr><td class="ln">47</td><td class="src">  );</td></tr>
+          <tr><td class="ln">48</td><td class="src">};</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="box basics">
+      <span class="box-tag">Basics: the empty <code>&lt;&gt;...&lt;/&gt;</code> tags on lines 22 and 46</span>
+      <p>A component's <code>return</code> can only hand back one single thing, not two separate elements side by side. This file needs to return both a <code>BuyNowModal</code> and a <code>WalletConect</code>, two siblings, so it needs something to hold them together. Wrapping them in a real tag like a <code>&lt;div&gt;</code> would work but would add an actual, real, empty <code>div</code> to the page's HTML for no reason. <code>&lt;&gt;...&lt;/&gt;</code> is a Fragment, a wrapper that satisfies React's "return one thing" rule without adding anything real to the page at all.</p>
+    </div>
+
+    <div class="note">
+      <p><span class="linetag">Lines 4-5</span> <code>dynamic()</code> is a Next.js function, not a React one. Instead of importing <code>BuyNowModal</code> normally at the top of the file, this loads its code lazily, only once it's actually needed, and <code>{ ssr: false }</code> tells Next.js never to try rendering it on the server at all. Both modals depend on browser only things, a connected wallet, <code>window</code>, that don't exist on a server, so this avoids a crash during server rendering and keeps the modal code out of the initial page load for everyone who never opens it.</p>
+    </div>
+
+    <div class="plain"><span class="plain-tag">in plain english</span>Think of it like a streaming video that doesn't download until someone presses play. The code for these two popups sits on the server, unused, until the very moment a domain gets selected, instead of every single visitor downloading popup code they might never open.</div>
+
+    <div class="note">
+      <p><span class="linetag">Lines 11-19</span> One call to <code>useBuyIntent()</code>, and object destructuring pulls out exactly the seven pieces this component actually needs. This is the entire connection between "the decision" and "the rendering," everything below this line is just wiring those seven values into two existing components' props.</p>
+    </div>
+
+    <div class="note">
+      <p><span class="linetag">Line 23</span> <code>{selectedDomain && ( ... )}</code> is how conditional rendering works in JSX without writing a full <code>if</code> statement. If <code>selectedDomain</code> is <code>null</code>, JavaScript's <code>&&</code> short circuits and the whole expression evaluates to <code>null</code>, which React simply renders as nothing. If it's a real object, truthy, the right hand side, the actual <code>&lt;BuyNowModal&gt;</code>, gets rendered. This is also why <code>BuyNowModal</code> only appears here at all, before any domain has ever been selected, there's nothing to show it data for, so it doesn't render.</p>
+    </div>
+
+    <div class="box basics">
+      <span class="box-tag">Basics: why <code>&&</code> works as an on/off switch</span>
+      <p><code>&&</code> normally means "and" in an <code>if</code> condition, but in JavaScript it also has a second behavior: <code>a &amp;&amp; b</code> checks <code>a</code> first, and if <code>a</code> is falsy, it stops right there and the whole expression becomes <code>a</code>, it never even looks at <code>b</code>. Only if <code>a</code> is truthy does it move on and become <code>b</code>. That's called short circuiting, and it's exactly what turns <code>selectedDomain &amp;&amp; (&lt;BuyNowModal .../&gt;)</code> into "show the modal only if a domain has actually been picked."</p>
+    </div>
+
+    <div class="note">
+      <p><span class="linetag">Line 33</span> <code>BuyNowModal</code> expects its <code>keywords</code> prop as one comma separated string, but the shared <code>BuyableDomain</code> type stores keywords as a real array, <code>string[]</code>. <code>.join(", ")</code> is a plain JavaScript array method that turns an array into a string, gluing every item together with <code>", "</code> between them. This is the one spot where the shared shape gets converted into the exact shape one specific old component still expects.</p>
+    </div>
+
+    <div class="box basics">
+      <span class="box-tag">Basics: <code>.join()</code> in one line</span>
+      <p><code>["fast", "cool", "short"].join(", ")</code> produces the single string <code>"fast, cool, short"</code>. It's a method that exists on every array, and it always works the same way, put the separator in the parentheses, get one string back out.</p>
+    </div>
+
+    <div class="note">
+      <p><span class="linetag">Line 44</span> <code>selectedDomain?.id</code> uses optional chaining. Without the <code>?</code>, reading <code>.id</code> off a <code>null</code> value would throw an error and crash the page. With it, if <code>selectedDomain</code> is <code>null</code>, the whole expression just evaluates to <code>undefined</code> instead of crashing. This matters here specifically because <code>WalletConect</code>, unlike <code>BuyNowModal</code> above it, is rendered unconditionally, it has to exist before a domain is ever selected, so this line has to survive <code>selectedDomain</code> being empty.</p>
+    </div>
+
+    <div class="box recipe">
+      <span class="box-tag">The pattern this file follows</span>
+      <p>A "host" component's whole job is to sit exactly once in the tree, read from a Context, and turn that state into real rendered UI. It owns no state of its own, everything it reads comes from the hook. Anywhere five different files each need to conditionally show the same kind of popup, this same shape, one hook for the decision, one host for the rendering, is worth reaching for again.</p>
+    </div>
+  </section>
+
+  <!-- TYPE -->
+  <section id="type">
+    <div class="section-head"><span class="section-num">3</span><h2>The shared type</h2></div>
+    <p class="section-kicker">Not a new file, an addition to an existing one, but worth its own stop because of what it prevents.</p>
+    <span class="file-tag">src/types/BuyModal.ts</span>
+
+    <div class="codewrap">
+      <div class="head">what was added</div>
+      <div class="scroll">
+        <table class="code">
+          <tr><td class="ln">18</td><td class="src">// The one shape every buy surface has to normalize its own domain data into</td></tr>
+          <tr><td class="ln">19</td><td class="src">// before calling buy(domain). The five call sites don't agree today on field</td></tr>
+          <tr><td class="ln">20</td><td class="src">// names (id vs domain_id, currency vs assetContract, keywords joined vs raw),</td></tr>
+          <tr><td class="ln">21</td><td class="src">// this is where that gets settled, once, instead of five different ways.</td></tr>
+          <tr class="hl"><td class="ln">22</td><td class="src">export interface BuyableDomain {</td></tr>
+          <tr><td class="ln">23</td><td class="src">  id: any;</td></tr>
+          <tr><td class="ln">24</td><td class="src">  domainName: string;</td></tr>
+          <tr><td class="ln">25</td><td class="src">  network: string;</td></tr>
+          <tr><td class="ln">26</td><td class="src">  tokenId: string;</td></tr>
+          <tr><td class="ln">27</td><td class="src">  pricePerToken?: number | string;</td></tr>
+          <tr><td class="ln">28</td><td class="src">  description: string;</td></tr>
+          <tr><td class="ln">29</td><td class="src">  keywords: string[];</td></tr>
+          <tr><td class="ln">30</td><td class="src">  endTime?: any;</td></tr>
+          <tr><td class="ln">31</td><td class="src">  usdAmount: any;</td></tr>
+          <tr><td class="ln">32</td><td class="src">}</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="box why">
+      <span class="box-tag">Why this had to exist before the migration could start</span>
+      <p>Before this, five files each had their own idea of what a domain object looks like, one called the id field <code>id</code>, another called it <code>domain_id</code>, one called the network field <code>currency</code>, others called it <code>assetContract</code>. The shared <code>buy(domain)</code> function has no way to know which name each caller happens to use. Rather than have that shared code guess or handle every possible name, this interface names the one shape it will always accept, and every migrated file's job became "translate your local names into this shape right before calling <code>buy</code>," a small, visible, one line-per-field conversion at each call site instead of a hidden guessing game inside shared code.</p>
+    </div>
+
+    <div class="box concept">
+      <span class="box-tag">Concept: the <code>?</code> after a field name</span>
+      <p><code>pricePerToken?: number | string</code> means this field is optional, an object can be a valid <code>BuyableDomain</code> with or without it. Compare that to <code>domainName: string</code> with no <code>?</code>, which is required, TypeScript will refuse to compile a call to <code>buy(...)</code> that's missing it. This is exactly what makes the type useful as a safety net, not just documentation, forgetting a required field becomes a compile error instead of a bug discovered by a user clicking a broken button.</p>
+    </div>
+
+    <div class="box basics">
+      <span class="box-tag">Basics: what <code>any</code> actually means, and why three fields use it</span>
+      <p>Every other type seen so far, <code>string</code>, <code>boolean</code>, <code>string[]</code>, is TypeScript checking that the value really is that shape. <code>any</code> is the opposite, it tells TypeScript "stop checking this field entirely, allow literally anything here." It's not a good default, it's closer to a pressure valve. On lines 23, 30, and 31, <code>id</code>, <code>endTime</code>, and <code>usdAmount</code> are typed <code>any</code> specifically because the five source files disagree on whether these come through as a number, a string, or a differently shaped date, and pinning down the real type for all five at once was out of scope for this phase. It's a known, visible trade off, not an oversight, the sort of thing worth tightening later once every caller's real data shape is confirmed.</p>
+    </div>
+  </section>
+
+  <!-- WIRING -->
+  <section id="wiring">
+    <div class="section-head"><span class="section-num">4</span><h2>Wiring it into the app</h2></div>
+    <p class="section-kicker">A hook and a host are useless until something actually mounts the Provider. This is the one edit to the file every page in the app already passes through.</p>
+    <span class="file-tag">pages/_app.tsx</span>
+
+    <div class="codewrap">
+      <div class="head">before</div>
+      <div class="scroll">
+        <table class="code">
+          <tr><td class="ln"></td><td class="src">&lt;Provider store={store}&gt;</td></tr>
+          <tr><td class="ln"></td><td class="src">  &lt;AutoLogoutHandler /&gt;</td></tr>
+          <tr><td class="ln"></td><td class="src">  &lt;InitProvider /&gt;</td></tr>
+          <tr class="hl"><td class="ln"></td><td class="src">  &lt;AppContent Component={Component} pageProps={pageProps} router={router} /&gt;</td></tr>
+          <tr><td class="ln"></td><td class="src">  &lt;ToastContainer ... /&gt;</td></tr>
+          <tr><td class="ln"></td><td class="src">&lt;/Provider&gt;</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="codewrap">
+      <div class="head">after</div>
+      <div class="scroll">
+        <table class="code">
+          <tr><td class="ln"></td><td class="src">&lt;Provider store={store}&gt;</td></tr>
+          <tr><td class="ln"></td><td class="src">  &lt;AutoLogoutHandler /&gt;</td></tr>
+          <tr><td class="ln"></td><td class="src">  &lt;InitProvider /&gt;</td></tr>
+          <tr class="hl"><td class="ln"></td><td class="src">  &lt;BuyIntentProvider&gt;</td></tr>
+          <tr class="hl"><td class="ln"></td><td class="src">    &lt;AppContent Component={Component} pageProps={pageProps} router={router} /&gt;</td></tr>
+          <tr class="hl"><td class="ln"></td><td class="src">    &lt;BuyIntentModalHost /&gt;</td></tr>
+          <tr class="hl"><td class="ln"></td><td class="src">  &lt;/BuyIntentProvider&gt;</td></tr>
+          <tr><td class="ln"></td><td class="src">  &lt;ToastContainer ... /&gt;</td></tr>
+          <tr><td class="ln"></td><td class="src">&lt;/Provider&gt;</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="box basics">
+      <span class="box-tag">Basics: nesting is like envelopes inside envelopes</span>
+      <p>Picture each pair of tags as a physical envelope, and whatever sits between the opening and closing tag as what's sealed inside it. <code>&lt;BuyIntentProvider&gt;</code> is now one envelope, and inside it are two things sealed together: the envelope containing every real page, <code>&lt;AppContent /&gt;</code>, and the envelope holding the two popups, <code>&lt;BuyIntentModalHost /&gt;</code>. Anything sealed inside an envelope can see what that envelope is carrying, in React's case that means "can call <code>useContext</code> and read the value that envelope is broadcasting." Nothing sealed in a different, unrelated envelope can. This physical picture is the entire reason placement in this tree matters as much as it does.</p>
+    </div>
+
+    <div class="box concept">
+      <span class="box-tag">Concept: JSX nesting is the whole app's wiring diagram</span>
+      <p>Every component wrapped inside another component's tags can read anything that outer component provides through Context, and nothing outside it can. <code>&lt;AppContent&gt;</code>, which renders whichever actual page the user is on, now sits inside <code>&lt;BuyIntentProvider&gt;</code>, that's the only reason any page in the entire app is able to call <code>useBuyIntent()</code> at all. <code>&lt;BuyIntentModalHost /&gt;</code> sits inside it too, as a sibling to <code>AppContent</code>, for the exact same reason, it needs to read the same Context.</p>
+    </div>
+
+    <div class="box why">
+      <span class="box-tag">Why this exact spot in the tree, not higher or lower</span>
+      <p>This had to go inside the Redux <code>&lt;Provider store={store}&gt;</code>, not outside it, because the hook reads <code>evmWalletAddress</code> with <code>useSelector</code>, and <code>useSelector</code> only works inside the Redux Provider. It also had to go somewhere that wraps <code>AppContent</code>, since that's what actually renders every page. Right next to <code>AutoLogoutHandler</code> and <code>InitProvider</code> matched how this app already handles "one thing that needs to exist once, for the whole app," rather than inventing a new convention.</p>
+    </div>
+  </section>
+
+  <!-- MIGRATION WORKED EXAMPLE -->
+  <section id="migration">
+    <div class="section-head"><span class="section-num">5</span><h2>Migrating a file, the full worked example</h2></div>
+    <p class="section-kicker">This is the reference migration, the file the hook's own logic was copied from in the first place, so its "before" and "after" line up almost exactly with what the hook now does internally.</p>
+    <span class="file-tag">src/component/domain-item/page.tsx</span>
+
+    <div class="box basics">
+      <span class="box-tag">Basics: how to read a before and after code block</span>
+      <p>Every codewrap below labeled "before" or "after" shows the exact same spot in the same file, at two different points in time. Nothing in a "before" block still exists once the migration is done, and nothing in an "after" block existed before it. Rows shaded blue are the specific lines a note or box below is talking about, everything else is there purely so the shaded lines have context to sit inside.</p>
+    </div>
+
+    <h4 class="sub">Before, the button and its two modals</h4>
+    <div class="codewrap">
+      <div class="head">what used to be here</div>
+      <div class="scroll">
+        <table class="code">
+          <tr><td class="ln"></td><td class="src">&lt;button
+  onClick={() =&gt; {
+    const token = getCookieValue(Cookie_Key.ACCESS_TOKEN);
+    if (!token) { ToastMessage(...'Please log in...'); return; }
+    if (!evmWalletAddress) { ToastMessage(...'add your Wallet Address...'); ROUTER.push(...); return; }
+    if (!walletProvider || !walletProviderType) { toggleModal(id); }
+    else { handleShow(id); }
+  }}
+  className="open-modal-btn"
+&gt;
+  Buy Now
+&lt;/button&gt;
+&lt;BuyNowModal domainId={id} show={showModal} handleClose={handleClose} domain={domainName} network={currency} ... /&gt;
+&lt;WalletConect isOpen={isModalOpen} toggle={toggleModal} onConfirm={handleShow} walletAddress={evmWalletAddress} closeModel={closeModel} domainId={selectedDomainId} /&gt;</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <h4 class="sub">After</h4>
+    <div class="codewrap">
+      <div class="head">what's here now, lines 104-119</div>
+      <div class="scroll">
+        <table class="code">
+          <tr><td class="ln">104</td><td class="src">              &lt;button</td></tr>
+          <tr class="hl"><td class="ln">105-115</td><td class="src">                onClick={() =&gt; buy({
+                  id,
+                  domainName,
+                  network: currency,
+                  tokenId,
+                  pricePerToken,
+                  description,
+                  keywords,
+                  endTime,
+                  usdAmount,
+                })}</td></tr>
+          <tr><td class="ln">116</td><td class="src">                className="open-modal-btn"</td></tr>
+          <tr><td class="ln">117</td><td class="src">              &gt;</td></tr>
+          <tr><td class="ln">118</td><td class="src">                Buy Now</td></tr>
+          <tr><td class="ln">119</td><td class="src">              &lt;/button&gt;</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="box diff">
+      <span class="box-tag">What changed, and why each piece</span>
+      <p><strong>The four checks became one function call.</strong> All that inline logic, reading the cookie, checking the wallet address, checking the provider, deciding which popup to open, moved into <code>BuyIntentContext.tsx</code>'s <code>buy()</code> function. This button's whole job now is calling it with the right data.</p>
+      <p><strong>The object literal passed to <code>buy()</code> is where this file translates its own field names into the shared shape.</strong> Every field here, <code>id</code>, <code>domainName</code>, <code>tokenId</code>, and so on, already existed as this component's own props, shorthand syntax again, they're just being collected into one object matching <code>BuyableDomain</code>. The one field that isn't a straight passthrough is <code>network: currency</code>, this file's prop is called <code>currency</code>, but the shared shape calls that field <code>network</code>, so this line is doing the renaming right at the boundary.</p>
+      <p><strong>Both modals disappeared entirely</strong> from this file's JSX. They're not gone, they moved to the single host in part 2, mounted once for the whole app instead of once per card.</p>
+    </div>
+
+    <div class="plain"><span class="plain-tag">in plain english</span>Before, every single one of these cards had its own private copy of the receptionist from section 1's story, checking the same three things over and over. After, the card just calls out to the one shared receptionist and hands her the visitor's paperwork, everything about who checks what now lives in exactly one place.</div>
+
+    <h4 class="sub">Above the button: what got deleted from the top of the file</h4>
+    <div class="box diff">
+      <span class="box-tag">Removed, and exactly why each one was safe to remove</span>
+      <p><code>useState</code> calls for <code>showModal</code>, <code>isModalOpen</code>, and <code>selectedDomainId</code>, plus the functions <code>toggleModal</code>, <code>handleShow</code>, <code>handleClose</code>, and <code>closeModel</code>, all deleted. Every one of them existed for exactly one reason, to drive the two modals that used to live in this file. Once the modals moved out, checking each one's only usages confirmed they had nothing left to do, this is why deletions were verified with the type checker and linter after every file, not just assumed safe.</p>
+      <p>Six imports removed too: the two <code>dynamic()</code> calls that loaded the modals, <code>useAppKitProvider</code>, <code>useSelector</code>/<code>RootState</code>, <code>useGetUserProfileQuery</code>, and <code>useRouter</code>. Each one was only ever used by the deleted logic above, once that logic was gone, importing them at all would have been dead weight the linter would have flagged.</p>
+      <p>One new import replaced all of that: <code>import { useBuyIntent } from "@/context/BuyIntentContext"</code>, and one line inside the component, <code>const { buy } = useBuyIntent();</code>, destructuring just the one function this file actually needs out of everything the hook exposes.</p>
+    </div>
+
+    <div class="box basics">
+      <span class="box-tag">Basics: what "the type checker and the linter" actually are</span>
+      <p>Two separate automated tools were run after every single file change in this phase, and neither one is guesswork. The type checker, run with the command <code>tsc --noEmit</code>, reads every <code>.ts</code> and <code>.tsx</code> file in the project and confirms every value matches the shape TypeScript expects it to have, exactly the kind of checking described in idea 0.8, catching things like a deleted variable that's still referenced somewhere. The linter, ESLint, separately checks for things that compile fine but are still worth flagging, an import that's brought in but never used, for instance. Running both after a deletion, rather than trusting memory, is what turns "I think this is safe to delete" into "the tools confirm nothing else in this file still needs it."</p>
+    </div>
+
+    <div class="box recipe">
+      <span class="box-tag">The migration recipe, in general terms</span>
+      <p>Find every piece of state and every function whose only job was feeding the thing you just centralized. Delete the thing you centralized from this file's JSX. Replace its trigger, the button's <code>onClick</code> here, with a call into the new shared hook, translating this file's own field names into the shared shape at that exact call site. Then let the type checker and linter tell you what's now unused, rather than guessing, and remove exactly that, nothing more.</p>
+    </div>
+  </section>
+
+  <!-- OTHER FOUR -->
+  <section id="variants">
+    <div class="section-head"><span class="section-num">6</span><h2>The other four, same recipe, different wrinkles</h2></div>
+    <p class="section-kicker">Once the pattern above is understood, the remaining four migrations are the same shape with small, file specific differences worth knowing rather than re-reading line by line.</p>
+
+    <div class="box diff">
+      <span class="box-tag">slider/slider.tsx</span>
+      <p>Same swap, but <code>network</code> is mapped from this file's own field, <code>assetContract</code>, not <code>currency</code>, a reminder that the translation step at each call site really does depend on that specific file's own naming. Two extra functions, <code>getUsdPrice</code> and <code>getProviderKey</code>, got deleted too, they only ever existed to compute a value for a modal prop that no longer gets passed from this file at all, confirmed dead by checking every usage before removing them, not assumed.</p>
+      <p><em>In short:</em> same recipe, different source field name for <code>network</code>, plus two extra dead helper functions cleared out along the way.</p>
+    </div>
+
+    <div class="box diff">
+      <span class="box-tag">watchlist/page.tsx</span>
+      <p><code>id: item.domain_id</code>, this file's own data uses <code>domain_id</code>, the one call site out of five that does. Worth remembering because it's exactly the kind of naming drift the shared <code>BuyableDomain</code> type exists to absorb, this file's translation line looks different from the others, and that's expected, not a mistake.</p>
+      <p><em>In short:</em> the one file whose local id field is spelled differently, which is exactly the kind of drift the shared type was built to swallow without anyone noticing at the call site.</p>
+    </div>
+
+    <div class="box diff">
+      <span class="box-tag">pages/index.tsx</span>
+      <p>This is the one migration that changed real behavior, not just where the logic lives. Its old inline checks never tested whether a wallet was actually connected, so this file never opened a wallet-connect popup at all. Since the shared <code>buy()</code> function always runs its full check, migrating this file to call it added that missing step automatically, as a side effect of consolidating rather than a change made on purpose to this file specifically.</p>
+      <p><em>In short:</em> a genuine bug fix arrived for free, this page had been skipping the wallet check entirely, and consolidating onto the shared <code>buy()</code> closed that gap without anyone having to notice it first.</p>
+    </div>
+
+    <div class="box diff">
+      <span class="box-tag">pages/seller-portfolio/[slug].tsx</span>
+      <p>This file's old modal-opening function also refetched the user's profile as an extra step, something none of the other four did. Checking <code>wallet-connect/index.tsx</code> directly showed that component already fetches the profile itself internally, so that extra call was redundant, not load bearing, and got dropped rather than carried into the shared hook as a special case just for this one file.</p>
+      <p><em>In short:</em> one redundant network call quietly dropped, confirmed safe only after reading the component it was duplicating, never assumed.</p>
+    </div>
+  </section>
+
+  <!-- RECIPE -->
+  <section id="recipe">
+    <div class="section-head"><span class="section-num">→</span><h2>The general recipe, for next time</h2></div>
+    <p class="section-kicker">Strip away the domain specifics and this is a reusable shape for any situation where the same logic has been copy pasted across several files and needs to become one. None of these eight steps require anything beyond the ideas covered in this document, so this recipe is meant to actually be picked up and reused, not just read once.</p>
+
+    <ol class="recap-list">
+      <li><strong>Find the reference implementation.</strong> Usually one of the duplicated copies already does it best, or most completely, use that one as the source of truth for what the shared version should do, don't design from scratch.</li>
+      <li><strong>Decide where shared state should live</strong> by looking at what this codebase already does for something structurally similar, a login flag, a theme setting, before reaching for Context or Redux or anything else out of habit.</li>
+      <li><strong>Write the interface before the logic.</strong> List exactly what the rest of the app needs to read and call, that list becomes the Context's type, and nothing gets added that isn't actually needed somewhere real.</li>
+      <li><strong>Build the hook and its Provider together</strong>, following whichever existing pattern was chosen in step 2, with the real behavior living inside the Provider, not scattered across callers.</li>
+      <li><strong>Build one host</strong> if what's being consolidated includes something visual, a modal, a popup, a banner, so it renders once instead of once per caller.</li>
+      <li><strong>Define a shared shape for the data</strong> if the callers don't already agree on field names, and translate into it at each call site rather than guessing inside the shared code.</li>
+      <li><strong>Migrate one file at a time.</strong> Swap the trigger, delete what only existed to drive the old version, and let the type checker and linter, not memory, tell you exactly what's safe to remove.</li>
+      <li><strong>Wire the Provider in at the right spot</strong> in the app's root, wrapping whatever needs to read it, and nested inside whatever it itself depends on.</li>
+    </ol>
+
+    <div class="box basics">
+      <span class="box-tag">If this is the first time doing this kind of work</span>
+      <p>Don't try to hold all eight steps in your head before starting. Open the reference file from step 1 first, read it slowly, and just ask one question at a time: what does this piece of state actually control, what would break if it disappeared, what's the smallest new file that could hold it. The hook and the host in this document look tidy now, but they came from repeatedly asking exactly those small questions about five messy files, one at a time, not from seeing the whole shape in advance.</p>
+    </div>
+  </section>
+
+  <div class="footer">
+    <span>Endless Domains · buy gate, line by line · companion to the Phase 1 Paper Trail</span>
+    <span>Every code sample tied to a real file on this page is the actual, current code, verified fresh. The short examples in the Start Here section exist only to teach an idea, they're clearly labeled "illustrative example" and are not part of this codebase.</span>
+  </div>
+
+</main>
+
+<script>
+  (function(){
+    var links = Array.prototype.slice.call(document.querySelectorAll('#pillnav a'));
+    var sections = links.map(function(a){ return document.querySelector(a.getAttribute('href')); }).filter(Boolean);
+    if(!('IntersectionObserver' in window)) return;
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        var idx = sections.indexOf(entry.target);
+        if(idx === -1) return;
+        if(entry.isIntersecting){
+          links.forEach(function(l){ l.classList.remove('active'); });
+          links[idx].classList.add('active');
+        }
+      });
+    }, { rootMargin: '-40% 0px -50% 0px', threshold: 0 });
+    sections.forEach(function(s){ io.observe(s); });
+  })();
+</script>

@@ -1,0 +1,446 @@
+<title>Phase 2 Paper Trail</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root{
+    color-scheme: light;
+    --paper:#F2F4F6;
+    --paper-raised:#FFFFFF;
+    --ink:#1A2233;
+    --ink-soft:#55606E;
+    --ink-faint:#8A93A0;
+    --line:#DCE1E6;
+    --line-strong:#C3CBD3;
+    --accent:#2455A4;
+    --accent-ink:#163B73;
+    --accent-soft:#E4ECF7;
+    --c-red:#B23A2E;      --c-red-bg:#F7E2DE;
+    --c-amber:#9C6B12;    --c-amber-bg:#F5E8CC;
+    --c-plum:#6E4A8C;     --c-plum-bg:#EFE4F3;
+    --c-green:#227A5B;    --c-green-bg:#DFF0E7;
+    --shadow: 0 1px 2px rgba(26,34,51,0.06), 0 6px 20px rgba(26,34,51,0.06);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+    font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{font-family:"Fraunces",Georgia,serif; font-weight:600; color:var(--ink); text-wrap:balance; margin:0;}
+  code, .mono{font-family:"IBM Plex Mono","SFMono-Regular",monospace;}
+  a{color:var(--accent);}
+  p{margin:0;}
+
+  .topnav{
+    position:sticky; top:0; z-index:20;
+    background:color-mix(in srgb, var(--paper) 88%, transparent);
+    backdrop-filter:blur(10px); border-bottom:1px solid var(--line);
+  }
+  .topnav-inner{
+    max-width:960px; margin:0 auto; display:flex; align-items:center; gap:18px;
+    padding:12px 24px; overflow-x:auto;
+  }
+  .topnav-title{
+    font-family:"Fraunces",serif; font-weight:600; font-size:0.95rem;
+    color:var(--ink); white-space:nowrap; flex:none;
+    padding-right:6px; border-right:1px solid var(--line);
+  }
+  .topnav-links{display:flex; gap:4px; flex:none;}
+  .topnav-links a{
+    display:flex; align-items:center; gap:6px; font-size:0.76rem; font-weight:500;
+    color:var(--ink-soft); text-decoration:none; white-space:nowrap;
+    padding:6px 10px; border-radius:100px; transition:background 0.15s, color 0.15s;
+  }
+  .topnav-links a:hover, .topnav-links a.active{background:var(--accent-soft); color:var(--accent-ink);}
+
+  main{max-width:900px; margin:0 auto; padding:0 24px 120px;}
+
+  .hero{padding:52px 0 36px; border-bottom:1px solid var(--line);}
+  .eyebrow{
+    font-family:"IBM Plex Mono",monospace; font-size:0.75rem; letter-spacing:0.08em;
+    text-transform:uppercase; color:var(--accent); font-weight:500;
+    margin-bottom:16px; display:block;
+  }
+  .hero h1{font-size:clamp(2.2rem,5.5vw,3.1rem); line-height:1.06; letter-spacing:-0.01em;}
+  .hero-sub{margin-top:18px; font-size:1.05rem; color:var(--ink-soft); max-width:68ch; line-height:1.65;}
+  .hero-meta{
+    margin-top:22px; display:flex; gap:18px; flex-wrap:wrap;
+    font-family:"IBM Plex Mono",monospace; font-size:0.76rem; color:var(--ink-faint);
+  }
+
+  .glance{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:1px;
+    background:var(--line); border:1px solid var(--line); border-radius:10px;
+    overflow:hidden; margin-top:32px;
+  }
+  .glance-card{background:var(--paper-raised); padding:18px 16px;}
+  .glance-num{font-family:"Fraunces",serif; font-weight:600; font-size:1.7rem; color:var(--accent); line-height:1;}
+  .glance-label{
+    display:block; margin-top:6px; font-family:"IBM Plex Mono",monospace; font-size:0.7rem;
+    color:var(--ink-faint); text-transform:uppercase; letter-spacing:0.04em;
+  }
+  @media (max-width:640px){ .glance{grid-template-columns:1fr 1fr;} }
+
+  .tablewrap{margin-top:22px; overflow-x:auto; border:1px solid var(--line); border-radius:8px;}
+  table{width:100%; border-collapse:collapse; font-size:0.86rem; min-width:560px;}
+  thead th{
+    text-align:left; font-family:"IBM Plex Mono",monospace; font-size:0.68rem;
+    text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-faint); font-weight:500;
+    background:var(--paper); padding:10px 14px; border-bottom:1px solid var(--line);
+  }
+  tbody td{padding:11px 14px; border-bottom:1px solid var(--line); color:var(--ink-soft); vertical-align:top;}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody td.file{font-family:"IBM Plex Mono",monospace; font-size:0.78rem; color:var(--ink);}
+  .tag-new{color:var(--c-green); font-weight:600; font-family:"IBM Plex Mono",monospace; font-size:0.72rem; text-transform:uppercase;}
+  .tag-mod{color:var(--accent); font-weight:600; font-family:"IBM Plex Mono",monospace; font-size:0.72rem; text-transform:uppercase;}
+
+  section{padding:52px 0; border-bottom:1px solid var(--line);}
+  section:last-of-type{border-bottom:none;}
+  .section-head{display:flex; align-items:baseline; gap:14px; margin-bottom:8px;}
+  .section-num{font-family:"IBM Plex Mono",monospace; font-size:0.9rem; font-weight:500; color:var(--accent); flex:none;}
+  .section-head h2{font-size:1.55rem;}
+  .section-kicker{color:var(--ink-soft); font-size:0.98rem; margin-top:14px; max-width:70ch; line-height:1.65;}
+  .section-kicker + .section-kicker{margin-top:10px;}
+  .file-tag{
+    display:inline-flex; align-items:center; gap:8px; font-family:"IBM Plex Mono",monospace;
+    font-size:0.8rem; color:var(--accent-ink); background:var(--accent-soft);
+    padding:5px 12px; border-radius:6px; margin-top:16px;
+  }
+  h3.sub{margin-top:36px; font-size:1.15rem; font-family:"IBM Plex Sans"; font-weight:600;}
+
+  .box{
+    margin-top:18px; padding:18px 20px; background:var(--paper-raised);
+    border:1px solid var(--line); border-left:3px solid var(--box-c, var(--ink-faint));
+    border-radius:8px; box-shadow:var(--shadow);
+  }
+  .box-tag{
+    display:inline-block; font-family:"IBM Plex Mono",monospace; font-size:0.66rem;
+    font-weight:600; letter-spacing:0.05em; text-transform:uppercase; padding:3px 9px;
+    border-radius:5px; background:var(--box-bg); color:var(--box-c); margin-bottom:10px;
+  }
+  .box h4{font-family:"IBM Plex Sans",sans-serif; font-weight:600; font-size:0.98rem; color:var(--ink); margin-bottom:8px;}
+  .box p{color:var(--ink-soft); font-size:0.93rem; line-height:1.65;}
+  .box p + p{margin-top:9px;}
+  .box .ref{
+    margin-top:12px; font-family:"IBM Plex Mono",monospace; font-size:0.74rem;
+    color:var(--ink-faint); padding-top:11px; border-top:1px dashed var(--line);
+  }
+  .box.decision{--box-c:var(--accent-ink); --box-bg:var(--accent-soft);}
+  .box.correction{--box-c:var(--c-amber); --box-bg:var(--c-amber-bg);}
+  .box.checked{--box-c:var(--c-plum); --box-bg:var(--c-plum-bg);}
+  .box.verify{--box-c:var(--c-green); --box-bg:var(--c-green-bg);}
+  .box.blocked{--box-c:var(--c-red); --box-bg:var(--c-red-bg);}
+
+  .filecard{
+    margin-top:20px; padding:20px 22px; background:var(--paper-raised);
+    border:1px solid var(--line); border-radius:10px; box-shadow:var(--shadow);
+  }
+  .filecard-head{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px;}
+  .filecard-head .file{
+    font-family:"IBM Plex Mono",monospace; font-size:0.92rem; color:var(--ink); font-weight:500;
+  }
+  .filecard ul{margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:9px;}
+  .filecard li{
+    position:relative; padding-left:22px; font-size:0.92rem; color:var(--ink-soft); line-height:1.55;
+  }
+  .filecard li::before{content:"→"; color:var(--accent); font-weight:600; position:absolute; left:0; top:0;}
+  .filecard li strong{color:var(--ink); font-weight:600;}
+  .filecard li.removed::before{content:"✕"; color:var(--c-plum);}
+  .verifystrip{
+    margin-top:14px; padding-top:12px; border-top:1px dashed var(--line);
+    display:flex; align-items:center; gap:8px; font-family:"IBM Plex Mono",monospace;
+    font-size:0.78rem; color:var(--c-green); font-weight:500;
+  }
+
+  .checklist{margin:16px 0 0; padding:0; list-style:none; display:flex; flex-direction:column; gap:0;}
+  .checklist li{
+    display:flex; gap:12px; align-items:flex-start; padding:13px 0;
+    border-bottom:1px solid var(--line); font-size:0.92rem; color:var(--ink-soft); line-height:1.55;
+  }
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .mark{
+    flex:none; margin-top:2px; width:20px; height:20px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-family:"IBM Plex Mono",monospace; font-size:0.68rem; font-weight:600;
+  }
+  .checklist li.pending .mark{background:var(--c-amber-bg); color:var(--c-amber);}
+  .checklist li.pending .mark::before{content:"○";}
+  .checklist li.blocked .mark{background:var(--c-red-bg); color:var(--c-red);}
+  .checklist li.blocked .mark::before{content:"✕";}
+  .checklist strong{color:var(--ink);}
+  .checklist .expect{
+    display:block; margin-top:5px; font-family:"IBM Plex Mono",monospace; font-size:0.78rem; color:var(--ink-faint);
+  }
+
+  .footer{
+    margin-top:36px; padding-top:22px; border-top:1px solid var(--line);
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;
+    font-family:"IBM Plex Mono",monospace; font-size:0.74rem; color:var(--ink-faint);
+  }
+  .footer span{max-width:48%;}
+  @media (max-width:600px){ .footer span{max-width:100%;} }
+  ::selection{background:var(--accent-soft); color:var(--accent-ink);}
+</style>
+
+<nav class="topnav">
+  <div class="topnav-inner">
+    <span class="topnav-title">Phase 2 Paper Trail</span>
+    <div class="topnav-links" id="pillnav">
+      <a href="#overview">Overview</a>
+      <a href="#step0">0 Verify</a>
+      <a href="#step1">1 Buy</a>
+      <a href="#step2">2 Listing</a>
+      <a href="#step3">3 Delist</a>
+      <a href="#step4">4 Verify</a>
+      <a href="#testing">Testing</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+
+  <div class="hero" id="overview">
+    <span class="eyebrow">Phase 2 · rewrite both transaction handlers · executed, not just planned</span>
+    <h1>Every change, and why it happened</h1>
+    <p class="hero-sub">This is the record of actually doing phase 2 of the build order, step by step, in the same order it was worked through. Not a redo of the plan, a log of what was decided, what got double checked before being trusted, and exactly which file each thing happened in. This phase touches real transaction signing, so it also says plainly what has and hasn't actually been run in a browser yet, rather than implying more testing happened than really did.</p>
+    <div class="hero-meta">
+      <span>Companion to: docs/phase-2-rewrite-transaction-handlers-plan.md</span>
+      <span>Companion to: the Settlement Gap review, sections 08 and L</span>
+      <span>Companion to: the Phase 1 Paper Trail</span>
+    </div>
+
+    <div class="glance">
+      <div class="glance-card"><span class="glance-num">0</span><span class="glance-label">New files</span></div>
+      <div class="glance-card"><span class="glance-num">4</span><span class="glance-label">Files edited</span></div>
+      <div class="glance-card"><span class="glance-num">3</span><span class="glance-label">Gaps fixed beyond the literal prompt</span></div>
+      <div class="glance-card"><span class="glance-num">2</span><span class="glance-label">Open questions flagged, not guessed at</span></div>
+    </div>
+
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>File</th><th>Status</th><th>One line reason</th></tr></thead>
+        <tbody>
+          <tr><td class="file">src/component/modals/BuyNowModal.tsx</td><td><span class="tag-mod">Edited</span></td><td>domainBuyHandler rewritten to the corrected order, plus the Buy button wiring.</td></tr>
+          <tr><td class="file">src/component/modals/DomainListingModal.tsx</td><td><span class="tag-mod">Edited</span></td><td>approval(), the network switch, and the create listing block all rewritten.</td></tr>
+          <tr><td class="file">src/component/modals/SubmitButton.tsx</td><td><span class="tag-mod">Edited</span></td><td>Added an isSubmitting prop so the button can actually disable for a whole submission.</td></tr>
+          <tr><td class="file">src/component/domain-self-item/index.tsx</td><td><span class="tag-mod">Edited</span></td><td>delistHandler's backend call reordered to after chain confirmation, its receipt check untouched.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- STEP 0 -->
+  <section id="step0">
+    <div class="section-head"><span class="section-num">0</span><h2>Re-verify before touching anything</h2></div>
+    <p class="section-kicker">The plan document had already been checked once against the live code when it was written. Before any edit in this phase, all three target files were read again in full and compared line by line against that document's own description, since code moves and the plan itself says not to trust it blindly.</p>
+
+    <div class="box verify">
+      <span class="box-tag">Confirmed as written, line for line</span>
+      <p>All three files matched the plan's description exactly, down to the same line numbers, in <strong>BuyNowModal.tsx</strong>, <strong>DomainListingModal.tsx</strong>, and <strong>domain-self-item/index.tsx</strong>. Nothing had drifted since the plan was written, so it was safe to proceed straight into step 1 without correcting anything in the plan itself.</p>
+    </div>
+
+    <div class="box correction">
+      <span class="box-tag">Nuance worth stating plainly</span>
+      <h4>BuyNowModal.tsx already had a way to switch networks, just not an automatic one</h4>
+      <p>The plan's wording, "wrong network just bails, no switch attempted at all," is accurate about what happens inside <code>domainBuyHandler</code> itself, but read on its own it could sound like there was no way to switch networks anywhere in this file. There was: the Buy button already swapped to a "Switch Network" label and called a separate <code>handleSwitchNetwork</code> function when <code>isWrongNetwork</code> was true, it just took two clicks, one to switch and a second one to actually buy. This is also the exact mechanism behind an earlier question in this project, why "Switch Network" wasn't appearing on one branch during manual testing, the two click path was there the whole time, just easy to miss without reading the button's own logic.</p>
+    </div>
+  </section>
+
+  <!-- STEP 1 -->
+  <section id="step1">
+    <div class="section-head"><span class="section-num">1</span><h2>Rewrite BuyNowModal.tsx</h2></div>
+    <p class="section-kicker">domainBuyHandler rewritten end to end to the corrected order: guard against a second submission, switch networks inline and continue automatically, check the balance against the exact amount actually sent with gas included, send the transaction, confirm the receipt before telling anyone it worked, then and only then tell the backend and show success.</p>
+
+    <div class="box decision">
+      <span class="box-tag">Decision</span>
+      <h4>The Buy button now always calls the same function</h4>
+      <p>Making the network switch genuinely automatic meant more than rewriting the function's insides, the button itself used to call one of two different functions depending on <code>isWrongNetwork</code>. It now always calls <code>domainBuyHandler</code>, which handles switching and buying in the same click. The old separate <code>handleSwitchNetwork</code> function was deleted once nothing referenced it anymore, confirmed by the linter finding zero remaining usages.</p>
+    </div>
+
+    <div class="box checked">
+      <span class="box-tag">Checked before building</span>
+      <p>Searched the codebase for an existing block explorer link helper and any existing gas estimation call before writing either, found neither. Both are genuinely new code in this file, not patterns borrowed from elsewhere in this app, which is exactly why they're the two pieces of this rewrite worth the closest look during actual testing, see the note at the end of the testing section below.</p>
+      <p>Also checked how the shared <code>ToastMessage</code> component renders its message prop, in <code>src/component/toast-message/info-primary.tsx</code> and its siblings. It renders as plain text inside a paragraph tag, no HTML or link support. The block explorer link the plan asked for is shown as plain, copyable text rather than a real hyperlink, changing that would mean editing a component shared across the whole app, out of scope for this file.</p>
+    </div>
+
+    <div class="box decision">
+      <span class="box-tag">Decision</span>
+      <h4>Errors no longer close the modal automatically</h4>
+      <p>The original code called <code>handleClose()</code> in its one catch block for every failure, including a cancelled wallet prompt. That meant the popup vanished the instant anything went wrong, taking the error message's context with it. The rewrite only closes the modal on a genuine success, every failure path now leaves it open so the message is actually visible and the user can retry without reopening it.</p>
+    </div>
+
+    <div class="box decision">
+      <span class="box-tag">Deliberately left open</span>
+      <h4>The 2% buffer question from the original review</h4>
+      <p>Whether the 2% native token buffer added on top of the required amount is refunded on chain if unused, or simply kept, was flagged as an open question in the original review. The calculation itself was left exactly as it was, with a comment marking it unresolved, rather than guessing at an answer that would change how much a buyer actually pays.</p>
+    </div>
+
+    <div class="verifystrip">✓ Typecheck clean across the whole project, zero new lint errors, only pre-existing "any" style warnings already present before this change.</div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section id="step2">
+    <div class="section-head"><span class="section-num">2</span><h2>Rewrite DomainListingModal.tsx</h2></div>
+    <p class="section-kicker">Three fixes in one file: approval() now throws instead of swallowing a cancelled prompt, a successful network switch now continues straight into the submission instead of stopping, and the create listing block now checks the receipt, reads the listing id from the transaction's own event log, and checks the backend save for every listing.</p>
+
+    <div class="box decision">
+      <span class="box-tag">Decision, beyond the literal wording</span>
+      <h4>approval()'s own toast messages were removed, not just its return value</h4>
+      <p>The plan asked for the cancelled prompt to throw instead of returning false, so the caller's already correct, already distinct messages become reachable. Making that change on its own would have caused two stacked toasts for the same event, since <code>approval()</code> was also independently showing its own message before throwing. The internal toasts inside <code>approval()</code>'s catch block were removed so the caller's existing messages, which already say the right thing for a cancelled prompt versus a genuine failure, are the only thing the user actually sees.</p>
+    </div>
+
+    <div class="box checked">
+      <span class="box-tag">Checked before trusting it</span>
+      <h4>Confirmed the ListingAdded event exists, with a listingId field, on every network's ABI</h4>
+      <p>Reading the listing id from the transaction receipt's own event log instead of a second contract call meant first confirming that event actually exists and is shaped the way it needed to be. Checked directly inside <code>BnbAbi.json</code>, <code>EthSepoliaAbi.json</code>, and <code>PolyAbi.json</code>, the three ABI files this file's <code>envConfig</code> actually loads, all three define a <code>ListingAdded</code> event with a <code>listingId</code> field as its first indexed argument. Confirmed before writing the decoder, not assumed.</p>
+    </div>
+
+    <div class="box decision">
+      <span class="box-tag">Decision</span>
+      <h4>A missing listing id, and a failed backend save, are queued locally instead of lost</h4>
+      <p>Both cases mean the chain has already confirmed the listing but the app can't yet, or didn't, get it saved. Rather than close the modal as if nothing happened, either case now writes the listing's data plus its transaction hash to a small local queue and shows an honest "still syncing" message. Being upfront about the limit here: this only builds the side that captures the data so it isn't silently lost, nothing today reads that queue back and retries it automatically. Building that consumer, or a "pending listings" screen, is a real product decision, not something to invent by guessing, and is left explicitly open the same way the 2% buffer question was in step 1.</p>
+    </div>
+
+    <div class="box decision">
+      <span class="box-tag">Gap fixed beyond the literal prompt</span>
+      <h4>isSubmitting could get stuck true forever, or never get set at all</h4>
+      <p>Two separate problems surfaced while touching this code, both sitting squarely inside the plan's own "disabled for the whole duration of a submission" goal. First, <code>isSubmitting</code> was only ever set to true inside <code>approval()</code>, which is skipped entirely when the NFT is already approved, so a re-listing would never have actually disabled the button. Second, neither of this function's two outer catch blocks ever reset <code>isSubmitting</code> back to false, so a real failure would leave the button permanently stuck disabled. Both fixed: submitting state is now set before the create listing step regardless of whether approval ran, and both catches reset it. <code>SubmitButton.tsx</code> gained a new <code>isSubmitting</code> prop to actually make use of this.</p>
+    </div>
+
+    <div class="verifystrip">✓ Typecheck clean across the whole project, zero new lint errors, in either this file or SubmitButton.tsx.</div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section id="step3">
+    <div class="section-head"><span class="section-num">3</span><h2>Fix the delist file's ordering, not its correctness check</h2></div>
+    <p class="section-kicker">domain-self-item/index.tsx's delistHandler already checked receipt.status === 1 correctly, it was the reference pattern the other two files copied from in steps 1 and 2. The only bug here was that the backend was told before the chain had confirmed anything. That receipt check was left completely untouched, only the ordering moved.</p>
+
+    <div class="box decision">
+      <span class="box-tag">Decision, made necessary by the reorder itself</span>
+      <h4>The backend failure message could no longer honestly say "Transaction failed"</h4>
+      <p>Once the backend call moved to after chain confirmation, its own failure message needed to change too, the on-chain transaction had already succeeded by that point, only the backend record failed to update. Leaving the old wording in place would have made the message actively misleading, a regression introduced purely by moving the code rather than a pre-existing issue. It now reads "Delisted on chain, but failed to update our records" for that specific case.</p>
+    </div>
+
+    <div class="box checked">
+      <span class="box-tag">Deliberately not built</span>
+      <p>No retry queue was added here the way one was for a failed listing save in step 2. Step 3's own prompt scoped this file to the ordering fix only, and its own title says as much, "fix the ordering, not the correctness check." Adding a retry mechanism here would have gone beyond what was actually asked.</p>
+    </div>
+
+    <div class="verifystrip">✓ Typecheck clean across the whole project, zero new lint errors.</div>
+  </section>
+
+  <!-- STEP 4 -->
+  <section id="step4">
+    <div class="section-head"><span class="section-num">4</span><h2>Verify</h2></div>
+    <p class="section-kicker">The plan's own step 4 asks for the type checker and linter to run across all three edited files and for anything they surface to get fixed. That happened continuously through steps 1 to 3 instead of as one pass at the end, every file was checked the moment it was changed, the same discipline phase 1 used.</p>
+
+    <div class="box verify">
+      <span class="box-tag">Result</span>
+      <p>The full project typecheck stayed at zero errors through every single edit in this phase. Lint came back with zero new errors and zero new warnings anywhere, the only warnings present are the same pre-existing "any" and image element warnings that were already in these files before phase 2 started. None of the five files phase 1 migrated were touched, confirmed by the diff for this phase covering exactly the four files listed at the top of this document and nothing else.</p>
+    </div>
+  </section>
+
+  <!-- TESTING -->
+  <section id="testing">
+    <div class="section-head"><span class="section-num">→</span><h2>Testing this phase</h2></div>
+    <p class="section-kicker">Everything above is static verification: the type checker confirming the code's shapes are consistent, the linter confirming nothing is obviously dangling. Neither one proves a real wallet, a real network switch, or a real transaction actually behaves the way this rewrite intends. As of this document, that live testing has not yet been run in this session, this section lays out exactly what to run and, for the part that can't be run yet, exactly why not, rather than leaving that unclear.</p>
+
+    <h3 class="sub">Can be tested right now, no valid on chain listing required</h3>
+    <p class="section-kicker" style="margin-top:6px;">Every one of these fails, or should fail, before a transaction is ever sent, which is exactly why none of them depend on a real listing existing on chain. Each line below is what the actual rewritten code should now do, not the plan's abstract description of it.</p>
+
+    <ul class="checklist">
+      <li class="pending">
+        <span class="mark"></span>
+        <span><strong>Reject the wallet prompt on Buy.</strong> Should show "You cancelled the transaction." and leave the modal open, not the old flat "Something went wrong."
+          <span class="expect">expects: err.code === 4001 branch in BuyNowModal.tsx's catch</span>
+        </span>
+      </li>
+      <li class="pending">
+        <span class="mark"></span>
+        <span><strong>Reject the wallet prompt during listing approval.</strong> Should show "NFT approval rejected by user." and not proceed into creating the listing.
+          <span class="expect">expects: approval() now throws on 4001, caught at the call site around line 583</span>
+        </span>
+      </li>
+      <li class="pending">
+        <span class="mark"></span>
+        <span><strong>Start a Buy while on the wrong network.</strong> Should prompt a network switch and, once approved in the wallet, continue straight into the purchase in the same click.
+          <span class="expect">expects: no second click, no separate "Switch Network" action needed</span>
+        </span>
+      </li>
+      <li class="pending">
+        <span class="mark"></span>
+        <span><strong>Submit a listing while on the wrong network.</strong> Same expectation, a successful switch should fall through into approval and listing creation, not stop and require clicking Submit a second time.</span>
+      </li>
+      <li class="pending">
+        <span class="mark"></span>
+        <span><strong>Double click Buy Domain.</strong> The second click should do nothing, the button should read "Processing..." and be genuinely disabled, not just visually covered by the loader.</span>
+      </li>
+      <li class="pending">
+        <span class="mark"></span>
+        <span><strong>Double click Publish Listing.</strong> Same expectation, including for a re-listing where the NFT is already approved, the button should still disable immediately, this was the specific gap fixed in step 2.</span>
+      </li>
+      <li class="pending">
+        <span class="mark"></span>
+        <span><strong>Force insufficient funds in the connected wallet before buying.</strong> Should be caught by the balance check before anything is sent, and the amount it checks against should now match safeEthAmount plus estimated gas, not the old unrelated priceInWei figure.</span>
+      </li>
+    </ul>
+
+    <h3 class="sub">Needs a domain genuinely listed on the connected chain right now, blocked</h3>
+    <p class="section-kicker" style="margin-top:6px;">These four all depend on a transaction actually being accepted by the contract before succeeding or failing further downstream, which means they can't be exercised at all without a listing that's real on both sides, in the backend's database and on the actual deployed contract for that chain.</p>
+
+    <div class="box blocked">
+      <span class="box-tag">Exact reason this is blocked in this environment</span>
+      <p>Phase 1's own testing already hit this, documented in the Phase 1 Paper Trail: clicking Buy on a real domain card threw <code>call revert exception ... method="getRequiredNativeAmount(uint256)"</code>, a genuine on chain revert, not a frontend bug. The most likely cause identified at the time was that this domain's listing exists in the backend's database but not, or not correctly, on the actual smart contract for the connected chain, a data mismatch common on staging environments where backend and on chain state get seeded separately. That condition was never confirmed fixed. Every one of the four checks below needs a transaction to actually be accepted by the contract before it can even begin, so all four are blocked by this exact same unresolved condition, not by anything new in phase 2's own code.</p>
+      <p>One concrete difference worth expecting once this is resolved: if the same underlying revert happens again, step 1's error classification means it would now show "The transaction reverted on chain..." instead of the old flat "Something went wrong.", a clearer message, not a working purchase. The rewrite makes the failure honest, it doesn't make a listing that doesn't really exist on chain purchasable.</p>
+    </div>
+
+    <ul class="checklist">
+      <li class="blocked">
+        <span class="mark"></span>
+        <span><strong>A full successful purchase.</strong> Would confirm the success message only appears after receipt.status === 1, and that the backend is only told once that check passes.</span>
+      </li>
+      <li class="blocked">
+        <span class="mark"></span>
+        <span><strong>Forcing a backend save failure right after a successful purchase</strong> (for example, by disconnecting briefly right after the transaction confirms). Would confirm the failure no longer gets caught and silently ignored.</span>
+      </li>
+      <li class="blocked">
+        <span class="mark"></span>
+        <span><strong>A full successful listing.</strong> Would confirm the receipt check, and confirm the listing id actually gets read correctly from the ListingAdded event log rather than falling back to the second contract call.</span>
+      </li>
+      <li class="blocked">
+        <span class="mark"></span>
+        <span><strong>Delisting an existing listing.</strong> Would confirm the backend is now told only after the chain confirms the cancellation, not before.</span>
+      </li>
+    </ul>
+
+    <h3 class="sub">What to look at hardest, once testing is possible</h3>
+    <div class="box checked">
+      <span class="box-tag">Least proven pieces of this rewrite</span>
+      <p>Two specific additions in step 1 have no prior working example anywhere else in this codebase to have leaned on while writing them, confirmed by search before building either. The gas estimate added to the balance check, using <code>contract.estimateGas.buy(...)</code> and <code>provider.getGasPrice()</code>, and the block explorer link built from a small chain id lookup table. Both typecheck cleanly and follow standard ethers v5 usage, but neither has been exercised against a real wallet and a real network yet, and they're the two pieces of this phase worth the closest attention the first time a real transaction actually runs.</p>
+    </div>
+  </section>
+
+  <div class="footer">
+    <span>Endless Domains · phase 2 implementation record, rewrite both transaction handlers</span>
+    <span>Static verification passed throughout · live testing not yet run, four checks blocked on the same on-chain data mismatch phase 1 found</span>
+  </div>
+
+</main>
+
+<script>
+  (function(){
+    var links = Array.prototype.slice.call(document.querySelectorAll('#pillnav a'));
+    var sections = links.map(function(a){ return document.querySelector(a.getAttribute('href')); }).filter(Boolean);
+    if(!('IntersectionObserver' in window)) return;
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        var idx = sections.indexOf(entry.target);
+        if(idx === -1) return;
+        if(entry.isIntersecting){
+          links.forEach(function(l){ l.classList.remove('active'); });
+          links[idx].classList.add('active');
+        }
+      });
+    }, { rootMargin: '-40% 0px -50% 0px', threshold: 0 });
+    sections.forEach(function(s){ io.observe(s); });
+  })();
+</script>
