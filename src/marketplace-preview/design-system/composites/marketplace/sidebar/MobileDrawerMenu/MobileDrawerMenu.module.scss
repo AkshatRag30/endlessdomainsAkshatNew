@@ -1,0 +1,318 @@
+@import '@mpstyles/_mixins.scss';
+
+// Figma node 34:2884 — mobile/tablet drawer content. The .sidebar wrapper
+// in MarketplacePageShell already supplies the drawer's fixed positioning,
+// width, and 16px padding — this only styles what's inside it. Hidden at
+// desktop, where MarketplaceSidebar (CSS-hidden below desktop, see its own
+// module) still renders instead.
+
+.drawer {
+  display: none;
+
+  @include tablet-down {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+}
+
+// ── Header: logo + close ────────────────────────────────────────────────
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  display: block;
+  line-height: 0;
+
+  img {
+    height: 28px;
+    width: auto;
+  }
+}
+
+.close {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--color-gray-light);
+  cursor: pointer;
+}
+
+.closeBar {
+  position: absolute;
+  width: 14px;
+  height: 1.5px;
+  background: var(--color-black-primary);
+
+  &:first-child {
+    transform: rotate(45deg);
+  }
+
+  &:last-child {
+    transform: rotate(-45deg);
+  }
+}
+
+// ── Search ───────────────────────────────────────────────────────────────
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 40px;
+  padding: 0 var(--space-3);
+  background: var(--color-white-primary);
+  border: 0.5px solid var(--color-border-black-subtle);
+  border-radius: var(--radius-sm);
+}
+
+.searchIcon {
+  display: block;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+.searchInput {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  color: var(--color-black-alpha-55);
+  background: none;
+  border: none;
+  outline: none;
+
+  &::placeholder {
+    color: var(--color-black-alpha-55);
+  }
+}
+
+.kbdGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex-shrink: 0;
+}
+
+.kbd {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 var(--space-1);
+  background: var(--color-black-light);
+  border: 1px solid var(--color-white-primary);
+  border-radius: 4px;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-darkest);
+}
+
+// ── Sections (Navigation / Browse) ──────────────────────────────────────
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.sectionTitle {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-nav);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #4a4a4a; // design-specific: Figma-exact
+}
+
+.divider {
+  height: 1px;
+  background: var(--color-border-black-subtle);
+}
+
+// ── Navigation (mirrors Header's own nav exactly) ───────────────────────
+
+.navList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.navLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: fit-content;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-regular);
+  font-size: 17px;
+  letter-spacing: -0.02em;
+  color: #666; // design-specific: Figma-exact
+  text-decoration: none;
+}
+
+.navLinkActive {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+}
+
+.navArrow {
+  display: block;
+  width: 7px;
+  height: 7px;
+}
+
+// ── Browse ───────────────────────────────────────────────────────────────
+
+.browseList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.browseRow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2-5);
+  height: 39px;
+  padding: 0 var(--space-2);
+  margin: 0 calc(var(--space-2) * -1);
+  border-radius: 6px;
+  overflow: hidden;
+  text-decoration: none;
+}
+
+// Figma node 34:2994's boxed background + flourish was originally Explore's
+// own fixed look. It's really a "this is the selected row" treatment, so it
+// now applies to whichever row previewSelectedBrowseId points at (see the
+// .tsx) rather than being stuck to Explore regardless of what's selected.
+.browseRowSelected {
+  background: #f4f4f6; // design-specific: Figma-exact
+
+  .browseLabel {
+    color: var(--color-black-primary);
+    font-weight: var(--font-weight-medium);
+  }
+}
+
+.browseIcon {
+  display: block;
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.browseLabel {
+  flex: 1;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-regular);
+  font-size: 17px;
+  letter-spacing: -0.02em;
+  color: #666; // design-specific: Figma-exact
+  position: relative;
+  z-index: 1;
+}
+
+// Decorative flourish from the Figma export — purely ornamental, sits
+// behind the icon/label (z-index above), faded so it doesn't compete with
+// them for attention. Only rendered on the selected row (see the .tsx).
+.exploreDeco1,
+.exploreDeco2 {
+  position: absolute;
+  right: var(--space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  height: 10px;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.exploreDeco1 {
+  width: 80px;
+}
+
+.exploreDeco2 {
+  width: 140px;
+  right: 60px;
+}
+
+// Figma node 34:3002 — the main gradient "swoosh" the two thin lines above
+// sit on top of, Figma-exact 103:17.912 aspect ratio.
+.exploreDeco3 {
+  position: absolute;
+  right: var(--space-2);
+  top: 50%;
+  transform: translateY(-50%);
+  width: 103px;
+  height: 18px;
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.browseCount {
+  position: relative;
+  z-index: 1; // stays above the selected row's deco flourish, same reason as .browseIcon/.browseLabel
+  font-family: var(--font-space-grotesk); // closest already-loaded face to Figma's JetBrains Mono
+  font-size: var(--text-small-12);
+  color: #a6a1bb; // design-specific: Figma-exact
+}
+
+.browseBadge {
+  position: relative;
+  z-index: 1; // same reason as .browseCount
+  padding: 1px var(--space-1-5);
+  border-radius: var(--radius-full);
+  background: var(--color-gray-light);
+  color: var(--color-gray-dark);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-10);
+  font-weight: var(--font-weight-medium);
+  text-transform: uppercase;
+}
+
+// ── Footer / auth action ────────────────────────────────────────────────
+
+.footer {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--space-2);
+}
+
+.authLinks {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.authButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2) var(--space-6);
+  background: var(--color-white-primary);
+  border: 1px solid var(--color-border-black-subtle);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  font-family: var(--font-space-grotesk); // closest already-loaded face to Figma's Geist Mono
+  font-size: var(--text-body-small);
+  color: var(--color-blue-primary);
+  text-decoration: none;
+}

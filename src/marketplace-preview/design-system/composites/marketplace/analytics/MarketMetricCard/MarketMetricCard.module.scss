@@ -1,0 +1,64 @@
+// Figma node 1:1645 — one metric card.
+
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-2-5);
+  background: var(--color-white-primary);
+  border: 1px solid var(--color-blue-primary-alpha-07); // closest existing token to Figma's rgba(38,57,237,0.08)
+  border-radius: 8px;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.label {
+  font-family: var(--font-satoshi);
+  font-size: 10px;
+  color: #9291a5; // design-specific: Figma-exact
+}
+
+.valueRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.value {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: 1.2rem;
+  letter-spacing: -0.02em;
+  color: #191627; // design-specific: Figma-exact
+  white-space: nowrap;
+}
+
+.secondary {
+  font-family: var(--font-satoshi);
+  font-size: 9px;
+  color: #aba7bc; // design-specific: Figma-exact
+}
+
+.chart {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+  width: 108px;
+  flex-shrink: 0;
+}
+
+.chartLabels {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-space-grotesk); // closest already-loaded face to Figma's Consolas
+  font-size: 9px;
+  color: #aba7bc; // design-specific: Figma-exact
+}

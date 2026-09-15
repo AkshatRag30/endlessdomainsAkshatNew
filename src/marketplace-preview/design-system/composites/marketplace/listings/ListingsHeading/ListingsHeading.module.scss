@@ -1,0 +1,20 @@
+@import '@mpstyles/_mixins.scss';
+
+.row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.title {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: 17px;
+  color: var(--color-black-primary);
+}
+
+.count {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  color: var(--color-black-alpha-55);
+}

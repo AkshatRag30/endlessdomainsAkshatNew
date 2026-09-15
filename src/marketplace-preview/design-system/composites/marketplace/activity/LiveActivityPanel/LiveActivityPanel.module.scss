@@ -1,0 +1,167 @@
+@import '@mpstyles/_mixins.scss';
+
+// Figma node 1:1543. The background noise texture from that node's own PNG
+// export is skipped, but the main site's real stripe-bg mixin (a repeating
+// 135deg diagonal hairline gradient, used the same way across its cards,
+// tab bars, and hero surfaces) replaces the earlier plain fill.
+
+.panel {
+  position: relative;
+  padding: var(--space-2);
+  background: rgba(249, 249, 249, 0.2);
+  @include stripe-bg;
+  overflow: hidden; // keeps the stripe pattern inside the rounded corners, same pairing the main site always uses
+  border: 1px solid var(--color-blue-primary-alpha-07); // closest existing token to Figma's rgba(38,57,237,0.08)
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+
+  // Figma's revised mobile mockup (node 34:1041) drops this panel entirely
+  // in favor of the new LiveActivityTicker under the header — tablet and
+  // desktop are unaffected, this panel still renders there.
+  @include mobile {
+    display: none;
+  }
+}
+
+.tabs {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  align-self: flex-start;
+  padding: 3px;
+  background: var(--color-white-primary);
+  border: 1px solid var(--color-border-black-subtle);
+  border-radius: 6px;
+  box-shadow: 0 1.3px 4.6px rgba(0, 0, 0, 0.05);
+}
+
+.tab {
+  padding: var(--space-1) var(--space-2);
+  border: none;
+  background: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  color: var(--color-black-alpha-55);
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.tabActive {
+  background: linear-gradient(180deg, var(--color-blue-primary), var(--color-blue-primary-alpha-50));
+  color: var(--color-white-primary);
+  font-weight: var(--font-weight-medium);
+  box-shadow: inset 0 1px 4.6px rgba(255, 255, 255, 0.6);
+}
+
+.card {
+  background: var(--color-white-primary);
+  border-radius: 2px;
+  padding: var(--space-2) var(--space-3);
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  margin-bottom: var(--space-2);
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-small-13);
+  color: #454e43; // design-specific: Figma-exact
+  text-transform: capitalize;
+}
+
+.liveDot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--color-status-available);
+  flex-shrink: 0;
+  animation: pulse 2s ease-in-out infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+// ── Auto-scrolling feed ──────────────────────────────────────────────────
+// Same duplicate-pass marquee PromotedDomainsSection and LiveActivityTicker
+// already use, just vertical: .track holds two identical passes of the
+// same items stacked end to end, and animates from translateY(0) to
+// translateY(-50%) — since both passes are identical, that half-height
+// translation loops with no visible seam. Paused on hover/focus so the
+// feed can actually be read, falls back to the old manually-scrollable
+// list for prefers-reduced-motion (second, purely decorative pass hidden
+// so a reduced-motion visitor doesn't scroll past a duplicated feed).
+
+.list {
+  position: relative;
+  max-height: 260px;
+  overflow: hidden;
+  mask-image: linear-gradient(180deg, transparent, black 20px, black calc(100% - 20px), transparent);
+  -webkit-mask-image: linear-gradient(180deg, transparent, black 20px, black calc(100% - 20px), transparent);
+
+  @media (prefers-reduced-motion: reduce) {
+    overflow-y: auto;
+
+    // still scrolls, the scrollbar itself just isn't drawn
+    scrollbar-width: none; // Firefox
+    -ms-overflow-style: none; // old Edge/IE
+
+    &::-webkit-scrollbar {
+      display: none; // Chrome, Safari, current Edge
+    }
+  }
+}
+
+.track {
+  display: flex;
+  flex-direction: column;
+  animation: activity-marquee var(--loop-seconds, 20s) linear infinite;
+
+  .list:hover &,
+  .list:focus-within & {
+    animation-play-state: paused;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+.pass {
+  display: flex;
+  flex-direction: column;
+
+  @media (prefers-reduced-motion: reduce) {
+    &:last-child {
+      display: none;
+    }
+  }
+}
+
+@keyframes activity-marquee {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-50%);
+  }
+}
+
+.empty {
+  padding: var(--space-4) 0;
+  text-align: center;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  color: var(--color-gray-primary);
+}

@@ -1,0 +1,163 @@
+// Figma node 1:1034 — one of 8 identical placeholder cards in a horizontal
+// scroller. Measurements below are Figma-exact unless noted otherwise.
+
+.card {
+  position: relative;
+  flex-shrink: 0;
+  width: 282px;
+  // min-height, not height — the fixed 192px clipped real content once
+  // real line-heights were accounted for (see the line-height fix below).
+  // min-height keeps 192px as the normal case while never silently
+  // cropping content again if metrics shift.
+  min-height: 192px;
+  background: var(--color-white-primary);
+  border: 1px solid var(--color-border-black-subtle);
+  border-radius: 3px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+// ── Top row: marker + domain name + extension ──────────────────────────────
+
+.topRow {
+  position: relative;
+  padding: var(--space-1) var(--space-2) var(--space-2);
+  border-bottom: 1px solid var(--color-border-black-subtle);
+  display: grid;
+  grid-template-columns: 19px 1fr;
+  column-gap: var(--space-1-5);
+  row-gap: 2px;
+  align-items: center;
+}
+
+.marker {
+  width: 19px;
+  height: 14px;
+  grid-row: 2;
+}
+
+.domainLabel {
+  grid-column: 1 / -1;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  line-height: 1.2;
+  color: var(--color-black-alpha-55);
+  text-transform: capitalize;
+}
+
+.domainRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  min-width: 0;
+}
+
+.domainName {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-small-13);
+  line-height: 1.2;
+  color: var(--color-black-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// ── Middle row: appraised value | chain ─────────────────────────────────────
+
+.middleRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid var(--color-border-black-subtle);
+}
+
+.middleRow .cell:first-child {
+  border-right: 1px solid var(--color-border-black-subtle);
+}
+
+// ── Bottom row: price | actions ─────────────────────────────────────────────
+
+.bottomRow {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+}
+
+.cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: var(--space-2);
+  // flex children default to min-height:auto, which can refuse to shrink
+  // below their own content size and silently grow the row past the
+  // card's intended height — this is what let text overflow the card
+  // in the first place, alongside the missing line-heights below.
+  min-height: 0;
+}
+
+.label {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  line-height: 1.2;
+  color: var(--color-black-alpha-55);
+  text-transform: capitalize;
+}
+
+.value {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-small-13);
+  line-height: 1.2;
+  color: var(--color-black-primary);
+}
+
+.usd {
+  font-family: var(--font-space-grotesk); // closest already-loaded face to Figma's JetBrains Mono for this label
+  font-size: var(--text-small-10);
+  line-height: 1.2;
+  color: #a6a1bb; // design-specific: Figma-exact, no token match
+}
+
+// ── Actions ──────────────────────────────────────────────────────────────
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  justify-content: flex-end;
+}
+
+.buyNow {
+  flex-shrink: 0;
+}
+
+.favorite {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.favoriteIcon {
+  width: 14px;
+  height: 13px;
+}
+
+.favoriteIconActive {
+  width: 14px;
+  height: 13px;
+  // the source asset is stroke-only in a neutral tone — shift it toward the
+  // error/red token family for the active state rather than shipping a
+  // second downloaded asset for one color change
+  filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(325deg) brightness(101%) contrast(101%);
+}

@@ -1,0 +1,193 @@
+
+@import '@mpstyles/_mixins.scss';
+
+$corner-size: 18px;
+$corner-clip: path("M5 2 H14 C15 2 15.5 3.2 14.7 3.8 C11 7 7 11 3.8 14.7 C3.2 15.5 2 15 2 14 V5 C2 3.3 3.3 2 5 2 Z");
+
+// ── Button shell ───────────────────────────────────────────────────────────
+
+.button {
+  position:        relative;
+  display:         flex;
+  justify-content: center;
+  align-items:     center;
+  height:          var(--button-height);
+  width:           200px; // design-specific: Figma-exact default button width
+  background:      var(--color-white-primary);
+  border:          none;
+  cursor:          pointer;
+
+  font-family:    var(--font-satoshi);
+  font-size:      var(--text-button);
+  font-weight:    var(--font-weight-medium);
+  color:          var(--color-gray-primary);
+  letter-spacing: 1px; // design-specific: Figma-exact button letter-spacing
+  @include mobile{
+    height:  var(--button-height-sm)
+  }
+
+  // CSS custom property drives all four corner decoration backgrounds.
+  // Setting --_corner-bg on the button element cascades into ::before/::after
+  // and into the .corner child span's pseudo-elements — no specificity conflicts.
+  --_corner-bg: var(--color-gray-primary);
+
+  transition: color 0.3s ease;
+
+  &.fullWidth {
+    width: 100%; padding: var(--space-6); // 24px ≈ 25px Figma value, nearest token
+
+  @include mobile{
+    padding: var(--space-4); // 16px ≈ 15px Figma value, nearest token
+  }
+}
+
+  &:hover:not(:disabled) {
+    color: var(--color-blue-primary);
+    --_corner-bg: var(--color-blue-primary);
+  }
+
+  &:active:not(:disabled) {
+    color: var(--color-blue-dark);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor:  not-allowed;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+    color: var(--color-blue-primary);
+    --_corner-bg: var(--color-blue-primary);
+  }
+}
+
+.transparent {
+  background: transparent;
+  color: var(--color-white-primary);
+  --_corner-bg: var(--color-white-primary);
+
+  &:hover:not(:disabled) {
+    color: var(--color-white-primary);
+    --_corner-bg: var(--color-white-primary);
+  }
+
+  &:active:not(:disabled) {
+    color: var(--color-white-dark);
+  }
+
+  &:focus-visible {
+    color: var(--color-white-primary);
+    --_corner-bg: var(--color-white-primary);
+  }
+}
+
+// ── Error variant ──────────────────────────────────────────────────────────
+
+.variantError {
+  color: var(--color-error);
+  --_corner-bg: var(--color-error);
+
+  &:hover:not(:disabled) {
+    color: var(--color-error-text-dark);
+    --_corner-bg: var(--color-error-text-dark);
+  }
+
+  &:active:not(:disabled) {
+    color: var(--color-error-text-dark);
+  }
+
+  &:focus-visible {
+    color: var(--color-error-text-dark);
+    --_corner-bg: var(--color-error-text-dark);
+  }
+}
+
+// ── Label ──────────────────────────────────────────────────────────────────
+
+.label {
+  position: relative;
+  z-index:  2;
+}
+
+.labelSrOnly {
+  position:   absolute;
+  width:      1px;
+  height:     1px;
+  padding:    0;
+  margin:     -1px;
+  overflow:   hidden;
+  clip:       rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border:     0;
+}
+
+.iconOnly {
+  width: auto;
+  padding: 0 var(--space-4);
+}
+
+// ── Icon ───────────────────────────────────────────────────────────────────
+
+.iconLeft,
+.iconRight {
+  position:    relative;
+  z-index:     2;
+  display:     flex;
+  align-items: center;
+  font-size:   var(--text-body);
+}
+
+.iconLeft  { margin-right: var(--space-2); }
+.iconRight { margin-left:  var(--space-2); }
+
+// ── Corner decorations ─────────────────────────────────────────────────────
+// button::before  → top-left
+// button::after   → top-right
+// .corner::before → bottom-left
+// .corner::after  → bottom-right
+
+%corner-base {
+  content:    '';
+  position:   absolute;
+  width:      $corner-size;
+  height:     $corner-size;
+  background: var(--_corner-bg, var(--color-gray-primary));
+  clip-path:  $corner-clip;
+  transition: background 0.3s ease;
+}
+
+.button {
+  &::before {
+    @extend %corner-base;
+    top:  0;
+    left: 0;
+  }
+
+  &::after {
+    @extend %corner-base;
+    top:       0;
+    right:     0;
+    transform: rotate(90deg);
+  }
+}
+
+.corner {
+  position:       absolute;
+  inset:          0;
+  pointer-events: none;
+
+  &::before {
+    @extend %corner-base;
+    bottom:    0;
+    left:      0;
+    transform: rotate(-90deg);
+  }
+
+  &::after {
+    @extend %corner-base;
+    bottom:    0;
+    right:     0;
+    transform: rotate(180deg);
+  }
+}

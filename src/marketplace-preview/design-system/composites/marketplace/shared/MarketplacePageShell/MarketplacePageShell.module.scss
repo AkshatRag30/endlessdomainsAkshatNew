@@ -1,0 +1,145 @@
+@import '@mpstyles/_mixins.scss';
+
+.shell {
+  position: relative;
+
+  // Clears MobileBottomNav's fixed bar so it never covers whatever ends up
+  // last on the page (Promoted Domains after the mobile reorder below).
+  @include mobile {
+    padding-bottom: 76px;
+  }
+}
+
+// ── Grid ─────────────────────────────────────────────────────────────────
+// Desktop: sidebar column beside a hero-then-main column, rail spans both
+// rows on the right (unchanged from before the hero got its own slot — same
+// columns/gap, hero and main just sit in separate rows of the same track).
+// Below 992px there's no sidebar column at all (off-canvas drawer instead,
+// see .sidebar) and hero / rail / main restack in Figma's own order (nodes
+// 20:1153 / 27:531): hero, then rail (Live Activity + Market Activity),
+// then the rest of main.
+
+.grid {
+  display: grid;
+  grid-template-columns: 240px 1fr 320px; // design-specific: sidebar / main / right rail widths
+  grid-template-areas:
+    "sidebar hero rail"
+    "sidebar main rail";
+  gap: var(--space-6);
+  padding: var(--space-6) var(--container-padding-x);
+  align-items: start;
+
+  @include tablet-down {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "hero"
+      "rail"
+      "main";
+    padding: var(--space-4);
+  }
+}
+
+.sidebar {
+  grid-area: sidebar;
+  min-width: 0;
+
+  @include tablet-down {
+    position: fixed;
+    // 59px matches Header.module.scss's .bar height exactly (also a
+    // literal, not a token, there) — the drawer sits below the header
+    // rather than covering it, so the logo and connect wallet/logout
+    // stay reachable while it's open.
+    top: 59px;
+    left: 0;
+    bottom: 0;
+    width: 280px;
+    z-index: 40;
+    background: var(--color-white-primary);
+    box-shadow: var(--shadow-panel);
+    padding: var(--space-4);
+    overflow-y: auto;
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+  }
+}
+
+.sidebarOpen {
+  @include tablet-down {
+    transform: translateX(0);
+  }
+}
+
+.hero {
+  grid-area: hero;
+  min-width: 0;
+}
+
+.main {
+  grid-area: main;
+  min-width: 0;
+}
+
+.rightRail {
+  grid-area: rail;
+  min-width: 0;
+}
+
+// Main column: Promoted Domains before Live Listings on tablet/desktop
+// (node 27:531), but Figma's revised mobile mockup (34:1041) swaps that —
+// listings first, promoted domains after — so the swap is scoped to mobile
+// only via order rather than reordering the JSX itself.
+.mainStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.promotedSlot {
+  @include mobile {
+    order: 2;
+  }
+}
+
+.listingsSlot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+
+  @include mobile {
+    order: 1;
+  }
+}
+
+// Live Activity + Market Activity: stacked in the narrow desktop rail and
+// stacked again full-width on mobile, but side by side as two columns at
+// tablet width (Figma node 27:594) where there's room for both.
+.railGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+
+  @include tablet {
+    flex-direction: row;
+    align-items: flex-start;
+
+    > * {
+      flex: 1;
+      min-width: 0;
+    }
+  }
+}
+
+.scrim {
+  display: none;
+
+  @include tablet-down {
+    display: block;
+    position: fixed;
+    top: 59px; // matches .sidebar's top offset — same reasoning
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--color-modal-scrim);
+    z-index: 30;
+  }
+}

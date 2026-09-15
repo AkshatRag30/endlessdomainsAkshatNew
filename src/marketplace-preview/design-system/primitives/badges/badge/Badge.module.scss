@@ -1,0 +1,38 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 3px var(--space-2);
+  border-radius: var(--radius-full);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+.neutral {
+  background: var(--color-gray-light);
+  color: var(--color-gray-dark);
+}
+
+.accent {
+  background: var(--color-blue-light);
+  color: var(--color-blue-primary);
+}
+
+// Figma node 1:1645 (Market Activity's percent-change badge) — exact colors.
+.success {
+  background: #e7f6ee;
+  color: #12a05c;
+}
+
+.warning {
+  background: rgba(253, 198, 81, 0.16); // design-specific: no amber tint token exists yet
+  color: var(--color-amber);
+}
+
+.danger {
+  background: var(--color-error-soft-bg);
+  color: var(--color-error);
+}

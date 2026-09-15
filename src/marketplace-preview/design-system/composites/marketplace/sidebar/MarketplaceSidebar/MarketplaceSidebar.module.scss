@@ -1,0 +1,49 @@
+@import '@mpstyles/_mixins.scss';
+
+// The main site's own BuilderSidebar uses this exact pairing — solid white
+// fill, a subtle blue-tinted border, stripe-bg on top — applied directly to
+// the sidebar's outer wrapper. Same treatment now applied here and to the
+// three marketplace panels (LiveActivityPanel, MarketActivityPanel,
+// PromotedDomainsSection) that already carry it.
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding: var(--space-4);
+  background: var(--color-white-primary);
+  @include stripe-bg;
+  overflow: hidden;
+  border: 1px solid var(--color-blue-primary-alpha-07); // consistent with the alpha already used throughout this build, rather than BuilderSidebar's own alpha-20
+  border-radius: 8px;
+
+  // Figma's drawer mockup (node 34:2884) is a different layout below
+  // desktop, not a reflow of this one — MobileDrawerMenu replaces it there.
+  @include tablet-down {
+    display: none;
+  }
+}
+
+.authAction {
+  display: block;
+  width: 100%;
+  padding: var(--space-2) var(--space-2-5);
+  border: none;
+  background: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+  text-align: left;
+  text-decoration: none; // used on both the Logout <button> (already unaffected) and the Login/Sign Up <Link>s, which need this explicitly
+  cursor: pointer;
+
+  &:hover {
+    background: var(--color-blue-light);
+  }
+}
+
+.authLinks {
+  display: flex;
+  flex-direction: column;
+}

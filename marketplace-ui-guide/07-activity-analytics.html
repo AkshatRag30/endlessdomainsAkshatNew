@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Activity &amp; Analytics</title>
+<link rel="stylesheet" href="assets/guide.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="sidenav">
+    <a href="index.html" class="brand">Marketplace UI Guide</a>
+    <span class="brand-sub">Learn it, don't just have it</span>
+    <nav>
+      <a class="nav-link" href="index.html"><span class="num">·</span><span>Overview &amp; map</span></a>
+      <div class="group-label">Foundations</div>
+      <a class="nav-link" href="00-fundamentals.html"><span class="num">00</span><span>Fundamentals crash course</span></a>
+      <a class="nav-link" href="01-design-tokens.html"><span class="num">01</span><span>Design tokens &amp; globals</span></a>
+      <a class="nav-link" href="02-primitives.html"><span class="num">02</span><span>Primitives</span></a>
+      <div class="group-label">Structure</div>
+      <a class="nav-link" href="03-layout-shell.html"><span class="num">03</span><span>Header &amp; page shell</span></a>
+      <a class="nav-link" href="04-sidebar-navigation.html"><span class="num">04</span><span>Sidebar &amp; mobile nav</span></a>
+      <div class="group-label">Sections</div>
+      <a class="nav-link" href="05-hero-promoted.html"><span class="num">05</span><span>Hero &amp; Promoted Domains</span></a>
+      <a class="nav-link" href="06-listings-table.html"><span class="num">06</span><span>The listings table</span></a>
+      <a class="nav-link current" href="07-activity-analytics.html"><span class="num">07</span><span>Activity &amp; analytics</span></a>
+      <div class="group-label">Systems</div>
+      <a class="nav-link" href="08-data-layer.html"><span class="num">08</span><span>Types &amp; mock data</span></a>
+      <a class="nav-link" href="09-responsive-patterns.html"><span class="num">09</span><span>Responsive patterns</span></a>
+      <a class="nav-link" href="10-real-apis.html"><span class="num">10</span><span>Wiring to real APIs</span></a>
+    </nav>
+  </aside>
+
+  <div class="content">
+    <div class="wrap">
+      <p class="eyebrow">Phase 07 &middot; Sections</p>
+      <h1 class="title">Live activity and market analytics</h1>
+      <p class="dek">Two right-rail panels, one that becomes a totally different component shape on mobile, and one that renders two totally different layouts from the exact same data and got that toggle backwards the first time.</p>
+
+      <h2><span class="section-num">1</span>LiveActivityPanel vs. LiveActivityTicker: same data, two different components</h2>
+      <p>The right rail's "recent activity" feed has a full desktop presentation &mdash; a row of filter tabs (All/Sale/Listing/Drop) above a scrollable list of activity rows &mdash; and a completely different mobile presentation: a single-line auto-scrolling ticker with a dropdown instead of tabs, because there's no room for four separate tab buttons in a 30px-tall bar. Rather than one component trying to be both, they're two separate components, <span class="path">LiveActivityPanel</span> and <span class="path">LiveActivityTicker</span>, CSS-toggled exactly like phase 04's sidebar/drawer pair.</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">LiveActivityTicker.tsx</span></div>
+        <pre><span class="cm">/**
+ * Mobile-only, replaces LiveActivityPanel (CSS-hidden at mobile) with a
+ * condensed always-scrolling ticker instead of the full tabs + list panel.
+ * Same duplicate-pass marquee technique PromotedDomainsSection already
+ * runs. The chevron next to "Live activity" is a real dropdown trigger,
+ * opens the same All/Sale/Listing/Drop filter as a dropdown instead of a
+ * row of tabs since there's no room for four buttons in a 30px bar.
+ */</span></pre>
+      </div>
+      <p>Two things worth pulling out of that comment. First, the ticker's scrolling row reuses the exact duplicate-pass marquee technique from phase 05 &mdash; two identical <span class="path">.pass</span> blocks inside one <span class="path">.track</span>, animated by exactly half its own width. Once you've built that trick once, it's the same three lines of CSS reasoning every other place a row needs to auto-scroll seamlessly. Second, the filter itself is the same four options in both components, just presented as tabs when there's room and collapsed into a dropdown when there isn't &mdash; the same filtering concept, two different UI shapes for two different amounts of space.</p>
+
+      <h3>The dropdown: phase 02's outside-click pattern, in a real composite</h3>
+      <div class="code-card">
+        <div class="code-label"><span class="file">LiveActivityTicker.tsx</span></div>
+        <pre><span class="ct">const</span> [open, setOpen] = useState(<span class="cn">false</span>)
+<span class="ct">const</span> rootRef = useRef&lt;HTMLDivElement&gt;(<span class="cn">null</span>)
+
+useEffect(() =&gt; {
+  <span class="ct">const</span> handleClickOutside = (e: MouseEvent) =&gt; {
+    <span class="ct">if</span> (rootRef.current &amp;&amp; !rootRef.current.contains(e.target <span class="ct">as</span> Node)) {
+      setOpen(<span class="cn">false</span>)
+    }
+  }
+  document.addEventListener(<span class="cs">'mousedown'</span>, handleClickOutside)
+  <span class="ct">return</span> () =&gt; document.removeEventListener(<span class="cs">'mousedown'</span>, handleClickOutside)
+}, [])</pre>
+      </div>
+      <p>This is the identical shape phase 02 walked through for <span class="path">FilterDropdown</span> &mdash; a ref on the dropdown's own root element, a document-level listener that closes the menu the instant a click lands anywhere <em>not</em> inside that ref, and a cleanup function that removes the listener when the component unmounts. Recognizing "I need a click-away-to-close menu" as the same solved problem, rather than inventing a new approach each time, is exactly the payoff of having learned the primitive once.</p>
+
+      <h3>The hydration bug, and why the fix is one attribute, not a rewrite</h3>
+      <div class="code-card">
+        <div class="code-label"><span class="file">LiveActivityTicker.tsx</span></div>
+        <pre><span class="ct">function</span> formatRelativeTime(iso: <span class="cn">string</span>): <span class="cn">string</span> {
+  <span class="ct">const</span> seconds = Math.floor((Date.now() - <span class="ct">new</span> Date(iso).getTime()) / <span class="cn">1000</span>)
+  <span class="ct">if</span> (seconds &lt; <span class="cn">30</span>) <span class="ct">return</span> <span class="cs">'now'</span>
+  <span class="cm">// ...minutes/hours/days...</span>
+}
+
+<span class="ct">&lt;span</span> className={styles.time} suppressHydrationWarning<span class="ct">&gt;</span>
+  {formatRelativeTime(item.occurredAt)}
+<span class="ct">&lt;/span&gt;</span></pre>
+      </div>
+      <div class="callout gotcha">
+        <span class="label">Why the exact same code can print two different things on server and client</span>
+        <p>Next.js renders every page's initial HTML once on the server, then React "hydrates" that same markup in the browser &mdash; attaching event handlers and taking over from where the server left off. For that handoff to work invisibly, the HTML React generates on the client during hydration has to match, character for character, what the server already sent down. <span class="path">mockTickerItems</span>' <span class="path">occurredAt</span> field is computed with <span class="path">Date.now()</span> when the module first loads &mdash; and the server evaluates that module at a different wall-clock instant than the browser does moments later. <span class="path">formatRelativeTime</span> is deterministic given its input, but its input (the gap between now and <span class="path">occurredAt</span>) is not the same value on both sides, so "3s ago" on the server can legitimately render as "4s ago" once the client re-runs the same function a moment later.</p>
+        <p style="margin-top:8px"><span class="path">suppressHydrationWarning</span> is React's own sanctioned escape hatch for exactly this situation &mdash; a value that is expected and acceptable to differ between server and client render, most commonly a timestamp. It's a targeted attribute on the one element whose text is allowed to drift, not a workaround for an actual bug: the underlying values are both "correct," they're just correct at two different instants. Reaching for <span class="path">suppressHydrationWarning</span> is only the right move when you can explain why the mismatch is expected, the way this comment does &mdash; using it to silence a hydration warning you don't understand would hide a real bug instead.</p>
+      </div>
+
+      <h2><span class="section-num">2</span>LiveActivityPanel keeps moving: turning a static list into a vertical marquee</h2>
+      <p><span class="path">LiveActivityPanel</span> — the desktop/tablet feed, not the mobile ticker — started out as an ordinary manually-scrollable list: a fixed-height box, <span class="path">overflow-y: auto</span>, scroll it yourself with your mouse wheel or trackpad. The design calls for it to feel alive instead — constantly, gently scrolling on its own, the way a real trading ticker never sits still. That's a genuinely different piece of behavior from anything phase 05 covered, but it turns out to need none of the same new ideas: it's the exact same duplicate-pass marquee trick from <span class="path">PromotedDomainsSection</span>, just running vertically instead of horizontally.</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">LiveActivityPanel.tsx</span></div>
+        <pre><span class="ct">const</span> SECONDS_PER_ITEM = <span class="cn">2.5</span>
+
+<span class="ct">const</span> trackStyle = {
+  <span class="cs">'--loop-seconds'</span>: <span class="cn">`${items.length * SECONDS_PER_ITEM}s`</span>,
+} <span class="ct">as</span> React.CSSProperties
+
+<span class="ct">&lt;div</span> className={styles.list}<span class="ct">&gt;</span>
+  <span class="ct">&lt;div</span> className={styles.track} style={trackStyle}<span class="ct">&gt;</span>
+    {[<span class="cn">0</span>, <span class="cn">1</span>].map((pass) =&gt; (
+      <span class="ct">&lt;div</span> className={styles.pass} key={pass} aria-hidden={pass === <span class="cn">1</span>}<span class="ct">&gt;</span>
+        {items.map((item) =&gt; <span class="ct">&lt;ActivityItem</span> key={<span class="cn">`${item.id}-${pass}`</span>} item={item} <span class="ct">/&gt;</span>)}
+      <span class="ct">&lt;/div&gt;</span>
+    ))}
+  <span class="ct">&lt;/div&gt;</span>
+<span class="ct">&lt;/div&gt;</span></pre>
+      </div>
+      <p>If phase 05's marquee is still fresh, every line of this should already read as familiar: the list of items renders twice, back to back, inside <span class="path">.track</span>; the animation's speed is computed from how many items there actually are (<span class="path">SECONDS_PER_ITEM</span>) rather than a fixed number, so the feed doesn't visibly speed up or slow down just because a filter tab happens to leave more or fewer rows on screen; and that computed duration crosses from JavaScript into CSS through an inline <span class="path">style</span> object, landing as the custom property <span class="path">--loop-seconds</span> that the stylesheet reads back with <span class="path">var(--loop-seconds, 20s)</span>. The one thing that's actually new is the axis.</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">LiveActivityPanel.module.scss</span></div>
+        <pre>.list {
+  position: relative;
+  max-height: <span class="cn">260px</span>;
+  overflow: hidden;
+  mask-image: linear-gradient(<span class="cn">180deg</span>, transparent, black <span class="cn">20px</span>, black calc(<span class="cn">100%</span> - <span class="cn">20px</span>), transparent);
+}
+
+.track {
+  display: flex;
+  flex-direction: column;
+  animation: activity-marquee <span class="cn">var(--loop-seconds, 20s)</span> linear infinite;
+
+  .list:hover &amp; { animation-play-state: paused; }
+}
+
+<span class="ct">@keyframes</span> activity-marquee {
+  from { transform: <span class="ck">translateY</span>(<span class="cn">0</span>); }
+  to   { transform: <span class="ck">translateY</span>(<span class="cn">-50%</span>); }
+}</pre>
+      </div>
+      <p>Everything about the horizontal version transfers over just by swapping which axis each property talks about: <span class="path">flex-direction: row</span> becomes <span class="path">column</span> (phase 00, section 8, is the place to review what that swap does to a flex container if it's not automatic yet), <span class="path">translateX</span> becomes <span class="path">translateY</span>, and the <span class="path">90deg</span> left-to-right fade gradient from <span class="path">PromotedDomainsSection</span> becomes a <span class="path">180deg</span> top-to-bottom one. The seamless-loop math is identical either way: two identical copies stacked end to end, animated by exactly negative one copy's own size (50% of the doubled total), so the moment the loop restarts, what's on screen is pixel-identical to frame zero.</p>
+      <div class="callout why">
+        <span class="label">Why the old manual-scroll behavior didn't just disappear</span>
+        <p>The stylesheet keeps a <span class="path">prefers-reduced-motion</span> branch that restores exactly the original behavior — <span class="path">overflow-y: auto</span>, no animation, the duplicate second pass hidden — the same accessibility fallback phase 05's marquee already establishes as the standard for any continuously-moving content in this codebase. A visitor with that setting enabled never sees the feed move on its own; they get the plain, original scrollable list back, unchanged from before this section existed.</p>
+      </div>
+      <p>One practical note if you ever need to confirm a change like this actually works: a single static screenshot can't show a continuous animation moving, no matter how carefully you inspect it — you're comparing one frozen instant to itself. What a screenshot <em>can</em> confirm is that the underlying markup and compiled CSS are correct — the <span class="path">.track</span> element exists with the right <span class="path">--loop-seconds</span> value baked in, and the <span class="path">@keyframes</span> rule compiled without errors — which is verifiable evidence even though it isn't a picture of motion itself.</p>
+
+      <h2><span class="section-num">3</span>MarketActivityPanel: one component, two entirely different chart layouts</h2>
+      <p>This is the most dramatic "render both, CSS decides" case in the whole page. On desktop, Market Activity is four small metric cards stacked vertically. On tablet and mobile, it's a single large chart with a row of tabs above it to pick which metric the chart is currently showing. These aren't two arrangements of the same markup &mdash; the tablet/mobile version has a chart, a value readout, and a badge that simply don't exist in the desktop card list at all. Both are still rendered by the same component, from the same underlying data:</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">MarketActivityPanel.tsx</span></div>
+        <pre><span class="ct">const</span> [timeRange, setTimeRange] = useState&lt;MarketTimeRange&gt;(<span class="cs">'24h'</span>)
+<span class="ct">const</span> [selectedMetricId, setSelectedMetricId] = useState(mockMarketMetrics[<span class="cn">0</span>].id)
+<span class="ct">const</span> selectedMetric = mockMarketMetrics.find((m) =&gt; m.id === selectedMetricId) ?? mockMarketMetrics[<span class="cn">0</span>]
+
+<span class="ct">return</span> (
+  <span class="ct">&lt;div</span> className={styles.panel}<span class="ct">&gt;</span>
+    <span class="ct">&lt;div</span> className={<span class="cn">`${styles.cards} ${styles.cardsOnly}`</span>}<span class="ct">&gt;</span>
+      {mockMarketMetrics.map((metric) =&gt; <span class="ct">&lt;MarketMetricCard</span> key={metric.id} metric={metric} timeRange={timeRange} <span class="ct">/&gt;</span>)}
+    <span class="ct">&lt;/div&gt;</span>
+
+    <span class="ct">&lt;div</span> className={styles.expanded}<span class="ct">&gt;</span>
+      {<span class="cm">/* metric tabs, big value readout, Sparkline chart — all driven by `selectedMetric` */</span>}
+    <span class="ct">&lt;/div&gt;</span>
+  <span class="ct">&lt;/div&gt;</span>
+)</pre>
+      </div>
+      <p><span class="path">selectedMetricId</span> only matters to the expanded (tablet/mobile) layout &mdash; the card list ignores it entirely and just maps over every metric at once, since there's room to show all four simultaneously as small cards. <span class="path">timeRange</span>, by contrast, is shared: the same toggle button group (<span class="path">rangeToggle</span>, built once and reused in both places rather than duplicated) controls which time window both layouts read from, so switching to 7d on either layout stays in effect if the viewport is ever resized across the breakpoint.</p>
+
+      <h3>The cascade-order bug: two rules, opposite intents, same specificity</h3>
+      <p>This component's stylesheet carries an unusually direct comment about a real bug, worth reading in full because the mechanism (not just the fix) is the actual lesson:</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">MarketActivityPanel.module.scss</span></div>
+        <pre>.cards {
+  display: flex;
+  flex-direction: column;
+  gap: <span class="cn">var(--space-2)</span>;
+}
+
+<span class="cm">// These two rules must come AFTER .cards above: the card-list element
+// carries both .cards and .cardsOnly, and .cards's own display:flex is
+// unconditional — with equal specificity, whichever rule is declared
+// later in the file wins the cascade at any width where both apply.
+// Declared first (as this used to be), .cardsOnly's display:none
+// silently lost to .cards's display:flex at every width, which is
+// exactly why the old stacked cards never actually hid.</span>
+.cardsOnly {
+  <span class="ct">@include</span> tablet-down { display: <span class="cn">none</span>; }
+}
+
+.expanded {
+  display: <span class="cn">none</span>;
+  <span class="ct">@include</span> tablet-down { display: flex; }
+}</pre>
+      </div>
+      <div class="callout gotcha">
+        <span class="label">CSS specificity ties are broken by source order, not by which rule "sounds like" it should win</span>
+        <p>Both <span class="path">.cards</span> and <span class="path">.cardsOnly</span> are single-class selectors &mdash; identical specificity. When two rules with identical specificity both apply to the same element and disagree about a property (here, <span class="path">display</span>), CSS doesn't pick the "more conditional-looking" one or the one that seems more specific in intent. It picks whichever one is written later in the stylesheet, full stop. The card list element has both classes on it (<span class="path">className={`${styles.cards} ${styles.cardsOnly}`}</span>), so at tablet-down widths there were genuinely two rules in play: <span class="path">.cards</span> saying "always flex" and <span class="path">.cardsOnly</span> saying "none below tablet." With <span class="path">.cardsOnly</span> declared first in the file, <span class="path">.cards</span>'s later, unconditional rule simply overwrote it for every property they both touched, at every screen width, so the card list never actually disappeared &mdash; it just sat rendered underneath the new expanded chart, both visible at once.</p>
+        <p style="margin-top:8px">This was found by fetching the browser's actual computed CSS for the element and reading the declaration order that won, not by staring at the source file guessing which rule "should" apply. That's generally the fastest way to debug a cascade conflict once a fix that looks obviously correct in the source doesn't take effect: ask the browser what actually won, don't keep re-reading the file.</p>
+      </div>
+
+      <h3>The expanded chart reuses Sparkline exactly as phase 02 described it</h3>
+      <div class="code-card">
+        <div class="code-label"><span class="file">MarketActivityPanel.tsx</span></div>
+        <pre><span class="ct">&lt;Sparkline</span>
+  data={selectedMetric.series[timeRange]}
+  variant={selectedMetric.id === <span class="cs">'sales'</span> ? <span class="cs">'bar'</span> : <span class="cs">'area'</span>}
+  height={<span class="cn">120</span>}
+<span class="ct">/&gt;</span></pre>
+      </div>
+      <p>Nothing new here &mdash; this is the same <span class="path">variant</span>-prop pattern from phase 02, just fed a different slice of data (<span class="path">selectedMetric.series[timeRange]</span>) depending on which metric tab and which time range are currently selected. The Sales metric renders as bars, every other metric renders as a filled area line, purely by passing a different string into the same component.</p>
+
+      <h2><span class="section-num">4</span>MarketMetricCard: the small building block behind the card list</h2>
+      <p>Each of the four desktop cards is a <span class="path">MarketMetricCard</span> &mdash; a label, a formatted value, a trend badge, and (depending on the metric) a tiny inline sparkline. It's not covered in its own section here because there's genuinely nothing new in it past what phases 01 and 02 already established: design tokens for spacing and color, <span class="path">Badge</span>'s variant prop for the up/down indicator, and <span class="path">Sparkline</span> again at a much smaller <span class="path">height</span>. Once the primitives are solid, most composites really are this short to explain.</p>
+
+      <h2><span class="section-num">5</span>What to remember from this phase</h2>
+      <ul class="checklist">
+        <li>A continuous-motion pattern (the marquee) transfers cleanly from a horizontal case to a vertical one by swapping the axis-specific properties in lockstep — flex direction, translate axis, fade-gradient angle — while the seamless-loop math (duplicate, animate by exactly negative one copy's size) stays identical.</li>
+        <li>When two layouts genuinely differ in structure, not just size, build them as separate components/blocks and let a media query pick between them — the same pattern from phase 04, now seen with a real desktop-vs-tablet/mobile split instead of desktop-vs-mobile.</li>
+        <li>Share the state that both layouts need to agree on (like a time-range toggle) by lifting it to their common parent and passing the same control into both, rather than building it twice.</li>
+        <li>A value computed from the current time (<span class="path">Date.now()</span>) at module load will differ between server and client render — that's an expected hydration mismatch, and <span class="path">suppressHydrationWarning</span> on just that element is the correct, targeted fix, not a rewrite.</li>
+        <li>Two same-specificity CSS rules that disagree are resolved by source order alone — the one declared later in the file wins, regardless of which one "sounds" more specific to the reader. When a display toggle doesn't seem to take effect, check declaration order before assuming the selector itself is wrong.</li>
+        <li>When a CSS fix that looks correct doesn't take effect, check the browser's actual computed styles for the element rather than re-reading the source file again.</li>
+      </ul>
+
+      <div class="phase-nav">
+        <a class="to-index" href="06-listings-table.html">← The listings table</a>
+        <a href="08-data-layer.html">Next: Types &amp; mock data →</a>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

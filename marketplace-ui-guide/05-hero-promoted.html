@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hero &amp; Promoted Domains</title>
+<link rel="stylesheet" href="assets/guide.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="sidenav">
+    <a href="index.html" class="brand">Marketplace UI Guide</a>
+    <span class="brand-sub">Learn it, don't just have it</span>
+    <nav>
+      <a class="nav-link" href="index.html"><span class="num">·</span><span>Overview &amp; map</span></a>
+      <div class="group-label">Foundations</div>
+      <a class="nav-link" href="00-fundamentals.html"><span class="num">00</span><span>Fundamentals crash course</span></a>
+      <a class="nav-link" href="01-design-tokens.html"><span class="num">01</span><span>Design tokens &amp; globals</span></a>
+      <a class="nav-link" href="02-primitives.html"><span class="num">02</span><span>Primitives</span></a>
+      <div class="group-label">Structure</div>
+      <a class="nav-link" href="03-layout-shell.html"><span class="num">03</span><span>Header &amp; page shell</span></a>
+      <a class="nav-link" href="04-sidebar-navigation.html"><span class="num">04</span><span>Sidebar &amp; mobile nav</span></a>
+      <div class="group-label">Sections</div>
+      <a class="nav-link current" href="05-hero-promoted.html"><span class="num">05</span><span>Hero &amp; Promoted Domains</span></a>
+      <a class="nav-link" href="06-listings-table.html"><span class="num">06</span><span>The listings table</span></a>
+      <a class="nav-link" href="07-activity-analytics.html"><span class="num">07</span><span>Activity &amp; analytics</span></a>
+      <div class="group-label">Systems</div>
+      <a class="nav-link" href="08-data-layer.html"><span class="num">08</span><span>Types &amp; mock data</span></a>
+      <a class="nav-link" href="09-responsive-patterns.html"><span class="num">09</span><span>Responsive patterns</span></a>
+      <a class="nav-link" href="10-real-apis.html"><span class="num">10</span><span>Wiring to real APIs</span></a>
+    </nav>
+  </aside>
+
+  <div class="content">
+    <div class="wrap">
+      <p class="eyebrow">Phase 05 &middot; Sections</p>
+      <h1 class="title">The hero banner and the promoted domains marquee</h1>
+      <p class="dek">A component that's smaller than it looks because the design did the hard work in an image file, next to a component that's bigger than it looks because it runs a real CSS animation loop.</p>
+
+      <h2><span class="section-num">1</span>MarketplaceHero: know when NOT to build something</h2>
+      <p>The hero looks like it should be the most complex component on the page &mdash; an abstract network illustration with five floating category chips (Collectibles, Credit, Real Estate, Equity, Commodity) scattered across it. It's actually one of the smallest files in the whole codebase:</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">MarketplaceHero/MarketplaceHero.tsx</span></div>
+        <pre><span class="ct">export const</span> MarketplaceHero = () =&gt; {
+  <span class="ct">return</span> (
+    <span class="ct">&lt;div</span> className={styles.hero}<span class="ct">&gt;</span>
+      <span class="ct">&lt;div</span> className={styles.badge}<span class="ct">&gt;</span>
+        <span class="ct">&lt;img</span> src=<span class="cs">"/assets/img/hero/logo-white-text.svg"</span> alt=<span class="cs">"Endless Domains"</span> className={styles.logo} <span class="ct">/&gt;</span>
+      <span class="ct">&lt;/div&gt;</span>
+    <span class="ct">&lt;/div&gt;</span>
+  )
+}</pre>
+      </div>
+      <p>That's the whole component: a container div with a background image, and one badge with the logo on top. No chip elements, no positioning math, no data array of five category labels.</p>
+      <div class="callout gotcha">
+        <span class="label">A wrong assumption caught before it became wasted work</span>
+        <p>Earlier in this project, a <span class="path">HeroCategoryChip</span> type was defined in the types file, assuming the five floating chips would be separate positioned React elements that needed real data and layout code. Pulling the actual design data for this node via Figma's <span class="path">get_design_context</span> tool (not just eyeballing the screenshot) showed the truth: the network illustration <em>and</em> all five chips are baked into a single exported background image, <span class="path">hero-network-bg.png</span>. There was never anything to position. The <span class="path">HeroCategoryChip</span> type still exists in the types file, unused, as a record of that dead end.</p>
+        <p style="margin-top:8px">The lesson generalizes past this one component: before writing layout code for something that looks like a set of separately positioned pieces, check whether the design tool's structured data agrees that they're separate elements at all. A screenshot alone can't tell you that a flat image and five real DOM elements would render identically.</p>
+      </div>
+
+      <h3>The one real responsive decision it makes</h3>
+      <div class="code-card">
+        <div class="code-label"><span class="file">MarketplaceHero.module.scss</span></div>
+        <pre>.hero {
+  aspect-ratio: <span class="cn">835 / 172</span>; <span class="cm">// design-specific: Figma-exact hero proportions</span>
+  background-image: <span class="ck">url</span>(<span class="cs">'/assets/img/hero/hero-network-bg.png'</span>);
+  background-size: cover;
+
+  <span class="ct">@include</span> mobile {
+    aspect-ratio: <span class="cn">355 / 105</span>; <span class="cm">// mobile crop is a different image proportion, not a scaled-down desktop one</span>
+  }
+}</pre>
+      </div>
+      <p><span class="path">aspect-ratio</span> reserves the right amount of vertical space for the image before it's even loaded (so nothing jumps as the page paints), and <span class="path">background-size: cover</span> lets one image file serve both ratios by cropping rather than stretching. This one line was also a bug fix: it used to read <span class="path">4/3</span> at mobile, a guess that made the hero far taller and squatter than the real mobile mockup (Figma node 20:1191) called for.</p>
+
+      <h2><span class="section-num">2</span>PromotedDomainsSection: a real CSS-only marquee</h2>
+      <p>This is the row of domain cards that auto-scrolls sideways forever. It's a genuinely common UI pattern &mdash; and one that's very easy to get almost right and subtly wrong (visible jump at the loop point, unreadable while it's moving, or impossible to stop for anyone who needs it stopped). Walking through it slowly is worth it because the same three techniques reappear anywhere you need an infinite scroller.</p>
+
+      <h3>Trick 1: duplicate the content, animate exactly half its width</h3>
+      <div class="code-card">
+        <div class="code-label"><span class="file">PromotedDomainsSection.tsx</span></div>
+        <pre><span class="ct">&lt;div</span> className={styles.track} style={trackStyle}<span class="ct">&gt;</span>
+  {[<span class="cn">0</span>, <span class="cn">1</span>].map((pass) =&gt; (
+    <span class="ct">&lt;div</span> className={styles.pass} key={pass} aria-hidden={pass === <span class="cn">1</span>}<span class="ct">&gt;</span>
+      {mockPromotedListings.map((listing) =&gt; (
+        <span class="ct">&lt;PromotedDomainCard</span> key={<span class="cn">`${listing.id}-${pass}`</span>} listing={listing} <span class="ct">/&gt;</span>
+      ))}
+    <span class="ct">&lt;/div&gt;</span>
+  ))}
+<span class="ct">&lt;/div&gt;</span></pre>
+      </div>
+      <div class="code-card">
+        <div class="code-label"><span class="file">PromotedDomainsSection.module.scss</span></div>
+        <pre>.track {
+  display: flex;
+  width: max-content; <span class="cm">// two passes side by side, never wraps</span>
+  animation: promoted-marquee <span class="cn">var(--loop-seconds, 28s)</span> linear infinite;
+}
+
+<span class="ct">@keyframes</span> promoted-marquee {
+  from { transform: <span class="ck">translateX</span>(<span class="cn">0</span>); }
+  to   { transform: <span class="ck">translateX</span>(<span class="cn">-50%</span>); }
+}</pre>
+      </div>
+      <p>The list of cards is rendered <em>twice</em>, back to back, inside one flex row wide enough to hold both copies. The animation slides that row left by exactly half its own width. Because the second half is an exact copy of the first, the instant the animation finishes, what's on screen is pixel-identical to what was on screen at frame zero &mdash; so the animation can jump straight back to <span class="path">translateX(0)</span> and repeat, and nobody watching can tell the loop restarted. This is the whole trick behind every seamless CSS marquee: duplicate, then translate by exactly one copy's width.</p>
+      <p>The second pass is marked <span class="path">aria-hidden="true"</span>, since it's a visual duplicate with no new information &mdash; a screen reader should only ever announce the promoted domains list once.</p>
+
+      <h3>Trick 2: pace the loop by content, not by a magic duration</h3>
+      <div class="code-card">
+        <div class="code-label"><span class="file">PromotedDomainsSection.tsx</span></div>
+        <pre><span class="ct">const</span> SECONDS_PER_CARD = <span class="cn">3.5</span>
+
+<span class="ct">const</span> trackStyle = {
+  <span class="cs">'--loop-seconds'</span>: <span class="cn">`${mockPromotedListings.length * SECONDS_PER_CARD}s`</span>,
+} <span class="ct">as</span> React.CSSProperties</pre>
+      </div>
+      <p>A fixed <span class="path">animation-duration: 28s</span> would look fine with today's 8 mock cards and wrong the day someone adds a 9th &mdash; either too fast (each card barely gets a moment on screen) or, worse, still 28 seconds for more content, which just changes the effective speed as a side effect of an unrelated data change. Computing the duration from <span class="path">list.length * secondsPerCard</span> keeps the apparent speed constant no matter how many cards there are, and it's passed into CSS through an inline <span class="path">style</span> object, landing as a CSS custom property (<span class="path">--loop-seconds</span>) that the <span class="path">@keyframes</span> rule reads back with <span class="path">var(--loop-seconds, 28s)</span>. <span class="path">28s</span> there is only a fallback for the rare case the variable is missing entirely.</p>
+      <div class="callout gotcha">
+        <span class="label">A number isn't a time</span>
+        <p>The inline style deliberately writes <span class="path">`${...}s`</span>, not the bare number. <span class="path">animation-duration</span> is a CSS <span class="path">&lt;time&gt;</span> value and requires a unit &mdash; a custom property holding a bare number like <span class="path">28</span> is not a valid time, so <span class="path">var(--loop-seconds)</span> would fail to parse and CSS quietly falls back to the property's initial value, which for duration is <span class="path">0s</span>. The visible symptom is the whole row just sitting still with no console error at all, because this fails silently as invalid CSS rather than as a JavaScript exception. If you ever build something like this and the animation refuses to move, check that a unit made it into the string.</p>
+      </div>
+
+      <h3>Trick 3: pause on hover, and give reduced-motion users a real fallback</h3>
+      <div class="code-card">
+        <div class="code-label"><span class="file">PromotedDomainsSection.module.scss</span></div>
+        <pre>.track {
+  .marquee:hover &amp;,
+  .marquee:focus-within &amp; {
+    animation-play-state: paused;
+  }
+
+  <span class="ct">@media</span> (prefers-reduced-motion: reduce) {
+    animation: <span class="cn">none</span>;
+  }
+}
+
+.marquee {
+  <span class="ct">@media</span> (prefers-reduced-motion: reduce) {
+    overflow-x: auto; <span class="cm">// becomes a plain manually-scrollable row</span>
+  }
+}
+
+.pass {
+  <span class="ct">@media</span> (prefers-reduced-motion: reduce) {
+    &amp;:last-child { display: <span class="cn">none</span>; } <span class="cm">// don't scroll past a duplicated set of cards</span>
+  }
+}</pre>
+      </div>
+      <p><span class="path">animation-play-state: paused</span> freezes the animation exactly where it is (not a snap back to the start) the instant a pointer hovers the row or keyboard focus lands inside it &mdash; without this, an infinitely sliding row of clickable buttons would be nearly impossible to actually click, the target keeps moving out from under the cursor. <span class="path">:focus-within</span> matters as much as <span class="path">:hover</span> here: a keyboard user tabbing into a card's buy button needs the row to stop too, not just a mouse user hovering it.</p>
+      <p><span class="path">prefers-reduced-motion</span> is an operating-system-level accessibility setting some users turn on because motion causes them real discomfort (vestibular disorders, migraines). The media query above turns the animation off entirely and switches the row back to an ordinary manually-scrollable flex row &mdash; and since there's no more animation to loop seamlessly, the second, duplicate pass is hidden too, so a reduced-motion visitor scrolling the row by hand doesn't run into the same 8 cards twice.</p>
+
+      <h3>The scroll fade and the design's own decorative asset</h3>
+      <div class="code-card">
+        <div class="code-label"><span class="file">PromotedDomainsSection.module.scss</span></div>
+        <pre>.marquee {
+  overflow: hidden;
+  mask-image: linear-gradient(<span class="cn">90deg</span>, transparent, black <span class="cn">24px</span>, black calc(<span class="cn">100%</span> - <span class="cn">24px</span>), transparent);
+}</pre>
+      </div>
+      <p><span class="path">mask-image</span> is CSS's way of making parts of an element transparent using a gradient as the transparency map, rather than its actual color. Here it fades the row's own left and right edges to nothing over 24px, which signals "there's more content past this edge" without needing a separate overlay element. It's paired with a <span class="path">-webkit-</span> prefixed duplicate for Safari, which still requires the vendor-prefixed property for this feature.</p>
+      <p>The glow bar along the section's top edge (<span class="path">promoted-glow.png</span>) is a real exported asset from the Figma file, not a CSS gradient approximation &mdash; confirmed the same way the hero's chips were: by reading <span class="path">get_design_context</span>'s output rather than guessing from the screenshot which pieces were images versus which were CSS.</p>
+
+      <h2><span class="section-num">3</span>PromotedDomainCard: composing primitives you already know</h2>
+      <p>Once you've read phase 02, this card has almost nothing new in it &mdash; it's a demonstration of composing primitives rather than introducing one. <span class="path">ExtensionBadge</span>, <span class="path">ChainBadge</span>, and <span class="path">TrendIndicator</span> are all badge-family primitives with the variant-prop pattern from phase 02; the buy-now button reuses <span class="path">PrimaryButton</span>'s stylesheet directly rather than wrapping it in a new component, since nothing about it differs from the primitive except size.</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">PromotedDomainCard.tsx</span></div>
+        <pre><span class="ct">&lt;button</span> type=<span class="cs">"button"</span> className={<span class="cn">`${primaryBtnStyles.button} ${primaryBtnStyles.sm} ${styles.buyNow}`</span>}<span class="ct">&gt;</span>
+  {<span class="cm">/* PrimaryButton's ::before fill layer sits above unwrapped text — span required */</span>}
+  <span class="ct">&lt;span&gt;</span>buy now<span class="ct">&lt;/span&gt;</span>
+<span class="ct">&lt;/button&gt;</span></pre>
+      </div>
+      <p>That inline comment is worth pausing on &mdash; it's a direct callback to phase 02's <span class="path">::before</span> fill-layer explanation for the chamfered button shape. The layer sits <em>above</em> the button's own content in stacking order, so any text placed as a bare, unwrapped child of the button would render underneath it and disappear. Wrapping the label in its own <span class="path">&lt;span&gt;</span> gives it a real stacking context that the fill layer's <span class="path">z-index</span> doesn't reach into. This is exactly the kind of thing that looks like an unnecessary extra element until you delete it and the button text vanishes.</p>
+      <div class="callout note">
+        <span class="label">This button is real-looking, not real-acting</span>
+        <p>The comment directly above it says so: <span class="path">{/* Static mock data — this button is visually real but not wired to BuyNowModal or any wallet call */}</span>. It's a deliberate, labeled gap &mdash; phase 10 covers exactly what wiring this up for real involves.</p>
+      </div>
+      <p>The one piece of local state on this card, <span class="path">favorited</span>, is a small preview of a pattern phase 06 covers in depth for the listings table: <span class="path">useState(!!listing.isFavorited)</span> seeds initial state from the mock data (so a listing marked favorited in the data starts already favorited on screen) but afterwards the click handler owns it entirely &mdash; toggling this card's heart icon never writes back to <span class="path">mockPromotedListings</span> itself.</p>
+
+      <h2><span class="section-num">4</span>What to remember from this phase</h2>
+      <ul class="checklist">
+        <li>Before writing layout code for something that looks like several positioned pieces, check the design tool's structured data (not just the screenshot) for whether they're actually separate elements or one baked-in image.</li>
+        <li>A seamless CSS marquee is: duplicate the content once, animate a translate of exactly negative one copy's width, loop.</li>
+        <li>Pace a loop's duration from the data driving it (item count) instead of a fixed number, so the apparent speed doesn't silently change when the data does.</li>
+        <li>A CSS custom property holding a duration needs its unit baked into the string — a bare number is an invalid time value and fails silently to the property's zero default.</li>
+        <li>Pause continuous motion on both <span class="path">:hover</span> and <span class="path">:focus-within</span>, and turn it off entirely under <span class="path">prefers-reduced-motion: reduce</span> — this isn't optional polish, it's an accessibility requirement some visitors depend on.</li>
+      </ul>
+
+      <div class="phase-nav">
+        <a class="to-index" href="04-sidebar-navigation.html">← Sidebar &amp; mobile nav</a>
+        <a href="06-listings-table.html">Next: The listings table →</a>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

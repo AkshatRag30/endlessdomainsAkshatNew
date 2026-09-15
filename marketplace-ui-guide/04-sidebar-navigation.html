@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sidebar &amp; Mobile Nav</title>
+<link rel="stylesheet" href="assets/guide.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="sidenav">
+    <a href="index.html" class="brand">Marketplace UI Guide</a>
+    <span class="brand-sub">Learn it, don't just have it</span>
+    <nav>
+      <a class="nav-link" href="index.html"><span class="num">·</span><span>Overview &amp; map</span></a>
+      <div class="group-label">Foundations</div>
+      <a class="nav-link" href="00-fundamentals.html"><span class="num">00</span><span>Fundamentals crash course</span></a>
+      <a class="nav-link" href="01-design-tokens.html"><span class="num">01</span><span>Design tokens &amp; globals</span></a>
+      <a class="nav-link" href="02-primitives.html"><span class="num">02</span><span>Primitives</span></a>
+      <div class="group-label">Structure</div>
+      <a class="nav-link" href="03-layout-shell.html"><span class="num">03</span><span>Header &amp; page shell</span></a>
+      <a class="nav-link current" href="04-sidebar-navigation.html"><span class="num">04</span><span>Sidebar &amp; mobile nav</span></a>
+      <div class="group-label">Sections</div>
+      <a class="nav-link" href="05-hero-promoted.html"><span class="num">05</span><span>Hero &amp; Promoted Domains</span></a>
+      <a class="nav-link" href="06-listings-table.html"><span class="num">06</span><span>The listings table</span></a>
+      <a class="nav-link" href="07-activity-analytics.html"><span class="num">07</span><span>Activity &amp; analytics</span></a>
+      <div class="group-label">Systems</div>
+      <a class="nav-link" href="08-data-layer.html"><span class="num">08</span><span>Types &amp; mock data</span></a>
+      <a class="nav-link" href="09-responsive-patterns.html"><span class="num">09</span><span>Responsive patterns</span></a>
+      <a class="nav-link" href="10-real-apis.html"><span class="num">10</span><span>Wiring to real APIs</span></a>
+    </nav>
+  </aside>
+
+  <div class="content">
+    <div class="wrap">
+      <p class="eyebrow">Phase 04 &middot; Structure</p>
+      <h1 class="title">Sidebar, mobile drawer, and bottom nav</h1>
+      <p class="dek">Three different navigation surfaces &mdash; a persistent desktop sidebar, a rich off-canvas mobile drawer, and a fixed mobile tab bar &mdash; and why they're three separate components instead of one component reflowing.</p>
+
+      <h2><span class="section-num">1</span>Desktop sidebar: avoiding a false-active bug</h2>
+      <p><span class="path">MarketplaceSidebar</span> renders two <span class="path">SidebarSection</span>s (Browse, Your Account), each a list of <span class="path">SidebarNavItem</span>s. The interesting part isn't the rendering, it's how "is this link currently active" gets decided.</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">SidebarSection.tsx</span></div>
+        <pre><span class="ct">const</span> { pathname } = useRouter()
+<span class="ct">return</span> (
+  ...
+  {section.items.map((item) =&gt; (
+    <span class="ct">&lt;SidebarNavItem</span> key={item.id} item={item}
+      active={<span class="ck">!item.isPlaceholder</span> &amp;&amp; pathname === item.href} <span class="ct">/&gt;</span>
+  ))}
+)</pre>
+      </div>
+      <div class="callout gotcha">
+        <span class="label">The bug this line avoids</span>
+        <p>Most sidebar items don't have a real page to link to yet, so they all point at the same placeholder href, <span class="path">/</span>. A naive <span class="path">active={pathname === item.href}</span> check would compare <em>every</em> item's href against the current path &mdash; and since several share the exact same placeholder href, several would light up as "active" simultaneously the moment you're on the homepage. The fix is the <span class="path">!item.isPlaceholder &amp;&amp;</span> guard: an item can only ever be marked active if it has a real, unique destination. This is why the mock navigation data (phase 08) carries an explicit <span class="path">isPlaceholder</span> flag on every item &mdash; it's not decorative, it's what this check depends on.</p>
+      </div>
+
+      <h2><span class="section-num">2</span>Two components for one visual slot: render both, let CSS decide</h2>
+      <p>The mobile drawer's content, once you open it, doesn't look like a smaller version of the desktop sidebar &mdash; it's a genuinely different layout with a search field, a Navigation section that mirrors the header's own links, and a highlighted Explore row that the desktop sidebar doesn't have at all. Rather than one component branching internally on screen size, this project builds it as <strong>two separate components</strong>, both always rendered, with CSS showing exactly one at a time.</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">MarketplaceSidebar.module.scss</span></div>
+        <pre>.sidebar {
+  <span class="cm">// the desktop sidebar's own styles, unconditional</span>
+  <span class="ct">@include</span> tablet-down { display: <span class="cn">none</span>; }
+}</pre>
+      </div>
+      <div class="code-card">
+        <div class="code-label"><span class="file">MobileDrawerMenu.module.scss</span></div>
+        <pre>.drawer {
+  display: <span class="cn">none</span>;
+  <span class="ct">@include</span> tablet-down { display: flex; flex-direction: column; }
+}</pre>
+      </div>
+      <p>Both get passed into the same <span class="path">sidebar</span> slot on <span class="path">MarketplacePageShell</span> as siblings:</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">pages/design-preview/marketplace.tsx</span></div>
+        <pre>sidebar={
+  <span class="ct">&lt;&gt;</span>
+    <span class="ct">&lt;MarketplaceSidebar /&gt;</span>
+    <span class="ct">&lt;MobileDrawerMenu</span> onClose={() =&gt; setMenuOpen(<span class="cn">false</span>)} <span class="ct">/&gt;</span>
+  <span class="ct">&lt;/&gt;</span>
+}</pre>
+      </div>
+      <div class="callout why">
+        <span class="label">Why not one component with an if/else on screen width</span>
+        <p>Checking <span class="path">window.innerWidth</span> in JavaScript and branching what to render requires a <span class="path">useEffect</span>, only knows the true width after the component has already mounted once (causing a visible flash on first paint), and re-renders on every resize event. A pure CSS media query has none of those costs &mdash; the browser decides which block is visible before anything paints, and resizing the window just repaints, no JavaScript involved. This exact "render both, CSS decides" shape reappears in phase 07 for an even more dramatic case &mdash; two completely different chart layouts for the same data.</p>
+      </div>
+
+      <h3>Reusing the header's own navigation data</h3>
+      <p>The drawer's Navigation section isn't a second copy of the header's Marketplace/Portfolio/Sell/Resources links &mdash; it imports the exact same data and the exact same active-check the header uses:</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">MobileDrawerMenu.tsx</span></div>
+        <pre><span class="ct">import</span> { HEADER_NAV_ITEMS } <span class="ct">from</span> <span class="cs">'@/design-system/layouts/header/menuItems'</span>
+
+{HEADER_NAV_ITEMS.map((item) =&gt; {
+  <span class="ct">const</span> isActive = pathname === item.href &amp;&amp; item.label === <span class="cs">'Marketplace'</span>
+  <span class="ct">return</span> <span class="ct">&lt;Link</span> href={item.href} className={isActive ? styles.navLinkActive : <span class="cs">''</span>}<span class="ct">&gt;</span>{item.label}<span class="ct">&lt;/Link&gt;</span>
+})}</pre>
+      </div>
+      <p>If a new nav item is ever added to the real header, the drawer picks it up automatically &mdash; there is no second list to remember to update.</p>
+
+      <h3>A decoration that follows selection, not stuck to one item</h3>
+      <p>The Explore row in the drawer has a distinctive highlighted background and a decorative flourish graphic. An earlier version of this component hardcoded that decoration onto Explore specifically. When the drawer later needed a "which item did you just tap" indicator for design review, the fix wasn't to add a second, different highlight &mdash; it was to realize the Explore decoration <em>was already</em> exactly that indicator, just wired to the wrong thing.</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">MobileDrawerMenu.tsx</span></div>
+        <pre>{browseSection.items.map((item) =&gt; {
+  <span class="ct">const</span> isSelected = previewMode &amp;&amp; previewSelectedBrowseId === item.id
+  <span class="ct">return</span> (
+    <span class="ct">&lt;Link</span> key={item.id} className={<span class="cn">`${styles.browseRow} ${isSelected ? styles.browseRowSelected : ''}`</span>}<span class="ct">&gt;</span>
+      ...
+      {isSelected &amp;&amp; <span class="ct">&lt;</span>...decorative flourish images...<span class="ct">&gt;</span>}
+    <span class="ct">&lt;/Link&gt;</span>
+  )
+})}</pre>
+      </div>
+      <p>Every row in the Browse list, including Explore, is now rendered from the exact same map over the exact same array &mdash; whichever one's <span class="path">id</span> matches the currently-selected id gets the highlight and flourish, and it starts on Explore only because that's the initial state value, not because Explore is special-cased in the markup anymore.</p>
+
+      <h2><span class="section-num">3</span>previewMode: a temporary, clearly-scoped escape hatch</h2>
+      <p>Every link in this preview page would, in a real logged-out session, either navigate away from the page entirely or redirect to a login screen for anything behind auth &mdash; both of which make it impossible to actually look at the design you're reviewing. The fix is a prop, explicitly documented as temporary:</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">MobileDrawerMenu.tsx</span></div>
+        <pre><span class="cm">// TEMPORARY, preview-only — nav links mark themselves selected instead of</span>
+<span class="cm">// navigating. Only ever passed from the preview page. Remove once real</span>
+<span class="cm">// destinations exist.</span>
+previewMode?: <span class="cn">boolean</span>
+
+<span class="ct">&lt;Link</span> href={item.href}
+  onClick={previewMode ? (e) =&gt; { e.preventDefault(); setPreviewSelectedId(item.id) } : onClose}
+<span class="ct">&gt;</span></pre>
+      </div>
+      <p><span class="path">e.preventDefault()</span> stops the browser's default behavior for a link click (actually navigating), and the click instead just updates local state that drives which row looks "active." Every component across this whole page that got this treatment &mdash; <span class="path">Header</span>, <span class="path">MarketplaceSidebar</span>, <span class="path">MobileDrawerMenu</span> &mdash; takes the same optional, default-off prop, for the same reason section 3 of phase 03 explained: a shared component gets new behavior through a prop that defaults to not changing anything for callers that don't pass it.</p>
+
+      <h2><span class="section-num">4</span>The bottom nav: a genuinely new component, and why it was removed then rebuilt</h2>
+      <p><span class="path">MobileBottomNav</span> is a fixed tab bar pinned to the bottom of the viewport &mdash; a real addition to the design, not a responsive reflow of anything that exists on desktop. It teaches a small but important lesson about fixed-position UI and page layout.</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">MobileBottomNav.module.scss</span></div>
+        <pre>.nav {
+  <span class="ct">@include</span> mobile {
+    display: flex;
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    padding: <span class="cn">var(--space-3) var(--space-3) calc(var(--space-3) + env(safe-area-inset-bottom, 0px))</span>;
+  }
+}</pre>
+      </div>
+      <div class="callout gotcha">
+        <span class="label">Fixed elements don't reserve their own space</span>
+        <p><span class="path">position: fixed</span> takes an element completely out of the page's normal document flow &mdash; the rest of the page has no idea it's there and will happily render content underneath it. The fix lives one file away, on the page shell itself:</p>
+      </div>
+      <div class="code-card">
+        <div class="code-label"><span class="file">MarketplacePageShell.module.scss</span></div>
+        <pre>.shell {
+  <span class="ct">@include</span> mobile { padding-bottom: <span class="cn">76px</span>; } <span class="cm">// clears the fixed nav's own height</span>
+}</pre>
+      </div>
+      <p>76px of bottom padding on the page's own outer wrapper leaves exactly enough empty space at the end of the page for the fixed bar to sit over without covering real content. Any time you add a <span class="path">position: fixed</span> element pinned to an edge of the screen, this is the matching move: pad the scrollable content by that element's own size, on the same edge.</p>
+      <p><span class="path">env(safe-area-inset-bottom, 0px)</span> in the padding above is worth knowing too &mdash; it's a CSS environment variable that iPhones with a home-indicator bar (no physical home button) expose automatically, so the nav's padding grows slightly on those devices to clear the indicator, and is simply <span class="path">0px</span> (the fallback) everywhere else.</p>
+
+      <h2><span class="section-num">5</span>SidebarPromoCard: a real design shape from raw CSS, and hiding on a real condition</h2>
+      <p>The "What Is Your Name Worth?" card's notched blue background is built the same way as phase 02's buttons &mdash; <span class="path">clip-path: polygon(...)</span> &mdash; just with different corner coordinates and a gradient fill instead of a flat color, matched to a decorative CSS glow behind it using layered <span class="path">box-shadow</span>-like radial gradients.</p>
+
+      <h3>How clip-path: polygon() actually draws that shape, point by point</h3>
+      <p><span class="path">clip-path</span> doesn't change an element's size or background — it takes an element that's already a normal rectangle and hides everything outside a shape you describe, as if you cut the rectangle out with scissors along a line you drew. <span class="path">polygon(...)</span> is one way to describe that line: a list of <span class="path">x y</span> coordinate pairs, each one a point, connected in order, one straight edge at a time, until the last point connects back to the first to close the shape.</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">SidebarPromoCard.module.scss</span></div>
+        <pre>$notch: polygon(
+  <span class="cn">20px</span> <span class="cn">0</span>,                    <span class="cm">// 1. top edge, 20px in from the left</span>
+  calc(<span class="cn">100%</span> - <span class="cn">20px</span>) <span class="cn">0</span>,      <span class="cm">// 2. top edge, 20px in from the right</span>
+  <span class="cn">100%</span> <span class="cn">20px</span>,                  <span class="cm">// 3. right edge, 20px down — these two points cut the top-right corner</span>
+  <span class="cn">100%</span> calc(<span class="cn">100%</span> - <span class="cn">21px</span>),      <span class="cm">// 4. right edge, 21px up from the bottom</span>
+  calc(<span class="cn">100%</span> - <span class="cn">21px</span>) <span class="cn">100%</span>,      <span class="cm">// 5. bottom edge, 21px in from the right — cuts the bottom-right corner</span>
+  <span class="cn">0</span> <span class="cn">100%</span>,                    <span class="cm">// 6. straight to the real bottom-left corner — no cut here</span>
+  <span class="cn">0</span> <span class="cn">21px</span>                     <span class="cm">// 7. left edge, 21px up from the bottom — back toward point 1</span>
+);</pre>
+      </div>
+      <p>Each coordinate is measured from the shape's own top-left corner: the first number is how far across (<span class="path">x</span>), the second is how far down (<span class="path">y</span>) — so <span class="path">0 0</span> would be the exact top-left corner, and <span class="path">100% 100%</span> the exact bottom-right one. Walk the seven points above in order and you're tracing the card's outline clockwise: start a little in from the top-left corner, run right along the top, cut diagonally down-and-right to skip the top-right corner entirely, run down the right edge, cut diagonally again to skip the bottom-right corner, then — this is the one corner that's different — go straight to the <em>actual</em> bottom-left corner (point 6, <span class="path">0 100%</span>) instead of cutting it, then straight back up to where the pattern started.</p>
+      <div class="callout gotcha">
+        <span class="label">Why one corner needed a fix: two points make a cut, one point makes a real corner</span>
+        <p>The shape originally chamfered <em>all four</em> corners — the bottom-left one was cut using the same two-point technique as the other three, a point on the bottom edge (<span class="path">21px 100%</span>) followed by a point on the left edge (<span class="path">0 calc(100% - 21px)</span>), with a diagonal line connecting them exactly like the top-right and bottom-right cuts. Cutting a corner is always two points that each sit a little short of the real corner, one on each of the two edges that meet there — remove those two points and put a single point at the real corner coordinates instead (<span class="path">0 100%</span>, the literal bottom-left of the box), and that corner stops being cut and becomes a sharp, real 90° vertex, while the other three corners keep their chamfer untouched since their own point pairs weren't touched at all.</p>
+      </div>
+      <p>This is really the entire trick behind every chamfered shape in this codebase — phase 02's button corners, this card's notch — a small, fixed number of pixels shaved off however many corners the design calls for, described as pairs of points instead of a single sharp one. Wanting a specific corner to stay sharp is just wanting fewer pairs: collapse that corner's two points back into the one real coordinate it was always approximating.</p>
+
+      <p>Its "connect wallet" button is real, and real means it has to respect real auth state, not just the visual review mode above:</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">SidebarPromoCard.tsx</span></div>
+        <pre><span class="ct">const</span> { authenticated } = useAuth()
+<span class="ct">if</span> (authenticated) <span class="ct">return null</span></pre>
+      </div>
+      <div class="callout why">
+        <span class="label">Why hide the whole card, not just the button</span>
+        <p>The header's own connect-wallet button already hides itself once a user is signed in, showing a profile menu instead. This card's CTA is the exact same action pointed at the exact same destination &mdash; leaving the card visible with nothing useful for it to do would be a dead end for a signed-in visitor. Reusing the same <span class="path">useAuth()</span> hook the header already relies on, rather than inventing a second way to check auth state, is what keeps this consistent if the real auth logic ever changes.</p>
+      </div>
+
+      <h2><span class="section-num">6</span>What to remember from this phase</h2>
+      <ul class="checklist">
+        <li>Guard "is this active" checks against placeholder/shared data, not just a raw equality check, or several items can light up at once.</li>
+        <li>When a mobile layout is genuinely different, not just resized, build it as a separate component and let CSS choose between the two, rather than branching one component on window width.</li>
+        <li>A decoration meant to indicate "selected" should be driven by the same state/id comparison for every item, not hardcoded onto whichever item happened to be selected in the reference design.</li>
+        <li>A <span class="path">position: fixed</span> element needs the rest of the page padded to match its size on the edge it's pinned to, or it covers real content.</li>
+        <li>In a <span class="path">clip-path: polygon()</span> shape, a chamfered corner is always two points, one just short of the real corner on each edge that meets there — collapse them into the single real coordinate to make that specific corner sharp again, without touching any other corner's own points.</li>
+        <li>Hide UI based on the real condition it depends on (auth state), separately from any temporary review-only behavior layered on top of it.</li>
+      </ul>
+
+      <div class="phase-nav">
+        <a class="to-index" href="03-layout-shell.html">← Header &amp; page shell</a>
+        <a href="05-hero-promoted.html">Next: Hero &amp; Promoted Domains →</a>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

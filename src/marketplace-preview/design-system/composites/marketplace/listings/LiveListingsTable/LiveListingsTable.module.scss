@@ -1,0 +1,191 @@
+@import '@mpstyles/_mixins.scss';
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+// ── Desktop/tablet: one unified scrolling grid ──────────────────────────
+// Figma node 1:1087 — same column proportions as ListingRow so header and
+// rows line up. CSS-hidden below desktop, see .mobileSplit below for why.
+
+.scrollWrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+
+  @include mobile {
+    display: none;
+  }
+}
+
+.header {
+  display: grid;
+  grid-template-columns: 2.4fr 1fr 1.4fr 1.2fr 1.9fr;
+  background: var(--color-white-primary);
+  border: 1px solid var(--color-border-black-subtle);
+  border-radius: 3px;
+
+  span {
+    padding: var(--space-2) var(--space-3);
+    font-family: var(--font-satoshi);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--text-small-13);
+    color: var(--color-black-alpha-55);
+
+    &:not(:first-child) {
+      border-left: 1px solid var(--color-border-black-subtle);
+    }
+  }
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+// ── Mobile: Domain Name in a real fixed pane beside a fully scrollable
+// pane for everything else, instead of one scrolling grid with a stuck
+// column ────────────────────────────────────────────────────────────────
+// A single sticky Domain column over one shared scroll area was tried and
+// dropped (see ListingRow's .row comment) — the sticky column always
+// covers a band of screen width equal to its own size, so the far end of
+// the Action column could only ever be reached by first passing behind
+// it, and Buy Now/the heart icon could never actually clear the overlay
+// no matter how far you scrolled. Splitting Domain into a pane that isn't
+// part of the scrolling width at all sidesteps that entirely — the
+// scrollable pane's natural end reveals Action in full, nothing hidden.
+
+.mobileSplit {
+  display: none;
+
+  @include mobile {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+}
+
+.domainPane {
+  flex-shrink: 0;
+  width: 172px; // was 140px — more breathing room before a name needs to scroll (see ListingRow's .domainNameScroll)
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+// Fixed (not min-) heights, shared by both panes' header and every row —
+// the previous min-height on the header pair was a guess at what the
+// desktop .header span (inherited line-height, no explicit value) renders
+// at, and it guessed wrong. Any per-pane difference here, even a couple of
+// px, compounds down the list since every row after it inherits the
+// offset, which is what actually caused domain names to visibly drift out
+// of line with their own row's data by the time you scroll a few rows
+// down. Fixed heights on both sides make that impossible instead of
+// merely unlikely.
+$table-header-height: 32px;
+$table-row-height: 56px;
+
+.domainPaneHeader {
+  height: $table-header-height;
+  padding: 0 var(--space-3);
+  background: var(--color-white-primary);
+  border: 1px solid var(--color-border-black-subtle);
+  border-radius: 3px;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-small-13);
+  color: var(--color-black-alpha-55);
+  display: flex;
+  align-items: center;
+}
+
+.domainPaneRow {
+  height: $table-row-height;
+  display: flex;
+  align-items: stretch;
+  background: var(--color-white-primary);
+  border: 1px solid var(--color-border-black-subtle);
+  border-radius: 3px;
+  overflow: hidden;
+
+  > * {
+    flex: 1;
+    justify-content: center; // ListingDomainCell's .cell is flex-column — this centers it vertically within the fixed row height
+  }
+}
+
+// $rest-width: Figma-exact proportional width of Price+Appraised+Chain+
+// Action only (5.5 of the desktop row's 7.9fr total, 5.5/7.9 × 835),
+// matching the same per-fr scale the desktop grid uses.
+$rest-width: 581px;
+
+.scrollPane {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.scrollPaneInner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: $rest-width;
+}
+
+.restHeader {
+  height: $table-header-height;
+  display: grid;
+  grid-template-columns: 1fr 1.4fr 1.2fr 1.9fr;
+  background: var(--color-white-primary);
+  border: 1px solid var(--color-border-black-subtle);
+  border-radius: 3px;
+
+  span {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding: 0 var(--space-3);
+    font-family: var(--font-satoshi);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--text-small-13);
+    color: var(--color-black-alpha-55);
+
+    &:not(:first-child) {
+      border-left: 1px solid var(--color-border-black-subtle);
+    }
+  }
+}
+
+.restRows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.restRow {
+  height: $table-row-height;
+  display: grid;
+  grid-template-columns: 1fr 1.4fr 1.2fr 1.9fr;
+  align-items: center;
+  background: var(--color-white-primary);
+  border: 1px solid var(--color-border-black-subtle);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.empty {
+  padding: var(--space-6) var(--space-3);
+  text-align: center;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  color: var(--color-gray-primary);
+}
+
+.showMore {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--space-2);
+}

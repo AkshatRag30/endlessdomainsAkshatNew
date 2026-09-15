@@ -1,0 +1,178 @@
+@import '@mpstyles/_mixins.scss';
+
+// Figma node 1:1645. The background noise texture from that node's own PNG
+// export is skipped, but the main site's real stripe-bg mixin replaces the
+// earlier plain fill — same treatment applied to LiveActivityPanel.
+
+.panel {
+  position: relative;
+  padding: var(--space-2);
+  background: rgba(255, 255, 255, 0.2);
+  @include stripe-bg;
+  overflow: hidden;
+  border: 1px solid var(--color-blue-primary-alpha-07); // closest existing token to Figma's rgba(38,57,237,0.08)
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.titleRow {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.title {
+  font-family: var(--font-satoshi);
+  font-size: 17px;
+  color: var(--color-black-primary);
+  text-transform: capitalize;
+}
+
+.updated {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  color: var(--color-black-alpha-74);
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  align-self: flex-start;
+}
+
+.toggleOption {
+  padding: 3px var(--space-2);
+  border: none;
+  background: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-small-12);
+  color: var(--color-black-alpha-65);
+}
+
+.toggleOptionActive {
+  background: linear-gradient(180deg, #404040, #1a1a1a); // same dark gradient as the filter buttons/search submit — established this session
+  color: var(--color-white-primary);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25);
+}
+
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+// ── Card list (desktop only) vs. expanded single chart (tablet + mobile) ──
+// Figma originally kept the stacked mini-card list at both desktop and
+// mobile widths (nodes 1:1645 / 20:1311) with only tablet (27:697) getting
+// the big-chart-with-tabs layout. The revised mobile mockup (34:1041) now
+// shows that same expanded layout at mobile too, so it's tablet-down as a
+// whole rather than tablet alone — both blocks still render, CSS shows one.
+//
+// These two rules must come AFTER .cards above: the card-list element
+// carries both .cards and .cardsOnly, and .cards's own display:flex is
+// unconditional — with equal specificity, whichever rule is declared later
+// in the file wins the cascade at any width where both apply. Declared
+// first (as this used to be, at the top of the file), .cardsOnly's
+// display:none silently lost to .cards's display:flex at every width,
+// which is exactly why the old stacked cards never actually hid and sat on
+// top of the new chart instead of being replaced by it.
+.cardsOnly {
+  @include tablet-down {
+    display: none;
+  }
+}
+
+.expanded {
+  display: none;
+
+  @include tablet-down {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+}
+
+// ── Expanded (tablet-only) single chart ─────────────────────────────────
+
+.metricTabs {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  align-self: flex-start;
+  padding: 3px;
+  background: var(--color-white-primary);
+  border: 1px solid var(--color-border-black-subtle);
+  border-radius: 6px;
+  box-shadow: 0 1.3px 4.6px rgba(0, 0, 0, 0.05);
+}
+
+.metricTab {
+  padding: var(--space-1) var(--space-2);
+  border: none;
+  background: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  color: var(--color-black-alpha-55);
+  white-space: nowrap;
+}
+
+.metricTabActive {
+  background: linear-gradient(180deg, var(--color-blue-primary), var(--color-blue-primary-alpha-50));
+  color: var(--color-white-primary);
+  font-weight: var(--font-weight-medium);
+  box-shadow: inset 0 1px 4.6px rgba(255, 255, 255, 0.6);
+}
+
+.expandedValueRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.expandedValue {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: 1.4rem;
+  letter-spacing: -0.02em;
+  color: #191627; // design-specific: Figma-exact, matches MarketMetricCard's .value
+}
+
+.expandedValueRow .toggle {
+  margin-left: auto;
+}
+
+.expandedSecondary {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  color: #aba7bc; // design-specific: Figma-exact, matches MarketMetricCard's .secondary
+}
+
+.expandedChart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.expandedChartLabels {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-space-grotesk); // closest already-loaded face to Figma's Consolas
+  font-size: var(--text-small-12);
+  color: #aba7bc; // design-specific: Figma-exact
+}

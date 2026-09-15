@@ -28,6 +28,12 @@ const nextConfig = {
         if (url.startsWith('@newstyles/')) {
           const file = url.replace('@newstyles/', '')
           done({ file: path.join(__dirname, 'src/design-system/styles', file) })
+        } else if (url.startsWith('@mpstyles/')) {
+          // Marketplace preview's own tokens/mixins (copied from the source
+          // project under src/marketplace-preview/) — a separate alias so it
+          // never resolves against this project's own design-system/styles.
+          const file = url.replace('@mpstyles/', '')
+          done({ file: path.join(__dirname, 'src/marketplace-preview/design-system/styles', file) })
         } else {
           done(null)
         }

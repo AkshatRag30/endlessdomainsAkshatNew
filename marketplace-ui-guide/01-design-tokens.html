@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design Tokens &amp; Globals</title>
+<link rel="stylesheet" href="assets/guide.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="sidenav">
+    <a href="index.html" class="brand">Marketplace UI Guide</a>
+    <span class="brand-sub">Learn it, don't just have it</span>
+    <nav>
+      <a class="nav-link" href="index.html"><span class="num">·</span><span>Overview &amp; map</span></a>
+      <div class="group-label">Foundations</div>
+      <a class="nav-link" href="00-fundamentals.html"><span class="num">00</span><span>Fundamentals crash course</span></a>
+      <a class="nav-link current" href="01-design-tokens.html"><span class="num">01</span><span>Design tokens &amp; globals</span></a>
+      <a class="nav-link" href="02-primitives.html"><span class="num">02</span><span>Primitives</span></a>
+      <div class="group-label">Structure</div>
+      <a class="nav-link" href="03-layout-shell.html"><span class="num">03</span><span>Header &amp; page shell</span></a>
+      <a class="nav-link" href="04-sidebar-navigation.html"><span class="num">04</span><span>Sidebar &amp; mobile nav</span></a>
+      <div class="group-label">Sections</div>
+      <a class="nav-link" href="05-hero-promoted.html"><span class="num">05</span><span>Hero &amp; Promoted Domains</span></a>
+      <a class="nav-link" href="06-listings-table.html"><span class="num">06</span><span>The listings table</span></a>
+      <a class="nav-link" href="07-activity-analytics.html"><span class="num">07</span><span>Activity &amp; analytics</span></a>
+      <div class="group-label">Systems</div>
+      <a class="nav-link" href="08-data-layer.html"><span class="num">08</span><span>Types &amp; mock data</span></a>
+      <a class="nav-link" href="09-responsive-patterns.html"><span class="num">09</span><span>Responsive patterns</span></a>
+      <a class="nav-link" href="10-real-apis.html"><span class="num">10</span><span>Wiring to real APIs</span></a>
+    </nav>
+  </aside>
+
+  <div class="content">
+    <div class="wrap">
+      <p class="eyebrow">Phase 01 &middot; Foundations</p>
+      <h1 class="title">Design tokens &amp; global styles</h1>
+      <p class="dek">Before any component, three small files: <span class="path">tokens.scss</span>, <span class="path">_mixins.scss</span>, <span class="path">fonts.scss</span>. Every color, size, and breakpoint used anywhere in this guide traces back to one of these.</p>
+
+      <h2><span class="section-num">1</span>Why tokens instead of raw values</h2>
+      <p>Open any component's stylesheet in this project and you'll almost never see a bare hex color or a bare pixel value for spacing. Instead you'll see things like <span class="path">var(--color-blue-primary)</span> or <span class="path">var(--space-4)</span>. These are <strong>CSS custom properties</strong> &mdash; plain CSS, no build step needed &mdash; declared once on <span class="path">:root</span> in <span class="path">src/design-system/styles/tokens.scss</span> and then referenced everywhere else.</p>
+      <div class="callout why">
+        <span class="label">Why this matters</span>
+        <p>If the brand blue ever changes, it changes in one line, not in forty files. If you're reading a component's CSS and see <span class="path">var(--color-black-alpha-55)</span>, you immediately know it's a semi-transparent black used elsewhere too, not a one-off value someone typed by hand &mdash; the variable name <em>is</em> the documentation.</p>
+      </div>
+
+      <h2><span class="section-num">2</span>Reading <span class="path">tokens.scss</span></h2>
+      <p>The file is one giant <span class="path">:root { ... }</span> block, organized into labeled sections with comment dividers. Here's the shape, trimmed to the parts you'll see referenced constantly in later phases:</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">src/design-system/styles/tokens.scss</span><span>excerpt</span></div>
+        <pre><span class="cm">// ── Blue ──────────────────────────────────────────────────────────────────</span>
+<span class="ck">--color-blue-primary</span>: <span class="cs">#2639ED</span>;
+<span class="ck">--color-blue-light</span>: <span class="cs">#e9ebfd</span>;
+<span class="ck">--color-blue-dark</span>: <span class="cs">#1d2bb2</span>;
+
+<span class="cm">// ── Font families ─────────────────────────────────────────────────────────</span>
+<span class="ck">--font-satoshi</span>: <span class="cs">'Satoshi', sans-serif</span>;
+<span class="ck">--font-space-grotesk</span>: <span class="cs">'Space Grotesk', sans-serif</span>;
+
+<span class="cm">// ── Font sizes ────────────────────────────────────────────────────────────</span>
+<span class="ck">--text-h1</span>: <span class="cs">65px</span>;
+<span class="ck">--text-body</span>: <span class="cs">22px</span>;
+<span class="ck">--text-small-13</span>: <span class="cs">13px</span>;
+<span class="ck">--text-small-12</span>: <span class="cs">12px</span>;
+
+<span class="cm">// ── Font weights ──────────────────────────────────────────────────────────</span>
+<span class="ck">--font-weight-regular</span>: <span class="cs">400</span>;
+<span class="ck">--font-weight-medium</span>: <span class="cs">500</span>;
+<span class="ck">--font-weight-semibold</span>: <span class="cs">600</span>;
+<span class="ck">--font-weight-bold</span>: <span class="cs">700</span>;
+
+<span class="cm">// ── Base Spacing Scale ────────────────────────────────────────────────────</span>
+<span class="ck">--space-1</span>: <span class="cs">4px</span>;
+<span class="ck">--space-2</span>: <span class="cs">8px</span>;
+<span class="ck">--space-3</span>: <span class="cs">12px</span>;
+<span class="ck">--space-4</span>: <span class="cs">16px</span>;
+<span class="ck">--space-6</span>: <span class="cs">24px</span>;</pre>
+      </div>
+      <p>Notice the naming pattern: <span class="path">--text-small-13</span> literally means "a small text size, 13px" &mdash; the number in the name is the pixel value, so you never have to jump back to this file to know what a size token means when you see it used. The spacing scale (<span class="path">--space-1</span> through <span class="path">--space-15</span>) is a fixed ladder of values, not arbitrary numbers, so any two components that both use <span class="path">--space-4</span> automatically line up.</p>
+
+      <h3>Colors that don't fit the palette</h3>
+      <p>You'll also spot literal hex values inside component stylesheets throughout this project, always with a comment like <span class="path">// design-specific: Figma-exact, no token match</span>. That's intentional, not an oversight: when a design calls for a one-off color that doesn't belong in the shared palette, the convention here is to write the literal value with a comment explaining it's deliberate, rather than inventing a new token that would only ever be used once.</p>
+
+      <h2><span class="section-num">3</span>Breakpoints live in <span class="path">_mixins.scss</span>, not in every file</h2>
+      <p>Every responsive rule in this whole codebase &mdash; every single <span class="path">@media</span> query &mdash; goes through one of a handful of named mixins defined once in <span class="path">src/design-system/styles/_mixins.scss</span>. Nobody writes a raw <span class="path">@media (max-width: 767px)</span> by hand.</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">src/design-system/styles/_mixins.scss</span><span>excerpt</span></div>
+        <pre><span class="ck">$breakpoint-mobile</span>: <span class="cs">768px</span>;
+<span class="ck">$breakpoint-tablet</span>: <span class="cs">1025px</span>;   <span class="cm">// widened from 992px — see phase 09</span>
+<span class="ck">$breakpoint-desktop</span>: <span class="cs">1025px</span>;
+
+<span class="ct">@mixin</span> mobile {
+  <span class="ct">@media</span> (max-width: <span class="cn">#{$breakpoint-mobile - 1px}</span>) { <span class="ck">@content</span>; }
+}
+
+<span class="ct">@mixin</span> tablet-down {
+  <span class="ct">@media</span> (max-width: <span class="cn">#{$breakpoint-tablet - 1px}</span>) { <span class="ck">@content</span>; }
+}
+
+<span class="ct">@mixin</span> tablet {
+  <span class="ct">@media</span> (min-width: <span class="cn">$breakpoint-mobile</span>) and (max-width: <span class="cn">#{$breakpoint-tablet - 1px}</span>) { <span class="ck">@content</span>; }
+}</pre>
+      </div>
+      <p>Every component you'll see in later phases writes responsive CSS like this:</p>
+      <div class="code-card">
+        <div class="code-label"><span>a typical mobile override, this pattern repeats hundreds of times</span></div>
+        <pre>.someClass {
+  <span class="cm">// desktop styles here, unconditional</span>
+
+  <span class="ct">@include</span> mobile {
+    <span class="cm">// only applies below 768px</span>
+  }
+}</pre>
+      </div>
+      <p>Three named ranges matter for this page: <strong>mobile</strong> (below 768px), <strong>tablet</strong> (768&ndash;1024px), and everything at 1025px and above is treated as desktop by simply <em>not</em> being wrapped in a mobile/tablet-down mixin &mdash; the base, unconditional rule in every stylesheet <em>is</em> the desktop styling. <span class="path">tablet-down</span> means "mobile and tablet combined," used constantly because this page's off-canvas drawer behavior applies to both.</p>
+      <div class="callout gotcha">
+        <span class="label">A real bug this caused</span>
+        <p>Until this project's breakpoints were widened, <span class="path">$breakpoint-tablet</span> was <span class="path">992px</span> while <span class="path">$breakpoint-desktop</span> was <span class="path">1025px</span> &mdash; a 33px gap that belonged to neither range. A real iPad Pro landscape width (1024px) fell straight into that gap and silently got the full desktop layout, sidebar column and all, breaking the mobile-style listings table. Phase 09 covers the fix and how the gap was found.</p>
+      </div>
+
+      <h3>Other mixins you'll see constantly</h3>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>Mixin</th><th>What it's for</th></tr></thead>
+          <tbody>
+            <tr><td class="path">@include focus-ring</td><td>One consistent keyboard-focus outline style, used on every interactive element</td></tr>
+            <tr><td class="path">@include stripe-bg</td><td>A subtle diagonal hairline texture used as a background on several panels &mdash; see phase 07</td></tr>
+            <tr><td class="path">@include max-width($w) / min-width($w)</td><td>An escape hatch for a one-off breakpoint that doesn't match the named ranges</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2><span class="section-num">4</span>Fonts: a real bug worth knowing about</h2>
+      <p>Two font families are used throughout &mdash; Satoshi (most text) and Space Grotesk (numbers, prices, anything monospace-flavored in the original design). They're declared as tokens in <span class="path">tokens.scss</span> exactly like colors:</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">src/design-system/styles/tokens.scss</span></div>
+        <pre><span class="ck">--font-satoshi</span>: <span class="cs">'Satoshi', sans-serif</span>;
+<span class="ck">--font-space-grotesk</span>: <span class="cs">'Space Grotesk', sans-serif</span>;</pre>
+      </div>
+      <div class="callout gotcha">
+        <span class="label">The bug: declaring a font is not the same as loading it</span>
+        <p>For a long stretch of this project, every component correctly wrote <span class="path">font-family: var(--font-satoshi)</span>, but the actual font file was never loaded anywhere &mdash; no <span class="path">&lt;link&gt;</span> tag, no <span class="path">@font-face</span>, no <span class="path">next/font</span>. The browser silently fell back to its default system sans-serif for every single piece of text on the page. Nothing errored, nothing looked <em>broken</em> exactly, it just looked thinner and slightly wrong everywhere at once, which made it hard to spot until someone compared it side-by-side against the real Figma file.</p>
+        <p>The fix lives in <span class="path">pages/_document.tsx</span>, the one file in a Next.js app that wraps every page and is the right place for document-level <span class="path">&lt;link&gt;</span> tags:</p>
+      </div>
+      <div class="code-card">
+        <div class="code-label"><span class="file">pages/_document.tsx</span></div>
+        <pre><span class="ct">&lt;Head&gt;</span>
+  <span class="ct">&lt;link</span> rel=<span class="cs">"stylesheet"</span>
+    href=<span class="cs">"https://api.fontshare.com/v2/css?f[]=satoshi@variable&amp;display=swap"</span> <span class="ct">/&gt;</span>
+  <span class="ct">&lt;link</span> rel=<span class="cs">"stylesheet"</span>
+    href=<span class="cs">"https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;display=swap"</span> <span class="ct">/&gt;</span>
+<span class="ct">&lt;/Head&gt;</span></pre>
+      </div>
+      <p>Two details worth noticing. First, Satoshi is requested as <span class="path">@variable</span> rather than fixed weights &mdash; the font-hosting service Fontshare doesn't ship a static "semibold" (600) file for this typeface, only 400/500/700/900, so a fixed-weight request would have silently substituted the nearest weight it had. A variable font file covers the entire 300&ndash;900 range continuously, so every weight this project's CSS asks for actually renders as that real weight. Second, both are <span class="path">&lt;link&gt;</span> tags in the document head, not a CSS <span class="path">@import</span> &mdash; a <span class="path">@import</span> in a stylesheet is render-blocking in a way a discovered-during-HTML-parsing <span class="path">&lt;link&gt;</span> isn't, so this loads in parallel with everything else instead of one more thing in a blocking chain.</p>
+
+      <div class="phase-nav">
+        <a class="to-index" href="00-fundamentals.html">← Fundamentals crash course</a>
+        <a href="02-primitives.html">Next: Primitives →</a>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

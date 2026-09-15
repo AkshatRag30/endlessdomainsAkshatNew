@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Responsive Patterns</title>
+<link rel="stylesheet" href="assets/guide.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="sidenav">
+    <a href="index.html" class="brand">Marketplace UI Guide</a>
+    <span class="brand-sub">Learn it, don't just have it</span>
+    <nav>
+      <a class="nav-link" href="index.html"><span class="num">·</span><span>Overview &amp; map</span></a>
+      <div class="group-label">Foundations</div>
+      <a class="nav-link" href="00-fundamentals.html"><span class="num">00</span><span>Fundamentals crash course</span></a>
+      <a class="nav-link" href="01-design-tokens.html"><span class="num">01</span><span>Design tokens &amp; globals</span></a>
+      <a class="nav-link" href="02-primitives.html"><span class="num">02</span><span>Primitives</span></a>
+      <div class="group-label">Structure</div>
+      <a class="nav-link" href="03-layout-shell.html"><span class="num">03</span><span>Header &amp; page shell</span></a>
+      <a class="nav-link" href="04-sidebar-navigation.html"><span class="num">04</span><span>Sidebar &amp; mobile nav</span></a>
+      <div class="group-label">Sections</div>
+      <a class="nav-link" href="05-hero-promoted.html"><span class="num">05</span><span>Hero &amp; Promoted Domains</span></a>
+      <a class="nav-link" href="06-listings-table.html"><span class="num">06</span><span>The listings table</span></a>
+      <a class="nav-link" href="07-activity-analytics.html"><span class="num">07</span><span>Activity &amp; analytics</span></a>
+      <div class="group-label">Systems</div>
+      <a class="nav-link" href="08-data-layer.html"><span class="num">08</span><span>Types &amp; mock data</span></a>
+      <a class="nav-link current" href="09-responsive-patterns.html"><span class="num">09</span><span>Responsive patterns</span></a>
+      <a class="nav-link" href="10-real-apis.html"><span class="num">10</span><span>Wiring to real APIs</span></a>
+    </nav>
+  </aside>
+
+  <div class="content">
+    <div class="wrap">
+      <p class="eyebrow">Phase 09 &middot; Systems</p>
+      <h1 class="title">The responsive system, seen all at once</h1>
+      <p class="dek">Every earlier phase used pieces of this system without stopping to look at the whole thing. This phase is the recap — the breakpoint scale, the one recurring layout pattern that shows up in six different components, and a catalog of the real bugs that came from getting it wrong, gathered in one place instead of scattered across six files.</p>
+
+      <h2><span class="section-num">1</span>The four-tier breakpoint scale</h2>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>Mixin</th><th>Range</th><th>Used for</th></tr></thead>
+          <tbody>
+            <tr><td class="path">small-mobile</td><td>&le; 499px</td><td>Rare — a handful of extra-narrow-phone adjustments</td></tr>
+            <tr><td class="path">mobile</td><td>&le; 767px</td><td>Phone-width layout switches (drawer nav, split-pane table, bottom nav)</td></tr>
+            <tr><td class="path">tablet</td><td>768px&ndash;1024px</td><td>The iPad-Pro-portrait band specifically — the expanded Market Activity chart, sidebar rail row layout</td></tr>
+            <tr><td class="path">tablet-down</td><td>&le; 1024px</td><td>"Anything narrower than desktop" — mobile drawer, hidden desktop sidebar, MarketActivityPanel's expanded layout</td></tr>
+            <tr><td class="path">desktop</td><td>&ge; 1025px</td><td>Implicit default — most component base styles, no media query needed</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Two mixins are worth calling out because they're easy to reach for interchangeably and mean different things: <span class="path">tablet</span> alone is a narrow <em>band</em> (768&ndash;1024px only), while <span class="path">tablet-down</span> is everything at or below that band's top edge, phone widths included. Anywhere a mobile layout and a tablet layout happen to share the same treatment (the drawer menu, the hidden desktop sidebar), the code reaches for <span class="path">tablet-down</span> once instead of duplicating the same rule under both <span class="path">mobile</span> and <span class="path">tablet</span>. Anywhere tablet needs something phones specifically shouldn't get (the expanded chart layout, before the later mockup made it apply at mobile too), it's <span class="path">tablet</span> alone.</p>
+      <div class="callout gotcha">
+        <span class="label">The 992&ndash;1024px dead zone</span>
+        <p>Phase 01 covered this in passing; it belongs here too, because it's the canonical example of what happens when a breakpoint scale has a gap. <span class="path">$breakpoint-tablet</span> used to be <span class="path">992px</span> while <span class="path">$breakpoint-desktop</span> was <span class="path">1025px</span> &mdash; leaving 992&ndash;1024px covered by neither <span class="path">tablet-down</span> nor <span class="path">desktop</span>. A real iPad Pro (834px portrait, 1024px landscape) landed exactly in that gap and silently got the unmodified desktop layout, no error, just the wrong design. The fix was making <span class="path">$breakpoint-tablet</span> and <span class="path">$breakpoint-desktop</span> equal (<span class="path">1025px</span>), so every pixel width is covered by exactly one of the two mixins with nothing left in between. Any time you introduce a new breakpoint variable, check that its range is contiguous with its neighbors — a gap doesn't throw an error, it just quietly falls through to whatever rule happens to apply by default.</p>
+      </div>
+
+      <h2><span class="section-num">2</span>The one pattern that appears six times: render both, let CSS decide</h2>
+      <p>By now you've seen this shape enough times to recognize it as one idea wearing different clothes. Every time a section of the UI looks <em>genuinely different</em> between breakpoints (not just resized, but different elements entirely), the solution in this codebase is the same: render every version unconditionally, and let a CSS media query show exactly one.</p>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>Where</th><th>Version A</th><th>Version B</th></tr></thead>
+          <tbody>
+            <tr><td>Phase 03</td><td class="path">Header</td><td class="path">.menuToggle (hamburger, tablet-down only)</td></tr>
+            <tr><td>Phase 04</td><td class="path">MarketplaceSidebar</td><td class="path">MobileDrawerMenu</td></tr>
+            <tr><td>Phase 06</td><td class="path">.scrollWrap (desktop grid)</td><td class="path">.mobileSplit (two-pane table)</td></tr>
+            <tr><td>Phase 07</td><td class="path">LiveActivityPanel</td><td class="path">LiveActivityTicker</td></tr>
+            <tr><td>Phase 07</td><td class="path">.cardsOnly (stacked cards)</td><td class="path">.expanded (single big chart)</td></tr>
+            <tr><td>Phase 04</td><td>Desktop sidebar hidden</td><td>Bottom nav fixed (mobile only)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout why">
+        <span class="label">Why this pattern won over a JavaScript width check, every single time</span>
+        <p>A <span class="path">useEffect</span> that reads <span class="path">window.innerWidth</span> only knows the real width after the component has already mounted once — so the very first paint either guesses wrong or renders nothing until that effect runs, which is a visible flash or a layout jump depending on which way the guess is wrong. It also means every resize event re-triggers a React re-render just to flip a boolean. A CSS media query has neither cost: the browser resolves which rule applies before anything paints, and resizing the browser window is purely the browser's own paint pipeline, no JavaScript involved, no flash, no re-render. The one price paid for this is that both versions exist in the DOM at once — acceptable for the small, mostly-static components on this page; worth reconsidering only if a hidden variant were doing something expensive (a live data subscription, a heavy chart library) that shouldn't run at all while invisible.</p>
+      </div>
+      <div class="callout gotcha">
+        <span class="label">The one time this pattern actually broke: cascade order</span>
+        <p>Phase 07's <span class="path">.cardsOnly</span>/<span class="path">.expanded</span> bug is the pattern's one real failure mode: when the "show" and "hide" rules have equal CSS specificity, whichever is declared later in the file wins, regardless of which one looks like it should be conditional. The fix isn't specific to that component — any time you add a new toggle rule to a stylesheet that already has an unconditional rule for the same class, declare the toggle <em>after</em> it, or reach for a higher-specificity/more explicit selector so source order can't decide the outcome by accident.</p>
+      </div>
+
+      <h2><span class="section-num">3</span>previewMode: one prop pattern, four components, a hard scope boundary</h2>
+      <p>Phase 04 introduced this in the sidebar; it's worth seeing as a system rather than a one-off. <span class="path">Header</span>, <span class="path">MarketplaceSidebar</span>/<span class="path">SidebarSection</span>/<span class="path">SidebarNavItem</span>, and <span class="path">MobileDrawerMenu</span> all take the same optional prop, default <span class="path">undefined</span>/falsy, that changes exactly one thing: a link click calls <span class="path">e.preventDefault()</span> and updates local "selected" state instead of actually navigating.</p>
+      <div class="callout note">
+        <span class="label">Why this is safe to leave in a shared component instead of a real risk</span>
+        <p>Three things keep this from leaking into the real app. First, it's opt-in with a falsy default — every caller that doesn't explicitly pass <span class="path">previewMode</span> gets completely unmodified, real-navigation behavior, which is every page except this one preview page. Second, only <span class="path">pages/design-preview/marketplace.tsx</span> — an unlinked route nothing else routes to — actually passes it. Third, every place it's added carries a comment marking it temporary and explaining what it's standing in for, so it reads as a deliberate, findable exception rather than something that could be mistaken for permanent behavior later. This is the general shape worth remembering: a temporary behavior change to a shared component should be an explicit, defaulted-off prop with a comment explaining why, not a global flag, an environment check, or a silent behavior change with no trace of why it's there.</p>
+      </div>
+
+      <h2><span class="section-num">4</span>Touch and scroll: the gotchas that only show up on a real device</h2>
+      <p>Three separate scroll-related bugs across phases 06 and 07 share a common thread: none of them were visible in a static screenshot or caught by a type checker, and two of the three survived a first "fix" that looked correct in the source code.</p>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>Symptom</th><th>Real cause</th><th>Where</th></tr></thead>
+          <tbody>
+            <tr><td>Long domain name wouldn't scroll on mobile at all</td><td>Ancestor's <span class="path">align-items: flex-start</span> left the scrollable element with no real width to overflow against</td><td>Phase 06</td></tr>
+            <tr><td>Buy Now button unreachable by scroll</td><td><span class="path">position: sticky</span> permanently occupies screen space content has to pass behind</td><td>Phase 06</td></tr>
+            <tr><td>Two panes' rows drifted out of alignment</td><td>Guessed <span class="path">min-height</span> didn't match the other pane's real rendered height, and a floor doesn't prevent drift</td><td>Phase 06</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>The practical takeaway isn't a specific property to memorize, it's a debugging order of operations: if a scroll/overflow rule looks right in the CSS and still doesn't behave right in the browser, check the element's own real, computed width/height before adding more scroll-specific properties to it. <span class="path">overflow-x: auto</span> and <span class="path">touch-action: pan-x</span> can't do anything for an element that never actually became narrower than its content in the first place — and no amount of touch-specific CSS fixes a width problem.</p>
+
+      <h2><span class="section-num">5</span>What to remember from this phase</h2>
+      <ul class="checklist">
+        <li>Keep a breakpoint scale contiguous — verify each mixin's range starts exactly where the previous one ends, or a width in the gap silently gets the wrong layout with no error.</li>
+        <li>"Render both, CSS decides" beats a JavaScript width check for anything structural — no first-paint flash, no resize-triggered re-render — but a toggle pair added to an existing stylesheet needs to be declared after any unconditional rule for the same class, or cascade order picks the wrong winner.</li>
+        <li>A temporary behavior change to a shared component should be an explicit, default-off prop with a comment, scoped to exactly the one place that opts in — not a global flag or a silent special case.</li>
+        <li>When a scroll or overflow rule looks correct and still doesn't work, check the element's actual computed width/height in the browser before adding more properties to the rule.</li>
+      </ul>
+
+      <div class="phase-nav">
+        <a class="to-index" href="08-data-layer.html">← Types &amp; mock data</a>
+        <a href="10-real-apis.html">Next: Wiring to real APIs →</a>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

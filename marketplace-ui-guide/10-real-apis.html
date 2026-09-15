@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wiring to Real APIs</title>
+<link rel="stylesheet" href="assets/guide.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="sidenav">
+    <a href="index.html" class="brand">Marketplace UI Guide</a>
+    <span class="brand-sub">Learn it, don't just have it</span>
+    <nav>
+      <a class="nav-link" href="index.html"><span class="num">·</span><span>Overview &amp; map</span></a>
+      <div class="group-label">Foundations</div>
+      <a class="nav-link" href="00-fundamentals.html"><span class="num">00</span><span>Fundamentals crash course</span></a>
+      <a class="nav-link" href="01-design-tokens.html"><span class="num">01</span><span>Design tokens &amp; globals</span></a>
+      <a class="nav-link" href="02-primitives.html"><span class="num">02</span><span>Primitives</span></a>
+      <div class="group-label">Structure</div>
+      <a class="nav-link" href="03-layout-shell.html"><span class="num">03</span><span>Header &amp; page shell</span></a>
+      <a class="nav-link" href="04-sidebar-navigation.html"><span class="num">04</span><span>Sidebar &amp; mobile nav</span></a>
+      <div class="group-label">Sections</div>
+      <a class="nav-link" href="05-hero-promoted.html"><span class="num">05</span><span>Hero &amp; Promoted Domains</span></a>
+      <a class="nav-link" href="06-listings-table.html"><span class="num">06</span><span>The listings table</span></a>
+      <a class="nav-link" href="07-activity-analytics.html"><span class="num">07</span><span>Activity &amp; analytics</span></a>
+      <div class="group-label">Systems</div>
+      <a class="nav-link" href="08-data-layer.html"><span class="num">08</span><span>Types &amp; mock data</span></a>
+      <a class="nav-link" href="09-responsive-patterns.html"><span class="num">09</span><span>Responsive patterns</span></a>
+      <a class="nav-link current" href="10-real-apis.html"><span class="num">10</span><span>Wiring to real APIs</span></a>
+    </nav>
+  </aside>
+
+  <div class="content">
+    <div class="wrap">
+      <p class="eyebrow">Phase 10 &middot; Systems &middot; Final phase</p>
+      <h1 class="title">What has to change to make this real</h1>
+      <p class="dek">Everything up to this point was built so that this phase could be short. If phase 08's boundary held, replacing mock data with a real API touches the data layer and nothing else — every component in phases 03 through 07 keeps working unmodified.</p>
+
+      <h2><span class="section-num">1</span>The project already has a working RTK Query pattern &mdash; reuse it, don't invent a second one</h2>
+      <p>This app doesn't need a new data-fetching approach designed for this page. <span class="path">src/core/redux/domainListing.ts</span> already injects real domain-listing endpoints into a shared RTK Query API slice, and that exact shape is what this page's endpoints should follow:</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">src/core/redux/domainListing.ts (existing, real)</span></div>
+        <pre><span class="ct">export const</span> DomainListApi = myApi.injectEndpoints({
+  endpoints: (builder) =&gt; ({
+    GetAllDomainListing: builder.query&lt;DomainAllListingResponse, { offset: <span class="cn">number</span>, limit: <span class="cn">number</span> }&gt;({
+      query: ({ offset, limit }) =&gt; ({
+        url: <span class="cn">`${GetAllDomainListingApi}?offset=${offset}&amp;limit=${limit}`</span>,
+        method: <span class="cs">"GET"</span>,
+      }),
+      transformResponse: (response) =&gt; response,
+      providesTags: [<span class="cs">"all_domain_listing"</span>],
+    }),
+    <span class="cm">// ...more endpoints on the same injected slice...</span>
+  }),
+})
+
+<span class="ct">export const</span> { useGetAllDomainListingQuery, ... } = DomainListApi</pre>
+      </div>
+      <p><span class="path">injectEndpoints</span> adds new query/mutation endpoints onto one shared API slice (<span class="path">myApi</span>) rather than creating a separate store per feature &mdash; every endpoint gets caching, tag-based invalidation, and an auto-generated React hook (<span class="path">useGetAllDomainListingQuery</span>) for free, all wired through the same Redux store the rest of the app already uses. A new <span class="path">marketplaceListings.ts</span> file following this exact shape, injecting a <span class="path">GetMarketplaceListings</span> endpoint the same way <span class="path">GetAllDomainListing</span> is injected here, is the natural next step &mdash; not a new library, not a new pattern, the same one already proven out elsewhere in this codebase.</p>
+
+      <h2><span class="section-num">2</span>The migration, mapped one data file at a time</h2>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>Mock file (today)</th><th>Becomes</th><th>Components affected</th></tr></thead>
+          <tbody>
+            <tr><td class="path">data/marketplace/domains.ts</td><td>A query hook, e.g. <span class="path">useGetMarketplaceListingsQuery()</span></td><td>LiveListingsTable, PromotedDomainsSection</td></tr>
+            <tr><td class="path">data/marketplace/activity.ts</td><td>A query hook + a live channel (see section 4)</td><td>LiveActivityPanel, LiveActivityTicker</td></tr>
+            <tr><td class="path">data/marketplace/analytics.ts</td><td>A query hook, polled or pushed</td><td>MarketActivityPanel, MarketMetricCard</td></tr>
+            <tr><td class="path">data/marketplace/navigation.ts</td><td>Mostly stays static (it's site structure, not user data) — only <span class="path">count</span> fields become live</td><td>MarketplaceSidebar, MobileDrawerMenu</td></tr>
+            <tr><td class="path">data/marketplace/categories.ts</td><td>A query hook, or stays static if categories rarely change</td><td>ListingCategoryTabs</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Every row in that table is a change to one file in <span class="path">src/data/marketplace/</span>, or the introduction of one new hook file next to it. No row requires touching a composite's <span class="path">.tsx</span> or <span class="path">.module.scss</span> &mdash; that's the entire payoff of phase 08's split between "what the shape of the data is" (the types, which don't need to change) and "what today's actual values are" (the mock data, which gets replaced).</p>
+
+      <h2><span class="section-num">3</span>A concrete before/after: LiveListingsTable</h2>
+      <p>Here's what actually changes in the component that currently receives mock data as a prop from the page:</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">pages/design-preview/marketplace.tsx — today</span></div>
+        <pre><span class="ct">import</span> { mockListings } <span class="ct">from</span> <span class="cs">'@/data/marketplace/domains'</span>
+<span class="ct">import</span> { filterListings } <span class="ct">from</span> <span class="cs">'@/hooks/marketplace/useListingFilters'</span>
+
+<span class="ct">const</span> { filters, debouncedSearch } = useListingFilters()
+<span class="ct">const</span> filtered = filterListings(mockListings, debouncedSearch, filters)
+
+<span class="ct">&lt;LiveListingsTable</span> listings={filtered} <span class="ct">/&gt;</span></pre>
+      </div>
+      <div class="code-card">
+        <div class="code-label"><span class="file">pages/design-preview/marketplace.tsx — after wiring a real endpoint</span></div>
+        <pre><span class="ct">import</span> { useGetMarketplaceListingsQuery } <span class="ct">from</span> <span class="cs">'@/core/redux/marketplaceListings'</span>
+
+<span class="ct">const</span> { filters, debouncedSearch } = useListingFilters()
+<span class="ct">const</span> { data, isLoading, isError } = useGetMarketplaceListingsQuery({
+  search: debouncedSearch,
+  extension: filters.extension !== <span class="cs">'any'</span> ? filters.extension : <span class="ct">undefined</span>,
+  chain: filters.chain !== <span class="cs">'any'</span> ? filters.chain : <span class="ct">undefined</span>,
+})
+
+{isLoading &amp;&amp; <span class="ct">&lt;ListingsTableSkeleton</span> <span class="ct">/&gt;</span>}
+{isError &amp;&amp; <span class="ct">&lt;p&gt;</span>Couldn't load listings.<span class="ct">&lt;/p&gt;</span>}
+{data &amp;&amp; <span class="ct">&lt;LiveListingsTable</span> listings={data.listings} <span class="ct">/&gt;</span>}</pre>
+      </div>
+      <p><span class="path">LiveListingsTable</span> itself, and everything inside it &mdash; <span class="path">ListingRow</span>, the two-pane mobile split, the favorited-state logic &mdash; is completely untouched by this diff. Its prop is still <span class="path">listings: MarketplaceListing[]</span>; it never knew or cared whether that array came from a hardcoded file or a network response. What changes above the component boundary: <span class="path">filterListings</span>'s pure client-side <span class="path">.filter()</span> (fine for 28 static rows, wrong for a real dataset) moves server-side as query parameters, so search/extension/chain filtering scales with the real dataset instead of requiring every row to ship to the browser first. And <span class="path">isLoading</span>/<span class="path">isError</span> states, which don't exist at all for a synchronous mock array, need real UI &mdash; a skeleton and an error message are the two states the current preview has literally never had to show, because mock data never fails and is never in-flight.</p>
+
+      <h2><span class="section-num">4</span>What doesn't map cleanly, and needs a real decision before it's just a data swap</h2>
+      <div class="callout gotcha">
+        <span class="label">"Live" ticker and activity feed need an actual live transport, not just a query</span>
+        <p><span class="path">LiveActivityTicker</span> and <span class="path">LiveActivityPanel</span> are named "live" for a reason the mock data doesn't have to reckon with: the real version needs new activity to appear without a page refresh. A one-shot <span class="path">useQuery</span> fetched once on page load doesn't do that. This needs either polling (<span class="path">pollingInterval</span> is a built-in RTK Query option, the simplest option) or a push transport (WebSocket/SSE) if genuinely sub-second updates matter for this feed. That's a real architectural decision, not a mechanical rename, and it belongs to whoever owns the backend for this feature to weigh in on before it's built.</p>
+      </div>
+      <div class="callout gotcha">
+        <span class="label">Buy Now and the favorite heart are currently decorative</span>
+        <p>Every "Buy Now" button across <span class="path">ListingRow</span>, <span class="path">ListingRestCells</span>, and <span class="path">PromotedDomainCard</span> carries the same comment: <em>visually real, not wired to BuyNowModal or any wallet call</em>. The real app already has a <span class="path">BuyNowModal</span> and wallet-transaction flow elsewhere in the codebase (outside this preview) &mdash; wiring these buttons means calling into that existing flow, not building a new one. The favorite/watchlist heart icon currently toggles a local <span class="path">Set&lt;string&gt;</span> that forgets itself on refresh; the real app already has a watchlist slice (<span class="path">src/core/redux/watchlist.ts</span>) that this should read from and dispatch to instead, so a favorited domain actually persists per user rather than resetting every time the page reloads.</p>
+      </div>
+      <div class="callout note">
+        <span class="label">Chain icons and a few Figma-exact colors are placeholders too</span>
+        <p><span class="path">domains.ts</span> says so directly: the four <span class="path">Chain</span> constants point at icon paths (<span class="path">/assets/img/chains/*.svg</span>) that don't exist as real assets in this project yet, because <span class="path">ChainBadge</span> was built before anyone sourced real chain logos. This is a smaller gap than the two above, but the same principle applies: it's a known, labeled placeholder, not a silent one, findable by anyone who greps for the same comment that's already there.</p>
+      </div>
+
+      <h2><span class="section-num">5</span>The whole guide, in one sentence</h2>
+      <p>Every phase before this one was really in service of this one observation: a UI built out of small, single-purpose components, styled with tokens instead of magic numbers, fed data through one narrow, typed boundary, and made responsive by rendering every layout and letting CSS choose &mdash; is a UI where "make it real" is a change to a handful of files at the edge, not a rewrite of everything in the middle. That's the actual, reusable skill this guide was trying to teach past this one page: build the boundary first, and the migration takes care of itself.</p>
+
+      <h2><span class="section-num">6</span>What to remember from this phase, and from the whole guide</h2>
+      <ul class="checklist">
+        <li>Reuse an existing data-fetching pattern already proven in the codebase (RTK Query's <span class="path">injectEndpoints</span>, here) rather than introducing a second approach for one page.</li>
+        <li>A clean mock-data-behind-a-hook-boundary means most of a real-API migration is confined to <span class="path">src/data/marketplace/</span> and a new hooks/endpoints file — components keep their same typed props and don't change.</li>
+        <li>Moving from mock to real data introduces states mock data never had to show — loading, error, empty — and those need real UI, not just a data source swap.</li>
+        <li>Not everything is a mechanical rename: a feed that's actually meant to be live needs a real live transport decision (polling vs. push), and "visually real but not wired up" buttons need to be connected to the flows that already exist elsewhere in the app, not rebuilt from scratch.</li>
+        <li>A labeled placeholder (a comment saying exactly what's fake and why) is what makes a future migration tractable — the alternative, an unlabeled placeholder that looks finished, is what turns a one-file data swap into an investigation.</li>
+      </ul>
+
+      <div class="phase-nav">
+        <a class="to-index" href="09-responsive-patterns.html">← Responsive patterns</a>
+        <a href="index.html">Back to the overview →</a>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

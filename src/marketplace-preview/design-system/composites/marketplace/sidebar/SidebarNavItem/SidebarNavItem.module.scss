@@ -1,0 +1,96 @@
+.item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-2-5);
+  border-radius: var(--radius-sm);
+  overflow: hidden; // clips the active-state flourish below to the row's own bounds
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  color: var(--color-gray-dark);
+  text-decoration: none; // Link renders an <a> — Bootstrap's global default underlines it otherwise
+  transition: background 0.15s ease, color 0.15s ease;
+
+  &:hover {
+    background: var(--color-gray-light-hover);
+    color: var(--color-gray-darker);
+  }
+}
+
+.active {
+  background: var(--color-blue-light);
+  color: var(--color-blue-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+.label {
+  position: relative;
+  z-index: 1; // stays above the active-state flourish
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trailing {
+  position: relative;
+  z-index: 1; // stays above the active-state flourish
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  flex-shrink: 0;
+}
+
+.count {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  color: var(--color-gray-primary);
+}
+
+.badge {
+  padding: 1px var(--space-1-5);
+  border-radius: var(--radius-full);
+  background: var(--color-gray-light);
+  color: var(--color-gray-dark);
+  font-size: var(--text-small-10);
+  font-weight: var(--font-weight-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+// Same decorative flourish as the mobile drawer's selected row (Figma node
+// 34:2994 / MobileDrawerMenu's .exploreDeco*), reused here rather than a
+// second copy — the sidebar row is narrower, so these are sized down to fit
+// without needing new assets.
+.deco1,
+.deco2 {
+  position: absolute;
+  right: var(--space-2);
+  top: 50%;
+  transform: translateY(-50%);
+  height: 8px;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.deco1 {
+  width: 54px;
+}
+
+.deco2 {
+  width: 90px;
+  right: 40px;
+}
+
+.deco3 {
+  position: absolute;
+  right: var(--space-1);
+  top: 50%;
+  transform: translateY(-50%);
+  width: 70px;
+  height: 12px;
+  opacity: 0.6;
+  pointer-events: none;
+}

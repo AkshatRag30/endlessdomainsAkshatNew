@@ -1,0 +1,5 @@
+
+// Satoshi (Fontshare, variable weight 300–900) and Space Grotesk (Google Fonts,
+// static weights 400/500/600/700) are loaded as <link> tags in pages/_document.tsx.
+// CSS @import creates a render-blocking request chain; <link> in <head> is
+// discovered during HTML parsing and downloads in parallel with other resources.

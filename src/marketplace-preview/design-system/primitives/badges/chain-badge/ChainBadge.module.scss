@@ -1,0 +1,37 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-gray-dark);
+  white-space: nowrap;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+.polygon {
+  background: var(--color-purple-primary);
+}
+
+.ethereum {
+  background: var(--color-gray-darker);
+}
+
+.arbitrum {
+  background: var(--color-blue-primary);
+}
+
+.bsc {
+  background: var(--color-amber);
+}
+
+.default {
+  background: var(--color-gray-medium);
+}

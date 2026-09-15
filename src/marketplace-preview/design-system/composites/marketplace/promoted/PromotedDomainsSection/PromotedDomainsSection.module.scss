@@ -1,0 +1,98 @@
+@import '@mpstyles/_mixins.scss';
+
+// Figma node 1:1034. The blurred blue bar along the top edge is now the
+// real exported asset (imgRectangle1329134226 in get_design_context's
+// output), not a CSS approximation — it bleeds slightly above the card via
+// a negative top offset, same as the real design, and gets clipped by this
+// section's own overflow:hidden exactly like Figma's overflow-clip does.
+// Left/right scroll fades are real CSS mask gradients, not decoration for
+// its own sake — they signal the row scrolls. Background now also carries
+// the main site's real stripe-bg texture, same treatment as the two right
+// rail panels.
+
+.section {
+  position: relative;
+  padding: var(--space-6) var(--space-4) var(--space-4);
+  background: var(--color-gray-light-bg-85);
+  @include stripe-bg;
+  border: 1px solid var(--color-blue-primary-alpha-07); // closest existing token to Figma's rgba(38,57,237,0.08)
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.glow {
+  position: absolute;
+  top: -10px; // design-specific: Figma-exact
+  left: 50%;
+  transform: translateX(-50%);
+  width: 102%; // design-specific: Figma's asset is slightly wider than its container (842px vs ~835px)
+  height: 35px; // design-specific: Figma-exact
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.heading {
+  margin: 0 0 var(--space-4);
+  font-family: var(--font-satoshi);
+  font-size: 18px;
+  font-weight: var(--font-weight-regular);
+  color: var(--color-black-primary);
+  text-transform: capitalize;
+}
+
+// ── Auto-sliding marquee ─────────────────────────────────────────────────
+// Two identical passes of the same cards sit side by side in `.track`,
+// which animates from translateX(0) to translateX(-50%) — since the two
+// passes are identical, that half-width translation loops seamlessly with
+// no visible seam or reset jump. Pauses on hover/focus so a visitor can
+// actually read or click a card. Falls back to the original manually
+// scrollable row for prefers-reduced-motion, with the second (purely
+// decorative) pass hidden so reduced-motion visitors don't scroll past a
+// duplicated set of cards.
+
+.marquee {
+  overflow: hidden;
+  padding-bottom: 2px;
+  mask-image: linear-gradient(90deg, transparent, black 24px, black calc(100% - 24px), transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, black 24px, black calc(100% - 24px), transparent);
+
+  @media (prefers-reduced-motion: reduce) {
+    overflow-x: auto;
+  }
+}
+
+.track {
+  display: flex;
+  width: max-content;
+  animation: promoted-marquee var(--loop-seconds, 28s) linear infinite;
+
+  .marquee:hover &,
+  .marquee:focus-within & {
+    animation-play-state: paused;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+.pass {
+  display: flex;
+  gap: var(--space-3);
+  padding-right: var(--space-3); // gap between the end of one pass and the start of the next
+
+  @media (prefers-reduced-motion: reduce) {
+    &:last-child {
+      display: none;
+    }
+  }
+}
+
+@keyframes promoted-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}

@@ -1,0 +1,31 @@
+@import '@mpstyles/_mixins.scss';
+
+// Figma node 1:1048 — flex row, search left, filter pills right, border
+// below the whole bar.
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid #eeedf3; // design-specific: Figma-exact
+
+  @include mobile {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.dropdowns {
+  display: flex;
+  align-items: center;
+  gap: 7px; // design-specific: Figma-exact
+  overflow-x: auto;
+
+  // Figma's mobile mockup (node 20:1955) wraps the pills onto a second line
+  // instead of scrolling them.
+  @include mobile {
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
+}

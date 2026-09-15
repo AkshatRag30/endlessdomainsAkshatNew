@@ -1,0 +1,17 @@
+// Figma node 1:1034 (Promoted Domains card) — amber pill, not a generic
+// gray chip, --color-amber (#fdc651) is an exact match to the real border.
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px var(--space-2);
+  border: 1px solid var(--color-amber);
+  border-radius: var(--radius-full);
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-13);
+  line-height: 1.2; // unset, this inherited the app's global 1.5–1.6 body line-height and helped overflow PromotedDomainCard/ListingRow's fixed heights
+  font-weight: var(--font-weight-regular);
+  color: var(--color-black-primary);
+  background: transparent;
+  white-space: nowrap;
+}

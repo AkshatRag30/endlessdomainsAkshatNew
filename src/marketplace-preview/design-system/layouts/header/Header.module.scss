@@ -1,0 +1,282 @@
+@import '@mpstyles/_mixins.scss';
+
+// Figma node 3:6449 / 3:6603 — both sides share one 59px bar with the same
+// hairline border, so it is applied once on the outer bar rather than once
+// per side.
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  height: 59px; // design-specific: Figma-exact bar height
+  padding: 0 var(--container-padding-x);
+  background: var(--color-white-primary);
+  border-bottom: 0.3px solid var(--color-border-black-subtle);
+
+  @include mobile {
+    gap: var(--space-3);
+  }
+}
+
+// ── Left side: logo + nav ─────────────────────────────────────────────────
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-7);
+  min-width: 0;
+}
+
+// ── Mobile/tablet menu toggle (Figma nodes 20:1155 / 27:551) ───────────────
+// Only rendered when Header is given onMenuClick, so no other page gets this
+// button — see the HeaderProps comment.
+
+.menuToggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(180deg, var(--color-blue-primary), var(--color-blue-primary-alpha-50));
+  cursor: pointer;
+
+  @include tablet-down {
+    display: inline-flex;
+  }
+}
+
+.menuToggleBar,
+.menuToggleBar::before,
+.menuToggleBar::after {
+  content: '';
+  display: block;
+  width: 14px;
+  height: 1.5px;
+  border-radius: 1px;
+  background: var(--color-white-primary);
+}
+
+.menuToggleBar {
+  position: relative;
+
+  &::before {
+    position: absolute;
+    top: -4.5px;
+    left: 0;
+  }
+
+  &::after {
+    position: absolute;
+    top: 4.5px;
+    left: 0;
+  }
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  text-decoration: none; // Link renders an <a> — nothing in this design-system layer resets the browser/Bootstrap default underline, unlike the legacy .nav-link classes reused below
+
+  img {
+    display: block;
+    height: 34px; // design-specific: Figma-exact logo height
+    width: auto;
+  }
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+
+  @include tablet-down {
+    display: none; // no mobile menu in this pass — see index.tsx note
+  }
+}
+
+.navDivider {
+  width: 1px;
+  height: 19px; // design-specific: Figma-exact divider height
+  background: var(--color-border-black-subtle);
+}
+
+.navLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px; // design-specific: Figma value 6.376px, nearest clean pixel
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-black-alpha-55);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: var(--color-gray-darker);
+  }
+
+  &.active {
+    color: var(--color-blue-primary);
+    font-weight: var(--font-weight-medium);
+  }
+}
+
+.navArrow {
+  display: block;
+  width: 7px; // design-specific: Figma-exact 7.287px, nearest clean pixel
+  height: 7px;
+}
+
+// ── Right side: search + connect wallet ────────────────────────────────────
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 9px; // design-specific: Figma-exact gap
+
+  @include mobile {
+    gap: var(--space-2);
+  }
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 9px; // design-specific: Figma-exact gap
+  width: 100%;
+  max-width: 404px; // design-specific: Figma-exact search bar width
+  height: 40px; // design-specific: Figma-exact search bar height
+  padding: 0 var(--space-2);
+  background: var(--color-white-primary);
+  border: 0.5px solid var(--color-border-black-subtle);
+
+  @include mobile {
+    display: none; // no room next to the logo/nav on small screens in this pass
+  }
+}
+
+.searchIcon {
+  display: block;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+.searchPlaceholder {
+  flex: 1;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-black-alpha-55);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: none;
+  border: none;
+  outline: none;
+
+  &::placeholder {
+    color: var(--color-black-alpha-55);
+  }
+}
+
+.kbdGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex-shrink: 0;
+}
+
+.kbd {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 var(--space-1);
+  background: var(--color-black-light); // #e6e6e6 — exact token match
+  border: 1px solid var(--color-white-primary);
+  border-radius: 4px; // design-specific: no matching radius token this small
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-darkest);
+}
+
+.connectWallet {
+  flex-shrink: 0;
+  white-space: nowrap;
+  text-decoration: none;
+
+  @include mobile {
+    display: none; // swapped for .walletIconButton below
+  }
+}
+
+// ── Mobile-only icon chips (Figma node 34:1043) ─────────────────────────
+// Both chips share the same chamfered-corner shape from the Figma export
+// (background-image, not clip-path — the path has a gradient fill and a
+// hairline stroke baked in, not worth reproducing by hand). Hidden outside
+// mobile — tablet keeps the desktop connect-wallet button and search bar.
+
+.walletIconButton {
+  display: none;
+
+  @include mobile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 36px;
+    height: 30px;
+    background-image: url('/assets/img/marketplace/header-chip-shape.svg');
+    background-size: 100% 100%;
+  }
+}
+
+.walletIcon {
+  display: block;
+  width: 18px;
+  height: auto;
+}
+
+.mobileSearchButton {
+  display: none;
+
+  @include mobile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 36px;
+    height: 30px;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+  }
+}
+
+.mobileSearchIcon {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+// ── Authenticated state (unchanged behavior, see index.tsx) ────────────────
+// The dropdown reuses the site's existing global classnames (nav-link,
+// user-dropdown, dropdown-list, logout-btn from public/assets/css) so its
+// behavior and look stay exactly what they are today. This wrapper only
+// positions that existing block into the new bar.
+.accountSlot {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}

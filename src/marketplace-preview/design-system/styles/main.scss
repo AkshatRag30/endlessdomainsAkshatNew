@@ -1,0 +1,14 @@
+// Entry point for the marketplace preview's own design tokens — mirrors
+// src/design-system/styles/main.scss in the source project. Imported once
+// from pages/_app.tsx so every *.module.scss under marketplace-preview/ can
+// read its var(--x) custom properties. Unlike the source project, every
+// custom property and global element reset here is scoped under
+// [data-marketplace-preview] (see tokens.scss) instead of bare :root/h1..ul,
+// so importing this globally cannot affect any other page in this project —
+// only elements inside <div data-marketplace-preview> pick it up.
+
+// 1. Font imports (must come before everything)
+@import './fonts.scss';
+
+// 2. Your CSS custom properties (available to all *.module.scss)
+@import './tokens.scss';

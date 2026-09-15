@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Types &amp; Mock Data</title>
+<link rel="stylesheet" href="assets/guide.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="sidenav">
+    <a href="index.html" class="brand">Marketplace UI Guide</a>
+    <span class="brand-sub">Learn it, don't just have it</span>
+    <nav>
+      <a class="nav-link" href="index.html"><span class="num">·</span><span>Overview &amp; map</span></a>
+      <div class="group-label">Foundations</div>
+      <a class="nav-link" href="00-fundamentals.html"><span class="num">00</span><span>Fundamentals crash course</span></a>
+      <a class="nav-link" href="01-design-tokens.html"><span class="num">01</span><span>Design tokens &amp; globals</span></a>
+      <a class="nav-link" href="02-primitives.html"><span class="num">02</span><span>Primitives</span></a>
+      <div class="group-label">Structure</div>
+      <a class="nav-link" href="03-layout-shell.html"><span class="num">03</span><span>Header &amp; page shell</span></a>
+      <a class="nav-link" href="04-sidebar-navigation.html"><span class="num">04</span><span>Sidebar &amp; mobile nav</span></a>
+      <div class="group-label">Sections</div>
+      <a class="nav-link" href="05-hero-promoted.html"><span class="num">05</span><span>Hero &amp; Promoted Domains</span></a>
+      <a class="nav-link" href="06-listings-table.html"><span class="num">06</span><span>The listings table</span></a>
+      <a class="nav-link" href="07-activity-analytics.html"><span class="num">07</span><span>Activity &amp; analytics</span></a>
+      <div class="group-label">Systems</div>
+      <a class="nav-link current" href="08-data-layer.html"><span class="num">08</span><span>Types &amp; mock data</span></a>
+      <a class="nav-link" href="09-responsive-patterns.html"><span class="num">09</span><span>Responsive patterns</span></a>
+      <a class="nav-link" href="10-real-apis.html"><span class="num">10</span><span>Wiring to real APIs</span></a>
+    </nav>
+  </aside>
+
+  <div class="content">
+    <div class="wrap">
+      <p class="eyebrow">Phase 08 &middot; Systems</p>
+      <h1 class="title">Where the data comes from, and how it's shaped</h1>
+      <p class="dek">Every composite in phases 03 through 07 rendered something. This phase is about the layer underneath all of them — the types that describe what a domain listing or a sidebar item actually is, and the mock data that plays the role of a real API response until there is one.</p>
+
+      <h2><span class="section-num">1</span>The two-folder split, and why it exists</h2>
+      <div class="diagram tree">src/types/marketplace/    <span class="f">what the shape of the data is</span>  (interfaces, no values)
+src/data/marketplace/     <span class="f">what today's actual data is</span>  (real values, matching those interfaces)</span></div>
+      <p>Every domain gets one file in each folder, named to match: <span class="path">types/marketplace/domain.ts</span> defines <span class="path">MarketplaceListing</span>, <span class="path">data/marketplace/domains.ts</span> exports an array of real objects shaped like it. This split matters more than it looks like it should, because it's what makes phase 10's real-API migration a contained, predictable change: a component that imports <span class="path">MarketplaceListing</span> from the types folder and receives an array of them as a prop doesn't know or care whether that array came from a hardcoded file or a network response &mdash; only the data folder's contents need to change.</p>
+
+      <h2><span class="section-num">2</span>A type that was designed to be replaced later, on purpose</h2>
+      <div class="code-card">
+        <div class="code-label"><span class="file">types/marketplace/domain.ts</span></div>
+        <pre><span class="cm">/**
+ * Frontend-facing domain/listing models for the marketplace redesign.
+ *
+ * These deliberately mirror the real `DomainListing` (src/types/DomainList.ts)
+ * and `TrendingDomain` (src/types/Domain.ts) fields where they overlap
+ * (domainName, chain/assetContract, pricePerToken -> priceEth, usdAmount ->
+ * priceUsd), so a future API adapter is a rename/reshape, not a redesign.
+ */</span>
+
+<span class="ct">export interface</span> MarketplaceListing {
+  id: <span class="cn">string</span>
+  domainName: <span class="cn">string</span>
+  extension: <span class="cn">string</span>
+  isPremium?: <span class="cn">boolean</span>
+  chain: Chain
+  priceEth: <span class="cn">number</span>
+  priceUsd: <span class="cn">number</span>
+  appraisedValueEth: <span class="cn">number</span>
+  appraisedTrend: <span class="cs">'high'</span> | <span class="cs">'low'</span> | <span class="cs">'neutral'</span>
+  isPromoted?: <span class="cn">boolean</span>
+  isFavorited?: <span class="cn">boolean</span>
+}</pre>
+      </div>
+      <div class="callout why">
+        <span class="label">Why name fields to match an existing, unrelated type instead of whatever reads best in isolation</span>
+        <p>This project already has real domain types elsewhere in the codebase (<span class="path">DomainListing</span>, <span class="path">TrendingDomain</span>) used by pages outside this preview. <span class="path">priceEth</span> here isn't an arbitrary name choice &mdash; it's deliberately close to that existing <span class="path">pricePerToken</span> field, and <span class="path">priceUsd</span> to <span class="path">usdAmount</span>, specifically so that whoever eventually wires this page to a real endpoint is doing a mechanical rename/reshape between two similar, already-understood shapes, rather than inventing a mapping from scratch. A type built for a one-off preview can afford to name things however's clearest in isolation; a type meant to become real infrastructure benefits from staying close to the vocabulary the rest of the codebase already uses for the same concept.</p>
+      </div>
+      <p>Notice which fields are optional (<span class="path">?</span>) and which aren't. <span class="path">isPremium</span>, <span class="path">isPromoted</span>, and <span class="path">isFavorited</span> are all optional booleans &mdash; a listing that doesn't specify them is simply treated as <span class="path">false</span>/not set wherever a component reads them (<span class="path">listing.isPremium &amp;&amp;</span> in <span class="path">ListingDomainCell</span>, for instance). <span class="path">id</span>, <span class="path">domainName</span>, <span class="path">chain</span>, and the price/appraisal fields are all required &mdash; there's no sensible rendering of a listing card without a name or a price, so TypeScript is made to enforce that every mock (and later, every real API response mapped into this shape) actually has them.</p>
+
+      <h2><span class="section-num">3</span>Mock data as a small generator function, not a hand-typed array</h2>
+      <p>28 listings, each with a domain name, a chain, a price, an appraised value and trend, a premium flag, and a promoted flag, all internally consistent (a "high" appraisal trend actually has a higher appraised value than price, for instance) &mdash; hand-writing 28 object literals would be both tedious and a place bugs hide. Instead, <span class="path">domains.ts</span> writes one array of just the interesting part (the name stems) and a function that derives everything else:</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">data/marketplace/domains.ts</span></div>
+        <pre><span class="ct">const</span> NAME_STEMS = [
+  <span class="cs">'cryptowave'</span>, <span class="cs">'pixelforge'</span>, <span class="cs">'nebulax'</span>,
+  <span class="cs">'thisisanextremelylongdomainnamefortestingpurposes'</span>, <span class="cm">// test fixture, see below</span>
+  <span class="cs">'voidrunner'</span>, <span class="cs">'aetherlink'</span>, <span class="cs">'quantumleap'</span>,
+  <span class="cm">// ...24 more...</span>
+]
+
+<span class="ct">function</span> buildListings(): MarketplaceListing[] {
+  <span class="ct">const</span> chains = [POLYGON, ETHEREUM, ARBITRUM, BSC]
+
+  <span class="ct">return</span> NAME_STEMS.map((stem, index) =&gt; {
+    <span class="ct">const</span> isHighAppraisal = index % <span class="cn">2</span> === <span class="cn">0</span>
+    <span class="ct">const</span> priceEth = Number((<span class="cn">8</span> + (index % <span class="cn">7</span>) * <span class="cn">1.35</span>).toFixed(<span class="cn">2</span>))
+
+    <span class="ct">return</span> {
+      id: <span class="cn">`listing-${index + 1}`</span>,
+      domainName: stem,
+      extension: <span class="cs">'.ud'</span>,
+      isPremium: index % <span class="cn">3</span> === <span class="cn">0</span>,
+      chain: chains[index % chains.length],
+      priceEth,
+      priceUsd: Math.round(priceEth * <span class="cn">2820</span>),
+      appraisedValueEth: isHighAppraisal ? priceEth : Number((priceEth * <span class="cn">0.75</span>).toFixed(<span class="cn">2</span>)),
+      appraisedTrend: isHighAppraisal ? <span class="cs">'high'</span> : <span class="cs">'low'</span>,
+      isPromoted: index &lt; <span class="cn">8</span>,
+      isFavorited: <span class="cn">false</span>,
+    }
+  })
+}
+
+<span class="ct">export const</span> mockListings: MarketplaceListing[] = buildListings()
+<span class="ct">export const</span> mockPromotedListings = mockListings.filter((l) =&gt; l.isPromoted)</pre>
+      </div>
+      <p>Every derived field is computed from <span class="path">index</span>, using modulo (<span class="path">%</span>) to cycle through a small set of variations &mdash; <span class="path">index % 4</span> walks through all four chains in order and wraps back to Polygon after BSC, <span class="path">index % 2 === 0</span> alternates high/low appraisal every other listing, <span class="path">index % 3 === 0</span> marks every third listing premium. None of it is random (no <span class="path">Math.random()</span> anywhere), which matters for two reasons: the exact same 28 listings render every time the page loads, so a screenshot taken today still matches one taken tomorrow, and every value is reproducible enough to reason about by just reading the formula, rather than needing to run the code to know what listing 15 looks like.</p>
+      <p><span class="path">mockPromotedListings</span>, the array phase 05's marquee actually renders, isn't a second hand-picked list &mdash; it's <span class="path">.filter()</span>ed straight out of <span class="path">mockListings</span> by the same <span class="path">isPromoted</span> flag every other component would read. There is exactly one array of listings in the whole app; every other export in this file is a view over it.</p>
+      <div class="callout note">
+        <span class="label">A one-line data change, made in exactly one place, for a UI bug that needed real content to reproduce</span>
+        <p>When the mobile listings table's domain-name horizontal scroll (phase 06) needed verifying, the existing 27 name stems were all short enough to fit inside 172px without ever needing to scroll &mdash; there was no way to see the bug, let alone confirm the fix, without a name long enough to actually overflow. The fix was adding one deliberately oversized stem, with a comment explaining exactly why it's there and why it's positioned 4th in the array rather than last (so it lands on the table's first page of 14, visible without an extra "Show more" click). This is what "test fixture" means in a mock-data file: a value chosen specifically to exercise an edge case, not just to look plausible.</p>
+      </div>
+
+      <h2><span class="section-num">4</span>Navigation data: a flag that exists purely to prevent a bug</h2>
+      <p>Phase 04 covered the sidebar's <span class="path">isPlaceholder</span> guard against multiple nav items appearing active at once. The type it depends on lives here:</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">types/marketplace/navigation.ts</span></div>
+        <pre><span class="ct">export interface</span> SidebarNavItem {
+  id: <span class="cn">string</span>
+  label: <span class="cn">string</span>
+  href: <span class="cn">string</span>
+  count?: <span class="cn">number</span>
+  badge?: <span class="cn">string</span> <span class="cm">// e.g. 'soon'</span>
+  <span class="cm">/** True when href has no real destination yet — points at '/' until built */</span>
+  isPlaceholder?: <span class="cn">boolean</span>
+}</pre>
+      </div>
+      <p>This is worth noticing as a general shape: a field on a type doesn't have to represent something the design shows on screen at all. <span class="path">isPlaceholder</span> is invisible to a user entirely &mdash; it exists solely so that application logic (that active-state check in <span class="path">SidebarSection</span>) has something real to branch on, instead of trying to infer "is this a real destination" from the href string itself (which would have been far more fragile, since every placeholder item currently happens to share the exact same href).</p>
+      <p>The same file also still defines <span class="path">HeroCategoryChip</span>, unused anywhere in the current components &mdash; the leftover from phase 05's wrong assumption about the hero's floating category chips being separate positioned elements. It's a small, harmless reminder that not every type that gets written ends up used, and that's fine; deleting it isn't necessary, but recognizing it as dead when you encounter it (rather than assuming it must be wired up somewhere you haven't found yet) is a useful reading skill on its own.</p>
+
+      <h2><span class="section-num">5</span>What to remember from this phase</h2>
+      <ul class="checklist">
+        <li>Keep type definitions (the shape) and mock data (today's actual values) in separate, matching files — it's what makes swapping mock data for a real response a change in one place.</li>
+        <li>When a mock type will eventually be mapped from a real API, name its fields close to the real type's existing vocabulary, not just whatever reads cleanest in isolation — it turns the future mapping into a mechanical rename instead of a redesign.</li>
+        <li>Generate structured mock data from a small seed array plus a deterministic formula (modulo on index, not <span class="path">Math.random()</span>) rather than hand-typing every object — it's shorter, internally consistent, and reproducible across renders.</li>
+        <li>Derive filtered views (<span class="path">mockPromotedListings</span>) from the one source array instead of maintaining a second hand-written list that can drift out of sync.</li>
+        <li>A type field doesn't have to represent anything visible — a flag that exists purely to make application logic (like an active-state check) correct is a legitimate, sometimes necessary part of a data model.</li>
+        <li>When a UI bug needs a specific kind of content to reproduce (an overflow, an edge case), add that content to the mock data deliberately, with a comment explaining why it's there — don't just eyeball whether existing data happens to trigger it.</li>
+      </ul>
+
+      <div class="phase-nav">
+        <a class="to-index" href="07-activity-analytics.html">← Activity &amp; analytics</a>
+        <a href="09-responsive-patterns.html">Next: Responsive patterns →</a>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

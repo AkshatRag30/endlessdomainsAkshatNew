@@ -1,0 +1,32 @@
+.trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  line-height: 1.2; // unset, this inherited the app's global 1.5–1.6 body line-height and helped overflow PromotedDomainCard/ListingRow's fixed heights
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+}
+
+.up {
+  color: var(--color-status-available);
+}
+
+.down {
+  color: var(--color-error);
+}
+
+.neutral {
+  color: var(--color-gray-dark);
+
+  .arrow {
+    transform: rotate(90deg); // the fallback asset points up — rotate flat for 'neutral'
+  }
+}
+
+.arrow {
+  display: block;
+  width: 9px; // design-specific: Figma-exact ~9.59px
+  height: 7px;
+}

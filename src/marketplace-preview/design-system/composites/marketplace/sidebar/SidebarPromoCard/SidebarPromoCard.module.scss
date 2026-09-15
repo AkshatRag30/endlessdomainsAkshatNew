@@ -1,0 +1,64 @@
+// Figma node 26:2931 — notched blue card. clip-path corner cuts are fixed px
+// (not %), same convention PrimaryButton's own $clip already uses, so the
+// chamfer stays a constant size regardless of the card's fluid width.
+// Bottom-left stays a sharp 90° vertex — only three of the four corners are
+// chamfered, so there's no "0 calc(100% - 21px), 21px 100%" pair cutting
+// that corner, just one point straight at "0 100%".
+$notch: polygon(
+  20px 0,
+  calc(100% - 20px) 0,
+  100% 20px,
+  100% calc(100% - 21px),
+  calc(100% - 21px) 100%,
+  0 100%,
+  0 21px
+);
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  color: var(--color-white-primary);
+  background: linear-gradient(180deg, var(--color-blue-primary) 0%, rgba(38, 57, 237, 0.47) 100%); // design-specific: Figma-exact end-stop opacity, no token match
+  clip-path: #{$notch};
+
+  // Soft halo behind the shape — glow color/opacity are shared tokens, but
+  // the layered blur is design-specific (Figma export has no equivalent
+  // single CSS property). inset stays within .sidebar's own padding so
+  // its overflow: hidden doesn't hard-clip the blur.
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -16px;
+    z-index: -1;
+    background: radial-gradient(closest-side, var(--color-blue-primary-alpha-30), var(--color-blue-primary-alpha-13) 60%, transparent 80%);
+    filter: blur(16px);
+    pointer-events: none;
+  }
+}
+
+.heading {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-white-primary);
+}
+
+.body {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  line-height: var(--leading-small);
+  color: var(--color-white-alpha-90);
+}
+
+.cta {
+  margin-top: var(--space-1);
+  width: 100%;
+  justify-content: center;
+  text-decoration: none; // Link renders an <a>, same gap PrimaryButton itself never needed since the main site only ever uses it on real <button> elements
+}

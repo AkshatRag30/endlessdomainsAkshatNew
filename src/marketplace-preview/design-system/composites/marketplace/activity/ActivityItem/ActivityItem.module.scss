@@ -1,0 +1,54 @@
+// Figma node 1:1543 (one row of the Live Activity list).
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border-black-subtle);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.text {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  color: var(--color-black-alpha-55);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.price {
+  font-weight: var(--font-weight-medium);
+}
+
+.bought {
+  color: #11d000; // design-specific: Figma-exact
+}
+
+.listed {
+  color: var(--color-blue-primary);
+}
+
+.dropped {
+  color: var(--color-error);
+}
+
+.time {
+  flex-shrink: 0;
+  font-family: var(--font-space-grotesk); // closest already-loaded face to Figma's JetBrains Mono
+  font-size: 10px;
+  color: #a6a1bb; // design-specific: Figma-exact, no token match
+}

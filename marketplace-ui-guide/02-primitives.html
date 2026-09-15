@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Primitives</title>
+<link rel="stylesheet" href="assets/guide.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="sidenav">
+    <a href="index.html" class="brand">Marketplace UI Guide</a>
+    <span class="brand-sub">Learn it, don't just have it</span>
+    <nav>
+      <a class="nav-link" href="index.html"><span class="num">·</span><span>Overview &amp; map</span></a>
+      <div class="group-label">Foundations</div>
+      <a class="nav-link" href="00-fundamentals.html"><span class="num">00</span><span>Fundamentals crash course</span></a>
+      <a class="nav-link" href="01-design-tokens.html"><span class="num">01</span><span>Design tokens &amp; globals</span></a>
+      <a class="nav-link current" href="02-primitives.html"><span class="num">02</span><span>Primitives</span></a>
+      <div class="group-label">Structure</div>
+      <a class="nav-link" href="03-layout-shell.html"><span class="num">03</span><span>Header &amp; page shell</span></a>
+      <a class="nav-link" href="04-sidebar-navigation.html"><span class="num">04</span><span>Sidebar &amp; mobile nav</span></a>
+      <div class="group-label">Sections</div>
+      <a class="nav-link" href="05-hero-promoted.html"><span class="num">05</span><span>Hero &amp; Promoted Domains</span></a>
+      <a class="nav-link" href="06-listings-table.html"><span class="num">06</span><span>The listings table</span></a>
+      <a class="nav-link" href="07-activity-analytics.html"><span class="num">07</span><span>Activity &amp; analytics</span></a>
+      <div class="group-label">Systems</div>
+      <a class="nav-link" href="08-data-layer.html"><span class="num">08</span><span>Types &amp; mock data</span></a>
+      <a class="nav-link" href="09-responsive-patterns.html"><span class="num">09</span><span>Responsive patterns</span></a>
+      <a class="nav-link" href="10-real-apis.html"><span class="num">10</span><span>Wiring to real APIs</span></a>
+    </nav>
+  </aside>
+
+  <div class="content">
+    <div class="wrap">
+      <p class="eyebrow">Phase 02 &middot; Foundations</p>
+      <h1 class="title">Primitives: the small reusable pieces</h1>
+      <p class="dek">One folder, <span class="path">src/design-system/primitives/</span>, holding everything too small to be its own "section" but used by several sections. Learn these once, recognize them everywhere.</p>
+
+      <h2><span class="section-num">1</span>What makes something a primitive</h2>
+      <p>The rule this codebase follows: if a piece of UI has <strong>no idea what page it's on</strong> &mdash; it just takes props and renders &mdash; it's a primitive. A <span class="path">Badge</span> doesn't know if it's showing a domain extension or a status; it just renders whatever text and color variant you hand it. Compare that to a <em>composite</em> (phases 03&ndash;07), which knows exactly what it is &mdash; <span class="path">MarketplaceHero</span> is only ever the marketplace hero, never anything else.</p>
+
+      <h2><span class="section-num">2</span>Badge: the variant-prop pattern</h2>
+      <p>This is the simplest possible example of a pattern you'll see in almost every primitive: one component, a <span class="path">variant</span> prop, and a CSS class per variant.</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">src/design-system/primitives/badges/badge/Badge.tsx</span></div>
+        <pre><span class="ct">export interface</span> BadgeProps {
+  variant?: <span class="cs">'neutral'</span> | <span class="cs">'accent'</span> | <span class="cs">'success'</span> | <span class="cs">'warning'</span> | <span class="cs">'danger'</span>
+  children: React.ReactNode
+}
+
+<span class="ct">export const</span> Badge = ({ variant = <span class="cs">'neutral'</span>, children }: BadgeProps) =&gt; (
+  <span class="ct">&lt;span</span> className={<span class="cn">`${styles.badge} ${styles[variant]}`</span>}<span class="ct">&gt;</span>
+    {children}
+  <span class="ct">&lt;/span&gt;</span>
+)</pre>
+      </div>
+      <p>The className is built by string-joining two CSS Module classes: the base <span class="path">.badge</span> (shared layout &mdash; padding, border-radius, font) and one variant class that only changes color. <span class="path">styles[variant]</span> is a plain JavaScript computed property lookup &mdash; when <span class="path">variant</span> is <span class="path">'success'</span>, <span class="path">styles[variant]</span> reads the same as <span class="path">styles.success</span>.</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">Badge.module.scss</span></div>
+        <pre>.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: <span class="cn">1px var(--space-2)</span>;
+  border-radius: <span class="cn">var(--radius-full)</span>;
+  font-family: <span class="cn">var(--font-satoshi)</span>;
+  font-size: <span class="cn">var(--text-small-12)</span>;
+}
+.success { background: <span class="cs">#e7f6ee</span>; color: <span class="cs">#12a05c</span>; }
+.danger  { background: <span class="cn">var(--color-error-soft-bg)</span>; color: <span class="cn">var(--color-error)</span>; }</pre>
+      </div>
+      <p>Every badge-like primitive in this project follows this exact shape: <span class="path">ChainBadge</span> (a chain name + dot, colored per chain), <span class="path">ExtensionBadge</span> (the small <span class="path">.ud</span> pill next to a domain name), and <span class="path">TrendIndicator</span> (an up/down arrow + label for price trends) are all the same pattern with different content and variants.</p>
+
+      <h2><span class="section-num">3</span>Buttons: the clip-path notch technique</h2>
+      <p>Look closely at any button in this design and the corners aren't simple rounded rectangles &mdash; they're chamfered, cut at an angle, like a stop sign with only some corners cut. That shape comes from CSS <span class="path">clip-path: polygon(...)</span>, and it's worth understanding in detail because it reappears in half a dozen unrelated components later (the header's hamburger chip, the mobile drawer's Explore row, the bottom nav's icon chips).</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">src/design-system/primitives/buttons/primary-button/Primarybutton.module.scss</span></div>
+        <pre><span class="ck">$clip</span>: polygon(
+  <span class="cn">10px</span> 0%, calc(100% - 20px) 0%, 100% <span class="cn">20px</span>,
+  100% calc(100% - 10px), calc(100% - 10px) 100%, <span class="cn">10px</span> 100%,
+  0% calc(100% - 10px), 0% <span class="cn">10px</span>
+);
+
+.button {
+  clip-path: <span class="cn">#{$clip}</span>;
+  background: <span class="cn">var(--color-gray-medium)</span>;   <span class="cm">// fallback, covered by ::before below</span>
+}
+
+.button::before {
+  content: <span class="cs">""</span>;
+  position: absolute;
+  inset: <span class="cn">1px</span>;                       <span class="cm">// 1px smaller than the button — this is what makes the border look like a ring</span>
+  clip-path: <span class="cn">#{$clip}</span>;              <span class="cm">// same cut shape, so the fill matches the outer edge exactly</span>
+  background: <span class="cn">var(--color-blue-primary)</span>;
+  transition: all 0.3s ease;
+}</pre>
+      </div>
+      <p><span class="path">clip-path: polygon(...)</span> describes a shape as a sequence of x/y coordinate pairs, one per corner, tracing the outline clockwise from the top-left. Each pair like <span class="path">10px 0%</span> means "10 pixels in from the left, at the top edge" &mdash; by giving two coordinates near each corner instead of one, the corner gets cut diagonally instead of meeting at a point. Mixing <span class="path">px</span> and <span class="path">calc(100% - 10px)</span> is what makes the shape scale correctly at any button width while keeping the corner cuts a constant, fixed size instead of stretching with the button.</p>
+      <div class="callout why">
+        <span class="label">Why a separate ::before instead of styling .button directly</span>
+        <p>The visible fill color lives on a <span class="path">::before</span> pseudo-element sitting <span class="path">1px</span> inside the real button edge, not on the button itself. That 1px gap is what reads as a crisp border/glow around the fill. Hover and active states then only need to swap <em>this one layer's</em> background and box-shadow, leaving the outer shape untouched &mdash; which is also why button text has to be wrapped in a real child element (a <span class="path">&lt;span&gt;</span>), given <span class="path">z-index: 1</span> so it paints above the <span class="path">::before</span> layer instead of underneath it.</p>
+      </div>
+      <p>A smaller version of the same shape, <span class="path">$clip-sm</span>, backs the <span class="path">.sm</span> size variant used for compact buttons like "Buy Now" in the listings table. Color variants (<span class="path">.transparent</span>, <span class="path">.dark</span>, <span class="path">.error</span>, <span class="path">.green</span>) each just override what the <span class="path">::before</span> layer's background is, the shape math never changes.</p>
+
+      <h2><span class="section-num">4</span>FilterDropdown: the open/close/outside-click pattern</h2>
+      <p>This one small component teaches a pattern reused later by the mobile ticker's own dropdown (phase 07) almost line for line. It's a button that toggles a floating list, and closes itself when you click anywhere else on the page.</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">src/design-system/primitives/inputs/filter-dropdown/FilterDropdown.tsx</span></div>
+        <pre><span class="ct">const</span> [open, setOpen] = useState(<span class="cn">false</span>)
+<span class="ct">const</span> rootRef = useRef&lt;HTMLDivElement&gt;(<span class="cn">null</span>)
+
+useEffect(() =&gt; {
+  <span class="ct">const</span> handleClickOutside = (e: MouseEvent) =&gt; {
+    <span class="ct">if</span> (rootRef.current &amp;&amp; !rootRef.current.contains(e.target <span class="ct">as</span> Node)) {
+      setOpen(<span class="cn">false</span>)
+    }
+  }
+  document.addEventListener(<span class="cs">'mousedown'</span>, handleClickOutside)
+  <span class="ct">return</span> () =&gt; document.removeEventListener(<span class="cs">'mousedown'</span>, handleClickOutside)
+}, [])</pre>
+      </div>
+      <p>Three moving parts: a boolean <span class="path">open</span> state, a <span class="path">ref</span> attached to the component's outermost wrapper element, and one document-level click listener registered in a <span class="path">useEffect</span>. The listener checks whether the click's target is <em>inside</em> the wrapper (<span class="path">rootRef.current.contains(...)</span>) &mdash; if it's not, the click happened somewhere else on the page, so the dropdown closes. Clicking the trigger button itself doesn't accidentally close-then-reopen, because the trigger is inside the wrapper too, so a click on it is "inside" and the outside-click handler does nothing; the button's own <span class="path">onClick</span> is what actually toggles it.</p>
+      <div class="callout gotcha">
+        <span class="label">Why the listener is added in useEffect, and removed in its cleanup</span>
+        <p>If you attached this listener directly in the component body instead of inside <span class="path">useEffect</span>, it would re-attach a new listener on every single re-render without ever removing the old one &mdash; a memory leak, and eventually the click handler firing multiple times per click. The empty dependency array <span class="path">[]</span> means "run this setup once, when the component first mounts," and the function <span class="path">useEffect</span> returns is the cleanup that runs when the component unmounts, removing the exact listener that was added.</p>
+      </div>
+      <p>The trigger button's label always shows the fixed filter name ("Price", "Chain"), never the current selection &mdash; the open panel below is what shows which option is picked, via an <span class="path">optionActive</span> class comparing each option's value to the current <span class="path">value</span> prop.</p>
+
+      <h2><span class="section-num">5</span>Sparkline: wrapping a charting library safely</h2>
+      <p>The little mini-charts on metric cards (phase 07) aren't hand-drawn SVG &mdash; they're <a href="https://recharts.org" target="_blank" rel="noopener">Recharts</a>, wrapped in a small primitive so the rest of the app never imports Recharts directly.</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">src/design-system/primitives/charts/sparkline/Sparkline.tsx</span></div>
+        <pre><span class="ct">export const</span> Sparkline = ({ data, color = <span class="cs">'var(--color-blue-primary)'</span>, height = <span class="cn">40</span>, variant = <span class="cs">'area'</span> }: SparklineProps) =&gt; {
+  <span class="ct">const</span> gradientId = <span class="cn">`sparkline-${useId().replace(/:/g, '')}`</span>
+
+  <span class="ct">return</span> (
+    <span class="ct">&lt;div</span> style={{ height }}<span class="ct">&gt;</span>
+      <span class="ct">&lt;ResponsiveContainer</span> width=<span class="cs">"100%"</span> height=<span class="cs">"100%"</span><span class="ct">&gt;</span>
+        {variant === <span class="cs">'bar'</span> ? (
+          <span class="ct">&lt;BarChart</span> data={data}<span class="ct">&gt;&lt;Bar</span> dataKey=<span class="cs">"value"</span> fill={color} <span class="ct">/&gt;&lt;/BarChart&gt;</span>
+        ) : (
+          <span class="ct">&lt;AreaChart</span> data={data}<span class="ct">&gt;</span>
+            <span class="ct">&lt;defs&gt;&lt;linearGradient</span> id={gradientId}<span class="ct">&gt;</span>...<span class="ct">&lt;/linearGradient&gt;&lt;/defs&gt;</span>
+            <span class="ct">&lt;Area</span> dataKey=<span class="cs">"value"</span> stroke={color} fill={<span class="cn">`url(#${gradientId})`</span>} <span class="ct">/&gt;</span>
+          <span class="ct">&lt;/AreaChart&gt;</span>
+        )}
+      <span class="ct">&lt;/ResponsiveContainer&gt;</span>
+    <span class="ct">&lt;/div&gt;</span>
+  )
+}</pre>
+      </div>
+      <p>Two details that matter beyond "it draws a chart." First, <span class="path">variant: 'area' | 'bar'</span> exists because the real design isn't uniform &mdash; the Sales metric card genuinely uses a bar chart while every other metric uses a filled line, a real distinction in the Figma file, not a stylistic choice made up for this project. Second, <span class="path">useId()</span> generates a unique gradient id per chart instance &mdash; SVG gradient ids are global to the whole page's DOM, so without a unique id, two sparklines on the same page would silently share (and visually corrupt) each other's gradient fill.</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">src/design-system/primitives/charts/sparkline/index.ts</span></div>
+        <pre><span class="ct">import</span> dynamic <span class="ct">from</span> <span class="cs">'next/dynamic'</span>
+<span class="ct">export default</span> dynamic(() =&gt; import(<span class="cs">'./Sparkline'</span>), { ssr: <span class="cn">false</span> })</pre>
+      </div>
+      <div class="callout why">
+        <span class="label">Why this is loaded with next/dynamic and ssr: false</span>
+        <p>Recharts measures the real DOM (element widths/heights) to lay out a chart, and there is no DOM on the server during server-side rendering &mdash; it would either crash or render nothing useful. <span class="path">next/dynamic</span> with <span class="path">ssr: false</span> tells Next.js to skip this component entirely on the server and only render it after the page has hydrated in a real browser, where the DOM actually exists to measure.</p>
+      </div>
+
+      <h2><span class="section-num">6</span>What to remember from this phase</h2>
+      <ul class="checklist">
+        <li>A primitive takes props and renders &mdash; it never imports mock data or knows what page it's on.</li>
+        <li>Variant props map to CSS Module classes via a computed property lookup, <span class="path">styles[variant]</span>.</li>
+        <li>Chamfered corners are <span class="path">clip-path: polygon()</span> on both the button and a 1px-inset <span class="path">::before</span> fill layer, not an image or a border trick.</li>
+        <li>A dropdown that closes on outside-click needs a ref, a document-level listener added in <span class="path">useEffect</span>, and that listener removed in the effect's cleanup function.</li>
+        <li>Anything that measures the DOM (charts, most third-party visualization libraries) needs <span class="path">next/dynamic(..., &#123; ssr: false &#125;)</span>.</li>
+      </ul>
+
+      <div class="phase-nav">
+        <a class="to-index" href="01-design-tokens.html">← Design tokens &amp; globals</a>
+        <a href="03-layout-shell.html">Next: Header &amp; page shell →</a>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Header &amp; Page Shell</title>
+<link rel="stylesheet" href="assets/guide.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="sidenav">
+    <a href="index.html" class="brand">Marketplace UI Guide</a>
+    <span class="brand-sub">Learn it, don't just have it</span>
+    <nav>
+      <a class="nav-link" href="index.html"><span class="num">·</span><span>Overview &amp; map</span></a>
+      <div class="group-label">Foundations</div>
+      <a class="nav-link" href="00-fundamentals.html"><span class="num">00</span><span>Fundamentals crash course</span></a>
+      <a class="nav-link" href="01-design-tokens.html"><span class="num">01</span><span>Design tokens &amp; globals</span></a>
+      <a class="nav-link" href="02-primitives.html"><span class="num">02</span><span>Primitives</span></a>
+      <div class="group-label">Structure</div>
+      <a class="nav-link current" href="03-layout-shell.html"><span class="num">03</span><span>Header &amp; page shell</span></a>
+      <a class="nav-link" href="04-sidebar-navigation.html"><span class="num">04</span><span>Sidebar &amp; mobile nav</span></a>
+      <div class="group-label">Sections</div>
+      <a class="nav-link" href="05-hero-promoted.html"><span class="num">05</span><span>Hero &amp; Promoted Domains</span></a>
+      <a class="nav-link" href="06-listings-table.html"><span class="num">06</span><span>The listings table</span></a>
+      <a class="nav-link" href="07-activity-analytics.html"><span class="num">07</span><span>Activity &amp; analytics</span></a>
+      <div class="group-label">Systems</div>
+      <a class="nav-link" href="08-data-layer.html"><span class="num">08</span><span>Types &amp; mock data</span></a>
+      <a class="nav-link" href="09-responsive-patterns.html"><span class="num">09</span><span>Responsive patterns</span></a>
+      <a class="nav-link" href="10-real-apis.html"><span class="num">10</span><span>Wiring to real APIs</span></a>
+    </nav>
+  </aside>
+
+  <div class="content">
+    <div class="wrap">
+      <p class="eyebrow">Phase 03 &middot; Structure</p>
+      <h1 class="title">The header and the page shell</h1>
+      <p class="dek">Two files decide where everything else in this guide gets to live: <span class="path">Header</span> (the top bar, shared by the whole site) and <span class="path">MarketplacePageShell</span> (the three-column grid that's this page's private skeleton).</p>
+
+      <h2><span class="section-num">1</span>The page file itself: assembly, not building</h2>
+      <p>Start at the top: <span class="path">pages/design-preview/marketplace.tsx</span>. It's short because its only job is arranging composites, not implementing any of them.</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">pages/design-preview/marketplace.tsx</span><span>shape, trimmed</span></div>
+        <pre><span class="ct">export default function</span> MarketplacePreview() {
+  <span class="ct">const</span> [menuOpen, setMenuOpen] = useState(<span class="cn">false</span>)
+  <span class="ct">const</span> { filters, debouncedSearch, setFilter } = useListingFilters()
+  <span class="ct">const</span> filtered = filterListings(mockListings, debouncedSearch, filters)
+
+  <span class="ct">return</span> (
+    <span class="ct">&lt;div&gt;</span>
+      <span class="ct">&lt;Header</span> onMenuClick={() =&gt; setMenuOpen(p =&gt; !p)} menuOpen={menuOpen} <span class="ct">/&gt;</span>
+      <span class="ct">&lt;LiveActivityTicker</span> <span class="ct">/&gt;</span>
+      <span class="ct">&lt;MarketplacePageShell</span>
+        sidebar={<span class="ct">&lt;&gt;&lt;MarketplaceSidebar /&gt;&lt;MobileDrawerMenu</span> onClose={...} <span class="ct">/&gt;&lt;/&gt;</span>}
+        hero={<span class="ct">&lt;MarketplaceHero /&gt;</span>}
+        sidebarOpen={menuOpen}
+        onCloseSidebar={() =&gt; setMenuOpen(<span class="cn">false</span>)}
+        rightRail={<span class="ct">&lt;</span>...<span class="ct">&gt;&lt;LiveActivityPanel /&gt;&lt;MarketActivityPanel /&gt;&lt;/</span>...<span class="ct">&gt;</span>}
+      <span class="ct">&gt;</span>
+        <span class="ct">&lt;</span>...<span class="ct">&gt;&lt;PromotedDomainsSection /&gt;&lt;ListingCategoryTabs /&gt;&lt;LiveListingsTable</span> listings={filtered} <span class="ct">/&gt;&lt;/</span>...<span class="ct">&gt;</span>
+      <span class="ct">&lt;/MarketplacePageShell&gt;</span>
+      <span class="ct">&lt;MobileBottomNav /&gt;</span>
+    <span class="ct">&lt;/div&gt;</span>
+  )
+}</pre>
+      </div>
+      <p>Everything this file does: own two pieces of state (whether the mobile menu is open, and the active search/filter values), fetch/filter the mock listings, and pass all of that down as props. No layout math happens here &mdash; that's <span class="path">MarketplacePageShell</span>'s job, next.</p>
+
+      <h2><span class="section-num">2</span>MarketplacePageShell: a CSS Grid with named areas</h2>
+      <p>The desktop layout is sidebar, main content, and a right rail, side by side. Rather than three separate flex containers with manually matched widths, it's one CSS Grid with named template areas &mdash; the cleanest way to describe "these regions exist, here's roughly how they're arranged" without hand-computing pixel math.</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">MarketplacePageShell.module.scss</span></div>
+        <pre>.grid {
+  display: grid;
+  grid-template-columns: <span class="cn">240px 1fr 320px</span>;
+  grid-template-areas:
+    <span class="cs">"sidebar hero rail"</span>
+    <span class="cs">"sidebar main rail"</span>;
+  gap: <span class="cn">var(--space-6)</span>;
+}
+.sidebar { grid-area: <span class="cn">sidebar</span>; }
+.hero    { grid-area: <span class="cn">hero</span>; }
+.main    { grid-area: <span class="cn">main</span>; }
+.rightRail { grid-area: <span class="cn">rail</span>; }</pre>
+      </div>
+      <p>Read the <span class="path">grid-template-areas</span> block literally as a picture of the layout: two rows, three columns. The word <span class="path">rail</span> appears in <em>both</em> rows at the same column position &mdash; CSS Grid automatically merges that into one cell spanning both rows, which is why the right rail visually runs the full height beside both the hero and the main content below it, without any explicit "span 2 rows" instruction anywhere.</p>
+      <p>Then any element given <span class="path">grid-area: hero</span> (via a class like <span class="path">.hero</span> above) is placed into whichever named area matches, regardless of where it sits in the actual HTML/JSX source order. That decoupling &mdash; DOM order doesn't have to match visual order &mdash; is exactly what makes the mobile rewrite below possible with one extra media query instead of restructuring any component.</p>
+
+      <h3>The same grid, one property changed, becomes the mobile layout</h3>
+      <div class="code-card">
+        <div class="code-label"><span class="file">MarketplacePageShell.module.scss</span></div>
+        <pre><span class="ct">@include</span> tablet-down {
+  grid-template-columns: <span class="cn">1fr</span>;
+  grid-template-areas:
+    <span class="cs">"hero"</span>
+    <span class="cs">"rail"</span>
+    <span class="cs">"main"</span>;
+}</pre>
+      </div>
+      <p>Below 1025px, the sidebar column drops out of the layout entirely (it becomes an off-canvas drawer instead &mdash; phase 04) and the remaining three areas collapse to one column, stacked hero, then rail, then main. Notice the <em>order</em> changed too: on desktop the rail sits beside hero+main, but on mobile it's deliberately placed <em>between</em> them &mdash; Live Activity and Market Activity move up to sit right under the hero instead of trailing at the very bottom, matching what the real Figma mobile mockup showed. Nothing about <span class="path">Header</span>, <span class="path">MarketplaceHero</span>, or any rail component had to know this reorder was happening &mdash; it's purely a property of where the grid places each named area at each breakpoint.</p>
+
+      <h2><span class="section-num">3</span>The header: one component, used by the whole site</h2>
+      <p><span class="path">src/design-system/layouts/header/index.tsx</span> is not marketplace-specific &mdash; every page in the real app renders it. That matters for how new behavior gets added to it.</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">Header/index.tsx</span></div>
+        <pre><span class="ct">type</span> HeaderProps = {
+  hidden?: boolean
+  <span class="cm">// Opt-in only — omitted by every page except the marketplace preview,</span>
+  <span class="cm">// so no other page's header changes.</span>
+  onMenuClick?: () =&gt; <span class="cn">void</span>
+  menuOpen?: boolean
+}</pre>
+      </div>
+      <div class="callout why">
+        <span class="label">Why the hamburger button is an optional prop, not just always-on</span>
+        <p><span class="path">Header</span> is used across the real site, most of which has no off-canvas drawer to open. Making <span class="path">onMenuClick</span> optional and only rendering the hamburger chip when it's actually passed means every other page's header renders <em>exactly</em> as it did before this feature existed &mdash; the marketplace preview page is the only caller that passes it. This "opt-in prop" shape reappears constantly in this project any time a shared component needs new behavior that only one caller wants.</p>
+      </div>
+      <div class="code-card">
+        <div class="code-label"><span class="file">Header/index.tsx</span></div>
+        <pre>{onMenuClick &amp;&amp; (
+  <span class="ct">&lt;button</span> className={styles.menuToggle} onClick={onMenuClick} aria-expanded={menuOpen}<span class="ct">&gt;</span>
+    <span class="ct">&lt;span</span> className={styles.menuToggleBar} <span class="ct">/&gt;</span>
+  <span class="ct">&lt;/button&gt;</span>
+)}</pre>
+      </div>
+      <p>The chip's chamfered shape uses the exact same <span class="path">clip-path</span> technique from phase 02, just applied to a small square button instead of a pill. Its three horizontal bars (the hamburger icon itself) are drawn with pure CSS &mdash; no image &mdash; three <span class="path">&lt;span&gt;</span>-like bars positioned with <span class="path">::before</span>/<span class="path">::after</span>, the same technique used again for the drawer's close ("X") button in phase 04.</p>
+
+      <h2><span class="section-num">4</span>The mobile drawer: fixed position, animated with a transform</h2>
+      <p>The sidebar's off-canvas behavior below 1025px lives entirely in CSS, driven by one boolean class:</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">MarketplacePageShell.module.scss</span></div>
+        <pre>.sidebar {
+  <span class="ct">@include</span> tablet-down {
+    position: fixed;
+    top: <span class="cn">59px</span>;               <span class="cm">// matches the header's own height, so the drawer opens below it, not over it</span>
+    left: 0; bottom: 0;
+    width: <span class="cn">280px</span>;
+    transform: translateX(<span class="cn">-100%</span>);  <span class="cm">// off-screen to the left by default</span>
+    transition: transform <span class="cn">0.2s</span> ease;
+  }
+}
+.sidebarOpen {
+  <span class="ct">@include</span> tablet-down { transform: translateX(<span class="cn">0</span>); }
+}</pre>
+      </div>
+      <p><span class="path">translateX(-100%)</span> shifts the whole drawer left by exactly its own width, which is what makes it invisible off-screen without needing <span class="path">display: none</span> (which couldn't be transitioned). When the <span class="path">sidebarOpen</span> class is added, <span class="path">transform</span> changes to <span class="path">translateX(0)</span>, and because <span class="path">transition: transform 0.2s ease</span> is already declared on the base rule, the browser animates smoothly between the two positions instead of snapping.</p>
+      <p>The React side is almost nothing &mdash; <span class="path">MarketplacePageShell</span> doesn't own this state itself, it's a fully <strong>controlled component</strong> for this:</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">MarketplacePageShell.tsx</span></div>
+        <pre><span class="ct">export const</span> MarketplacePageShell = ({ sidebar, hero, rightRail, children, sidebarOpen, onCloseSidebar }: Props) =&gt; {
+  <span class="ct">const</span> sidebarClass = [styles.sidebar, sidebarOpen ? styles.sidebarOpen : <span class="cs">''</span>].filter(Boolean).join(<span class="cs">' '</span>)
+  <span class="ct">return</span> (
+    <span class="ct">&lt;div</span> className={styles.shell}<span class="ct">&gt;</span>
+      <span class="ct">&lt;div</span> className={styles.grid}<span class="ct">&gt;</span>
+        <span class="ct">&lt;aside</span> className={sidebarClass}<span class="ct">&gt;</span>{sidebar}<span class="ct">&lt;/aside&gt;</span>
+        <span class="ct">&lt;div</span> className={styles.hero}<span class="ct">&gt;</span>{hero}<span class="ct">&lt;/div&gt;</span>
+        <span class="ct">&lt;aside</span> className={styles.rightRail}<span class="ct">&gt;</span>{rightRail}<span class="ct">&lt;/aside&gt;</span>
+        <span class="ct">&lt;main</span> className={styles.main}<span class="ct">&gt;</span>{children}<span class="ct">&lt;/main&gt;</span>
+      <span class="ct">&lt;/div&gt;</span>
+      {sidebarOpen &amp;&amp; <span class="ct">&lt;div</span> className={styles.scrim} onClick={onCloseSidebar} <span class="ct">/&gt;</span>}
+    <span class="ct">&lt;/div&gt;</span>
+  )
+}</pre>
+      </div>
+      <div class="callout why">
+        <span class="label">Controlled vs. self-owned state</span>
+        <p>Earlier in this project, the shell owned <span class="path">sidebarOpen</span> itself with its own <span class="path">useState</span>, and rendered its own toggle button floating above the grid. That button needed to move <em>inside</em> the header bar to match the real design (this phase, section 3) &mdash; but the header is a sibling of the shell in the page tree, not a child, so it has no way to reach into the shell's internal state. The state had to move up to the one component that's an ancestor of both: the page itself. This is the standard React answer whenever two separate components need to agree on one piece of state &mdash; lift it to their nearest common parent, and pass it down to both as props.</p>
+      </div>
+      <p>The <span class="path">scrim</span> is the semi-transparent dark overlay behind the open drawer &mdash; it only renders when the drawer is open, and clicking it calls the same <span class="path">onCloseSidebar</span> the close button uses, giving you "tap anywhere outside to dismiss" for free from one <span class="path">onClick</span>.</p>
+
+      <h2><span class="section-num">5</span>What to remember from this phase</h2>
+      <ul class="checklist">
+        <li>CSS Grid named areas decouple visual order from DOM order &mdash; reordering a responsive layout is often just rewriting <span class="path">grid-template-areas</span>, no JSX changes.</li>
+        <li>A shared component (<span class="path">Header</span>) gets new behavior through optional props that default to off, so every other caller is provably unaffected.</li>
+        <li>An off-canvas drawer is <span class="path">position: fixed</span> + <span class="path">translateX(-100%)</span> + a transition, toggled by adding one class.</li>
+        <li>When two sibling components need to share state, lift that state to their nearest common parent and pass it down as props to both.</li>
+      </ul>
+
+      <div class="phase-nav">
+        <a class="to-index" href="02-primitives.html">← Primitives</a>
+        <a href="04-sidebar-navigation.html">Next: Sidebar &amp; mobile nav →</a>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,172 @@
+@import '@mpstyles/_mixins.scss';
+
+// Figma node 1:1149. Column proportions derived from the real header/row x
+// positions (domain ~243px, price ~107px, appraised ~145px, chain ~119px,
+// action ~195px of an 809px row) — not the screenshot alone.
+//
+// This is the desktop/tablet layout only now. Mobile doesn't reuse this
+// grid at all — a single sticky Domain column over one scrolling grid was
+// tried and dropped: the sticky column always covers a band of screen
+// width equal to its own size, so the far end of the Action column could
+// only ever be reached by first passing behind it, meaning Buy Now/the
+// heart icon could never actually clear the overlay. LiveListingsTable
+// instead splits Domain into a real fixed pane and the rest into a
+// separately, fully scrollable pane — see that file's .mobileSplit.
+.row {
+  display: grid;
+  grid-template-columns: 2.4fr 1fr 1.4fr 1.2fr 1.9fr;
+  align-items: center;
+  min-height: 56px;
+  background: var(--color-white-primary);
+  border: 1px solid var(--color-border-black-subtle);
+  border-radius: 3px;
+
+  @include mobile {
+    display: none;
+  }
+}
+
+.cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: var(--space-2) var(--space-3);
+  min-width: 0;
+  min-height: 0;
+
+  &:not(:first-child) {
+    border-left: 1px solid var(--color-border-black-subtle);
+  }
+}
+
+.actionCell {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+// ── Domain cell ──────────────────────────────────────────────────────────
+
+.domain {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  min-width: 0;
+
+  // Real bug this fixed: .cell (above) uses align-items: flex-start, so
+  // without an explicit width here .domain was sizing to its own content
+  // instead of filling .cell's already-constrained width — meaning a long
+  // domain name's flex:1 sibling (.domainNameScroll) had no actual space
+  // to shrink against, so .domain just grew to fit the full name and
+  // pushed the extension badge out past the pane's own right edge, where
+  // it silently got clipped by .domainPaneRow's overflow: hidden instead
+  // of staying visible on the right like it was supposed to.
+  @include mobile {
+    width: 100%;
+  }
+
+  // The extension badge (always the last child — marker/domainNameScroll
+  // come first) stays a fixed size on the right at mobile, it never gets
+  // squeezed by .domainNameScroll's flex:1 next to it.
+  > *:last-child {
+    @include mobile {
+      flex-shrink: 0;
+    }
+  }
+}
+
+.marker {
+  width: 19px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+// Mobile-only scroll clip for a long domain name — see .domainName below
+// for the matching mobile override that lets the name grow past its own
+// box instead of truncating, which is what this actually scrolls. The
+// extension badge is domain's own last child and isn't given flex:1, so it
+// keeps its natural size and stays fixed on the right regardless of how
+// far the name is scrolled.
+.domainNameScroll {
+  min-width: 0;
+
+  @include mobile {
+    display: block; // was relying on flex-item blockification alone — being explicit here since overflow on an inline element is unreliable
+    flex: 1;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch; // real bug this fixes: without it, iOS Safari doesn't reliably start a touch-drag scroll on a region this small, it just reads as a failed tap/the page's own vertical scroll instead
+    touch-action: pan-x; // tells the browser this element owns horizontal drags specifically, instead of possibly handing the gesture to the page's vertical scroll
+    scrollbar-width: none; // still scrolls, the scrollbar itself just isn't drawn — same technique LiveActivityPanel's own .list already uses
+    -ms-overflow-style: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+}
+
+.domainName {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-small-13);
+  line-height: 1.2; // unset, this inherited the app's global 1.5–1.6 body line-height, same bug fixed in PromotedDomainCard
+  color: var(--color-black-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  @include mobile {
+    display: block;
+    width: max-content; // grows to the name's real width instead of clipping — .domainNameScroll above is what clips/scrolls it now
+    overflow: visible;
+    text-overflow: clip;
+  }
+}
+
+// ── Shared value styles ─────────────────────────────────────────────────
+
+.value {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-small-13);
+  line-height: 1.2;
+  color: var(--color-black-primary);
+}
+
+.usd {
+  font-family: var(--font-space-grotesk); // closest already-loaded face to Figma's JetBrains Mono
+  font-size: var(--text-small-10);
+  line-height: 1.2;
+  color: #a6a1bb; // design-specific: Figma-exact, no token match
+}
+
+// ── Action cell ──────────────────────────────────────────────────────────
+
+.buyNow {
+  flex-shrink: 0;
+}
+
+.favorite {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.favoriteIcon {
+  width: 14px;
+  height: 13px;
+}
+
+.favoriteIconActive {
+  width: 14px;
+  height: 13px;
+  filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(325deg) brightness(101%) contrast(101%);
+}

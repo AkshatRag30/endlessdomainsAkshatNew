@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Listings Table</title>
+<link rel="stylesheet" href="assets/guide.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="sidenav">
+    <a href="index.html" class="brand">Marketplace UI Guide</a>
+    <span class="brand-sub">Learn it, don't just have it</span>
+    <nav>
+      <a class="nav-link" href="index.html"><span class="num">·</span><span>Overview &amp; map</span></a>
+      <div class="group-label">Foundations</div>
+      <a class="nav-link" href="00-fundamentals.html"><span class="num">00</span><span>Fundamentals crash course</span></a>
+      <a class="nav-link" href="01-design-tokens.html"><span class="num">01</span><span>Design tokens &amp; globals</span></a>
+      <a class="nav-link" href="02-primitives.html"><span class="num">02</span><span>Primitives</span></a>
+      <div class="group-label">Structure</div>
+      <a class="nav-link" href="03-layout-shell.html"><span class="num">03</span><span>Header &amp; page shell</span></a>
+      <a class="nav-link" href="04-sidebar-navigation.html"><span class="num">04</span><span>Sidebar &amp; mobile nav</span></a>
+      <div class="group-label">Sections</div>
+      <a class="nav-link" href="05-hero-promoted.html"><span class="num">05</span><span>Hero &amp; Promoted Domains</span></a>
+      <a class="nav-link current" href="06-listings-table.html"><span class="num">06</span><span>The listings table</span></a>
+      <a class="nav-link" href="07-activity-analytics.html"><span class="num">07</span><span>Activity &amp; analytics</span></a>
+      <div class="group-label">Systems</div>
+      <a class="nav-link" href="08-data-layer.html"><span class="num">08</span><span>Types &amp; mock data</span></a>
+      <a class="nav-link" href="09-responsive-patterns.html"><span class="num">09</span><span>Responsive patterns</span></a>
+      <a class="nav-link" href="10-real-apis.html"><span class="num">10</span><span>Wiring to real APIs</span></a>
+    </nav>
+  </aside>
+
+  <div class="content">
+    <div class="wrap">
+      <p class="eyebrow">Phase 06 &middot; Sections</p>
+      <h1 class="title">The listings table, and the mobile layout that took three tries</h1>
+      <p class="dek">This phase spends more time on failed attempts than successful code, on purpose. The table you can scroll on a phone today is the third architecture tried for it, and the two that got abandoned teach the mechanism better than a clean success story would.</p>
+
+      <h2><span class="section-num">1</span>The pieces above the table itself</h2>
+      <p><span class="path">ListingCategoryTabs</span> and <span class="path">ListingFilterBar</span> sit above <span class="path">LiveListingsTable</span> and both lean on components you already know from earlier phases &mdash; tabs are a row of buttons with an active-state border radius fixed to match Figma exactly (a literal, Figma-measured <span class="path">3.9px</span>, not a token, since no existing radius token matched it), and the filter bar is a row of <span class="path">FilterDropdown</span>s, the exact outside-click-to-close primitive from phase 02.</p>
+
+      <h3>useListingFilters: state and filtering logic kept out of the component</h3>
+      <div class="code-card">
+        <div class="code-label"><span class="file">hooks/marketplace/useListingFilters.ts</span></div>
+        <pre><span class="ct">export function</span> useListingFilters() {
+  <span class="ct">const</span> [filters, setFilters] = useState&lt;ListingFilters&gt;(DEFAULT_LISTING_FILTERS)
+  <span class="ct">const</span> debouncedSearch = useDebounces(filters.search)
+
+  <span class="ct">const</span> setFilter = &lt;K extends <span class="ck">keyof</span> ListingFilters&gt;(key: K, value: ListingFilters[K]) =&gt; {
+    setFilters((prev) =&gt; ({ ...prev, [key]: value }))
+  }
+
+  <span class="ct">return</span> { filters, debouncedSearch, setFilter }
+}</pre>
+      </div>
+      <p>This is a small but worth-noticing separation: the page component doesn't hold six separate <span class="path">useState</span> calls for search/extension/price/length/chain/listed. It holds one hook call. Anything about <em>how</em> filter state is stored or debounced can change inside this one file without touching the component that uses it &mdash; the component only ever sees <span class="path">{ filters, debouncedSearch, setFilter }</span>.</p>
+      <div class="callout note">
+        <span class="label">Reusing the project's existing debounce, not writing a new one</span>
+        <p>The comment in the real file is blunt about why: <em>"matches src/utils/useDebounce.ts's existing 300ms default rather than introducing a second debounce implementation (this repo already has three)."</em> When you're adding a new feature to an existing codebase, grep for whether the thing you're about to write already exists somewhere else first &mdash; a fourth debounce implementation would work fine in isolation and still make the codebase harder to reason about.</p>
+      </div>
+
+      <h3>filterListings: honest about what it doesn't do yet</h3>
+      <div class="code-card">
+        <div class="code-label"><span class="file">hooks/marketplace/useListingFilters.ts</span></div>
+        <pre><span class="ct">export function</span> filterListings(listings: MarketplaceListing[], search: <span class="cn">string</span>, filters: ListingFilters) {
+  <span class="ct">const</span> term = search.trim().toLowerCase()
+
+  <span class="ct">return</span> listings.filter((listing) =&gt; {
+    <span class="ct">if</span> (term &amp;&amp; !listing.domainName.toLowerCase().includes(term)) <span class="ct">return false</span>
+    <span class="ct">if</span> (filters.extension !== <span class="cs">'any'</span> &amp;&amp; listing.extension !== filters.extension) <span class="ct">return false</span>
+    <span class="ct">if</span> (filters.chain !== <span class="cs">'any'</span> &amp;&amp; listing.chain.id !== CHAIN_VALUE_TO_ID[filters.chain]) <span class="ct">return false</span>
+    <span class="ct">return true</span>
+  })
+}</pre>
+      </div>
+      <p>Search and chain filters actually run against real fields on <span class="path">MarketplaceListing</span>. Price, length, and listed-date don't &mdash; there's no matching field on the type yet. The function still accepts those filter values as parameters (so the dropdowns for them are fully functional UI, nothing is disabled), it just never checks them. That's a deliberate, visible gap rather than a silent lie: it would have been easy to fake a length filter against <span class="path">domainName.length</span> and have it look like it worked while actually filtering on the wrong thing. Leaving it unimplemented and saying so in the comment is more honest than a filter that quietly does the wrong computation.</p>
+
+      <h2><span class="section-num">2</span>ListingRow: one row, split into three exports</h2>
+      <p>The desktop table is a single grid row: Domain Name, Price, Appraised Value, Chain, Action, five columns, one component. The mobile table needed the Domain Name cell to live in a completely different place in the DOM from the other four cells (more on why in a moment) &mdash; so <span class="path">ListingRow.tsx</span> exports three things instead of one:</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">ListingRow.tsx</span></div>
+        <pre><span class="ct">export const</span> ListingDomainCell = ({ listing }) =&gt; ( <span class="cm">// just the Domain Name cell</span>
+  <span class="ct">&lt;div</span> className={styles.cell}<span class="ct">&gt;</span>...<span class="ct">&lt;/div&gt;</span>
+)
+
+<span class="ct">export const</span> ListingRestCells = ({ listing, favorited, onToggleFavorite }) =&gt; ( <span class="cm">// Price/Appraised/Chain/Action</span>
+  <span class="ct">&lt;&gt;</span>...<span class="ct">&lt;/&gt;</span>
+)
+
+<span class="ct">export const</span> ListingRow = ({ listing, favorited, onToggleFavorite }) =&gt; ( <span class="cm">// desktop: both, together</span>
+  <span class="ct">&lt;div</span> className={styles.row}<span class="ct">&gt;</span>
+    <span class="ct">&lt;ListingDomainCell</span> listing={listing} <span class="ct">/&gt;</span>
+    <span class="ct">&lt;ListingRestCells</span> listing={listing} favorited={favorited} onToggleFavorite={onToggleFavorite} <span class="ct">/&gt;</span>
+  <span class="ct">&lt;/div&gt;</span>
+)</pre>
+      </div>
+      <p>Desktop uses the combined <span class="path">ListingRow</span>. Mobile uses <span class="path">ListingDomainCell</span> and <span class="path">ListingRestCells</span> separately, rendering each into a different parent. Nothing about a single cell's own markup or styling had to change to support this &mdash; only where it gets mounted.</p>
+
+      <h2><span class="section-num">3</span>Three architectures for the mobile table, in the order they were actually tried</h2>
+      <p>The requirement was simple to state: on a phone, the table is wider than the screen, so it needs to scroll sideways &mdash; but the Domain Name column should stay visible the whole time, so you always know which row you're looking at while the rest of the data slides underneath it. Three real approaches were built, in this order.</p>
+
+      <h3>Attempt 1: one scrolling grid with <span class="path">position: sticky</span> on the Domain column</h3>
+      <p>The obvious-sounding first approach: keep the desktop's single 5-column grid, wrap the whole row in a horizontally scrolling container, and make the Domain Name cell <span class="path">position: sticky; left: 0</span> so it stays pinned to the left edge while the rest of the row scrolls underneath it.</p>
+      <div class="callout gotcha">
+        <span class="label">Why this was abandoned</span>
+        <p>A sticky element doesn't just stay in place, it stays <em>on top</em> &mdash; it occupies a real band of screen width for as long as it's stuck, and everything else in the scrolling row still has to pass underneath that band to reach the far edge. In practice that meant the Action column's Buy Now button and heart icon, way over on the right of the row, could only ever be scrolled <em>behind</em> the sticky Domain column, never past it and back into clear space on the other side &mdash; there is no "other side" once you're pinned to the left edge of the same scrolling viewport. No amount of extra scroll range fixes this, because the problem isn't how far you can scroll, it's that the sticky column and the content trying to reach past it are fighting over the same physical space the whole time.</p>
+        <p style="margin-top:8px">This was tried first specifically because it reuses the existing single-grid row with the smallest amount of new code &mdash; worth knowing sticky's real failure mode before reaching for it on a similar problem in the future, rather than rediscovering it the hard way.</p>
+      </div>
+
+      <h3>Attempt 2: extend the scroll range so the overlap clears</h3>
+      <p>The next idea kept the sticky column but tried to compensate: add extra right-side padding and a wider <span class="path">min-width</span> to the scrolling row, so there'd be enough empty scroll distance past the Action column for it to eventually clear the sticky column's overlay band entirely.</p>
+      <div class="callout gotcha">
+        <span class="label">Why this was also rejected</span>
+        <p>This one actually got built and then explicitly reverted. It technically could work, but only by making the row artificially wider than its real content &mdash; scrolling "through" empty padding space just to get Buy Now out from behind the pinned column. That's a real UX cost (you have to scroll further than the actual data requires, and there's a stretch of blank space at the end) for a problem that's really about the sticky column overlapping content, not about there being too little scroll distance. This is the point where a step back to "is sticky even the right primitive here" happens, instead of continuing to patch around its failure mode.</p>
+        <p style="margin-top:8px">A quieter option was floated here too: drop the Action column from the scrollable area on mobile entirely, so Buy Now/favorite simply aren't reachable by horizontal scroll at all. It was tried, worked exactly as described, and still didn't feel right once it was visible on a real device &mdash; a listings row you can't act on from the scrolled view is a real functional loss, not just a visual compromise.</p>
+      </div>
+
+      <h3>Attempt 3 (final): two independent panes instead of one scrolling column</h3>
+      <p>The idea that actually solved it: stop trying to make one scrolling area behave like it has a frozen column, and build two separate flex children side by side instead &mdash; a narrow pane that never scrolls, holding only Domain Name cells, and a second pane next to it that scrolls independently and holds everything else. There's no overlap because there's no shared coordinate space to overlap in &mdash; the fixed pane and the scrolling pane are just two ordinary siblings in a flex row.</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">LiveListingsTable.tsx</span></div>
+        <pre><span class="ct">&lt;div</span> className={styles.mobileSplit}<span class="ct">&gt;</span>
+  <span class="ct">&lt;div</span> className={styles.domainPane}<span class="ct">&gt;</span>
+    <span class="ct">&lt;div</span> className={styles.domainPaneHeader}<span class="ct">&gt;</span>Domain Name<span class="ct">&lt;/div&gt;</span>
+    {visible.map((listing) =&gt; <span class="ct">&lt;ListingDomainCell</span> key={listing.id} listing={listing} <span class="ct">/&gt;</span>)}
+  <span class="ct">&lt;/div&gt;</span>
+
+  <span class="ct">&lt;div</span> className={styles.scrollPane}<span class="ct">&gt;</span>
+    <span class="ct">&lt;div</span> className={styles.scrollPaneInner}<span class="ct">&gt;</span>
+      <span class="ct">&lt;div</span> className={styles.restHeader}<span class="ct">&gt;</span>Price / Appraised / Chain / Action<span class="ct">&lt;/div&gt;</span>
+      {visible.map((listing) =&gt; <span class="ct">&lt;ListingRestCells</span> key={listing.id} listing={listing} ... <span class="ct">/&gt;</span>)}
+    <span class="ct">&lt;/div&gt;</span>
+  <span class="ct">&lt;/div&gt;</span>
+<span class="ct">&lt;/div&gt;</span></pre>
+      </div>
+      <div class="code-card">
+        <div class="code-label"><span class="file">LiveListingsTable.module.scss</span></div>
+        <pre>.domainPane {
+  flex-shrink: <span class="cn">0</span>;
+  width: <span class="cn">172px</span>;
+}
+
+.scrollPane {
+  flex: <span class="cn">1</span>;
+  min-width: <span class="cn">0</span>; <span class="cm">// lets the pane shrink below its content's natural width — see the gotcha below</span>
+  overflow-x: auto;
+}
+
+.scrollPaneInner {
+  min-width: <span class="cn">581px</span>; <span class="cm">// $rest-width: Figma-exact width of Price+Appraised+Chain+Action</span>
+}</pre>
+      </div>
+      <p><span class="path">.domainPane</span> is a fixed 172px and never scrolls &mdash; it's simply not wide enough to need to, since it holds nothing but domain names. <span class="path">.scrollPane</span> is the flexible sibling that fills whatever width is left and scrolls its own contents (<span class="path">.scrollPaneInner</span>, held to its real Figma-measured minimum width) independently. Scrolling one has zero effect on the other, because they don't share a scroll container at all.</p>
+      <div class="callout gotcha">
+        <span class="label">min-width: 0, the one-line fix flexbox almost always needs</span>
+        <p>A flex item's default minimum width is its own content's natural width, not zero &mdash; so without <span class="path">min-width: 0</span> on <span class="path">.scrollPane</span>, the flex item would refuse to shrink smaller than <span class="path">.scrollPaneInner</span>'s full 581px content, which defeats the entire point of giving it <span class="path">overflow-x: auto</span> in a narrower space. This single-line fix comes up constantly any time a flex or grid child needs to scroll or truncate its own oversized content — it's worth remembering as a reflex, not re-discovering each time a flex child refuses to shrink.</p>
+      </div>
+
+      <h3>Why two independently rendered structures, not one that reflows</h3>
+      <p>Notice that <span class="path">LiveListingsTable.tsx</span> renders <em>both</em> <span class="path">.scrollWrap</span> (the desktop single grid) and <span class="path">.mobileSplit</span> (the two-pane version) unconditionally, same as every other responsive component in this codebase &mdash; CSS shows exactly one via <span class="path">display: none</span> at the matching breakpoint. This is why <span class="path">favoritedIds</span> got explicitly lifted up to <span class="path">LiveListingsTable</span> instead of staying as local state inside <span class="path">ListingRow</span>: mobile renders a listing's favorite button somewhere entirely different in the tree from where desktop renders the same listing's favorite button, so if each kept its own local <span class="path">useState</span>, toggling favorite on mobile would have zero effect on what desktop's copy of that same row shows, and vice versa. One <span class="path">Set&lt;string&gt;</span> of favorited ids, owned by the table and passed down as props to whichever layout is currently visible, is what keeps them in agreement regardless of which one CSS is showing right now.</p>
+
+      <h2><span class="section-num">4</span>Keeping two independently-laid-out panes in row alignment</h2>
+      <p>Once domain names and their row's data live in genuinely separate DOM trees, a new problem appears that a single grid never had: nothing guarantees the two panes' rows are the same height, so a taller row on one side visually drifts out of alignment with its own data on the other side as you scroll down the list.</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">LiveListingsTable.module.scss</span></div>
+        <pre><span class="cm">// Fixed (not min-) heights, shared by both panes' header and every row —
+// a guessed min-height on the header pair didn't match the desktop
+// .header span's inherited line-height, and any per-pane difference, even
+// a couple of px, compounds down the list as every row after it inherits
+// the offset.</span>
+$table-header-height: <span class="cn">32px</span>;
+$table-row-height: <span class="cn">56px</span>;
+
+.domainPaneHeader { height: $table-header-height; }
+.domainPaneRow     { height: $table-row-height; }
+.restHeader        { height: $table-header-height; }
+.restRow           { height: $table-row-height; }</pre>
+      </div>
+      <div class="callout gotcha">
+        <span class="label">min-height is a suggestion, height is a guarantee</span>
+        <p><span class="path">min-height</span> only sets a floor &mdash; if either pane's content (say, a row whose price text wraps, or whose badge is taller than expected) needs more room than the floor, that row simply grows past it, and now the two panes' Nth rows are different heights again with no error, no warning, just a slow visual drift that gets worse the further down the list you scroll. Using an explicit <span class="path">height</span> instead, shared by both panes through the same SCSS variable, removes the possibility entirely &mdash; every row in both panes is exactly the same height no matter what, because nothing is allowed to grow past it. (Content that doesn't fit gets centered and clipped rather than reflowing, which is an acceptable tradeoff for table cells holding short, predictable values like these.)</p>
+      </div>
+
+      <h2><span class="section-num">5</span>Inside the Domain Name cell: two nested scroll problems, one real fix</h2>
+      <p>A long domain name (the demo data includes one specifically for testing: <span class="path">thisisanextremelylongdomainnamefortestingpurposes.io</span>) doesn't fit in a 172px pane. The requirement was specific: the long name should scroll <em>horizontally inside its own cell</em>, while the extension badge next to it (<span class="path">.io</span>) stays fixed in place on the right, never scrolling out of view.</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">ListingRow.tsx</span></div>
+        <pre><span class="ct">&lt;div</span> className={styles.domain}<span class="ct">&gt;</span>
+  <span class="ct">&lt;span</span> className={styles.domainNameScroll}<span class="ct">&gt;</span>
+    <span class="ct">&lt;span</span> className={styles.domainName}<span class="ct">&gt;</span>{listing.domainName}<span class="ct">&lt;/span&gt;</span>
+  <span class="ct">&lt;/span&gt;</span>
+  <span class="ct">&lt;ExtensionBadge</span> extension={listing.extension} <span class="ct">/&gt;</span>
+<span class="ct">&lt;/div&gt;</span></pre>
+      </div>
+      <p>Three nested layers, each with one job: <span class="path">.domain</span> is the flex row holding the scrollable name and the fixed badge side by side. <span class="path">.domainNameScroll</span> is the scroll <em>viewport</em> &mdash; it has a real, constrained width and <span class="path">overflow-x: auto</span>. <span class="path">.domainName</span> is the content inside it, which at mobile width is told to stop truncating and instead grow to its real full-text width, becoming wider than its own viewport and therefore scrollable.</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">ListingRow.module.scss</span></div>
+        <pre>.domainNameScroll {
+  <span class="ct">@include</span> mobile {
+    display: block;
+    flex: <span class="cn">1</span>;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
+    scrollbar-width: <span class="cn">none</span>;
+  }
+}
+
+.domainName {
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; <span class="cm">// desktop: truncates</span>
+
+  <span class="ct">@include</span> mobile {
+    width: max-content; <span class="cm">// mobile: grows past its own box instead</span>
+    overflow: visible;
+    text-overflow: clip;
+  }
+}</pre>
+      </div>
+      <p>The first version of this fix added <span class="path">touch-action</span> and <span class="path">-webkit-overflow-scrolling: touch</span> and looked correct in the code &mdash; it compiled, the rule was there &mdash; and still didn't actually scroll on a real device. Two more rounds of guessing (different touch properties, explicit <span class="path">display: block</span>) didn't fix it either. The real cause turned out to live one level up, outside this file entirely.</p>
+      <div class="callout gotcha">
+        <span class="label">The actual root cause: a sibling's align-items, not a missing touch property</span>
+        <p><span class="path">.cell</span>, the ancestor one level above <span class="path">.domain</span>, sets <span class="path">align-items: flex-start</span>. Flex items with <span class="path">align-items: flex-start</span> size themselves to their own content along the cross axis <em>by default</em>, rather than stretching to fill their container. Since <span class="path">.domain</span> never got an explicit width of its own, it was sizing itself to whatever content it held &mdash; which meant it simply grew to fit the entire long domain name, and its flex sibling <span class="path">.domainNameScroll</span> (given <span class="path">flex: 1</span>) had no actual constrained space to be squeezed into, so there was nothing for it to overflow <em>against</em>. No real width constraint means no real overflow, means <span class="path">overflow-x: auto</span> has nothing to do, means no scrollbar, no scroll gesture, no matter how many touch-specific properties get added.</p>
+        <p style="margin-top:8px">The one-line fix was <span class="path">.domain { @include mobile { width: 100%; } }</span> &mdash; forcing <span class="path">.domain</span> itself to actually fill its parent's width, which finally gives <span class="path">.domainNameScroll</span>'s <span class="path">flex: 1</span> a real, smaller-than-content space to be constrained into. Once that width is real, everything downstream (the overflow, the touch scrolling, the badge staying put) started working with no other changes.</p>
+      </div>
+      <p>This was confirmed with actual before/after screenshots taken through a headless browser, not just re-reading the CSS and reasoning about it &mdash; after two guess-based attempts had already failed silently (no compile error, no visible breakage in a static screenshot, just "doesn't scroll" only discoverable by actually trying to drag it), verifying against a real rendered page was what found the sibling's <span class="path">align-items</span> as the actual cause instead of a fourth guess.</p>
+      <div class="callout note">
+        <span class="label">The general lesson</span>
+        <p>When a CSS fix "should" work by every reading of the rule you changed, and it still doesn't behave correctly, the bug is very often one level up the tree &mdash; in a container property (<span class="path">align-items</span>, <span class="path">min-width</span>, <span class="path">overflow</span>) that's silently constraining or unconstraining the element you're actually trying to fix, rather than in the rule you keep re-editing.</p>
+      </div>
+
+      <h2><span class="section-num">6</span>ListingsHeading: a component that was planned for and never built</h2>
+      <p>Above the search/filter row, every breakpoint of the reference design shows a small heading: "Live Listings" next to a live count of how many domains are showing. For a while, this codebase's implementation simply didn't have it — not a bug exactly, more a step that got skipped. The evidence it was always meant to exist was sitting in the data file the whole time:</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">data/marketplace/domains.ts</span></div>
+        <pre><span class="ct">export const</span> MOCK_LISTINGS_TOTAL = mockListings.length <span class="cm">// 28, matches "28 domains" in the reference design</span></pre>
+      </div>
+      <p>That export existed, with a comment explaining exactly what it was for, and nothing in the entire app ever imported it. That's a useful thing to be able to notice while reading a codebase: an exported constant with a comment referencing a specific piece of UI ("matches X in the reference design") that no component actually uses is a strong signal that a piece of the design was planned for but the component that was supposed to read it never got built. The fix was small — a new, single-purpose component:</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">ListingsHeading/ListingsHeading.tsx</span></div>
+        <pre><span class="ct">export interface</span> ListingsHeadingProps {
+  count: <span class="cn">number</span>
+}
+
+<span class="ct">export const</span> ListingsHeading = ({ count }: ListingsHeadingProps) =&gt; (
+  <span class="ct">&lt;div</span> className={styles.row}<span class="ct">&gt;</span>
+    <span class="ct">&lt;span</span> className={styles.title}<span class="ct">&gt;</span>Live Listings<span class="ct">&lt;/span&gt;</span>
+    <span class="ct">&lt;span</span> className={styles.count}<span class="ct">&gt;</span>{count} domains<span class="ct">&lt;/span&gt;</span>
+  <span class="ct">&lt;/div&gt;</span>
+)</pre>
+      </div>
+      <p>Two small decisions here are worth pulling out, because they're the kind of small decisions that come up in every component you'll ever add to an existing app. First: where does this new piece live in the file tree? It's not part of <span class="path">ListingFilterBar</span> even though it sits directly above that component's own search row in the final layout, because it isn't really about filtering — it's its own small fact about the page (how many listings exist right now), so it gets its own folder, <span class="path">listings/ListingsHeading/</span>, following the exact one-component-one-job convention every other composite in this codebase follows. Second: where does the <span class="path">count</span> number actually come from? Not the unused <span class="path">MOCK_LISTINGS_TOTAL</span> constant — that number never changes no matter what you search or filter for, which would make the heading quietly wrong the moment a filter actually narrows the list. Instead it's wired to <span class="path">filtered.length</span>, the same already-filtered array the table itself renders:</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">pages/design-preview/marketplace.tsx</span></div>
+        <pre><span class="ct">const</span> filtered = filterListings(mockListings, debouncedSearch, filters)
+
+<span class="ct">&lt;ListingCategoryTabs</span> ... <span class="ct">/&gt;</span>
+<span class="ct">&lt;ListingsHeading</span> count={filtered.length} <span class="ct">/&gt;</span>
+<span class="ct">&lt;ListingFilterBar</span> ... <span class="ct">/&gt;</span>
+<span class="ct">&lt;LiveListingsTable</span> listings={filtered} pageSize={<span class="cn">14</span>} <span class="ct">/&gt;</span></pre>
+      </div>
+      <p><span class="path">ListingsHeading</span>, <span class="path">LiveListingsTable</span>, and the filtered count all read from the exact same <span class="path">filtered</span> array computed once at the top of the page — so the heading's number and the table's actual contents can never disagree with each other, and it happens to equal the unused <span class="path">MOCK_LISTINGS_TOTAL</span> constant's value only when no filter is narrowing the results, which is a consequence of reading real data rather than something that had to be kept in sync by hand.</p>
+
+      <h2><span class="section-num">7</span>What to remember from this phase</h2>
+      <ul class="checklist">
+        <li><span class="path">position: sticky</span> occupies real screen space for as long as it's stuck — anything that needs to scroll past it has to pass behind it first, which fails badly for interactive content (buttons) at the far end of a scrolling row.</li>
+        <li>When a sticky/pinned element and the content trying to scroll past it are fundamentally fighting over the same space, the fix is usually architectural (two independent panes) rather than a CSS tweak (more padding, more scroll range).</li>
+        <li>Split a "reused everywhere" row component into named sub-pieces (<span class="path">ListingDomainCell</span> / <span class="path">ListingRestCells</span>) when different layouts need to mount the same cells in different places in the tree.</li>
+        <li>State that two independently-rendered layouts both need to agree on (favorited, selected, etc.) has to be lifted to their common parent — local state inside a component that gets mounted twice in two different places will desync.</li>
+        <li>Use explicit, shared <span class="path">height</span> values (not <span class="path">min-height</span>) to keep two separately-laid-out structures' rows aligned — a floor doesn't stop drift, a fixed value does.</li>
+        <li><span class="path">min-width: 0</span> is the single most common missing line when a flex or grid child refuses to shrink or scroll below its content's natural size.</li>
+        <li>When a CSS rule looks correct and still doesn't behave right, check the parent's <span class="path">align-items</span>/<span class="path">min-width</span>/<span class="path">overflow</span> before adding more properties to the rule you're already looking at — and verify against a real rendered page once guessing twice hasn't worked.</li>
+        <li>An exported constant with a comment pointing at a specific piece of UI that nothing actually imports is a signal that a planned piece of the design never got wired up — worth noticing while reading a codebase, not just while writing one.</li>
+        <li>Derive a displayed count from the same data the rest of the UI is already rendering (<span class="path">filtered.length</span>), not from a separate constant — two numbers computed from the same source can never quietly disagree.</li>
+      </ul>
+
+      <div class="phase-nav">
+        <a class="to-index" href="05-hero-promoted.html">← Hero &amp; Promoted Domains</a>
+        <a href="07-activity-analytics.html">Next: Activity &amp; analytics →</a>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

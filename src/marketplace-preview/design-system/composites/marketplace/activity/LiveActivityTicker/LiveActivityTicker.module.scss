@@ -1,0 +1,236 @@
+@import '@mpstyles/_mixins.scss';
+
+// Figma node 34:2031 — mobile-only ticker under the header, above the hero.
+// Hidden entirely outside mobile since it has no tablet/desktop reference.
+//
+// Background is a judgment call, not a literal pixel match: sampling the
+// real Figma export's rendered pixels shows a white background, but the
+// domain/price/time text on it uses light, near-white colors (#eae8f4,
+// #b9a7ff, #8880a6, all confirmed present in the export) that would be
+// almost invisible on white — that combination only makes sense on a dark
+// surface, so the white is read as a gap in the Figma file (a fill that
+// didn't get set) rather than the intended design. Picked --color-blue-darker
+// (navy, already in the palette, pairs with the blue LIVE ACTIVITY badge)
+// over the previous --color-surface-dark, which was near-black and read as
+// flat/undesigned rather than on-brand.
+
+.bar {
+  display: none;
+
+  @include mobile {
+    display: flex;
+    align-items: center;
+    height: 30px;
+    background: var(--color-blue-darker); // was --color-surface-dark (#090909, reads as flat black) — see comment below
+    // No overflow: hidden here — .marquee below already clips its own
+    // horizontal scroll on its own, and this bar being the clipping
+    // ancestor was cutting the dropdown menu off before it could ever
+    // show, since the menu opens below the 30px bar, not inside it.
+  }
+}
+
+// ── Filter dropdown — the chevron beside "Live activity" in the Figma
+// export is a real trigger, not decoration. Same All/Sale/Listing/Drop
+// options as LiveActivityPanel's tabs, own small dropdown here rather than
+// reusing the FilterDropdown primitive, since that one is styled as a dark
+// pill on a light bar — the opposite of this already-dark chip, forcing it
+// to fit would fight its own styling more than it would save.
+
+.dropdown {
+  position: relative;
+  flex-shrink: 0;
+  height: 100%;
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  height: 100%;
+  padding: 0 var(--space-3);
+  border: none;
+  background: var(--color-blue-primary);
+  color: var(--color-white-primary);
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-bold);
+  font-size: 10.5px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.liveDot {
+  width: 5px;
+  height: 5px;
+  border-radius: var(--radius-full);
+  background: var(--color-white-primary);
+  box-shadow: 0 0 0 3px var(--color-white-alpha-30);
+  flex-shrink: 0;
+}
+
+.chevron {
+  display: block;
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+}
+
+.menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 10;
+  margin: var(--space-1) 0 0;
+  padding: var(--space-1);
+  min-width: 100px;
+  list-style: none;
+  background: var(--color-white-primary);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-panel);
+}
+
+.menuOption {
+  display: block;
+  width: 100%;
+  padding: var(--space-1) var(--space-2);
+  border: none;
+  border-radius: 4px;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  color: var(--color-gray-dark);
+
+  &:hover {
+    background: var(--color-gray-light-hover);
+  }
+}
+
+.menuOptionActive {
+  background: var(--color-blue-light);
+  color: var(--color-blue-primary);
+  font-weight: var(--font-weight-medium);
+
+  &:hover {
+    background: var(--color-blue-light-hover);
+  }
+}
+
+.empty {
+  margin: 0;
+  padding: 0 var(--space-4);
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-12);
+  color: #8880a6; // design-specific: Figma-exact, matches .time
+  white-space: nowrap;
+  line-height: 30px;
+}
+
+// ── Auto-sliding marquee — same technique as PromotedDomainsSection's own
+// track/pass/keyframes, just a different visual skin (dark ticker row
+// instead of a card carousel), so it gets its own keyframe name rather
+// than sharing one across two unrelated components.
+
+.marquee {
+  flex: 1;
+  height: 100%;
+  overflow: hidden;
+  min-width: 0;
+
+  @media (prefers-reduced-motion: reduce) {
+    overflow-x: auto;
+  }
+}
+
+.track {
+  display: flex;
+  height: 100%;
+  width: max-content;
+  animation: ticker-marquee var(--loop-seconds, 40s) linear infinite;
+
+  .marquee:hover &,
+  .marquee:focus-within & {
+    animation-play-state: paused;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+.pass {
+  display: flex;
+  height: 100%;
+
+  @media (prefers-reduced-motion: reduce) {
+    &:last-child {
+      display: none;
+    }
+  }
+}
+
+.entry {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 100%;
+  padding: 0 var(--space-4);
+  white-space: nowrap;
+}
+
+.dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 2px;
+  background: #0fc9b8; // design-specific: Figma-exact ticker glow dot, no token match
+  box-shadow: 0 0 5px rgba(15, 201, 184, 0.8);
+  flex-shrink: 0;
+}
+
+.domain {
+  font-family: var(--font-space-grotesk); // closest already-loaded face to Figma's JetBrains Mono
+  font-size: var(--text-small-12);
+  color: #eae8f4; // design-specific: Figma-exact
+}
+
+.price {
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-semibold);
+  font-size: 13px;
+  color: #b9a7ff; // design-specific: Figma-exact
+}
+
+.change {
+  font-family: var(--font-space-grotesk);
+  font-weight: var(--font-weight-bold);
+  font-size: 11px;
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.up {
+  background: rgba(124, 242, 180, 0.14); // design-specific: Figma-exact, dark-row tint has no light-theme token equivalent
+  color: #7cf2b4; // design-specific: Figma-exact
+}
+
+.down {
+  background: rgba(255, 157, 157, 0.14); // design-specific: Figma-exact
+  color: #ff9d9d; // design-specific: Figma-exact
+}
+
+.time {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-12);
+  color: #8880a6; // design-specific: Figma-exact
+}
+
+@keyframes ticker-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}

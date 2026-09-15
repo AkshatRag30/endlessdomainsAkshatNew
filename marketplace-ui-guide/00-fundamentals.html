@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fundamentals</title>
+<link rel="stylesheet" href="assets/guide.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="sidenav">
+    <a href="index.html" class="brand">Marketplace UI Guide</a>
+    <span class="brand-sub">Learn it, don't just have it</span>
+    <nav>
+      <a class="nav-link" href="index.html"><span class="num">·</span><span>Overview &amp; map</span></a>
+      <div class="group-label">Foundations</div>
+      <a class="nav-link current" href="00-fundamentals.html"><span class="num">00</span><span>Fundamentals crash course</span></a>
+      <a class="nav-link" href="01-design-tokens.html"><span class="num">01</span><span>Design tokens &amp; globals</span></a>
+      <a class="nav-link" href="02-primitives.html"><span class="num">02</span><span>Primitives</span></a>
+      <div class="group-label">Structure</div>
+      <a class="nav-link" href="03-layout-shell.html"><span class="num">03</span><span>Header &amp; page shell</span></a>
+      <a class="nav-link" href="04-sidebar-navigation.html"><span class="num">04</span><span>Sidebar &amp; mobile nav</span></a>
+      <div class="group-label">Sections</div>
+      <a class="nav-link" href="05-hero-promoted.html"><span class="num">05</span><span>Hero &amp; Promoted Domains</span></a>
+      <a class="nav-link" href="06-listings-table.html"><span class="num">06</span><span>The listings table</span></a>
+      <a class="nav-link" href="07-activity-analytics.html"><span class="num">07</span><span>Activity &amp; analytics</span></a>
+      <div class="group-label">Systems</div>
+      <a class="nav-link" href="08-data-layer.html"><span class="num">08</span><span>Types &amp; mock data</span></a>
+      <a class="nav-link" href="09-responsive-patterns.html"><span class="num">09</span><span>Responsive patterns</span></a>
+      <a class="nav-link" href="10-real-apis.html"><span class="num">10</span><span>Wiring to real APIs</span></a>
+    </nav>
+  </aside>
+
+  <div class="content">
+    <div class="wrap">
+      <p class="eyebrow">Phase 00 &middot; Foundations &middot; Start here if any of this is new</p>
+      <h1 class="title">The building blocks, explained from zero</h1>
+      <p class="dek">Every later phase assumes you already know what a React hook is, what a flex container does, and why a media query is wrapped in a Sass mixin. This phase is where all of that gets explained in plain language, with small throwaway examples, before you meet any of it for real. If you already know React and CSS well, skim the headings and jump to whatever's unfamiliar — otherwise, read it straight through once. Nothing here is specific to this project; it's the vocabulary the rest of the guide is written in.</p>
+
+      <h2><span class="section-num">1</span>What a React component actually is</h2>
+      <p>Strip away everything else, and a React component is just a JavaScript function that returns a description of some markup. The description isn't real HTML yet — it's a JavaScript object tree that React later turns into real DOM elements in the browser. You write that description using JSX, which looks like HTML mixed directly into JavaScript:</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">a component, from scratch</span></div>
+        <pre><span class="ct">function</span> Greeting(props) {
+  <span class="ct">return</span> <span class="ct">&lt;p&gt;</span>Hello, {props.name}<span class="ct">&lt;/p&gt;</span>
+}
+
+<span class="cm">// used elsewhere as:</span>
+<span class="ct">&lt;Greeting</span> name=<span class="cs">"Akshat"</span> <span class="ct">/&gt;</span></pre>
+      </div>
+      <p><span class="path">props</span> is just the function's argument — whatever attributes you write on the JSX tag (<span class="path">name="Akshat"</span>) arrive as an object (<span class="path">{ name: "Akshat" }</span>) that the function reads. Every component this project defines works exactly like this: a function, an optional props object in, some JSX out. When you see <span class="path">export interface FooProps { ... }</span> above a component in this codebase, that's TypeScript describing the shape of that props object so your editor can catch a typo (a missing prop, a wrong type) before the code ever runs.</p>
+      <p>The curly braces <span class="path">{ }</span> inside JSX are how you drop back into plain JavaScript in the middle of markup — <span class="path">{props.name}</span> above, <span class="path">{listing.domainName}</span> everywhere in this codebase, <span class="path">{items.map(...)}</span> to turn an array into a list of elements. Anywhere you see curly braces inside a tag in this guide's code samples, that's a JavaScript expression being evaluated and dropped into the markup at that spot.</p>
+
+      <h2><span class="section-num">2</span>State: a component's own memory</h2>
+      <p>A plain JavaScript variable inside a function forgets its value the moment the function returns — and a component function re-runs every time it re-renders. <span class="path">useState</span> is React's way of giving a component a piece of memory that survives across those re-runs, and — critically — changing it is what triggers React to re-run the component and update the screen in the first place.</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">state, from scratch</span></div>
+        <pre><span class="ct">function</span> Counter() {
+  <span class="ct">const</span> [count, setCount] = useState(<span class="cn">0</span>) <span class="cm">// 0 is the starting value</span>
+
+  <span class="ct">return</span> (
+    <span class="ct">&lt;button</span> onClick={() =&gt; setCount(count + <span class="cn">1</span>)}<span class="ct">&gt;</span>
+      Clicked {count} times
+    <span class="ct">&lt;/button&gt;</span>
+  )
+}</pre>
+      </div>
+      <p><span class="path">useState(0)</span> returns a pair: the current value (<span class="path">count</span>) and a function to change it (<span class="path">setCount</span>) — always destructured with array syntax like this, always in that order. Calling <span class="path">setCount(count + 1)</span> does two things: it updates the value React remembers for next time, and it schedules the component to re-render, so the new count actually shows up on screen. This is the mechanism behind every interactive thing in this codebase — a dropdown's open/closed flag, which tab is active, which listing is favorited, all of it is a <span class="path">useState</span> call somewhere, and every one of them follows this exact shape.</p>
+      <div class="callout note">
+        <span class="label">A pattern you'll see constantly: functional updates</span>
+        <p>Instead of <span class="path">setCount(count + 1)</span>, this codebase very often writes <span class="path">setCount((prev) => prev + 1)</span> — passing a function instead of a value. That form receives React's own most up-to-date version of the state as <span class="path">prev</span>, rather than trusting whatever <span class="path">count</span> happened to be when the surrounding code last ran. It matters most when a state update depends on the previous value and might fire more than once before a re-render catches up — <span class="path">setFavoritedIds((prev) => { const next = new Set(prev); ...; return next })</span> in <span class="path">LiveListingsTable</span> is a real example from phase 06.</p>
+      </div>
+
+      <h2><span class="section-num">3</span>Effects: doing something when the component appears (or changes)</h2>
+      <p><span class="path">useState</span> handles values the component renders. <span class="path">useEffect</span> handles everything else a component might need to do that isn't rendering — subscribing to an event, starting a timer, fetching data, or (the example this codebase uses constantly) listening for a click anywhere on the page.</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">an effect, from scratch</span></div>
+        <pre>useEffect(() =&gt; {
+  <span class="cm">// this runs after the component first renders</span>
+  <span class="ct">const</span> handleClick = () =&gt; console.log(<span class="cs">'clicked somewhere'</span>)
+  document.addEventListener(<span class="cs">'click'</span>, handleClick)
+
+  <span class="ct">return</span> () =&gt; {
+    <span class="cm">// this runs right before the component disappears (or before the effect re-runs)</span>
+    document.removeEventListener(<span class="cs">'click'</span>, handleClick)
+  }
+}, []) <span class="cm">// the dependency array — empty means "run once, on mount"</span></pre>
+      </div>
+      <p>Three parts to notice. The function you pass in runs after render, not during — so it's safe to touch things outside React (the real DOM, the network, timers) without interfering with what's being drawn on screen. The function you <em>return</em> from inside it is the cleanup — React calls it automatically when the component is about to be removed from the page, and this matters enormously: forgetting to remove an event listener you added means it keeps firing forever, even after the component that added it is long gone, silently leaking. And the array at the end (<span class="path">[]</span> here) controls when the effect re-runs at all — empty means only once, ever; list a variable in it (<span class="path">[open]</span>, say) and the effect re-runs any time that specific value changes.</p>
+      <p>This exact shape — listen on mount, remove on unmount — is precisely how every dropdown and menu in this codebase closes itself when you click outside it. You'll meet the real version of it in phase 02 (<span class="path">FilterDropdown</span>) and see it reused twice more, verbatim in shape, in phase 07.</p>
+
+      <h2><span class="section-num">4</span>Refs: a box that doesn't trigger a re-render</h2>
+      <p><span class="path">useRef</span> looks similar to <span class="path">useState</span> — it also gives a component a value that survives across re-renders — but changing a ref's value does <em>not</em> cause the component to re-render. Its most common job in this codebase is holding a direct handle to a real DOM element, so plain JavaScript can be run against it (checking "did this click land inside this element or outside it").</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">a ref, from scratch</span></div>
+        <pre><span class="ct">const</span> boxRef = useRef&lt;HTMLDivElement&gt;(<span class="cn">null</span>)
+
+<span class="ct">&lt;div</span> ref={boxRef}<span class="ct">&gt;</span>...<span class="ct">&lt;/div&gt;</span>
+
+<span class="cm">// later, inside an effect or event handler:</span>
+<span class="ct">if</span> (boxRef.current &amp;&amp; !boxRef.current.contains(event.target)) {
+  <span class="cm">// the click landed outside this div</span>
+}</pre>
+      </div>
+      <p><span class="path">boxRef.current</span> starts as <span class="path">null</span> and React fills it in with the real DOM node the moment that element mounts — from then on, <span class="path">boxRef.current</span> <em>is</em> that actual <span class="path">&lt;div&gt;</span> in the browser, with every real DOM method (<span class="path">.contains()</span>, <span class="path">.focus()</span>, <span class="path">.scrollTo()</span>) available on it. Put together with the <span class="path">useEffect</span> pattern above, this is the entire outside-click-to-close mechanism this project reuses everywhere: a ref on the menu's root element, a document-wide click listener in an effect, and a check of whether the click target is inside or outside that ref.</p>
+
+      <h2><span class="section-num">5</span>CSS Modules: why a class name isn't just a string</h2>
+      <p>Every component in this codebase imports its stylesheet like this: <span class="path">import styles from './Thing.module.scss'</span>, then writes <span class="path">className={styles.card}</span> instead of <span class="path">className="card"</span>. This isn't decoration — <span class="path">.module.scss</span> is a special file extension the build tool (webpack, underneath Next.js) recognizes, and it does something to every class name written inside a file with that extension: it rewrites each one into a longer, unique string, and hands you back a JavaScript object mapping your original names to the rewritten ones.</p>
+      <div class="callout why">
+        <span class="label">Why bother — what problem this solves</span>
+        <p>Plain CSS class names are global — a <span class="path">.card</span> rule in one file can accidentally override a <span class="path">.card</span> rule from a completely unrelated file, purely because they happen to share a name, with no error or warning. As a project grows past a handful of components, avoiding name collisions by convention (increasingly long, hand-negotiated class names) gets unsustainable fast. CSS Modules solve it structurally: <span class="path">styles.card</span> in <span class="path">SidebarPromoCard.module.scss</span> might compile to something like <span class="path">SidebarPromoCard_card__a1b2c</span>, and <span class="path">styles.card</span> in a totally different file compiles to a different unique string — so two components can both use the friendly name <span class="path">.card</span> in their own source and never once collide in the actual browser. This is also exactly why you'll never see a plain string literal as a <span class="path">className</span> anywhere in this codebase's components (outside of combining several <span class="path">styles.x</span> values together) — <span class="path">className="card"</span> would refer to a real, global class that doesn't exist and would style nothing.</p>
+      </div>
+
+      <h2><span class="section-num">6</span>The box model: what padding, border, and margin actually are</h2>
+      <p>Every element on a page is a rectangle made of four nested layers, from the inside out: <strong>content</strong> (the text or child elements), <strong>padding</strong> (empty space inside the element's own background/border), <strong>border</strong> (a visible or invisible edge), and <strong>margin</strong> (empty space outside the element, pushing neighboring elements away). Padding and border are "inside" the element in the sense that they're part of what gets a background color; margin is always transparent and never gets one.</p>
+      <p>One global setting changes how an element's declared <span class="path">width</span> is measured against these layers, and it matters enough to call out here because it's set once, globally, and then quietly assumed everywhere: <span class="path">box-sizing: border-box</span>. Without it, <span class="path">width: 200px; padding: 20px</span> renders as 240px wide overall (the padding adds <em>on top of</em> the 200px). With it — which is what this project's global reset applies to every element — that same rule renders as exactly 200px wide overall, with the padding eating into the content area instead of adding to the total. Every width/padding number quoted anywhere in this guide assumes <span class="path">border-box</span> is in effect, because it always is.</p>
+
+      <h2><span class="section-num">7</span>Display: block, inline, and the two layout modes that matter here</h2>
+      <p><span class="path">display</span> is the single most consequential CSS property an element has — it decides the entire layout algorithm used for that element and its children. The two values that matter for basically everything in this codebase are <span class="path">flex</span> and <span class="path">grid</span>; the two you need to recognize as their opposite are <span class="path">block</span> (default for things like <span class="path">&lt;div&gt;</span> and <span class="path">&lt;p&gt;</span> — stacks top to bottom, each element as wide as its parent) and <span class="path">inline</span> (default for things like <span class="path">&lt;span&gt;</span> — flows left to right like text, can't take a width or height). <span class="path">display: none</span> is the fourth value you'll see constantly — it removes the element from the page's layout entirely, as if it weren't in the markup at all (not just invisible — it takes up zero space), which is the exact mechanism behind every "render both, CSS decides" pattern in this guide.</p>
+
+      <h2><span class="section-num">8</span>Flexbox: arranging things in a single row or column</h2>
+      <p><span class="path">display: flex</span> turns an element into a flex <em>container</em>, and every direct child becomes a flex <em>item</em>, laid out along one line (row by default, or column) rather than each stacking on its own line the way block elements do.</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">flexbox, from scratch</span></div>
+        <pre>.row {
+  display: flex;
+  flex-direction: row;      <span class="cm">// or column — which way items line up</span>
+  align-items: center;      <span class="cm">// position along the CROSS axis (perpendicular to direction)</span>
+  justify-content: space-between; <span class="cm">// position along the MAIN axis (the direction itself)</span>
+  gap: <span class="cn">12px</span>;              <span class="cm">// space between items, no manual margins needed</span>
+}</pre>
+      </div>
+      <p>The two axes are the whole trick to remembering which property does what: in a <span class="path">row</span>, the <em>main</em> axis runs left to right (so <span class="path">justify-content</span> controls horizontal spacing — <span class="path">space-between</span> pushes the first and last items to the edges and spreads the rest evenly, <span class="path">center</span> bunches them in the middle), and the <em>cross</em> axis runs top to bottom (so <span class="path">align-items</span> controls vertical alignment — <span class="path">center</span> vertically centers every item, <span class="path">flex-start</span> aligns them all to the top). Switch to <span class="path">flex-direction: column</span> and the two axes swap roles entirely: now <span class="path">justify-content</span> controls vertical spacing and <span class="path">align-items</span> controls horizontal.</p>
+      <h3>Growing and shrinking: flex-grow, flex-shrink, flex-basis</h3>
+      <p>Every flex item has three more properties, almost always set together through the <span class="path">flex</span> shorthand. <span class="path">flex: 1</span> — the single most common value in this codebase — means <span class="path">flex-grow: 1; flex-shrink: 1; flex-basis: 0%</span>: this item should start from zero and grow to fill whatever space is left over, sharing it proportionally with any other sibling that also has <span class="path">flex: 1</span>. <span class="path">flex-shrink: 0</span> alone (seen constantly on icons and badges in this codebase) means the opposite: never let this item shrink below its natural size, no matter how tight the container gets — everything else should shrink first.</p>
+      <div class="callout gotcha">
+        <span class="label">The single most common flexbox surprise: min-width</span>
+        <p>A flex item's default minimum width isn't zero — it's the natural width of its own content. That means a flex item with <span class="path">flex: 1</span> and a long line of text or a wide child can refuse to shrink smaller than that content, even though you gave it <span class="path">flex: 1</span> specifically hoping it would compress. The fix is one line: <span class="path">min-width: 0</span> (or, on a column, <span class="path">min-height: 0</span>), which explicitly removes that content-based floor. You'll meet this exact bug, and this exact one-line fix, as a real production issue in phase 06's listings table.</p>
+      </div>
+      <p>Two more properties round this out. <span class="path">gap</span> puts even spacing between items without needing a margin on every child (and without the classic "last item has an extra margin I need to remove" problem). <span class="path">flex-wrap: wrap</span> lets items that don't fit on one line drop to a second line instead of overflowing or squeezing forever — off by default, so a flex row will otherwise cram everything onto one line no matter how narrow the container gets.</p>
+
+      <h2><span class="section-num">9</span>Grid: arranging things in rows AND columns at once</h2>
+      <p>Flexbox is fundamentally one-dimensional — a single row or a single column. <span class="path">display: grid</span> is for when you need both at once — real rows and real columns, with items placed into specific cells.</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">grid, from scratch</span></div>
+        <pre>.layout {
+  display: grid;
+  grid-template-columns: <span class="cn">2.4fr 1fr 1.4fr</span>; <span class="cm">// three columns, proportional widths</span>
+  grid-template-areas:
+    <span class="cs">"sidebar header header"</span>
+    <span class="cs">"sidebar main    rail"</span>;
+}
+
+.sidebar { grid-area: sidebar; } <span class="cm">// placed by name, not by row/column numbers</span></pre>
+      </div>
+      <p><span class="path">fr</span> is grid's own unit, short for "fraction" — <span class="path">2.4fr 1fr 1.4fr</span> splits the available width into 4.8 total shares and gives the first column 2.4 of them, proportional sizing without ever computing a percentage by hand. <span class="path">grid-template-areas</span> is the feature this codebase leans on hardest: you draw the layout as a little ASCII map of named regions (each string is one row, each word one column's occupant), and any child can be dropped into one of those named regions with a single <span class="path">grid-area: name</span> — including spanning multiple rows or columns automatically, just by repeating its name in more than one cell of the map. The payoff, covered in depth in phase 03, is that a completely different map for mobile (different row/column shape, different reading order) can reuse the exact same child elements with zero changes to the actual markup — only the CSS map changes.</p>
+
+      <h2><span class="section-num">10</span>The cascade and specificity: how CSS decides between two conflicting rules</h2>
+      <p>Two rules can both apply to the same element and disagree about a property. CSS has to pick one, and it does so with a fixed set of tie-breakers, checked in order: first, whichever rule is more <strong>specific</strong> wins (an id selector beats a class selector, which beats a plain element selector like <span class="path">div</span>); second, if two rules are exactly tied in specificity, whichever one is written <strong>later in the stylesheet</strong> wins — full stop, regardless of which one "sounds" more like it should apply.</p>
+      <p>In practice, nearly everything in this codebase is styled with single classes (<span class="path">.card</span>, <span class="path">.title</span>) — which are all equally specific — so the second rule, source order, ends up mattering constantly. This isn't an obscure edge case: phase 07 walks through a real bug in this exact codebase where two same-specificity rules disagreed about whether an element should be visible, and the one declared earlier in the file silently lost, every time, at every screen width, because CSS always resolves same-specificity ties by position in the file rather than by which rule looks more like the "special case."</p>
+
+      <h2><span class="section-num">11</span>Positioning: the five values of `position`, in one line each</h2>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>Value</th><th>What it does</th></tr></thead>
+          <tbody>
+            <tr><td class="path">static</td><td>The default — normal document flow, <span class="path">top</span>/<span class="path">left</span>/etc. have no effect.</td></tr>
+            <tr><td class="path">relative</td><td>Still takes up its normal space in the flow, but <span class="path">top</span>/<span class="path">left</span>/etc. can nudge it visually, and it becomes the anchor for any <span class="path">absolute</span> children.</td></tr>
+            <tr><td class="path">absolute</td><td>Removed from normal flow entirely; positioned relative to its nearest <span class="path">relative</span> (or <span class="path">absolute</span>/<span class="path">fixed</span>) ancestor instead of the page.</td></tr>
+            <tr><td class="path">fixed</td><td>Removed from flow; positioned relative to the browser viewport itself, stays put even as the page scrolls.</td></tr>
+            <tr><td class="path">sticky</td><td>Normal flow until the page scrolls past a threshold, then behaves like <span class="path">fixed</span> within its own parent's bounds.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>The pairing that shows up constantly in this codebase is <span class="path">position: relative</span> on a parent plus <span class="path">position: absolute</span> on a child — a decorative glow behind a card, a badge pinned to a corner, a fill layer sitting on top of a button's own background. The parent doesn't need any other property changed to become that anchor; just declaring <span class="path">position: relative</span> on it (even with no <span class="path">top</span>/<span class="path">left</span> values at all) is what makes it the reference point for any absolutely-positioned child, instead of the child measuring itself against the whole page.</p>
+      <div class="callout gotcha">
+        <span class="label">Why sticky isn't a free "stay in place" — and takes up real space while it's stuck</span>
+        <p>It's tempting to read <span class="path">position: sticky</span> as "this element floats above everything, out of the way." It doesn't — while it's in its stuck state, it still occupies a real band of screen space, on top of whatever's near it, and anything that needs to move past that band in the same scroll container has to pass <em>behind</em> it first. Phase 06 covers a real case where this made an entire button permanently unreachable, and walks through why the fix wasn't a CSS tweak but a different structural approach entirely.</p>
+      </div>
+      <p>One more idea worth having before phase 04: <strong>stacking context</strong> and <span class="path">z-index</span>. When two positioned elements overlap, <span class="path">z-index</span> (a plain number) decides which one draws on top — higher numbers win, and elements with no explicit <span class="path">z-index</span> stack in the order they appear in the markup. This is exactly how a button's own colored fill layer can be drawn as a separate <span class="path">::before</span> element sitting visually on top of the button's flat background but still underneath its own text (covered for real in phase 02).</p>
+
+      <h2><span class="section-num">12</span>Media queries, and why this project never writes one directly</h2>
+      <p>A media query is a CSS rule that only applies when some condition about the viewport is true — most commonly a minimum or maximum width:</p>
+      <div class="code-card">
+        <div class="code-label"><span class="file">a media query, from scratch</span></div>
+        <pre>.card {
+  padding: <span class="cn">24px</span>; <span class="cm">// applies always</span>
+}
+
+<span class="ct">@media</span> (max-width: <span class="cn">767px</span>) {
+  .card {
+    padding: <span class="cn">12px</span>; <span class="cm">// only applies when the viewport is 767px wide or narrower</span>
+  }
+}</pre>
+      </div>
+      <p>You will never see a raw <span class="path">@media (max-width: ...)</span> written directly in this codebase's own component stylesheets — instead, every one of them writes <span class="path">@include mobile { ... }</span>, or <span class="path">@include tablet-down { ... }</span>, and so on. These are Sass <strong>mixins</strong> — reusable blocks of CSS (here, specifically, reusable media-query wrappers) defined once, centrally, in <span class="path">_mixins.scss</span>, and reused everywhere with <span class="path">@include</span>. The entire benefit is that the actual pixel breakpoint (767px, or wherever "mobile" ends) lives in exactly one place — change it once in the mixin's own definition, and every component that ever wrote <span class="path">@include mobile</span> picks up the new value automatically, instead of someone needing to find and edit forty separate <span class="path">@media (max-width: 767px)</span> blocks scattered across forty files. Phase 01 covers the real mixin file and its actual breakpoint values in detail.</p>
+
+      <h2><span class="section-num">13</span>Two different kinds of "variable": $sass-variables vs. var(--css-custom-properties)</h2>
+      <p>This codebase uses both kinds constantly, and they look similar but behave completely differently — worth being sure of the difference before phase 01 leans on it.</p>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th></th><th class="path">$sass-variable</th><th class="path">var(--css-custom-property)</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Exists</strong></td><td>Only while Sass compiles your <span class="path">.scss</span> into plain CSS — gone by the time the browser sees anything.</td><td>For real, in the browser, as an actual CSS feature the browser understands natively.</td></tr>
+            <tr><td><strong>Can change at runtime?</strong></td><td>No — once compiled, it's just whatever raw value got substituted in.</td><td>Yes — JavaScript can set one per-element via an inline <span class="path">style</span>, and it can be overridden differently under a media query.</td></tr>
+            <tr><td><strong>Typical use here</strong></td><td>A breakpoint number, a polygon shape reused a few times in one file (<span class="path">$clip</span>, <span class="path">$notch</span>).</td><td>A design token meant to be shared across the whole app (<span class="path">var(--space-4)</span>, <span class="path">var(--color-blue-primary)</span>).</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>The fact that <span class="path">var(--x)</span> is a real, live browser feature — not just a compile-time text substitution — is exactly what makes one of this project's more clever tricks possible: <span class="path">PromotedDomainsSection</span> computes an animation's duration in JavaScript (based on how many cards there are) and hands it to CSS through an inline <span class="path">style={{ '--loop-seconds': '28s' }}</span>, which the stylesheet then reads back with <span class="path">animation-duration: var(--loop-seconds, 28s)</span>. A <span class="path">$sass-variable</span> could never do this — it has no way to receive a value computed at the moment the page actually runs, only values known when the stylesheet was written. Phase 05 covers this trick in full.</p>
+
+      <h2><span class="section-num">14</span>You're ready</h2>
+      <p>That's the complete vocabulary this guide assumes from here on: components as functions, state and effects and refs, CSS Modules, the box model, flex and grid, the cascade, positioning, media-query mixins, and the two kinds of variable. Every later phase will still explain what's specific to <em>this</em> project and <em>this</em> design — but it will stop pausing to explain what a flex container is, or what <span class="path">useEffect</span>'s cleanup function is for. If something in a later phase ever feels like it skipped a step, it's very likely referring back to one of the sections above — the <span class="path">path/like/this</span> vocabulary should now be recognizable even where a phase doesn't re-explain it.</p>
+
+      <div class="phase-nav">
+        <a class="to-index" href="index.html">← Overview &amp; map</a>
+        <a href="01-design-tokens.html">Next: Design tokens &amp; globals →</a>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

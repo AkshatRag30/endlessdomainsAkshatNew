@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learn: Building the Marketplace UI</title>
+<link rel="stylesheet" href="assets/guide.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="sidenav">
+    <a href="index.html" class="brand">Marketplace UI Guide</a>
+    <span class="brand-sub">Learn it, don't just have it</span>
+    <nav>
+      <a class="nav-link current" href="index.html"><span class="num">·</span><span>Overview &amp; map</span></a>
+      <div class="group-label">Foundations</div>
+      <a class="nav-link" href="00-fundamentals.html"><span class="num">00</span><span>Fundamentals crash course</span></a>
+      <a class="nav-link" href="01-design-tokens.html"><span class="num">01</span><span>Design tokens &amp; globals</span></a>
+      <a class="nav-link" href="02-primitives.html"><span class="num">02</span><span>Primitives</span></a>
+      <div class="group-label">Structure</div>
+      <a class="nav-link" href="03-layout-shell.html"><span class="num">03</span><span>Header &amp; page shell</span></a>
+      <a class="nav-link" href="04-sidebar-navigation.html"><span class="num">04</span><span>Sidebar &amp; mobile nav</span></a>
+      <div class="group-label">Sections</div>
+      <a class="nav-link" href="05-hero-promoted.html"><span class="num">05</span><span>Hero &amp; Promoted Domains</span></a>
+      <a class="nav-link" href="06-listings-table.html"><span class="num">06</span><span>The listings table</span></a>
+      <a class="nav-link" href="07-activity-analytics.html"><span class="num">07</span><span>Activity &amp; analytics</span></a>
+      <div class="group-label">Systems</div>
+      <a class="nav-link" href="08-data-layer.html"><span class="num">08</span><span>Types &amp; mock data</span></a>
+      <a class="nav-link" href="09-responsive-patterns.html"><span class="num">09</span><span>Responsive patterns</span></a>
+      <a class="nav-link" href="10-real-apis.html"><span class="num">10</span><span>Wiring to real APIs</span></a>
+    </nav>
+  </aside>
+
+  <div class="content">
+    <div class="wrap">
+      <p class="eyebrow">Marketplace UI Guide &middot; Start here</p>
+      <h1 class="title">How <span class="path">/design-preview/marketplace</span> was actually built</h1>
+      <p class="dek">Eleven files, read in order, that walk through every real file behind the page &mdash; what each one does, why it's shaped the way it is, and the mistakes that got made and fixed along the way. Not a tour. By the end you should be able to build another page in this same style yourself, without needing this guide open.</p>
+
+      <h2><span class="section-num">01</span>How to use this</h2>
+      <p>Each phase is a real HTML file in this same folder, open them directly in a browser, or click through the sidebar. They build on each other in order &mdash; primitives before the composites that use them, the page shell before the sections that sit inside it. If you already know a phase's topic, skip it, the sidebar always shows where you are.</p>
+      <p>Every phase quotes real code from real files in this project, with the file path labeled on the code block. When you see a <span class="path">path/like/this.tsx</span> chip, that's a real file you can open side by side with the guide. Nothing here is invented for the tutorial &mdash; if a snippet looks odd, it's because the real file looks odd, usually for a reason explained right next to it.</p>
+
+      <div class="callout why">
+        <span class="label">How to read the callouts</span>
+        <p>Teal boxes like this explain <strong>why</strong> something is built the way it is, the design or engineering reasoning. Amber boxes are a <strong>heads up</strong> on a convention worth remembering. Red boxes are a <strong>real bug</strong> that actually happened while building this, kept in because the mistake teaches the mechanism better than getting it right the first time would have.</p>
+      </div>
+
+      <div class="callout note">
+        <span class="label">New to React or CSS at this level?</span>
+        <p>Every phase after this one assumes you already know what a React hook is, what a flex container does, and why a breakpoint gets wrapped in a Sass mixin instead of written as a raw media query. If any of that isn't second nature yet, start with <a href="00-fundamentals.html">phase 00, the fundamentals crash course</a>, first — it explains all of it from zero, with small standalone examples, before you meet any of it for real. If you're already comfortable with React and CSS, skip straight to phase 01.</p>
+      </div>
+
+      <h2><span class="section-num">02</span>The 30-second mental model</h2>
+      <p>Everything under <span class="path">/design-preview/marketplace</span> is one Next.js page that assembles a tree of small, single-purpose React components. Every component owns exactly three things: its own <strong>markup</strong> (a <span class="path">.tsx</span> file), its own <strong>styling</strong> (a CSS Modules <span class="path">.module.scss</span> file, scoped so its class names can never collide with anyone else's), and nothing else &mdash; no component reaches into another component's stylesheet. Data comes from plain TypeScript objects in <span class="path">src/data/marketplace/</span>, typed by interfaces in <span class="path">src/types/marketplace/</span>, so that swapping mock data for a real API later means changing where the data comes from, never how a component renders it.</p>
+      <p class="wide">Three ideas repeat constantly across this codebase once you notice them, and phase 09 covers each in depth once you've seen enough real examples to recognize it:</p>
+      <ul>
+        <li><strong>Design tokens over hardcoded values.</strong> Colors, spacing, type sizes live as CSS custom properties in one file, <span class="path">tokens.scss</span>, and every component reads <span class="path">var(--space-4)</span> instead of writing <span class="path">16px</span>.</li>
+        <li><strong>Render both, let CSS decide.</strong> When a component looks genuinely different on mobile versus desktop &mdash; not just resized, but a different layout &mdash; both versions get rendered into the DOM and a media query shows one, hides the other. No JavaScript branching on screen width for layout.</li>
+        <li><strong>Mock data behind a narrow boundary.</strong> Every composite that needs data either receives it as a prop or reads one small file in <span class="path">src/data/marketplace/</span>. A real backend replaces that one file's contents, not the component that renders it.</li>
+      </ul>
+
+      <h2><span class="section-num">03</span>The folder map</h2>
+      <p>Everything for this page lives under four roots. Skim this once now, it'll make sense of every file path the later phases point at.</p>
+      <div class="diagram tree">src/design-system/
+  <span class="f">styles/</span>              tokens.scss, _mixins.scss, fonts.scss &mdash; phase 01
+  <span class="f">primitives/</span>          badges, buttons, inputs, charts &mdash; phase 02
+  <span class="f">layouts/header/</span>      the site-wide header &mdash; phase 03
+  <span class="f">composites/marketplace/</span>
+    shared/            MarketplacePageShell, MobileBottomNav &mdash; phase 03
+    sidebar/           MarketplaceSidebar, MobileDrawerMenu &mdash; phase 04
+    hero/, promoted/   MarketplaceHero, PromotedDomainsSection &mdash; phase 05
+    listings/          ListingCategoryTabs, LiveListingsTable, ListingRow &mdash; phase 06
+    activity/          LiveActivityPanel, LiveActivityTicker &mdash; phase 07
+    analytics/         MarketActivityPanel, MarketMetricCard &mdash; phase 07
+
+src/types/marketplace/    one .ts file of interfaces per data domain &mdash; phase 08
+src/data/marketplace/     one .ts file of mock data per domain &mdash; phase 08
+src/hooks/marketplace/    useListingFilters.ts &mdash; phase 08
+
+pages/design-preview/marketplace.tsx   the page itself &mdash; assembles everything above</span></div>
+
+      <div class="callout note">
+        <span class="label">Where the page itself lives</span>
+        <p><span class="path">pages/design-preview/marketplace.tsx</span> is short on purpose &mdash; maybe 90 lines. It doesn't build UI, it only imports composites and arranges them. Every phase after this one is about what's <em>inside</em> those composites; you'll see the page file itself again in phase 03, once you know what it's assembling.</p>
+      </div>
+
+      <h2><span class="section-num">04</span>Reading order</h2>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>Phase</th><th>Question it answers</th><th>Main files</th></tr></thead>
+          <tbody>
+            <tr><td><strong>00</strong></td><td>What's a hook, a flex container, a media query — from zero?</td><td>no project files — pure fundamentals</td></tr>
+            <tr><td><strong>01</strong></td><td>Where do colors, spacing, and breakpoints actually come from?</td><td class="path">tokens.scss, _mixins.scss</td></tr>
+            <tr><td><strong>02</strong></td><td>What are the small reusable building blocks?</td><td class="path">primitives/*</td></tr>
+            <tr><td><strong>03</strong></td><td>How does the page's overall grid and header work?</td><td class="path">Header, MarketplacePageShell</td></tr>
+            <tr><td><strong>04</strong></td><td>How does the mobile drawer and bottom nav work?</td><td class="path">MarketplaceSidebar, MobileDrawerMenu</td></tr>
+            <tr><td><strong>05</strong></td><td>How does the auto-scrolling card carousel work?</td><td class="path">PromotedDomainsSection</td></tr>
+            <tr><td><strong>06</strong></td><td>How does a table become two independent panes on mobile?</td><td class="path">LiveListingsTable, ListingRow</td></tr>
+            <tr><td><strong>07</strong></td><td>How does one component render two totally different layouts?</td><td class="path">MarketActivityPanel</td></tr>
+            <tr><td><strong>08</strong></td><td>Where does the data come from, and how is it typed?</td><td class="path">types/, data/, hooks/</td></tr>
+            <tr><td><strong>09</strong></td><td>What actually breaks on mobile, and why?</td><td>cross-cutting</td></tr>
+            <tr><td><strong>10</strong></td><td>What has to change to make this real?</td><td>cross-cutting</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="wide">If you're new to React or to CSS at this depth, start with phase 00. Otherwise start with phase 01 &mdash; even if CSS custom properties feel basic, the naming conventions there are what make every later code snippet readable at a glance.</p>
+
+      <div class="phase-nav">
+        <span></span>
+        <a href="00-fundamentals.html">Next: Fundamentals crash course →</a>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
