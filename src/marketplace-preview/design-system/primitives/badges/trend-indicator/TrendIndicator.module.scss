@@ -15,6 +15,14 @@
 
 .down {
   color: var(--color-error);
+
+  .arrow {
+    // trend-down.svg's path is byte-for-byte identical to trend-up.svg's,
+    // just recolored — it was never actually mirrored, so 'down' rendered
+    // the same up-pointing arrow as 'up' in a different color. Flipped
+    // here in CSS instead of shipping a corrected/mirrored asset.
+    transform: scaleY(-1);
+  }
 }
 
 .neutral {

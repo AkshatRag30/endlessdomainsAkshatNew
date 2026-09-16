@@ -174,12 +174,18 @@ const Header: React.FC<HeaderProps> = ({ hidden, onMenuClick, menuOpen, previewM
             </div>
           ) : (
             <>
-              <Link href="/login" className={`${primaryBtnStyles.button} ${primaryBtnStyles.sm} ${styles.connectWallet}`}>
-                {/* PrimaryButton's ::before fill layer sits above unwrapped text (its CSS only lifts `> *` element children above it) — span required, not decorative */}
-                <span>connect wallet</span>
-              </Link>
+              {/* Was two separate links in MarketplaceSidebar's "Your Account" section — moved here, inside the connect-wallet pill, replacing its "connect wallet" text, rather than duplicated in both places. */}
+              <div className={`${primaryBtnStyles.button} ${primaryBtnStyles.sm} ${styles.connectWallet} ${styles.authLinks}`}>
+                <Link href="/login" className={styles.authLink}>
+                  <span>Login</span>
+                </Link>
+                <span className={styles.authDivider} aria-hidden="true" />
+                <Link href="/register" className={styles.authLink}>
+                  <span>Sign Up</span>
+                </Link>
+              </div>
               {/* Figma node 34:1043 — mobile swaps the text button for this icon-only chip, same /login destination */}
-              <Link href="/login" className={styles.walletIconButton} aria-label="Connect wallet">
+              <Link href="/login" className={styles.walletIconButton} aria-label="Login or sign up">
                 <img src="/assets/img/marketplace/header-wallet-icon.svg" alt="" aria-hidden="true" className={styles.walletIcon} />
               </Link>
             </>

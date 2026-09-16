@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import Link from 'next/link'
 import { useAuth } from '@/marketplace-preview/stubs/auth'
 import { mockSidebarSections } from '@/marketplace-preview/data/marketplace/navigation'
 import SidebarSection from '../SidebarSection'
@@ -8,20 +7,29 @@ import styles from './MarketplaceSidebar.module.scss'
 
 export interface MarketplaceSidebarProps {
   // TEMPORARY, preview-only — see SidebarNavItem's matching prop for why.
-  // Only ever passed from pages/design-preview/marketplace.tsx.
+  // Only ever passed from pages/design-preview/*.
   previewMode?: boolean
+  // TEMPORARY, preview-only. Which nav item starts selected in preview mode
+  // — defaults to the first Browse item (the marketplace preview's existing
+  // behavior) when omitted, so that page's usage is unaffected. The My
+  // Domains preview passes 'my-domains' here instead, since its real route
+  // (see mockSidebarSections) doesn't match its own /design-preview/* URL,
+  // so the pathname-based `active` check in SidebarSection never fires.
+  initialSelectedId?: string
 }
 
 /**
  * Renders both sidebar groups from static navigation data (Phase 2), plus
- * an auth-aware action under "Your Account": Login/Sign Up when signed out,
- * Logout when signed in — reusing the exact same useAuth()/logout() the
- * header and pages/index.tsx already use, not a new auth entry point.
+ * a Logout action under "Your Account" when signed in — reusing the exact
+ * same useAuth()/logout() the header already uses, not a new auth entry
+ * point. Login/Sign Up used to live here too when signed out; they now live
+ * inside the header's connect-wallet button instead (see Header/index.tsx),
+ * so there's nothing rendered in this slot for a signed-out visitor.
  */
-export const MarketplaceSidebar = ({ previewMode }: MarketplaceSidebarProps) => {
+export const MarketplaceSidebar = ({ previewMode, initialSelectedId }: MarketplaceSidebarProps) => {
   const { authenticated, logout } = useAuth()
   const [browseSection, accountSection] = mockSidebarSections
-  const [previewSelectedId, setPreviewSelectedId] = useState<string | null>(browseSection.items[0]?.id ?? null)
+  const [previewSelectedId, setPreviewSelectedId] = useState<string | null>(initialSelectedId ?? browseSection.items[0]?.id ?? null)
 
   return (
     <div className={styles.sidebar}>
@@ -38,19 +46,10 @@ export const MarketplaceSidebar = ({ previewMode }: MarketplaceSidebarProps) => 
         selectedId={previewSelectedId}
         onSelectItem={setPreviewSelectedId}
       >
-        {authenticated ? (
+        {authenticated && (
           <button type="button" className={styles.authAction} onClick={logout}>
             Logout
           </button>
-        ) : (
-          <div className={styles.authLinks}>
-            <Link href="/login" className={styles.authAction}>
-              Login
-            </Link>
-            <Link href="/register" className={styles.authAction}>
-              Sign Up
-            </Link>
-          </div>
         )}
       </SidebarSection>
 

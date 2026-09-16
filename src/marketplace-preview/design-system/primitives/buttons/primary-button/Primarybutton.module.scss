@@ -215,6 +215,33 @@ $clip-sm: polygon(
     opacity: 0.5;
   }
 
+  // "Edit Price" (My Domains table/card, listed rows) — design-specific:
+  // Figma-exact charcoal gradient + light gray outline, no token equivalent.
+  // The outer .button background is the 1px ring left showing around the
+  // inset ::before fill (same technique every other variant here uses), so
+  // it carries the border color, not a real CSS border.
+  &.charcoal {
+    background: #d9d6d6;
+  }
+
+  &.charcoal::before {
+    background: linear-gradient(181.98deg, #474141 -22.08%, #414040 121.16%);
+  }
+
+  &.charcoal:not(.disabled):hover::before {
+    background: linear-gradient(181.98deg, #524b4b -22.08%, #4c4b4b 121.16%);
+  }
+
+  &.charcoal:not(.disabled):active::before {
+    background: #363131;
+    box-shadow: inset 0 2px 4px var(--color-black-alpha-55);
+  }
+
+  &.charcoal.disabled::before {
+    background: linear-gradient(181.98deg, #474141 -22.08%, #414040 121.16%);
+    opacity: 0.5;
+  }
+
 
   @include mobile {
     clip-path: #{$clip-sm};

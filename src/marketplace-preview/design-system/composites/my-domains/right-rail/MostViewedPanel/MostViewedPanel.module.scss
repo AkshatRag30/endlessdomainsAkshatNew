@@ -1,0 +1,20 @@
+.statPair {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  white-space: nowrap;
+}
+
+.statPrimary {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: 13px;
+  color: var(--color-black-alpha-74);
+}
+
+.statSecondary {
+  font-family: var(--font-space-grotesk);
+  font-size: 9px;
+  color: #5d5d5d; // design-specific: Figma-exact
+}

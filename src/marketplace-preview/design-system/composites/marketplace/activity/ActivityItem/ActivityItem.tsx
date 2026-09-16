@@ -28,8 +28,9 @@ export const ActivityItem = ({ item }: ActivityItemProps) => {
     <div className={styles.item}>
       <img src="/assets/img/marketplace/activity-icon.svg" alt="" aria-hidden="true" className={styles.icon} />
       <p className={styles.text}>
-        {item.actorAddress} {VERB[item.action]} {item.itemLabel} for{' '}
-        <span className={`${styles.price} ${styles[item.action]}`}>${item.priceUsd.toLocaleString('en-US')}</span>
+        <span className={styles.domainName}>{item.itemLabel}</span> {VERB[item.action]} for{' '}
+        <span className={`${styles.price} ${styles[item.action]}`}>${item.priceUsd.toLocaleString('en-US')}</span>{' '}
+        by {item.actorAddress}
       </p>
       {/* mockActivity's occurredAt is computed from Date.now() at module load, a different wall-clock instant on the server than on the client, so this text can legitimately differ between them — same fix React's own docs recommend for relative-time display, not a real mismatch to warn about */}
       <span className={styles.time} suppressHydrationWarning>

@@ -26,7 +26,12 @@
     "sidebar hero rail"
     "sidebar main rail";
   gap: var(--space-6);
-  padding: var(--space-6) var(--container-padding-x);
+  // Literal 32px, not var(--container-padding-x) (80px) — that token is the
+  // main site's marketing-page gutter and stays untouched in tokens.scss
+  // for future syncs; this dashboard shell's own gutter is much tighter,
+  // confirmed against the Figma frame's near-zero side margins. Keep in
+  // sync with Header.module.scss's .bar padding — same reasoning there.
+  padding: var(--space-6) 32px;
   align-items: start;
 
   @include tablet-down {
@@ -42,6 +47,17 @@
 .sidebar {
   grid-area: sidebar;
   min-width: 0;
+
+  // Pinned in place while the middle/main column scrolls — only kicks in
+  // once the 3-column grid itself is active (tablet-up); at tablet-down
+  // this is the off-canvas drawer instead (see below), where sticky
+  // wouldn't make sense against a single-column stacked layout.
+  @include tablet-up {
+    position: sticky;
+    top: 0;
+    max-height: 100vh;
+    overflow-y: auto;
+  }
 
   @include tablet-down {
     position: fixed;
@@ -82,6 +98,29 @@
 .rightRail {
   grid-area: rail;
   min-width: 0;
+
+  // Same reasoning as .sidebar above — scrolls with the page until it hits
+  // the top offset, then holds in place (e.g. My Domains' right rail is
+  // shorter than the listings table below it, so without this it would
+  // scroll away entirely and leave a blank gap next to the still-scrolling
+  // middle column instead of staying put once its own content — Quick
+  // Actions included — has fully scrolled into view).
+  @include tablet-up {
+    position: sticky;
+    top: 0;
+    max-height: 100vh;
+    overflow-y: auto;
+
+    // Still scrolls if its content is ever taller than the viewport, the
+    // scrollbar itself just isn't drawn — same technique LiveActivityPanel's
+    // own .list already uses.
+    scrollbar-width: none; // Firefox
+    -ms-overflow-style: none; // old Edge/IE
+
+    &::-webkit-scrollbar {
+      display: none; // Chrome, Safari, current Edge
+    }
+  }
 }
 
 // Main column: Promoted Domains before Live Listings on tablet/desktop

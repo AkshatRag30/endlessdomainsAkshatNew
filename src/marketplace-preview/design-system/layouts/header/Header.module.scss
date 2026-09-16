@@ -9,12 +9,25 @@
   justify-content: space-between;
   gap: var(--space-6);
   height: 59px; // design-specific: Figma-exact bar height
-  padding: 0 var(--container-padding-x);
+  // Was var(--container-padding-x) (80px, scaling to 60/48px on desktop
+  // widths) — that token is the main site's own marketing-page gutter,
+  // copied byte-for-byte into tokens.scss and left untouched there so it
+  // stays diffable against future syncs from that site. This dashboard
+  // shell wants a much tighter gutter than a marketing page, confirmed
+  // against the Figma frame's own near-zero side margins, so it gets its
+  // own literal value instead of a token edit. Keep in sync with
+  // MarketplacePageShell.module.scss's .grid padding — same reasoning there.
+  padding: 0 32px;
   background: var(--color-white-primary);
   border-bottom: 0.3px solid var(--color-border-black-subtle);
 
+  @include tablet-down {
+    padding: 0 20px;
+  }
+
   @include mobile {
     gap: var(--space-3);
+    padding: 0 16px;
   }
 }
 
@@ -218,6 +231,30 @@
   @include mobile {
     display: none; // swapped for .walletIconButton below
   }
+}
+
+// Login + Sign Up sharing the connect-wallet pill — see the component
+// comment for why these moved here instead of staying in the sidebar.
+.authLinks {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.authLink {
+  text-decoration: none;
+  color: inherit;
+
+  &:hover {
+    opacity: 0.85;
+  }
+}
+
+.authDivider {
+  width: 1px;
+  height: 12px;
+  background: var(--color-white-alpha-30);
+  flex-shrink: 0;
 }
 
 // ── Mobile-only icon chips (Figma node 34:1043) ─────────────────────────

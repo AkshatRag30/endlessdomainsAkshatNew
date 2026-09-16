@@ -1,0 +1,167 @@
+@import '@mpstyles/_mixins.scss';
+
+// Figma node 50:6225. Column proportions loosely mirror the marketplace
+// redesign's ListingRow (same 6-column idea, one extra column for Interest).
+.row {
+  display: grid;
+  grid-template-columns: 2.2fr 1fr 1.2fr 1fr 0.9fr 1fr;
+  align-items: center;
+  min-height: 60px;
+  background: var(--color-white-primary);
+  border: 1px solid var(--color-border-black-subtle);
+  border-left: 3px solid transparent;
+  border-radius: 3px;
+
+  @include mobile {
+    display: flex;
+    flex-wrap: wrap;
+    row-gap: var(--space-2);
+    padding: var(--space-3);
+  }
+}
+
+// Only 'for-sale' rows get a colored left edge — see the component comment.
+// Simplified stacked-card layout below 768px (see .row's mobile override)
+// rather than the marketplace table's fixed + scroll-pane split — full
+// mobile-split fidelity is deferred to the plan's dedicated Phase 11
+// responsive pass.
+.statusForSale { border-left-color: var(--color-status-available); }
+
+.cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: var(--space-2) var(--space-3);
+  min-width: 0;
+
+  &:not(:first-child) {
+    border-left: 1px solid var(--color-border-black-subtle);
+  }
+
+  @include mobile {
+    flex: 1 1 45%;
+    padding: 0;
+    border-left: none !important;
+  }
+}
+
+.actionCell {
+  flex-direction: row;
+  align-items: center;
+
+  @include mobile {
+    flex: 1 1 100%;
+    justify-content: flex-end;
+  }
+}
+
+// ── Domain cell ──────────────────────────────────────────────────────────
+
+.domainCell {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-2);
+
+  @include mobile {
+    flex: 1 1 100%;
+  }
+}
+
+.marker {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+.domainText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.domainNameRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.domainName {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-small-13);
+  color: var(--color-black-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.domainMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+}
+
+.chars {
+  font-family: var(--font-space-grotesk);
+  font-size: 10px;
+  color: var(--color-gray-primary);
+  white-space: nowrap;
+}
+
+// ── Value / Interest cells ───────────────────────────────────────────────
+
+.value {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-small-13);
+  line-height: 1.2;
+  color: var(--color-black-primary);
+}
+
+.usd {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-10);
+  line-height: 1.2;
+  color: #a6a1bb; // design-specific: Figma-exact, matches ListingRow's .usd
+}
+
+.dash {
+  color: var(--color-gray-medium);
+}
+
+.renewal {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-small-13);
+  color: var(--color-black-primary);
+
+  svg {
+    flex-shrink: 0;
+    color: var(--color-gray-primary);
+  }
+}
+
+.interestCell {
+  flex-direction: row;
+  gap: var(--space-3);
+}
+
+.interestStat {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-12);
+  color: var(--color-gray-dark);
+}
+
+.heartIcon {
+  width: 11px;
+  height: 10px;
+}

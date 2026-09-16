@@ -1,0 +1,15 @@
+.rightRailStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  // Breathing room after Quick Actions (the last panel) — without it, the
+  // sticky rail's own scroll area (see MarketplacePageShell's .rightRail)
+  // ends flush against the panel's bottom edge with nothing after it.
+  padding-bottom: var(--space-6);
+}
+
+.mainStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}

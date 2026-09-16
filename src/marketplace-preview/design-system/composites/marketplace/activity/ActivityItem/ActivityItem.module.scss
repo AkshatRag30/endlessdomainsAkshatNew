@@ -30,6 +30,11 @@
   white-space: nowrap;
 }
 
+.domainName {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-black-primary);
+}
+
 .price {
   font-weight: var(--font-weight-medium);
 }

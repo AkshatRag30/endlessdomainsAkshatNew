@@ -35,15 +35,9 @@
   font-weight: var(--font-weight-medium);
   color: var(--color-blue-primary);
   text-align: left;
-  text-decoration: none; // used on both the Logout <button> (already unaffected) and the Login/Sign Up <Link>s, which need this explicitly
   cursor: pointer;
 
   &:hover {
     background: var(--color-blue-light);
   }
-}
-
-.authLinks {
-  display: flex;
-  flex-direction: column;
 }

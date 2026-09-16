@@ -1,0 +1,165 @@
+// Same edge-to-edge divider convention as PromotedDomainCard.module.scss
+// (Figma node 1:1034): the card itself carries no padding, every divider
+// lives on a full-width row so its border-bottom runs card-edge to
+// card-edge, and a 2-column row's vertical divider is a real border-right
+// on the first cell, not a gap between two floating columns.
+
+.card {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-white-primary);
+  border: 1px solid var(--color-border-black-subtle);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+// ── Top row: status badge | interest counts ─────────────────────────────
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-border-black-subtle);
+}
+
+.interest {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.interestStat {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-12);
+  color: var(--color-gray-dark);
+}
+
+.heartIcon {
+  width: 11px;
+  height: 10px;
+}
+
+// ── Identity row ─────────────────────────────────────────────────────────
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-border-black-subtle);
+  min-width: 0;
+}
+
+.identityText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.domainName {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-small-13);
+  color: var(--color-black-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.marker {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+}
+
+.chars {
+  font-family: var(--font-space-grotesk);
+  font-size: 10px;
+  color: var(--color-gray-primary);
+  white-space: nowrap;
+}
+
+// ── Stat rows: two 2-column rows, EST.value|Renewal then Price|Action ────
+
+.statsRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid var(--color-border-black-subtle);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  padding: var(--space-2) var(--space-3);
+  border-right: 1px solid var(--color-border-black-subtle);
+
+  &:last-child {
+    border-right: none;
+  }
+}
+
+.actionStat {
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.statLabel {
+  font-family: var(--font-satoshi);
+  font-size: 11px;
+  color: var(--color-black-alpha-55);
+  text-transform: capitalize;
+}
+
+.statValue {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-small-13);
+  color: var(--color-black-primary);
+}
+
+.dash {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  color: var(--color-gray-medium);
+}
+
+.renewal {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-small-13);
+  color: var(--color-black-primary);
+
+  svg {
+    flex-shrink: 0;
+    color: var(--color-gray-primary);
+  }
+}

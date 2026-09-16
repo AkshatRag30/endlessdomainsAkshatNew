@@ -4,7 +4,7 @@ import styles from './Primarybutton.module.scss'
 export interface PrimaryButtonProps {
   children?: React.ReactNode
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void
-  variant?: 'default' | 'transparent' | 'dark' | 'error' | 'green'
+  variant?: 'default' | 'transparent' | 'dark' | 'error' | 'green' | 'charcoal'
   transparent?: boolean
   dark?: boolean
   size?: 'sm' | 'md'

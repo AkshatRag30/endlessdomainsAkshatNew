@@ -54,7 +54,7 @@ export const PromotedDomainCard = ({ listing }: PromotedDomainCardProps) => {
           {/* Static mock data — this button is visually real but not wired to BuyNowModal or any wallet call */}
           <button type="button" className={`${primaryBtnStyles.button} ${primaryBtnStyles.sm} ${styles.buyNow}`}>
             {/* PrimaryButton's ::before fill layer sits above unwrapped text — span required, not decorative */}
-            <span>buy now</span>
+            <span>Buy Now</span>
           </button>
           <button
             type="button"

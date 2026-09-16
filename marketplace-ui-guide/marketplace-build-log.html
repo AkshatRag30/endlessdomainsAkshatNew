@@ -1,0 +1,469 @@
+<title>Marketplace Build Log</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=Work+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+
+  :root{
+    --paper:#f6f5f0; --surface:#ffffff; --surface-alt:#ece9e0;
+    --ink:#1b2024; --ink-soft:#5c6570; --ink-faint:#8a919b;
+    --border:#dedacf; --border-strong:#c9c4b6;
+    --accent:#1f6f6b; --accent-strong:#123f3d; --accent-tint:#dceeeb;
+    --kept:#2f7d46; --kept-tint:#e4f2e7;
+    --changed:#a8710a; --changed-tint:#fbefda;
+    --added:#1f6f6b; --added-tint:#dceeeb;
+    --risk:#b03a2e; --risk-tint:#f8e3e0;
+    --code-bg:#20262b; --code-ink:#e7e4da; --code-accent:#7fd4c9; --code-string:#e2b06b; --code-comment:#7a8a86;
+    --shadow: 0 1px 2px rgba(27,32,36,.04), 0 8px 24px -12px rgba(27,32,36,.12);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#14181a; --surface:#1b2124; --surface-alt:#20272a;
+      --ink:#eeece4; --ink-soft:#a9b0ac; --ink-faint:#767f7c;
+      --border:#2c3437; --border-strong:#3a4346;
+      --accent:#5fc0b7; --accent-strong:#8ad9d0; --accent-tint:#1c3532;
+      --kept:#6fbf7f; --kept-tint:#1d2f22;
+      --changed:#d9a44f; --changed-tint:#332a17;
+      --added:#5fc0b7; --added-tint:#1c3532;
+      --risk:#e08074; --risk-tint:#3a211d;
+      --code-bg:#101416; --code-ink:#dfe6e3; --code-accent:#8ad9d0; --code-string:#e8bd7c; --code-comment:#61706c;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#14181a; --surface:#1b2124; --surface-alt:#20272a;
+    --ink:#eeece4; --ink-soft:#a9b0ac; --ink-faint:#767f7c;
+    --border:#2c3437; --border-strong:#3a4346;
+    --accent:#5fc0b7; --accent-strong:#8ad9d0; --accent-tint:#1c3532;
+    --kept:#6fbf7f; --kept-tint:#1d2f22;
+    --changed:#d9a44f; --changed-tint:#332a17;
+    --added:#5fc0b7; --added-tint:#1c3532;
+    --risk:#e08074; --risk-tint:#3a211d;
+    --code-bg:#101416; --code-ink:#dfe6e3; --code-accent:#8ad9d0; --code-string:#e8bd7c; --code-comment:#61706c;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+  }
+
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:var(--paper); color:var(--ink); font-family:"Work Sans", -apple-system, "Segoe UI", sans-serif; line-height:1.6; font-size:16px; }
+  h1,h2,h3{ font-family:"Source Serif 4", Georgia, serif; color:var(--ink); text-wrap:balance; margin:0; }
+  code, .mono, .path{ font-family:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace; }
+  a{ color:var(--accent-strong); }
+
+  .wrap{ max-width:920px; margin:0 auto; padding:0 24px 96px; }
+
+  header.masthead{ padding:64px 0 36px; border-bottom:1px solid var(--border); }
+  .eyebrow{ font-family:"JetBrains Mono", monospace; font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color:var(--accent-strong); margin:0 0 14px; }
+  h1.title{ font-size:2.4rem; font-weight:600; line-height:1.12; max-width:22ch; }
+  .dek{ margin:16px 0 0; max-width:62ch; color:var(--ink-soft); font-size:1.05rem; }
+
+  dl.meta-strip{ display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); gap:18px 24px; margin:32px 0 0; padding:20px 22px; background:var(--surface); border:1px solid var(--border); border-radius:10px; }
+  .meta-strip div{ display:flex; flex-direction:column; gap:4px; }
+  .meta-strip dt{ font-size:.66rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint); }
+  .meta-strip dd{ margin:0; font-size:.84rem; color:var(--ink); font-family:"JetBrains Mono", monospace; }
+
+  nav.toc{ display:flex; flex-wrap:wrap; gap:6px 16px; padding:18px 0 0; font-size:.82rem; }
+  nav.toc a{ color:var(--ink-soft); text-decoration:none; padding:2px 0; border-bottom:1px solid transparent; }
+  nav.toc a:hover{ color:var(--accent-strong); border-color:var(--accent); }
+
+  section{ padding:44px 0; border-bottom:1px solid var(--border); }
+  section:last-of-type{ border-bottom:none; }
+  .section-head{ display:flex; align-items:baseline; gap:14px; margin-bottom:20px; }
+  .section-num{ font-family:"JetBrains Mono", monospace; color:var(--accent); font-size:.9rem; font-weight:600; }
+  h2.section-title{ font-size:1.4rem; font-weight:600; }
+  .lede{ max-width:68ch; color:var(--ink-soft); margin:0 0 18px; }
+  p{ max-width:68ch; } p.wide{ max-width:none; }
+
+  /* phase blocks */
+  .phase{ border:1px solid var(--border); border-left:3px solid var(--accent); border-radius:8px; background:var(--surface); box-shadow:var(--shadow); padding:20px 22px; margin-bottom:16px; }
+  .phase.checkpoint{ border-left-color:var(--risk); }
+  .phase-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:10px; }
+  .phase-num{ font-family:"JetBrains Mono", monospace; font-size:.72rem; color:var(--ink-faint); letter-spacing:.08em; text-transform:uppercase; }
+  .phase-title{ font-family:"Source Serif 4", serif; font-size:1.15rem; font-weight:600; margin:2px 0 0; }
+  .phase-badges{ display:flex; gap:6px; flex-wrap:wrap; }
+  .badge{ display:inline-block; font-size:.64rem; font-weight:600; letter-spacing:.03em; padding:3px 9px; border-radius:999px; white-space:nowrap; }
+  .badge.kept{ background:var(--kept-tint); color:var(--kept); }
+  .badge.changed{ background:var(--changed-tint); color:var(--changed); }
+  .badge.added{ background:var(--added-tint); color:var(--added); }
+  .badge.risk{ background:var(--risk-tint); color:var(--risk); }
+  .phase dl.facts{ margin:12px 0; display:grid; gap:10px; }
+  .phase dl.facts > div{ display:grid; grid-template-columns:120px 1fr; gap:14px; font-size:.86rem; }
+  .phase dl.facts dt{ font-weight:600; color:var(--ink); }
+  .phase dl.facts dd{ margin:0; color:var(--ink-soft); }
+  .phase dl.facts dd .path{ color:var(--accent-strong); font-size:.82rem; }
+  .phase p.decisions{ font-size:.9rem; color:var(--ink-soft); max-width:none; margin:10px 0; }
+  .phase p.verify{ font-size:.82rem; color:var(--ink-faint); margin:10px 0 0; padding-top:10px; border-top:1px dotted var(--border-strong); }
+  .phase p.verify strong{ color:var(--kept); }
+
+  .table-scroll{ overflow-x:auto; border:1px solid var(--border); border-radius:10px; margin:14px 0; }
+  table{ width:100%; border-collapse:collapse; background:var(--surface); font-size:.84rem; }
+  table th{ text-align:left; font-family:"JetBrains Mono", monospace; font-size:.64rem; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-faint); padding:10px 13px; border-bottom:1px solid var(--border); white-space:nowrap; }
+  table td{ padding:11px 13px; border-bottom:1px solid var(--border); vertical-align:top; color:var(--ink-soft); }
+  table td.path, table td strong{ color:var(--ink); }
+  table tr:last-child td{ border-bottom:none; }
+
+  .code-card{ background:var(--code-bg); color:var(--code-ink); border-radius:10px; overflow:hidden; box-shadow:var(--shadow); margin:16px 0; }
+  .code-card .code-label{ display:flex; align-items:center; justify-content:space-between; padding:9px 16px; font-family:"JetBrains Mono", monospace; font-size:.7rem; letter-spacing:.04em; color:var(--code-comment); border-bottom:1px solid rgba(255,255,255,.08); }
+  .code-card pre{ margin:0; padding:16px; overflow-x:auto; font-family:"JetBrains Mono", monospace; font-size:.79rem; line-height:1.6; }
+  .code-card .cm{ color:var(--code-comment); }
+
+  ul.plain{ margin:0; padding:0; list-style:none; display:grid; gap:10px; }
+  ul.plain li{ padding-left:18px; position:relative; font-size:.94rem; color:var(--ink-soft); max-width:68ch; }
+  ul.plain li::before{ content:""; position:absolute; left:0; top:.55em; width:6px; height:6px; border-radius:50%; background:var(--accent); }
+
+  .effort-pill{ display:inline-flex; align-items:center; font-size:.7rem; font-weight:600; padding:3px 10px; border-radius:999px; }
+  .effort-easy{ background:var(--kept-tint); color:var(--kept); }
+  .effort-medium{ background:var(--changed-tint); color:var(--changed); }
+  .effort-hard{ background:var(--risk-tint); color:var(--risk); }
+
+  footer.close{ padding:44px 0 0; color:var(--ink-faint); font-size:.82rem; }
+
+  @media (max-width:640px){
+    h1.title{ font-size:1.9rem; max-width:none; }
+    .phase dl.facts > div{ grid-template-columns:1fr; gap:2px; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Build log · Phases 2 through 15 · Phase 16 on hold</p>
+    <h1 class="title">Marketplace Build Log</h1>
+    <p class="dek">Everything actually built toward the new marketplace landing page, in order, with the files touched, the real decisions made, where guesses got corrected once real Figma data arrived, and an honest read on how much work stands between this and a live backend.</p>
+
+    <dl class="meta-strip">
+      <div><dt>Status</dt><dd>Phases 2&#8211;15 complete</dd></div>
+      <div><dt>On hold</dt><dd>Phase 16 (integration)</dd></div>
+      <div><dt>New files</dt><dd>&#8776; 90</dd></div>
+      <div><dt>Figma nodes pulled</dt><dd>&#8776; 25 real</dd></div>
+      <div><dt>Assets downloaded</dt><dd>13 real, 0 fabricated</dd></div>
+      <div><dt>New dependencies</dt><dd>none</dd></div>
+      <div><dt>Preview</dt><dd class="path">/design-preview/marketplace</dd></div>
+    </dl>
+
+    <nav class="toc">
+      <a href="#phases">Phase by phase</a>
+      <a href="#corrections">Where guesses got corrected</a>
+      <a href="#files">File manifest</a>
+      <a href="#api">API readiness</a>
+      <a href="#gaps">Known gaps</a>
+      <a href="#status">Where things stand</a>
+    </nav>
+  </header>
+
+  <section id="phases">
+    <div class="section-head"><span class="section-num">01</span><h2 class="section-title">Phase by phase</h2></div>
+    <p class="lede">Same order it was built in. Two phases are marked as checkpoints, they're the ones the original plan flagged as worth a fresh look before continuing, and both got one.</p>
+
+    <div class="phase">
+      <div class="phase-head">
+        <div><p class="phase-num">Phase 02</p><p class="phase-title">Data models + static data</p></div>
+        <div class="phase-badges"><span class="badge added">10 files</span></div>
+      </div>
+      <dl class="facts">
+        <div><dt>Files</dt><dd><span class="path">src/types/marketplace/*</span> (5), <span class="path">src/data/marketplace/*</span> (5)</dd></div>
+        <div><dt>Figma</dt><dd>none yet &#8212; screenshot only</dd></div>
+      </dl>
+      <p class="decisions"><code>MarketplaceListing</code> deliberately mirrors the real <code>DomainListing</code>/<code>TrendingDomain</code> API fields so a future adapter is a rename, not a redesign. <code>ActivityFeedItem</code> and <code>MarketMetric</code> have no backend precedent, so they're isolated behind their own future hooks. Mock data uses 28 varied, realistic domain names rather than repeating the screenshot's one placeholder name 28 times.</p>
+      <p class="verify"><strong>Verified:</strong> clean <code>tsc --noEmit</code>.</p>
+    </div>
+
+    <div class="phase">
+      <div class="phase-head">
+        <div><p class="phase-num">Phase 03</p><p class="phase-title">New primitives</p></div>
+        <div class="phase-badges"><span class="badge added">21 files</span><span class="badge changed">4 later corrected</span></div>
+      </div>
+      <dl class="facts">
+        <div><dt>Files</dt><dd>7 primitives &#215; 3 files: <span class="path">badge</span>, <span class="path">chain-badge</span>, <span class="path">extension-badge</span>, <span class="path">trend-indicator</span>, <span class="path">search-input</span>, <span class="path">filter-dropdown</span>, <span class="path">sparkline</span></dd></div>
+        <div><dt>Figma</dt><dd>none yet &#8212; screenshot only</dd></div>
+      </dl>
+      <p class="decisions">Built before any real Figma pull, so this was the most-guessed phase &#8212; four of these seven got corrected once real data arrived later (see the corrections table below). <code>ChainBadge</code> uses a colored dot instead of a real chain logo, no such asset exists in the project. <code>Sparkline</code> is dynamic-imported with <code>ssr:false</code> since recharts measures the DOM. Confirmed recharts 2.15.2 needs none of the TypeScript casting workarounds the main site's 3.x documents.</p>
+      <p class="verify"><strong>Verified:</strong> clean <code>tsc</code> + a real production build with all seven mounted on a throwaway test page, then deleted.</p>
+    </div>
+
+    <div class="phase">
+      <div class="phase-head">
+        <div><p class="phase-num">Phase 04</p><p class="phase-title">Layout shell</p></div>
+        <div class="phase-badges"><span class="badge added">4 files</span><span class="badge changed">fixed in Phase 11</span></div>
+      </div>
+      <dl class="facts">
+        <div><dt>Files</dt><dd><span class="path">composites/marketplace/shared/MarketplacePageShell/*</span> (3), curated barrel started</dd></div>
+      </dl>
+      <p class="decisions">The only true "layout" composite in the whole build &#8212; pure grid, no data. Sidebar / main / right rail on desktop, right rail drops full width below tablet, sidebar becomes an off-canvas panel with its own hamburger toggle and scrim below mobile. Its own collapse state, nothing else.</p>
+      <p class="verify"><strong>Verified:</strong> clean <code>tsc</code> + all three slots confirmed rendering through a throwaway page.</p>
+    </div>
+
+    <div class="phase">
+      <div class="phase-head">
+        <div><p class="phase-num">Phase 05</p><p class="phase-title">Sidebar</p></div>
+        <div class="phase-badges"><span class="badge added">4 composites</span></div>
+      </div>
+      <dl class="facts">
+        <div><dt>Files</dt><dd><span class="path">MarketplaceSidebar</span>, <span class="path">SidebarSection</span>, <span class="path">SidebarNavItem</span>, <span class="path">SidebarPromoCard</span></dd></div>
+      </dl>
+      <p class="decisions">Caught a real bug before it shipped: most sidebar items share the placeholder href <code>/</code>, and since this page lives at <code>/</code>, a naive active-route check would have lit up seven items at once. Active state now only applies to items with a real, non-placeholder destination. The account section is auth-aware per your direction &#8212; Login/Sign Up when signed out, Logout when signed in, reusing the exact <code>useAuth()</code>/<code>logout()</code> the header already uses. Skipped the sidebar's collapse-to-icons chevron and the "Explore" toggle switch &#8212; neither has a defined behavior or the icon assets they'd need.</p>
+      <p class="verify"><strong>Verified:</strong> clean <code>tsc</code> + live requests with and without a session cookie, confirmed the auth swap and confirmed zero false-active nav items.</p>
+    </div>
+
+    <div class="phase">
+      <div class="phase-head">
+        <div><p class="phase-num">Phase 06</p><p class="phase-title">Hero + Promoted Domains</p></div>
+        <div class="phase-badges"><span class="badge added">9 files</span><span class="badge kept">first real Figma pull</span></div>
+      </div>
+      <dl class="facts">
+        <div><dt>Files</dt><dd><span class="path">MarketplaceHero</span>, <span class="path">PromotedDomainsSection</span>, <span class="path">PromotedDomainCard</span></dd></div>
+        <div><dt>Figma nodes</dt><dd>1:1017 (hero), 1:1034 (promoted card)</dd></div>
+        <div><dt>Real assets</dt><dd>hero background illustration, white-text logo, domain marker, trend up/down arrows, favorite heart</dd></div>
+      </dl>
+      <p class="decisions">The hero's floating category chips turned out to be baked into one exported background image, not separate elements &#8212; the <code>HeroCategoryChip</code> data type from Phase 2 assumed otherwise and goes unused as a result (left in place, not deleted). Getting real measurements here is what triggered the first two corrections: <code>ExtensionBadge</code> and <code>TrendIndicator</code> both got rebuilt to match the real design instead of the Phase 3 guess.</p>
+      <p class="verify"><strong>Verified:</strong> clean <code>tsc</code> + live render of the hero and three cards with real chain and price data.</p>
+    </div>
+
+    <div class="phase">
+      <div class="phase-head">
+        <div><p class="phase-num">Phase 07</p><p class="phase-title">Category tabs + filter bar</p></div>
+        <div class="phase-badges"><span class="badge added">7 files</span><span class="badge changed">2 primitives rebuilt</span></div>
+      </div>
+      <dl class="facts">
+        <div><dt>Files</dt><dd><span class="path">ListingCategoryTabs</span>, <span class="path">ListingFilterBar</span>, <span class="path">hooks/marketplace/useListingFilters.ts</span></dd></div>
+        <div><dt>Figma node</dt><dd>1:1048 (search + 5 filter buttons)</dd></div>
+        <div><dt>Real assets</dt><dd>search clear icon, search submit icon, filter chevron</dd></div>
+      </dl>
+      <p class="decisions">Real data showed the filter bar is dark gradient pills, not the light bordered dropdowns guessed in Phase 3 &#8212; both <code>SearchInput</code> and <code>FilterDropdown</code> were rebuilt rather than left as a second, wrong version. <code>TabButton</code>'s fixed 162px width (from the main site) doesn't fit six category tabs in an 835px column, so the row scrolls horizontally instead of fighting that primitive's own sizing. <code>useListingFilters</code> standardizes on the one existing debounce utility the codebase already has &#8212; there are three competing ones in this repo, no reason to add a fourth. The filter bar is a controlled component (<code>filters</code> + <code>onFilterChange</code> props), not self-owned state, specifically so Phase 8's table could share the exact same state.</p>
+      <p class="verify"><strong>Verified:</strong> clean <code>tsc</code> + a live interaction test that read real React state back out of the rendered page after clicking through it.</p>
+    </div>
+
+    <div class="phase checkpoint">
+      <div class="phase-head">
+        <div><p class="phase-num">Phase 08</p><p class="phase-title">Live Listings table</p></div>
+        <div class="phase-badges"><span class="badge risk">checkpoint</span><span class="badge added">7 files</span></div>
+      </div>
+      <dl class="facts">
+        <div><dt>Files</dt><dd><span class="path">LiveListingsTable</span>, <span class="path">ListingRow</span>, <code>filterListings</code> added to the filters hook</dd></div>
+        <div><dt>Figma nodes</dt><dd>1:1087 (header row), 1:1149 (data row)</dd></div>
+      </dl>
+      <p class="decisions">Each row in the real design is individually bordered and rounded, not one shared-border table &#8212; built as ARIA-roled div grids instead of literal <code>&lt;table&gt;</code> markup so the corners actually look right. Column proportions came from the real x-positions in the Figma data, not eyeballed. Buy Now is explicitly inert, visually real, wired to nothing, per the original constraint against calling <code>BuyNowModal</code> or any wallet code. Price, length, and listed filters are accepted by <code>filterListings</code> but don't actually filter anything yet &#8212; there's no matching field on <code>MarketplaceListing</code> for them, and faking a filter that silently does nothing felt worse than flagging it honestly in the code.</p>
+      <p class="verify"><strong>Verified:</strong> clean <code>tsc</code> + a live test confirming 28 total listings, 14 rendered, a working "Show 14 more," and real search/chain filtering narrowing the visible rows.</p>
+    </div>
+
+    <div class="phase">
+      <div class="phase-head">
+        <div><p class="phase-num">Phase 09</p><p class="phase-title">Live Activity</p></div>
+        <div class="phase-badges"><span class="badge added">6 files</span></div>
+      </div>
+      <dl class="facts">
+        <div><dt>Files</dt><dd><span class="path">LiveActivityPanel</span>, <span class="path">ActivityItem</span></dd></div>
+        <div><dt>Figma node</dt><dd>1:1543</dd></div>
+        <div><dt>Real assets</dt><dd>activity item icon</dd></div>
+      </dl>
+      <p class="decisions">Self-contained like the Promoted Domains section &#8212; owns its own mock data and its own tab-filter state rather than taking props, since nothing else on the page needs to share that state. The All/Sale/Listing/Drop tabs are a segmented pill control built from scratch; <code>TabButton</code>'s clipped-corner look doesn't match this design at all, so it wasn't forced in. Only the "bought" event had a real color reference in Figma (green); listed and dropped colors are a reasonable extension, not something pulled from the file. The live pulse dot respects <code>prefers-reduced-motion</code>.</p>
+      <p class="verify"><strong>Verified:</strong> clean <code>tsc</code> + live render confirming all four tabs and all three action types.</p>
+    </div>
+
+    <div class="phase checkpoint">
+      <div class="phase-head">
+        <div><p class="phase-num">Phase 10</p><p class="phase-title">Market Activity + Recharts</p></div>
+        <div class="phase-badges"><span class="badge risk">checkpoint</span><span class="badge added">6 files</span></div>
+      </div>
+      <dl class="facts">
+        <div><dt>Files</dt><dd><span class="path">MarketActivityPanel</span>, <span class="path">MarketMetricCard</span>, <span class="path">Sparkline</span> extended</dd></div>
+        <div><dt>Figma node</dt><dd>1:1645</dd></div>
+      </dl>
+      <p class="decisions">This node confirmed the Phase 2 mock values (29.4 ETH, 76, 130%, 82%, 8%) were already accurate before ever seeing the real design &#8212; the earlier screenshot-only guess held up. It also showed the charts aren't uniform: Sales is a bar chart while Volume and both New Listings cards are filled lines, so <code>Sparkline</code> gained a <code>variant: 'area' | 'bar'</code> prop rather than assuming one chart type everywhere. <code>Badge</code>'s success variant got recolored to the exact green this node specified.</p>
+      <p class="verify"><strong>Verified:</strong> clean <code>tsc</code> (confirms <code>BarChart</code> has the same clean typing as <code>AreaChart</code>) + live render of all four metric cards with correct values and percentages read back from the page.</p>
+    </div>
+
+    <div class="phase">
+      <div class="phase-head">
+        <div><p class="phase-num">Phase 11</p><p class="phase-title">Responsive pass</p></div>
+        <div class="phase-badges"><span class="badge changed">2 real bugs fixed</span></div>
+      </div>
+      <dl class="facts">
+        <div><dt>Files touched</dt><dd><span class="path">SearchInput.module.scss</span>, <span class="path">MarketplacePageShell.module.scss</span></dd></div>
+      </dl>
+      <p class="decisions">Two real, not cosmetic, bugs found by auditing every composite against the plan's own responsive strategy rather than assuming earlier phases already covered it. <strong>One:</strong> <code>SearchInput</code>'s 206px max-width, the exact Figma desktop measurement, was still capping the field even after the filter bar switched to a full-width mobile layout. <strong>Two:</strong> the mobile sidebar drawer opened from the very top of the viewport, meaning it would visually bury the header underneath it &#8212; moved its offset to 59px, exactly the header's own height, so the drawer now opens below the header instead of over it. Everything else audited (grid breakpoints, off-canvas sidebar, hero crop, card and tab scrolling, table column collapse) needed no changes.</p>
+      <p class="verify"><strong>Verified:</strong> clean <code>tsc</code> and a clean compile through the live preview. Honest limit: no real browser is available in this environment (Playwright isn't installed), so this was a careful logical read of the CSS and breakpoints, not a literal look at a phone-width viewport.</p>
+    </div>
+
+    <div class="phase">
+      <div class="phase-head">
+        <div><p class="phase-num">Phase 12</p><p class="phase-title">Font loading audit + fix</p></div>
+        <div class="phase-badges"><span class="badge risk">real bug</span><span class="badge changed">2 files</span></div>
+      </div>
+      <dl class="facts">
+        <div><dt>Files</dt><dd><span class="path">pages/_document.tsx</span>, <span class="path">design-system/styles/fonts.scss</span></dd></div>
+        <div><dt>Figma nodes</dt><dd>1:1016, 1:1041, 1:1124, 1:1091, 1:1859, 1:1912, 1:1854 &#8212; spot-checked live font family/weight/size/color across a heading, a table cell, a column header, and sidebar nav labels</dd></div>
+      </dl>
+      <p class="decisions">Raised by you as "the font weight looks thin against Figma." Traced it to a real bug, not a sizing mismatch: <span class="path">fonts.scss</span>'s own comment claimed Satoshi and Space Grotesk were loaded as <code>&lt;link&gt;</code> tags in <span class="path">_document.tsx</span>, but that file had no such tags, and a repo-wide search turned up no <code>@font-face</code>, no local woff files, and no <code>next/font</code> usage anywhere. Every element requesting either font was silently falling back to the browser's default sans-serif at whatever weight was requested &#8212; that's what read as "thin," since Satoshi's real letterforms are noticeably bolder than a fallback face at the same weight. Fixed by adding real <code>&lt;link&gt;</code> tags: Fontshare's CDN for Satoshi, Google Fonts for Space Grotesk. Satoshi specifically uses Fontshare's <code>@variable</code> request (300&#8211;900 in one continuous face) rather than fixed weights, since Fontshare's static build has no 600/semibold instance and this codebase already sets Satoshi to semibold in two places &#8212; fixed weights would have silently substituted the nearest static weight instead of rendering the real one. While auditing this, also found and flagged (not fixed, a separate decision) that <span class="path">SidebarSection</span>/<span class="path">SidebarPromoCard</span> use Satoshi semibold where the live BROWSE label in Figma is actually Satoshi medium &#8212; left as-is pending your call.</p>
+      <p class="verify"><strong>Verified:</strong> curled both font CSS endpoints directly and confirmed the returned <code>font-family</code> names and weight coverage; confirmed the live dev server's rendered HTML included the corrected link tags.</p>
+    </div>
+
+    <div class="phase">
+      <div class="phase-head">
+        <div><p class="phase-num">Phase 13</p><p class="phase-title">Component polish: promo card shape + tab radius</p></div>
+        <div class="phase-badges"><span class="badge changed">3 files</span></div>
+      </div>
+      <dl class="facts">
+        <div><dt>Files</dt><dd><span class="path">SidebarPromoCard.tsx</span>, <span class="path">SidebarPromoCard.module.scss</span>, <span class="path">ListingCategoryTabs.module.scss</span></dd></div>
+        <div><dt>Figma nodes</dt><dd>26:2931 (not reachable via the API &#8212; not found &#8212; so this was built from the clip-path CSS and reference image you provided directly, not a live pull), 1:1515 (real pull)</dd></div>
+      </dl>
+      <p class="decisions">Two small, unrelated fixes done back to back. The promo card's flat light-blue background was replaced with the notched blue gradient shape you supplied, kept as fixed-pixel corner cuts (same convention <code>PrimaryButton</code>'s own clip-path already uses) so the notch stays a constant size at the card's fluid width. Switching the background from light to solid blue meant the heading/body text had to flip to white and the CTA button had to switch to <code>PrimaryButton</code>'s existing <code>transparent</code> variant, since the default blue button would have disappeared into the new background &#8212; both are consequences of the shape change, not scope creep. Separately, the active category tab (<span class="path">ListingCategoryTabs</span>) was inheriting the base tab's 999px full-pill radius; live Figma values show the selected pill uses a much smaller 3.888px radius, closer to a rounded rectangle. Fixed with one override, nothing else in the file touched.</p>
+      <p class="verify"><strong>Verified:</strong> clean compile through the live preview after each change.</p>
+    </div>
+
+    <div class="phase checkpoint">
+      <div class="phase-head">
+        <div><p class="phase-num">Phase 14</p><p class="phase-title">Mobile + tablet responsive rebuild</p></div>
+        <div class="phase-badges"><span class="badge risk">checkpoint</span><span class="badge changed">14 files</span></div>
+      </div>
+      <dl class="facts">
+        <div><dt>Files</dt><dd><span class="path">layouts/header/index.tsx</span>, <span class="path">Header.module.scss</span>, <span class="path">MarketplacePageShell.tsx</span>, <span class="path">MarketplacePageShell.module.scss</span>, <span class="path">pages/design-preview/marketplace.tsx</span>, <span class="path">MarketplaceHero.module.scss</span>, <span class="path">MarketActivityPanel.tsx</span>, <span class="path">MarketActivityPanel.module.scss</span>, <span class="path">ListingCategoryTabs.module.scss</span>, <span class="path">ListingFilterBar.module.scss</span>, <span class="path">LiveListingsTable.tsx</span>, <span class="path">LiveListingsTable.module.scss</span>, <span class="path">ListingRow.module.scss</span>, <span class="path">design-system/styles/_mixins.scss</span></dd></div>
+        <div><dt>Figma nodes</dt><dd>20:1153 (mobile, 390px) and its children; 27:531 (tablet, iPad Pro 11&#8243;, 834px) and its children</dd></div>
+      </dl>
+      <p class="decisions">Full ground-up mobile and tablet pass against two real Figma mockups, not a guessed reflow of the desktop CSS. Biggest structural finding: on both mobile and tablet, Live Activity and Market Activity move up to sit directly under the hero, before Promoted Domains, instead of staying in the desktop right rail &#8212; <code>MarketplacePageShell</code> gained a dedicated <code>hero</code> prop (previously bundled inside the same <code>children</code> slot as the rest of main) so its grid could reorder hero/rail/main below 992px via <code>grid-template-areas</code> without touching the desktop rows at all. At tablet width those two panels sit side by side as two columns (new <code>.railGroup</code> class), collapsing to one column at mobile and staying in their narrow desktop rail otherwise. The persistent 240/220px sidebar column was removed below 992px entirely in favor of extending the existing off-canvas drawer up through tablet width, since Figma's tablet mockup has no visible sidebar column either &#8212; the drawer's own toggle button moved out of <code>MarketplacePageShell</code> (which used to float it above the grid) and into <code>Header</code> itself as a new opt-in <code>onMenuClick</code> prop, so every other page in the app that doesn't pass that prop renders identically to before. The hero's mobile aspect-ratio was corrected from a guessed 4:3 to the real 355:105 crop. Market Activity got a genuinely new tablet-only variant &#8212; one big chart with metric-selector tabs (Volume/Sales/New Listings &#215;2) instead of the stacked mini-card list &#8212; reusing the existing <code>Sparkline</code> and <code>Badge</code> components rather than a new charting dependency; both the card list and the expanded view render together, CSS decides which shows per breakpoint. The listings table dropped its old behavior of hiding the Chain/Action columns at tablet width, which turned out to be wrong against both mockups &#8212; mobile keeps all five columns and scrolls the whole table horizontally (new wrapper, 835px min-width, Figma-exact), tablet needs no special handling at all since all five columns already fit natively at 834px. Category tabs and the filter pill row got matching mobile-only treatment, horizontal scroll and flex-wrap respectively, replacing behavior that was previously either forced-shrink or the wrong direction. One real bug found during verification, not before: an existing 992&#8211;1024px gap in <span class="path">_mixins.scss</span> (tablet topped out at 991px, desktop only started at 1025px) meant a real iPad Pro at either of its actual widths fell through to the unmodified desktop 3-column grid, breaking the listings table. Closed by widening <code>$breakpoint-tablet</code> to 1025px &#8212; checked first that no other file in the codebase references that variable or the tablet mixins it drives, so the fix is scoped to marketplace today even though the file itself is shared.</p>
+      <p class="verify"><strong>Verified:</strong> clean compile through the live dev server after every sub-change; confirmed new class names and markup landed in the rendered HTML; confirmed the iPad Pro gap fix by checking that variable's only other references before changing it. Honest limit, same as Phase 11: no real browser is available in this environment, so this was verified by compiling, reading the CSS/breakpoints carefully, and comparing against Figma screenshots pulled directly &#8212; not a literal look at a rendered narrow or tablet-width viewport.</p>
+    </div>
+
+    <div class="phase">
+      <div class="phase-head">
+        <div><p class="phase-num">Phase 15</p><p class="phase-title">Auth-state bugs</p></div>
+        <div class="phase-badges"><span class="badge risk">2 real bugs</span><span class="badge changed">2 files</span></div>
+      </div>
+      <dl class="facts">
+        <div><dt>Files</dt><dd><span class="path">SidebarPromoCard.tsx</span>, <span class="path">component/ProtectedRoute.tsx</span></dd></div>
+      </dl>
+      <p class="decisions">Two unrelated auth-state bugs, both raised by you as questions rather than bug reports. <strong>One:</strong> <code>SidebarPromoCard</code>'s CTA is the exact same "connect wallet" action, pointed at the exact same <code>/login</code> destination, as Header's own connect-wallet button &#8212; but Header already hides that button once <code>authenticated</code> is true, while the promo card had no auth check at all and would keep prompting an already-connected user to connect. Fixed with the same <code>useAuth()</code> check already used elsewhere in the sidebar; the card now renders nothing once signed in, rather than leaving a half-dead card with no functioning CTA. <strong>Two:</strong> the temporary preview route was redirecting every logged-out visitor straight to <span class="path">/login</span>. Root cause was unrelated to anything built in this session &#8212; <span class="path">ProtectedRoute.tsx</span> wraps every page in the app behind a route allowlist, and <span class="path">/design-preview/marketplace</span> was simply never added to it. Fixed by adding a <code>/design-preview</code> exception in all three places that check it (public-route check, always-renderable check, redirect-away-if-already-authenticated check), mirroring the existing <code>/seller-portfolio</code> and <code>/ens-marketplace</code> exceptions exactly rather than inventing a new pattern.</p>
+      <p class="verify"><strong>Verified:</strong> clean compile after each fix; confirmed the route guard change follows the exact existing exception pattern rather than a new one.</p>
+    </div>
+  </section>
+
+  <section id="corrections">
+    <div class="section-head"><span class="section-num">02</span><h2 class="section-title">Where guesses got corrected</h2></div>
+    <p class="lede">Phase 3 built five primitives before any real Figma data existed for this page, working only from your pasted screenshot. Once real design nodes got pulled starting in Phase 6, four of those five turned out to need real changes, not just polish. Rather than leave two versions of the truth sitting in the codebase, each one was rebuilt in place.</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Primitive</th><th>Phase 3 guess</th><th>What the real data showed</th><th>Corrected in</th></tr></thead>
+        <tbody>
+          <tr><td><strong>ExtensionBadge</strong></td><td>Generic gray bordered chip</td><td>Amber-bordered pill, exact match to the existing <code>--color-amber</code> token</td><td class="path">Phase 6</td></tr>
+          <tr><td><strong>TrendIndicator</strong></td><td>Unicode arrow characters (&#8599;&#8600;)</td><td>Two real exported SVG arrows, pre-colored green/red</td><td class="path">Phase 6</td></tr>
+          <tr><td><strong>SearchInput</strong></td><td>Bordered box, leading icon, kbd hint</td><td>Translucent field with a clear button and a dark search-submit button, no leading icon</td><td class="path">Phase 7</td></tr>
+          <tr><td><strong>FilterDropdown</strong></td><td>Light bordered select showing the current value</td><td>Dark gradient pill always showing the filter's name, not the current value</td><td class="path">Phase 7</td></tr>
+          <tr><td><strong>Badge (success variant)</strong></td><td>Approximate green, no token existed</td><td>Exact <code>#e7f6ee</code> / <code>#12a05c</code> from the Market Activity percent badges</td><td class="path">Phase 10</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="wide">The one primitive that needed <em>no</em> correction once real data arrived was <code>ChainBadge</code>, and that's mostly luck &#8212; there was no real chain-logo asset to compare it against either way, so it's still running on the colored-dot placeholder decided in Phase 3.</p>
+  </section>
+
+  <section id="files">
+    <div class="section-head"><span class="section-num">03</span><h2 class="section-title">File manifest</h2></div>
+    <p class="lede">Every new folder created across Phases 2 through 11, relative to <span class="path">src/</span> and <span class="path">public/</span> in <span class="path">endlessdomains-marketplace-frontend</span>. No new files were added in Phases 12&#8211;15, only edits to files already listed here plus three shared files outside this tree: two lines each in <span class="path">tsconfig.json</span> and <span class="path">pages/_app.tsx</span> from earlier this session, <span class="path">pages/_document.tsx</span> (Phase 12, font links), and <span class="path">src/component/ProtectedRoute.tsx</span> (Phase 15, route allowlist).</p>
+    <div class="code-card">
+      <div class="code-label"><span>new since Phase 2</span><span>~90 files</span></div>
+      <pre>types/marketplace/                  <span class="cm">5 files + barrel</span>
+data/marketplace/                   <span class="cm">5 files</span>
+hooks/marketplace/                  useListingFilters.ts
+
+design-system/primitives/
+  badges/                            badge, chain-badge, extension-badge, trend-indicator
+  inputs/                            search-input, filter-dropdown
+  charts/                            sparkline
+
+design-system/composites/marketplace/
+  shared/                             MarketplacePageShell
+  sidebar/                            MarketplaceSidebar, SidebarSection, SidebarNavItem, SidebarPromoCard
+  hero/                               MarketplaceHero
+  promoted/                           PromotedDomainsSection, PromotedDomainCard
+  listings/                           ListingCategoryTabs, ListingFilterBar, LiveListingsTable, ListingRow
+  activity/                           LiveActivityPanel, ActivityItem
+  analytics/                          MarketActivityPanel, MarketMetricCard
+  index.ts                            <span class="cm">curated barrel, grows every phase</span>
+
+public/assets/img/
+  hero/                               hero-network-bg.png, logo-white-text.svg
+  marketplace/                        domain-marker, trend-up, trend-down, favorite,
+                                       search-clear, search-submit, filter-chevron, activity-icon
+
+pages/design-preview/marketplace.tsx  <span class="cm">temporary — not linked anywhere, safe to delete</span></pre>
+    </div>
+  </section>
+
+  <section id="api">
+    <div class="section-head"><span class="section-num">04</span><h2 class="section-title">How easy would real API integration be</h2></div>
+    <p class="lede">The swap boundary designed in from Phase 2: every composite receives typed data as props or reads it from a small hook, never an RTK Query hook directly. Swapping mock data for a real endpoint means changing the inside of one hook plus a small mapper function &#8212; no composite or primitive touched. That part is done and true today. What varies a lot is whether the backend actually has the endpoint to call yet.</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Data</th><th>Backend today</th><th>What's needed</th><th>Effort</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Live Listings table</strong><br><span class="path">MarketplaceListing[]</span></td>
+            <td>Real endpoint already exists and is already used elsewhere in the app (<code>useGetAllDomainListingByQueryQuery</code>)</td>
+            <td>Write one mapper function reshaping <code>DomainListing</code> &#8594; <code>MarketplaceListing</code>, swap the hook's internals</td>
+            <td><span class="effort-pill effort-easy">Easy</span></td>
+          </tr>
+          <tr>
+            <td><strong>Promoted Domains</strong><br><span class="path">MarketplaceListing[]</span> (filtered)</td>
+            <td>Real endpoint already exists (<code>useGetPromotedDomainQuery</code>), currently unused by the archived page too</td>
+            <td>Same mapper as above, reused</td>
+            <td><span class="effort-pill effort-easy">Easy</span></td>
+          </tr>
+          <tr>
+            <td><strong>Category tab counts</strong><br><span class="path">ListingCategory[]</span></td>
+            <td>No dedicated endpoint; counts would need computing from listing data or a small new aggregate</td>
+            <td>Either a small new backend aggregate, or compute client-side from a full listing fetch</td>
+            <td><span class="effort-pill effort-medium">Medium</span></td>
+          </tr>
+          <tr>
+            <td><strong>Sidebar account counts</strong><br>Watchlist, My domains, etc.</td>
+            <td>Watchlist and My Domains are real, already-linked pages backed by real per-user endpoints; the counts themselves aren't fetched yet</td>
+            <td>Wire the existing per-user hooks (already used on those real pages) into the sidebar data</td>
+            <td><span class="effort-pill effort-medium">Medium</span></td>
+          </tr>
+          <tr>
+            <td><strong>Live Activity feed</strong><br><span class="path">ActivityFeedItem[]</span></td>
+            <td>Confirmed during planning: no market-wide activity feed endpoint exists anywhere in the backend, only a per-user history endpoint</td>
+            <td>Needs new backend work first &#8212; a real-time or polled market-wide event feed doesn't exist to call yet</td>
+            <td><span class="effort-pill effort-hard">Hard, backend-blocked</span></td>
+          </tr>
+          <tr>
+            <td><strong>Market Activity metrics</strong><br><span class="path">MarketMetric[]</span></td>
+            <td>Confirmed during planning: no time-ranged volume/sales/new-listings endpoint exists. Two related enum entries exist in code with no endpoint built and no known response shape</td>
+            <td>Needs new backend work first, plus confirming those two dead enum entries with backend before assuming they're usable</td>
+            <td><span class="effort-pill effort-hard">Hard, backend-blocked</span></td>
+          </tr>
+          <tr>
+            <td><strong>Price / length / listed filters</strong></td>
+            <td>No matching field on the real listing data as currently modeled</td>
+            <td>Confirm these fields exist (or can be derived) on the real API response before wiring the filter logic that already exists in <code>filterListings</code></td>
+            <td><span class="effort-pill effort-medium">Medium</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="wide">Net read: the left two-thirds of the page, listings, promoted cards, filtering, is close, the real endpoints already exist and are already used elsewhere in this codebase. The right rail, Live Activity and Market Activity, is the part that's genuinely blocked on new backend work, not frontend effort, since those endpoints simply don't exist yet.</p>
+  </section>
+
+  <section id="gaps">
+    <div class="section-head"><span class="section-num">05</span><h2 class="section-title">Known gaps, said plainly</h2></div>
+    <ul class="plain">
+      <li>Two background noise textures from the Figma file, behind the header's search box and behind both right-rail panels, were skipped rather than downloaded as a second raster asset for a barely-visible 5&#37; opacity effect.</li>
+      <li>The hero's blurred gradient bar above Promoted Domains is approximated with a CSS blur, not the exact exported image.</li>
+      <li>Chain logos are colored dots, not real per-chain icons &#8212; no such assets exist in the project for Polygon, Ethereum, Arbitrum, or BNB Chain.</li>
+      <li>The sidebar's collapse-to-icons chevron and its "Explore" toggle switch are not built &#8212; neither has a defined behavior or the icon assets they'd need.</li>
+      <li>Every "Buy Now" and every favorite heart is real and clickable but wired to nothing &#8212; no <code>BuyNowModal</code>, no wallet call, exactly as required for this phase of the work.</li>
+      <li>Responsive behavior (Phases 11 and 14) was verified by compiling and reading the CSS/breakpoints carefully against real Figma screenshots, not by looking at an actual rendered narrow or tablet-width viewport &#8212; this project has no browser automation tool installed.</li>
+      <li>Figma's mobile mockup shows two icon-chip buttons (message, search) in the header where the tablet mockup instead shows the real connect-wallet button &#8212; since neither icon's behavior was ever specified, the header keeps its real, functioning connect-wallet/account slot at every width instead of building non-functional icons to match the screenshot exactly.</li>
+      <li>There's no Figma reference for what the mobile drawer looks like in its open state &#8212; it still uses the plain white panel styling built back in Phase 4, not a design-matched version.</li>
+      <li>The <span class="path">/design-preview</span> allowlist added to <code>ProtectedRoute</code> in Phase 15 is a temporary carve-out tied to this being a temporary route &#8212; it should come out once Phase 16 integration replaces it with the real page at its real URL.</li>
+    </ul>
+  </section>
+
+  <section id="status">
+    <div class="section-head"><span class="section-num">06</span><h2 class="section-title">Where things stand</h2></div>
+    <p class="wide">Phases 2 through 15 are built, verified, and live on the temporary preview route <span class="path">/design-preview/marketplace</span>, which is not linked from anywhere in the real app and, as of Phase 15, is reachable whether or not you're logged in. Phases 12 through 15 were a QA and fidelity pass on top of the original 2&#8211;11 build &#8212; a real font-loading bug, two small Figma corrections, a full mobile/tablet responsive rebuild against real device mockups, and two auth-state bugs &#8212; not new features. Phase 16, wiring all of this into the real <span class="path">pages/index.tsx</span> and retiring the temporary Login/Sign Up page, is intentionally on hold right now while visual mismatches against the Figma reference get fixed first, at your request. Nothing in this document has been wired into the live site yet.</p>
+  </section>
+
+  <footer class="close">
+    Reflects the repository as of this write-up. The preview route and every file listed above may have moved on since if further fixes have landed.
+  </footer>
+
+</div>

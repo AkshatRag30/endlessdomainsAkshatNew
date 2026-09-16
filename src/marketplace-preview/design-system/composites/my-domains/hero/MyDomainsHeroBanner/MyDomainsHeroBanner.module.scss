@@ -1,0 +1,150 @@
+@import '@mpstyles/_mixins.scss';
+
+// Figma node 50:6510. Background is two real layers, matching the export:
+// the gradient, then the noise texture blended on top via a pseudo-element
+// — NOT the stripe-bg mixin this used before. That mixin sets
+// background-image directly, and since it was declared after `background:`
+// in the same rule, it silently overwrote the gradient's background-image
+// entirely (background-image is a longhand the shorthand above it also
+// sets, and the later declaration wins), leaving the banner with almost no
+// real background — which is why the white text was unreadable against it.
+
+.hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  min-height: 69px;
+  padding: var(--space-4) var(--space-5);
+  border-radius: 4px;
+  overflow: hidden;
+  background: linear-gradient(97.1deg, rgb(38, 57, 237) 4.38%, rgb(39, 38, 38) 75.98%); // Figma-exact
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url('/assets/img/my-domains/hero-noise.png');
+    background-size: 290px 290px;
+    mix-blend-mode: plus-lighter;
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  @include mobile {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+// Figma nodes 50:6511-50:6540 — faint (~4% opacity, baked into the assets
+// themselves) rounded-square accents, mostly clipped by .hero's own
+// overflow:hidden with just their edges peeking in. Positioned as
+// percentages of this banner's own box, converted from the export's fixed
+// 835×89px reference frame, so they hold their relative placement at any
+// banner width instead of only being correct at one fixed size.
+
+.blob {
+  position: absolute;
+  pointer-events: none;
+}
+
+.blobA1 {
+  left: 56.3%;
+  top: 120.7%;
+  width: 49px;
+  height: 49px;
+  transform: translate(-50%, -50%) scaleY(-1);
+}
+
+.blobB1 {
+  left: 60.3%;
+  top: 84.2%;
+  width: 40px;
+  height: 40px;
+  transform: translate(-50%, -50%) scaleY(-1) rotate(90deg);
+}
+
+.blobA2 {
+  left: 36.3%;
+  top: -8.9%;
+  width: 49px;
+  height: 49px;
+  transform: translate(-50%, -50%) scaleY(-1) rotate(90deg);
+}
+
+.blobB2 {
+  left: 40.2%;
+  top: 28.4%;
+  width: 40px;
+  height: 40px;
+  transform: translate(-50%, -50%) scaleY(-1) rotate(180deg);
+}
+
+.blobC {
+  left: -3.8%;
+  top: 24.1%;
+  width: 43px;
+  height: 43px;
+  transform: translateY(-50%) scaleY(-1) rotate(88.94deg);
+}
+
+.copy {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 60ch;
+}
+
+.heading {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: 18px;
+  color: var(--color-white-primary);
+  text-transform: capitalize;
+}
+
+.body {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  line-height: 1.45;
+  color: var(--color-white-alpha-90);
+}
+
+.actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  flex-shrink: 0;
+
+  @include mobile {
+    width: 100%;
+
+    > * {
+      flex: 1;
+    }
+  }
+}
+
+// SecondaryButton's own module sets a fixed 200x57px by default (the main
+// site's marketing-page size) — this banner is 69px tall, not a marketing
+// section. Targeting the plain `button` tag here (not a class) gives this
+// enough specificity to win over that default regardless of which CSS
+// module happens to load first, without needing !important.
+.bulkListWrap {
+  display: inline-flex;
+
+  button {
+    width: 126px; // Figma-exact
+    height: 48px; // Figma-exact
+    font-size: 12px;
+    letter-spacing: normal;
+  }
+}

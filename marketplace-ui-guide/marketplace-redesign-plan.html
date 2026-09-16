@@ -1,0 +1,473 @@
+<title>Marketplace Redesign Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=Work+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+
+  :root{
+    --paper:#f6f5f0;
+    --surface:#ffffff;
+    --surface-alt:#ece9e0;
+    --ink:#1b2024;
+    --ink-soft:#5c6570;
+    --ink-faint:#8a919b;
+    --border:#dedacf;
+    --border-strong:#c9c4b6;
+    --accent:#1f6f6b;
+    --accent-strong:#123f3d;
+    --accent-tint:#dceeeb;
+    --kept:#2f7d46;
+    --kept-tint:#e4f2e7;
+    --changed:#a8710a;
+    --changed-tint:#fbefda;
+    --added:#1f6f6b;
+    --added-tint:#dceeeb;
+    --risk:#b03a2e;
+    --risk-tint:#f8e3e0;
+    --code-bg:#20262b;
+    --code-ink:#e7e4da;
+    --code-accent:#7fd4c9;
+    --code-string:#e2b06b;
+    --code-comment:#7a8a86;
+    --shadow: 0 1px 2px rgba(27,32,36,.04), 0 8px 24px -12px rgba(27,32,36,.12);
+  }
+
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#14181a;
+      --surface:#1b2124;
+      --surface-alt:#20272a;
+      --ink:#eeece4;
+      --ink-soft:#a9b0ac;
+      --ink-faint:#767f7c;
+      --border:#2c3437;
+      --border-strong:#3a4346;
+      --accent:#5fc0b7;
+      --accent-strong:#8ad9d0;
+      --accent-tint:#1c3532;
+      --kept:#6fbf7f;
+      --kept-tint:#1d2f22;
+      --changed:#d9a44f;
+      --changed-tint:#332a17;
+      --added:#5fc0b7;
+      --added-tint:#1c3532;
+      --risk:#e08074;
+      --risk-tint:#3a211d;
+      --code-bg:#101416;
+      --code-ink:#dfe6e3;
+      --code-accent:#8ad9d0;
+      --code-string:#e8bd7c;
+      --code-comment:#61706c;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#14181a; --surface:#1b2124; --surface-alt:#20272a;
+    --ink:#eeece4; --ink-soft:#a9b0ac; --ink-faint:#767f7c;
+    --border:#2c3437; --border-strong:#3a4346;
+    --accent:#5fc0b7; --accent-strong:#8ad9d0; --accent-tint:#1c3532;
+    --kept:#6fbf7f; --kept-tint:#1d2f22;
+    --changed:#d9a44f; --changed-tint:#332a17;
+    --added:#5fc0b7; --added-tint:#1c3532;
+    --risk:#e08074; --risk-tint:#3a211d;
+    --code-bg:#101416; --code-ink:#dfe6e3; --code-accent:#8ad9d0; --code-string:#e8bd7c; --code-comment:#61706c;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+  }
+
+  *{ box-sizing:border-box; }
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:"Work Sans", -apple-system, "Segoe UI", sans-serif;
+    line-height:1.6; font-size:16px;
+  }
+  h1,h2,h3{ font-family:"Source Serif 4", Georgia, serif; color:var(--ink); text-wrap:balance; margin:0; }
+  code, .mono, .path{ font-family:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace; }
+  a{ color:var(--accent-strong); }
+  a:focus-visible, button:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+
+  .wrap{ max-width:900px; margin:0 auto; padding:0 24px 96px; }
+
+  header.masthead{ padding:64px 0 36px; border-bottom:1px solid var(--border); }
+  .eyebrow{
+    font-family:"JetBrains Mono", monospace; font-size:.72rem; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--accent-strong); margin:0 0 14px;
+  }
+  h1.title{ font-size:2.4rem; font-weight:600; line-height:1.12; max-width:20ch; }
+  .dek{ margin:16px 0 0; max-width:60ch; color:var(--ink-soft); font-size:1.05rem; }
+
+  dl.meta-strip{
+    display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:18px 28px;
+    margin:32px 0 0; padding:20px 22px; background:var(--surface); border:1px solid var(--border); border-radius:10px;
+  }
+  .meta-strip div{ display:flex; flex-direction:column; gap:4px; }
+  .meta-strip dt{ font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint); }
+  .meta-strip dd{ margin:0; font-size:.86rem; color:var(--ink); font-family:"JetBrains Mono", monospace; }
+
+  nav.toc{ display:flex; flex-wrap:wrap; gap:6px 18px; padding:18px 0 0; font-size:.84rem; }
+  nav.toc a{ color:var(--ink-soft); text-decoration:none; padding:2px 0; border-bottom:1px solid transparent; }
+  nav.toc a:hover{ color:var(--accent-strong); border-color:var(--accent); }
+
+  section{ padding:44px 0; border-bottom:1px solid var(--border); }
+  section:last-of-type{ border-bottom:none; }
+  .section-head{ display:flex; align-items:baseline; gap:14px; margin-bottom:20px; }
+  .section-num{ font-family:"JetBrains Mono", monospace; color:var(--accent); font-size:.9rem; font-weight:600; }
+  h2.section-title{ font-size:1.4rem; font-weight:600; }
+  .lede{ max-width:66ch; color:var(--ink-soft); margin:0 0 18px; }
+  p{ max-width:66ch; }
+  p.wide{ max-width:none; }
+
+  dl.facts{ margin:0; display:grid; gap:16px; }
+  dl.facts > div{ display:grid; grid-template-columns:190px 1fr; gap:18px; padding-bottom:14px; border-bottom:1px dotted var(--border-strong); }
+  dl.facts > div:last-child{ border-bottom:none; padding-bottom:0; }
+  dl.facts dt{ font-weight:600; font-size:.9rem; color:var(--ink); }
+  dl.facts dd{ margin:0; font-size:.9rem; color:var(--ink-soft); font-family:"Work Sans",sans-serif; }
+  dl.facts dd .path{ color:var(--accent-strong); font-size:.84rem; }
+
+  .table-scroll{ overflow-x:auto; border:1px solid var(--border); border-radius:10px; margin:14px 0; }
+  table{ width:100%; border-collapse:collapse; background:var(--surface); font-size:.85rem; }
+  table th{
+    text-align:left; font-family:"JetBrains Mono", monospace; font-size:.66rem; letter-spacing:.07em;
+    text-transform:uppercase; color:var(--ink-faint); padding:11px 14px; border-bottom:1px solid var(--border); white-space:nowrap;
+  }
+  table td{ padding:12px 14px; border-bottom:1px solid var(--border); vertical-align:top; color:var(--ink-soft); }
+  table td.path, table td strong{ color:var(--ink); }
+  table tr:last-child td{ border-bottom:none; }
+
+  .badge{ display:inline-block; font-size:.66rem; font-weight:600; letter-spacing:.03em; padding:3px 9px; border-radius:999px; white-space:nowrap; }
+  .badge.kept{ background:var(--kept-tint); color:var(--kept); }
+  .badge.changed{ background:var(--changed-tint); color:var(--changed); }
+  .badge.added{ background:var(--added-tint); color:var(--added); }
+  .badge.risk{ background:var(--risk-tint); color:var(--risk); }
+
+  .code-card{ background:var(--code-bg); color:var(--code-ink); border-radius:10px; overflow:hidden; box-shadow:var(--shadow); margin:16px 0; }
+  .code-card .code-label{
+    display:flex; align-items:center; justify-content:space-between; padding:9px 16px;
+    font-family:"JetBrains Mono", monospace; font-size:.7rem; letter-spacing:.04em; color:var(--code-comment);
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  .code-card pre{ margin:0; padding:16px; overflow-x:auto; font-family:"JetBrains Mono", monospace; font-size:.8rem; line-height:1.65; }
+  .code-card .cm{ color:var(--code-comment); }
+  .code-card .str{ color:var(--code-string); }
+  .code-card .kw{ color:var(--code-accent); }
+
+  ol.rail{ list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(3, 1fr); gap:14px; }
+  ol.rail li{
+    border:1px solid var(--border); border-left:3px solid var(--accent); background:var(--surface);
+    border-radius:8px; padding:15px 16px 17px; box-shadow:var(--shadow);
+  }
+  ol.rail li.checkpoint{ border-left-color:var(--risk); }
+  ol.rail .step-num{ font-family:"JetBrains Mono", monospace; font-size:.7rem; color:var(--ink-faint); letter-spacing:.08em; display:flex; justify-content:space-between; align-items:center; }
+  ol.rail h3{ font-family:"Work Sans", sans-serif; font-size:.95rem; font-weight:600; margin:6px 0 6px; }
+  ol.rail p{ font-size:.82rem; color:var(--ink-soft); margin:0; max-width:none; }
+
+  ul.plain{ margin:0; padding:0; list-style:none; display:grid; gap:10px; }
+  ul.plain li{ padding-left:18px; position:relative; font-size:.95rem; color:var(--ink-soft); max-width:66ch; }
+  ul.plain li::before{ content:""; position:absolute; left:0; top:.55em; width:6px; height:6px; border-radius:50%; background:var(--accent); }
+
+  .risk-list{ margin:0; display:grid; gap:10px; }
+  .risk-list li{
+    list-style:none; padding:12px 14px; background:var(--risk-tint); border:1px solid var(--risk);
+    border-radius:8px; font-size:.87rem; color:var(--ink); max-width:none;
+  }
+
+  footer.close{ padding:44px 0 0; color:var(--ink-faint); font-size:.82rem; }
+
+  @media (max-width:640px){
+    ol.rail{ grid-template-columns:1fr; }
+    dl.facts > div{ grid-template-columns:1fr; gap:4px; }
+    h1.title{ font-size:1.9rem; max-width:none; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Implementation plan · approved, not yet built</p>
+    <h1 class="title">Marketplace Redesign Plan</h1>
+    <p class="dek">A dashboard style landing page, sidebar, hero, promoted domains, a live listings table, and a right rail of activity and market charts, planned against the real codebase before a line of it gets written.</p>
+
+    <dl class="meta-strip">
+      <div><dt>Reference</dt><dd>Figma node 1:1016</dd></div>
+      <div><dt>Repo</dt><dd>endlessdomains&#8209;marketplace&#8209;frontend</dd></div>
+      <div><dt>Status</dt><dd>Approved · Phase 2 done</dd></div>
+      <div><dt>New files planned</dt><dd>&#8776; 84</dd></div>
+      <div><dt>Existing files touched</dt><dd>1&#8211;2</dd></div>
+      <div><dt>New dependencies</dt><dd>none</dd></div>
+      <div><dt>Charting library</dt><dd>recharts (already installed)</dd></div>
+      <div><dt>Checkpoints</dt><dd>before Phase 8 &amp; 10</dd></div>
+    </dl>
+
+    <nav class="toc">
+      <a href="#analysis">Repository analysis</a>
+      <a href="#architecture">Existing architecture</a>
+      <a href="#api">API analysis</a>
+      <a href="#breakdown">Design breakdown</a>
+      <a href="#components">Component architecture</a>
+      <a href="#data-models">Data models</a>
+      <a href="#static-data">Static data</a>
+      <a href="#migration">API migration</a>
+      <a href="#folders">Folder structure</a>
+      <a href="#phases">Implementation phases</a>
+      <a href="#validation">Validation</a>
+      <a href="#risks">Risks</a>
+    </nav>
+  </header>
+
+  <section id="analysis">
+    <div class="section-head"><span class="section-num">01</span><h2 class="section-title">Current repository analysis</h2></div>
+    <p class="lede">Two architectures coexist today. The legacy layer, <span class="path">src/component/</span> and <span class="path">src/template/</span>, is what every real page still renders through, global Bootstrap flavored class names, RTK Query called directly inside components. The new layer, <span class="path">src/design&#8209;system/</span>, was started this session and mirrors the company's main site on disk.</p>
+    <dl class="facts">
+      <div><dt>New layer, already built</dt><dd><span class="path">primitives/buttons/</span> (5 components), <span class="path">layouts/header/</span> (built this session from this same Figma file), <span class="path">styles/</span> (tokens, mixins, fonts, copied byte for byte from the main site and checksum verified)</dd></div>
+      <div><dt>Aliases in place</dt><dd><code>@/*</code> &#8594; <span class="path">src/*</span>, <code>@newstyles/*</code> &#8594; <span class="path">src/design&#8209;system/styles/*</span></dd></div>
+      <div><dt>Tokens are already global</dt><dd><span class="path">main.scss</span> is imported in <span class="path">pages/_app.tsx</span>, every CSS custom property is available everywhere already</dd></div>
+      <div><dt>Old landing page</dt><dd>archived, untouched, at <span class="path">src/_archive/marketplace/MarketplaceLandingLegacy.tsx</span> &#8212; reference only, never imported</dd></div>
+      <div><dt>Current pages/index.tsx</dt><dd>minimal: renders the new <code>Header</code> plus a Login/Sign Up/Logout block, inside <code>Layout</code> with <code>noHeader</code> true so the old header never double renders. This is exactly where the new content lands.</dd></div>
+    </dl>
+  </section>
+
+  <section id="architecture">
+    <div class="section-head"><span class="section-num">02</span><h2 class="section-title">Existing architecture</h2></div>
+    <p class="lede">Every design system folder is <code>Component.tsx</code> + <code>Component.module.scss</code> + an <code>index</code> barrel. Conditional classes compose with <code>[styles.x, cond ? styles.y : '', className].filter(Boolean).join(' ')</code>, already the pattern in all five button primitives.</p>
+    <dl class="facts">
+      <div><dt>classnames package</dt><dd>Not installed, and shouldn't be &#8212; the filter/join pattern already covers it</dd></div>
+      <div><dt>Tailwind / styled&#8209;components / CVA</dt><dd>None present, none to add, confirmed in package.json</dd></div>
+      <div><dt>Charting</dt><dd><strong>recharts is already installed</strong>, <code>^2.15.2</code> &#8212; no new dependency needed</dd></div>
+      <div><dt>Main site's chart convention</dt><dd>Imports recharts directly, no wrapper. Its <code>^3</code> carries a typing workaround, <code>const ResponsiveContainer = _RC as any</code>, for a children&#8209;prop issue &#8212; confirm in Phase 10 whether our older <code>^2.15.2</code> needs it too, don't assume.</dd></div>
+      <div><dt>Header contract</dt><dd><code>React.FC&lt;&#123; transparent?, hidden? &#125;&gt;</code>, self&#8209;contained auth and mobile state, fixed 59px bar, no children &#8212; render as a sibling, keep <code>Layout</code>'s <code>noHeader</code> true</dd></div>
+    </dl>
+  </section>
+
+  <section id="api">
+    <div class="section-head"><span class="section-num">03</span><h2 class="section-title">Existing marketplace &amp; API analysis</h2></div>
+    <p class="lede">Base API is <span class="path">src/core/redux/api.ts</span>, <code>myApi</code>, bearer token from the <code>access_token</code> cookie. The relevant hooks and their shapes:</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Hook</th><th>File</th><th>Response shape</th></tr></thead>
+        <tbody>
+          <tr><td class="path">useGetAllDomainListingByQueryQuery</td><td class="path">domainListing.ts</td><td><code>DomainAllListingResponse&#123; data?: DomainListing[] &#125;</code></td></tr>
+          <tr><td class="path">useGetRecentSalesQuery</td><td class="path">domainListing.ts</td><td><code>RecentSaleDetail[]</code></td></tr>
+          <tr><td class="path">useGetTrendingApiQuery / PremiumDomain / PromotedDomain</td><td class="path">domain.ts</td><td><code>TrendingDomain&#123; usdAmount, pricePerToken, ... &#125;</code></td></tr>
+          <tr><td class="path">useGetCryptoPriceQuery</td><td class="path">cryptoPrice.ts</td><td><code>&#123; result: Record&lt;string, number&gt; &#125;</code></td></tr>
+          <tr><td class="path">useGetAnalyticsStatsQuery / useGetUserHistoryQuery</td><td class="path">userProfile.ts</td><td>user&#8209;scoped only, not market&#8209;wide</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="wide"><span class="badge risk">confirmed gap</span>&nbsp; no market&#8209;wide "Live Activity" feed and no time&#8209;ranged "Market Activity" endpoint exists anywhere in the codebase. Two enum entries, <code>COUNT_ANALYTICS</code> and <code>PROVIDER_AND_TLDS</code>, exist with no built endpoint and no known response shape, worth asking backend about later, not usable now.</p>
+    <p class="wide">Best existing shape references, legacy, read&#8209;only, never called from the new page: <code>CustomSlider</code> for the promoted domain card shape, <code>DomainSearch</code> for the collapsible filter&#8209;sidebar pattern, the <span class="path">transaction&#8209;history</span> page's real <code>&lt;table&gt;</code> for the sortable listings table with skeleton and empty states, <code>ProfileSidebar</code> for a static vertical nav. Reusable hooks: <code>useDebounces</code> (300ms default) and <code>useIsMobile</code> (768px default), both already used by the new Header.</p>
+  </section>
+
+  <section id="breakdown">
+    <div class="section-head"><span class="section-num">04</span><h2 class="section-title">Reference design breakdown</h2></div>
+    <dl class="facts">
+      <div><dt>Global</dt><dd><code>Layout</code> + existing <code>Header</code> + a new <code>MarketplacePageShell</code> (sidebar / center / right rail grid)</dd></div>
+      <div><dt>Left sidebar</dt><dd>Browse group (Explore, Recently sold, Under estimate, Price drops, Extensions, Auctions) and Your Account group (Watchlist, Alerts, My domains, Seller analytics), plus a "What Is Your Name Worth?" promo card</dd></div>
+      <div><dt>Center</dt><dd>Dark hero banner with floating category chips, 3 Promoted Domain cards, a 6&#8209;item category tab row, a search + 4 filter dropdowns, a sortable Live Listings table, a Show N more button</dd></div>
+      <div><dt>Right rail</dt><dd>Live Activity panel with All/Sale/Listing/Drop tabs, and a Market Activity panel with a 24h/7d/30d toggle and 4 metric cards each with a sparkline</dd></div>
+    </dl>
+  </section>
+
+  <section id="components">
+    <div class="section-head"><span class="section-num">05</span><h2 class="section-title">Component architecture</h2></div>
+    <div class="code-card">
+      <div class="code-label"><span>component tree</span><span>pages/index.tsx</span></div>
+      <pre>pages/index.tsx
+  Layout (noHeader, noFooter)
+    Header                                    <span class="cm">— existing, reused as-is</span>
+    MarketplacePageShell
+      MarketplaceSidebar
+        SidebarSection
+          SidebarNavItem × N
+        SidebarPromoCard
+      MarketplaceMain
+        MarketplaceHero
+        PromotedDomainsSection
+          PromotedDomainCard × 3
+        ListingCategoryTabs                    <span class="cm">— built on TabButton (existing)</span>
+        ListingFilterBar
+          SearchInput, FilterDropdown × 4
+        LiveListingsTable
+          ListingRow × N
+            DomainIdentity, ChainBadge, FavoriteButton, BuyNowButton
+        ShowMoreButton                          <span class="cm">— existing DefaultButton</span>
+      MarketplaceRightRail
+        LiveActivityPanel
+          ActivityTabs, ActivityItem × N
+        MarketActivityPanel
+          TimeRangeToggle
+          MarketMetricCard × 4
+            Sparkline (recharts)</pre>
+    </div>
+
+    <p class="wide"><strong>Primitives</strong>, new and existing &#8212; generic, no domain knowledge, could sit anywhere in the app:</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Component</th><th>Status</th><th>Use</th></tr></thead>
+        <tbody>
+          <tr><td>SearchInput, FilterDropdown</td><td><span class="badge added">new</span></td><td>Listing search + filter bar</td></tr>
+          <tr><td>Badge, ChainBadge, ExtensionBadge, TrendIndicator</td><td><span class="badge added">new</span></td><td>Table row and card decoration</td></tr>
+          <tr><td>Sparkline</td><td><span class="badge added">new</span></td><td>Chrome&#8209;free recharts AreaChart, data via props</td></tr>
+          <tr><td>FavoriteButton</td><td><span class="badge added">new</span></td><td>Wraps existing SecondaryButton, iconOnly</td></tr>
+          <tr><td>TabButton, PrimaryButton, SecondaryButton, DefaultButton</td><td><span class="badge kept">existing</span></td><td>Category/activity tabs, Buy Now, Show more</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="wide"><strong>Composites</strong>, marketplace&#8209;specific &#8212; built from the primitives above but shaped around domain/listing/activity concepts that only make sense on this page:</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Component</th><th>Data required</th></tr></thead>
+        <tbody>
+          <tr><td>MarketplacePageShell</td><td>none, layout only</td></tr>
+          <tr><td>MarketplaceSidebar, SidebarSection, SidebarNavItem, SidebarPromoCard</td><td><code>SidebarNavItem[]</code></td></tr>
+          <tr><td>MarketplaceHero</td><td><code>HeroCategoryChip[]</code></td></tr>
+          <tr><td>PromotedDomainsSection, PromotedDomainCard</td><td><code>MarketplaceListing[]</code> (isPromoted)</td></tr>
+          <tr><td>ListingCategoryTabs, ListingFilterBar</td><td><code>ListingCategory[]</code>, local filter state</td></tr>
+          <tr><td>LiveListingsTable, ListingRow</td><td><code>MarketplaceListing[]</code></td></tr>
+          <tr><td>LiveActivityPanel, ActivityItem</td><td><code>ActivityFeedItem[]</code></td></tr>
+          <tr><td>MarketActivityPanel, MarketMetricCard</td><td><code>MarketMetric[]</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="wide"><strong>Layout</strong>: only <code>MarketplacePageShell</code> is new here, arranging sidebar / main / right rail and owning responsive collapse. <span class="path">layouts/footer/</span> stays empty, the reference has no footer.</p>
+  </section>
+
+  <section id="data-models">
+    <div class="section-head"><span class="section-num">06</span><h2 class="section-title">Data models</h2></div>
+    <p class="lede">Frontend&#8209;facing types at <span class="path">src/types/marketplace/</span>. <code>MarketplaceListing</code> deliberately mirrors the real <code>DomainListing</code>/<code>TrendingDomain</code> fields so a later adapter is a rename, not a redesign. <code>ActivityFeedItem</code> and <code>MarketMetric</code> have no backend precedent, modeled off the screenshot, isolated behind their own hooks.</p>
+    <div class="code-card">
+      <div class="code-label"><span>src/types/marketplace/domain.ts</span><span>excerpt</span></div>
+      <pre><span class="kw">export interface</span> MarketplaceListing &#123;
+  id: string
+  domainName: string
+  extension: string            <span class="cm">// '.ud'</span>
+  chain: Chain
+  priceEth: number
+  priceUsd: number
+  appraisedValueEth: number
+  appraisedTrend: <span class="str">'high'</span> | <span class="str">'low'</span> | <span class="str">'neutral'</span>
+  isPromoted?: boolean
+  isFavorited?: boolean
+&#125;</pre>
+    </div>
+    <div class="code-card">
+      <div class="code-label"><span>src/types/marketplace/analytics.ts</span><span>excerpt</span></div>
+      <pre><span class="kw">export type</span> MarketTimeRange = <span class="str">'24h'</span> | <span class="str">'7d'</span> | <span class="str">'30d'</span>
+
+<span class="kw">export interface</span> MarketMetric &#123;
+  id: <span class="str">'volume'</span> | <span class="str">'sales'</span> | <span class="str">'newListings'</span> | <span class="str">'newListingsValue'</span>
+  value: number
+  changePercent: number
+  series: Record&lt;MarketTimeRange, ChartPoint[]&gt;
+&#125;</pre>
+    </div>
+  </section>
+
+  <section id="static-data">
+    <div class="section-head"><span class="section-num">07</span><h2 class="section-title">Static data, and the migration boundary</h2></div>
+    <p class="lede">No <span class="path">src/data</span> convention existed before this plan. Given the design system boundary already established this session, presentation only, data stays outside it, static fixtures live at a new <span class="path">src/data/marketplace/</span>, five files, typed named exports only, no JSX.</p>
+    <p class="wide">The swap boundary is one hook per data need, never a prop change at the component level:</p>
+    <div class="code-card">
+      <div class="code-label"><span>src/hooks/marketplace/useMarketplaceListings.ts</span><span>today &#8594; later</span></div>
+      <pre><span class="cm">// today</span>
+<span class="kw">export function</span> useMarketplaceListings() &#123;
+  <span class="kw">return</span> mockListings
+&#125;
+
+<span class="cm">// later — same export shape</span>
+<span class="kw">export function</span> useMarketplaceListings() &#123;
+  <span class="kw">const</span> &#123; data &#125; = useGetAllDomainListingByQueryQuery(params)
+  <span class="kw">return</span> useMemo(() =&gt; (data?.data ?? []).map(toMarketplaceListing), [data])
+&#125;</pre>
+    </div>
+    <p class="wide">Components only ever receive <code>MarketplaceListing[]</code> / <code>ActivityFeedItem[]</code> / <code>MarketMetric[]</code> as props, never an RTK Query hook directly. When the backend changes, only the mapper and the hook's internals change, every composite and primitive is untouched.</p>
+  </section>
+
+  <section id="migration">
+    <div class="section-head"><span class="section-num">08</span><h2 class="section-title">Recharts, and what's already built</h2></div>
+    <p class="lede">One reusable primitive, modeled on the main site's <code>PVSparkline</code>: <code>AreaChart</code>/<code>Area</code>/<code>ResponsiveContainer</code>, no axes, no tooltip, <code>isAnimationActive&#123;false&#125;</code>, loaded via <code>next/dynamic</code> with <code>ssr: false</code> since recharts measures the DOM and breaks under SSR.</p>
+    <p class="wide"><span class="badge kept">done</span>&nbsp; Phase 2 is complete as of this document: <span class="path">src/types/marketplace/</span> (5 files) and <span class="path">src/data/marketplace/</span> (5 files) exist, typecheck clean. 28 mock listings across 4 chains, 8 activity events, 4 market metrics with generated 24h/7d/30d sparkline series ending at the real screenshot values (29.4 ETH volume, 76 sales, 143 new listings, 0.52 ETH), the 6 category counts, both sidebar groups, and the hero's chips.</p>
+  </section>
+
+  <section id="folders">
+    <div class="section-head"><span class="section-num">09</span><h2 class="section-title">Proposed folder structure</h2></div>
+    <div class="code-card">
+      <div class="code-label"><span>src/</span><span>new paths only</span></div>
+      <pre>types/marketplace/        <span class="cm">domain, activity, analytics, navigation, index — done</span>
+data/marketplace/         <span class="cm">domains, activity, analytics, categories, navigation — done</span>
+hooks/marketplace/        useMarketplaceListings, useMarketActivity,
+                           useMarketMetrics, useListingFilters
+design-system/
+  primitives/
+    buttons/               <span class="cm">existing, unchanged</span>
+    inputs/                search-input, filter-dropdown
+    badges/                badge, chain-badge, extension-badge, trend-indicator
+    charts/                sparkline
+  layouts/
+    header/                <span class="cm">existing, unchanged</span>
+    footer/                <span class="cm">stays empty</span>
+  composites/
+    shared/                <span class="cm">existing, still empty — untouched</span>
+    marketplace/
+      shared/               MarketplacePageShell
+      sidebar/              MarketplaceSidebar, SidebarSection, SidebarNavItem, SidebarPromoCard
+      hero/                 MarketplaceHero
+      promoted/             PromotedDomainsSection, PromotedDomainCard
+      listings/             ListingCategoryTabs, ListingFilterBar, LiveListingsTable, ListingRow
+      activity/             LiveActivityPanel, ActivityItem
+      analytics/            MarketActivityPanel, MarketMetricCard
+      index.ts               <span class="cm">curated barrel, mirrors main site convention</span></pre>
+    </div>
+    <p class="wide">Read only, never touched: <span class="path">src/_archive/marketplace/*</span> and every legacy component named in section 03. Reused, not modified: <code>Header</code>, all five button primitives, the tokens/mixins files, <code>useDebounces</code>, <code>useIsMobile</code>, <code>Layout</code>.</p>
+  </section>
+
+  <section id="phases">
+    <div class="section-head"><span class="section-num">10</span><h2 class="section-title">Implementation phases</h2></div>
+    <p class="lede">Twelve phases, in this order, two explicit checkpoints for a fresh go&#8209;ahead before continuing.</p>
+    <ol class="rail">
+      <li><p class="step-num">01 <span class="badge kept">done</span></p><h3>Repository analysis</h3><p>Three parallel research passes across both codebases, this document.</p></li>
+      <li><p class="step-num">02 <span class="badge kept">done</span></p><h3>Data models + static data</h3><p>Types and mock data, typechecked clean.</p></li>
+      <li><p class="step-num">03</p><h3>New primitives</h3><p>SearchInput, FilterDropdown, Badge + 2 presets, TrendIndicator, Sparkline with a real Recharts smoke test.</p></li>
+      <li><p class="step-num">04</p><h3>Layout shell</h3><p>MarketplacePageShell only, empty slots, responsive skeleton.</p></li>
+      <li><p class="step-num">05</p><h3>Sidebar</h3><p>Wired to navigation data. Decide where the Login/Sign Up/Logout block lives.</p></li>
+      <li><p class="step-num">06</p><h3>Hero + Promoted Domains</h3><p>Filtered from the same listings data by isPromoted.</p></li>
+      <li><p class="step-num">07</p><h3>Category tabs + filter bar</h3><p>Built on the existing TabButton, local state via useListingFilters + useDebounces.</p></li>
+      <li class="checkpoint"><p class="step-num">08 <span class="badge risk">checkpoint</span></p><h3>Live Listings table</h3><p>Buy Now stays inert, visual only, no BuyNowModal or wallet call. Decide the mobile table strategy against real rows.</p></li>
+      <li><p class="step-num">09</p><h3>Right rail: Live Activity</h3><p>Tabs on TabButton, wired to activity data.</p></li>
+      <li class="checkpoint"><p class="step-num">10 <span class="badge risk">checkpoint</span></p><h3>Right rail: Market Activity + Recharts</h3><p>Confirm here whether the recharts 2.x ResponsiveContainer typing cast is actually needed.</p></li>
+      <li><p class="step-num">11</p><h3>Responsive pass</h3><p>Real device&#8209;width checks across everything built, not per section.</p></li>
+      <li><p class="step-num">12</p><h3>Integration + validation</h3><p>Wire into pages/index.tsx below Header, run the full checklist.</p></li>
+    </ol>
+  </section>
+
+  <section id="validation">
+    <div class="section-head"><span class="section-num">11</span><h2 class="section-title">Validation checklist</h2></div>
+    <ul class="plain">
+      <li><code>tsc --noEmit</code> clean, <code>next lint</code> with no new warnings.</li>
+      <li>No new composite imports from <span class="path">src/core/redux/*</span> directly — grep confirms zero matches.</li>
+      <li>Search, category tabs, and filter dropdowns all operate on the local static array, nothing appears in the network tab.</li>
+      <li>Favorite toggles local state only; Buy Now is visually present and does nothing.</li>
+      <li>Time&#8209;range toggle swaps each metric card's sparkline; charts confirmed with a real <code>next build</code>, not just a type check.</li>
+      <li>Manual check at mobile, tablet, and desktop widths against section 10 of the full plan.</li>
+      <li>The existing Header still renders once, auth state and the account dropdown still work exactly as already verified this session.</li>
+      <li>Every other route still renders the old header via Layout, untouched.</li>
+    </ul>
+  </section>
+
+  <section id="risks">
+    <div class="section-head"><span class="section-num">12</span><h2 class="section-title">Risks and open items</h2></div>
+    <ul class="risk-list">
+      <li><code>DomainResponse</code> is declared twice in the codebase with different shapes, in <span class="path">Domain.ts</span> and <span class="path">DomainList.ts</span>, be careful which one gets imported later.</li>
+      <li>Three different debounce implementations exist in the repo; only <code>useDebounces</code> should be used here.</li>
+      <li><span class="path">tokens.scss</span>'s own responsive value overrides (1400/1200/992/768/480) use a different breakpoint set than <span class="path">_mixins.scss</span>'s named mixins (500/768/992/1025/1440) — component layout standardizes on the named mixins.</li>
+      <li>No generic card&#8209;shadow token exists yet; one additive token, <code>--shadow-card</code>, is proposed, no existing token changes.</li>
+      <li>Recharts here is 2.15.2, older than the main site's 3.x — confirm the typing workaround is actually needed rather than pre&#8209;copying it.</li>
+      <li>The sidebar's collapse behavior has no ready&#8209;made component to lift wholesale; expect to build it fresh, informed by DomainSearch's filter&#8209;sidebar toggle.</li>
+      <li>Header is a fixed 59px bar with no sub&#8209;nav slot — the new shell must sit as a sibling, not a child, and Layout's <code>noHeader</code> must stay true.</li>
+    </ul>
+  </section>
+
+  <footer class="close">
+    Full plan on file at <span class="path">C:\Users\ACER\.claude\plans\vectorized-beaming-pizza.md</span>. This page is a saved, readable copy of that approved plan as it stood after Phase 2; the working tree may have moved on since.
+  </footer>
+
+</div>

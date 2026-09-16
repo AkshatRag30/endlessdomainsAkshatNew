@@ -2,11 +2,12 @@
   position: relative;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: var(--space-2);
   padding: var(--space-2) var(--space-2-5);
   border-radius: var(--radius-sm);
-  overflow: hidden; // clips the active-state flourish below to the row's own bounds
+  // Visible, not hidden — the active state's bracket (.bracket) sits at
+  // left:-8px, outside this row's own box, and must not get clipped.
+  overflow: visible;
   font-family: var(--font-satoshi);
   font-size: var(--text-small-13);
   color: var(--color-gray-dark);
@@ -19,28 +20,49 @@
   }
 }
 
+// Figma nodes 23:2916 ("Explore") / 57:9354 ("My domains") — light gray
+// row, black label, a leading icon, and a pale taper into a count pill.
+// Was a flat --color-blue-light fill with blue text before, which looked
+// nothing like the real design.
 .active {
-  background: var(--color-blue-light);
-  color: var(--color-blue-primary);
+  background: #f4f4f6; // design-specific: Figma-exact, no matching token
+  border-radius: 6px; // design-specific: Figma-exact, narrower than --radius-sm
   font-weight: var(--font-weight-medium);
+
+  &:hover {
+    background: #f4f4f6;
+  }
+
+  .label {
+    color: var(--color-black-primary);
+  }
+}
+
+.activeIcon {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
 }
 
 .label {
   position: relative;
-  z-index: 1; // stays above the active-state flourish
+  z-index: 1;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+// ── Inactive trailing (badge/count, unchanged) ────────────────────────────
+
 .trailing {
   position: relative;
-  z-index: 1; // stays above the active-state flourish
+  z-index: 1;
   display: flex;
   align-items: center;
   gap: var(--space-1-5);
   flex-shrink: 0;
+  margin-left: auto; // .item lost justify-content:space-between when the active layout needed a flex-growing middle instead
 }
 
 .count {
@@ -60,37 +82,73 @@
   letter-spacing: 0.04em;
 }
 
-// Same decorative flourish as the mobile drawer's selected row (Figma node
-// 34:2994 / MobileDrawerMenu's .exploreDeco*), reused here rather than a
-// second copy — the sidebar row is narrower, so these are sized down to fit
-// without needing new assets.
-.deco1,
-.deco2 {
+// ── Active trailing: count pill, no connecting line to the label ─────────
+// Figma nodes 23:2916 / 57:9354 export a "Vector 4160" line between the
+// label and the pill. Three passes at reproducing it (two stroke lines with
+// a gap between them, then a filled wedge, then a stroked outline) all
+// looked wrong in different ways — dropped rather than keep guessing at
+// its geometry; just the pill on its own.
+
+.activeTrailing {
+  position: relative;
+  flex: 1;
+  min-width: 32px;
+  height: 21px;
+  margin-left: var(--space-1);
+}
+
+.pillWrap {
   position: absolute;
-  right: var(--space-2);
+  right: 0;
   top: 50%;
   transform: translateY(-50%);
-  height: 8px;
-  opacity: 0.5;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  // Fixed, not min-width — an unforced flex box (nothing pushing it wider
+  // when there's no count, e.g. "Explore") previously squeezed this down
+  // to 40px, squashing the pill PNG horizontally from its native ~103x18.
+  // 100px keeps close to that ~5.75:1 ratio at this height so it renders
+  // at roughly its real proportions whether or not a count is present.
+  width: 100px;
+  height: 18px;
+  padding-right: var(--space-1-5);
+}
+
+.pill {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  // contain, not fill — .pillWrap is sized close to this PNG's native
+  // ratio, but contain is a safety net against any remaining mismatch
+  // distorting it, rather than stretching to whatever box it's given.
+  object-fit: contain;
   pointer-events: none;
 }
 
-.deco1 {
-  width: 54px;
+.pillCount,
+.pillBadge {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-space-grotesk); // closest already-loaded face to Figma's JetBrains Mono
+  font-size: 11.5px; // Figma-exact
+  color: var(--color-blue-dark); // reads better on the pale pill than flat black
 }
 
-.deco2 {
-  width: 90px;
-  right: 40px;
+.pillBadge {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
-.deco3 {
+// ── Left bracket flourish ──────────────────────────────────────────────
+
+.bracket {
   position: absolute;
-  right: var(--space-1);
+  left: -8px;
   top: 50%;
   transform: translateY(-50%);
-  width: 70px;
-  height: 12px;
-  opacity: 0.6;
+  width: 13px;
+  height: 40px;
   pointer-events: none;
 }

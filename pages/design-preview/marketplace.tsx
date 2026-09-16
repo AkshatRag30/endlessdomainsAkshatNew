@@ -27,7 +27,6 @@ import shellStyles from '@/marketplace-preview/design-system/composites/marketpl
  *
  * This project has no real auth/cookie backend yet, so useAuth() always
  * reports a logged-out visitor (see src/marketplace-preview/stubs/auth.ts).
- * Right rail composition still matches the source project's Phase 8 state.
  */
 export default function MarketplacePreview() {
   const [activeCategory, setActiveCategory] = useState('all')
