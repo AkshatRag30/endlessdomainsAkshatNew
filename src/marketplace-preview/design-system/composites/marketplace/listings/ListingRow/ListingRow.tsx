@@ -31,7 +31,11 @@ export const ListingDomainCell = ({ listing }: ListingDomainCellProps) => (
       {listing.isPremium && (
         <img src="/assets/img/marketplace/domain-marker.svg" alt="" aria-hidden="true" className={styles.marker} />
       )}
-      <span className={styles.domainNameScroll}>
+      {/* title, not a custom tooltip — a long name is already visibly clipped
+          (ellipsis on desktop) or scrollable (mobile), so the browser's own
+          native hover tooltip is enough to reveal the rest on desktop, at
+          zero cost, and it's simply inert on touch devices with no hover. */}
+      <span className={styles.domainNameScroll} title={listing.domainName}>
         <span className={styles.domainName}>{listing.domainName}</span>
       </span>
       <ExtensionBadge extension={listing.extension} />

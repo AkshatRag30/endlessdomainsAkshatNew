@@ -23,7 +23,7 @@ export const PromotedDomainCard = ({ listing }: PromotedDomainCardProps) => {
         <img src="/assets/img/marketplace/domain-marker.svg" alt="" aria-hidden="true" className={styles.marker} />
         <span className={styles.domainLabel}>domain name</span>
         <div className={styles.domainRow}>
-          <span className={styles.domainName}>{listing.domainName}</span>
+          <span className={styles.domainName} title={listing.domainName}>{listing.domainName}</span>
           <ExtensionBadge extension={listing.extension} />
         </div>
       </div>
