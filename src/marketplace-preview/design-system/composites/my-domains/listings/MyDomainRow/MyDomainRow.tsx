@@ -4,6 +4,7 @@ import ChainBadge from '@/marketplace-preview/design-system/primitives/badges/ch
 import ExtensionBadge from '@/marketplace-preview/design-system/primitives/badges/extension-badge'
 import TrendIndicator from '@/marketplace-preview/design-system/primitives/badges/trend-indicator'
 import DomainAvatar from '@/marketplace-preview/design-system/primitives/avatars/domain-avatar'
+import Tooltip from '@/marketplace-preview/design-system/primitives/tooltip'
 import PrimaryButton from '@/marketplace-preview/design-system/primitives/buttons/primary-button'
 import { formatUsd, formatRenewal, TREND_DIRECTION, TREND_LABEL } from '../formatMyDomain'
 import styles from './MyDomainRow.module.scss'
@@ -24,12 +25,12 @@ export const MyDomainRow = ({ domain }: MyDomainRowProps) => {
   return (
     <div className={rowClass} role="row">
       <div className={`${styles.cell} ${styles.domainCell}`} role="cell">
-        <DomainAvatar />
+        <DomainAvatar chain={domain.chain} />
         <div className={styles.domainText}>
           <div className={styles.domainNameRow}>
-            <span className={styles.domainName} title={`${domain.domainName}${domain.extension}`}>
-              {domain.domainName}
-            </span>
+            <Tooltip label={`${domain.domainName}${domain.extension}`} className={styles.domainNameTooltip}>
+              <span className={styles.domainName}>{domain.domainName}</span>
+            </Tooltip>
             <ExtensionBadge extension={domain.extension} />
             {domain.isPremium && (
               <img src="/assets/img/marketplace/domain-marker.svg" alt="Premium" className={styles.marker} />

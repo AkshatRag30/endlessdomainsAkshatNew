@@ -9,6 +9,19 @@
   white-space: nowrap;
 }
 
+.logo {
+  // Was 14px — these are real circular brand marks (ENS, UD, Arbitrum,
+  // BNB Chain), designed at 20x20 — shrunk further than that reads as
+  // faint/hard to make out, closer to their native size instead.
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+// Fallback only now — used when a Chain.id has no entry in
+// CHAIN_ID_TO_PROVIDER, so an unrecognized chain still shows something
+// rather than nothing.
 .dot {
   width: 8px;
   height: 8px;

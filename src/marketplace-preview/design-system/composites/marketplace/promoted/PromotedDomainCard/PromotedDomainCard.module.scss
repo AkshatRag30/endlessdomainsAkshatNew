@@ -53,7 +53,18 @@
   min-width: 0;
 }
 
+// Tooltip's own .wrap is the direct flex child of .domainRow now, not
+// .domainName — needs its own shrink/min-width pair (.domainName got this
+// for free before via overflow:hidden implying min-width:auto → 0 on a
+// flex item; .wrap has no overflow of its own so needs it explicitly).
+.domainNameTooltip {
+  flex: 1;
+  min-width: 0;
+}
+
 .domainName {
+  display: block;
+  width: 100%;
   font-family: var(--font-satoshi);
   font-weight: var(--font-weight-medium);
   font-size: var(--text-small-13);

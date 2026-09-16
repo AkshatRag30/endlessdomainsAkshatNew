@@ -81,6 +81,15 @@
   flex-shrink: 0;
 }
 
+// Tooltip's own .wrap sits between .domain and .domainNameScroll now (it's
+// the direct flex child), so it carries the flex:1/min-width:0 pair that
+// used to live directly on .domainNameScroll below — same reasoning, just
+// one level further out.
+.domainNameTooltip {
+  flex: 1;
+  min-width: 0;
+}
+
 // Truncates with an ellipsis on desktop/tablet, scrolls horizontally on
 // mobile — see .domainName below for the matching mobile override that lets
 // the name grow past its own box instead of truncating, which is what this

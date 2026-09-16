@@ -3,6 +3,7 @@ import type { MarketplaceListing } from '@/marketplace-preview/types/marketplace
 import ExtensionBadge from '@/marketplace-preview/design-system/primitives/badges/extension-badge'
 import ChainBadge from '@/marketplace-preview/design-system/primitives/badges/chain-badge'
 import TrendIndicator from '@/marketplace-preview/design-system/primitives/badges/trend-indicator'
+import Tooltip from '@/marketplace-preview/design-system/primitives/tooltip'
 import primaryBtnStyles from '@/marketplace-preview/design-system/primitives/buttons/primary-button/Primarybutton.module.scss'
 import styles from './PromotedDomainCard.module.scss'
 
@@ -23,7 +24,9 @@ export const PromotedDomainCard = ({ listing }: PromotedDomainCardProps) => {
         <img src="/assets/img/marketplace/domain-marker.svg" alt="" aria-hidden="true" className={styles.marker} />
         <span className={styles.domainLabel}>domain name</span>
         <div className={styles.domainRow}>
-          <span className={styles.domainName} title={listing.domainName}>{listing.domainName}</span>
+          <Tooltip label={listing.domainName} className={styles.domainNameTooltip}>
+            <span className={styles.domainName}>{listing.domainName}</span>
+          </Tooltip>
           <ExtensionBadge extension={listing.extension} />
         </div>
       </div>

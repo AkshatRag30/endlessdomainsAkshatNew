@@ -1,0 +1,22 @@
+<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<mask id="mask0_351_9273" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="0" y="0" width="20" height="20">
+<path d="M20 0H0V20H20V0Z" fill="white"/>
+</mask>
+<g mask="url(#mask0_351_9273)">
+<path d="M20 10C20 8.02219 19.4135 6.08878 18.3147 4.44429C17.2159 2.7998 15.6541 1.51808 13.8268 0.761201C11.9996 0.00432432 9.98891 -0.193698 8.0491 0.192155C6.10929 0.578007 4.32746 1.5304 2.92894 2.92893C1.53041 4.32745 0.578004 6.10929 0.192152 8.0491C-0.193701 9.98891 0.00433284 11.9996 0.761209 13.8268C1.51809 15.6541 2.79981 17.2159 4.4443 18.3147C6.08879 19.4135 8.02219 20 10 20C12.6522 20 15.1957 18.9464 17.0711 17.0711C18.9464 15.1957 20 12.6522 20 10Z" fill="#03001A"/>
+<mask id="mask1_351_9273" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="5" y="4" width="11" height="12">
+<path d="M15.5 4H5V16H15.5V4Z" fill="white"/>
+</mask>
+<g mask="url(#mask1_351_9273)">
+<path d="M10.25 4.75V7.20599" stroke="white" stroke-width="0.188" stroke-linejoin="round"/>
+<path d="M14.837 12.6274L12.748 11.4004" stroke="white" stroke-width="0.188" stroke-linejoin="round"/>
+<path d="M5.76855 12.6274L7.85655 11.4004" stroke="white" stroke-width="0.188" stroke-linejoin="round"/>
+<path d="M10.2525 9.99969L7.81348 8.58969L10.2525 7.17969L12.6885 8.59569L10.2525 9.99969Z" stroke="white" stroke-width="0.375" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M10.2554 12.8068L7.81738 11.4068V8.5918L10.2554 9.9998V12.8068Z" stroke="white" stroke-width="0.375" stroke-linejoin="round"/>
+<path d="M10.25 12.8066L12.688 11.4136V8.59961L10.25 9.9996V12.8066Z" stroke="white" stroke-width="0.375" stroke-linejoin="round"/>
+<path d="M14.75 12.6268V7.38081L10.25 4.75781L5.75 7.38081V12.6268L10.25 15.2498L14.75 12.6268Z" stroke="white" stroke-width="0.563" stroke-miterlimit="10"/>
+<path d="M10.2502 10.0086L10.1082 10.2516L10.2502 10.3336L10.3922 10.2516L10.2502 10.0086ZM5.61621 7.62857L10.1092 10.2516L10.3932 9.76558L5.90021 7.14258L5.61621 7.62857ZM10.3922 10.2516L14.8992 7.62857L14.6162 7.14258L10.1092 9.76558L10.3922 10.2516Z" fill="white"/>
+<path d="M10.25 10.0088V15.2498" stroke="white" stroke-width="0.563" stroke-miterlimit="10" stroke-linecap="round"/>
+</g>
+</g>
+</svg>

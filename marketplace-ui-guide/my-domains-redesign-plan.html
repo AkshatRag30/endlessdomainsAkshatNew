@@ -1,0 +1,506 @@
+<title>My Domains Redesign Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=Work+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+
+  :root{
+    --paper:#f6f5f0;
+    --surface:#ffffff;
+    --surface-alt:#ece9e0;
+    --ink:#1b2024;
+    --ink-soft:#5c6570;
+    --ink-faint:#8a919b;
+    --border:#dedacf;
+    --border-strong:#c9c4b6;
+    --accent:#1f6f6b;
+    --accent-strong:#123f3d;
+    --accent-tint:#dceeeb;
+    --kept:#2f7d46;
+    --kept-tint:#e4f2e7;
+    --changed:#a8710a;
+    --changed-tint:#fbefda;
+    --added:#1f6f6b;
+    --added-tint:#dceeeb;
+    --risk:#b03a2e;
+    --risk-tint:#f8e3e0;
+    --pending:#6a5fa8;
+    --pending-tint:#eae7f7;
+    --code-bg:#20262b;
+    --code-ink:#e7e4da;
+    --code-accent:#7fd4c9;
+    --code-string:#e2b06b;
+    --code-comment:#7a8a86;
+    --shadow: 0 1px 2px rgba(27,32,36,.04), 0 8px 24px -12px rgba(27,32,36,.12);
+  }
+
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#14181a;
+      --surface:#1b2124;
+      --surface-alt:#20272a;
+      --ink:#eeece4;
+      --ink-soft:#a9b0ac;
+      --ink-faint:#767f7c;
+      --border:#2c3437;
+      --border-strong:#3a4346;
+      --accent:#5fc0b7;
+      --accent-strong:#8ad9d0;
+      --accent-tint:#1c3532;
+      --kept:#6fbf7f;
+      --kept-tint:#1d2f22;
+      --changed:#d9a44f;
+      --changed-tint:#332a17;
+      --added:#5fc0b7;
+      --added-tint:#1c3532;
+      --risk:#e08074;
+      --risk-tint:#3a211d;
+      --pending:#b3a6e8;
+      --pending-tint:#2a2540;
+      --code-bg:#101416;
+      --code-ink:#dfe6e3;
+      --code-accent:#8ad9d0;
+      --code-string:#e8bd7c;
+      --code-comment:#61706c;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#14181a; --surface:#1b2124; --surface-alt:#20272a;
+    --ink:#eeece4; --ink-soft:#a9b0ac; --ink-faint:#767f7c;
+    --border:#2c3437; --border-strong:#3a4346;
+    --accent:#5fc0b7; --accent-strong:#8ad9d0; --accent-tint:#1c3532;
+    --kept:#6fbf7f; --kept-tint:#1d2f22;
+    --changed:#d9a44f; --changed-tint:#332a17;
+    --added:#5fc0b7; --added-tint:#1c3532;
+    --risk:#e08074; --risk-tint:#3a211d;
+    --pending:#b3a6e8; --pending-tint:#2a2540;
+    --code-bg:#101416; --code-ink:#dfe6e3; --code-accent:#8ad9d0; --code-string:#e8bd7c; --code-comment:#61706c;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+  }
+
+  *{ box-sizing:border-box; }
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:"Work Sans", -apple-system, "Segoe UI", sans-serif;
+    line-height:1.6; font-size:16px;
+  }
+  h1,h2,h3{ font-family:"Source Serif 4", Georgia, serif; color:var(--ink); text-wrap:balance; margin:0; }
+  code, .mono, .path{ font-family:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace; }
+  a{ color:var(--accent-strong); }
+  a:focus-visible, button:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+
+  .wrap{ max-width:900px; margin:0 auto; padding:0 24px 96px; }
+
+  header.masthead{ padding:64px 0 36px; border-bottom:1px solid var(--border); }
+  .eyebrow{
+    font-family:"JetBrains Mono", monospace; font-size:.72rem; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--accent-strong); margin:0 0 14px;
+  }
+  h1.title{ font-size:2.4rem; font-weight:600; line-height:1.12; max-width:20ch; }
+  .dek{ margin:16px 0 0; max-width:60ch; color:var(--ink-soft); font-size:1.05rem; }
+
+  dl.meta-strip{
+    display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:18px 28px;
+    margin:32px 0 0; padding:20px 22px; background:var(--surface); border:1px solid var(--border); border-radius:10px;
+  }
+  .meta-strip div{ display:flex; flex-direction:column; gap:4px; }
+  .meta-strip dt{ font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint); }
+  .meta-strip dd{ margin:0; font-size:.86rem; color:var(--ink); font-family:"JetBrains Mono", monospace; }
+
+  nav.toc{ display:flex; flex-wrap:wrap; gap:6px 18px; padding:18px 0 0; font-size:.84rem; }
+  nav.toc a{ color:var(--ink-soft); text-decoration:none; padding:2px 0; border-bottom:1px solid transparent; }
+  nav.toc a:hover{ color:var(--accent-strong); border-color:var(--accent); }
+
+  section{ padding:44px 0; border-bottom:1px solid var(--border); }
+  section:last-of-type{ border-bottom:none; }
+  .section-head{ display:flex; align-items:baseline; gap:14px; margin-bottom:20px; }
+  .section-num{ font-family:"JetBrains Mono", monospace; color:var(--accent); font-size:.9rem; font-weight:600; }
+  h2.section-title{ font-size:1.4rem; font-weight:600; }
+  .lede{ max-width:66ch; color:var(--ink-soft); margin:0 0 18px; }
+  p{ max-width:66ch; }
+  p.wide{ max-width:none; }
+
+  dl.facts{ margin:0; display:grid; gap:16px; }
+  dl.facts > div{ display:grid; grid-template-columns:190px 1fr; gap:18px; padding-bottom:14px; border-bottom:1px dotted var(--border-strong); }
+  dl.facts > div:last-child{ border-bottom:none; padding-bottom:0; }
+  dl.facts dt{ font-weight:600; font-size:.9rem; color:var(--ink); }
+  dl.facts dd{ margin:0; font-size:.9rem; color:var(--ink-soft); font-family:"Work Sans",sans-serif; }
+  dl.facts dd .path{ color:var(--accent-strong); font-size:.84rem; }
+
+  .table-scroll{ overflow-x:auto; border:1px solid var(--border); border-radius:10px; margin:14px 0; }
+  table{ width:100%; border-collapse:collapse; background:var(--surface); font-size:.85rem; }
+  table th{
+    text-align:left; font-family:"JetBrains Mono", monospace; font-size:.66rem; letter-spacing:.07em;
+    text-transform:uppercase; color:var(--ink-faint); padding:11px 14px; border-bottom:1px solid var(--border); white-space:nowrap;
+  }
+  table td{ padding:12px 14px; border-bottom:1px solid var(--border); vertical-align:top; color:var(--ink-soft); }
+  table td.path, table td strong{ color:var(--ink); }
+  table tr:last-child td{ border-bottom:none; }
+
+  .badge{ display:inline-block; font-size:.66rem; font-weight:600; letter-spacing:.03em; padding:3px 9px; border-radius:999px; white-space:nowrap; }
+  .badge.kept{ background:var(--kept-tint); color:var(--kept); }
+  .badge.changed{ background:var(--changed-tint); color:var(--changed); }
+  .badge.added{ background:var(--added-tint); color:var(--added); }
+  .badge.risk{ background:var(--risk-tint); color:var(--risk); }
+  .badge.pending{ background:var(--pending-tint); color:var(--pending); }
+
+  .code-card{ background:var(--code-bg); color:var(--code-ink); border-radius:10px; overflow:hidden; box-shadow:var(--shadow); margin:16px 0; }
+  .code-card .code-label{
+    display:flex; align-items:center; justify-content:space-between; padding:9px 16px;
+    font-family:"JetBrains Mono", monospace; font-size:.7rem; letter-spacing:.04em; color:var(--code-comment);
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  .code-card pre{ margin:0; padding:16px; overflow-x:auto; font-family:"JetBrains Mono", monospace; font-size:.8rem; line-height:1.65; }
+  .code-card .cm{ color:var(--code-comment); }
+  .code-card .str{ color:var(--code-string); }
+  .code-card .kw{ color:var(--code-accent); }
+
+  ol.rail{ list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(3, 1fr); gap:14px; }
+  ol.rail li{
+    border:1px solid var(--border); border-left:3px solid var(--accent); background:var(--surface);
+    border-radius:8px; padding:15px 16px 17px; box-shadow:var(--shadow);
+  }
+  ol.rail li.checkpoint{ border-left-color:var(--risk); }
+  ol.rail li.pending{ border-left-color:var(--pending); }
+  ol.rail .step-num{ font-family:"JetBrains Mono", monospace; font-size:.7rem; color:var(--ink-faint); letter-spacing:.08em; display:flex; justify-content:space-between; align-items:center; }
+  ol.rail h3{ font-family:"Work Sans", sans-serif; font-size:.95rem; font-weight:600; margin:6px 0 6px; }
+  ol.rail p{ font-size:.82rem; color:var(--ink-soft); margin:0; max-width:none; }
+
+  ul.plain{ margin:0; padding:0; list-style:none; display:grid; gap:10px; }
+  ul.plain li{ padding-left:18px; position:relative; font-size:.95rem; color:var(--ink-soft); max-width:66ch; }
+  ul.plain li::before{ content:""; position:absolute; left:0; top:.55em; width:6px; height:6px; border-radius:50%; background:var(--accent); }
+
+  .risk-list{ margin:0; display:grid; gap:10px; }
+  .risk-list li{
+    list-style:none; padding:12px 14px; background:var(--risk-tint); border:1px solid var(--risk);
+    border-radius:8px; font-size:.87rem; color:var(--ink); max-width:none;
+  }
+
+  footer.close{ padding:44px 0 0; color:var(--ink-faint); font-size:.82rem; }
+
+  @media (max-width:640px){
+    ol.rail{ grid-template-columns:1fr; }
+    dl.facts > div{ grid-template-columns:1fr; gap:4px; }
+    h1.title{ font-size:1.9rem; max-width:none; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Implementation plan &middot; phases 05&#8211;09 built (inert actions), incl. grid/list card views &middot; awaiting further Figma updates</p>
+    <h1 class="title">My Domains Redesign Plan</h1>
+    <p class="dek">The signed&#8209;in user's own domain portfolio &mdash; a gradient hero, four portfolio stat cards, six status tabs, a listings surface that genuinely switches between a table and a card grid, and a right rail of Needs Attention / Most Viewed / Quick Actions &mdash; broken into concrete, reviewable phases against the real Figma files and the real codebase.</p>
+
+    <dl class="meta-strip">
+      <div><dt>References</dt><dd>Figma node 50:6190; node 375:51246 (card/list views)</dd></div>
+      <div><dt>File keys</dt><dd>hq6HmB0...eGv; RsuK6KT...GOum</dd></div>
+      <div><dt>Repo</dt><dd>endlessdomains&#8209;marketplace&#8209;frontend</dd></div>
+      <div><dt>Status</dt><dd>Core build live at /design&#8209;preview/account/my&#8209;domains</dd></div>
+      <div><dt>New files so far</dt><dd>&#8776; 60</dd></div>
+      <div><dt>New dependencies</dt><dd>none</dd></div>
+      <div><dt>Reused wholesale</dt><dd>MarketplacePageShell, MarketplaceSidebar, ListingCategoryTabs, ListingsHeading, Badge/ExtensionBadge/ChainBadge/TrendIndicator, SearchInput/FilterDropdown</dd></div>
+      <div><dt>Checkpoint</dt><dd>Phase 04 still open &mdash; built inert instead of blocking on it</dd></div>
+    </dl>
+    <p class="wide"><span class="badge pending">incoming</span>&nbsp; more changes, updates, and new Figma designs are still expected &mdash; sections 04, 05, and the phase list below will keep getting revised as those land, same as this update did for the card/list view designs. This pass covers what was buildable without a Phase 04 answer: the full page shell, real filtering, a genuinely working grid/list toggle, and every visual element, with every action intentionally inert.</p>
+
+    <nav class="toc">
+      <a href="#analysis">Current page analysis</a>
+      <a href="#architecture">Existing architecture</a>
+      <a href="#api">API &amp; data analysis</a>
+      <a href="#breakdown">Design breakdown</a>
+      <a href="#components">Component architecture</a>
+      <a href="#data-models">Data models</a>
+      <a href="#static-data">Static data</a>
+      <a href="#gaps">Reused logic &amp; confirmed gaps</a>
+      <a href="#folders">Folder structure</a>
+      <a href="#phases">Implementation phases</a>
+      <a href="#validation">Validation</a>
+      <a href="#risks">Risks</a>
+    </nav>
+  </header>
+
+  <section id="analysis">
+    <div class="section-head"><span class="section-num">01</span><h2 class="section-title">Current page analysis</h2></div>
+    <p class="lede">"My Domains" lives at <span class="path">pages/profile/domains/index.tsx</span>, behind a server&#8209;side auth redirect. It renders through the legacy layer only &mdash; global Bootstrap&#8209;flavored class names, no design&#8209;system involvement, and a static <code>ProfileSidebar</code> shared with every other <span class="path">/profile/*</span> route.</p>
+    <dl class="facts">
+      <div><dt>Page</dt><dd><span class="path">pages/profile/domains/index.tsx</span> &mdash; owns all query state (search, tld, tab, pagination) and pushes the API response into Redux via <code>setDomainSummary</code></dd></div>
+      <div><dt>Template</dt><dd><span class="path">src/template/domains-list/index.tsx</span> &mdash; search box, TLD filter panel, Listed/Unlisted tabs, bulk listing button, maps the array to <code>DomainItem</code></dd></div>
+      <div><dt>Item component</dt><dd><span class="path">src/component/domain-self-item/index.tsx</span> &mdash; the heaviest piece: renders the card <strong>and</strong> owns the on&#8209;chain delist transaction (ethers, per&#8209;chain contract/ABI maps, network switching), plus opens the listing, appraisal, and promote modals</dd></div>
+      <div><dt>Sidebar</dt><dd><code>ProfileSidebar</code> &mdash; shared static nav across <span class="path">pages/profile/*</span>. <strong>The new design doesn't use this at all</strong> &mdash; see section 04.</dd></div>
+    </dl>
+  </section>
+
+  <section id="architecture">
+    <div class="section-head"><span class="section-num">02</span><h2 class="section-title">Existing architecture to reuse</h2></div>
+    <p class="lede">The marketplace redesign already built a design&#8209;system layer this codebase didn't have before, and the Figma file for this page turns out to reuse almost the entire marketplace shell, not just its visual language.</p>
+    <dl class="facts">
+      <div><dt>Directly reusable, unchanged</dt><dd><code>Header</code>, <code>MarketplacePageShell</code>, <code>MarketplaceSidebar</code> (needs only an "active item" prop it likely doesn't have yet)</dd></div>
+      <div><dt>Directly relevant primitives</dt><dd><code>Badge</code>/<code>ChainBadge</code>/<code>ExtensionBadge</code> (Premium marker, chain icon), <code>SearchInput</code>, <code>FilterDropdown</code> (All Extension / All Chain / Recently Added)</dd></div>
+      <div><dt>Convention</dt><dd><code>Component.tsx</code> + <code>Component.module.scss</code> + an <code>index</code> barrel; conditional classes via <code>[styles.x, cond ? styles.y : '', className].filter(Boolean).join(' ')</code></dd></div>
+      <div><dt>Aliases in place</dt><dd><code>@/*</code> &#8594; <span class="path">src/*</span>, matching <span class="path">@/types/my-domains</span> and <span class="path">@/data/my-domains</span> already created</dd></div>
+    </dl>
+  </section>
+
+  <section id="api">
+    <div class="section-head"><span class="section-num">03</span><h2 class="section-title">Existing "My Domains" API &amp; data analysis</h2></div>
+    <p class="lede">Five separate hooks currently power one page, three of them fired straight out of the deepest component in the tree rather than the page:</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Hook</th><th>File</th><th>Called from</th><th>Response shape</th></tr></thead>
+        <tbody>
+          <tr><td class="path">useGetDomainSummaryByUserQuery</td><td class="path">domainListing.ts</td><td>page</td><td><code>DomainSummaryResponse&#123; data, paginationInfo, totalDomains, totalListed, totalUnlisted &#125;</code></td></tr>
+          <tr><td class="path">useLazyGetRefreshDomainListQuery</td><td class="path">domain.ts</td><td>page (Refresh button)</td><td>refetch trigger only</td></tr>
+          <tr><td class="path">useGetDomainExpiryDateQuery</td><td class="path">domain.ts</td><td><strong>DomainItem</strong>, polled every 60s</td><td><code>&#123; data: &#123; domainName, expiry_date &#125;[] &#125;</code>, joined client&#8209;side by <code>domainName</code></td></tr>
+          <tr><td class="path">useGetDomainTldListQuery</td><td class="path">domain.ts</td><td>DomainsList template</td><td><code>string[]</code> of TLDs for the filter panel</td></tr>
+          <tr><td class="path">useSetDomainAppraiselMutation / useSetCancelDomainListingMutation</td><td class="path">domain.ts / domainListing.ts</td><td><strong>DomainItem</strong></td><td>action mutations, not read data</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="wide"><span class="badge risk">confirmed gap</span>&nbsp; the inner domain object inside <code>DomainSummaryResponse</code> is loosely typed <code>any</code> everywhere it's passed around, and today's API only knows Listed/Unlisted &mdash; nothing about estimated value, view/save counts, or the five&#8209;way status split (For sale / Not listed / Sold / Expiring soon / Expired) this design calls for. All of that is new surface, not a rename job.</p>
+    <p class="wide">List, delist, promote, and appraise are full client&#8209;side blockchain transactions inside <code>DomainItem</code>: reading the connected wallet's network, mapping the domain's provider to an expected chain ID and marketplace contract address + ABI, prompting a network switch, then calling the contract directly with <code>ethers</code>. None of this changes for the redesign &mdash; only where it's triggered from does.</p>
+  </section>
+
+  <section id="breakdown">
+    <div class="section-head"><span class="section-num">04</span><h2 class="section-title">Reference design breakdown</h2></div>
+    <p class="lede">Figma node <code>50:6190</code>, "My domains." Read element by element, top to bottom:</p>
+    <dl class="facts">
+      <div><dt>Left sidebar</dt><dd><strong>Not a new component.</strong> Pixel&#8209;identical in structure to the marketplace redesign's sidebar &mdash; same Browse group (Explore 37, Recently sold 37, Under estimate 19, Price drops 4, Extensions, Auctions soon), same Your Account group (Watchlist 12, Alerts 4, Seller analytics) &mdash; with "My domains" rendered as the current/active item instead of none active. This page shares the marketplace shell, it doesn't get its own sidebar. See the open question in section 12.</dd></div>
+      <div><dt>Hero banner</dt><dd>Dark&#8209;to&#8209;blue gradient bar. Heading "My domains", subcopy "Everything in your connected wallet. List, reprice or transfer without leaving this page.", two actions on the right: an icon "Bulk List" affordance and a primary pill button "List a domain."</dd></div>
+      <div><dt>Portfolio stat cards</dt><dd>Four gradient tiles in a 2&times;2 grid: <strong>Domains</strong> (24 / "11 listed"), <strong>Estimated value</strong> (51.3 / "ETH &middot; $144,700"), <strong>Listed value</strong> (17.6 / "ETH live on sale"), <strong>Sold, all time</strong> (01 / "$5,922"). Each is visually the same layout with a different gradient (blue, dark gray, gray, purple) and a faint noise texture &mdash; one primitive, not four.</dd></div>
+      <div><dt>Category tabs</dt><dd>"All domain 14,208 &middot; For sale 11 &middot; Not listed 10 &middot; Sold 19 &middot; Expiring soon 3 &middot; Expired 2" &mdash; six pill tabs with counts, replacing the old page's two&#8209;tab Listed/Unlisted.</dd></div>
+      <div><dt>Table header</dt><dd>"Live listings" + "28 domains", then a search input (with a clear&#8209;&times; affordance and a separate search button), three dropdowns (All Extension, All Chain, Recently Added), and a grid/list view toggle.</dd></div>
+      <div><dt>Table columns</dt><dd>Domain Name (icon, name, extension/premium badges, chain, "N chars"), Price, EST. value, Interest (eye count + heart count), Renewal (date), Action &mdash; a dark "Edit Price" button on listed rows, a highlighted blue "List" button on unlisted ones. Each row's left edge is colored by status.</dd></div>
+      <div><dt>Right rail</dt><dd>Three stacked cards: <strong>Needs Attention</strong> (domain + "Renews in N days" + a "Review" link, last row rendered faded as a scroll&#8209;for&#8209;more cue), <strong>Getting The Most Views</strong> (domain + "not listed" + view count + saved count), <strong>Quick Actions</strong> (List a domain / Bulk list / Appraise a domain / Transfer, each with an icon and a one&#8209;line description).</dd></div>
+    </dl>
+    <p class="wide"><span class="badge risk">data quality note</span>&nbsp; the Figma file's own placeholder numbers don't agree with each other &mdash; the Domains card says 24, the category tabs sum to 45 (and "All domain" alone says 14,208), and the sidebar's "My domains" badge says 80. Treat none of these as real reference numbers, only the labels/format are meaningful. The sidebar's promo card is a further case of the same thing: its Figma layer text literally reads "Taiko is Ethereum, enhanced" (an unrelated leftover string), while the rendered screenshot correctly shows "What Is Your Name Worth?" &mdash; the screenshot is ground truth there, not the layer.</p>
+
+    <h3 style="margin-top:28px; font-size:1.05rem;">04b &mdash; Grid/list card views (second reference, node 375:51246)</h3>
+    <p class="lede">A separate Figma file supplies the two view&#8209;toggle states in full: "Property 1=Default" (node 375:51245, the list/table view, confirming the column layout above) and "Property 1=Variant2" (node 375:51247, a 3&#8209;column card grid). The view toggle built earlier was visual only; this reference is what made it real.</p>
+    <dl class="facts">
+      <div><dt>Confirmed vs. guessed</dt><dd>The list view matches what was already built, with two corrections: a circular domain avatar icon precedes the name in every row/card (missed originally), and EST. value carries a High/Low <code>TrendIndicator</code> the first pass didn't have. Price and EST. value both render USD only in this reference, not ETH + USD as first guessed.</dd></div>
+      <div><dt>Status color, corrected</dt><dd>Only <code>for&#8209;sale</code> rows get a colored (green) left edge. The first pass invented a 5&#8209;color mapping across every status before this reference existed &mdash; that guess is wrong and has been corrected to match.</dd></div>
+      <div><dt>New element: Status legend</dt><dd>A small "Status &nbsp;Not Listed&nbsp; For sale" badge pair sits above the column headers in both views &mdash; a legend for the left&#8209;edge color, not an interactive filter. Present in the very first full&#8209;page screenshot too, but missed until this reference made it unambiguous.</dd></div>
+      <div><dt>Card layout</dt><dd>Same fields as the row, rearranged: a status badge and interest counts across the top, the domain identity block, then two 2&#8209;column stat rows (EST. value + Renewal, then Price + Action).</dd></div>
+    </dl>
+  </section>
+
+  <section id="components">
+    <div class="section-head"><span class="section-num">05</span><h2 class="section-title">Component architecture</h2></div>
+    <p class="wide"><span class="badge kept">built</span>&nbsp; the tree below is as-built, live at <span class="path">pages/design-preview/account/my-domains.tsx</span> &mdash; a temporary preview route, same convention as the marketplace redesign's own preview page, not yet linked from <span class="path">pages/profile/domains/index.tsx</span> pending Phase 04's route decision.</p>
+    <div class="code-card">
+      <div class="code-label"><span>component tree</span><span>pages/design-preview/account/my-domains.tsx</span></div>
+      <pre>Header                                      <span class="cm">— existing, reused as-is</span>
+MarketplacePageShell                        <span class="cm">— existing, reused as-is</span>
+  MarketplaceSidebar                        <span class="cm">— existing, + new initialSelectedId prop</span>
+  MobileDrawerMenu                          <span class="cm">— existing, reused as-is</span>
+  (main column)
+    MyDomainsHeroBanner                      <span class="cm">— built: gradient bar, Bulk List + List a domain</span>
+    MyDomainsCategoryTabs                    <span class="cm">— built: thin adapter over existing ListingCategoryTabs</span>
+    ListingsHeading                          <span class="cm">— existing, reused as-is ("Live Listings" + count)</span>
+    MyDomainsFilterBar
+      SearchInput                            <span class="cm">— existing</span>
+      FilterDropdown × 3                     <span class="cm">— existing (Extension, Chain, Sort)</span>
+      ViewToggle                             <span class="cm">— built: grid/list, now genuinely switches MyDomainsTable</span>
+    MyDomainsTable                            <span class="cm">— built: status legend + real list/grid switch on viewMode</span>
+      MyDomainRow × N                          <span class="cm">— list mode</span>
+        DomainAvatar                            <span class="cm">— built: new primitive, generic circular mark</span>
+        ExtensionBadge, ChainBadge, TrendIndicator  <span class="cm">— existing primitives</span>
+        Action button                           <span class="cm">— Edit Price / List, intentionally inert — see §08</span>
+      MyDomainCard × N                         <span class="cm">— built: new, grid mode, same fields as MyDomainRow</span>
+  (right rail)
+    PortfolioStatsRow
+      StatCard × 4                           <span class="cm">— built: new primitive, gradient variant prop</span>
+    InfoListCard × 3                         <span class="cm">— built: new shared primitive</span>
+      NeedsAttentionPanel
+      MostViewedPanel
+      QuickActionsPanel</pre>
+    </div>
+    <p class="wide"><code>formatMyDomain.ts</code> holds the USD/renewal formatters and the trend/status label maps <code>MyDomainRow</code> and <code>MyDomainCard</code> both need &mdash; written once, since a row and a card rendering the exact same fields drifting out of sync would be a worse outcome than a small shared file.</p>
+    <p class="wide"><strong>Why one <code>InfoListCard</code>, not three bespoke panels:</strong> Needs Attention, Getting The Most Views, and Quick Actions are visually identical containers &mdash; a title, a divided list of rows, each row an icon avatar + a two&#8209;line label block + trailing content. Only the trailing content and the row data differ (a "Review" link, a view/save count pair, or a static description). One component with a row&#8209;renderer prop covers all three, mirroring how the marketplace redesign's <code>ListingRow</code> was split into reusable cell pieces.</p>
+    <p class="wide"><strong>Reuse found while building, beyond what section 02 anticipated:</strong> <code>MyDomainsCategoryTabs</code> needed zero new styling &mdash; it's a data adapter over the marketplace redesign's existing <code>ListingCategoryTabs</code>, not a new component. <code>ListingsHeading</code> ("Live Listings" + a count) is reused verbatim, since this design's table heading turned out to say the exact same thing.</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Component</th><th>Status</th><th>Data required</th></tr></thead>
+        <tbody>
+          <tr><td>StatCard</td><td><span class="badge added">built</span></td><td>label, value, sublabel, gradient variant</td></tr>
+          <tr><td>InfoListCard</td><td><span class="badge added">built</span></td><td>title, rows (icon, title, subtitle, trailing), icon variant</td></tr>
+          <tr><td>ViewToggle</td><td><span class="badge added">built</span></td><td>local state only</td></tr>
+          <tr><td>MyDomainsHeroBanner</td><td><span class="badge added">built</span></td><td>static copy + two action callbacks (unwired)</td></tr>
+          <tr><td>PortfolioStatsRow</td><td><span class="badge added">built</span></td><td><code>MyDomainsSummary</code></td></tr>
+          <tr><td>MyDomainsCategoryTabs</td><td><span class="badge added">built</span></td><td><code>MyDomainsStatusCounts</code>, active status</td></tr>
+          <tr><td>MyDomainsFilterBar</td><td><span class="badge added">built</span></td><td>local filter state, real search/extension/chain filtering</td></tr>
+          <tr><td>MyDomainsTable</td><td><span class="badge added">built</span></td><td><code>MyDomainListing[]</code>, <code>viewMode</code> &mdash; genuinely switches list/grid</td></tr>
+          <tr><td>MyDomainRow (list), MyDomainCard (grid)</td><td><span class="badge added">built</span></td><td><code>MyDomainListing</code> &mdash; identical fields, two layouts</td></tr>
+          <tr><td>DomainAvatar</td><td><span class="badge added">built</span></td><td>none &mdash; generic mark, same in every row/card</td></tr>
+          <tr><td>NeedsAttentionPanel, MostViewedPanel, QuickActionsPanel</td><td><span class="badge added">built</span></td><td><code>MyDomainListing[]</code> (filtered/sorted) or <code>QuickAction[]</code></td></tr>
+          <tr><td>SearchInput, FilterDropdown, ExtensionBadge, ChainBadge, ListingCategoryTabs, ListingsHeading, MarketplacePageShell, MarketplaceSidebar, MobileDrawerMenu</td><td><span class="badge kept">existing</span></td><td>reused from the marketplace redesign, unchanged</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="data-models">
+    <div class="section-head"><span class="section-num">06</span><h2 class="section-title">Data models</h2></div>
+    <p class="lede">Updated at <span class="path">src/types/my-domains/</span> this session to match the design. <code>status</code> replaces the old boolean <code>isListed</code>/<code>category</code> with the five&#8209;way split the tabs need; <code>estimatedValueEth/Usd</code>, <code>views</code>, and <code>savedCount</code> are new fields with no API precedent at all.</p>
+    <div class="code-card">
+      <div class="code-label"><span>src/types/my-domains/domain.ts</span><span>done</span></div>
+      <pre><span class="kw">export type</span> DomainStatus = <span class="str">'for-sale'</span> | <span class="str">'not-listed'</span> | <span class="str">'sold'</span> | <span class="str">'expiring-soon'</span> | <span class="str">'expired'</span>
+
+<span class="kw">export interface</span> MyDomainListing &#123;
+  id: string
+  domainName: string
+  extension: string
+  lengthChars: number
+  chain: Chain                     <span class="cm">// reused from @/types/marketplace</span>
+  status: DomainStatus
+  blockchainStatus: <span class="str">'Pending'</span> | <span class="str">'Success'</span> | <span class="str">'Failed'</span>
+  isPremium?: boolean
+  listingId?: string
+  tokenId?: string
+  priceEth?: number                <span class="cm">// only when status is 'for-sale'</span>
+  priceUsd?: number
+  estimatedValueEth: number
+  estimatedValueUsd: number
+  appraisedTrend: <span class="str">'high'</span> | <span class="str">'low'</span> | <span class="str">'neutral'</span>   <span class="cm">// added for the card/list reference's TrendIndicator</span>
+  views: number
+  savedCount: number
+  renewalTimestamp: number
+&#125;
+
+<span class="kw">export interface</span> MyDomainsSummary &#123;
+  domains: MyDomainListing[]
+  pagination: MyDomainsPagination
+  statusCounts: Record&lt;DomainStatus | <span class="str">'all'</span>, number&gt;
+  totalDomains: number
+  estimatedValueEth: number
+  estimatedValueUsd: number
+  listedValueEth: number
+  soldCount: number
+  soldValueUsd: number
+&#125;</pre>
+    </div>
+    <p class="wide"><code>QuickAction</code> lives in its own file, <span class="path">src/types/my-domains/actions.ts</span>, since it's a different concept (a static action descriptor, not a domain) &mdash; same split the marketplace types use between <span class="path">domain.ts</span>, <span class="path">activity.ts</span>, and <span class="path">analytics.ts</span>.</p>
+  </section>
+
+  <section id="static-data">
+    <div class="section-head"><span class="section-num">07</span><h2 class="section-title">Static data</h2></div>
+    <p class="lede">Updated at <span class="path">src/data/my-domains/</span> this session. <span class="path">domains.ts</span> now generates 24 domains with a realistic status spread (11 for&#8209;sale, 8 not&#8209;listed, 3 sold, 1 expiring&#8209;soon, 1 expired), derives <code>statusCounts</code> and the four portfolio totals from that same array instead of hand&#8209;typing them, and exports two derived slices, <code>mockNeedsAttention</code> (expiring&#8209;soon + expired) and <code>mockMostViewed</code> (sorted by <code>views</code>), rather than inventing separate fixture shapes for the two right&#8209;rail panels that are really just filtered views of the same list. <span class="path">actions.ts</span> holds the four static Quick Actions, copied verbatim from the Figma layer text.</p>
+    <p class="wide"><span class="badge kept">built</span>&nbsp; <span class="path">src/hooks/my-domains/useMyDomainsFilters.ts</span> is the filter&#8209;state half of this &mdash; local search/extension/chain/sort state plus <code>filterMyDomains()</code>, real logic the page actually calls, not a sketch. The data&#8209;fetch half below, <code>useMyDomains</code> itself (the swap boundary to the real API), is still the one piece of section 07 not built yet:</p>
+    <div class="code-card">
+      <div class="code-label"><span>src/hooks/my-domains/useMyDomains.ts</span><span>today &#8594; later, not yet built</span></div>
+      <pre><span class="cm">// today</span>
+<span class="kw">export function</span> useMyDomains(params: MyDomainsQueryParams) &#123;
+  <span class="kw">return</span> mockMyDomainsSummary
+&#125;
+
+<span class="cm">// later — same export shape</span>
+<span class="kw">export function</span> useMyDomains(params: MyDomainsQueryParams) &#123;
+  <span class="kw">const</span> &#123; data &#125; = useGetDomainSummaryByUserQuery(params)
+  <span class="kw">const</span> &#123; data: expiry &#125; = useGetDomainExpiryDateQuery(undefined, &#123; pollingInterval: 60_000 &#125;)
+  <span class="kw">return</span> useMemo(() =&gt; toMyDomainsSummary(data, expiry), [data, expiry])
+&#125;</pre>
+    </div>
+  </section>
+
+  <section id="gaps">
+    <div class="section-head"><span class="section-num">08</span><h2 class="section-title">Reused logic, and confirmed gaps</h2></div>
+    <p class="lede">Unlike the marketplace redesign, where Buy Now stays permanently inert, most of this page's buttons already have real, working logic behind them today &mdash; the job is reconnecting UI, not building new transactions.</p>
+    <p class="wide"><span class="badge pending">decision</span>&nbsp; for this build pass, every action below was deliberately left inert &mdash; visually real, no handler wired &mdash; rather than guessing at the open questions in this table. That was an explicit choice, not a blocked checkpoint: wiring them for real is still Phase 08's job once Edit Price/DeList/Promote/Transfer are confirmed, most likely informed by the new Figma updates coming next.</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Design element</th><th>Existing logic to reuse</th></tr></thead>
+        <tbody>
+          <tr><td>"List a domain" (hero + Quick Actions)</td><td><code>DomainListingModal</code>, wired from <code>DomainItem</code> today</td></tr>
+          <tr><td>"Bulk List" (hero + Quick Actions)</td><td><code>DomainBulkListingModal</code>, already built and used from <span class="path">domains-list/index.tsx</span></td></tr>
+          <tr><td>"Appraise a domain" (Quick Actions)</td><td><code>DomainAppraiselModal</code> + <code>useSetDomainAppraiselMutation</code></td></tr>
+          <tr><td>Row "Edit Price" action</td><td><span class="badge risk">unclear</span> &mdash; likely the same reprice flow inside <code>DomainListingModal</code>, needs confirming since the old page never exposed a standalone reprice action</td></tr>
+          <tr><td>Delist</td><td><span class="badge risk">not visible in this design</span> &mdash; the old page's DeList button doesn't appear in the table's Action column; may live behind a secondary menu not shown in the static screenshot, or be dropped from this page</td></tr>
+          <tr><td>Promote</td><td><span class="badge risk">not visible in this design</span> &mdash; no per&#8209;row Promote button here, unlike the current page</td></tr>
+          <tr><td>"Transfer" (Quick Actions)</td><td><span class="badge risk">confirmed gap</span> &mdash; no mutation, modal, or hook for domain transfer exists anywhere in the codebase today; this is new, not a reskin</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="folders">
+    <div class="section-head"><span class="section-num">09</span><h2 class="section-title">Proposed folder structure</h2></div>
+    <div class="code-card">
+      <div class="code-label"><span>src/</span><span>as-built</span></div>
+      <pre>types/my-domains/          domain, actions, index — <span class="cm">done</span>
+data/my-domains/           domains, actions — <span class="cm">done</span>
+hooks/my-domains/          useMyDomainsFilters — <span class="cm">done</span>; useMyDomains (API swap) — <span class="cm">pending</span>
+design-system/
+  primitives/
+    cards/                  stat-card, info-list-card       <span class="cm">done</span>
+    toggles/                view-toggle                      <span class="cm">done</span>
+    avatars/                domain-avatar                     <span class="cm">done</span>
+  composites/
+    my-domains/
+      hero/                  MyDomainsHeroBanner              <span class="cm">done</span>
+      summary/               PortfolioStatsRow                <span class="cm">done</span>
+      listings/              MyDomainsCategoryTabs, MyDomainsFilterBar, MyDomainsTable,
+                              MyDomainRow, MyDomainCard, formatMyDomain.ts  <span class="cm">done</span>
+      right-rail/            NeedsAttentionPanel, MostViewedPanel, QuickActionsPanel  <span class="cm">done</span>
+      index.ts                <span class="cm">curated barrel — done</span>
+public/assets/img/my-domains/   real Figma-exported icons/texture — <span class="cm">done</span>
+pages/design-preview/account/my-domains.tsx  <span class="cm">preview route — done</span></pre>
+    </div>
+    <p class="wide">Read only, untouched: the on&#8209;chain transaction logic and modal wiring inside <span class="path">src/component/domain-self-item/index.tsx</span> &mdash; still waiting on Phase 04's answer for how it gets triggered from the new UI.</p>
+  </section>
+
+  <section id="phases">
+    <div class="section-head"><span class="section-num">10</span><h2 class="section-title">Implementation phases</h2></div>
+    <p class="lede">Twelve phases. Phase 04's checkpoint is still genuinely open, but 05&#8211;09 didn't have to wait on it &mdash; they were built with every action intentionally inert instead, so the visual and data layer could move ahead without guessing at Edit Price/DeList/Promote/Transfer. That guess still can't be avoided forever: it's now the gate in front of Phase 08's real work (wiring) rather than in front of Phase 05.</p>
+    <ol class="rail">
+      <li><p class="step-num">01 <span class="badge kept">done</span></p><h3>Current page analysis</h3><p>Data flow, API shapes, and on&#8209;chain action logic mapped.</p></li>
+      <li><p class="step-num">02 <span class="badge kept">done</span></p><h3>Initial data models</h3><p>First pass at <span class="path">types/my-domains</span> and <span class="path">data/my-domains</span>, before the design existed.</p></li>
+      <li><p class="step-num">03 <span class="badge kept">done</span></p><h3>Design pulled, models revised</h3><p>Figma node 50:6190 read element by element; types and mock data updated to match, typechecked clean.</p></li>
+      <li class="checkpoint"><p class="step-num">04 <span class="badge risk">still open</span></p><h3>Confirm action semantics</h3><p>Edit Price vs DeList vs Promote, the route (per §04's sidebar finding), and now also whatever the incoming Figma updates change. Not blocking 05&#8211;09 in the meantime, but blocking real wiring.</p></li>
+      <li><p class="step-num">05 <span class="badge kept">done</span></p><h3>StatCard + PortfolioStatsRow</h3><p>One primitive, four gradient variants, real totals from <code>MyDomainsSummary</code>.</p></li>
+      <li><p class="step-num">06 <span class="badge kept">done</span></p><h3>Hero banner</h3><p><code>MyDomainsHeroBanner</code> built; Bulk List/List a domain render but are inert (see §08 decision), not wired to their existing modals yet.</p></li>
+      <li><p class="step-num">07 <span class="badge kept">done</span></p><h3>Category tabs + filter bar</h3><p><code>MyDomainsCategoryTabs</code>, <code>ListingsHeading</code>, <code>MyDomainsFilterBar</code> on existing <code>SearchInput</code>/<code>FilterDropdown</code>, new <code>ViewToggle</code> &mdash; search/extension/chain/status filtering all genuinely work.</p></li>
+      <li><p class="step-num">08 <span class="badge changed">built, inert</span></p><h3>Listings table</h3><p><code>MyDomainsTable</code> built with a genuinely working list/grid switch (<code>MyDomainRow</code> / <code>MyDomainCard</code>, per the second Figma reference) rendering real mock data; every action button is intentionally inert, per the §08 decision, until Phase 04 resolves.</p></li>
+      <li><p class="step-num">09 <span class="badge kept">done</span></p><h3>Right rail</h3><p><code>InfoListCard</code> primitive, then the three panels built on it, all rendering real (mock) data.</p></li>
+      <li><p class="step-num">10</p><h3>useMyDomains hook</h3><p>Swap the mock for <code>useGetDomainSummaryByUserQuery</code> + the expiry join, per section 07's boundary. Not started.</p></li>
+      <li><p class="step-num">11</p><h3>Responsive pass</h3><p>The card grid already reflows 3&#8594;2&#8594;1 columns by breakpoint, and list mode has a simplified stacked mobile layout; the marketplace table's full fixed+scroll&#8209;pane split for list mode, and real device&#8209;width verification generally, are still pending.</p></li>
+      <li><p class="step-num">12</p><h3>Integration + validation</h3><p>Wire into the route decided at Phase 04, run the full checklist. Not started.</p></li>
+    </ol>
+  </section>
+
+  <section id="validation">
+    <div class="section-head"><span class="section-num">11</span><h2 class="section-title">Validation checklist</h2></div>
+    <p class="lede">Checked so far, against the actual build:</p>
+    <ul class="plain">
+      <li><span class="badge kept">verified</span> <code>tsc --noEmit</code> clean, <code>next lint</code> clean (only pre&#8209;existing <code>&lt;img&gt;</code>/Sass&#8209;import warnings already present elsewhere in this codebase).</li>
+      <li><span class="badge kept">verified</span> Dev server renders <span class="path">/design-preview/account/my-domains</span> with a 200 and every expected string present (hero copy, all four stat cards, all six tabs, all six table columns, all three right&#8209;rail panels) &mdash; checked directly against the rendered HTML, not assumed from the code.</li>
+      <li><span class="badge kept">verified</span> Category tabs' counts equal the sum of <code>statusCounts</code>, derived from the same mock array rather than hand&#8209;typed.</li>
+      <li><span class="badge kept">verified</span> Search, extension, chain, and status&#8209;tab filtering all genuinely narrow the table &mdash; not decorative.</li>
+      <li><span class="badge kept">verified</span> All new Figma&#8209;sourced icon/texture assets return 200 from the dev server.</li>
+      <li><span class="badge kept">verified</span> Both view modes render correctly server&#8209;side (checked directly, not assumed) &mdash; list mode's six columns and grid mode's cards, including the status legend present in both.</li>
+      <li><span class="badge risk">pending</span> List, Bulk List, Appraise, and whatever Edit Price resolves to at Phase 04 trigger their real modals and on&#8209;chain calls &mdash; not yet, everything is intentionally inert this pass.</li>
+      <li><span class="badge risk">pending</span> Manual check at mobile/tablet/desktop widths against a real browser render (only render&#8209;correctness was checked via HTML, not a visual pass).</li>
+      <li><span class="badge risk">pending</span> Sidebar's promo card copy, and the page's server&#8209;side auth redirect once this moves off the preview route.</li>
+    </ul>
+  </section>
+
+  <section id="risks">
+    <div class="section-head"><span class="section-num">12</span><h2 class="section-title">Risks and open items</h2></div>
+    <ul class="risk-list">
+      <li>The design's sidebar is the marketplace redesign's sidebar reused wholesale, not the old <code>ProfileSidebar</code> &mdash; open question whether "My Domains" moves out of <span class="path">/profile/*</span> into the same shell/route family as the marketplace page. Needs a decision at Phase 04, not an assumption.</li>
+      <li>The table's Action column reads "Edit Price," with no DeList or Promote button visible per row, unlike the current page's actual behavior. Whether these moved to a secondary menu, got cut, or "Edit Price" is meant to cover reprice only is unconfirmed.</li>
+      <li>"Transfer" in Quick Actions has no existing mutation, modal, or API hook anywhere in the codebase &mdash; a genuinely new feature, not a reskin, and out of scope for this plan's phases unless explicitly added.</li>
+      <li>The Figma file's own placeholder numbers are mutually inconsistent (24 vs a 45 sum vs 14,208 vs 80) &mdash; none of them should be treated as real reference values, only the labels and layout.</li>
+      <li>Self&#8209;correction, not a new risk: the first pass guessed a 5&#8209;color left&#8209;edge mapping and Price/EST. value both showing ETH+USD, before the card/list reference (node 375:51246) existed. Both were wrong and are now fixed &mdash; a reminder that anything not yet confirmed by an actual Figma pull in this doc is a guess, flagged or not.</li>
+      <li>The on&#8209;chain delist/list logic in <code>DomainItem</code> is tightly coupled to per&#8209;chain env&#8209;keyed contract/ABI maps; moving or splitting this component needs care to avoid duplicating that logic.</li>
+      <li><code>DomainResponse</code> is declared twice elsewhere in the codebase with different shapes (<span class="path">Domain.ts</span> vs <span class="path">DomainList.ts</span>) &mdash; same landmine flagged in the marketplace plan, still unresolved.</li>
+      <li>The real API applies its own listed/unlisted filtering server&#8209;side, and the old page re&#8209;filters again client&#8209;side on top of that &mdash; worth resolving which layer owns filtering (now across five statuses, not two) before <code>useMyDomains</code> is wired to the real query.</li>
+    </ul>
+  </section>
+
+  <footer class="close">
+    Companion to <span class="path">marketplace-redesign-plan.html</span> at the repo root, same format. Figma references: node 50:6190 in file hq6HmB04UFUlFiJp9f9eGv (the page); node 375:51246 in file RsuK6KTlnOHlhquXKDGOum (the grid/list card views). Sections 04/05 and the phase list are expected to change again as further Figma updates arrive &mdash; this snapshot reflects the build as of the inert first pass, not a final state.
+  </footer>
+
+</div>

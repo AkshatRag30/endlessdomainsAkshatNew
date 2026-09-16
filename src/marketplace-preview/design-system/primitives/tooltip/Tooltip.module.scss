@@ -1,0 +1,46 @@
+// Themed, fast-appearing replacement for the native title="" tooltip.
+// Native browser tooltips are unstyled OS chrome and take ~500ms-1s to
+// appear (varies by browser/OS, not controllable) — this one is themed to
+// match the app and appears in well under half that.
+
+.wrap {
+  position: relative;
+  display: inline-flex;
+  min-width: 0;
+
+  &::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 0;
+    bottom: calc(100% + 8px);
+    z-index: 50;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background: var(--color-black-primary);
+    color: var(--color-white-primary);
+    font-family: var(--font-satoshi);
+    font-size: 12px;
+    font-weight: var(--font-weight-medium);
+    line-height: 1.3;
+    white-space: nowrap;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(4px);
+    pointer-events: none;
+    // Hiding: fades out over 120ms, then (only once invisible) drops out
+    // of the layout — so un-hovering doesn't just cut it off mid-fade.
+    transition: opacity 0.12s ease, transform 0.12s ease, visibility 0s linear 0.12s;
+  }
+
+  &:hover::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    // Showing: visibility flips immediately, but the fade itself waits
+    // ~120ms before starting — long enough that brushing past on the way
+    // to something else doesn't flash a tooltip, short enough to still
+    // read as "fast" against a native tooltip's much longer, fixed delay.
+    transition: opacity 0.12s ease 0.12s, transform 0.12s ease 0.12s, visibility 0s linear 0s;
+  }
+}

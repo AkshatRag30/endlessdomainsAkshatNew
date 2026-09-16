@@ -2,9 +2,15 @@
 
 // Figma node 50:6225. Column proportions loosely mirror the marketplace
 // redesign's ListingRow (same 6-column idea, one extra column for Interest).
+// Action's share was bumped from 1fr — with PrimaryButton now correctly
+// refusing to shrink or wrap its label (see Primarybutton.module.scss),
+// 1fr wasn't wide enough at laptop widths to fit "Edit Price" without the
+// button overflowing past the column's own right edge. Must match
+// MyDomainsTable.module.scss's .header ratio exactly, or the header and
+// rows drift out of alignment.
 .row {
   display: grid;
-  grid-template-columns: 2.2fr 1fr 1.2fr 1fr 0.9fr 1fr;
+  grid-template-columns: 2fr 0.9fr 1.1fr 0.9fr 0.8fr 1.4fr;
   align-items: center;
   min-height: 60px;
   background: var(--color-white-primary);
@@ -50,6 +56,16 @@
   flex-direction: row;
   align-items: center;
 
+  // PrimaryButton's own desktop padding (--space-5, 20px each side) is
+  // sized for standalone marketing buttons — inside a table cell that's
+  // still tight even after widening the column above, so it's trimmed
+  // here specifically. Targets the plain `button` tag, not a class, so it
+  // wins regardless of CSS module load order (same pattern used for the
+  // hero's Bulk List button).
+  button {
+    padding: 0 var(--space-3);
+  }
+
   @include mobile {
     flex: 1 1 100%;
     justify-content: flex-end;
@@ -88,7 +104,17 @@
   min-width: 0;
 }
 
+// Tooltip's own .wrap is what the flex row above actually shrinks (it's
+// the direct flex child now, not .domainName) — needs the shrink/min-width
+// pair itself so .domainName inside it has a real width to truncate against.
+.domainNameTooltip {
+  flex: 1;
+  min-width: 0;
+}
+
 .domainName {
+  display: block;
+  width: 100%;
   font-family: var(--font-satoshi);
   font-weight: var(--font-weight-medium);
   font-size: var(--text-small-13);

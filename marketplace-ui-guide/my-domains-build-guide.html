@@ -1,0 +1,446 @@
+<title>My Domains Build Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=Work+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+
+  :root{
+    --paper:#f6f5f0; --surface:#ffffff; --surface-alt:#ece9e0;
+    --ink:#1b2024; --ink-soft:#5c6570; --ink-faint:#8a919b;
+    --border:#dedacf; --border-strong:#c9c4b6;
+    --accent:#1f6f6b; --accent-strong:#123f3d; --accent-tint:#dceeeb;
+    --kept:#2f7d46; --kept-tint:#e4f2e7;
+    --changed:#a8710a; --changed-tint:#fbefda;
+    --added:#1f6f6b; --added-tint:#dceeeb;
+    --risk:#b03a2e; --risk-tint:#f8e3e0;
+    --code-bg:#20262b; --code-ink:#e7e4da; --code-accent:#7fd4c9; --code-string:#e2b06b; --code-comment:#7a8a86;
+    --shadow: 0 1px 2px rgba(27,32,36,.04), 0 8px 24px -12px rgba(27,32,36,.12);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#14181a; --surface:#1b2124; --surface-alt:#20272a;
+      --ink:#eeece4; --ink-soft:#a9b0ac; --ink-faint:#767f7c;
+      --border:#2c3437; --border-strong:#3a4346;
+      --accent:#5fc0b7; --accent-strong:#8ad9d0; --accent-tint:#1c3532;
+      --kept:#6fbf7f; --kept-tint:#1d2f22;
+      --changed:#d9a44f; --changed-tint:#332a17;
+      --added:#5fc0b7; --added-tint:#1c3532;
+      --risk:#e08074; --risk-tint:#3a211d;
+      --code-bg:#101416; --code-ink:#dfe6e3; --code-accent:#8ad9d0; --code-string:#e8bd7c; --code-comment:#61706c;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#14181a; --surface:#1b2124; --surface-alt:#20272a;
+    --ink:#eeece4; --ink-soft:#a9b0ac; --ink-faint:#767f7c;
+    --border:#2c3437; --border-strong:#3a4346;
+    --accent:#5fc0b7; --accent-strong:#8ad9d0; --accent-tint:#1c3532;
+    --kept:#6fbf7f; --kept-tint:#1d2f22;
+    --changed:#d9a44f; --changed-tint:#332a17;
+    --added:#5fc0b7; --added-tint:#1c3532;
+    --risk:#e08074; --risk-tint:#3a211d;
+    --code-bg:#101416; --code-ink:#dfe6e3; --code-accent:#8ad9d0; --code-string:#e8bd7c; --code-comment:#61706c;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+  }
+
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:var(--paper); color:var(--ink); font-family:"Work Sans", -apple-system, "Segoe UI", sans-serif; line-height:1.6; font-size:16px; }
+  h1,h2,h3{ font-family:"Source Serif 4", Georgia, serif; color:var(--ink); text-wrap:balance; margin:0; }
+  code, .mono, .path{ font-family:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace; }
+  a{ color:var(--accent-strong); }
+
+  .wrap{ max-width:920px; margin:0 auto; padding:0 24px 96px; }
+
+  header.masthead{ padding:64px 0 36px; border-bottom:1px solid var(--border); }
+  .eyebrow{ font-family:"JetBrains Mono", monospace; font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color:var(--accent-strong); margin:0 0 14px; }
+  h1.title{ font-size:2.4rem; font-weight:600; line-height:1.12; max-width:22ch; }
+  .dek{ margin:16px 0 0; max-width:62ch; color:var(--ink-soft); font-size:1.05rem; }
+
+  dl.meta-strip{ display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); gap:18px 24px; margin:32px 0 0; padding:20px 22px; background:var(--surface); border:1px solid var(--border); border-radius:10px; }
+  .meta-strip div{ display:flex; flex-direction:column; gap:4px; }
+  .meta-strip dt{ font-size:.66rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint); }
+  .meta-strip dd{ margin:0; font-size:.84rem; color:var(--ink); font-family:"JetBrains Mono", monospace; }
+
+  nav.toc{ display:flex; flex-wrap:wrap; gap:6px 16px; padding:18px 0 0; font-size:.82rem; }
+  nav.toc a{ color:var(--ink-soft); text-decoration:none; padding:2px 0; border-bottom:1px solid transparent; }
+  nav.toc a:hover{ color:var(--accent-strong); border-color:var(--accent); }
+
+  section{ padding:44px 0; border-bottom:1px solid var(--border); }
+  section:last-of-type{ border-bottom:none; }
+  .section-head{ display:flex; align-items:baseline; gap:14px; margin-bottom:20px; }
+  .section-num{ font-family:"JetBrains Mono", monospace; color:var(--accent); font-size:.9rem; font-weight:600; }
+  h2.section-title{ font-size:1.4rem; font-weight:600; }
+  h3.sub-title{ font-family:"Source Serif 4", serif; font-size:1.08rem; font-weight:600; margin:28px 0 10px; }
+  .lede{ max-width:68ch; color:var(--ink-soft); margin:0 0 18px; }
+  p{ max-width:68ch; } p.wide{ max-width:none; }
+
+  .phase{ border:1px solid var(--border); border-left:3px solid var(--accent); border-radius:8px; background:var(--surface); box-shadow:var(--shadow); padding:20px 22px; margin-bottom:16px; }
+  .phase.checkpoint{ border-left-color:var(--risk); }
+  .phase-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:10px; }
+  .phase-num{ font-family:"JetBrains Mono", monospace; font-size:.72rem; color:var(--ink-faint); letter-spacing:.08em; text-transform:uppercase; }
+  .phase-title{ font-family:"Source Serif 4", serif; font-size:1.15rem; font-weight:600; margin:2px 0 0; }
+  .phase-badges{ display:flex; gap:6px; flex-wrap:wrap; }
+  .badge{ display:inline-block; font-size:.64rem; font-weight:600; letter-spacing:.03em; padding:3px 9px; border-radius:999px; white-space:nowrap; }
+  .badge.kept{ background:var(--kept-tint); color:var(--kept); }
+  .badge.changed{ background:var(--changed-tint); color:var(--changed); }
+  .badge.added{ background:var(--added-tint); color:var(--added); }
+  .badge.risk{ background:var(--risk-tint); color:var(--risk); }
+  .phase dl.facts{ margin:12px 0; display:grid; gap:10px; }
+  .phase dl.facts > div{ display:grid; grid-template-columns:120px 1fr; gap:14px; font-size:.86rem; }
+  .phase dl.facts dt{ font-weight:600; color:var(--ink); }
+  .phase dl.facts dd{ margin:0; color:var(--ink-soft); }
+  .phase dl.facts dd .path{ color:var(--accent-strong); font-size:.82rem; }
+  .phase p.decisions{ font-size:.9rem; color:var(--ink-soft); max-width:none; margin:10px 0; }
+  .phase p.verify{ font-size:.82rem; color:var(--ink-faint); margin:10px 0 0; padding-top:10px; border-top:1px dotted var(--border-strong); }
+  .phase p.verify strong{ color:var(--kept); }
+
+  .table-scroll{ overflow-x:auto; border:1px solid var(--border); border-radius:10px; margin:14px 0; }
+  table{ width:100%; border-collapse:collapse; background:var(--surface); font-size:.84rem; }
+  table th{ text-align:left; font-family:"JetBrains Mono", monospace; font-size:.64rem; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-faint); padding:10px 13px; border-bottom:1px solid var(--border); white-space:nowrap; }
+  table td{ padding:11px 13px; border-bottom:1px solid var(--border); vertical-align:top; color:var(--ink-soft); }
+  table td.path, table td strong{ color:var(--ink); }
+  table tr:last-child td{ border-bottom:none; }
+
+  .code-card{ background:var(--code-bg); color:var(--code-ink); border-radius:10px; overflow:hidden; box-shadow:var(--shadow); margin:16px 0; }
+  .code-card .code-label{ display:flex; align-items:center; justify-content:space-between; padding:9px 16px; font-family:"JetBrains Mono", monospace; font-size:.7rem; letter-spacing:.04em; color:var(--code-comment); border-bottom:1px solid rgba(255,255,255,.08); }
+  .code-card pre{ margin:0; padding:16px; overflow-x:auto; font-family:"JetBrains Mono", monospace; font-size:.79rem; line-height:1.6; }
+  .code-card .cm{ color:var(--code-comment); }
+  .code-card .kw{ color:var(--code-accent); }
+  .code-card .str{ color:var(--code-string); }
+
+  ul.plain{ margin:0; padding:0; list-style:none; display:grid; gap:10px; }
+  ul.plain li{ padding-left:18px; position:relative; font-size:.94rem; color:var(--ink-soft); max-width:68ch; }
+  ul.plain li::before{ content:""; position:absolute; left:0; top:.55em; width:6px; height:6px; border-radius:50%; background:var(--accent); }
+
+  .lesson{ background:var(--accent-tint); border:1px solid var(--accent); border-radius:8px; padding:14px 16px; margin:14px 0; font-size:.88rem; color:var(--ink); max-width:none; }
+  .lesson strong{ color:var(--accent-strong); }
+
+  .effort-pill{ display:inline-flex; align-items:center; font-size:.7rem; font-weight:600; padding:3px 10px; border-radius:999px; }
+  .effort-easy{ background:var(--kept-tint); color:var(--kept); }
+  .effort-medium{ background:var(--changed-tint); color:var(--changed); }
+  .effort-hard{ background:var(--risk-tint); color:var(--risk); }
+
+  footer.close{ padding:44px 0 0; color:var(--ink-faint); font-size:.82rem; }
+
+  @media (max-width:640px){
+    h1.title{ font-size:1.9rem; max-width:none; }
+    .phase dl.facts > div{ grid-template-columns:1fr; gap:2px; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Build guide &middot; how it's structured, how to build it by hand, how it plugs into the real app</p>
+    <h1 class="title">My Domains Build Guide</h1>
+    <p class="dek">A walkthrough of the signed&#8209;in user's domain portfolio page, why it's structured the way it is, every real decision and bug fix made building it, and what's left before it's a real page in the app instead of a preview route.</p>
+
+    <dl class="meta-strip">
+      <div><dt>Preview</dt><dd class="path">/design-preview/account/my-domains</dd></div>
+      <div><dt>Status</dt><dd>Core UI built, all actions inert</dd></div>
+      <div><dt>New files</dt><dd>&#8776; 65</dd></div>
+      <div><dt>Figma nodes pulled</dt><dd>2 real files, 5 nodes</dd></div>
+      <div><dt>Assets downloaded</dt><dd>15 real, 0 fabricated</dd></div>
+      <div><dt>New dependencies</dt><dd>none</dd></div>
+    </dl>
+
+    <nav class="toc">
+      <a href="#structure">How it's structured</a>
+      <a href="#byhand">Building it by hand</a>
+      <a href="#phases">Phase by phase</a>
+      <a href="#files">File manifest</a>
+      <a href="#api">Real API integration</a>
+      <a href="#sidebar">Becoming a real page in the sidebar</a>
+      <a href="#gaps">Open questions</a>
+    </nav>
+  </header>
+
+  <section id="structure">
+    <div class="section-head"><span class="section-num">01</span><h2 class="section-title">How it's structured</h2></div>
+    <p class="lede">Five layers, each only knowing about the one below it. This is the same shape the marketplace redesign already established &mdash; My Domains reuses most of layers 1 and 2 outright instead of rebuilding them.</p>
+
+    <div class="code-card">
+      <div class="code-label"><span>layer stack</span><span>top to bottom</span></div>
+      <pre><span class="cm">1. Page</span>           pages/design-preview/account/my-domains.tsx
+<span class="cm">                    owns state: which status tab, which filters, grid or list</span>
+
+<span class="cm">2. Shell (shared)</span>  MarketplacePageShell + MarketplaceSidebar + Header
+<span class="cm">                    pure layout — sidebar / main / right rail grid, no data of its own</span>
+
+<span class="cm">3. Composites</span>     MyDomainsHeroBanner, PortfolioStatsRow, MyDomainsCategoryTabs,
+<span class="cm">                    MyDomainsFilterBar, MyDomainsTable, MyDomainRow, MyDomainCard,
+                    NeedsAttentionPanel, MostViewedPanel, QuickActionsPanel
+<span class="cm">                    each one domain-shaped — knows what a "domain" or a "quick action" is</span>
+
+<span class="cm">4. Primitives</span>     StatCard, InfoListCard, ViewToggle, DomainAvatar
+<span class="cm">                    + reused: Badge, ExtensionBadge, ChainBadge, TrendIndicator,
+                    SearchInput, FilterDropdown, PrimaryButton, SecondaryButton
+<span class="cm">                    generic — no idea what a "domain" is, just take props and render</span>
+
+<span class="cm">5. Data</span>           src/types/my-domains/*, src/data/my-domains/*,
+                    src/hooks/my-domains/useMyDomainsFilters.ts
+<span class="cm">                    typed shapes + static fixtures, no API calls yet</span></pre>
+    </div>
+
+    <p class="wide">The rule that keeps this from turning into spaghetti: <strong>a layer only ever imports from the layer below it.</strong> The page imports composites and the shell; composites import primitives and data; primitives import nothing domain-specific at all. Break that rule once (say, a primitive importing a composite) and the whole point of having layers &mdash; being able to change one without reading the others &mdash; is gone.</p>
+
+    <h3 class="sub-title">The swap boundary</h3>
+    <p class="lede">Every composite receives data as typed props or reads it from a hook &mdash; never an API hook directly. That's what makes "swap the mock data for a real endpoint" a one-file change instead of a rewrite.</p>
+    <div class="code-card">
+      <div class="code-label"><span>src/hooks/my-domains/useMyDomains.ts</span><span>today &#8594; later, not yet built</span></div>
+      <pre><span class="cm">// today — every composite already calls something shaped like this</span>
+<span class="kw">export function</span> useMyDomains(params: MyDomainsQueryParams) &#123;
+  <span class="kw">return</span> mockMyDomainsSummary
+&#125;
+
+<span class="cm">// later — same export shape, nothing above this line changes</span>
+<span class="kw">export function</span> useMyDomains(params: MyDomainsQueryParams) &#123;
+  <span class="kw">const</span> &#123; data &#125; = useGetDomainSummaryByUserQuery(params)
+  <span class="kw">const</span> &#123; data: expiry &#125; = useGetDomainExpiryDateQuery(undefined, &#123; pollingInterval: 60_000 &#125;)
+  <span class="kw">return</span> useMemo(() =&gt; toMyDomainsSummary(data, expiry), [data, expiry])
+&#125;</pre>
+    </div>
+    <p class="wide">Nobody above this hook &mdash; not <code>MyDomainsTable</code>, not the page &mdash; needs to change when the right side of that function changes. That's the entire point of the layering: the pain of a real API integration gets contained to one small file instead of spreading through every component that touches domain data.</p>
+  </section>
+
+  <section id="byhand">
+    <div class="section-head"><span class="section-num">02</span><h2 class="section-title">Building it by hand, without AI</h2></div>
+    <p class="lede">The mechanics that actually mattered, in the order you'd hit them. None of this is specific to AI-assisted work &mdash; it's just the discipline that kept this build from accumulating a pile of small visual bugs.</p>
+
+    <div class="lesson"><strong>Pull real measurements before you build, not after.</strong> The first pass at the category tabs, the trend arrows, and the hero background were all built from a screenshot or a reasonable guess. All three turned out wrong once the real Figma node was actually pulled &mdash; not "close but needs polish" wrong, structurally wrong (reusing the wrong component entirely, a mirrored asset that was never actually mirrored, a CSS mixin silently deleting the background it sat under). A screenshot tells you what it looks like; it doesn't tell you the exact colors, the exact spacing, or whether two elements are actually the same component reused. Get the real numbers first.</div>
+
+    <div class="lesson"><strong>Reuse before you build.</strong> <code>MyDomainsCategoryTabs</code> at one point was a thin wrapper around the marketplace page's own tab component, because they looked similar enough at a glance. They weren't the same design at all. The fix wasn't "build a new component," it was "notice the existing one doesn't fit and build the right one instead of forcing the wrong one to work." Before writing a new component, check whether one already exists that fits &mdash; but be honest when it doesn't, instead of bending it until it half-fits.</div>
+
+    <div class="lesson"><strong>Override a shared component's size safely.</strong> Reusing <code>SecondaryButton</code> or <code>FilterDropdown</code> in a new context sometimes means they're the wrong size for where you're putting them (they were built for a different, wider row elsewhere in the app). You can't just add a class and hope it wins &mdash; two CSS Modules files both defining a plain class selector have equal specificity, and which one "wins" depends on module load order, which isn't something to rely on. The safe pattern: wrap the shared component in your own element, then target the plain HTML tag it renders (<code>button</code>, <code>img</code>) from inside your wrapper class. A tag selector inside a class selector always beats a bare class selector, regardless of load order, with no <code>!important</code> needed.</div>
+    <div class="code-card">
+      <div class="code-label"><span>pattern</span><span>specificity-safe override</span></div>
+      <pre><span class="kw">// the shared component always renders a plain &lt;button&gt;</span>
+&lt;span className=&#123;styles.bulkListWrap&#125;&gt;
+  &lt;SecondaryButton transparent&gt;Bulk List&lt;/SecondaryButton&gt;
+&lt;/span&gt;
+
+<span class="cm">/* targets the tag, not a class — wins regardless of CSS module order */</span>
+.bulkListWrap button &#123;
+  width: 126px;
+  height: 48px;
+&#125;</pre>
+    </div>
+
+    <div class="lesson"><strong>Keep the "reserved space" trick in mind for state changes.</strong> Adding a border to only the active state of a list item shifts that item's size by the border width unless the inactive state reserves the same space with a transparent border. Same idea any time a property only applies conditionally &mdash; give the base state a neutral value for that property instead of omitting it, so toggling the state doesn't move anything else on the page.</div>
+
+    <div class="lesson"><strong>Sticky sidebars are two CSS declarations, not a scroll listener.</strong> "Left and right columns stay in place while the middle scrolls" sounds like it needs JavaScript. It doesn't: <code>position: sticky; top: 0;</code> on the column, plus <code>align-items: start</code> on the parent grid (without that, grid items stretch to fill the row and have nowhere to "stick" from). The browser handles the rest, including the exact behavior of "scrolls normally until its content runs out, then holds in place."</div>
+
+    <div class="lesson"><strong>Know when to stop guessing at a shape.</strong> A small decorative connector between the sidebar label and its count pill went through three different attempts (two disconnected lines, a filled shape that read as a plain rectangle, a stroked outline) before it got dropped entirely rather than attempting a fourth guess. Recognizing "I'm pattern-matching on a shape I don't have exact data for" and stopping is itself a useful skill &mdash; a missing decoration is a smaller problem than three wrong ones in a row.</div>
+  </section>
+
+  <section id="phases">
+    <div class="section-head"><span class="section-num">03</span><h2 class="section-title">Phase by phase</h2></div>
+    <p class="lede">In build order. Several phases are small, targeted fixes raised as direct feedback rather than planned work &mdash; included as their own entries since each one is a real, distinct decision, not just polish.</p>
+
+    <div class="phase">
+      <div class="phase-head"><div><p class="phase-num">Phase 01</p><p class="phase-title">Current page research + initial data models</p></div><div class="phase-badges"><span class="badge added">6 files</span></div></div>
+      <dl class="facts">
+        <div><dt>Files</dt><dd><span class="path">src/types/my-domains/*</span>, <span class="path">src/data/my-domains/*</span></dd></div>
+        <div><dt>Research</dt><dd>Mapped the real old page (<span class="path">pages/profile/domains</span>), its five API hooks, and its heaviest component (<span class="path">domain-self-item</span>, which owns real on-chain delist transactions)</dd></div>
+      </dl>
+      <p class="decisions">Built before any design existed for the new page &mdash; a clean <code>MyDomainListing</code> type replacing the old page's loosely-typed <code>any</code>, and mock data mirroring the real API's field names so a future adapter is a rename, not a redesign.</p>
+    </div>
+
+    <div class="phase">
+      <div class="phase-head"><div><p class="phase-num">Phase 02</p><p class="phase-title">Design pulled, models revised</p></div><div class="phase-badges"><span class="badge kept">first real Figma pull</span></div></div>
+      <dl class="facts">
+        <div><dt>Figma node</dt><dd>50:6190 (the full page)</dd></div>
+      </dl>
+      <p class="decisions">Real measurements added fields the screenshot-only pass had no way to know about: a five-way <code>status</code> split replacing a simple listed/unlisted boolean, <code>estimatedValueEth/Usd</code>, <code>views</code>, <code>savedCount</code>, <code>renewalTimestamp</code>. Also surfaced that the Figma file's own placeholder numbers don't agree with each other across the stat cards, the tabs, and the sidebar badge &mdash; documented as unreliable rather than picking one to trust.</p>
+    </div>
+
+    <div class="phase">
+      <div class="phase-head"><div><p class="phase-num">Phase 03</p><p class="phase-title">Core build: hero, stats, tabs, filter bar, table, right rail</p></div><div class="phase-badges"><span class="badge added">~40 files</span><span class="badge risk">actions inert</span></div></div>
+      <dl class="facts">
+        <div><dt>New primitives</dt><dd><span class="path">StatCard</span>, <span class="path">InfoListCard</span>, <span class="path">ViewToggle</span></dd></div>
+        <div><dt>New composites</dt><dd><span class="path">MyDomainsHeroBanner</span>, <span class="path">PortfolioStatsRow</span>, <span class="path">MyDomainsCategoryTabs</span> (v1), <span class="path">MyDomainsFilterBar</span>, <span class="path">MyDomainsTable</span>, <span class="path">MyDomainRow</span>, <span class="path">NeedsAttentionPanel</span>, <span class="path">MostViewedPanel</span>, <span class="path">QuickActionsPanel</span></dd></div>
+      </dl>
+      <p class="decisions">List, Edit Price, Bulk List, Appraise, and Transfer all render as real buttons with no handler wired &mdash; a deliberate choice, not a blocker, made explicitly so the visual and data layer could move ahead without guessing at semantics the design doesn't confirm (DeList and Promote aren't visible in this design at all, and Transfer has no backend mutation anywhere in the codebase). <code>MyDomainsCategoryTabs</code> this pass was a thin wrapper over the marketplace page's own tab component &mdash; corrected in Phase 09.</p>
+    </div>
+
+    <div class="phase">
+      <div class="phase-head"><div><p class="phase-num">Phase 04</p><p class="phase-title">Grid/list dual view</p></div><div class="phase-badges"><span class="badge added">2 new components</span><span class="badge kept">second Figma pull</span></div></div>
+      <dl class="facts">
+        <div><dt>Figma node</dt><dd>375:51246, a second file &mdash; "Property 1=Default" (list) / "Property 1=Variant2" (grid)</dd></div>
+        <div><dt>Files</dt><dd><span class="path">MyDomainCard</span>, <span class="path">DomainAvatar</span>, <span class="path">formatMyDomain.ts</span> (shared formatters, one source of truth for two layouts)</dd></div>
+      </dl>
+      <p class="decisions">The view toggle existed since Phase 03 but didn't actually switch anything &mdash; this is what made it real. Confirmed against this reference and corrected from the first guess: only <code>for-sale</code> rows get a colored left edge (not all five statuses), Price and EST. value show USD only (not ETH+USD), and a circular domain avatar precedes the name in every row, which the first pass had missed entirely.</p>
+    </div>
+
+    <div class="phase">
+      <div class="phase-head"><div><p class="phase-num">Phase 05</p><p class="phase-title">Card divider fix</p></div><div class="phase-badges"><span class="badge changed">1 file</span></div></div>
+      <p class="decisions">Raised as feedback: the card's internal dividers weren't reaching the card's own edges, and there was no vertical line between the two stat columns. Root cause was padding living on the outer card instead of on each row/cell &mdash; moved it, matching the exact convention the existing <code>PromotedDomainCard</code> already uses (padding per-cell, a real <code>border-right</code> for the vertical divider, not a gap).</p>
+    </div>
+
+    <div class="phase">
+      <div class="phase-head"><div><p class="phase-num">Phase 06</p><p class="phase-title">Shared-component fixes</p></div><div class="phase-badges"><span class="badge risk">2 real bugs</span><span class="badge changed">6 files</span></div></div>
+      <dl class="facts">
+        <div><dt>Files</dt><dd><span class="path">PrimaryButton</span> (+charcoal variant), <span class="path">TrendIndicator.module.scss</span>, <span class="path">ActivityItem</span>, <span class="path">PromotedDomainCard</span></dd></div>
+      </dl>
+      <p class="decisions">Four unrelated fixes, all to components shared with the marketplace page, so each one fixed both pages at once. <strong>Edit Price</strong> was a <code>DefaultButton</code> — swapped for a new <code>charcoal</code> variant on <code>PrimaryButton</code> matching the exact gradient/border from the Figma layer. <strong>The "Low" trend arrow</strong> was a real bug: <span class="path">trend-down.svg</span> turned out to be byte-for-byte identical to <span class="path">trend-up.svg</span>, just recolored red — never actually mirrored, so every "Low" badge silently showed an up arrow in a different color. Fixed with a CSS <code>scaleY(-1)</code> instead of a new asset. <strong>Live Activity</strong> text was reordered (domain name first, wallet address last) and the domain name given real visual weight (semibold, full-strength black) instead of blending into the muted sentence around it. <strong>"buy now"</strong> was lowercase in <code>PromotedDomainCard</code> while the equivalent button elsewhere already said "Buy Now" — a one-line inconsistency fix.</p>
+    </div>
+
+    <div class="phase">
+      <div class="phase-head"><div><p class="phase-num">Phase 07</p><p class="phase-title">Login/Sign Up moved into the header</p></div><div class="phase-badges"><span class="badge changed">3 files</span></div></div>
+      <p class="decisions">Login and Sign Up used to live in the sidebar's "Your Account" section when signed out. Moved into the header's connect-wallet pill as two links with a small divider, replacing its "connect wallet" text, and removed from the sidebar entirely — Logout still shows there when signed in, since that wasn't part of the request.</p>
+    </div>
+
+    <div class="phase">
+      <div class="phase-head"><div><p class="phase-num">Phase 08</p><p class="phase-title">Page gutter fix</p></div><div class="phase-badges"><span class="badge changed">2 files</span></div></div>
+      <p class="decisions">The header and page shell were both using <code>--container-padding-x</code> (80px), a token copied byte-for-byte from the main marketing site's own tokens file and left untouched there deliberately, for future syncs. That token is sized for a spacious marketing page, not a dashboard. Rather than edit a token meant to stay in sync with an external source, both files got their own literal 32px gutter instead — confirmed against the real Figma frame's own near-zero side margins, much closer than 80px.</p>
+    </div>
+
+    <div class="phase">
+      <div class="phase-head"><div><p class="phase-num">Phase 09</p><p class="phase-title">Category tabs rebuilt</p></div><div class="phase-badges"><span class="badge risk">wrong reuse corrected</span><span class="badge added">2 files</span></div></div>
+      <p class="decisions">Raised as feedback: the tabs were "very small" and had no visible blue active state. Root cause was Phase 03's assumption that this page's tabs matched the marketplace page's own small translucent glass-pill tabs — they don't. Rebuilt from scratch to match this page's actual design: large 17px text, only the active tab gets a solid filled pill, inactive tabs are plain text with a small gray superscript count and no background at all.</p>
+    </div>
+
+    <div class="phase">
+      <div class="phase-head"><div><p class="phase-num">Phase 10</p><p class="phase-title">Hero background bug</p></div><div class="phase-badges"><span class="badge risk">real bug</span><span class="badge added">4 assets</span></div></div>
+      <p class="decisions">Raised as feedback: white hero text was invisible. Root cause was a genuine CSS bug, not a missing decoration — a <code>stripe-bg</code> mixin included after the gradient in the same rule set <code>background-image</code> directly, which silently overwrote the gradient entirely (it's a longhand the shorthand above it also sets, and the later declaration wins). Fixed by moving the real noise texture onto a separate <code>::before</code> pseudo-element blended on top with <code>mix-blend-mode: plus-lighter</code>, matching how the export actually layers it, and added the five faint decorative accents pulled as real assets, positioned as percentages of the banner's own box rather than the export's fixed pixel frame.</p>
+    </div>
+
+    <div class="phase">
+      <div class="phase-head"><div><p class="phase-num">Phase 11</p><p class="phase-title">Bulk List → SecondaryButton</p></div><div class="phase-badges"><span class="badge changed">1 file</span></div></div>
+      <p class="decisions">The corner-bracket motif around "Bulk List" in the reference turned out to be the existing <code>SecondaryButton</code> primitive's own signature decoration, not a bespoke flourish — an earlier pass had skipped it as a simplification instead of recognizing the match. Swapped in the real component (transparent variant, sized down from its 200&#215;57px marketing-page default to the Figma-exact 126&#215;48 via the tag-selector override pattern described in section 02).</p>
+    </div>
+
+    <div class="phase">
+      <div class="phase-head"><div><p class="phase-num">Phase 12</p><p class="phase-title">Sidebar active-state rebuild</p></div><div class="phase-badges"><span class="badge risk">3 iterations</span><span class="badge added">3 assets</span></div></div>
+      <dl class="facts">
+        <div><dt>Figma nodes</dt><dd>23:2916 ("Explore"), 57:9354 ("My domains")</dd></div>
+      </dl>
+      <p class="decisions">Rebuilt entirely against two real Figma pulls: a light gray row background, a leading circular icon, and a count pill, replacing a flat blue fill that looked nothing like the reference. The connecting line between the label and the count pill went through three failed attempts — two disconnected stroke lines, a filled shape that read as a plain rectangle through its own flat mid-section, then a stroked outline that still didn't read as "connected" to a border added afterward — and was ultimately dropped rather than attempting a fourth guess (see the lesson in section 02). A subsequent request to add a blue border around the active row, and to have it visually connect to the left bracket shape, was tried and then explicitly reverted at your request.</p>
+    </div>
+
+    <div class="phase">
+      <div class="phase-head"><div><p class="phase-num">Phase 13</p><p class="phase-title">Filter bar + view toggle polish</p></div><div class="phase-badges"><span class="badge changed">2 files</span></div></div>
+      <p class="decisions">The view toggle's active icon was a solid blue background with a white icon — changed to a white background with a blue icon per direct feedback, a one-line color swap once correctly scoped (an earlier attempt at resizing the whole filter row alongside it was reverted at your request — the color was the only actual ask).</p>
+    </div>
+
+    <div class="phase">
+      <div class="phase-head"><div><p class="phase-num">Phase 14</p><p class="phase-title">Sticky sidebar + right rail</p></div><div class="phase-badges"><span class="badge added">2 files</span><span class="badge kept">applies to both pages</span></div></div>
+      <p class="decisions">Left sidebar and right rail both pinned in place while the middle column scrolls, via <code>position: sticky</code> on the shared <code>MarketplacePageShell</code> — applies to the marketplace page too, since they share this shell. Content shorter than the viewport (the right rail's stats + panels) scrolls normally until it's fully in view, then holds there rather than scrolling away and leaving a blank gap next to the still-scrolling middle column. Its own scrollbar is hidden (still scrolls if ever taller than the viewport, just doesn't draw one), and bottom padding was added after Quick Actions so it doesn't sit flush against the edge once pinned.</p>
+    </div>
+  </section>
+
+  <section id="files">
+    <div class="section-head"><span class="section-num">04</span><h2 class="section-title">File manifest</h2></div>
+    <p class="lede">New since Phase 01, relative to <span class="path">src/</span>, <span class="path">public/</span>, and <span class="path">pages/</span>. Files touched but not new (the shared marketplace components fixed in Phases 06&#8211;14) aren't repeated here — see each phase above for the exact list.</p>
+    <div class="code-card">
+      <div class="code-label"><span>new files</span><span>&#8776; 65</span></div>
+      <pre>types/my-domains/                   domain.ts, actions.ts, index.ts
+data/my-domains/                    domains.ts, actions.ts
+hooks/my-domains/                   useMyDomainsFilters.ts
+
+design-system/primitives/
+  cards/                             stat-card, info-list-card
+  toggles/                           view-toggle
+  avatars/                           domain-avatar
+
+design-system/composites/my-domains/
+  hero/                              MyDomainsHeroBanner
+  summary/                           PortfolioStatsRow
+  listings/                          MyDomainsCategoryTabs, MyDomainsFilterBar, MyDomainsTable,
+                                     MyDomainRow, MyDomainCard, formatMyDomain.ts
+  right-rail/                        NeedsAttentionPanel, MostViewedPanel, QuickActionsPanel
+  index.ts                           curated barrel
+
+public/assets/img/my-domains/       hero-noise.png, hero-blob-a/b/c.svg,
+                                     needs-attention-icon.svg, most-viewed-icon.svg,
+                                     action-list/bulk-list/appraise/transfer.svg,
+                                     stat-card-noise.png
+public/assets/img/marketplace/      sidebar-active-bracket.svg, sidebar-active-pill.png
+                                     <span class="cm">(new assets for a shared component, kept in the shared folder)</span>
+
+pages/design-preview/account/my-domains.tsx   <span class="cm">temporary — not linked anywhere, safe to delete</span>
+pages/design-preview/account/my-domains.module.scss</pre>
+    </div>
+  </section>
+
+  <section id="api">
+    <div class="section-head"><span class="section-num">05</span><h2 class="section-title">Real API integration</h2></div>
+    <p class="lede">Same swap-boundary pattern as section 01: nothing above <code>useMyDomains</code> needs to change. What varies is whether the backend already has the endpoint.</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Data</th><th>Backend today</th><th>What's needed</th><th>Effort</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Listings table</strong><br><span class="path">MyDomainListing[]</span></td>
+            <td>Real endpoint exists, already used by the old page (<code>useGetDomainSummaryByUserQuery</code>)</td>
+            <td>Map the response's loosely-typed inner object to <code>MyDomainListing</code>; join in expiry from the separate poll instead of doing it per-card</td>
+            <td><span class="effort-pill effort-easy">Easy</span></td>
+          </tr>
+          <tr>
+            <td><strong>Renewal countdown</strong></td>
+            <td>Real endpoint exists (<code>useGetDomainExpiryDateQuery</code>), polled every 60s</td>
+            <td>Merge into the same mapper above instead of a second per-card query</td>
+            <td><span class="effort-pill effort-easy">Easy</span></td>
+          </tr>
+          <tr>
+            <td><strong>List / Edit Price / Bulk List / Appraise actions</strong></td>
+            <td>Real, working mutations already exist in <span class="path">src/component/domain-self-item</span> — on-chain delist, appraisal API call, listing modal</td>
+            <td>Wire the existing logic to the new UI's buttons once Edit Price/DeList/Promote semantics are confirmed against the design (see open questions)</td>
+            <td><span class="effort-pill effort-medium">Medium</span></td>
+          </tr>
+          <tr>
+            <td><strong>Estimated value, views, saved count</strong></td>
+            <td>No backend precedent at all — new fields this design introduced</td>
+            <td>Confirm with backend whether these exist or need building; no frontend blocker once a shape is confirmed</td>
+            <td><span class="effort-pill effort-hard">Hard, backend-blocked</span></td>
+          </tr>
+          <tr>
+            <td><strong>Needs Attention / Getting The Most Views</strong></td>
+            <td>Not a separate endpoint — these are just filtered/sorted views over the same domain list</td>
+            <td>No new backend work; derive both from the same mapped list once views/estimated value exist</td>
+            <td><span class="effort-pill effort-medium">Medium</span></td>
+          </tr>
+          <tr>
+            <td><strong>Transfer action</strong></td>
+            <td>No mutation, modal, or hook exists anywhere in the codebase</td>
+            <td>Genuinely new feature — needs its own backend endpoint and its own modal, not a reskin of anything that exists</td>
+            <td><span class="effort-pill effort-hard">Hard, backend-blocked</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="wide">Net read: the listings table itself is close, the real endpoints already exist and are already used by the old page. The genuinely new surface, estimated value, view/save counts, and Transfer, is blocked on backend work, not frontend effort.</p>
+  </section>
+
+  <section id="sidebar">
+    <div class="section-head"><span class="section-num">06</span><h2 class="section-title">Becoming a real page in the sidebar</h2></div>
+    <p class="lede">Closer than it looks. The sidebar already has an entry for this page — it was never built to match, that's the actual remaining gap.</p>
+    <div class="code-card">
+      <div class="code-label"><span>src/data/marketplace/navigation.ts</span><span>already there, unedited</span></div>
+      <pre>&#123; id: <span class="str">'my-domains'</span>, label: <span class="str">'My domains'</span>, href: <span class="str">'/profile/domains'</span> &#125;</pre>
+    </div>
+    <p class="wide">This page currently lives at the temporary preview route, and the sidebar item above points at the real page's real URL. Three concrete steps close that gap:</p>
+    <ul class="plain">
+      <li><strong>Swap what <span class="path">pages/profile/domains/index.tsx</span> renders.</strong> The old page uses <code>Layout</code> + the old <code>ProfileSidebar</code>; the new one needs <code>Header</code> + <code>MarketplacePageShell</code> + <code>MarketplaceSidebar</code> instead, the exact tree already proven out at the preview route. The page's server-side auth redirect stays untouched either way.</li>
+      <li><strong>Confirm the active-state match.</strong> Since the real route is <code>/profile/domains</code> (not the preview route), <code>MarketplaceSidebar</code>'s existing pathname-based active check will just work without the <code>initialSelectedId</code> workaround the preview route currently needs.</li>
+      <li><strong>Wire <span class="path">useMyDomains</span> to the real query</strong> (see the API table above) before or alongside the route swap, so the newly-real page isn't showing mock data at its real URL.</li>
+    </ul>
+    <p class="wide">The open question this doesn't answer on its own: whether "My Domains" should keep living under <span class="path">/profile/*</span> at all, or move to sit alongside the marketplace page under a shared route family, given it now shares that page's exact shell. That's a routing/navigation decision, not a technical blocker either way.</p>
+  </section>
+
+  <section id="gaps">
+    <div class="section-head"><span class="section-num">07</span><h2 class="section-title">Open questions, said plainly</h2></div>
+    <ul class="plain">
+      <li>The table's Action column reads "Edit Price," with no DeList or Promote button visible per row anywhere in the design, even though both are real, working features on the old page today. Whether they moved behind a menu not visible in the static export, or are out of scope for this page, is unconfirmed.</li>
+      <li>"Transfer" in Quick Actions has no existing mutation, modal, or hook anywhere in the codebase — new scope, not a reskin.</li>
+      <li>The Figma file's own placeholder numbers (Domains card, category tab counts, sidebar badge) don't agree with each other — none should be treated as real reference values, only the labels and layout.</li>
+      <li>Mobile currently uses a simplified stacked layout for the listings table rather than the marketplace table's full fixed-pane-plus-scroll-pane split; real device-width verification hasn't happened, since this environment has no browser automation tool installed.</li>
+      <li>The left-sidebar decorative connector between a nav label and its count pill (Phase 12) is unresolved — dropped after three wrong attempts rather than guessed a fourth time.</li>
+    </ul>
+  </section>
+
+  <footer class="close">
+    Reflects the repository as of this write-up. The preview route and every file listed above may have moved on since if further fixes have landed.
+  </footer>
+
+</div>

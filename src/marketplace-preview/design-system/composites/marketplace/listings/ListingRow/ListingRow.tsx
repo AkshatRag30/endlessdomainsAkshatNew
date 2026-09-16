@@ -3,6 +3,7 @@ import type { MarketplaceListing } from '@/marketplace-preview/types/marketplace
 import ExtensionBadge from '@/marketplace-preview/design-system/primitives/badges/extension-badge'
 import ChainBadge from '@/marketplace-preview/design-system/primitives/badges/chain-badge'
 import TrendIndicator from '@/marketplace-preview/design-system/primitives/badges/trend-indicator'
+import Tooltip from '@/marketplace-preview/design-system/primitives/tooltip'
 import primaryBtnStyles from '@/marketplace-preview/design-system/primitives/buttons/primary-button/Primarybutton.module.scss'
 import styles from './ListingRow.module.scss'
 
@@ -31,13 +32,14 @@ export const ListingDomainCell = ({ listing }: ListingDomainCellProps) => (
       {listing.isPremium && (
         <img src="/assets/img/marketplace/domain-marker.svg" alt="" aria-hidden="true" className={styles.marker} />
       )}
-      {/* title, not a custom tooltip — a long name is already visibly clipped
-          (ellipsis on desktop) or scrollable (mobile), so the browser's own
-          native hover tooltip is enough to reveal the rest on desktop, at
-          zero cost, and it's simply inert on touch devices with no hover. */}
-      <span className={styles.domainNameScroll} title={listing.domainName}>
-        <span className={styles.domainName}>{listing.domainName}</span>
-      </span>
+      {/* Was a native title="" tooltip — unstyled OS chrome with a slow,
+          browser-controlled delay. Themed Tooltip primitive instead, same
+          reasoning applied across both marketplace and My Domains now. */}
+      <Tooltip label={listing.domainName} className={styles.domainNameTooltip}>
+        <span className={styles.domainNameScroll}>
+          <span className={styles.domainName}>{listing.domainName}</span>
+        </span>
+      </Tooltip>
       <ExtensionBadge extension={listing.extension} />
     </div>
   </div>

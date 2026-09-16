@@ -30,6 +30,7 @@ $clip-sm: polygon(
   position: relative;
   min-height: var(--button-height-sm);
   width: fit-content;
+  flex-shrink: 0; // a narrower flex/grid ancestor (e.g. a table's Action column at laptop widths) can otherwise shrink this below fit-content's preferred width
   padding: 0 var(--gap-inline);
   border: none;
   cursor: pointer;
@@ -40,6 +41,7 @@ $clip-sm: polygon(
   align-items: center;
   justify-content: center;
   gap: var(--gap-inline-sm);
+  white-space: nowrap; // was missing here — DefaultButton and SecondaryButton both already guard against this; without it, a squeezed container wraps the label onto two lines instead of the button just staying single-line at its own width
 
   font-family: var(--font-space-grotesk);
   font-size: var(--text-button);

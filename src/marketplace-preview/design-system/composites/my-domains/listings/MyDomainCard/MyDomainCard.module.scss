@@ -69,7 +69,17 @@
   min-width: 0;
 }
 
+// Tooltip's own .wrap is what .nameRow actually shrinks now (it's the
+// direct flex child, not .domainName) — needs the shrink/min-width pair
+// itself so .domainName inside it has a real width to truncate against.
+.domainNameTooltip {
+  flex: 1;
+  min-width: 0;
+}
+
 .domainName {
+  display: block;
+  width: 100%;
   font-family: var(--font-satoshi);
   font-weight: var(--font-weight-medium);
   font-size: var(--text-small-13);

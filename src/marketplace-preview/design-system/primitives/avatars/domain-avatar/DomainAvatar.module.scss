@@ -10,3 +10,18 @@
   color: var(--color-white-primary);
   box-shadow: 0 0 0 1px var(--color-white-primary), inset 0 1px 2px rgba(255, 255, 255, 0.4);
 }
+
+// Real per-chain logos are already full-color circular brand marks — a
+// plain white backdrop instead of the blue gradient above, which would
+// clash/muddy them. That gradient is now only the fallback glyph's
+// background, for chains with no resolved provider.
+.avatarLogo {
+  background: var(--color-white-primary);
+  box-shadow: 0 0 0 1px var(--color-border-black-subtle);
+}
+
+.logo {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
