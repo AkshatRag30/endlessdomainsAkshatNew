@@ -1,0 +1,52 @@
+@import '@mpstyles/_mixins.scss';
+
+.button {
+  display:         inline-flex;
+  align-items:     center;
+  justify-content: center;
+  gap:             var(--space-2-5);
+  background:      transparent;
+  border:          none;
+  cursor:          pointer;
+  padding:         var(--space-2) var(--space-3);
+
+  font-family:     var(--font-satoshi);
+  font-size:       var(--text-button);
+  font-weight:     var(--font-weight-bold);
+  color:           var(--color-gray-darkest);
+  letter-spacing:  var(--tracking-nav);
+  white-space:     nowrap;
+  text-transform:  capitalize;
+
+  transition: color 0.2s ease;
+
+  &:hover:not(:disabled) {
+    color: var(--color-blue-primary);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor:  not-allowed;
+  }
+
+  &:focus-visible {
+    outline:        2px solid var(--color-blue-primary);
+    outline-offset: 3px;
+    border-radius:  var(--radius-sm);
+  }
+
+  &.fullWidth {
+    width: 100%;
+  }
+}
+
+.label {
+  position: relative;
+}
+
+.icon {
+  display:     flex;
+  align-items: center;
+  font-size:   var(--text-nav);
+  flex-shrink: 0;
+}

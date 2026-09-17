@@ -36,8 +36,27 @@
 .left {
   display: flex;
   align-items: center;
-  gap: var(--space-7);
+  // logo.svg carries a fair bit of transparent padding baked into the file
+  // itself, so var(--space-7)'s 32px read as almost no gap next to the nav
+  // links — bumped to a literal that actually reads as breathing room.
+  gap: 56px;
   min-width: 0;
+
+  @include desktop {
+    gap: 72px;
+  }
+
+  @include wide {
+    gap: 96px;
+  }
+
+  // .nav is hidden below tablet (see .nav's own tablet-down rule), so this
+  // gap is only ever between the menu toggle and the logo there — the
+  // desktop logo-to-nav spacing doesn't apply and just wastes room next to
+  // an already-tight bar.
+  @include tablet-down {
+    gap: var(--space-2);
+  }
 }
 
 // ── Mobile/tablet menu toggle (Figma nodes 20:1155 / 27:551) ───────────────
@@ -227,7 +246,16 @@
   flex-shrink: 0;
   white-space: nowrap;
   text-decoration: none;
+}
 
+// Element-qualified selector, not just `.connectWallet` — this div also
+// carries PrimaryButton's own `.button` class (display: inline-flex), a
+// same-specificity plain class selector that was winning the cascade tie
+// over a bare `.connectWallet { display: none }` depending on bundle order,
+// leaving the pill visible and overlapping the logo on mobile instead of
+// actually hiding. `div.connectWallet` outranks a bare `.button` regardless
+// of source order.
+div.connectWallet {
   @include mobile {
     display: none; // swapped for .walletIconButton below
   }

@@ -38,7 +38,7 @@ export const MyDomainCard = ({ domain }: MyDomainCardProps) => (
       <DomainAvatar chain={domain.chain} />
       <div className={styles.identityText}>
         <div className={styles.nameRow}>
-          <Tooltip label={`${domain.domainName}${domain.extension}`} className={styles.domainNameTooltip}>
+          <Tooltip label={`${domain.domainName}${domain.extension}`} placement="bottom" portal className={styles.domainNameTooltip}>
             <span className={styles.domainName}>{domain.domainName}</span>
           </Tooltip>
           <ExtensionBadge extension={domain.extension} />

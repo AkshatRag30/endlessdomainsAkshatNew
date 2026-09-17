@@ -28,7 +28,7 @@ export const MyDomainRow = ({ domain }: MyDomainRowProps) => {
         <DomainAvatar chain={domain.chain} />
         <div className={styles.domainText}>
           <div className={styles.domainNameRow}>
-            <Tooltip label={`${domain.domainName}${domain.extension}`} className={styles.domainNameTooltip}>
+            <Tooltip label={`${domain.domainName}${domain.extension}`} portal className={styles.domainNameTooltip}>
               <span className={styles.domainName}>{domain.domainName}</span>
             </Tooltip>
             <ExtensionBadge extension={domain.extension} />

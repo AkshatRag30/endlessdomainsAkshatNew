@@ -44,6 +44,21 @@
   flex-shrink: 0;
 }
 
+// Figma node 70:4592's per-row icon set — each asset's own fill/stroke
+// color is baked in at export (varies slightly per glyph, e.g. #78738F vs
+// #A6A1BB), so this only constrains size/position, not color.
+.icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.iconSpacer {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
 .label {
   position: relative;
   z-index: 1;

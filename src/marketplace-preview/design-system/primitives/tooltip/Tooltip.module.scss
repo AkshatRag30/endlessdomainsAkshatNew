@@ -7,40 +7,179 @@
   position: relative;
   display: inline-flex;
   min-width: 0;
+}
 
-  &::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    left: 0;
-    bottom: calc(100% + 8px);
-    z-index: 50;
-    padding: 6px 10px;
-    border-radius: 6px;
-    background: var(--color-black-primary);
-    color: var(--color-white-primary);
-    font-family: var(--font-satoshi);
-    font-size: 12px;
-    font-weight: var(--font-weight-medium);
-    line-height: 1.3;
-    white-space: nowrap;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+// ── Plain-text mode (label prop, via CSS content: attr()) ────────────────
+// Scoped to [data-tooltip] specifically — the rich-content mode below
+// renders .wrap with no data-tooltip attribute at all, so this stays
+// correctly inert there instead of drawing an empty padded box.
+
+.wrap[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  // Centered on the trigger rather than anchored to one edge, with wrapping
+  // instead of nowrap — a long domain name at nowrap's full single-line
+  // width regularly ran wider than the narrow cards/columns it sits in
+  // (PromotedDomainCard is 282px total), overflowing past the card's own
+  // edge. Wrapping within a capped width keeps it inside its container in
+  // both directions instead of just picking a different single edge to
+  // overflow from.
+  left: 50%;
+  bottom: calc(100% + 8px);
+  z-index: 500;
+  max-width: 200px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: var(--color-black-primary);
+  color: var(--color-white-primary);
+  font-family: var(--font-satoshi);
+  font-size: 12px;
+  font-weight: var(--font-weight-medium);
+  line-height: 1.3;
+  white-space: normal;
+  // A domain name has no spaces/hyphens for normal word-wrap to break on —
+  // without this, max-width alone just lets one unbroken word overflow the
+  // box instead of actually wrapping it.
+  word-break: break-all;
+  text-align: center;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-50%) translateY(4px);
+  pointer-events: none;
+  // Hiding: fades out over 120ms, then (only once invisible) drops out
+  // of the layout — so un-hovering doesn't just cut it off mid-fade.
+  transition: opacity 0.12s ease, transform 0.12s ease, visibility 0s linear 0.12s;
+}
+
+.wrap[data-tooltip]:hover::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+  // Showing: visibility flips immediately, but the fade itself waits
+  // ~120ms before starting — long enough that brushing past on the way
+  // to something else doesn't flash a tooltip, short enough to still
+  // read as "fast" against a native tooltip's much longer, fixed delay.
+  transition: opacity 0.12s ease 0.12s, transform 0.12s ease 0.12s, visibility 0s linear 0s;
+}
+
+// ── Rich-content mode (content prop, a real child element) ───────────────
+// Same positioning/timing as the attr()-based tooltip above, just as an
+// actual rendered element instead, since content: attr() can't carry markup
+// (multiple differently-colored/weighted spans).
+
+.bubble {
+  position: absolute;
+  // Centered on the trigger, same reasoning as the attr()-mode tooltip
+  // above. This mode's one current usage (Live Activity) runs in portal
+  // mode instead (see .portalBubble below), so this path is a fallback for
+  // any future non-portal rich-content tooltip rather than something live
+  // today.
+  left: 50%;
+  bottom: calc(100% + 8px);
+  z-index: 500;
+  max-width: 240px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--color-black-primary);
+  white-space: normal;
+  word-break: break-word;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-50%) translateY(4px);
+  pointer-events: none;
+  transition: opacity 0.12s ease, transform 0.12s ease, visibility 0s linear 0.12s;
+}
+
+.wrap:hover .bubble {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+  transition: opacity 0.12s ease 0.12s, transform 0.12s ease 0.12s, visibility 0s linear 0s;
+}
+
+// White card — deliberately sets no text color of its own, so content's
+// own colors (e.g. Live Activity's bold domain name, colored price) read
+// exactly like they do in the row itself, just unclipped.
+.light .bubble {
+  background: var(--color-white-primary);
+  border: 1px solid var(--color-border-black-subtle);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+// ── Downward-opening variant ──────────────────────────────────────────────
+// Used inside an ancestor that clips overflow above itself (Live Activity's
+// scrolling list) — an upward-opening bubble on the topmost visible row
+// would need to render above that ancestor's own top edge and get clipped
+// no matter how high its z-index is, since overflow: hidden clips based on
+// the ancestor's box, not stacking order. Opening downward instead keeps
+// the bubble within the list's own bounds.
+.placementBottom.wrap[data-tooltip]::after,
+.placementBottom .bubble {
+  top: calc(100% + 8px);
+  bottom: auto;
+  transform: translateX(-50%) translateY(-4px);
+}
+
+.placementBottom.wrap[data-tooltip]:hover::after,
+.placementBottom:hover .bubble {
+  transform: translateX(-50%) translateY(0);
+}
+
+// ── Portal mode (portal prop) ─────────────────────────────────────────────
+// Rendered straight onto document.body via createPortal, positioned with
+// fixed top/bottom/right from the trigger's live getBoundingClientRect() —
+// so it's a sibling of the page root, not a descendant of any clipped
+// ancestor, and nothing upstream can clip it.
+
+.portalBubble {
+  position: fixed;
+  z-index: 1000;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--color-black-primary);
+  // Plain-text (label) usage renders raw text with no span of its own to
+  // carry a color, so it otherwise inherits the page's default text color
+  // instead of showing up against this dark background.
+  color: var(--color-white-primary);
+  font-family: var(--font-satoshi);
+  font-size: 12px;
+  font-weight: var(--font-weight-medium);
+  line-height: 1.3;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+  // forwards keeps the "to" keyframe's transform (which includes --tt-tx)
+  // applied after the animation ends, instead of the property reverting to
+  // its un-animated default — see the --tt-tx comment in Tooltip.tsx.
+  animation: tooltip-portal-in 0.12s ease forwards;
+}
+
+.portalBubble.light {
+  background: var(--color-white-primary);
+  border: 1px solid var(--color-border-black-subtle);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+// Domain-name-only portal tooltips (label, not content) — same wrapping
+// reasoning as the non-portal attr()-mode tooltip: a domain name has no
+// natural break point, so it needs an explicit max-width and a forced
+// mid-word break instead of running out as one long unbroken line.
+.portalBubbleWrap {
+  white-space: normal;
+  max-width: 260px;
+  word-break: break-all;
+  text-align: center;
+}
+
+@keyframes tooltip-portal-in {
+  from {
     opacity: 0;
-    visibility: hidden;
-    transform: translateY(4px);
-    pointer-events: none;
-    // Hiding: fades out over 120ms, then (only once invisible) drops out
-    // of the layout — so un-hovering doesn't just cut it off mid-fade.
-    transition: opacity 0.12s ease, transform 0.12s ease, visibility 0s linear 0.12s;
+    transform: var(--tt-tx, translateX(0)) translateY(4px);
   }
-
-  &:hover::after {
+  to {
     opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-    // Showing: visibility flips immediately, but the fade itself waits
-    // ~120ms before starting — long enough that brushing past on the way
-    // to something else doesn't flash a tooltip, short enough to still
-    // read as "fast" against a native tooltip's much longer, fixed delay.
-    transition: opacity 0.12s ease 0.12s, transform 0.12s ease 0.12s, visibility 0s linear 0s;
+    transform: var(--tt-tx, translateX(0)) translateY(0);
   }
 }

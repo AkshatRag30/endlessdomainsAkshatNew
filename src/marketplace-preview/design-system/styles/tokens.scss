@@ -410,12 +410,13 @@
  
 }
  
-// Scoped under [data-marketplace-preview] (originally bare h1..ul selectors
-// in the source project) so these resets can never leak into the rest of
-// this project's pages — only markup inside <div data-marketplace-preview>
-// picks them up.
 [data-marketplace-preview] {
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     margin-bottom: 0;
   }
 
@@ -431,4 +432,3 @@
     text-decoration: none;
   }
 }
- 

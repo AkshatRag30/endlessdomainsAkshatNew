@@ -22,14 +22,26 @@ const NAME_STEMS = [
   'solaris', 'mythicnode', 'glasswave', 'obsidian', 'stellarhash', 'cinderwolf',
   'prismatic', 'rovergrid', 'emberlink', 'frostbyte', 'orbitcast', 'wildcircuit',
   'vantagepoint', 'crimsontide', 'hollowmoon', 'silverfrost',
+  // Short/medium fixtures — every stem above is 7+ characters, which left
+  // the Length filter's "1-3 characters" and "4-6 characters" buckets with
+  // nothing to ever match.
+  'nx', 'qi', 'vox', 'nova', 'zeta', 'flux', 'echo',
 ]
+
+const DAY_MS = 24 * 60 * 60 * 1000
 
 function buildListings(): MarketplaceListing[] {
   const chains = [POLYGON, ETHEREUM, ARBITRUM, BSC]
 
   return NAME_STEMS.map((stem, index) => {
     const isHighAppraisal = index % 2 === 0
-    const priceEth = Number((8 + (index % 7) * 1.35).toFixed(2))
+    // Spread across all three Price filter buckets (Under 5 / 5-15 / 15+
+    // ETH) instead of the narrower 8-16 range this used to sit in, which
+    // left "Under 5 ETH" with nothing to ever show.
+    const priceEth = Number((3 + (index % 9) * 2.1).toFixed(2))
+    // Spread across all four Listed filter buckets (today / this week /
+    // this month / older) the same way.
+    const listedDaysAgo = [0.2, 3, 20, 60][index % 4]
 
     return {
       id: `listing-${index + 1}`,
@@ -43,6 +55,7 @@ function buildListings(): MarketplaceListing[] {
       appraisedTrend: isHighAppraisal ? 'high' : 'low',
       isPromoted: index < 8, // matches the Figma file's own promoted row, which repeats 8 cards
       isFavorited: false,
+      listedAt: new Date(Date.now() - listedDaysAgo * DAY_MS).toISOString(),
     }
   })
 }

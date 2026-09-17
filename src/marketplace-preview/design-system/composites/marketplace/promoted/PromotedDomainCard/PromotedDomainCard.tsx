@@ -24,7 +24,7 @@ export const PromotedDomainCard = ({ listing }: PromotedDomainCardProps) => {
         <img src="/assets/img/marketplace/domain-marker.svg" alt="" aria-hidden="true" className={styles.marker} />
         <span className={styles.domainLabel}>domain name</span>
         <div className={styles.domainRow}>
-          <Tooltip label={listing.domainName} className={styles.domainNameTooltip}>
+          <Tooltip label={listing.domainName} placement="bottom" portal className={styles.domainNameTooltip}>
             <span className={styles.domainName}>{listing.domainName}</span>
           </Tooltip>
           <ExtensionBadge extension={listing.extension} />

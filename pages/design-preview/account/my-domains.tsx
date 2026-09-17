@@ -21,18 +21,21 @@ import { useMyDomainsFilters, filterMyDomains } from '@/marketplace-preview/hook
 import styles from './my-domains.module.scss'
 
 /**
- * My Domains dashboard preview, copied over from the design-preview build in
- * the marketplace-v2 project — see marketplace.tsx in this same folder for
- * the shared composites/primitives/styles it reuses from
- * src/marketplace-preview/. Not linked from anywhere in the app — safe to
- * delete. See that project's my-domains-redesign-plan.html for the full
- * plan; this page covers phases 05-09 (stat cards through the right rail).
+ * Temporary preview route for the My Domains dashboard redesign — not
+ * linked from anywhere in the app, safe to delete once reviewed. See
+ * my-domains-redesign-plan.html at the repo root for the full plan; this
+ * page covers phases 05-09 (stat cards through the right rail).
  *
  * Every action button (List, Edit Price, Bulk List, Appraise, Transfer) is
- * intentionally inert — none of these are wired to real modals or on-chain
- * calls yet. MobileBottomNav is deliberately omitted here for the same
- * reason as the source project: it hardcodes "Explore" as the only active
- * tab and has no "My Domains" destination.
+ * intentionally inert — see the plan's section 08 and the Phase 04
+ * checkpoint. DeList and Promote aren't visible in this design at all, and
+ * "Transfer" has no existing mutation anywhere in the codebase yet, so none
+ * of these are wired to real modals or on-chain calls until that's resolved.
+ *
+ * MobileBottomNav (used by the marketplace preview) is deliberately omitted
+ * here — it hardcodes "Explore" as the only active tab and has no "My
+ * Domains" destination, which would just be a persistent, wrong active
+ * state on this page rather than a missing nice-to-have.
  */
 export default function MyDomainsPreview() {
   const [activeStatus, setActiveStatus] = useState<MyDomainsStatusFilter>('all')
@@ -44,7 +47,6 @@ export default function MyDomainsPreview() {
   const filtered = filterMyDomains(summary.domains, activeStatus, debouncedSearch, filters)
 
   return (
-    // Same scoping requirement as marketplace.tsx — see that file's comment.
     <div data-marketplace-preview>
       <Header onMenuClick={() => setMenuOpen((prev) => !prev)} menuOpen={menuOpen} previewMode />
       <MarketplacePageShell

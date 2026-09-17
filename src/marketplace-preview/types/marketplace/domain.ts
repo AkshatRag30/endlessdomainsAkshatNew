@@ -28,4 +28,6 @@ export interface MarketplaceListing {
   appraisedTrend: AppraisedTrend
   isPromoted?: boolean
   isFavorited?: boolean
+  /** ISO timestamp — feeds the Listed filter (Today / This week / This month). */
+  listedAt: string
 }

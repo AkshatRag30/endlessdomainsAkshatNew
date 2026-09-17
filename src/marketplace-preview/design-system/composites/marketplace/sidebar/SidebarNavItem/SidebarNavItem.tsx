@@ -38,12 +38,27 @@ export const SidebarNavItem = ({ item, active = false, previewMode, onSelect }: 
       }
     >
       {/* Figma nodes 23:2916 ("Explore") / 57:9354 ("My domains") — the
-          selected row's own leading icon. Only rendered for the active
-          item, not a persistent per-row icon (the source file doesn't give
-          every row a distinct icon asset to pull). */}
+          selected row's own leading icon, tuned specifically for the active
+          highlighted look. Left as-is rather than swapped for item.icon
+          below, to not disturb an already-approved active-row treatment. */}
       {active && (
         <img src="/assets/img/marketplace/drawer-explore-icon.svg" alt="" aria-hidden="true" className={styles.activeIcon} />
       )}
+
+      {/* Figma node 70:4592 — persistent per-row leading icon for inactive
+          rows (that reference gives every row its own icon, unlike the
+          single active-only asset above). Only items with a matching icon
+          in that design carry one; others fall back to no icon rather than
+          a guessed one. */}
+      {!active &&
+        (item.icon ? (
+          <img src={item.icon} alt="" aria-hidden="true" className={styles.icon} />
+        ) : (
+          // Keeps every row's label starting at the same x position within
+          // a section even though a few items (Recently sold, Under
+          // estimate, Price drops, Alerts) have no matching icon to show.
+          <span className={styles.iconSpacer} aria-hidden="true" />
+        ))}
 
       <span className={styles.label}>{item.label}</span>
 

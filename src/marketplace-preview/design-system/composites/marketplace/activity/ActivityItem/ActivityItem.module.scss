@@ -18,9 +18,17 @@
   flex-shrink: 0;
 }
 
-.text {
+// Tooltip's own .wrap is the direct flex child of .item now (not .text
+// directly) — needs the shrink/min-width pair itself so .text inside it
+// still has a real width to truncate against.
+.textTooltip {
   flex: 1;
   min-width: 0;
+}
+
+.text {
+  display: block;
+  width: 100%;
   margin: 0;
   font-family: var(--font-satoshi);
   font-size: var(--text-small-12);
@@ -28,6 +36,14 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+// Same base look as .text above, minus the truncation rules — this is the
+// full, unclipped copy shown inside the tooltip bubble.
+.tooltipSentence {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  color: var(--color-black-alpha-55);
 }
 
 .domainName {

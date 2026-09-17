@@ -19,26 +19,38 @@ export interface MarketplaceSidebarProps {
 }
 
 /**
- * Renders both sidebar groups from static navigation data (Phase 2), plus
- * a Logout action under "Your Account" when signed in — reusing the exact
- * same useAuth()/logout() the header already uses, not a new auth entry
- * point. Login/Sign Up used to live here too when signed out; they now live
- * inside the header's connect-wallet button instead (see Header/index.tsx),
- * so there's nothing rendered in this slot for a signed-out visitor.
+ * Renders all three sidebar groups from static navigation data — Marketplace
+ * / Seller Hub / Account, matching Figma node 70:3612 — plus a Logout
+ * action under Account when signed in, reusing the exact same
+ * useAuth()/logout() the header already uses, not a new auth entry point.
+ * Login/Sign Up used to live here too when signed out; they now live inside
+ * the header's connect-wallet button instead (see Header/index.tsx), so
+ * there's nothing rendered in this slot for a signed-out visitor.
  */
 export const MarketplaceSidebar = ({ previewMode, initialSelectedId }: MarketplaceSidebarProps) => {
   const { authenticated, logout } = useAuth()
-  const [browseSection, accountSection] = mockSidebarSections
-  const [previewSelectedId, setPreviewSelectedId] = useState<string | null>(initialSelectedId ?? browseSection.items[0]?.id ?? null)
+  const [marketplaceSection, sellerHubSection, accountSection] = mockSidebarSections
+  const [previewSelectedId, setPreviewSelectedId] = useState<string | null>(initialSelectedId ?? marketplaceSection.items[0]?.id ?? null)
 
   return (
     <div className={styles.sidebar}>
       <SidebarSection
-        section={browseSection}
+        section={marketplaceSection}
         previewMode={previewMode}
         selectedId={previewSelectedId}
         onSelectItem={setPreviewSelectedId}
       />
+
+      <div className={styles.divider} />
+
+      <SidebarSection
+        section={sellerHubSection}
+        previewMode={previewMode}
+        selectedId={previewSelectedId}
+        onSelectItem={setPreviewSelectedId}
+      />
+
+      <div className={styles.divider} />
 
       <SidebarSection
         section={accountSection}

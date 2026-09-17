@@ -2,10 +2,6 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { usePathname } from 'next/navigation'
-// This project has no @fortawesome packages installed and no real auth/
-// cookie backend yet — see src/marketplace-preview/stubs/auth.ts. The
-// account dropdown below is unreachable anyway since useAuth() here always
-// returns authenticated: false, so its icons are plain text instead.
 import { useAuth, deleteCookieAttribute, Cookie_Key, logoutUserApi } from '@/marketplace-preview/stubs/auth'
 import { useIsMobile } from '@/marketplace-preview/stubs/useIsMobile'
 import primaryBtnStyles from '@/marketplace-preview/design-system/primitives/buttons/primary-button/Primarybutton.module.scss'
@@ -164,7 +160,6 @@ const Header: React.FC<HeaderProps> = ({ hidden, onMenuClick, menuOpen, previewM
                         }}
                         className="logout-btn nav-link"
                       >
-                        &nbsp;
                         Log Out
                       </button>
                     </li>

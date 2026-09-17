@@ -23,6 +23,12 @@
   }
 }
 
+.divider {
+  height: 1px;
+  margin: 0 var(--space-2-5);
+  background: var(--color-border-black-subtle);
+}
+
 .authAction {
   display: block;
   width: 100%;

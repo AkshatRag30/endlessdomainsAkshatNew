@@ -1,0 +1,111 @@
+@import '@mpstyles/_mixins.scss';
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1-5); // 5px — Figma gap between icon and label
+  width: 162px; // design-specific: Figma-exact tab width
+  height: 47px; // design-specific: Figma-exact tab height (≈ --space-9 48px, nearest token)
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+  overflow: hidden;
+  transition: opacity 150ms ease;
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  @include mobile {
+    width: auto;
+    min-width: unset;
+    height: 32px; // design-specific: Figma-exact active tab height on mobile
+    padding: 0 var(--space-3);
+    flex-shrink: 0;
+  }
+}
+
+// ─── Active ───────────────────────────────────────────────────────────────────
+
+.active {
+  background: var(--color-blue-primary);
+  box-shadow: inset 0 0 17px 0 var(--color-white-primary); // design-specific: Figma-exact inset glow
+
+  .label {
+    font-weight: var(--font-weight-bold);
+  }
+}
+
+// ─── Inactive ─────────────────────────────────────────────────────────────────
+
+.inactive {
+  background: linear-gradient(
+    180deg,
+    var(--color-surface-mid) 0%,
+    var(--color-surface-hover) 100%
+  );
+  box-shadow:
+    3px 3px 3px 0 var(--color-black-alpha-15),
+    inset 0 1px 1px 0 var(--color-white-alpha-25);
+
+  .label {
+    font-weight: var(--font-weight-medium);
+  }
+
+  &:hover {
+    opacity: 0.85;
+  }
+
+  @include mobile {
+    background: transparent;
+    box-shadow: none;
+
+    .label {
+      color: var(--color-gray-primary);
+    }
+
+    .icon {
+      color: var(--color-gray-primary);
+    }
+  }
+}
+
+// ─── Icon ─────────────────────────────────────────────────────────────────────
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px; // design-specific: Figma-exact tab icon container — 2px smaller than --btn-icon-size
+  height: 22px; // design-specific: Figma-exact tab icon container — 2px smaller than --btn-icon-size
+  flex-shrink: 0;
+  color: var(--color-white-primary);
+
+  img,
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  @include mobile {
+    width: 13px; // design-specific: Figma-exact icon size on mobile tab bar
+    height: 13px;
+  }
+}
+
+// ─── Label ────────────────────────────────────────────────────────────────────
+
+.label {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-body-small); // 17px — Figma exact
+  color: var(--color-white-primary);
+  white-space: nowrap;
+  text-transform: capitalize;
+
+  @include mobile {
+    font-size: var(--text-small-12);
+  }
+}

@@ -95,6 +95,7 @@ const PROVIDER_LOGO_BASE = '/assets/img/marketplace/providers'
 export type DomainProviderKey =
   | 'UD'
   | 'ENS'
+  | 'Polygon'
   | 'Arbitrum'
   | 'BinanceSmartChain'
   | 'Bonfida'
@@ -115,6 +116,7 @@ export interface DomainProvider {
 export const DOMAIN_PROVIDERS: DomainProvider[] = [
   { label: 'Unstoppable Domains', image: `${PROVIDER_LOGO_BASE}/ud.svg`, provider: 'UD', colorName: '#7e45e5' },
   { label: 'Ethereum Name Service', image: `${PROVIDER_LOGO_BASE}/ethereum.svg`, provider: 'ENS', colorName: '#60aaf5' },
+  { label: 'Polygon', image: `${PROVIDER_LOGO_BASE}/polygon.svg`, provider: 'Polygon', colorName: '#8247e5' },
   { label: 'Arbitrum', image: `${PROVIDER_LOGO_BASE}/arb.svg`, provider: 'Arbitrum', colorName: '#1a71b1' },
   { label: 'Binance', image: `${PROVIDER_LOGO_BASE}/bnb.svg`, provider: 'BinanceSmartChain', colorName: '#ffc300' },
   { label: 'Bonfida', image: `${PROVIDER_LOGO_BASE}/bonnfida.svg`, provider: 'Bonfida', colorName: '#000' },
@@ -143,14 +145,9 @@ export const getAllDomainProviders = () => DOMAIN_PROVIDERS
 // This project's Chain.id values ('polygon'/'ethereum'/'arbitrum'/'bsc',
 // from src/types/marketplace/domain.ts) predate this ported helper, which
 // keys off the domain-provider name instead. Shared by ChainBadge and
-// DomainAvatar — both places a chain's real logo needs resolving — rather
-// than each keeping its own copy of this mapping. 'UD' stands in for
-// Polygon specifically: Unstoppable Domains' NFTs are minted on Polygon in
-// this app, and UD's own brand purple already near-matches Polygon's, which
-// is why the old dot-only ChainBadge used --color-purple-primary for
-// 'polygon' too.
+// DomainAvatar — both places a chain's real logo needs resolving.
 const CHAIN_ID_TO_PROVIDER: Record<string, DomainProviderKey> = {
-  polygon: 'UD',
+  polygon: 'Polygon',
   ethereum: 'ENS',
   arbitrum: 'Arbitrum',
   bsc: 'BinanceSmartChain',

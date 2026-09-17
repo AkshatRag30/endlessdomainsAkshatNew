@@ -35,7 +35,7 @@ export const ListingDomainCell = ({ listing }: ListingDomainCellProps) => (
       {/* Was a native title="" tooltip — unstyled OS chrome with a slow,
           browser-controlled delay. Themed Tooltip primitive instead, same
           reasoning applied across both marketplace and My Domains now. */}
-      <Tooltip label={listing.domainName} className={styles.domainNameTooltip}>
+      <Tooltip label={listing.domainName} portal className={styles.domainNameTooltip}>
         <span className={styles.domainNameScroll}>
           <span className={styles.domainName}>{listing.domainName}</span>
         </span>
