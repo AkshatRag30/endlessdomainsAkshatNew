@@ -22,9 +22,15 @@
 
 .header {
   display: grid;
-  // Must match ListingRow.module.scss's .row ratio exactly, minmax floor
-  // included — see that file's comment for why the floor is there.
-  grid-template-columns: minmax(310px, 2.4fr) 1fr 1.4fr 1.2fr 1.9fr;
+  // Must match ListingRow.module.scss's .row ratio exactly, including the
+  // @include wide-scoped minmax floor — see that file's comment for why
+  // it's scoped there instead of being unconditional.
+  grid-template-columns: 2.4fr 1fr 1.4fr 1.2fr 1.9fr;
+
+  @include wide {
+    grid-template-columns: minmax(310px, 2.4fr) 1fr 1.4fr 1.2fr 1.9fr;
+  }
+
   background: var(--color-white-primary);
   border: 1px solid var(--color-border-black-subtle);
   border-radius: 3px;

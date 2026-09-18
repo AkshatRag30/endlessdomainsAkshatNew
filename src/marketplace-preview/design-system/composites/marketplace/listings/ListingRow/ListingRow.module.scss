@@ -14,18 +14,26 @@
 // separately, fully scrollable pane — see that file's .mobileSplit.
 .row {
   display: grid;
-  // Domain's 2.4fr had no floor, so on a real laptop viewport — main
-  // column narrower than a desktop monitor's, sidebar/rail still fixed
-  // width either side — its actual pixel share shrank below what the
-  // truncated 25-character name plus the premium marker and extension
-  // badge need, so the CSS ellipsis clipped it well short of that cap
-  // (fine at ≥1600px-ish, where the fr share alone was already enough).
-  // minmax's floor is sized for that worst case (marker + 25 chars @
-  // 15px/Bold + extension badge + cell padding) so the full 25 characters
-  // render at any desktop width, not just a wide one. Must match
-  // LiveListingsTable.module.scss's .header ratio exactly, or the header
-  // and rows drift out of alignment.
-  grid-template-columns: minmax(310px, 2.4fr) 1fr 1.4fr 1.2fr 1.9fr;
+  // Plain fr share by default — no forced minimum on Domain — so it just
+  // truncates further via .domainName's own ellipsis on anything narrower
+  // than wide. A fixed 310px floor here used to be unconditional, which
+  // is exactly what squeezed the other columns at ~1376px (13" iPad Pro
+  // landscape is only 10px narrower than 1366px, the single most common
+  // laptop width — there's no width-only way to give one a floor without
+  // giving it to the other too). The 25-character guarantee is a wide-
+  // screen nice-to-have, not a requirement at every width, so it's scoped
+  // to @include wide below instead of living here unconditionally. Must
+  // match LiveListingsTable.module.scss's .header ratio exactly (both
+  // rules), or the header and rows drift out of alignment.
+  grid-template-columns: 2.4fr 1fr 1.4fr 1.2fr 1.9fr;
+
+  @include wide {
+    // minmax's floor is sized for the worst case (marker + 25 chars @
+    // 15px/Bold + extension badge + cell padding) so the full 25
+    // characters reliably render at genuinely wide desktop widths.
+    grid-template-columns: minmax(310px, 2.4fr) 1fr 1.4fr 1.2fr 1.9fr;
+  }
+
   // Was align-items: center — that only centers each .cell inside the grid
   // row instead of stretching it, so a .cell shorter than the row's own
   // height left its border-left column divider floating short of the

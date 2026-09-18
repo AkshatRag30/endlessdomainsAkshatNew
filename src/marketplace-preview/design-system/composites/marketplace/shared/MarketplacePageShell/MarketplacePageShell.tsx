@@ -27,14 +27,35 @@ export const MarketplacePageShell = ({ sidebar, hero, rightRail, children, sideb
   // page — the page underneath is still the normal scrollable document, so
   // without this it keeps scrolling behind the drawer while it's open,
   // which reads as broken (the drawer appears to float/jump against
-  // content moving behind it). Restored on close and on unmount so it can
-  // never get stuck locked if this component goes away while still open.
+  // content moving behind it). `overflow: hidden` alone was the first pass
+  // here, and it's enough on desktop, but real bug on iOS Safari: it does
+  // NOT block touch-drag scroll/rubber-banding on the body at all, only
+  // mouse-wheel and keyboard scrolling — the exact case that matters for a
+  // mobile hamburger menu. Pinning the body at its current scroll offset
+  // via position: fixed is the standard workaround that actually holds on
+  // iOS. Scroll position and every overridden style are restored on close
+  // and on unmount so it can never get stuck locked or jump to the top if
+  // this component goes away while still open.
   useEffect(() => {
     if (!sidebarOpen) return
-    const previousOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
+    const { body } = document
+    const scrollY = window.scrollY
+    const previous = {
+      overflow: body.style.overflow,
+      position: body.style.position,
+      top: body.style.top,
+      width: body.style.width,
+    }
+    body.style.overflow = 'hidden'
+    body.style.position = 'fixed'
+    body.style.top = `-${scrollY}px`
+    body.style.width = '100%'
     return () => {
-      document.body.style.overflow = previousOverflow
+      body.style.overflow = previous.overflow
+      body.style.position = previous.position
+      body.style.top = previous.top
+      body.style.width = previous.width
+      window.scrollTo(0, scrollY)
     }
   }, [sidebarOpen])
 

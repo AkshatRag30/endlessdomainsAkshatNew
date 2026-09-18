@@ -10,18 +10,26 @@
 // rows drift out of alignment.
 .row {
   display: grid;
-  // Domain's 2fr had no floor, so on a real laptop viewport — main column
-  // narrower than a desktop monitor's, sidebar/rail still fixed width
-  // either side — its actual pixel share shrank below what the truncated
-  // 25-character name plus the avatar, crown, and extension badge need,
-  // so the CSS ellipsis clipped it well short of that cap (fine at a
-  // wide-enough viewport, where the fr share alone was already enough).
-  // minmax's floor is sized for that worst case (avatar + 25 chars @
-  // 15px/Bold + extension badge + cell padding) so the full 25 characters
-  // render at any desktop width, not just a wide one. Must match
-  // MyDomainsTable.module.scss's .header ratio exactly, or the header and
-  // rows drift out of alignment.
-  grid-template-columns: minmax(320px, 2fr) 0.9fr 1.1fr 0.9fr 0.8fr 1.4fr;
+  // Plain fr share by default — no forced minimum on Domain — so it just
+  // truncates further via .domainName's own ellipsis on anything narrower
+  // than wide. A fixed 320px floor here used to be unconditional, which
+  // is exactly what squeezes the other columns at ~1376px (13" iPad Pro
+  // landscape is only 10px narrower than 1366px, the single most common
+  // laptop width — there's no width-only way to give one a floor without
+  // giving it to the other too). The 25-character guarantee is a wide-
+  // screen nice-to-have, not a requirement at every width, so it's scoped
+  // to @include wide below instead of living here unconditionally. Must
+  // match MyDomainsTable.module.scss's .header ratio exactly (both
+  // rules), or the header and rows drift out of alignment.
+  grid-template-columns: 2fr 0.9fr 1.1fr 0.9fr 0.8fr 1.4fr;
+
+  @include wide {
+    // minmax's floor is sized for the worst case (avatar + 25 chars @
+    // 15px/Bold + extension badge + cell padding) so the full 25
+    // characters reliably render at genuinely wide desktop widths.
+    grid-template-columns: minmax(320px, 2fr) 0.9fr 1.1fr 0.9fr 0.8fr 1.4fr;
+  }
+
   // Was align-items: center — that only centers each .cell inside the grid
   // row instead of stretching it, so a .cell shorter than the row's own
   // height left its border-left column divider floating short of the row's
