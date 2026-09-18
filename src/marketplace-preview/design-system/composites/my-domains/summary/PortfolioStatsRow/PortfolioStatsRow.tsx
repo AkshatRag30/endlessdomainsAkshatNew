@@ -1,6 +1,6 @@
 import React from 'react'
-import StatCard from '@/marketplace-preview/design-system/primitives/cards/stat-card'
-import type { MyDomainsSummary } from '@/marketplace-preview/types/my-domains'
+import StatCard from '@/design-system/primitives/cards/stat-card'
+import type { MyDomainsSummary } from '@/types/my-domains'
 import styles from './PortfolioStatsRow.module.scss'
 
 export interface PortfolioStatsRowProps {

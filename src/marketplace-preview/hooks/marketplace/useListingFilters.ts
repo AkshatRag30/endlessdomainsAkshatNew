@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useDebounces } from '@/utils/useDebounce'
-import type { MarketplaceListing } from '@/marketplace-preview/types/marketplace'
+import type { MarketplaceListing } from '@/types/marketplace'
 
 export interface ListingFilters {
   search: string

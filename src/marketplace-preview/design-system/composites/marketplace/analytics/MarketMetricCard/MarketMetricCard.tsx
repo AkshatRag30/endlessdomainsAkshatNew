@@ -1,7 +1,7 @@
 import React from 'react'
-import type { MarketMetric, MarketTimeRange } from '@/marketplace-preview/types/marketplace'
-import Badge from '@/marketplace-preview/design-system/primitives/badges/badge'
-import Sparkline from '@/marketplace-preview/design-system/primitives/charts/sparkline'
+import type { MarketMetric, MarketTimeRange } from '@/types/marketplace'
+import Badge from '@/design-system/primitives/badges/badge'
+import Sparkline from '@/design-system/primitives/charts/sparkline'
 import styles from './MarketMetricCard.module.scss'
 
 export interface MarketMetricCardProps {

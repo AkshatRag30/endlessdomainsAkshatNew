@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import styles from './MarketplacePageShell.module.scss'
 
 export interface MarketplacePageShellProps {
@@ -22,6 +22,21 @@ export interface MarketplacePageShellProps {
  */
 export const MarketplacePageShell = ({ sidebar, hero, rightRail, children, sidebarOpen, onCloseSidebar }: MarketplacePageShellProps) => {
   const sidebarClass = [styles.sidebar, sidebarOpen ? styles.sidebarOpen : ''].filter(Boolean).join(' ')
+
+  // The drawer is a fixed-position overlay, not a modal that replaces the
+  // page — the page underneath is still the normal scrollable document, so
+  // without this it keeps scrolling behind the drawer while it's open,
+  // which reads as broken (the drawer appears to float/jump against
+  // content moving behind it). Restored on close and on unmount so it can
+  // never get stuck locked if this component goes away while still open.
+  useEffect(() => {
+    if (!sidebarOpen) return
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = previousOverflow
+    }
+  }, [sidebarOpen])
 
   return (
     <div className={styles.shell}>

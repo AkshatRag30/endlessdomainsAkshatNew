@@ -1,4 +1,4 @@
-@import '@mpstyles/_mixins.scss';
+@import '@newstyles/_mixins.scss';
 
 // Figma node 34:2031 — mobile-only ticker under the header, above the hero.
 // Hidden entirely outside mobile since it has no tablet/desktop reference.
@@ -123,7 +123,7 @@
   padding: 0 var(--space-4);
   font-family: var(--font-space-grotesk);
   font-size: var(--text-small-12);
-  color: #8880a6; // design-specific: Figma-exact, matches .time
+  color: var(--color-gray-dark); // was #8880a6 — a light-on-dark color, washed out now the bar is white
   white-space: nowrap;
   line-height: 30px;
 }
@@ -199,7 +199,7 @@
   font-family: var(--font-space-grotesk);
   font-weight: var(--font-weight-semibold);
   font-size: 13px;
-  color: #b9a7ff; // design-specific: Figma-exact
+  color: var(--color-purple-primary); // was #b9a7ff — a light-on-dark color, washed out now the bar is white
 }
 
 .change {
@@ -210,20 +210,23 @@
   border-radius: 4px;
 }
 
+// Same success/danger pairing Badge.module.scss uses for the Market
+// Activity percent-change badge — was a light-on-dark tint (rgba over a
+// near-black row) that read as washed out once the bar became white.
 .up {
-  background: rgba(124, 242, 180, 0.14); // design-specific: Figma-exact, dark-row tint has no light-theme token equivalent
-  color: #7cf2b4; // design-specific: Figma-exact
+  background: #e7f6ee;
+  color: #12a05c;
 }
 
 .down {
-  background: rgba(255, 157, 157, 0.14); // design-specific: Figma-exact
-  color: #ff9d9d; // design-specific: Figma-exact
+  background: var(--color-error-soft-bg);
+  color: var(--color-error);
 }
 
 .time {
   font-family: var(--font-space-grotesk);
   font-size: var(--text-small-12);
-  color: #8880a6; // design-specific: Figma-exact
+  color: var(--color-gray-dark); // was #8880a6 — a light-on-dark color, washed out now the bar is white
 }
 
 @keyframes ticker-marquee {

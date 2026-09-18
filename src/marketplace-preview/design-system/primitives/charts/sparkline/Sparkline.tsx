@@ -1,6 +1,6 @@
 import React, { useId } from 'react'
 import { AreaChart, Area, BarChart, Bar, ResponsiveContainer } from 'recharts'
-import { ChartPoint } from '@/marketplace-preview/types/marketplace'
+import { ChartPoint } from '@/types/marketplace'
 import styles from './Sparkline.module.scss'
 
 export interface SparklineProps {

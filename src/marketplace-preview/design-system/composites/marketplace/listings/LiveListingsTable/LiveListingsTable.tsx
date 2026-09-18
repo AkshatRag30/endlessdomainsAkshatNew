@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import type { MarketplaceListing } from '@/marketplace-preview/types/marketplace'
-import DefaultButton from '@/marketplace-preview/design-system/primitives/buttons/default-buttons'
+import type { MarketplaceListing } from '@/types/marketplace'
+import DefaultButton from '@/design-system/primitives/buttons/default-buttons'
 import PromotedDomainCard from '../../promoted/PromotedDomainCard'
 import ListingRow from '../ListingRow'
 import styles from './LiveListingsTable.module.scss'

@@ -1,8 +1,8 @@
 import React from 'react'
-import SearchInput from '@/marketplace-preview/design-system/primitives/inputs/search-input'
-import FilterDropdown from '@/marketplace-preview/design-system/primitives/inputs/filter-dropdown'
-import ViewToggle, { ViewMode } from '@/marketplace-preview/design-system/primitives/toggles/view-toggle'
-import type { MyDomainsFilters } from '@/marketplace-preview/hooks/my-domains/useMyDomainsFilters'
+import SearchInput from '@/design-system/primitives/inputs/search-input'
+import FilterDropdown from '@/design-system/primitives/inputs/filter-dropdown'
+import ViewToggle, { ViewMode } from '@/design-system/primitives/toggles/view-toggle'
+import type { MyDomainsFilters } from '@/hooks/my-domains/useMyDomainsFilters'
 import styles from './MyDomainsFilterBar.module.scss'
 
 export interface MyDomainsFilterBarProps {

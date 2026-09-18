@@ -1,6 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
-import { mockSidebarSections } from '@/marketplace-preview/data/marketplace/navigation'
+import { mockSidebarSections } from '@/data/marketplace/navigation'
 import styles from './MobileBottomNav.module.scss'
 
 interface BottomNavItem {

@@ -1,6 +1,6 @@
 import React from 'react'
-import InfoListCard from '@/marketplace-preview/design-system/primitives/cards/info-list-card'
-import { quickActions } from '@/marketplace-preview/data/my-domains/actions'
+import InfoListCard from '@/design-system/primitives/cards/info-list-card'
+import { quickActions } from '@/data/my-domains/actions'
 
 const ICON_BY_ACTION: Record<string, string> = {
   list: '/assets/img/my-domains/action-list.svg',

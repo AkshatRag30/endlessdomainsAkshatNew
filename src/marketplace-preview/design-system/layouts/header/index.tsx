@@ -2,9 +2,14 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { usePathname } from 'next/navigation'
-import { useAuth, deleteCookieAttribute, Cookie_Key, logoutUserApi } from '@/marketplace-preview/stubs/auth'
-import { useIsMobile } from '@/marketplace-preview/stubs/useIsMobile'
-import primaryBtnStyles from '@/marketplace-preview/design-system/primitives/buttons/primary-button/Primarybutton.module.scss'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faGlobe, faChartLine, faHeart, faUser, faArrowRightArrowLeft, faSignOutAlt } from '@fortawesome/free-solid-svg-icons'
+import { useAuth } from '@/context/AuthContext'
+import { deleteCookieAttribute } from '@/core/services/cookies.service'
+import { Cookie_Key } from '@/core/enum/cookie.enum'
+import { useIsMobile } from '@/utils/UseIsMobile'
+import { logoutUserApi } from '@/core/services/api.service'
+import primaryBtnStyles from '@/design-system/primitives/buttons/primary-button/Primarybutton.module.scss'
 import styles from './Header.module.scss'
 import { HEADER_NAV_ITEMS } from './menuItems'
 
@@ -129,27 +134,27 @@ const Header: React.FC<HeaderProps> = ({ hidden, onMenuClick, menuOpen, previewM
                   <ul className="dropdown-list">
                     <li>
                       <Link href="/profile/domains" onClick={() => setShowDropdown(false)} className="nav-link">
-                        My Domains
+                        <FontAwesomeIcon icon={faGlobe} /> My Domains
                       </Link>
                     </li>
                     <li>
                       <Link href="/profile/analytics" onClick={() => setShowDropdown(false)} className="nav-link">
-                        Analytics
+                        <FontAwesomeIcon icon={faChartLine} /> Analytics
                       </Link>
                     </li>
                     <li>
                       <Link href="/profile/watchlist" onClick={() => setShowDropdown(false)} className="nav-link">
-                        Watchlist
+                        <FontAwesomeIcon icon={faHeart} /> Watchlist
                       </Link>
                     </li>
                     <li>
                       <Link href="/profile/userProfile" onClick={() => setShowDropdown(false)}>
-                        Profile
+                        <FontAwesomeIcon icon={faUser} /> Profile
                       </Link>
                     </li>
                     <li>
                       <Link href="/transaction-history" onClick={() => setShowDropdown(false)} className="nav-link">
-                        Transaction History
+                        <FontAwesomeIcon icon={faArrowRightArrowLeft} /> Transaction History
                       </Link>
                     </li>
                     <li>
@@ -160,6 +165,7 @@ const Header: React.FC<HeaderProps> = ({ hidden, onMenuClick, menuOpen, previewM
                         }}
                         className="logout-btn nav-link"
                       >
+                        <FontAwesomeIcon icon={faSignOutAlt} />
                         Log Out
                       </button>
                     </li>

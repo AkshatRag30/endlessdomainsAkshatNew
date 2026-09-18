@@ -1,7 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
-import { useAuth } from '@/marketplace-preview/stubs/auth'
-import primaryBtnStyles from '@/marketplace-preview/design-system/primitives/buttons/primary-button/Primarybutton.module.scss'
+import { useAuth } from '@/context/AuthContext'
+import primaryBtnStyles from '@/design-system/primitives/buttons/primary-button/Primarybutton.module.scss'
 import styles from './SidebarPromoCard.module.scss'
 
 /**

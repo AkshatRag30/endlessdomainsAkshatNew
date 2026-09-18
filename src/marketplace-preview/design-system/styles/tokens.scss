@@ -1,6 +1,6 @@
  
  
-[data-marketplace-preview] {
+:root {
  
   // ── Slider Card ───────────────────────────────────────────────────────────
   --color-slider-card-from: #6573ff;
@@ -342,7 +342,7 @@
  
 // Large Desktop
 @media (max-width: 1400px) {
-  [data-marketplace-preview] {
+  :root {
     --section-spacing: 100px;
     --container-padding-x: 60px;
     --header-height: 68px;
@@ -351,7 +351,7 @@
  
 // Desktop
 @media (max-width: 1200px) {
-  [data-marketplace-preview] {
+  :root {
     --section-spacing: 80px;
     --section-spacing-inner: 60px;
     --container-padding-x: 48px;
@@ -363,7 +363,7 @@
  
 // Tablet
 @media (max-width: 992px) {
-  [data-marketplace-preview] {
+  :root {
     --section-spacing: 64px;
     --section-spacing-inner: 48px;
     --container-padding-x: 32px;
@@ -376,7 +376,7 @@
  
 // Mobile Large
 @media (max-width: 768px) {
-  [data-marketplace-preview] {
+  :root {
     --section-spacing: 58px;
     --section-spacing-inner: 32px;
     --container-padding-x: 24px;
@@ -396,7 +396,7 @@
  
 // Mobile Small
 @media (max-width: 480px) {
-  [data-marketplace-preview] {
+  :root {
     --section-spacing: 52px;
     --section-spacing-inner: 24px;
     --container-padding-x: 16px;
@@ -410,26 +410,24 @@
  
 }
  
-[data-marketplace-preview] {
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    margin-bottom: 0;
-  }
-
-  ul {
-    padding: 0;
-  }
-
-  ul li {
-    list-style: none;
-  }
-
-  ul li a {
-    text-decoration: none;
-  }
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin-bottom: 0;
+}
+ 
+ul {
+  padding: 0;
+}
+ 
+ul li {
+  list-style: none;
+}
+ 
+ul li a {
+  text-decoration: none;
 }
  

@@ -1,4 +1,4 @@
-import { ListingCategory } from '@/marketplace-preview/types/marketplace'
+import { ListingCategory } from '@/types/marketplace'
 
 /** STATIC MOCK DATA — category counts confirmed against Figma node 1:1515's real design context. */
 

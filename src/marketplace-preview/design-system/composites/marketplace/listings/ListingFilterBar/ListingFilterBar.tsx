@@ -1,7 +1,7 @@
 import React from 'react'
-import SearchInput from '@/marketplace-preview/design-system/primitives/inputs/search-input'
-import FilterDropdown from '@/marketplace-preview/design-system/primitives/inputs/filter-dropdown'
-import type { ListingFilters } from '@/marketplace-preview/hooks/marketplace/useListingFilters'
+import SearchInput from '@/design-system/primitives/inputs/search-input'
+import FilterDropdown from '@/design-system/primitives/inputs/filter-dropdown'
+import type { ListingFilters } from '@/hooks/marketplace/useListingFilters'
 import styles from './ListingFilterBar.module.scss'
 
 export interface ListingFilterBarProps {

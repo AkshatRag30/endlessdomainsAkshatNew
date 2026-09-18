@@ -1,6 +1,6 @@
 import React from 'react'
-import type { ActivityFeedItem } from '@/marketplace-preview/types/marketplace'
-import Tooltip from '@/marketplace-preview/design-system/primitives/tooltip'
+import type { ActivityFeedItem } from '@/types/marketplace'
+import Tooltip from '@/design-system/primitives/tooltip'
 import styles from './ActivityItem.module.scss'
 
 export interface ActivityItemProps {

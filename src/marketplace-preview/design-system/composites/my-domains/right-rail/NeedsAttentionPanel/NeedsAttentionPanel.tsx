@@ -1,6 +1,6 @@
 import React from 'react'
-import InfoListCard from '@/marketplace-preview/design-system/primitives/cards/info-list-card'
-import type { MyDomainListing } from '@/marketplace-preview/types/my-domains'
+import InfoListCard from '@/design-system/primitives/cards/info-list-card'
+import type { MyDomainListing } from '@/types/my-domains'
 import styles from './NeedsAttentionPanel.module.scss'
 
 export interface NeedsAttentionPanelProps {

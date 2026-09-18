@@ -1,5 +1,5 @@
 import React from 'react'
-import type { ListingCategory } from '@/marketplace-preview/types/marketplace'
+import type { ListingCategory } from '@/types/marketplace'
 import styles from './ListingCategoryTabs.module.scss'
 
 export interface ListingCategoryTabsProps {

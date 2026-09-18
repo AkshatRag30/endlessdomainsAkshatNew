@@ -1,4 +1,4 @@
-import { ActivityFeedItem, TickerItem } from '@/marketplace-preview/types/marketplace'
+import { ActivityFeedItem, TickerItem } from '@/types/marketplace'
 
 /** STATIC MOCK DATA — no market-wide activity endpoint exists yet, see src/types/marketplace/activity.ts. */
 

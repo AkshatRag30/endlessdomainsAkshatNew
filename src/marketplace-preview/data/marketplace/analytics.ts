@@ -1,4 +1,4 @@
-import { ChartPoint, MarketMetric, MarketTimeRange } from '@/marketplace-preview/types/marketplace'
+import { ChartPoint, MarketMetric, MarketTimeRange } from '@/types/marketplace'
 
 /** STATIC MOCK DATA — no time-ranged market metrics endpoint exists yet, see src/types/marketplace/analytics.ts. */
 

@@ -1,6 +1,6 @@
 import React from 'react'
-import ListingCategoryTabs from '@/marketplace-preview/design-system/composites/marketplace/listings/ListingCategoryTabs'
-import type { DomainStatus, MyDomainsStatusCounts } from '@/marketplace-preview/types/my-domains'
+import ListingCategoryTabs from '@/design-system/composites/marketplace/listings/ListingCategoryTabs'
+import type { DomainStatus, MyDomainsStatusCounts } from '@/types/my-domains'
 
 export type MyDomainsStatusFilter = DomainStatus | 'all'
 

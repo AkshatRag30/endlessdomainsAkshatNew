@@ -1,4 +1,4 @@
-import { Chain, MarketplaceListing } from '@/marketplace-preview/types/marketplace'
+import { Chain, MarketplaceListing } from '@/types/marketplace'
 
 /**
  * STATIC MOCK DATA — not live. See useMarketplaceListings (Phase 3+) for the

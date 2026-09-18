@@ -1,4 +1,4 @@
-import type { MyDomainListing } from '@/marketplace-preview/types/my-domains'
+import type { MyDomainListing } from '@/types/my-domains'
 
 // Shared between MyDomainRow (list view) and MyDomainCard (grid view) —
 // both render the exact same fields, just laid out differently.

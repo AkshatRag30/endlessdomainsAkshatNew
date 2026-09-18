@@ -5,12 +5,19 @@ $breakpoint-mobile: 768px;
 // Was 992px, leaving a 992–1024px dead zone that fell through to the
 // desktop rules below (nothing was scoped to it) — real iPad Pro widths
 // (834px portrait, 1024px landscape/12.9") landed in that gap and got the
-// unmodified desktop layout. Tablet now runs right up to $breakpoint-desktop
-// so there's no gap between the two. No other file references this
-// variable or the tablet/tablet-down/tablet-up mixins it drives (checked),
-// so this only affects the marketplace preview that uses them today.
-$breakpoint-tablet: 1025px;
-$breakpoint-desktop: 1025px;
+// unmodified desktop layout. Bumped again from 1025 to 1040 — the newer
+// 13" iPad Pro (M4) is 1032px in portrait, just past the old 1025
+// cutoff, so it was falling into the fixed sidebar+rail desktop grid
+// instead of this breakpoint's single-column, full-width tablet layout
+// (Figma node 74:6318) where the listings table isn't squeezed at all.
+// Real laptops start well above 1040 (1280px+), so this doesn't reclaim
+// any width from the desktop layout that a laptop actually uses. Tablet
+// now runs right up to $breakpoint-desktop so there's no gap between the
+// two. No other file references this variable or the
+// tablet/tablet-down/tablet-up mixins it drives (checked), so this only
+// affects the marketplace preview that uses them today.
+$breakpoint-tablet: 1040px;
+$breakpoint-desktop: 1040px;
 $breakpoint-wide: 1440px;
 
 

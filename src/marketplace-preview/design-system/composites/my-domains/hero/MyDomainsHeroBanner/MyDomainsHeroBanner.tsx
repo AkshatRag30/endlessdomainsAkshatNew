@@ -1,6 +1,6 @@
 import React from 'react'
-import SecondaryButton from '@/marketplace-preview/design-system/primitives/buttons/secondary-button'
-import PrimaryButton from '@/marketplace-preview/design-system/primitives/buttons/primary-button'
+import SecondaryButton from '@/design-system/primitives/buttons/secondary-button'
+import PrimaryButton from '@/design-system/primitives/buttons/primary-button'
 import styles from './MyDomainsHeroBanner.module.scss'
 
 export interface MyDomainsHeroBannerProps {

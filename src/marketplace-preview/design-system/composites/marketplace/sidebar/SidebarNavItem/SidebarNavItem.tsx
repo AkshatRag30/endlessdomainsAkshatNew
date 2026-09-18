@@ -1,6 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
-import type { SidebarNavItem as SidebarNavItemData } from '@/marketplace-preview/types/marketplace'
+import type { SidebarNavItem as SidebarNavItemData } from '@/types/marketplace'
 import styles from './SidebarNavItem.module.scss'
 
 export interface SidebarNavItemProps {
