@@ -9,17 +9,24 @@ import styles from './PromotedDomainCard.module.scss'
 
 export interface PromotedDomainCardProps {
   listing: MarketplaceListing
+  /** Controlled favorite state — LiveListingsTable's mobile card view passes this so a card agrees with the desktop row on which listings are favorited. Falls back to internal state (uncontrolled) for the promoted marquee's own usage below, which never passes it. */
+  favorited?: boolean
+  onToggleFavorite?: () => void
+  /** LiveListingsTable's mobile card view — stretches to the list's full width instead of this card's own fixed 282px marquee width. */
+  fullWidth?: boolean
 }
 
 const formatEth = (value: number) => `${value.toFixed(2)} ETH`
 const formatUsd = (value: number) => `$${value.toLocaleString('en-US')}`
 
 /** Figma node 1:1034 — measurements, colors, and fonts taken from get_design_context, not the screenshot alone. */
-export const PromotedDomainCard = ({ listing }: PromotedDomainCardProps) => {
-  const [favorited, setFavorited] = useState(!!listing.isFavorited)
+export const PromotedDomainCard = ({ listing, favorited: favoritedProp, onToggleFavorite, fullWidth }: PromotedDomainCardProps) => {
+  const [favoritedState, setFavoritedState] = useState(!!listing.isFavorited)
+  const favorited = favoritedProp ?? favoritedState
+  const toggleFavorite = onToggleFavorite ?? (() => setFavoritedState((prev) => !prev))
 
   return (
-    <div className={styles.card}>
+    <div className={[styles.card, fullWidth && styles.fullWidth].filter(Boolean).join(' ')}>
       <div className={styles.topRow}>
         <img src="/assets/img/marketplace/domain-marker.svg" alt="" aria-hidden="true" className={styles.marker} />
         <span className={styles.domainLabel}>domain name</span>
@@ -64,7 +71,7 @@ export const PromotedDomainCard = ({ listing }: PromotedDomainCardProps) => {
             className={styles.favorite}
             aria-pressed={favorited}
             aria-label={favorited ? 'Remove from watchlist' : 'Add to watchlist'}
-            onClick={() => setFavorited((prev) => !prev)}
+            onClick={toggleFavorite}
           >
             <img
               src="/assets/img/marketplace/favorite.svg"

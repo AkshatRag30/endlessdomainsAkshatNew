@@ -18,6 +18,13 @@
   flex-direction: column;
 }
 
+// LiveListingsTable's mobile card view — a vertical stack of full-width
+// cards instead of this card's own fixed-width horizontal marquee use.
+.fullWidth {
+  width: 100%;
+  flex-shrink: 1;
+}
+
 // ── Top row: marker + domain name + extension ──────────────────────────────
 
 .topRow {

@@ -57,6 +57,19 @@
     top: 0;
     max-height: 100vh;
     overflow-y: auto;
+
+    // On a laptop-height viewport (shorter than a desktop monitor) the nav
+    // content is genuinely taller than 100vh, so a scroll is needed — same
+    // situation .rightRail already has below. Hidden here for the same
+    // reason: this sidebar reads as a fixed nav panel, not a scroll area,
+    // so a visible scrollbar down its side looks like a layout bug rather
+    // than an affordance. Still scrolls, the bar itself just isn't drawn.
+    scrollbar-width: none; // Firefox
+    -ms-overflow-style: none; // old Edge/IE
+
+    &::-webkit-scrollbar {
+      display: none; // Chrome, Safari, current Edge
+    }
   }
 
   @include tablet-down {

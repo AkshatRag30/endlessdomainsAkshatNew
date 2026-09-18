@@ -10,6 +10,12 @@ import styles from './ListingRow.module.scss'
 const formatEth = (value: number) => `${value.toFixed(2)} ETH`
 const formatUsd = (value: number) => `$${value.toLocaleString('en-US')}`
 
+// Same 25-character cap as My Domains' truncateDomainName (see that file's
+// formatMyDomain.ts) — the full name still shows in the Tooltip on hover.
+const DOMAIN_NAME_MAX_CHARS = 25
+const truncateDomainName = (name: string, max = DOMAIN_NAME_MAX_CHARS) =>
+  name.length > max ? `${name.slice(0, max)}…` : name
+
 export interface ListingDomainCellProps {
   listing: MarketplaceListing
 }
@@ -37,7 +43,7 @@ export const ListingDomainCell = ({ listing }: ListingDomainCellProps) => (
           reasoning applied across both marketplace and My Domains now. */}
       <Tooltip label={listing.domainName} portal className={styles.domainNameTooltip}>
         <span className={styles.domainNameScroll}>
-          <span className={styles.domainName}>{listing.domainName}</span>
+          <span className={styles.domainName}>{truncateDomainName(listing.domainName)}</span>
         </span>
       </Tooltip>
       <ExtensionBadge extension={listing.extension} />

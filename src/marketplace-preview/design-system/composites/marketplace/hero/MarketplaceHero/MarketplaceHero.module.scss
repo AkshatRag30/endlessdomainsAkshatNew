@@ -2,9 +2,6 @@
 
 .hero {
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   width: 100%;
   aspect-ratio: 835 / 172; // design-specific: Figma-exact hero proportions
   border-radius: 4.5px; // design-specific: Figma-exact
@@ -17,19 +14,4 @@
   @include mobile {
     aspect-ratio: 355 / 105; // design-specific: Figma-exact mobile crop (node 20:1191) — was 4/3, way too tall against the real mockup
   }
-}
-
-.badge {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-2) var(--space-4);
-  background: #0a0c17; // design-specific: Figma-exact, no token match
-  border-radius: var(--radius-md);
-}
-
-.logo {
-  display: block;
-  height: clamp(32px, 5vw, 44px); // design-specific: scales down before the hero itself does
-  width: auto;
 }

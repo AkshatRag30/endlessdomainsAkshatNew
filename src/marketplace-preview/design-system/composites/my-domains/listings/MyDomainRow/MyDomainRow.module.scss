@@ -10,17 +10,40 @@
 // rows drift out of alignment.
 .row {
   display: grid;
-  grid-template-columns: 2fr 0.9fr 1.1fr 0.9fr 0.8fr 1.4fr;
-  align-items: center;
+  // Domain's 2fr had no floor, so on a real laptop viewport — main column
+  // narrower than a desktop monitor's, sidebar/rail still fixed width
+  // either side — its actual pixel share shrank below what the truncated
+  // 25-character name plus the avatar, crown, and extension badge need,
+  // so the CSS ellipsis clipped it well short of that cap (fine at a
+  // wide-enough viewport, where the fr share alone was already enough).
+  // minmax's floor is sized for that worst case (avatar + 25 chars @
+  // 15px/Bold + extension badge + cell padding) so the full 25 characters
+  // render at any desktop width, not just a wide one. Must match
+  // MyDomainsTable.module.scss's .header ratio exactly, or the header and
+  // rows drift out of alignment.
+  grid-template-columns: minmax(320px, 2fr) 0.9fr 1.1fr 0.9fr 0.8fr 1.4fr;
+  // Was align-items: center — that only centers each .cell inside the grid
+  // row instead of stretching it, so a .cell shorter than the row's own
+  // height left its border-left column divider floating short of the row's
+  // top/bottom border instead of actually meeting it. Grid's own default
+  // (stretch) is what's needed here; .cell's justify-content: center below
+  // keeps the content itself vertically centered now that the box is full
+  // height.
   min-height: 60px;
   background: var(--color-white-primary);
   border: 1px solid var(--color-border-black-subtle);
-  border-left: 3px solid transparent;
+  // 3px reserved on every row, not just 'for-sale' — was transparent by
+  // default, which made every non-for-sale row read as missing its left
+  // border entirely instead of the plain neutral edge the rest of the row
+  // has. Same width in both states so the colored one below doesn't shift
+  // the row's content by 2px when it swaps in.
+  border-left: 3px solid var(--color-border-black-subtle);
   border-radius: 3px;
 
   @include mobile {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     row-gap: var(--space-2);
     padding: var(--space-3);
   }
@@ -37,6 +60,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  justify-content: center;
   gap: 2px;
   padding: var(--space-2) var(--space-3);
   min-width: 0;
@@ -55,14 +79,22 @@
 .actionCell {
   flex-direction: row;
   align-items: center;
+  // .cell's justify-content: center centers column-direction content
+  // vertically — here, with flex-direction flipped to row, that axis is
+  // horizontal instead, which would center the button in the cell instead
+  // of keeping it flush left. Reset explicitly.
+  justify-content: flex-start;
 
   // PrimaryButton's own desktop padding (--space-5, 20px each side) is
   // sized for standalone marketing buttons — inside a table cell that's
   // still tight even after widening the column above, so it's trimmed
   // here specifically. Targets the plain `button` tag, not a class, so it
   // wins regardless of CSS module load order (same pattern used for the
-  // hero's Bulk List button).
+  // hero's Bulk List button). A fixed width is added on top so "List" and
+  // "Edit Price" — the two labels this cell ever shows — render at the
+  // same width instead of each button sizing to its own text via fit-content.
   button {
+    width: 110px;
     padding: 0 var(--space-3);
   }
 
@@ -77,6 +109,9 @@
 .domainCell {
   flex-direction: row;
   align-items: center;
+  // See .actionCell's comment — .cell's justify-content: center is a
+  // column-axis rule, resets back to flex-start now that this cell is row.
+  justify-content: flex-start;
   gap: var(--space-2);
 
   @include mobile {
@@ -84,9 +119,11 @@
   }
 }
 
+// Figma-exact crown aspect ratio (19x13.71) — sized down to fit the meta
+// row rather than the 15x15 square it used when it sat next to the name.
 .marker {
-  width: 15px;
-  height: 15px;
+  width: 14px;
+  height: 10px;
   flex-shrink: 0;
 }
 
@@ -112,12 +149,13 @@
   min-width: 0;
 }
 
+// Figma node 72:9039 — 15px/Bold, up from 13px/Medium.
 .domainName {
   display: block;
   width: 100%;
   font-family: var(--font-satoshi);
-  font-weight: var(--font-weight-medium);
-  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--text-small-15);
   color: var(--color-black-primary);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -175,6 +213,9 @@
 
 .interestCell {
   flex-direction: row;
+  // See .actionCell's comment — resets .cell's column-axis centering back
+  // to flex-start now that this cell is row.
+  justify-content: flex-start;
   gap: var(--space-3);
 }
 

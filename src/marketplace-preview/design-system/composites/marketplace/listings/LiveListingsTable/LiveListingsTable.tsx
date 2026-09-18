@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import type { MarketplaceListing } from '@/marketplace-preview/types/marketplace'
 import DefaultButton from '@/marketplace-preview/design-system/primitives/buttons/default-buttons'
-import ListingRow, { ListingDomainCell, ListingRestCells } from '../ListingRow'
+import PromotedDomainCard from '../../promoted/PromotedDomainCard'
+import ListingRow from '../ListingRow'
 import styles from './LiveListingsTable.module.scss'
 
 export interface LiveListingsTableProps {
@@ -13,10 +14,10 @@ export interface LiveListingsTableProps {
 /**
  * Figma node 1:1087 (header) + 1:1149 (row). Pagination is a plain
  * reveal-more over the given array — no API call. favorited state lives
- * here (not in ListingRow) since mobile renders each listing's cells split
- * across two separate panes (see .mobileSplit in the stylesheet) — both
- * need to agree on which listings are favorited regardless of which
- * layout is currently visible.
+ * here (not in ListingRow) since mobile renders the same listings as a
+ * separate card list (see .cardList in the stylesheet, reusing
+ * PromotedDomainCard) — both need to agree on which listings are
+ * favorited regardless of which layout is currently visible.
  */
 export const LiveListingsTable = ({ listings, pageSize = 14 }: LiveListingsTableProps) => {
   const [visibleCount, setVisibleCount] = useState(pageSize)
@@ -60,36 +61,16 @@ export const LiveListingsTable = ({ listings, pageSize = 14 }: LiveListingsTable
             </div>
           </div>
 
-          <div className={styles.mobileSplit} role="table" aria-label="Live listings">
-            <div className={styles.domainPane} role="rowgroup">
-              <div className={styles.domainPaneHeader} role="columnheader">
-                Domain Name
-              </div>
-              {visible.map((listing) => (
-                <div key={listing.id} className={styles.domainPaneRow} role="row">
-                  <ListingDomainCell listing={listing} />
-                </div>
-              ))}
-            </div>
-
-            <div className={styles.scrollPane}>
-              <div className={styles.scrollPaneInner}>
-                <div className={styles.restHeader} role="row">
-                  <span role="columnheader">Price</span>
-                  <span role="columnheader">Appraised Value</span>
-                  <span role="columnheader">Chain</span>
-                  <span role="columnheader">Action</span>
-                </div>
-
-                <div className={styles.restRows} role="rowgroup">
-                  {visible.map((listing) => (
-                    <div key={listing.id} className={styles.restRow} role="row">
-                      <ListingRestCells listing={listing} favorited={favoritedIds.has(listing.id)} onToggleFavorite={() => toggleFavorite(listing.id)} />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+          <div className={styles.cardList} role="table" aria-label="Live listings">
+            {visible.map((listing) => (
+              <PromotedDomainCard
+                key={listing.id}
+                listing={listing}
+                fullWidth
+                favorited={favoritedIds.has(listing.id)}
+                onToggleFavorite={() => toggleFavorite(listing.id)}
+              />
+            ))}
           </div>
         </>
       )}

@@ -36,9 +36,10 @@
 
 .header {
   display: grid;
-  // Must match MyDomainRow.module.scss's .row ratio exactly — see that
-  // file's comment for why Action's share was widened from 1fr.
-  grid-template-columns: 2fr 0.9fr 1.1fr 0.9fr 0.8fr 1.4fr;
+  // Must match MyDomainRow.module.scss's .row ratio exactly, minmax floor
+  // included — see that file's comment for why Action's share was widened
+  // from 1fr and why Domain now has a floor.
+  grid-template-columns: minmax(320px, 2fr) 0.9fr 1.1fr 0.9fr 0.8fr 1.4fr;
   background: var(--color-white-primary);
   border: 1px solid var(--color-border-black-subtle);
   border-radius: 3px;

@@ -18,11 +18,11 @@ export const SidebarPromoCard = () => {
 
   return (
     <div className={styles.card}>
-      <p className={styles.heading}>What Is Your Name Worth?</p>
-      <p className={styles.body}>See the pricing signals free. The valuation is a paid report.</p>
+      <p className={styles.heading}>Promote a listing</p>
+      <p className={styles.body}>Push a name into the spotlight. $1 for 24 hours, $5 for 7 days.</p>
       <Link href="/login" className={`${primaryBtnStyles.button} ${primaryBtnStyles.sm} ${primaryBtnStyles.transparent} ${styles.cta}`}>
         {/* PrimaryButton's ::before fill layer sits above unwrapped text — span required, not decorative */}
-        <span>connect wallet</span>
+        <span>Choose a domain</span>
       </Link>
     </div>
   )

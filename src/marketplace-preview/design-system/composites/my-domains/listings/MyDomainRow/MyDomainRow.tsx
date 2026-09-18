@@ -6,7 +6,7 @@ import TrendIndicator from '@/marketplace-preview/design-system/primitives/badge
 import DomainAvatar from '@/marketplace-preview/design-system/primitives/avatars/domain-avatar'
 import Tooltip from '@/marketplace-preview/design-system/primitives/tooltip'
 import PrimaryButton from '@/marketplace-preview/design-system/primitives/buttons/primary-button'
-import { formatUsd, formatRenewal, TREND_DIRECTION, TREND_LABEL } from '../formatMyDomain'
+import { formatUsd, formatRenewal, truncateDomainName, TREND_DIRECTION, TREND_LABEL } from '../formatMyDomain'
 import styles from './MyDomainRow.module.scss'
 
 export interface MyDomainRowProps {
@@ -29,16 +29,16 @@ export const MyDomainRow = ({ domain }: MyDomainRowProps) => {
         <div className={styles.domainText}>
           <div className={styles.domainNameRow}>
             <Tooltip label={`${domain.domainName}${domain.extension}`} portal className={styles.domainNameTooltip}>
-              <span className={styles.domainName}>{domain.domainName}</span>
+              <span className={styles.domainName}>{truncateDomainName(domain.domainName)}</span>
             </Tooltip>
             <ExtensionBadge extension={domain.extension} />
-            {domain.isPremium && (
-              <img src="/assets/img/marketplace/domain-marker.svg" alt="Premium" className={styles.marker} />
-            )}
           </div>
           <div className={styles.domainMeta}>
             <ChainBadge chain={domain.chain} />
             <span className={styles.chars}>{domain.lengthChars} chars</span>
+            {domain.isPremium && (
+              <img src="/assets/img/marketplace/domain-marker.svg" alt="Premium" className={styles.marker} />
+            )}
           </div>
         </div>
       </div>

@@ -77,21 +77,24 @@
   min-width: 0;
 }
 
+// Figma node 72:9039 — 15px/Bold, up from 13px/Medium.
 .domainName {
   display: block;
   width: 100%;
   font-family: var(--font-satoshi);
-  font-weight: var(--font-weight-medium);
-  font-size: var(--text-small-13);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--text-small-15);
   color: var(--color-black-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+// Figma-exact crown aspect ratio (19x13.71) — sized down to fit the meta
+// row rather than the 15x15 square it used when it sat next to the name.
 .marker {
-  width: 15px;
-  height: 15px;
+  width: 14px;
+  height: 10px;
   flex-shrink: 0;
 }
 
@@ -137,6 +140,14 @@
   flex-direction: row;
   align-items: center;
   justify-content: flex-end;
+
+  // Same fixed-width override as MyDomainRow's .actionCell — "List" and
+  // "Edit Price" render at the same width instead of each sizing to its
+  // own text via PrimaryButton's fit-content default. Targets the plain
+  // `button` tag so it wins regardless of CSS module load order.
+  button {
+    width: 110px;
+  }
 }
 
 .statLabel {

@@ -7,7 +7,7 @@ import ChainBadge from '@/marketplace-preview/design-system/primitives/badges/ch
 import TrendIndicator from '@/marketplace-preview/design-system/primitives/badges/trend-indicator'
 import Badge from '@/marketplace-preview/design-system/primitives/badges/badge'
 import PrimaryButton from '@/marketplace-preview/design-system/primitives/buttons/primary-button'
-import { formatUsd, formatRenewal, TREND_DIRECTION, TREND_LABEL, STATUS_BADGE_LABEL } from '../formatMyDomain'
+import { formatUsd, formatRenewal, truncateDomainName, TREND_DIRECTION, TREND_LABEL, STATUS_BADGE_LABEL } from '../formatMyDomain'
 import styles from './MyDomainCard.module.scss'
 
 export interface MyDomainCardProps {
@@ -39,16 +39,16 @@ export const MyDomainCard = ({ domain }: MyDomainCardProps) => (
       <div className={styles.identityText}>
         <div className={styles.nameRow}>
           <Tooltip label={`${domain.domainName}${domain.extension}`} placement="bottom" portal className={styles.domainNameTooltip}>
-            <span className={styles.domainName}>{domain.domainName}</span>
+            <span className={styles.domainName}>{truncateDomainName(domain.domainName)}</span>
           </Tooltip>
           <ExtensionBadge extension={domain.extension} />
-          {domain.isPremium && (
-            <img src="/assets/img/marketplace/domain-marker.svg" alt="Premium" className={styles.marker} />
-          )}
         </div>
         <div className={styles.metaRow}>
           <ChainBadge chain={domain.chain} />
           <span className={styles.chars}>{domain.lengthChars} chars</span>
+          {domain.isPremium && (
+            <img src="/assets/img/marketplace/domain-marker.svg" alt="Premium" className={styles.marker} />
+          )}
         </div>
       </div>
     </div>

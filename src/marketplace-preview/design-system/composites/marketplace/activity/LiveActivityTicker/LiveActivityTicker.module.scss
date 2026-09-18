@@ -21,7 +21,7 @@
     display: flex;
     align-items: center;
     height: 30px;
-    background: var(--color-blue-darker); // was --color-surface-dark (#090909, reads as flat black) — see comment below
+    background: var(--color-white-primary); // was --color-blue-darker — direct request
     // No overflow: hidden here — .marquee below already clips its own
     // horizontal scroll on its own, and this bar being the clipping
     // ancestor was cutting the dropdown menu off before it could ever
@@ -192,7 +192,7 @@
 .domain {
   font-family: var(--font-space-grotesk); // closest already-loaded face to Figma's JetBrains Mono
   font-size: var(--text-small-12);
-  color: #eae8f4; // design-specific: Figma-exact
+  color: var(--color-black-primary); // was #eae8f4 — direct request, bar background is now white
 }
 
 .price {
