@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { mockActivity } from '@/data/marketplace/activity'
-import type { ActivityFilter, ActivityAction } from '@/types/marketplace'
+import { mockActivity } from '@/marketplace-preview/data/marketplace/activity'
+import type { ActivityFilter, ActivityAction } from '@/marketplace-preview/types/marketplace'
 import ActivityItem from '../ActivityItem'
 import styles from './LiveActivityPanel.module.scss'
 

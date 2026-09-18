@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
-import type { MarketplaceListing } from '@/types/marketplace'
-import ExtensionBadge from '@/design-system/primitives/badges/extension-badge'
-import ChainBadge from '@/design-system/primitives/badges/chain-badge'
-import TrendIndicator from '@/design-system/primitives/badges/trend-indicator'
-import Tooltip from '@/design-system/primitives/tooltip'
-import primaryBtnStyles from '@/design-system/primitives/buttons/primary-button/Primarybutton.module.scss'
+import type { MarketplaceListing } from '@/marketplace-preview/types/marketplace'
+import ExtensionBadge from '@/marketplace-preview/design-system/primitives/badges/extension-badge'
+import ChainBadge from '@/marketplace-preview/design-system/primitives/badges/chain-badge'
+import TrendIndicator from '@/marketplace-preview/design-system/primitives/badges/trend-indicator'
+import Tooltip from '@/marketplace-preview/design-system/primitives/tooltip'
+import primaryBtnStyles from '@/marketplace-preview/design-system/primitives/buttons/primary-button/Primarybutton.module.scss'
 import styles from './PromotedDomainCard.module.scss'
 
 export interface PromotedDomainCardProps {

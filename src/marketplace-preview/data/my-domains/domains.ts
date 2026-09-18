@@ -1,5 +1,5 @@
-import { POLYGON, ETHEREUM, ARBITRUM, BSC } from '@/data/marketplace/domains'
-import { DomainStatus, MyDomainListing, MyDomainsSummary } from '@/types/my-domains'
+import { POLYGON, ETHEREUM, ARBITRUM, BSC } from '@/marketplace-preview/data/marketplace/domains'
+import { DomainStatus, MyDomainListing, MyDomainsSummary } from '@/marketplace-preview/types/my-domains'
 
 /**
  * STATIC MOCK DATA for the "My Domains" dashboard revamp — not live. Feeds

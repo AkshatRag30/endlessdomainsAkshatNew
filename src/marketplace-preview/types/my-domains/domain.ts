@@ -16,7 +16,7 @@
  * (node 50:6190) and have no backend endpoint yet. See the implementation
  * plan, section 03, for the confirmed gap.
  */
-import { Chain } from '@/types/marketplace'
+import { Chain } from '@/marketplace-preview/types/marketplace'
 
 export type BlockchainStatus = 'Pending' | 'Success' | 'Failed'
 

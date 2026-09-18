@@ -1,5 +1,5 @@
 import React from 'react'
-import { mockPromotedListings } from '@/data/marketplace/domains'
+import { mockPromotedListings } from '@/marketplace-preview/data/marketplace/domains'
 import PromotedDomainCard from '../PromotedDomainCard'
 import styles from './PromotedDomainsSection.module.scss'
 

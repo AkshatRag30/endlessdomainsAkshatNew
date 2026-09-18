@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import { mockMarketMetrics, MARKET_METRICS_UPDATED_LABEL } from '@/data/marketplace/analytics'
-import type { MarketTimeRange } from '@/types/marketplace'
-import Badge from '@/design-system/primitives/badges/badge'
-import Sparkline from '@/design-system/primitives/charts/sparkline'
+import { mockMarketMetrics, MARKET_METRICS_UPDATED_LABEL } from '@/marketplace-preview/data/marketplace/analytics'
+import type { MarketTimeRange } from '@/marketplace-preview/types/marketplace'
+import Badge from '@/marketplace-preview/design-system/primitives/badges/badge'
+import Sparkline from '@/marketplace-preview/design-system/primitives/charts/sparkline'
 import MarketMetricCard from '../MarketMetricCard'
 import styles from './MarketActivityPanel.module.scss'
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { useAuth } from '@/context/AuthContext'
-import { mockSidebarSections } from '@/data/marketplace/navigation'
+import { useAuth } from '@/marketplace-preview/stubs/auth'
+import { mockSidebarSections } from '@/marketplace-preview/data/marketplace/navigation'
 import SidebarSection from '../SidebarSection'
 import SidebarPromoCard from '../SidebarPromoCard'
 import styles from './MarketplaceSidebar.module.scss'

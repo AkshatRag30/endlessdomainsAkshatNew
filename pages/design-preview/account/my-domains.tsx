@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import Header from '@/design-system/layouts/header'
-import MarketplacePageShell from '@/design-system/composites/marketplace/shared/MarketplacePageShell'
-import MarketplaceSidebar from '@/design-system/composites/marketplace/sidebar/MarketplaceSidebar'
-import MobileDrawerMenu from '@/design-system/composites/marketplace/sidebar/MobileDrawerMenu'
-import ListingsHeading from '@/design-system/composites/marketplace/listings/ListingsHeading'
+import Header from '@/marketplace-preview/design-system/layouts/header'
+import MarketplacePageShell from '@/marketplace-preview/design-system/composites/marketplace/shared/MarketplacePageShell'
+import MarketplaceSidebar from '@/marketplace-preview/design-system/composites/marketplace/sidebar/MarketplaceSidebar'
+import MobileDrawerMenu from '@/marketplace-preview/design-system/composites/marketplace/sidebar/MobileDrawerMenu'
+import ListingsHeading from '@/marketplace-preview/design-system/composites/marketplace/listings/ListingsHeading'
 import {
   MyDomainsHeroBanner,
   PortfolioStatsRow,
@@ -13,11 +13,11 @@ import {
   NeedsAttentionPanel,
   MostViewedPanel,
   QuickActionsPanel,
-} from '@/design-system/composites/my-domains'
-import type { MyDomainsStatusFilter } from '@/design-system/composites/my-domains'
-import type { ViewMode } from '@/design-system/primitives/toggles/view-toggle'
-import { mockMyDomainsSummary, mockNeedsAttention, mockMostViewed } from '@/data/my-domains/domains'
-import { useMyDomainsFilters, filterMyDomains } from '@/hooks/my-domains/useMyDomainsFilters'
+} from '@/marketplace-preview/design-system/composites/my-domains'
+import type { MyDomainsStatusFilter } from '@/marketplace-preview/design-system/composites/my-domains'
+import type { ViewMode } from '@/marketplace-preview/design-system/primitives/toggles/view-toggle'
+import { mockMyDomainsSummary, mockNeedsAttention, mockMostViewed } from '@/marketplace-preview/data/my-domains/domains'
+import { useMyDomainsFilters, filterMyDomains } from '@/marketplace-preview/hooks/my-domains/useMyDomainsFilters'
 import styles from './my-domains.module.scss'
 
 /**
@@ -47,7 +47,7 @@ export default function MyDomainsPreview() {
   const filtered = filterMyDomains(summary.domains, activeStatus, debouncedSearch, filters)
 
   return (
-    <div>
+    <div data-marketplace-preview>
       <Header onMenuClick={() => setMenuOpen((prev) => !prev)} menuOpen={menuOpen} previewMode />
       <MarketplacePageShell
         sidebar={

@@ -1,6 +1,6 @@
 import React from 'react'
-import { Chain } from '@/types/marketplace'
-import { getProviderForChainId } from '@/helpers/chaincurrency/chaincurrency'
+import { Chain } from '@/marketplace-preview/types/marketplace'
+import { getProviderForChainId } from '@/marketplace-preview/helpers/chaincurrency/chaincurrency'
 import styles from './ChainBadge.module.scss'
 
 export interface ChainBadgeProps {

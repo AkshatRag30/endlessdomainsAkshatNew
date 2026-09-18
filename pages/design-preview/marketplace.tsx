@@ -1,22 +1,22 @@
-import Header from '@/design-system/layouts/header'
-import MarketplacePageShell from '@/design-system/composites/marketplace/shared/MarketplacePageShell'
-import MarketplaceSidebar from '@/design-system/composites/marketplace/sidebar/MarketplaceSidebar'
-import MobileDrawerMenu from '@/design-system/composites/marketplace/sidebar/MobileDrawerMenu'
-import MarketplaceHero from '@/design-system/composites/marketplace/hero/MarketplaceHero'
-import PromotedDomainsSection from '@/design-system/composites/marketplace/promoted/PromotedDomainsSection'
-import ListingCategoryTabs from '@/design-system/composites/marketplace/listings/ListingCategoryTabs'
-import ListingsHeading from '@/design-system/composites/marketplace/listings/ListingsHeading'
-import ListingFilterBar from '@/design-system/composites/marketplace/listings/ListingFilterBar'
-import LiveListingsTable from '@/design-system/composites/marketplace/listings/LiveListingsTable'
-import LiveActivityPanel from '@/design-system/composites/marketplace/activity/LiveActivityPanel'
-import LiveActivityTicker from '@/design-system/composites/marketplace/activity/LiveActivityTicker'
-import MarketActivityPanel from '@/design-system/composites/marketplace/analytics/MarketActivityPanel'
-import MobileBottomNav from '@/design-system/composites/marketplace/shared/MobileBottomNav'
-import { useListingFilters, filterListings } from '@/hooks/marketplace/useListingFilters'
-import { mockListings } from '@/data/marketplace/domains'
-import { mockListingCategories } from '@/data/marketplace/categories'
+import Header from '@/marketplace-preview/design-system/layouts/header'
+import MarketplacePageShell from '@/marketplace-preview/design-system/composites/marketplace/shared/MarketplacePageShell'
+import MarketplaceSidebar from '@/marketplace-preview/design-system/composites/marketplace/sidebar/MarketplaceSidebar'
+import MobileDrawerMenu from '@/marketplace-preview/design-system/composites/marketplace/sidebar/MobileDrawerMenu'
+import MarketplaceHero from '@/marketplace-preview/design-system/composites/marketplace/hero/MarketplaceHero'
+import PromotedDomainsSection from '@/marketplace-preview/design-system/composites/marketplace/promoted/PromotedDomainsSection'
+import ListingCategoryTabs from '@/marketplace-preview/design-system/composites/marketplace/listings/ListingCategoryTabs'
+import ListingsHeading from '@/marketplace-preview/design-system/composites/marketplace/listings/ListingsHeading'
+import ListingFilterBar from '@/marketplace-preview/design-system/composites/marketplace/listings/ListingFilterBar'
+import LiveListingsTable from '@/marketplace-preview/design-system/composites/marketplace/listings/LiveListingsTable'
+import LiveActivityPanel from '@/marketplace-preview/design-system/composites/marketplace/activity/LiveActivityPanel'
+import LiveActivityTicker from '@/marketplace-preview/design-system/composites/marketplace/activity/LiveActivityTicker'
+import MarketActivityPanel from '@/marketplace-preview/design-system/composites/marketplace/analytics/MarketActivityPanel'
+import MobileBottomNav from '@/marketplace-preview/design-system/composites/marketplace/shared/MobileBottomNav'
+import { useListingFilters, filterListings } from '@/marketplace-preview/hooks/marketplace/useListingFilters'
+import { mockListings } from '@/marketplace-preview/data/marketplace/domains'
+import { mockListingCategories } from '@/marketplace-preview/data/marketplace/categories'
 import { useState } from 'react'
-import shellStyles from '@/design-system/composites/marketplace/shared/MarketplacePageShell/MarketplacePageShell.module.scss'
+import shellStyles from '@/marketplace-preview/design-system/composites/marketplace/shared/MarketplacePageShell/MarketplacePageShell.module.scss'
 
 /**
  * Temporary preview route assembling everything built through Phase 8 —
@@ -30,7 +30,7 @@ export default function MarketplacePreview() {
   const filtered = filterListings(mockListings, debouncedSearch, filters)
 
   return (
-    <div>
+    <div data-marketplace-preview>
       <Header onMenuClick={() => setMenuOpen((prev) => !prev)} menuOpen={menuOpen} previewMode />
       <LiveActivityTicker />
       <MarketplacePageShell

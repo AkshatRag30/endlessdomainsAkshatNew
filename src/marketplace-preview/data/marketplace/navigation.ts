@@ -1,4 +1,4 @@
-import { HeroCategoryChip, SidebarSection } from '@/types/marketplace'
+import { HeroCategoryChip, SidebarSection } from '@/marketplace-preview/types/marketplace'
 
 /**
  * STATIC MOCK DATA. Real routes are wired where they already exist

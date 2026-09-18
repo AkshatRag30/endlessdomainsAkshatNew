@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { mockTickerItems } from '@/data/marketplace/activity'
-import type { ActivityAction, ActivityFilter, TickerItem } from '@/types/marketplace'
+import { mockTickerItems } from '@/marketplace-preview/data/marketplace/activity'
+import type { ActivityAction, ActivityFilter, TickerItem } from '@/marketplace-preview/types/marketplace'
 import styles from './LiveActivityTicker.module.scss'
 
 const TABS: { id: ActivityFilter; label: string }[] = [

@@ -1,4 +1,4 @@
-import { QuickAction } from '@/types/my-domains'
+import { QuickAction } from '@/marketplace-preview/types/my-domains'
 
 /**
  * STATIC MOCK DATA — copy taken verbatim from the Figma reference (node

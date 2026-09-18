@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useDebounces } from '@/utils/useDebounce'
-import type { MyDomainListing } from '@/types/my-domains'
-import type { MyDomainsStatusFilter } from '@/design-system/composites/my-domains/listings/MyDomainsCategoryTabs'
+import type { MyDomainListing } from '@/marketplace-preview/types/my-domains'
+import type { MyDomainsStatusFilter } from '@/marketplace-preview/design-system/composites/my-domains/listings/MyDomainsCategoryTabs'
 
 export interface MyDomainsFilters {
   search: string
