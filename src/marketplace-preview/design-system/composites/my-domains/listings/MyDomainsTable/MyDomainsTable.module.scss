@@ -48,10 +48,18 @@
   display: grid;
   // Must match MyDomainRow.module.scss's .row ratio exactly, including its
   // minmax floors — see that file's comments for why Action's share was
-  // widened from 1fr and now has its own 134px floor, why Domain's floor is
-  // scoped to @include wide only, and why Interest/Renewal each get their
-  // own smaller floor unconditionally.
+  // widened from 1fr and now has its own 134px floor, why Domain gets a
+  // smaller floor between desktop and wide and a bigger one at wide itself
+  // rather than one unconditional value, and why Interest/Renewal each get
+  // their own smaller floor unconditionally.
   grid-template-columns: 2fr 0.9fr 1.1fr minmax(90px, 0.8fr) minmax(96px, 0.9fr) minmax(134px, 1.4fr);
+
+  // Must mirror MyDomainRow.module.scss's .row exactly, including this
+  // bracket — see that file's comment for why Domain gets a smaller 200px
+  // floor here instead of wide's 320px one.
+  @include between($breakpoint-desktop, $breakpoint-wide - 1px) {
+    grid-template-columns: minmax(200px, 2fr) 0.9fr 1.1fr minmax(90px, 0.8fr) minmax(96px, 0.9fr) minmax(134px, 1.4fr);
+  }
 
   @include wide {
     grid-template-columns: minmax(320px, 2fr) 0.9fr 1.1fr minmax(90px, 0.8fr) minmax(96px, 0.9fr) minmax(134px, 1.4fr);

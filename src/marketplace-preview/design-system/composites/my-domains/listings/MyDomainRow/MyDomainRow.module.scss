@@ -10,30 +10,35 @@
 // rows drift out of alignment.
 .row {
   display: grid;
-  // Plain fr share by default — no forced minimum on Domain — so it just
-  // truncates further via .domainName's own ellipsis on anything narrower
-  // than wide. A fixed 320px floor here used to be unconditional, which
-  // is exactly what squeezes the other columns at ~1376px (13" iPad Pro
-  // landscape is only 10px narrower than 1366px, the single most common
-  // laptop width — there's no width-only way to give one a floor without
-  // giving it to the other too). The 25-character guarantee is a wide-
-  // screen nice-to-have, not a requirement at every width, so it's scoped
-  // to @include wide below instead of living here unconditionally. Must
-  // match MyDomainsTable.module.scss's .header ratio exactly (both
-  // rules), or the header and rows drift out of alignment.
+  // Plain fr share below — no forced minimum on Domain at this narrowest
+  // tier (<1040px is tablet/mobile, restacked anyway) — so it truncates
+  // further via .domainName's own ellipsis. A single fixed 320px floor
+  // applied at every width used to be unconditional, which is exactly what
+  // squeezed the other columns at ~1376px (13" iPad Pro landscape is only
+  // 10px narrower than 1366px, the single most common laptop width).
+  // Domain now gets two tiers instead of one-size-fits-all: a smaller
+  // 200px floor between desktop and wide (see that bracket below — enough
+  // to stop names truncating after a handful of characters on a MacBook
+  // Air-class window, without reproducing the ~1376px squeeze a full 320px
+  // floor caused there), and the full 320px/25-character guarantee once
+  // @include wide's genuinely spacious width removes the tradeoff
+  // entirely. Must match MyDomainsTable.module.scss's .header ratio
+  // exactly (all three rules), or the header and rows drift out of
+  // alignment.
   //
-  // Interest and Renewal get their own floors, unlike Domain's (scoped to
-  // @include wide only, see above) — MarketplacePageShell's desktop grid
-  // reserves a fixed 240px sidebar + 320px rail regardless of viewport
-  // (see that file's .grid), so the "main" column these rows live in is
-  // genuinely narrow right at the 1040px desktop cutoff and stays fairly
-  // tight through ordinary laptop widths (~694px main at 1366px). Without
-  // a floor, Interest's/Renewal's plain fr share drops below what an
-  // icon + a couple of digits or a "MMM D" date needs on one line, and
-  // .renewal/.interestStat's own white-space: nowrap (see below) then has
-  // nothing to fall back on but wrapping the icon and text across two
-  // lines instead — a much smaller ask than Domain's 320px, so it doesn't
-  // reproduce the same squeeze-everything-else problem a Domain floor
+  // Interest and Renewal get their own floors unconditionally (not tiered
+  // like Domain's) — MarketplacePageShell's desktop grid reserves a fixed
+  // 240px sidebar + rail regardless of viewport (320px at wide, narrowed
+  // to 260px between desktop and wide — see that file's .grid), so the
+  // "main" column these rows live in is genuinely narrow right at the
+  // 1040px desktop cutoff and stays fairly tight through ordinary laptop
+  // widths (~694px main at 1366px). Without a floor, Interest's/Renewal's
+  // plain fr share drops below what an icon + a couple of digits or a
+  // "MMM D" date needs on one line, and .renewal/.interestStat's own
+  // white-space: nowrap (see below) then has nothing to fall back on but
+  // wrapping the icon and text across two lines instead — a much smaller
+  // ask than Domain's floors, so it doesn't reproduce the same
+  // squeeze-everything-else problem an unconditional Domain floor
   // caused unconditionally.
   // Action gets a floor too — its button is a fixed 110px with
   // flex-shrink: 0 (see .actionCell below), plus this cell's own 24px of
@@ -44,6 +49,22 @@
   // (see that file's .grid) — this is the guaranteed backstop regardless
   // of exactly how much room the shell hands over.
   grid-template-columns: 2fr 0.9fr 1.1fr minmax(90px, 0.8fr) minmax(96px, 0.9fr) minmax(134px, 1.4fr);
+
+  // A MacBook Air's browser window commonly reports a logical width right
+  // around 1440px — sometimes a few px under it once scrollbars/window
+  // chrome are subtracted — which lands it in this bracket instead of
+  // @include wide below, even though it looks like it should have plenty
+  // of room. Without a floor here, Domain drops to whatever's left after
+  // Renewal/Interest/Action take their own floors and truncates names
+  // after just a handful of characters. 200px is deliberately smaller than
+  // wide's 320px (not a 25-character guarantee, just enough to stop names
+  // from truncating this early) — MarketplacePageShell's rail is already
+  // narrowed to 260px in this same range (see that file), which is what
+  // makes room for this without squeezing Price/Est. value (still
+  // floor-less) noticeably.
+  @include between($breakpoint-desktop, $breakpoint-wide - 1px) {
+    grid-template-columns: minmax(200px, 2fr) 0.9fr 1.1fr minmax(90px, 0.8fr) minmax(96px, 0.9fr) minmax(134px, 1.4fr);
+  }
 
   @include wide {
     // minmax's floor is sized for the worst case (avatar + 25 chars @
@@ -106,6 +127,20 @@
   @include mobile {
     flex: 1 1 45%;
     padding: 0;
+  }
+}
+
+// Price's single value/dash sat flush against the column's left divider at
+// tablet-up (.cell's own align-items: flex-start) instead of centered in
+// its own column — mobile's stacked-card layout doesn't have this problem
+// (each cell reads as a labelless row, not a column of its own), so this
+// is scoped to tablet-up rather than changing .cell itself for every cell.
+// Declared after .cell, not before — same specificity (one class each), so
+// source order is what decides the winner, and a rule placed before .cell
+// gets silently overridden by it regardless of the media query.
+.priceCell {
+  @include tablet-up {
+    align-items: center;
   }
 }
 
@@ -254,6 +289,17 @@
   // See .actionCell's comment — resets .cell's column-axis centering back
   // to flex-start now that this cell is row.
   justify-content: flex-start;
+  // At tablet-up, flex-start packed both stats against the cell's left
+  // edge, so the second stat's own right edge (eye count + gap + heart
+  // count) ended up sitting flush against the Action column's divider on
+  // an ordinary laptop-width Interest column instead of reading as
+  // centered content — center within the column instead. Left as
+  // flex-start below tablet: mobile's stacked-card cell is a wide flex
+  // item, not a narrow column, so this isn't a problem there and the
+  // stats read better hugging the left like every other mobile stat.
+  @include tablet-up {
+    justify-content: center;
+  }
   // .cell's own align-items: flex-start governs the cross axis here (now
   // vertical, since flex-direction is row) — left as flex-start, this
   // pinned the two stat pairs to the top of the cell instead of centering

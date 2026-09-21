@@ -1,7 +1,6 @@
 import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { FiTarget } from 'react-icons/fi'
 import type { SidebarNavItem as SidebarNavItemData } from '@/marketplace-preview/types/marketplace'
 import styles from './SidebarNavItem.module.scss'
 
@@ -39,31 +38,32 @@ export const SidebarNavItem = ({ item, active = false, previewMode, onSelect }: 
           : undefined
       }
     >
-      {/* Figma nodes 23:2916 ("Explore") / 57:9354 ("My domains") — the
-          selected row's own leading icon, tuned specifically for the active
-          highlighted look. Fixed regardless of item.icon below, to not
-          disturb an already-approved active-row treatment. */}
-      {active && <FiTarget size={15} aria-hidden="true" className={styles.activeIcon} />}
-
-      {/* Figma node 70:4592 — persistent per-row leading icon for inactive
-          rows (that reference gives every row its own icon, unlike the
-          single active-only asset above). Only items with a matching icon
-          in that design carry one; others fall back to no icon rather than
-          a guessed one. item.icon is a react-icons component for the rows a
-          simple generic glyph exists for, or a public/ asset path for the
-          handful too specific/custom for one (see the data file's own
-          comment) — string is the only case that still needs next/image. */}
-      {!active &&
-        (typeof item.icon === 'string' ? (
-          <Image src={item.icon} alt="" aria-hidden="true" width={14} height={14} className={styles.icon} />
-        ) : item.icon ? (
-          <item.icon size={14} aria-hidden="true" className={styles.icon} />
-        ) : (
-          // Keeps every row's label starting at the same x position within
-          // a section even though a few items (Recently sold, Under
-          // estimate, Price drops, Alerts) have no matching icon to show.
-          <span className={styles.iconSpacer} aria-hidden="true" />
-        ))}
+      {/* Figma node 70:4592 — persistent per-row leading icon, same glyph
+          whether the row is active or not (only its color/size changes via
+          styles.activeIcon vs styles.icon) — a row's icon identity has to
+          stay recognizable across pages, since which row is "active" is a
+          per-page prop (initialSelectedId), not something inherent to the
+          row itself. item.icon is a react-icons component (or a bespoke
+          IconType-shaped component, see MyDomainsIcon) for the rows a
+          simple glyph exists for, or a public/ asset path for the handful
+          too specific/custom for one (see the data file's own comment) —
+          string is the only case that still needs next/image. */}
+      {typeof item.icon === 'string' ? (
+        <Image
+          src={item.icon}
+          alt=""
+          aria-hidden="true"
+          width={active ? 15 : 14}
+          height={active ? 15 : 14}
+          className={active ? styles.activeIcon : styles.icon}
+        />
+      ) : item.icon ? (
+        <item.icon size={active ? 15 : 14} aria-hidden="true" className={active ? styles.activeIcon : styles.icon} />
+      ) : (
+        // Keeps every row's label starting at the same x position within a
+        // section even though a few items have no matching icon to show.
+        <span className={active ? styles.activeIcon : styles.icon} aria-hidden="true" />
+      )}
 
       <span className={styles.label}>{item.label}</span>
 

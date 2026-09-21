@@ -45,7 +45,7 @@ export const MyDomainRow = ({ domain }: MyDomainRowProps) => {
         </div>
       </div>
 
-      <div className={styles.cell} role="cell">
+      <div className={`${styles.cell} ${styles.priceCell}`} role="cell">
         {domain.status === 'for-sale' && domain.priceUsd != null ? (
           <span className={styles.value}>{formatUsd(domain.priceUsd)}</span>
         ) : (

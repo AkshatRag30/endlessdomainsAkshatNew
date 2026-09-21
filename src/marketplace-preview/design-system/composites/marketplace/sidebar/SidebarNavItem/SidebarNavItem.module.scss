@@ -42,7 +42,7 @@
   width: 15px;
   height: 15px;
   flex-shrink: 0;
-  color: var(--color-blue-primary); // matches the original drawer-explore-icon.svg's own fill
+  color: var(--color-blue-primary); // active row's own icon tints blue instead of the row's default gray; no-op on rows whose icon has its own baked-in color (a string asset, or MyDomainsIcon's hardcoded fill)
 }
 
 // Figma node 70:4592's per-row icon set — each raw asset's own fill/stroke
@@ -53,12 +53,6 @@
 // instead; the handful of rows still on a raw asset path keep their own
 // baked-in tone, unaffected.
 .icon {
-  width: 14px;
-  height: 14px;
-  flex-shrink: 0;
-}
-
-.iconSpacer {
   width: 14px;
   height: 14px;
   flex-shrink: 0;
