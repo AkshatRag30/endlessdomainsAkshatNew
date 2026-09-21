@@ -62,9 +62,21 @@ export const MarketplacePageShell = ({ sidebar, hero, rightRail, children, sideb
   return (
     <div className={styles.shell}>
       <div className={styles.grid}>
-        <aside className={sidebarClass}>{sidebar}</aside>
+        {/* data-lenis-prevent: inert unless a page is wrapped in a global
+            smooth-scroll library (Lenis) that hijacks wheel events on the
+            whole document — this project doesn't have one, so it's a no-op
+            here, but this sidebar/rail's own sticky+overflow-y:auto internal
+            scroll can't receive native wheel events at all once one is
+            wired up elsewhere (e.g. endlessdomainsAkshatNew's _app.tsx),
+            since the library intercepts the wheel event before it reaches
+            this nested scroll container. Lenis specifically walks up the
+            event's composedPath looking for this attribute and skips
+            hijacking when it finds it, so it belongs on the element itself,
+            not just documented as a known issue for that project to patch
+            after every sync. */}
+        <aside className={sidebarClass} data-lenis-prevent>{sidebar}</aside>
         <div className={styles.hero}>{hero}</div>
-        <aside className={styles.rightRail}>{rightRail}</aside>
+        <aside className={styles.rightRail} data-lenis-prevent>{rightRail}</aside>
         <main className={styles.main}>{children}</main>
       </div>
 
