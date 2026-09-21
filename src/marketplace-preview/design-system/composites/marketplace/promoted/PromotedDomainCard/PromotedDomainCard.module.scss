@@ -169,13 +169,14 @@
 .favoriteIcon {
   width: 14px;
   height: 13px;
+  color: #a6a1bb; // design-specific: Figma-exact, matches the original favorite.svg's own stroke color
 }
 
 .favoriteIconActive {
   width: 14px;
   height: 13px;
-  // the source asset is stroke-only in a neutral tone — shift it toward the
-  // error/red token family for the active state rather than shipping a
-  // second downloaded asset for one color change
-  filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(325deg) brightness(101%) contrast(101%);
+  // Was a filter approximating red on the same gray asset — react-icons
+  // respects color/currentColor directly, so this just sets the color it
+  // was always trying to fake.
+  color: var(--color-error);
 }

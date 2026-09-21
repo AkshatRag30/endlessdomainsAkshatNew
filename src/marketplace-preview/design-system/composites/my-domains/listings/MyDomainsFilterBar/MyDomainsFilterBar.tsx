@@ -31,17 +31,25 @@ const SORT_OPTIONS = [
   { value: 'name', label: 'Name' },
 ]
 
-/** Figma node 50:6225 (filter row). Reuses the marketplace redesign's SearchInput/FilterDropdown primitives — three dropdowns here instead of five, plus a grid/list ViewToggle the marketplace filter bar doesn't have. */
+/**
+ * Figma node 50:6225 (filter row). Reuses the marketplace redesign's
+ * SearchInput/FilterDropdown primitives — three dropdowns here instead of
+ * five, plus a grid/list ViewToggle the marketplace filter bar doesn't have.
+ * ViewToggle is hidden below the mobile breakpoint (see the stylesheet) —
+ * Figma node 77:3743's responsive frame has no toggle at all there, since
+ * MyDomainsTable forces card view unconditionally on mobile regardless of
+ * the last-selected mode.
+ */
 export const MyDomainsFilterBar = ({ filters, onFilterChange, viewMode, onViewModeChange }: MyDomainsFilterBarProps) => {
   return (
     <div className={styles.bar}>
-      <SearchInput value={filters.search} onChange={(value) => onFilterChange('search', value)} />
+      <SearchInput value={filters.search} onChange={(value) => onFilterChange('search', value)} className={styles.searchInput} />
 
       <div className={styles.controls}>
         <FilterDropdown label="All Extension" value={filters.extension} options={EXTENSION_OPTIONS} onChange={(v) => onFilterChange('extension', v)} />
         <FilterDropdown label="All Chain" value={filters.chain} options={CHAIN_OPTIONS} onChange={(v) => onFilterChange('chain', v)} />
         <FilterDropdown label="Recently Added" value={filters.sort} options={SORT_OPTIONS} onChange={(v) => onFilterChange('sort', v)} />
-        <ViewToggle value={viewMode} onChange={onViewModeChange} />
+        <ViewToggle value={viewMode} onChange={onViewModeChange} className={styles.viewToggle} />
       </div>
     </div>
   )

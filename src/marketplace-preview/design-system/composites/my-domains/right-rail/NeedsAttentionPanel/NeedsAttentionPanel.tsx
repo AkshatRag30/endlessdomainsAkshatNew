@@ -1,4 +1,5 @@
 import React from 'react'
+import { FiUser } from 'react-icons/fi'
 import InfoListCard from '@/marketplace-preview/design-system/primitives/cards/info-list-card'
 import type { MyDomainListing } from '@/marketplace-preview/types/my-domains'
 import styles from './NeedsAttentionPanel.module.scss'
@@ -23,7 +24,7 @@ export const NeedsAttentionPanel = ({ domains }: NeedsAttentionPanelProps) => (
     emptyMessage="Nothing needs attention right now."
     rows={domains.map((domain) => ({
       id: domain.id,
-      iconSrc: '/assets/img/my-domains/needs-attention-icon.svg',
+      icon: FiUser,
       title: `${domain.domainName}${domain.extension}`,
       subtitle: formatRenewsIn(domain.renewalTimestamp),
       trailing: <span className={styles.review}>Review</span>,

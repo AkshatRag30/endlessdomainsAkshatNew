@@ -1,10 +1,10 @@
 import React from 'react'
+import type { IconType } from 'react-icons'
 import styles from './InfoListCard.module.scss'
 
 export interface InfoListCardRow {
   id: string
-  iconSrc: string
-  iconAlt?: string
+  icon: IconType
   title: string
   subtitle: string
   trailing?: React.ReactNode
@@ -42,7 +42,7 @@ export const InfoListCard = ({ title, rows, iconVariant = 'blue', emptyMessage, 
             <div key={row.id} className={styles.row}>
               <div className={styles.rowMain}>
                 <span className={avatarClass} aria-hidden="true">
-                  <img src={row.iconSrc} alt="" className={styles.avatarIcon} />
+                  <row.icon size={15} className={styles.avatarIcon} />
                 </span>
                 <div className={styles.textBlock}>
                   <span className={styles.title} title={row.title}>{row.title}</span>

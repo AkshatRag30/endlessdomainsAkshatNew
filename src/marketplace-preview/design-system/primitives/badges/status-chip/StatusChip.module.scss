@@ -1,0 +1,45 @@
+// Figma node 80:7181. Reuses the same noise-texture tile already used by
+// StatCard.module.scss's own gradient tiles — same asset, same blend
+// treatment, not a separate export.
+
+.chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  // Figma's 9px/2px-5px was measured off a card exported at a compressed
+  // ~78% scale (see MyDomainCard's own comment on node 60:13505) — legible
+  // there, but the Status legend sits at full scale next to normal-sized
+  // surrounding text, where 9px reads as too small on real desktop/large
+  // desktop screens. Bumped up for actual on-screen readability rather
+  // than matching that reference number literally.
+  padding: 3px 7px;
+  border-radius: 5px;
+  overflow: hidden;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-bold);
+  font-size: 11px;
+  line-height: 1.2;
+  color: var(--color-white-primary);
+  text-transform: capitalize;
+  white-space: nowrap;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url('/assets/img/my-domains/stat-card-noise.png');
+    background-size: 290px 290px;
+    mix-blend-mode: plus-lighter;
+    opacity: 0.4;
+    pointer-events: none;
+  }
+}
+
+.neutral {
+  background: linear-gradient(180deg, #333333, rgba(51, 51, 51, 0.6));
+}
+
+.forSale {
+  background: linear-gradient(180deg, #12a05c, rgba(18, 160, 92, 0.47));
+}

@@ -1,5 +1,18 @@
+@import '@mpstyles/_mixins.scss';
+
 .grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 8px; // Figma-exact
+
+  // 2 columns is right for the narrow 320px desktop sidebar rail this was
+  // designed for (Figma node 50:6238) and stays right at mobile's full-width
+  // single column. But at tablet width the whole shell collapses to one
+  // full-width column (see MarketplacePageShell.module.scss's .grid) — the
+  // same "there's real room now" reasoning as that file's own .railGroup —
+  // so 2 columns there stretches each tile far wider than its 103px height
+  // ever needs. All 4 fit comfortably across in one row instead.
+  @include tablet {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }

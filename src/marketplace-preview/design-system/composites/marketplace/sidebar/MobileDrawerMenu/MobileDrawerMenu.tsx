@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { FiSearch, FiTarget, FiCheck, FiX, FiArrowUpRight } from 'react-icons/fi'
 import { useRouter } from 'next/router'
 import { useAuth, deleteCookieAttribute, Cookie_Key, logoutUserApi } from '@/marketplace-preview/stubs/auth'
 import { HEADER_NAV_ITEMS } from '@/marketplace-preview/design-system/layouts/header/menuItems'
@@ -52,16 +54,15 @@ export const MobileDrawerMenu = ({ onClose, previewMode }: MobileDrawerMenuProps
     <div className={styles.drawer}>
       <div className={styles.header}>
         <Link href="/" className={styles.logo} onClick={onClose}>
-          <img src="/assets/img/logo.svg" alt="Endless Domains" />
+          <Image src="/assets/img/logo.svg" alt="Endless Domains" width={148} height={48} />
         </Link>
         <button type="button" className={styles.close} onClick={onClose} aria-label="Close menu">
-          <span className={styles.closeBar} />
-          <span className={styles.closeBar} />
+          <FiX size={18} aria-hidden="true" />
         </button>
       </div>
 
       <div className={styles.search}>
-        <img src="/assets/img/marketplace/drawer-search-icon.svg" alt="" aria-hidden="true" className={styles.searchIcon} />
+        <FiSearch size={18} aria-hidden="true" className={styles.searchIcon} />
         {/* Visual only for this pass, same as Header's own search field */}
         <input type="text" placeholder="Search...." className={styles.searchInput} readOnly />
         <div className={styles.kbdGroup}>
@@ -83,12 +84,7 @@ export const MobileDrawerMenu = ({ onClose, previewMode }: MobileDrawerMenuProps
                 className={`${styles.navLink} ${isActive ? styles.navLinkActive : ''}`}
               >
                 {item.label}
-                <img
-                  src={isActive ? '/assets/img/header/nav-arrow-active.svg' : '/assets/img/header/nav-arrow-inactive.svg'}
-                  alt=""
-                  aria-hidden="true"
-                  className={styles.navArrow}
-                />
+                <FiArrowUpRight size={7} aria-hidden="true" className={`${styles.navArrow} ${isActive ? styles.navArrowActive : ''}`} />
               </Link>
             )
           })}
@@ -116,20 +112,19 @@ export const MobileDrawerMenu = ({ onClose, previewMode }: MobileDrawerMenuProps
                 onClick={previewMode ? (e) => { e.preventDefault(); setPreviewSelectedBrowseId(item.id) } : onClose}
                 className={`${styles.browseRow} ${isSelected ? styles.browseRowSelected : ''}`}
               >
-                <img
-                  src={isExplore ? '/assets/img/marketplace/drawer-explore-icon.svg' : '/assets/img/marketplace/drawer-browse-icon.svg'}
-                  alt=""
-                  aria-hidden="true"
-                  className={styles.browseIcon}
-                />
+                {isExplore ? (
+                  <FiTarget size={15} aria-hidden="true" className={`${styles.browseIcon} ${styles.browseIconAccent}`} />
+                ) : (
+                  <FiCheck size={15} aria-hidden="true" className={styles.browseIcon} />
+                )}
                 <span className={styles.browseLabel}>{item.label}</span>
                 {typeof item.count === 'number' && <span className={styles.browseCount}>{item.count}</span>}
                 {item.badge && <span className={styles.browseBadge}>{item.badge}</span>}
                 {isSelected && (
                   <>
-                    <img src="/assets/img/marketplace/drawer-explore-deco-1.svg" alt="" aria-hidden="true" className={styles.exploreDeco1} />
-                    <img src="/assets/img/marketplace/drawer-explore-deco-2.svg" alt="" aria-hidden="true" className={styles.exploreDeco2} />
-                    <img src="/assets/img/marketplace/drawer-explore-deco-3.png" alt="" aria-hidden="true" className={styles.exploreDeco3} />
+                    <Image src="/assets/img/marketplace/drawer-explore-deco-1.svg" alt="" aria-hidden="true" width={80} height={10} className={styles.exploreDeco1} />
+                    <Image src="/assets/img/marketplace/drawer-explore-deco-2.svg" alt="" aria-hidden="true" width={140} height={10} className={styles.exploreDeco2} />
+                    <Image src="/assets/img/marketplace/drawer-explore-deco-3.png" alt="" aria-hidden="true" width={103} height={18} className={styles.exploreDeco3} />
                   </>
                 )}
               </Link>

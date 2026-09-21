@@ -26,3 +26,24 @@
     overflow-x: visible;
   }
 }
+
+// Figma node 77:3743 (responsive frame) drops the grid/list switch entirely
+// at mobile — MyDomainsTable forces card view there regardless of the last
+// selection (see its own comment), so a toggle with no effect would be
+// misleading rather than just redundant.
+.viewToggle {
+  @include mobile {
+    display: none;
+  }
+}
+
+// Slightly larger than SearchInput's own default (206px/33px) — this bar's
+// search field, above the listings table, reads as noticeably small next to
+// the filter dropdowns beside it. `div.searchInput` (element + class) has
+// higher specificity than the bare `.field` class SearchInput.module.scss
+// puts on the same element, so this wins regardless of which CSS module
+// loads first — same technique Header.module.scss's div.connectWallet uses.
+div.searchInput {
+  max-width: 240px;
+  height: 38px;
+}

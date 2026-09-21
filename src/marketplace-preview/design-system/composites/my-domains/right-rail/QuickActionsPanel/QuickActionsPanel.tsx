@@ -1,12 +1,14 @@
 import React from 'react'
+import type { IconType } from 'react-icons'
+import { FiTag, FiGrid, FiSearch, FiRepeat } from 'react-icons/fi'
 import InfoListCard from '@/marketplace-preview/design-system/primitives/cards/info-list-card'
 import { quickActions } from '@/marketplace-preview/data/my-domains/actions'
 
-const ICON_BY_ACTION: Record<string, string> = {
-  list: '/assets/img/my-domains/action-list.svg',
-  'bulk-list': '/assets/img/my-domains/action-bulk-list.svg',
-  appraise: '/assets/img/my-domains/action-appraise.svg',
-  transfer: '/assets/img/my-domains/action-transfer.svg',
+const ICON_BY_ACTION: Record<string, IconType> = {
+  list: FiTag,
+  'bulk-list': FiGrid,
+  appraise: FiSearch,
+  transfer: FiRepeat,
 }
 
 /**
@@ -22,7 +24,7 @@ export const QuickActionsPanel = () => (
     iconVariant="dark"
     rows={quickActions.map((action) => ({
       id: action.id,
-      iconSrc: ICON_BY_ACTION[action.id],
+      icon: ICON_BY_ACTION[action.id],
       title: action.label,
       subtitle: action.description,
     }))}

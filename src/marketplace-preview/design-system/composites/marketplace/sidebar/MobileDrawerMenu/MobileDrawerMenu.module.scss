@@ -46,22 +46,8 @@
   border: none;
   border-radius: var(--radius-sm);
   background: var(--color-gray-light);
+  color: var(--color-black-primary); // FiX — was 2 hand-rotated CSS bars, matches their own black
   cursor: pointer;
-}
-
-.closeBar {
-  position: absolute;
-  width: 14px;
-  height: 1.5px;
-  background: var(--color-black-primary);
-
-  &:first-child {
-    transform: rotate(45deg);
-  }
-
-  &:last-child {
-    transform: rotate(-45deg);
-  }
 }
 
 // ── Search ───────────────────────────────────────────────────────────────
@@ -176,6 +162,11 @@
   display: block;
   width: 7px;
   height: 7px;
+  color: var(--color-black-alpha-55); // nearest token to the original nav-arrow-inactive.svg's own 0.56 fill-opacity
+}
+
+.navArrowActive {
+  color: var(--color-blue-primary); // matches the original nav-arrow-active.svg's own fill
 }
 
 // ── Browse ───────────────────────────────────────────────────────────────
@@ -219,6 +210,13 @@
   flex-shrink: 0;
   position: relative;
   z-index: 1;
+  color: #a6a1bb; // design-specific: Figma-exact, matches the original drawer-browse-icon.svg's own stroke
+}
+
+// Explore's own row uses FiTarget instead of the plain FiCheck every other
+// row gets — matches the original drawer-explore-icon.svg's own blue stroke.
+.browseIconAccent {
+  color: var(--color-blue-primary);
 }
 
 .browseLabel {

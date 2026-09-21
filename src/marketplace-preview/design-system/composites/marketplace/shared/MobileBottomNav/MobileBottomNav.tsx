@@ -1,5 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
+import type { IconType } from 'react-icons'
+import { FiGlobe, FiHeart, FiTag, FiUser } from 'react-icons/fi'
 import { mockSidebarSections } from '@/marketplace-preview/data/marketplace/navigation'
 import styles from './MobileBottomNav.module.scss'
 
@@ -7,14 +9,14 @@ interface BottomNavItem {
   id: string
   label: string
   href: string
-  icon: string
+  icon: IconType
 }
 
 const ITEMS: BottomNavItem[] = [
-  { id: 'explore', label: 'Explore', href: '/', icon: '/assets/img/marketplace/bottomnav-explore.png' },
-  { id: 'watchlist', label: 'Watchlist', href: '/profile/watchlist', icon: '/assets/img/marketplace/bottomnav-watchlist.svg' },
-  { id: 'sell', label: 'Sell', href: '/', icon: '/assets/img/marketplace/bottomnav-sell.svg' },
-  { id: 'account', label: 'Account', href: '/profile/userProfile', icon: '/assets/img/marketplace/bottomnav-account.svg' },
+  { id: 'explore', label: 'Explore', href: '/', icon: FiGlobe },
+  { id: 'watchlist', label: 'Watchlist', href: '/profile/watchlist', icon: FiHeart },
+  { id: 'sell', label: 'Sell', href: '/', icon: FiTag },
+  { id: 'account', label: 'Account', href: '/profile/userProfile', icon: FiUser },
 ]
 
 const watchlistCount = mockSidebarSections.flatMap((section) => section.items).find((item) => item.id === 'watchlist')?.count
@@ -36,7 +38,7 @@ export const MobileBottomNav = () => {
           <Link key={item.id} href={item.href} className={`${styles.item} ${active ? styles.active : ''}`}>
             {active && <span className={styles.indicator} aria-hidden="true" />}
             <span className={styles.iconWrap}>
-              <img src={item.icon} alt="" aria-hidden="true" className={styles.icon} />
+              <item.icon size={20} aria-hidden="true" className={styles.icon} />
               {item.id === 'watchlist' && watchlistCount != null && <span className={styles.badge}>{watchlistCount}</span>}
             </span>
             <span>{item.label}</span>

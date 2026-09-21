@@ -1,4 +1,6 @@
 import React from 'react'
+import Image from 'next/image'
+import { FiHeart } from 'react-icons/fi'
 import type { MarketplaceListing } from '@/marketplace-preview/types/marketplace'
 import ExtensionBadge from '@/marketplace-preview/design-system/primitives/badges/extension-badge'
 import ChainBadge from '@/marketplace-preview/design-system/primitives/badges/chain-badge'
@@ -36,7 +38,7 @@ export const ListingDomainCell = ({ listing }: ListingDomainCellProps) => (
   <div className={styles.cell} role="cell">
     <div className={styles.domain}>
       {listing.isPremium && (
-        <img src="/assets/img/marketplace/domain-marker.svg" alt="" aria-hidden="true" className={styles.marker} />
+        <Image src="/assets/img/marketplace/domain-marker.svg" alt="" aria-hidden="true" width={19} height={14} className={styles.marker} />
       )}
       {/* Was a native title="" tooltip — unstyled OS chrome with a slow,
           browser-controlled delay. Themed Tooltip primitive instead, same
@@ -96,12 +98,7 @@ export const ListingRestCells = ({ listing, favorited, onToggleFavorite }: Listi
         aria-label={favorited ? 'Remove from watchlist' : 'Add to watchlist'}
         onClick={onToggleFavorite}
       >
-        <img
-          src="/assets/img/marketplace/favorite.svg"
-          alt=""
-          aria-hidden="true"
-          className={favorited ? styles.favoriteIconActive : styles.favoriteIcon}
-        />
+        <FiHeart size={14} aria-hidden="true" className={favorited ? styles.favoriteIconActive : styles.favoriteIcon} />
       </button>
     </div>
   </>

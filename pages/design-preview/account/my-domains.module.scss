@@ -1,3 +1,5 @@
+@import '@mpstyles/_mixins.scss';
+
 .rightRailStack {
   display: flex;
   flex-direction: column;
@@ -8,8 +10,49 @@
   padding-bottom: var(--space-6);
 }
 
+// Needs Attention / Most Viewed / Quick Actions, grouped separately from
+// PortfolioStatsRow above (which already has its own permanent 2-column
+// grid regardless of width). Mirrors MarketplacePageShell's own .railGroup
+// reasoning for LiveActivityPanel + MarketActivityPanel: below desktop the
+// rail is no longer squeezed into the fixed 320px sidebar column — at
+// tablet-down width the whole shell collapses to one full-width column
+// (see MarketplacePageShell.module.scss's .grid), so once at tablet width
+// specifically there's real room for two of these list panels side by
+// side instead of one skinny stacked column. Quick Actions spans both
+// columns underneath rather than dangling alone in a half-empty second
+// row. Covers the full 768–1039px tablet range as a single width-driven
+// layout — both a portrait iPad (~768–1032px) and a standard iPad's
+// landscape width (1024px) land in this same range and get the same
+// two-up treatment; only a wide-landscape iPad Pro (11"/13", ≥1194px) is
+// wide enough to cross into the desktop three-column grid instead.
+.panelGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+
+  @include tablet {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4);
+
+    > :last-child {
+      grid-column: 1 / -1;
+    }
+  }
+}
+
 .mainStack {
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
+}
+
+// Pulls "Live Listings" and the search/filter row right under it closer
+// together than .mainStack's own gap gives every sibling — that gap still
+// applies normally above (category tabs) and below (the table) this pair,
+// scoped here instead of shrinking .mainStack's gap everywhere.
+.headingAndFilters {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
 }

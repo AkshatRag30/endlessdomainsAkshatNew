@@ -1,6 +1,7 @@
-// Figma node 50:6238. Gradient stops/angles below are Figma-exact per variant.
-// The noise texture reuses the node's own exported tile rather than a
-// hand-drawn approximation — see figma-design-to-code's asset rule.
+// Figma node 50:6238 (also 72:9087). Gradient stops/angles below are
+// Figma-exact per variant. The noise texture reuses the node's own exported
+// tile rather than a hand-drawn approximation — see figma-design-to-code's
+// asset rule.
 
 .card {
   position: relative;
@@ -10,7 +11,14 @@
   overflow: hidden;
   padding: var(--space-3);
   display: flex;
-  align-items: flex-end;
+  // Figma positions the text block at top:50% with a -translate-y-1/2, i.e.
+  // vertically centered in the card, on all four variants — not pinned to
+  // the bottom edge. Bottom-pinning (the previous align-items: flex-end)
+  // made each card's internal baseline land at a different height once the
+  // four cards' content lengths differ even slightly (a 2-digit count next
+  // to a 4-digit ETH value), which is what read as misaligned across the
+  // 2x2 grid despite every card being the same fixed size.
+  align-items: center;
   box-shadow: inset 0 2px 24px rgba(255, 255, 255, 0.5);
 
   &::before {
@@ -48,11 +56,6 @@
   flex-direction: column;
   gap: var(--space-2);
   width: 100%;
-}
-
-.alignEnd {
-  align-items: flex-end;
-  text-align: right;
 }
 
 .top {

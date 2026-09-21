@@ -42,11 +42,16 @@
   width: 15px;
   height: 15px;
   flex-shrink: 0;
+  color: var(--color-blue-primary); // matches the original drawer-explore-icon.svg's own fill
 }
 
-// Figma node 70:4592's per-row icon set — each asset's own fill/stroke
-// color is baked in at export (varies slightly per glyph, e.g. #78738F vs
-// #A6A1BB), so this only constrains size/position, not color.
+// Figma node 70:4592's per-row icon set — each raw asset's own fill/stroke
+// color used to be baked in at export and varied slightly per glyph (e.g.
+// #78738F vs #A6A1BB, an incidental side effect of separate exports, not a
+// deliberate per-row color choice — see this file's own git history). The
+// react-icons rows now unify to this row's own text color via currentColor
+// instead; the handful of rows still on a raw asset path keep their own
+// baked-in tone, unaffected.
 .icon {
   width: 14px;
   height: 14px;
@@ -120,12 +125,18 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  // Fixed, not min-width — an unforced flex box (nothing pushing it wider
-  // when there's no count, e.g. "Explore") previously squeezed this down
-  // to 40px, squashing the pill PNG horizontally from its native ~103x18.
-  // 100px keeps close to that ~5.75:1 ratio at this height so it renders
-  // at roughly its real proportions whether or not a count is present.
-  width: 100px;
+  // The label must never truncate (it's the actual page name), so this
+  // can't reserve a fixed width and force the label to shrink around it —
+  // it has to be the one that adapts instead. width: 100% resolves against
+  // .activeTrailing (the nearest positioned ancestor, see its own rule) —
+  // whatever room is actually left after the label takes its full natural
+  // width, this matches it exactly, so it can never overlap the label. When
+  // there's plenty of room (a short label like "Explore"), max-width caps
+  // it at the pill PNG's native ~103x18 ratio at this height so it doesn't
+  // stretch wider than intended just because .activeTrailing (flex: 1) grew
+  // to fill the extra space.
+  width: 100%;
+  max-width: 100px;
   height: 18px;
   padding-right: var(--space-1-5);
 }
@@ -135,9 +146,11 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  // contain, not fill — .pillWrap is sized close to this PNG's native
-  // ratio, but contain is a safety net against any remaining mismatch
-  // distorting it, rather than stretching to whatever box it's given.
+  // contain — when .pillWrap shrinks below its natural ~100px (a long
+  // label leaving little room), this scales the pill PNG down with it
+  // instead of clipping or overlapping the label; when .pillWrap is at or
+  // above its natural size, contain is a safety net against any remaining
+  // aspect-ratio mismatch distorting it.
   object-fit: contain;
   pointer-events: none;
 }

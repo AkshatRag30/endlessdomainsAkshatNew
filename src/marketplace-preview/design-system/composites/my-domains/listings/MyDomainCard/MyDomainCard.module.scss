@@ -13,15 +13,27 @@
   overflow: hidden;
 }
 
-// ── Top row: status badge | interest counts ─────────────────────────────
+// ── Header: status badge + interest counts, then the identity row ───────
+// Figma node 60:13505 groups these two into one block with no divider
+// between them — only two dividers total in the whole card, both below
+// (before EST. value/Renewal, and before Price/Action). The badge and the
+// interest counts (views/saved) aren't actually siblings in that reference
+// — the counts float independently at the card's top-right corner — but a
+// space-between row achieves the same result without absolute positioning.
 
-.top {
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 3px; // Figma-exact (60:13506's own gap, 3.16px rounded)
+  padding: var(--space-1) var(--space-2-5); // Figma: ~4px top/bottom, ~10px sides
+  border-bottom: 1px solid var(--color-border-black-subtle);
+}
+
+.headerTop {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
-  border-bottom: 1px solid var(--color-border-black-subtle);
 }
 
 .interest {
@@ -35,13 +47,19 @@
   align-items: center;
   gap: 4px;
   font-family: var(--font-space-grotesk);
-  font-size: var(--text-small-12);
+  // Figma: 7.828px in this card's own scale — var(--text-small-10) is the
+  // nearest token below it.
+  font-size: var(--text-small-10);
   color: var(--color-gray-dark);
 }
 
 .heartIcon {
   width: 11px;
   height: 10px;
+  // Matches the original favorite.svg's own stroke="#a6a1bb" — a distinct,
+  // slightly warmer tone from .interestStat's gray-dark that the eye icon
+  // next to it inherits via currentColor, not a mismatch to fix.
+  color: #a6a1bb; // design-specific: Figma-exact, matches the $ labels elsewhere in this build
 }
 
 // ── Identity row ─────────────────────────────────────────────────────────
@@ -49,23 +67,23 @@
 .identity {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
-  border-bottom: 1px solid var(--color-border-black-subtle);
+  gap: 7px; // Figma-exact (60:13510)
   min-width: 0;
 }
 
+// Figma: name row (22.357px) + chain row (17.5px) sum exactly to this
+// container's own 39.857px height — no gap between them.
 .identityText {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 0;
   min-width: 0;
 }
 
 .nameRow {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px; // Figma-exact (60:13535)
   min-width: 0;
 }
 
@@ -77,13 +95,17 @@
   min-width: 0;
 }
 
-// Figma node 72:9039 — 15px/Bold, up from 13px/Medium.
+// Figma node 60:13505 (this card, at its actual 3-column grid width) shows
+// 13.609px/Medium here — smaller and lighter than MyDomainRow's own
+// .domainName (15px/Bold, node 72:9039), a separate, larger-scale reference
+// for the row layout. The two aren't the same context, so they're no
+// longer forced to match.
 .domainName {
   display: block;
   width: 100%;
   font-family: var(--font-satoshi);
-  font-weight: var(--font-weight-bold);
-  font-size: var(--text-small-15);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-small-13);
   color: var(--color-black-primary);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -128,12 +150,25 @@
   flex-direction: column;
   gap: 3px;
   min-width: 0;
-  padding: var(--space-2) var(--space-3);
+  padding: var(--space-2) var(--space-2-5); // Figma: ~10px sides (60:13598/60:13582 both start at x:10)
   border-right: 1px solid var(--color-border-black-subtle);
 
   &:last-child {
     border-right: none;
   }
+}
+
+// Figma's vertical divider (60:13606) sits only between EST. value and
+// Renewal — the Price/Action row (60:13582/60:13585) has no matching
+// divider element at all. `.statsRow:first-of-type` doesn't work for
+// scoping this to just the first row: :first-of-type matches the first
+// *div* among siblings regardless of class, and .header (also a div)
+// already claims that slot, so the selector silently matched nothing and
+// removed the divider from both rows instead of just the second one. The
+// adjacent-sibling combinator below targets the .statsRow that directly
+// follows another .statsRow — i.e. specifically the second one — instead.
+.statsRow + .statsRow .stat {
+  border-right: none;
 }
 
 .actionStat {
@@ -144,15 +179,22 @@
   // Same fixed-width override as MyDomainRow's .actionCell — "List" and
   // "Edit Price" render at the same width instead of each sizing to its
   // own text via PrimaryButton's fit-content default. Targets the plain
-  // `button` tag so it wins regardless of CSS module load order.
+  // `button` tag so it wins regardless of CSS module load order. Width
+  // narrowed to Figma's 93.69px (60:13585) — height is deliberately left at
+  // PrimaryButton's own sm height rather than forced down to Figma's
+  // 30.72px: that variant's corner-chamfer clip-path is a fixed 7px cut on
+  // every side, not a proportional one, and shrinking the box that much
+  // without also touching the shared primitive's own clip-path would make
+  // the chamfer swallow a visibly larger share of a much shorter button.
   button {
-    width: 110px;
+    width: 94px;
   }
 }
 
 .statLabel {
   font-family: var(--font-satoshi);
-  font-size: 11px;
+  // Figma: 10.271px — var(--text-small-10) is the nearest token.
+  font-size: var(--text-small-10);
   color: var(--color-black-alpha-55);
   text-transform: capitalize;
 }
@@ -160,23 +202,32 @@
 .statValue {
   font-family: var(--font-satoshi);
   font-weight: var(--font-weight-medium);
-  font-size: var(--text-small-13);
+  // Figma: 10.751px in this card's own scale — var(--text-small-10) is the
+  // nearest token (was var(--text-small-13), sized for a larger reference).
+  font-size: var(--text-small-10);
   color: var(--color-black-primary);
 }
 
 .dash {
   font-family: var(--font-satoshi);
-  font-size: var(--text-small-13);
-  color: var(--color-gray-medium);
+  font-size: var(--text-small-10);
+  // Figma: #070707 (near-black), not the gray-medium placeholder tone this
+  // used before.
+  color: var(--color-black-primary);
 }
 
 .renewal {
   display: flex;
   align-items: center;
   gap: 5px;
+  // Same defensive rule as MyDomainRow.module.scss's .renewal — this card
+  // layout has more room per stat than the 6-column row does, but nothing
+  // stops "Oct 21" from wrapping onto two lines if a column ever gets tight.
+  white-space: nowrap;
   font-family: var(--font-satoshi);
   font-weight: var(--font-weight-medium);
-  font-size: var(--text-small-13);
+  // Figma: 9.875px, matching .statValue's own corrected scale.
+  font-size: var(--text-small-10);
   color: var(--color-black-primary);
 
   svg {

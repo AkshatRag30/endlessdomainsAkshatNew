@@ -1,11 +1,13 @@
 import React from 'react'
+import Image from 'next/image'
+import { FiCalendar, FiEye, FiHeart } from 'react-icons/fi'
 import type { MyDomainListing } from '@/marketplace-preview/types/my-domains'
 import DomainAvatar from '@/marketplace-preview/design-system/primitives/avatars/domain-avatar'
 import Tooltip from '@/marketplace-preview/design-system/primitives/tooltip'
 import ExtensionBadge from '@/marketplace-preview/design-system/primitives/badges/extension-badge'
 import ChainBadge from '@/marketplace-preview/design-system/primitives/badges/chain-badge'
 import TrendIndicator from '@/marketplace-preview/design-system/primitives/badges/trend-indicator'
-import Badge from '@/marketplace-preview/design-system/primitives/badges/badge'
+import StatusChip from '@/marketplace-preview/design-system/primitives/badges/status-chip'
 import PrimaryButton from '@/marketplace-preview/design-system/primitives/buttons/primary-button'
 import { formatUsd, formatRenewal, truncateDomainName, TREND_DIRECTION, TREND_LABEL, STATUS_BADGE_LABEL } from '../formatMyDomain'
 import styles from './MyDomainCard.module.scss'
@@ -14,41 +16,52 @@ export interface MyDomainCardProps {
   domain: MyDomainListing
 }
 
-/** Figma node 375:51247 (grid view card) — same fields as MyDomainRow, laid out as a standalone card instead of a table row. */
+/**
+ * Figma node 375:51247 (grid view card) — same fields as MyDomainRow, laid
+ * out as a standalone card instead of a table row.
+ *
+ * Dimensions/scale corrected against Figma node 60:13505 — the card as it
+ * actually renders inside the 3-column desktop grid (node 60:13504, 809px
+ * wide, 3 x 265.45px cards with a 6px gap both directions, see
+ * MyDomainsTable.module.scss's .grid). That reference groups the status
+ * badge and the identity row into a single bordered block with no divider
+ * between them — only two dividers total, before EST. value/Renewal and
+ * before Price/Action — unlike the three this used to render (badge row,
+ * identity row, and stats each separately bordered).
+ */
 export const MyDomainCard = ({ domain }: MyDomainCardProps) => (
   <div className={styles.card}>
-    <div className={styles.top}>
-      <Badge variant={domain.status === 'for-sale' ? 'success' : 'neutral'}>{STATUS_BADGE_LABEL[domain.status]}</Badge>
-      <div className={styles.interest}>
-        <span className={styles.interestStat}>
-          <svg width="13" height="9" viewBox="0 0 13 9" fill="none" aria-hidden="true">
-            <path d="M6.5 0.5C3.5 0.5 1.2 2.3 0.3 4.5C1.2 6.7 3.5 8.5 6.5 8.5C9.5 8.5 11.8 6.7 12.7 4.5C11.8 2.3 9.5 0.5 6.5 0.5Z" stroke="currentColor" />
-            <circle cx="6.5" cy="4.5" r="1.8" stroke="currentColor" />
-          </svg>
-          {domain.views}
-        </span>
-        <span className={styles.interestStat}>
-          <img src="/assets/img/marketplace/favorite.svg" alt="" aria-hidden="true" className={styles.heartIcon} />
-          {domain.savedCount}
-        </span>
-      </div>
-    </div>
-
-    <div className={styles.identity}>
-      <DomainAvatar chain={domain.chain} />
-      <div className={styles.identityText}>
-        <div className={styles.nameRow}>
-          <Tooltip label={`${domain.domainName}${domain.extension}`} placement="bottom" portal className={styles.domainNameTooltip}>
-            <span className={styles.domainName}>{truncateDomainName(domain.domainName)}</span>
-          </Tooltip>
-          <ExtensionBadge extension={domain.extension} />
+    <div className={styles.header}>
+      <div className={styles.headerTop}>
+        <StatusChip variant={domain.status === 'for-sale' ? 'for-sale' : 'neutral'}>{STATUS_BADGE_LABEL[domain.status]}</StatusChip>
+        <div className={styles.interest}>
+          <span className={styles.interestStat}>
+            <FiEye size={13} aria-hidden="true" />
+            {domain.views}
+          </span>
+          <span className={styles.interestStat}>
+            <FiHeart size={11} aria-hidden="true" className={styles.heartIcon} />
+            {domain.savedCount}
+          </span>
         </div>
-        <div className={styles.metaRow}>
-          <ChainBadge chain={domain.chain} />
-          <span className={styles.chars}>{domain.lengthChars} chars</span>
-          {domain.isPremium && (
-            <img src="/assets/img/marketplace/domain-marker.svg" alt="Premium" className={styles.marker} />
-          )}
+      </div>
+
+      <div className={styles.identity}>
+        <DomainAvatar extension={domain.extension} />
+        <div className={styles.identityText}>
+          <div className={styles.nameRow}>
+            <Tooltip label={`${domain.domainName}${domain.extension}`} placement="bottom" portal className={styles.domainNameTooltip}>
+              <span className={styles.domainName}>{truncateDomainName(domain.domainName)}</span>
+            </Tooltip>
+            <ExtensionBadge extension={domain.extension} />
+          </div>
+          <div className={styles.metaRow}>
+            <ChainBadge chain={domain.chain} />
+            <span className={styles.chars}>{domain.lengthChars} chars</span>
+            {domain.isPremium && (
+              <Image src="/assets/img/marketplace/domain-marker.svg" alt="Premium" width={14} height={10} className={styles.marker} />
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -62,11 +75,7 @@ export const MyDomainCard = ({ domain }: MyDomainCardProps) => (
       <div className={styles.stat}>
         <span className={styles.statLabel}>Renewal</span>
         <span className={styles.renewal}>
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-            <rect x="1" y="2" width="10" height="9" rx="1.2" stroke="currentColor" />
-            <path d="M1 4.5H11" stroke="currentColor" />
-            <path d="M3.5 1V3M8.5 1V3" stroke="currentColor" strokeLinecap="round" />
-          </svg>
+          <FiCalendar size={12} aria-hidden="true" />
           {formatRenewal(domain.renewalTimestamp)}
         </span>
       </div>

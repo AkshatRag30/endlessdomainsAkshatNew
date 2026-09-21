@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
+import { FiChevronDown } from 'react-icons/fi'
 import { createPortal } from 'react-dom'
 import styles from './FilterDropdown.module.scss'
 
@@ -73,7 +74,7 @@ export const FilterDropdown = ({ label, value, options, onChange, className = ''
     <div className={shellClass} ref={rootRef}>
       <button type="button" className={styles.trigger} onClick={toggleOpen} aria-expanded={open}>
         {label}
-        <img src="/assets/img/marketplace/filter-chevron.svg" alt="" aria-hidden="true" className={styles.chevron} />
+        <FiChevronDown size={9} aria-hidden="true" className={styles.chevron} />
       </button>
 
       {open &&

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { FiChevronDown } from 'react-icons/fi'
 import { mockTickerItems } from '@/marketplace-preview/data/marketplace/activity'
 import type { ActivityAction, ActivityFilter, TickerItem } from '@/marketplace-preview/types/marketplace'
 import styles from './LiveActivityTicker.module.scss'
@@ -85,7 +86,7 @@ export const LiveActivityTicker = () => {
         >
           <span className={styles.liveDot} aria-hidden="true" />
           <span>{filter === 'all' ? 'Live activity' : activeLabel}</span>
-          <img src="/assets/img/marketplace/ticker-dropdown-arrow.svg" alt="" aria-hidden="true" className={styles.chevron} />
+          <FiChevronDown size={8} aria-hidden="true" className={styles.chevron} />
         </button>
 
         {open && (

@@ -1,4 +1,5 @@
 import React from 'react'
+import Image from 'next/image'
 import type { ActivityFeedItem } from '@/marketplace-preview/types/marketplace'
 import Tooltip from '@/marketplace-preview/design-system/primitives/tooltip'
 import styles from './ActivityItem.module.scss'
@@ -39,7 +40,7 @@ export const ActivityItem = ({ item }: ActivityItemProps) => {
 
   return (
     <div className={styles.item}>
-      <img src="/assets/img/marketplace/activity-icon.svg" alt="" aria-hidden="true" className={styles.icon} />
+      <Image src="/assets/img/marketplace/activity-icon.svg" alt="" aria-hidden="true" width={14} height={14} className={styles.icon} />
       <Tooltip
         variant="light"
         placement="bottom"

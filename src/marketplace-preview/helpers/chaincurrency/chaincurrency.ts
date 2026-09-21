@@ -144,8 +144,10 @@ export const getAllDomainProviders = () => DOMAIN_PROVIDERS
 
 // This project's Chain.id values ('polygon'/'ethereum'/'arbitrum'/'bsc',
 // from src/types/marketplace/domain.ts) predate this ported helper, which
-// keys off the domain-provider name instead. Shared by ChainBadge and
-// DomainAvatar — both places a chain's real logo needs resolving.
+// keys off the domain-provider name instead. Used by ChainBadge to resolve
+// the domain's network logo (Polygon/Ethereum/Arbitrum/BNB) — not the same
+// thing as which naming service issued the domain, see
+// getProviderForExtension below for that.
 const CHAIN_ID_TO_PROVIDER: Record<string, DomainProviderKey> = {
   polygon: 'Polygon',
   ethereum: 'ENS',
@@ -155,5 +157,28 @@ const CHAIN_ID_TO_PROVIDER: Record<string, DomainProviderKey> = {
 
 export const getProviderForChainId = (chainId: string) => {
   const providerKey = CHAIN_ID_TO_PROVIDER[chainId]
+  return providerKey ? getDomainProvider(providerKey) : undefined
+}
+
+// A domain's naming provider (who issued/registers it, shown by
+// DomainAvatar) is a different concept from the chain it lives on (shown by
+// ChainBadge) — two domains on the same chain can come from different
+// providers, and the same provider can mint on more than one chain. Keying
+// both off Chain.id (as DomainAvatar used to, via getProviderForChainId)
+// made them always resolve to the same logo. This keys off the domain's own
+// extension instead, which is what actually identifies the naming service.
+const EXTENSION_TO_PROVIDER: Record<string, DomainProviderKey> = {
+  '.ud': 'UD',
+  '.eth': 'ENS',
+  '.sol': 'Bonfida',
+  '.tez': 'Tezos',
+  '.apt': 'Aptos',
+  '.ton': 'Ton',
+  '.box': 'Box',
+  '.stark': 'Starknet',
+}
+
+export const getProviderForExtension = (extension: string) => {
+  const providerKey = EXTENSION_TO_PROVIDER[extension.toLowerCase()]
   return providerKey ? getDomainProvider(providerKey) : undefined
 }

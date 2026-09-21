@@ -1,7 +1,10 @@
 import React, { useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { usePathname } from 'next/navigation'
+import { FiMenu, FiArrowUpRight, FiSearch, FiUser } from 'react-icons/fi'
+import { BsWallet2 } from 'react-icons/bs'
 import { useAuth, deleteCookieAttribute, Cookie_Key, logoutUserApi } from '@/marketplace-preview/stubs/auth'
 import { useIsMobile } from '@/marketplace-preview/stubs/useIsMobile'
 import primaryBtnStyles from '@/marketplace-preview/design-system/primitives/buttons/primary-button/Primarybutton.module.scss'
@@ -66,19 +69,19 @@ const Header: React.FC<HeaderProps> = ({ hidden, onMenuClick, menuOpen, previewM
             aria-label={menuOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={menuOpen}
           >
-            <span className={styles.menuToggleBar} />
+            <FiMenu size={16} aria-hidden="true" />
           </button>
         )}
 
         <Link href="/" className={styles.logo}>
-          <img src="/assets/img/logo.svg" alt="Endless Domains" />
+          <Image src="/assets/img/logo.svg" alt="Endless Domains" width={148} height={48} />
         </Link>
 
         <nav className={styles.nav}>
           {HEADER_NAV_ITEMS.map((item, index) => {
             const isActive = previewMode ? item.label === previewSelectedNav : pathname === item.href && item.label === 'Marketplace'
             return (
-              <React.Fragment key={item.label}>
+              <div key={item.label} className={styles.navItem}>
                 {index > 0 && <span className={styles.navDivider} aria-hidden="true" />}
                 <Link
                   href={item.href}
@@ -86,14 +89,9 @@ const Header: React.FC<HeaderProps> = ({ hidden, onMenuClick, menuOpen, previewM
                   onClick={previewMode ? (e) => { e.preventDefault(); setPreviewSelectedNav(item.label) } : undefined}
                 >
                   {item.label}
-                  <img
-                    src={isActive ? '/assets/img/header/nav-arrow-active.svg' : '/assets/img/header/nav-arrow-inactive.svg'}
-                    alt=""
-                    aria-hidden="true"
-                    className={styles.navArrow}
-                  />
+                  <FiArrowUpRight size={7} aria-hidden="true" className={`${styles.navArrow} ${isActive ? styles.navArrowActive : ''}`} />
                 </Link>
-              </React.Fragment>
+              </div>
             )
           })}
         </nav>
@@ -101,7 +99,7 @@ const Header: React.FC<HeaderProps> = ({ hidden, onMenuClick, menuOpen, previewM
 
       <div className={styles.right}>
         <div className={styles.search}>
-          <img src="/assets/img/header/search-icon.svg" alt="" aria-hidden="true" className={styles.searchIcon} />
+          <FiSearch size={18} aria-hidden="true" className={styles.searchIcon} />
           {/* Visual only for this pass — not wired to the domain search API yet */}
           <input type="text" placeholder="Search...." className={styles.searchPlaceholder} readOnly />
           <div className={styles.kbdGroup}>
@@ -121,7 +119,7 @@ const Header: React.FC<HeaderProps> = ({ hidden, onMenuClick, menuOpen, previewM
               }}
             >
               <div className="nav-link active cursor-pointer">
-                <img src="/assets/img/User-profile.svg" alt="profile" />
+                <FiUser size={22} role="img" aria-label="profile" />
               </div>
 
               {showDropdown && (
@@ -181,7 +179,7 @@ const Header: React.FC<HeaderProps> = ({ hidden, onMenuClick, menuOpen, previewM
               </div>
               {/* Figma node 34:1043 — mobile swaps the text button for this icon-only chip, same /login destination */}
               <Link href="/login" className={styles.walletIconButton} aria-label="Login or sign up">
-                <img src="/assets/img/marketplace/header-wallet-icon.svg" alt="" aria-hidden="true" className={styles.walletIcon} />
+                <BsWallet2 size={16} aria-hidden="true" className={styles.walletIcon} />
               </Link>
             </>
           )}
@@ -189,7 +187,7 @@ const Header: React.FC<HeaderProps> = ({ hidden, onMenuClick, menuOpen, previewM
 
         {/* Figma node 34:1043 — mobile-only search trigger replacing the desktop search bar, which has no room at this width */}
         <button type="button" className={styles.mobileSearchButton} aria-label="Search">
-          <img src="/assets/img/marketplace/header-search-chip.svg" alt="" aria-hidden="true" className={styles.mobileSearchIcon} />
+          <Image src="/assets/img/marketplace/header-search-chip.svg" alt="" aria-hidden="true" width={37} height={31} className={styles.mobileSearchIcon} />
         </button>
       </div>
     </header>

@@ -1,4 +1,5 @@
 import React from 'react'
+import { FiSearch, FiX } from 'react-icons/fi'
 import styles from './SearchInput.module.scss'
 
 export interface SearchInputProps {
@@ -22,11 +23,11 @@ export const SearchInput = ({ value, onChange, placeholder = 'Search', className
         className={styles.input}
       />
       <button type="button" className={styles.clear} onClick={() => onChange('')} aria-label="Clear search">
-        <img src="/assets/img/marketplace/search-clear.svg" alt="" aria-hidden="true" />
+        <FiX size={15} aria-hidden="true" />
       </button>
       <span className={styles.divider} aria-hidden="true" />
       <button type="button" className={styles.submit} aria-label="Search">
-        <img src="/assets/img/marketplace/search-submit.svg" alt="" aria-hidden="true" />
+        <FiSearch size={15} aria-hidden="true" />
       </button>
     </div>
   )

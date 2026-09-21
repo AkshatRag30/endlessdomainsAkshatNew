@@ -67,16 +67,20 @@ export default function MyDomainsPreview() {
         rightRail={
           <div className={styles.rightRailStack}>
             <PortfolioStatsRow summary={summary} />
-            <NeedsAttentionPanel domains={mockNeedsAttention} />
-            <MostViewedPanel domains={mockMostViewed} />
-            <QuickActionsPanel />
+            <div className={styles.panelGroup}>
+              <NeedsAttentionPanel domains={mockNeedsAttention} />
+              <MostViewedPanel domains={mockMostViewed} />
+              <QuickActionsPanel />
+            </div>
           </div>
         }
       >
         <div className={styles.mainStack}>
           <MyDomainsCategoryTabs statusCounts={summary.statusCounts} activeId={activeStatus} onChange={setActiveStatus} />
-          <ListingsHeading count={filtered.length} />
-          <MyDomainsFilterBar filters={filters} onFilterChange={setFilter} viewMode={viewMode} onViewModeChange={setViewMode} />
+          <div className={styles.headingAndFilters}>
+            <ListingsHeading count={filtered.length} />
+            <MyDomainsFilterBar filters={filters} onFilterChange={setFilter} viewMode={viewMode} onViewModeChange={setViewMode} />
+          </div>
           <MyDomainsTable domains={filtered} viewMode={viewMode} pageSize={14} />
         </div>
       </MarketplacePageShell>

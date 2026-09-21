@@ -15,7 +15,6 @@ export const PortfolioStatsRow = ({ summary }: PortfolioStatsRowProps) => (
   <div className={styles.grid}>
     <StatCard
       variant="blue"
-      align="end"
       label="Domains"
       value={String(summary.totalDomains)}
       sublabel={`${summary.statusCounts['for-sale']} listed`}
@@ -34,7 +33,6 @@ export const PortfolioStatsRow = ({ summary }: PortfolioStatsRowProps) => (
     />
     <StatCard
       variant="purple"
-      align="end"
       label="Sold, all time"
       value={String(summary.soldCount).padStart(2, '0')}
       sublabel={formatUsd(summary.soldValueUsd)}

@@ -1,4 +1,5 @@
 import React from 'react'
+import Image from 'next/image'
 import { Chain } from '@/marketplace-preview/types/marketplace'
 import { getProviderForChainId } from '@/marketplace-preview/helpers/chaincurrency/chaincurrency'
 import styles from './ChainBadge.module.scss'
@@ -22,7 +23,7 @@ export const ChainBadge = ({ chain, className = '' }: ChainBadgeProps) => {
   return (
     <span className={shellClass}>
       {provider ? (
-        <img src={provider.image} alt="" aria-hidden="true" className={styles.logo} />
+        <Image src={provider.image} alt="" aria-hidden="true" width={18} height={18} className={styles.logo} />
       ) : (
         <span className={[styles.dot, styles[chain.id] ?? styles.default].filter(Boolean).join(' ')} aria-hidden="true" />
       )}

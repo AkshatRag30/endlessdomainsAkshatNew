@@ -25,6 +25,18 @@
   grid-template-areas:
     "sidebar hero rail"
     "sidebar main rail";
+  // rail spans both rows, and neither row has an explicit height — when
+  // rail's own content (e.g. My Domains' stat row + three right-rail
+  // panels) is taller than hero + main combined, the browser has to grow
+  // the row tracks to fit it. Without this, that extra height gets added
+  // to whichever row has the least of its own content to "earn" it, which
+  // in practice was almost always the hero row (a filtered-to-zero main
+  // column has next to nothing in it), showing up as blank space between
+  // the hero and the listings below it. Marking main as 1fr (hero stays
+  // min-content) tells the grid track-sizing algorithm to grow that
+  // spanning item's overflow into the fr track specifically, not distribute
+  // it across both, so hero only ever sizes to its own content.
+  grid-template-rows: min-content 1fr;
   gap: var(--space-6);
   // Literal 32px, not var(--container-padding-x) (80px) — that token is the
   // main site's marketing-page gutter and stays untouched in tokens.scss
@@ -34,12 +46,30 @@
   padding: var(--space-6) 32px;
   align-items: start;
 
+  // 320px for rail (and 240px for sidebar) was sized comfortably for
+  // genuinely wide desktops (≥1440px), where main still has plenty of
+  // room either way. Between 1040px and 1440px — a real MacBook Air's
+  // actual logical width lands here, not in the "wide" bucket — that same
+  // fixed 560px overhead eats a much bigger share of the viewport, leaving
+  // main narrow enough that My Domains' Action column button, its filter
+  // row's view toggle, and its category tabs were all visibly getting cut
+  // off or spilling past their own boundaries. Narrowing rail specifically
+  // in this range gives main real room back without touching the ≥1440px
+  // case that was already fine.
+  @include between($breakpoint-desktop, $breakpoint-wide - 1px) {
+    grid-template-columns: 240px 1fr 260px;
+  }
+
   @include tablet-down {
     grid-template-columns: 1fr;
     grid-template-areas:
       "hero"
       "rail"
       "main";
+    // Three separate stacked rows here, not two with rail spanning both —
+    // the min-content/1fr split above is meaningless (and would mis-size
+    // things) once rail is its own row instead of spanning.
+    grid-template-rows: auto;
     padding: var(--space-4);
   }
 }

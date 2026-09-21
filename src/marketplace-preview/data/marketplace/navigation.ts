@@ -1,3 +1,4 @@
+import { FiCompass, FiHeart, FiBarChart2, FiUser, FiSettings } from 'react-icons/fi'
 import { HeroCategoryChip, SidebarSection } from '@/marketplace-preview/types/marketplace'
 
 /**
@@ -17,7 +18,13 @@ import { HeroCategoryChip, SidebarSection } from '@/marketplace-preview/types/ma
 // Icon set pulled from Figma node 70:4592 (same file, the sidebar's own
 // icon layer). My domains reuses the exact same heart glyph as Watchlist —
 // that's not a mismatch on this side, the source file itself gives both
-// rows the identical icon asset.
+// rows the identical icon asset. Rows below use a react-icons component
+// where a plain, generic glyph exists for one (a heart, a person, a gear);
+// Extensions' sparkle-burst mark, Payouts' composite wallet+dollar glyph,
+// and the raster Auctions/Promotions icons are specific/custom enough that
+// no simple icon-set equivalent would actually match, so those keep their
+// exported asset path instead — see SidebarNavItem.tsx for how the two
+// render differently.
 const ICON_BASE = '/assets/img/marketplace/sidebar-icons'
 
 export const mockSidebarSections: SidebarSection[] = [
@@ -25,18 +32,18 @@ export const mockSidebarSections: SidebarSection[] = [
     id: 'marketplace',
     title: 'Marketplace',
     items: [
-      { id: 'explore', label: 'Explore', href: '/', isPlaceholder: true, icon: `${ICON_BASE}/explore.png` },
+      { id: 'explore', label: 'Explore', href: '/', isPlaceholder: true, icon: FiCompass },
       { id: 'auctions', label: 'Auctions', href: '/', badge: 'soon', isPlaceholder: true, icon: `${ICON_BASE}/auctions.png` },
       { id: 'extensions', label: 'Extensions', href: '/', count: 37, isPlaceholder: true, icon: `${ICON_BASE}/extensions.svg` },
-      { id: 'watchlist', label: 'Watchlist', href: '/profile/watchlist', count: 12, icon: `${ICON_BASE}/watchlist.svg` },
+      { id: 'watchlist', label: 'Watchlist', href: '/profile/watchlist', count: 12, icon: FiHeart },
     ],
   },
   {
     id: 'seller-hub',
     title: 'Seller Hub',
     items: [
-      { id: 'my-domains', label: 'My domains', href: '/profile/domains', count: 12, icon: `${ICON_BASE}/watchlist.svg` },
-      { id: 'analytics', label: 'Analytics', href: '/profile/analytics', count: 4, icon: `${ICON_BASE}/analytics.svg` },
+      { id: 'my-domains', label: 'My domains', href: '/profile/domains', count: 12, icon: FiHeart },
+      { id: 'analytics', label: 'Analytics', href: '/profile/analytics', count: 4, icon: FiBarChart2 },
       { id: 'payouts', label: 'Payouts', href: '/', isPlaceholder: true, icon: `${ICON_BASE}/payouts.svg` },
       { id: 'promotions', label: 'Promotions', href: '/', isPlaceholder: true, icon: `${ICON_BASE}/promotions.png` },
     ],
@@ -45,8 +52,8 @@ export const mockSidebarSections: SidebarSection[] = [
     id: 'account',
     title: 'Account',
     items: [
-      { id: 'profile', label: 'Profile', href: '/profile/userProfile', count: 12, icon: `${ICON_BASE}/profile.svg` },
-      { id: 'settings', label: 'Settings', href: '/', count: 4, isPlaceholder: true, icon: `${ICON_BASE}/settings.svg` },
+      { id: 'profile', label: 'Profile', href: '/profile/userProfile', count: 12, icon: FiUser },
+      { id: 'settings', label: 'Settings', href: '/', count: 4, isPlaceholder: true, icon: FiSettings },
     ],
   },
 ]

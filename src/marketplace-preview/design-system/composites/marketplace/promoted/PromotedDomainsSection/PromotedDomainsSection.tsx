@@ -1,4 +1,5 @@
 import React from 'react'
+import Image from 'next/image'
 import { mockPromotedListings } from '@/marketplace-preview/data/marketplace/domains'
 import PromotedDomainCard from '../PromotedDomainCard'
 import styles from './PromotedDomainsSection.module.scss'
@@ -26,7 +27,7 @@ export const PromotedDomainsSection = () => {
 
   return (
     <section className={styles.section}>
-      <img src="/assets/img/marketplace/promoted-glow.png" alt="" aria-hidden="true" className={styles.glow} />
+      <Image src="/assets/img/marketplace/promoted-glow.png" alt="" aria-hidden="true" width={860} height={35} className={styles.glow} />
       <p className={styles.heading}>Promoted domains</p>
       <div className={styles.marquee}>
         <div className={styles.track} style={trackStyle}>

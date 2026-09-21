@@ -21,13 +21,35 @@
   // to @include wide below instead of living here unconditionally. Must
   // match MyDomainsTable.module.scss's .header ratio exactly (both
   // rules), or the header and rows drift out of alignment.
-  grid-template-columns: 2fr 0.9fr 1.1fr 0.9fr 0.8fr 1.4fr;
+  //
+  // Interest and Renewal get their own floors, unlike Domain's (scoped to
+  // @include wide only, see above) — MarketplacePageShell's desktop grid
+  // reserves a fixed 240px sidebar + 320px rail regardless of viewport
+  // (see that file's .grid), so the "main" column these rows live in is
+  // genuinely narrow right at the 1040px desktop cutoff and stays fairly
+  // tight through ordinary laptop widths (~694px main at 1366px). Without
+  // a floor, Interest's/Renewal's plain fr share drops below what an
+  // icon + a couple of digits or a "MMM D" date needs on one line, and
+  // .renewal/.interestStat's own white-space: nowrap (see below) then has
+  // nothing to fall back on but wrapping the icon and text across two
+  // lines instead — a much smaller ask than Domain's 320px, so it doesn't
+  // reproduce the same squeeze-everything-else problem a Domain floor
+  // caused unconditionally.
+  // Action gets a floor too — its button is a fixed 110px with
+  // flex-shrink: 0 (see .actionCell below), plus this cell's own 24px of
+  // horizontal padding, 134px total it can never render narrower than
+  // without the button overflowing past the column's own right edge. A
+  // plain 1.4fr share could still drop below that on an ordinary laptop
+  // width even with MarketplacePageShell's rail narrowed at this range
+  // (see that file's .grid) — this is the guaranteed backstop regardless
+  // of exactly how much room the shell hands over.
+  grid-template-columns: 2fr 0.9fr 1.1fr minmax(90px, 0.8fr) minmax(96px, 0.9fr) minmax(134px, 1.4fr);
 
   @include wide {
     // minmax's floor is sized for the worst case (avatar + 25 chars @
     // 15px/Bold + extension badge + cell padding) so the full 25
     // characters reliably render at genuinely wide desktop widths.
-    grid-template-columns: minmax(320px, 2fr) 0.9fr 1.1fr 0.9fr 0.8fr 1.4fr;
+    grid-template-columns: minmax(320px, 2fr) 0.9fr 1.1fr minmax(90px, 0.8fr) minmax(96px, 0.9fr) minmax(134px, 1.4fr);
   }
 
   // Was align-items: center — that only centers each .cell inside the grid
@@ -75,12 +97,15 @@
 
   &:not(:first-child) {
     border-left: 1px solid var(--color-border-black-subtle);
+
+    @include mobile {
+      border-left: none;
+    }
   }
 
   @include mobile {
     flex: 1 1 45%;
     padding: 0;
-    border-left: none !important;
   }
 }
 
@@ -208,6 +233,11 @@
   display: flex;
   align-items: center;
   gap: 5px;
+  // Without this, a laptop-width Renewal column (see .row's comment on its
+  // minmax floor) let "Oct 21" wrap into "Oct" / "21" on two lines instead
+  // of just relying on the floor for room — the floor gives it the space,
+  // this stops it from wrapping even if that space is ever tight again.
+  white-space: nowrap;
   font-family: var(--font-satoshi);
   font-weight: var(--font-weight-medium);
   font-size: var(--text-small-13);
@@ -224,6 +254,13 @@
   // See .actionCell's comment — resets .cell's column-axis centering back
   // to flex-start now that this cell is row.
   justify-content: flex-start;
+  // .cell's own align-items: flex-start governs the cross axis here (now
+  // vertical, since flex-direction is row) — left as flex-start, this
+  // pinned the two stat pairs to the top of the cell instead of centering
+  // them the way Renewal's plain-column .cell already centers its own
+  // content via justify-content: center. Overridden so both sit at the
+  // same vertical level.
+  align-items: center;
   gap: var(--space-3);
 }
 
@@ -231,6 +268,9 @@
   display: flex;
   align-items: center;
   gap: 4px;
+  // Same reasoning as .renewal above — keeps "40" glued to its eye icon
+  // on one line rather than wrapping if the Interest column is ever tight.
+  white-space: nowrap;
   font-family: var(--font-space-grotesk);
   font-size: var(--text-small-12);
   color: var(--color-gray-dark);
@@ -239,4 +279,8 @@
 .heartIcon {
   width: 11px;
   height: 10px;
+  // Matches the original favorite.svg's own stroke="#a6a1bb" — a distinct,
+  // slightly warmer tone from .interestStat's gray-dark that the eye icon
+  // next to it inherits via currentColor, not a mismatch to fix.
+  color: #a6a1bb; // design-specific: Figma-exact, matches the $ labels elsewhere in this build
 }

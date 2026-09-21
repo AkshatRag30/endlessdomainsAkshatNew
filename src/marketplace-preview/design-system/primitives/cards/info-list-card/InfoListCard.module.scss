@@ -79,8 +79,11 @@
 .avatarIcon {
   width: 15px;
   height: 15px;
-  object-fit: contain;
-  filter: brightness(0) invert(1); // the exported line-art icons render dark by default — every avatar background here is dark enough to need them white
+  // Was filter: brightness(0) invert(1) forcing the exported line-art icons
+  // (dark by default) to white against these dark avatar backgrounds —
+  // react-icons respects color/currentColor directly, so this sets the
+  // same white it was always forcing.
+  color: var(--color-white-primary);
 }
 
 // ── Text block ───────────────────────────────────────────────────────────

@@ -1,4 +1,5 @@
 import React from 'react'
+import { FiEye } from 'react-icons/fi'
 import InfoListCard from '@/marketplace-preview/design-system/primitives/cards/info-list-card'
 import type { MyDomainListing } from '@/marketplace-preview/types/my-domains'
 import styles from './MostViewedPanel.module.scss'
@@ -23,7 +24,7 @@ export const MostViewedPanel = ({ domains }: MostViewedPanelProps) => (
     emptyMessage="No view activity yet."
     rows={domains.map((domain) => ({
       id: domain.id,
-      iconSrc: '/assets/img/my-domains/most-viewed-icon.svg',
+      icon: FiEye,
       title: `${domain.domainName}${domain.extension}`,
       subtitle: STATUS_LABEL[domain.status],
       trailing: (

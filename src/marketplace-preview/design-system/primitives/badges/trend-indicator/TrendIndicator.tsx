@@ -1,4 +1,5 @@
 import React from 'react'
+import Image from 'next/image'
 import styles from './TrendIndicator.module.scss'
 
 export interface TrendIndicatorProps {
@@ -21,7 +22,7 @@ export const TrendIndicator = ({ direction, label, className = '' }: TrendIndica
   return (
     <span className={shellClass}>
       {label}
-      <img src={ARROW_SRC[direction]} alt="" aria-hidden="true" className={styles.arrow} />
+      <Image src={ARROW_SRC[direction]} alt="" aria-hidden="true" width={9} height={7} className={styles.arrow} />
     </span>
   )
 }

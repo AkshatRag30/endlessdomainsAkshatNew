@@ -74,37 +74,11 @@
   border: none;
   border-radius: 8px;
   background: linear-gradient(180deg, var(--color-blue-primary), var(--color-blue-primary-alpha-50));
+  color: var(--color-white-primary); // FiMenu — was 3 hand-built CSS bars, matches their own white
   cursor: pointer;
 
   @include tablet-down {
     display: inline-flex;
-  }
-}
-
-.menuToggleBar,
-.menuToggleBar::before,
-.menuToggleBar::after {
-  content: '';
-  display: block;
-  width: 14px;
-  height: 1.5px;
-  border-radius: 1px;
-  background: var(--color-white-primary);
-}
-
-.menuToggleBar {
-  position: relative;
-
-  &::before {
-    position: absolute;
-    top: -4.5px;
-    left: 0;
-  }
-
-  &::after {
-    position: absolute;
-    top: 4.5px;
-    left: 0;
   }
 }
 
@@ -129,6 +103,12 @@
   @include tablet-down {
     display: none; // no mobile menu in this pass — see index.tsx note
   }
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
 }
 
 .navDivider {
@@ -163,6 +143,11 @@
   display: block;
   width: 7px; // design-specific: Figma-exact 7.287px, nearest clean pixel
   height: 7px;
+  color: var(--color-black-alpha-55); // nearest token to the original nav-arrow-inactive.svg's own 0.56 fill-opacity
+}
+
+.navArrowActive {
+  color: var(--color-blue-primary); // matches the original nav-arrow-active.svg's own fill
 }
 
 // ── Right side: search + connect wallet ────────────────────────────────────
@@ -310,6 +295,7 @@ div.connectWallet {
   display: block;
   width: 18px;
   height: auto;
+  color: var(--color-white-primary); // matches the original header-wallet-icon.svg's own white fill, against the dark chamfer chip
 }
 
 .mobileSearchButton {

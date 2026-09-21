@@ -11,6 +11,13 @@
   align-items: center;
   gap: var(--space-2);
   padding-bottom: var(--space-1);
+
+  // Figma node 77:3743 (responsive frame) has no legend row above the
+  // mobile card list — each MyDomainCard already carries its own status
+  // badge, so the separate legend is dropped rather than duplicated.
+  @include mobile {
+    display: none;
+  }
 }
 
 .legendLabel {
@@ -23,7 +30,10 @@
 .grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-3);
+  // Figma node 60:13504 — three 265.45px cards in an 809px-wide grid, each
+  // gap (both directions) exactly 6px; no token this small exists, so it's
+  // a literal like MyDomainCard's own Figma-exact values.
+  gap: 6px;
 
   @include tablet-down {
     grid-template-columns: repeat(2, 1fr);
@@ -36,14 +46,15 @@
 
 .header {
   display: grid;
-  // Must match MyDomainRow.module.scss's .row ratio exactly, including
-  // the @include wide-scoped minmax floor — see that file's comment for
-  // why Action's share was widened from 1fr and why the floor is scoped
-  // there instead of being unconditional.
-  grid-template-columns: 2fr 0.9fr 1.1fr 0.9fr 0.8fr 1.4fr;
+  // Must match MyDomainRow.module.scss's .row ratio exactly, including its
+  // minmax floors — see that file's comments for why Action's share was
+  // widened from 1fr and now has its own 134px floor, why Domain's floor is
+  // scoped to @include wide only, and why Interest/Renewal each get their
+  // own smaller floor unconditionally.
+  grid-template-columns: 2fr 0.9fr 1.1fr minmax(90px, 0.8fr) minmax(96px, 0.9fr) minmax(134px, 1.4fr);
 
   @include wide {
-    grid-template-columns: minmax(320px, 2fr) 0.9fr 1.1fr 0.9fr 0.8fr 1.4fr;
+    grid-template-columns: minmax(320px, 2fr) 0.9fr 1.1fr minmax(90px, 0.8fr) minmax(96px, 0.9fr) minmax(134px, 1.4fr);
   }
 
   background: var(--color-white-primary);
