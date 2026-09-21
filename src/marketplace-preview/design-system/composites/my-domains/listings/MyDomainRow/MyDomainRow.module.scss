@@ -48,7 +48,7 @@
   // width even with MarketplacePageShell's rail narrowed at this range
   // (see that file's .grid) — this is the guaranteed backstop regardless
   // of exactly how much room the shell hands over.
-  grid-template-columns: 2fr 0.9fr 1.1fr minmax(90px, 0.8fr) minmax(96px, 0.9fr) minmax(134px, 1.4fr);
+  grid-template-columns: 2fr 0.9fr minmax(90px, 0.8fr) minmax(96px, 0.9fr) 1.1fr minmax(134px, 1.4fr);
 
   // A MacBook Air's browser window commonly reports a logical width right
   // around 1440px — sometimes a few px under it once scrollbars/window
@@ -63,14 +63,14 @@
   // makes room for this without squeezing Price/Est. value (still
   // floor-less) noticeably.
   @include between($breakpoint-desktop, $breakpoint-wide - 1px) {
-    grid-template-columns: minmax(200px, 2fr) 0.9fr 1.1fr minmax(90px, 0.8fr) minmax(96px, 0.9fr) minmax(134px, 1.4fr);
+    grid-template-columns: minmax(200px, 2fr) 0.9fr minmax(90px, 0.8fr) minmax(96px, 0.9fr) 1.1fr minmax(134px, 1.4fr);
   }
 
   @include wide {
     // minmax's floor is sized for the worst case (avatar + 25 chars @
     // 15px/Bold + extension badge + cell padding) so the full 25
     // characters reliably render at genuinely wide desktop widths.
-    grid-template-columns: minmax(320px, 2fr) 0.9fr 1.1fr minmax(90px, 0.8fr) minmax(96px, 0.9fr) minmax(134px, 1.4fr);
+    grid-template-columns: minmax(320px, 2fr) 0.9fr minmax(90px, 0.8fr) minmax(96px, 0.9fr) 1.1fr minmax(134px, 1.4fr);
   }
 
   // Was align-items: center — that only centers each .cell inside the grid
@@ -141,6 +141,15 @@
 .priceCell {
   @include tablet-up {
     align-items: center;
+  }
+
+  // Price is the one value column meant to read as a call-to-action price
+  // tag rather than plain data — Est. value/Renewal share .value/.renewal's
+  // neutral black, Price alone gets the brand blue. Two-class selector
+  // (not !important) is enough to win over .value's own color regardless
+  // of source order.
+  .value {
+    color: var(--color-blue-primary);
   }
 }
 

@@ -171,6 +171,18 @@
   border-right: none;
 }
 
+// Price is emphasized beyond Figma's plain statValue styling (which matches
+// Est. value's size/weight exactly) — black, bolder, and bigger than the
+// other stat values, per explicit design request. Reuses the adjacent-
+// sibling selector above (second .statsRow = Price/Action) plus
+// :first-child (Price, not the actionStat button) to target only Price's
+// value without a new class or touching MyDomainCard.tsx.
+.statsRow + .statsRow .stat:first-child .statValue {
+  font-weight: var(--font-weight-bold);
+  font-size: var(--text-small-13);
+  color: var(--color-black-primary);
+}
+
 .actionStat {
   flex-direction: row;
   align-items: center;

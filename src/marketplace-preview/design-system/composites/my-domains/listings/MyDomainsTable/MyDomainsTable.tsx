@@ -58,9 +58,9 @@ export const MyDomainsTable = ({ domains, viewMode, pageSize = 14 }: MyDomainsTa
           <div className={styles.header} role="row">
             <span role="columnheader">Domain Name</span>
             <span role="columnheader">Price</span>
-            <span role="columnheader">EST. value</span>
             <span role="columnheader">Renewal</span>
             <span role="columnheader">Interest</span>
+            <span role="columnheader">EST. value</span>
             <span role="columnheader">Action</span>
           </div>
 

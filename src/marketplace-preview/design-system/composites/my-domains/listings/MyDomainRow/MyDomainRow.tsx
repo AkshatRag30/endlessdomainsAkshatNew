@@ -54,11 +54,6 @@ export const MyDomainRow = ({ domain }: MyDomainRowProps) => {
       </div>
 
       <div className={styles.cell} role="cell">
-        <span className={styles.value}>{formatUsd(domain.estimatedValueUsd)}</span>
-        <TrendIndicator direction={TREND_DIRECTION[domain.appraisedTrend]} label={TREND_LABEL[domain.appraisedTrend]} />
-      </div>
-
-      <div className={styles.cell} role="cell">
         <span className={styles.renewal}>
           <FiCalendar size={12} aria-hidden="true" />
           {formatRenewal(domain.renewalTimestamp)}
@@ -74,6 +69,11 @@ export const MyDomainRow = ({ domain }: MyDomainRowProps) => {
           <FiHeart size={11} aria-hidden="true" className={styles.heartIcon} />
           {domain.savedCount}
         </span>
+      </div>
+
+      <div className={styles.cell} role="cell">
+        <span className={styles.value}>{formatUsd(domain.estimatedValueUsd)}</span>
+        <TrendIndicator direction={TREND_DIRECTION[domain.appraisedTrend]} label={TREND_LABEL[domain.appraisedTrend]} />
       </div>
 
       <div className={`${styles.cell} ${styles.actionCell}`} role="cell">

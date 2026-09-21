@@ -2,6 +2,10 @@
 
 .shell {
   position: relative;
+  // Page backdrop behind the sidebar, hero banner, main listings/cards, and
+  // right rail — none of those set their own opaque background over their
+  // full bounds, so this is what actually shows through their gaps/padding.
+  background: var(--color-gray-page-bg);
 
   // Clears MobileBottomNav's fixed bar so it never covers whatever ends up
   // last on the page (Promoted Domains after the mobile reorder below).

@@ -52,17 +52,17 @@
   // smaller floor between desktop and wide and a bigger one at wide itself
   // rather than one unconditional value, and why Interest/Renewal each get
   // their own smaller floor unconditionally.
-  grid-template-columns: 2fr 0.9fr 1.1fr minmax(90px, 0.8fr) minmax(96px, 0.9fr) minmax(134px, 1.4fr);
+  grid-template-columns: 2fr 0.9fr minmax(90px, 0.8fr) minmax(96px, 0.9fr) 1.1fr minmax(134px, 1.4fr);
 
   // Must mirror MyDomainRow.module.scss's .row exactly, including this
   // bracket — see that file's comment for why Domain gets a smaller 200px
   // floor here instead of wide's 320px one.
   @include between($breakpoint-desktop, $breakpoint-wide - 1px) {
-    grid-template-columns: minmax(200px, 2fr) 0.9fr 1.1fr minmax(90px, 0.8fr) minmax(96px, 0.9fr) minmax(134px, 1.4fr);
+    grid-template-columns: minmax(200px, 2fr) 0.9fr minmax(90px, 0.8fr) minmax(96px, 0.9fr) 1.1fr minmax(134px, 1.4fr);
   }
 
   @include wide {
-    grid-template-columns: minmax(320px, 2fr) 0.9fr 1.1fr minmax(90px, 0.8fr) minmax(96px, 0.9fr) minmax(134px, 1.4fr);
+    grid-template-columns: minmax(320px, 2fr) 0.9fr minmax(90px, 0.8fr) minmax(96px, 0.9fr) 1.1fr minmax(134px, 1.4fr);
   }
 
   background: var(--color-white-primary);
@@ -75,6 +75,26 @@
     font-weight: var(--font-weight-medium);
     font-size: var(--text-small-13);
     color: var(--color-black-alpha-55);
+    // "EST. value" was the only label with a space in it, so it was the
+    // only one ever narrow enough to wrap onto a second line — that grew
+    // the header row taller than every other single-line label and left
+    // visible empty space beneath them. Every column header is a fixed,
+    // known label, never runtime content, so nowrap is safe here.
+    white-space: nowrap;
+    // .header and each MyDomainRow.module.scss .row are separate grid
+    // containers — even with identical grid-template-columns, a plain fr
+    // track's rendered width still depends on that grid's OWN content, via
+    // the implicit "auto" minimum size every grid item gets unless
+    // overridden. Forcing nowrap above made "EST. value" wider than it can
+    // break, which grew that column's auto-minimum past its 1.1fr share and
+    // desynced it from the data rows below (whose .cell already zeroes this
+    // out — see MyDomainRow.module.scss). Matching that here is what keeps
+    // the two grids' column widths identical on MacBook-range viewports
+    // (the between($breakpoint-desktop, $breakpoint-wide) bracket), where
+    // there isn't slack in the layout to hide the drift.
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
 
     &:not(:first-child) {
       border-left: 1px solid var(--color-border-black-subtle);
