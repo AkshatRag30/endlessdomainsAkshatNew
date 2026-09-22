@@ -80,7 +80,15 @@ export const Modal = ({ isOpen, onClose, title, dismissible = true, footer, chil
             </button>
           )}
         </div>
-        <div className={styles.body}>{children}</div>
+        {/* data-lenis-prevent: inert unless a page is wrapped in a global
+            smooth-scroll library (Lenis) that hijacks wheel events on the
+            whole document — this project doesn't have one, so it's a no-op
+            here, but this drawer's own overflow-y:auto body needs it once
+            synced into a target that does wire one up (e.g.
+            endlessdomainsAkshatNew's useSmoothScroll), since Lenis
+            intercepts the wheel event before it reaches this scroll
+            container. Same reasoning as MarketplacePageShell's sidebar/rail. */}
+        <div className={styles.body} data-lenis-prevent>{children}</div>
         {footer && <div className={styles.footer}>{footer}</div>}
       </div>
     </div>,
