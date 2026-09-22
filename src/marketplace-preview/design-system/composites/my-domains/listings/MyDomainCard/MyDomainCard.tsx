@@ -14,6 +14,8 @@ import styles from './MyDomainCard.module.scss'
 
 export interface MyDomainCardProps {
   domain: MyDomainListing
+  onList?: (domain: MyDomainListing) => void
+  onEditPrice?: (domain: MyDomainListing) => void
 }
 
 /**
@@ -29,7 +31,7 @@ export interface MyDomainCardProps {
  * before Price/Action — unlike the three this used to render (badge row,
  * identity row, and stats each separately bordered).
  */
-export const MyDomainCard = ({ domain }: MyDomainCardProps) => (
+export const MyDomainCard = ({ domain, onList, onEditPrice }: MyDomainCardProps) => (
   <div className={styles.card}>
     <div className={styles.header}>
       <div className={styles.headerTop}>
@@ -91,11 +93,11 @@ export const MyDomainCard = ({ domain }: MyDomainCardProps) => (
         )}
       </div>
       <div className={`${styles.stat} ${styles.actionStat}`}>
-        {/* Static mock data — visually real, intentionally inert per the implementation plan's Phase 04 checkpoint */}
+        {/* Opens the listing flow modal (listing-flow-implementation-plan.md) in mock-first mode — no real wallet/contract call yet. */}
         {domain.status === 'for-sale' ? (
-          <PrimaryButton size="sm" variant="charcoal">Edit Price</PrimaryButton>
+          <PrimaryButton size="sm" variant="charcoal" onClick={() => onEditPrice?.(domain)}>Edit Price</PrimaryButton>
         ) : (
-          <PrimaryButton size="sm">List</PrimaryButton>
+          <PrimaryButton size="sm" onClick={() => onList?.(domain)}>List</PrimaryButton>
         )}
       </div>
     </div>

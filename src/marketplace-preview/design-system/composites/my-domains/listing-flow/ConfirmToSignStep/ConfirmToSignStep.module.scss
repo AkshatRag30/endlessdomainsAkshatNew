@@ -1,0 +1,133 @@
+@import '@mpstyles/_mixins.scss';
+
+// Figma node 1:7791. Colors below (#171429, #7e7a93, the blue gradient
+// card, the green fee pill) are Figma-exact, matching OneTimeApprovalStep's
+// palette, no token match for this exact hue.
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-7) var(--space-5) var(--space-5);
+  text-align: center;
+
+  // Mobile responsive frame (node-id=1-11806, "first listing" section, confirm screen) — 16px horizontal inset, down from 20px.
+  @include mobile {
+    padding: var(--space-7) var(--space-4) var(--space-4);
+  }
+}
+
+.iconCircle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 58px;
+  height: 58px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(180deg, #27ff00 0%, rgba(39, 255, 0, 0.47) 100%);
+  color: var(--color-white-primary);
+  box-shadow: 0 0 0 6px var(--color-white-primary), 0 20px 51px rgba(87, 177, 255, 0.34);
+}
+
+.heading {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: 19px;
+  letter-spacing: -0.38px;
+  color: #171429;
+}
+
+.subtext {
+  margin: 0;
+  max-width: 408px;
+  font-family: var(--font-satoshi);
+  font-size: 14px;
+  line-height: 1.45;
+  color: #7e7a93;
+}
+
+.summaryCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  background: linear-gradient(180deg, var(--color-blue-primary) 5.388%, #333 100%);
+  text-align: left;
+}
+
+.summaryRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-family: var(--font-satoshi);
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.72);
+
+  strong {
+    font-weight: var(--font-weight-bold);
+    color: var(--color-white-primary);
+  }
+}
+
+.summaryRowEmphasis {
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  margin-top: 4px;
+  padding-top: 10px;
+
+  span {
+    color: rgba(255, 255, 255, 0.72);
+    font-weight: var(--font-weight-medium);
+  }
+
+  strong {
+    font-size: 15px;
+  }
+}
+
+.feePill {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--space-2-5) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: #e7f6ee;
+  color: #0c7a46;
+  font-family: var(--font-space-grotesk);
+  font-size: 12.5px;
+
+  strong {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+}
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-5);
+
+  @include mobile {
+    padding: var(--space-4);
+  }
+}
+
+.backLink {
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: var(--font-satoshi);
+  font-size: 11.5px;
+  color: #7e7a93;
+
+  &:hover {
+    color: var(--color-black-primary);
+  }
+}

@@ -1,0 +1,64 @@
+// Figma node 1:8780.
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.row {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-3);
+}
+
+.item {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.label {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-13);
+  color: var(--color-gray-primary);
+  white-space: nowrap;
+}
+
+.value {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-bold);
+  font-size: 17px;
+  color: #171429;
+}
+
+.valueEmphasis {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-bold);
+  font-size: 17px;
+  letter-spacing: -0.4px;
+  color: #171429;
+}
+
+.operator {
+  padding-bottom: 3px;
+  font-family: var(--font-space-grotesk);
+  font-size: 14px;
+  color: var(--color-gray-medium);
+}
+
+.note {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-12);
+  color: var(--color-gray-primary);
+
+  svg {
+    flex-shrink: 0;
+  }
+}

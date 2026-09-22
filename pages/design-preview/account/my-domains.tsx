@@ -13,12 +13,20 @@ import {
   NeedsAttentionPanel,
   MostViewedPanel,
   QuickActionsPanel,
+  ListingFlowModal,
 } from '@/marketplace-preview/design-system/composites/my-domains'
 import type { MyDomainsStatusFilter } from '@/marketplace-preview/design-system/composites/my-domains'
 import type { ViewMode } from '@/marketplace-preview/design-system/primitives/toggles/view-toggle'
+import type { MyDomainListing } from '@/marketplace-preview/types/my-domains'
 import { mockMyDomainsSummary, mockNeedsAttention, mockMostViewed } from '@/marketplace-preview/data/my-domains/domains'
 import { useMyDomainsFilters, filterMyDomains } from '@/marketplace-preview/hooks/my-domains/useMyDomainsFilters'
 import styles from './my-domains.module.scss'
+
+interface ListingModalState {
+  isOpen: boolean
+  mode: 'list' | 'edit'
+  domain: MyDomainListing
+}
 
 /**
  * Temporary preview route for the My Domains dashboard redesign — not
@@ -36,15 +44,31 @@ import styles from './my-domains.module.scss'
  * here — it hardcodes "Explore" as the only active tab and has no "My
  * Domains" destination, which would just be a persistent, wrong active
  * state on this page rather than a missing nice-to-have.
+ *
+ * "List a domain" / "Edit Price" now open ListingFlowModal (see
+ * listing-flow-implementation-plan.md at the repo root) — a mock-first flow,
+ * no real wallet/contract call. The hero banner's and Quick Actions' "List a
+ * domain" entry points aren't tied to one specific domain, so they open the
+ * flow for the first not-listed mock domain; a real domain-picker step is
+ * out of scope for this pass (see the plan's §9 follow-ups).
  */
 export default function MyDomainsPreview() {
   const [activeStatus, setActiveStatus] = useState<MyDomainsStatusFilter>('all')
   const [menuOpen, setMenuOpen] = useState(false)
   const [viewMode, setViewMode] = useState<ViewMode>('list')
+  const [listingModal, setListingModal] = useState<ListingModalState | null>(null)
   const { filters, debouncedSearch, setFilter } = useMyDomainsFilters()
 
   const summary = mockMyDomainsSummary
   const filtered = filterMyDomains(summary.domains, activeStatus, debouncedSearch, filters)
+
+  const openListModal = (domain?: MyDomainListing) => {
+    const target = domain ?? summary.domains.find((d) => d.status === 'not-listed') ?? summary.domains[0]
+    if (!target) return
+    setListingModal({ isOpen: true, mode: 'list', domain: target })
+  }
+  const openEditPriceModal = (domain: MyDomainListing) => setListingModal({ isOpen: true, mode: 'edit', domain })
+  const closeListingModal = () => setListingModal((prev) => (prev ? { ...prev, isOpen: false } : null))
 
   return (
     <div data-marketplace-preview>
@@ -61,7 +85,7 @@ export default function MyDomainsPreview() {
             <MobileDrawerMenu onClose={() => setMenuOpen(false)} previewMode />
           </>
         }
-        hero={<MyDomainsHeroBanner />}
+        hero={<MyDomainsHeroBanner onListDomain={() => openListModal()} />}
         sidebarOpen={menuOpen}
         onCloseSidebar={() => setMenuOpen(false)}
         rightRail={
@@ -70,7 +94,7 @@ export default function MyDomainsPreview() {
             <div className={styles.panelGroup}>
               <NeedsAttentionPanel domains={mockNeedsAttention} />
               <MostViewedPanel domains={mockMostViewed} />
-              <QuickActionsPanel />
+              <QuickActionsPanel onAction={(id) => id === 'list' && openListModal()} />
             </div>
           </div>
         }
@@ -81,9 +105,18 @@ export default function MyDomainsPreview() {
             <ListingsHeading count={filtered.length} />
             <MyDomainsFilterBar filters={filters} onFilterChange={setFilter} viewMode={viewMode} onViewModeChange={setViewMode} />
           </div>
-          <MyDomainsTable domains={filtered} viewMode={viewMode} pageSize={14} />
+          <MyDomainsTable domains={filtered} viewMode={viewMode} pageSize={14} onList={openListModal} onEditPrice={openEditPriceModal} />
         </div>
       </MarketplacePageShell>
+
+      {listingModal && (
+        <ListingFlowModal
+          isOpen={listingModal.isOpen}
+          mode={listingModal.mode}
+          domain={listingModal.domain}
+          onClose={closeListingModal}
+        />
+      )}
     </div>
   )
 }

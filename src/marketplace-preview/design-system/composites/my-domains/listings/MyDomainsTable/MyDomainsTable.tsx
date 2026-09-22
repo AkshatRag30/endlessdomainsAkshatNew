@@ -13,6 +13,8 @@ export interface MyDomainsTableProps {
   viewMode: ViewMode
   /** How many rows/cards a "Show N more" click reveals. */
   pageSize?: number
+  onList?: (domain: MyDomainListing) => void
+  onEditPrice?: (domain: MyDomainListing) => void
 }
 
 /**
@@ -30,7 +32,7 @@ export interface MyDomainsTableProps {
  * grid regardless of the (now mobile-hidden, see MyDomainsFilterBar)
  * ViewToggle's last selection.
  */
-export const MyDomainsTable = ({ domains, viewMode, pageSize = 14 }: MyDomainsTableProps) => {
+export const MyDomainsTable = ({ domains, viewMode, pageSize = 14, onList, onEditPrice }: MyDomainsTableProps) => {
   const [visibleCount, setVisibleCount] = useState(pageSize)
   const isMobile = useIsMobile()
   const effectiveViewMode = isMobile ? 'grid' : viewMode
@@ -50,7 +52,7 @@ export const MyDomainsTable = ({ domains, viewMode, pageSize = 14 }: MyDomainsTa
       ) : effectiveViewMode === 'grid' ? (
         <div className={styles.grid}>
           {visible.map((domain) => (
-            <MyDomainCard key={domain.id} domain={domain} />
+            <MyDomainCard key={domain.id} domain={domain} onList={onList} onEditPrice={onEditPrice} />
           ))}
         </div>
       ) : (
@@ -66,7 +68,7 @@ export const MyDomainsTable = ({ domains, viewMode, pageSize = 14 }: MyDomainsTa
 
           <div className={styles.rows} role="rowgroup">
             {visible.map((domain) => (
-              <MyDomainRow key={domain.id} domain={domain} />
+              <MyDomainRow key={domain.id} domain={domain} onList={onList} onEditPrice={onEditPrice} />
             ))}
           </div>
         </>

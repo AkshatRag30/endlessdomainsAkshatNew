@@ -1,0 +1,59 @@
+@import '@mpstyles/_mixins.scss';
+
+// Figma node 1:8442. Gradient stops (#efeef5 / #f7f6fb) are Figma-exact, no
+// token match for this particular shimmer tint. Figma's own screenshot
+// shows the shimmer as a static gradient, animated here (left-to-right
+// sweep) to actually read as "loading" rather than a fixed tinted block.
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-5);
+
+  // No mobile-specific "loading" frame was supplied, but every other step in
+  // this flow insets to 16px on mobile (down from 20px) — matched here too
+  // for consistency rather than leaving this one screen at the desktop inset.
+  @include mobile {
+    padding: var(--space-4);
+  }
+}
+
+.row {
+  border-radius: 12px;
+  background: linear-gradient(90deg, #efeef5 25%, #f7f6fb 50%, #efeef5 75%);
+  background-size: 200% 100%;
+  animation: listing-skeleton-shimmer 1.6s ease-in-out infinite;
+
+  &:nth-child(1) {
+    height: 56px;
+  }
+
+  &:nth-child(2) {
+    margin-top: var(--space-5);
+    height: 86px;
+  }
+
+  &:nth-child(3) {
+    margin-top: var(--space-5);
+    height: 58px;
+  }
+
+  &:nth-child(4) {
+    margin-top: var(--space-3);
+    height: 120px;
+  }
+
+  &:nth-child(5) {
+    margin-top: var(--space-5);
+    height: 58px;
+  }
+}
+
+@keyframes listing-skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}

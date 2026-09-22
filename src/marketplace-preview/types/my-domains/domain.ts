@@ -46,6 +46,29 @@ export interface MyDomainListing {
   renewalTimestamp: number // ms epoch — "Renewal" column / countdown badge
 }
 
+/**
+ * Backs the "List a domain / Edit listing" modal flow (implementation plan
+ * §6) — looked up by domain id rather than folded into MyDomainListing,
+ * since these fields only matter inside that flow, not the table. Deliberately
+ * excludes a per-domain approval flag: see mockWalletHasMarketplaceApproval
+ * in src/data/my-domains/domains.ts for why that's wallet-wide instead.
+ */
+export interface DomainListingInsights {
+  endlessScore: number // 0–5, "Endless score"
+  demand: 'low' | 'medium' | 'high'
+  comparableSalesLowUsd: number
+  comparableSalesHighUsd: number
+  quickSaleUsd: number
+  suggestedUsd: number
+  ambitiousUsd: number
+  gasTokenSymbol: string // "POL", "ETH", etc — per chain
+  approvalFeeEstimate: string // "≈ 0.02 POL", pre-formatted mock string, not computed
+  /** Wrong-network demo branch (implementation plan §12, Phase C) — when set, the form's mock wallet reports being on this chain instead of the domain's own. */
+  walletOnWrongNetwork?: boolean
+  /** Insufficient-funds demo branch (implementation plan §12, Phase D) — when set, signAndSubmit resolves { ok: false, reason: 'insufficient-funds' }. */
+  insufficientFunds?: boolean
+}
+
 export interface MyDomainsPagination {
   page: number
   limit: number

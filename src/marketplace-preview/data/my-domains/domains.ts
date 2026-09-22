@@ -1,5 +1,5 @@
 import { POLYGON, ETHEREUM, ARBITRUM, BSC } from '@/marketplace-preview/data/marketplace/domains'
-import { DomainStatus, MyDomainListing, MyDomainsSummary } from '@/marketplace-preview/types/my-domains'
+import { DomainListingInsights, DomainStatus, MyDomainListing, MyDomainsSummary } from '@/marketplace-preview/types/my-domains'
 
 /**
  * STATIC MOCK DATA for the "My Domains" dashboard revamp — not live. Feeds
@@ -124,3 +124,58 @@ export const mockNeedsAttention: MyDomainListing[] = mockMyDomains
 export const mockMostViewed: MyDomainListing[] = [...mockMyDomains]
   .sort((a, b) => b.views - a.views)
   .slice(0, 5)
+
+/**
+ * STATIC MOCK DATA for the "List a domain / Edit listing" modal flow
+ * (implementation plan §6/§12) — keyed by domain id, looked up when the
+ * flow opens for a given domain. `walletOnWrongNetwork`/`insufficientFunds`
+ * are fixtures for the later wrong-network/insufficient-funds phases
+ * (Phase C/D) — picking one of those flagged domains is how the demo
+ * reaches those branches, no dev-only toggle UI needed (plan §7/§9).
+ */
+export const mockDomainListingInsights: Record<string, DomainListingInsights> = Object.fromEntries(
+  mockMyDomains.map((domain, index) => {
+    const base = domain.estimatedValueUsd || domain.priceUsd || 5000
+    const suggestedUsd = Math.round(base / 50) * 50
+    const insights: DomainListingInsights = {
+      endlessScore: Number((3.4 + (index % 5) * 0.3).toFixed(1)),
+      demand: index % 3 === 0 ? 'high' : index % 3 === 1 ? 'medium' : 'low',
+      comparableSalesLowUsd: Math.round((suggestedUsd * 0.75) / 50) * 50,
+      comparableSalesHighUsd: Math.round((suggestedUsd * 1.25) / 50) * 50,
+      quickSaleUsd: Math.round((suggestedUsd * 0.9) / 50) * 50,
+      suggestedUsd,
+      ambitiousUsd: Math.round((suggestedUsd * 1.15) / 50) * 50,
+      gasTokenSymbol: 'POL',
+      approvalFeeEstimate: '≈ 0.02 POL',
+      walletOnWrongNetwork: index === 2, // fixture for Phase C
+      insufficientFunds: index === 3, // fixture for Phase D
+    }
+    return [domain.id, insights]
+  })
+)
+
+/**
+ * STATIC MOCK DATA — stands in for an on-chain isApprovedForAll(wallet,
+ * seaportOperator) read. Wallet-wide by design (plan §6), not keyed by
+ * domain id: approving once on any domain must make every other domain in
+ * this mock data set skip straight to the free "Sign to list" step for the
+ * rest of the session, matching the flow's own "once ever" copy. Starts
+ * false so a fresh demo naturally takes the first-listing path. A `let`
+ * export, not `const` — the mock hook mutates it directly rather than
+ * routing through Redux/state for something this deliberately throwaway;
+ * swapped for a real isApprovedForAll read once the plan's §8 real wiring
+ * happens.
+ */
+export let mockWalletHasMarketplaceApproval = false
+
+/**
+ * TypeScript/ESM treats a named import as a read-only binding, so another
+ * module can read mockWalletHasMarketplaceApproval directly but can't
+ * reassign it in place — this setter is the mutation path the mock
+ * `approve()` action (see useListingFlowActions) calls instead, keeping the
+ * flag itself a plain `let` rather than wrapping it in an object/ref just to
+ * make it externally mutable.
+ */
+export function setMockWalletHasMarketplaceApproval(value: boolean): void {
+  mockWalletHasMarketplaceApproval = value
+}

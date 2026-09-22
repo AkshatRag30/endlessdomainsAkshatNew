@@ -43,6 +43,20 @@
   }
 }
 
+.rowClickable {
+  cursor: pointer;
+  border-radius: 2px;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--color-gray-light);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
 .rowMain {
   display: flex;
   align-items: center;

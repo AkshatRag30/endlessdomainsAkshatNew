@@ -13,6 +13,8 @@ import styles from './MyDomainRow.module.scss'
 
 export interface MyDomainRowProps {
   domain: MyDomainListing
+  onList?: (domain: MyDomainListing) => void
+  onEditPrice?: (domain: MyDomainListing) => void
 }
 
 /**
@@ -21,7 +23,7 @@ export interface MyDomainRowProps {
  * renders with a plain neutral border. An earlier pass here guessed at a
  * 5-color mapping before this reference existed; that guess is corrected now.
  */
-export const MyDomainRow = ({ domain }: MyDomainRowProps) => {
+export const MyDomainRow = ({ domain, onList, onEditPrice }: MyDomainRowProps) => {
   const rowClass = [styles.row, domain.status === 'for-sale' ? styles.statusForSale : ''].filter(Boolean).join(' ')
 
   return (
@@ -77,11 +79,11 @@ export const MyDomainRow = ({ domain }: MyDomainRowProps) => {
       </div>
 
       <div className={`${styles.cell} ${styles.actionCell}`} role="cell">
-        {/* Static mock data — visually real, intentionally inert per the implementation plan's Phase 04 checkpoint (List/Edit Price semantics not yet confirmed against the real modals) */}
+        {/* Opens the listing flow modal (listing-flow-implementation-plan.md) in mock-first mode — no real wallet/contract call yet. */}
         {domain.status === 'for-sale' ? (
-          <PrimaryButton size="sm" variant="charcoal">Edit Price</PrimaryButton>
+          <PrimaryButton size="sm" variant="charcoal" onClick={() => onEditPrice?.(domain)}>Edit Price</PrimaryButton>
         ) : (
-          <PrimaryButton size="sm">List</PrimaryButton>
+          <PrimaryButton size="sm" onClick={() => onList?.(domain)}>List</PrimaryButton>
         )}
       </div>
     </div>

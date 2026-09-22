@@ -1,0 +1,154 @@
+// Figma node 1:8697 ("Domain insights" collapsible section, first-listing
+// form). Purple #5b3df5 and the surrounding #fcfbff/#eeedf3 surface are
+// Figma-exact — this section's own accent color, no token match.
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2-5);
+  width: 100%;
+}
+
+.card {
+  background: #fcfbff;
+  border: 1px solid #eeedf3;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2-5) var(--space-3);
+}
+
+.headerIcon {
+  color: #5b3df5;
+  flex-shrink: 0;
+}
+
+.headerLabel {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: 11.5px;
+  letter-spacing: 0.575px;
+  text-transform: capitalize;
+  color: #5b3df5;
+}
+
+.toggle {
+  margin-left: auto;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: var(--font-satoshi);
+  font-size: 11.5px;
+  color: var(--color-gray-primary);
+
+  &:hover {
+    color: var(--color-black-primary);
+  }
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2-5);
+  padding: 0 var(--space-3) var(--space-3);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  background: var(--color-white-primary);
+  border: 1px solid var(--color-black-alpha-05);
+  border-radius: var(--radius-sm);
+}
+
+.statLabel {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-10);
+  color: var(--color-black-primary);
+  white-space: nowrap;
+}
+
+.statValue {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--text-normal);
+  letter-spacing: -0.32px;
+  color: #171429;
+  white-space: nowrap;
+}
+
+.statValueMuted {
+  font-size: var(--text-small-10);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-gray-medium);
+}
+
+.demand-high { color: #12a05c; }
+.demand-medium { color: #b27400; }
+.demand-low { color: #ef4444; }
+
+.comparables {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-top: 1px solid #eeedf3;
+}
+
+.comparablesText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.comparablesLabel {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-10);
+  color: var(--color-gray-primary);
+  white-space: nowrap;
+}
+
+.comparablesValue {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--text-small-13);
+  color: #171429;
+  white-space: nowrap;
+}
+
+.comparablesBars {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.comparablesBar {
+  width: 9px;
+  border-radius: 2px 2px 0 0;
+  background: #dcd3fb; // design-specific: Figma-exact light lavender
+}
+
+.comparablesBarActive {
+  background: #5b3df5; // matches this card's own "Domain insights" heading accent
+}
+
+.callout {
+  margin: 0;
+  padding: var(--space-2) var(--space-2-5);
+  border-radius: var(--radius-sm);
+  background: #e7f6ee;
+  color: #0c7a46;
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-small-12);
+}

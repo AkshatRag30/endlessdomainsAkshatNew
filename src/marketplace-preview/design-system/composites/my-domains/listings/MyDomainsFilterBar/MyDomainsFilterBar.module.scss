@@ -21,8 +21,16 @@
   gap: 7px; // design-specific: Figma-exact
   overflow-x: auto;
 
+  // Figma's mobile frame (node 77:3830) keeps all three dropdowns in one
+  // row spanning the container's full width edge to edge, rather than
+  // wrapping onto extra rows or leaving trailing whitespace after a
+  // narrower "All Chain" — space-between lets each trigger keep its own
+  // content-driven width (so "Recently Added" isn't artificially squeezed
+  // into an equal third) while the row itself still stretches full-bleed.
   @include mobile {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    width: 100%;
     overflow-x: visible;
   }
 }
@@ -46,4 +54,14 @@
 div.searchInput {
   max-width: 240px;
   height: 38px;
+
+  // Figma's mobile frame (node 77:3830) gives Search its own full-width row
+  // above the filter row, not the same capped 240px it keeps next to the
+  // dropdowns at tablet-up — .bar's own mobile rule already stacks it above
+  // .controls (flex-direction: column), this is what lets it actually fill
+  // that row's width instead of sitting capped at 240px with empty space
+  // beside it.
+  @include mobile {
+    max-width: none;
+  }
 }

@@ -411,26 +411,25 @@
  
 }
  
-
 [data-marketplace-preview] {
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  margin-bottom: 0;
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin-bottom: 0;
+  }
+
+  ul {
+    padding: 0;
+  }
+
+  ul li {
+    list-style: none;
+  }
+
+  ul li a {
+    text-decoration: none;
+  }
 }
- 
-ul {
-  padding: 0;
-}
- 
-ul li {
-  list-style: none;
-}
- 
-ul li a {
-  text-decoration: none;
-}
- }

@@ -8,6 +8,7 @@ export interface InfoListCardRow {
   title: string
   subtitle: string
   trailing?: React.ReactNode
+  onClick?: () => void
 }
 
 export interface InfoListCardProps {
@@ -39,7 +40,23 @@ export const InfoListCard = ({ title, rows, iconVariant = 'blue', emptyMessage, 
       ) : (
         <div className={styles.list}>
           {rows.map((row) => (
-            <div key={row.id} className={styles.row}>
+            <div
+              key={row.id}
+              className={[styles.row, row.onClick ? styles.rowClickable : ''].filter(Boolean).join(' ')}
+              role={row.onClick ? 'button' : undefined}
+              tabIndex={row.onClick ? 0 : undefined}
+              onClick={row.onClick}
+              onKeyDown={
+                row.onClick
+                  ? (event) => {
+                      if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault()
+                        row.onClick?.()
+                      }
+                    }
+                  : undefined
+              }
+            >
               <div className={styles.rowMain}>
                 <span className={avatarClass} aria-hidden="true">
                   <row.icon size={15} className={styles.avatarIcon} />

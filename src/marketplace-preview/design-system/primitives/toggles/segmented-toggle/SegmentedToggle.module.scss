@@ -1,0 +1,145 @@
+@import '@mpstyles/_mixins.scss';
+
+// Figma nodes 1:8648 ("How to sell", variant="radio") and 1:8752 ("How long
+// it runs", variant="centered"). Border #e2e0ec and the black selected-state
+// gradient are Figma-exact, no token match for either.
+
+.group {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.option {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #e2e0ec;
+  border-radius: var(--radius-sm);
+  background: var(--color-white-primary);
+  cursor: pointer;
+  text-align: left;
+  transition: opacity 0.15s ease;
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.optionDisabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.optionActive {
+  border-color: transparent;
+  background: linear-gradient(180deg, #000 5.388%, #333 100%);
+}
+
+// ── radio variant ("How to sell") ────────────────────────────────────────
+
+.optionRadio {
+  gap: 6px;
+  padding: var(--space-3);
+  justify-content: center;
+}
+
+.optionHead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.radio {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid #e2e0ec;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.optionActive .radio {
+  border-color: var(--color-white-primary);
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    background: var(--color-white-primary);
+  }
+}
+
+.label {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-bold);
+  font-size: 13.5px;
+  color: #171429;
+}
+
+.optionActive .label {
+  color: var(--color-white-primary);
+}
+
+.sublabel {
+  font-family: var(--font-satoshi);
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: #171429;
+}
+
+.optionActive .sublabel {
+  color: var(--color-white-primary);
+}
+
+.badge {
+  margin-left: auto;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(180deg, var(--color-blue-primary) 0%, var(--color-blue-primary-alpha-50) 100%);
+  color: var(--color-white-primary);
+  font-family: var(--font-satoshi);
+  font-size: 10px;
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+}
+
+// ── centered variant ("How long it runs") ────────────────────────────────
+
+.centered .option {
+  border-radius: 11px;
+}
+
+.optionCentered {
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: var(--space-3);
+}
+
+.centered .optionActive {
+  border-radius: var(--radius-sm);
+}
+
+.bigLabel {
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-bold);
+  font-size: 17px;
+  color: #171429;
+}
+
+.optionActive .bigLabel {
+  color: var(--color-white-primary);
+}
+
+.caption {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  color: var(--color-gray-primary);
+}
+
+.optionActive .caption {
+  color: var(--color-white-primary);
+}
