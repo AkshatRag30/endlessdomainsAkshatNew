@@ -10,6 +10,7 @@ import SegmentedToggle from '@/marketplace-preview/design-system/primitives/togg
 import PrimaryButton from '@/marketplace-preview/design-system/primitives/buttons/primary-button'
 import DomainInsightsCard from '../DomainInsightsCard'
 import FeeBreakdownRow from '../FeeBreakdownRow'
+import TokenChainIcon from '../TokenChainIcon'
 import { formatExpiry, formatToken } from '../format'
 import styles from './ListingFormStep.module.scss'
 
@@ -98,7 +99,13 @@ export const ListingFormStep = ({
 
       <section className={styles.section}>
         <h3 className={styles.heading}>Your price · buyers pay this exact amount</h3>
-        <PriceInput value={price} onChange={onPriceChange} tokenSymbol="USDT" className={styles.priceInput} />
+        <PriceInput
+          value={price}
+          onChange={onPriceChange}
+          tokenSymbol="USDT"
+          tokenIcon={<TokenChainIcon chainIconSrc={domain.chain.iconSrc} />}
+          className={styles.priceInput}
+        />
         <div className={styles.pillRow}>
           <PillButton active={priceNumber === insights.quickSaleUsd} onClick={() => onPriceChange(String(insights.quickSaleUsd))}>
             Quick sale {formatToken(insights.quickSaleUsd)}
@@ -141,6 +148,8 @@ export interface ListingFormFooterProps {
   hasApproval: boolean
   onSubmit: () => void
   submitting?: boolean
+  /** Figma node 1:9355 — the wrong-network banner is non-blocking for the form itself, but signing still needs the wallet on the right chain, so the CTA stays disabled until the user switches. */
+  isWrongNetwork?: boolean
 }
 
 /**
@@ -149,13 +158,13 @@ export interface ListingFormFooterProps {
  * middle content scrolls), even though Figma draws it as part of the same
  * "Form" frame.
  */
-export const ListingFormFooter = ({ price, hasApproval, onSubmit, submitting = false }: ListingFormFooterProps) => {
+export const ListingFormFooter = ({ price, hasApproval, onSubmit, submitting = false, isWrongNetwork = false }: ListingFormFooterProps) => {
   const priceNumber = Number(price) || 0
 
   return (
     <div className={styles.footer}>
       <FeeBreakdownRow priceUsd={priceNumber} />
-      <PrimaryButton fullWidth loading={submitting} disabled={!price} onClick={onSubmit}>
+      <PrimaryButton fullWidth loading={submitting} disabled={!price || isWrongNetwork} onClick={onSubmit}>
         {hasApproval ? 'Sign to list' : 'Approve, then sign'}
       </PrimaryButton>
       <p className={styles.gasNote}>

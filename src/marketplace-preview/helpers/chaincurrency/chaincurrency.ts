@@ -14,6 +14,12 @@
  *     as-is. Not wired into anything in this project yet; ported because
  *     it's part of the same helper module, available if a price-currency
  *     icon is ever needed (e.g. a payment/checkout flow).
+ *   - USDT is the one exception: the listing flow (PriceInput's token chip,
+ *     plus every USDT amount in ConfirmToSignStep/ListingSuccessStep/
+ *     DomainInsightsCard) is the first real consumer, and it uses the
+ *     project's own downloaded tether-usdt.svg
+ *     (public/assets/img/my-domains/tether-usdt.svg) instead of the remote
+ *     cryptologos.cc one every other symbol here still uses.
  */
 
 export type CurrencySymbol = keyof typeof CURRENCY_MAP
@@ -21,7 +27,7 @@ export type CurrencySymbol = keyof typeof CURRENCY_MAP
 export const CURRENCY_MAP = {
   BTC: { name: 'Bitcoin', icon: 'https://cryptologos.cc/thumbs/bitcoin.png' },
   ETH: { name: 'Ethereum', icon: 'https://cryptologos.cc/thumbs/ethereum.png' },
-  USDT: { name: 'Tether USD', icon: 'https://cryptologos.cc/thumbs/tether.png' },
+  USDT: { name: 'Tether USD', icon: '/assets/img/my-domains/tether-usdt.svg' },
   USDC: { name: 'USD Coin', icon: 'https://cryptologos.cc/thumbs/usd-coin.png' },
   BNB: { name: 'Binance Coin', icon: 'https://cryptologos.cc/thumbs/binance-usd.png' },
   XRP: { name: 'XRP', icon: 'https://cryptologos.cc/thumbs/xrp.png' },
@@ -181,4 +187,32 @@ const EXTENSION_TO_PROVIDER: Record<string, DomainProviderKey> = {
 export const getProviderForExtension = (extension: string) => {
   const providerKey = EXTENSION_TO_PROVIDER[extension.toLowerCase()]
   return providerKey ? getDomainProvider(providerKey) : undefined
+}
+
+// Some APIs (e.g. /domain/detail's `domainProvider`/`blockchain` fields)
+// hand back the provider's own name directly — "Arbitrum", "UD" — rather
+// than a extension or a Chain.id this helper otherwise keys off. Matched
+// case-insensitively against DOMAIN_PROVIDERS' own `provider` key rather
+// than assumed to equal a DomainProviderKey exactly, since it's untyped
+// runtime API data, not a literal from this file. Returns undefined for
+// any name that doesn't match one of the providers above — callers are
+// expected to fall back visibly (a generic icon, a plain label) rather
+// than guess.
+export const getDomainProviderByName = (name?: string | null) => {
+  if (!name) return undefined
+  const normalized = name.trim().toLowerCase()
+  const exact = DOMAIN_PROVIDERS.find((p) => p.provider.toLowerCase() === normalized)
+  if (exact) return exact
+
+  // Unstoppable Domains mints across more than one chain, and the API
+  // prefixes the chain onto the provider name for those instead of sending
+  // plain "UD" — "UDBASE" (minted on Base) is the sample seen so far, but
+  // the same "UD" prefix pattern covers any other chain UD mints on that
+  // this helper hasn't seen a literal sample of yet. Still Unstoppable
+  // Domains as far as which naming service issued the domain, so any
+  // "UD..." variant resolves to the same UD logo rather than falling
+  // through to no match.
+  if (normalized.startsWith('ud')) return getDomainProvider('UD')
+
+  return undefined
 }

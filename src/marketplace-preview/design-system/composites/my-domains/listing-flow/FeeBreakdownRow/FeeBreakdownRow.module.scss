@@ -28,18 +28,26 @@
 }
 
 .value {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-1);
   font-family: var(--font-satoshi);
   font-weight: var(--font-weight-bold);
   font-size: 17px;
   color: #171429;
+  white-space: nowrap;
 }
 
 .valueEmphasis {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-1);
   font-family: var(--font-satoshi);
   font-weight: var(--font-weight-bold);
   font-size: 17px;
   letter-spacing: -0.4px;
   color: #171429;
+  white-space: nowrap;
 }
 
 .operator {

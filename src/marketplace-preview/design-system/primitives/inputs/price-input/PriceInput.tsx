@@ -37,10 +37,10 @@ export const PriceInput = ({ value, onChange, tokenSymbol, tokenIcon, disabled =
         aria-label={`Price in ${tokenSymbol}`}
       />
       <span className={styles.token}>
+        {tokenSymbol}
         {tokenIcon ?? (currency.icon ? (
           <Image src={currency.icon} alt="" aria-hidden="true" width={15} height={15} className={styles.tokenIcon} />
         ) : null)}
-        {tokenSymbol}
       </span>
     </div>
   )

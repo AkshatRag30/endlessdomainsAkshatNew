@@ -1,0 +1,21 @@
+// Figma node 1:9251 — chain badge is ~0.39x the token icon's size, overlapping its bottom-right corner.
+
+.wrap {
+  position: relative;
+  display: inline-flex;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.tokenIcon {
+  border-radius: var(--radius-full);
+}
+
+.chainBadge {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  border-radius: var(--radius-full);
+  box-shadow: 0 0 0 1px var(--color-white-primary);
+}

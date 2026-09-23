@@ -2,6 +2,7 @@ import React from 'react'
 import { FiCheck } from 'react-icons/fi'
 import PrimaryButton from '@/marketplace-preview/design-system/primitives/buttons/primary-button'
 import { formatExpiry, formatToken } from '../format'
+import TokenSuffix from '../TokenSuffix'
 import styles from './ListingSuccessStep.module.scss'
 
 export interface ListingSuccessStepProps {
@@ -23,11 +24,15 @@ export const ListingSuccessStep = ({ domainLabel, listedAtUsd, youReceiveUsd, ex
     <div className={styles.summaryCard}>
       <div className={styles.summaryRow}>
         <span>Listed at</span>
-        <strong>{formatToken(listedAtUsd)} USDT</strong>
+        <strong>
+          {formatToken(listedAtUsd)} <TokenSuffix />
+        </strong>
       </div>
       <div className={styles.summaryRow}>
         <span>You receive on sale</span>
-        <strong>{formatToken(youReceiveUsd)} USDT</strong>
+        <strong>
+          {formatToken(youReceiveUsd)} <TokenSuffix />
+        </strong>
       </div>
       <div className={styles.summaryRow}>
         <span>Expires</span>
@@ -45,17 +50,13 @@ export const ListingSuccessStep = ({ domainLabel, listedAtUsd, youReceiveUsd, ex
 export default ListingSuccessStep
 
 export interface ListingSuccessFooterProps {
-  onClose: () => void
   onListAnother: () => void
 }
 
-export const ListingSuccessFooter = ({ onClose, onListAnother }: ListingSuccessFooterProps) => (
+export const ListingSuccessFooter = ({ onListAnother }: ListingSuccessFooterProps) => (
   <div className={styles.footer}>
-    <PrimaryButton fullWidth onClick={onClose}>
-      Sign to list
+    <PrimaryButton fullWidth onClick={onListAnother}>
+      List another
     </PrimaryButton>
-    <button type="button" className={styles.listAnotherLink} onClick={onListAnother}>
-      list another
-    </button>
   </div>
 )

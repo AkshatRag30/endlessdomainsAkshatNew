@@ -21,9 +21,11 @@ const LOADING_DELAY_MS = 500
 /**
  * 'loading' (Phase E) is now the real first screen every entry point shows,
  * for LOADING_DELAY_MS, before ListingFlowModal auto-advances to 'form'.
- * 'confirm' (ConfirmToSignStep, Phase B) is live: an already-approved
- * wallet goes form -> confirm -> signing -> success, instead of jumping
- * straight from form to signing.
+ * 'confirm' (ConfirmToSignStep, Phase B) is live: both paths land on it
+ * before signing — an already-approved wallet goes
+ * form -> confirm -> signing -> success, and a wallet that still needs the
+ * one time approval goes
+ * form -> approval -> approval-pending -> confirm -> signing -> success.
  */
 export type ListingFlowStep = 'loading' | 'form' | 'approval' | 'approval-pending' | 'confirm' | 'signing' | 'success' | 'insufficient-funds'
 
@@ -116,15 +118,12 @@ export const ListingFlowModal = ({ isOpen, onClose, mode, domain }: ListingFlowM
     setStep('approval-pending')
     setSubmitting(true)
     await actions.approve()
-    const result = await actions.signAndSubmit({ priceUsd: Number(price), durationDays })
     setSubmitting(false)
-    setStep(result.ok ? 'success' : 'insufficient-funds')
+    setStep('confirm')
   }
 
   const handleListAnother = () => {
-    setStep('form')
-    setPrice('')
-    setDurationDays(30)
+    onClose()
   }
 
   const expiresAt = Date.now() + durationDays * DAY_MS
@@ -161,7 +160,15 @@ export const ListingFlowModal = ({ isOpen, onClose, mode, domain }: ListingFlowM
         switchingNetwork={switchingNetwork}
       />
     )
-    footer = <ListingFormFooter price={price} hasApproval={!actions.needsApproval()} onSubmit={handleSubmitForm} submitting={submitting} />
+    footer = (
+      <ListingFormFooter
+        price={price}
+        hasApproval={!actions.needsApproval()}
+        onSubmit={handleSubmitForm}
+        submitting={submitting}
+        isWrongNetwork={networkOk === false}
+      />
+    )
   } else if (step === 'approval') {
     body = <OneTimeApprovalStep approvalFeeEstimate={insights.approvalFeeEstimate} />
     footer = <OneTimeApprovalFooter onApprove={handleApprove} onBack={() => setStep('form')} submitting={submitting} />
@@ -212,7 +219,7 @@ export const ListingFlowModal = ({ isOpen, onClose, mode, domain }: ListingFlowM
         expiresAt={expiresAt}
       />
     )
-    footer = <ListingSuccessFooter onClose={onClose} onListAnother={handleListAnother} />
+    footer = <ListingSuccessFooter onListAnother={handleListAnother} />
   }
 
   return (

@@ -37,11 +37,25 @@ export const Modal = ({ isOpen, onClose, title, dismissible = true, footer, chil
   // panel's transform transition actually animates from off-screen instead
   // of snapping straight to its open position. Unmounting is delayed to let
   // the reverse transition play before the portal is torn down.
+  //
+  // Two nested rAFs, not one: a single rAF can land on the same frame as the
+  // "mounted" commit's own paint (the browser hasn't necessarily painted the
+  // off-screen state yet when the callback fires), so the panel jumps
+  // straight to its open position with no visible slide. The first rAF just
+  // confirms a frame has actually painted with panelEntered still absent;
+  // the second one — scheduled from inside it — is what flips the class, on
+  // a guaranteed-separate frame.
   useEffect(() => {
     if (isOpen) {
       setMounted(true)
-      const raf = requestAnimationFrame(() => setEntered(true))
-      return () => cancelAnimationFrame(raf)
+      let raf2 = 0
+      const raf1 = requestAnimationFrame(() => {
+        raf2 = requestAnimationFrame(() => setEntered(true))
+      })
+      return () => {
+        cancelAnimationFrame(raf1)
+        cancelAnimationFrame(raf2)
+      }
     }
     setEntered(false)
     const timeout = setTimeout(() => setMounted(false), EXIT_DURATION_MS)

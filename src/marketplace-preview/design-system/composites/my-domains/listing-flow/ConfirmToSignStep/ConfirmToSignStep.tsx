@@ -2,6 +2,7 @@ import React from 'react'
 import { FiEdit3 } from 'react-icons/fi'
 import PrimaryButton from '@/marketplace-preview/design-system/primitives/buttons/primary-button'
 import { formatExpiry, formatToken } from '../format'
+import TokenSuffix from '../TokenSuffix'
 import styles from './ConfirmToSignStep.module.scss'
 
 export interface ConfirmToSignStepProps {
@@ -39,15 +40,21 @@ export const ConfirmToSignStep = ({ domainLabel, buyerPaysUsd, feeUsd, youReceiv
       </div>
       <div className={styles.summaryRow}>
         <span>Buyer pays</span>
-        <strong>{formatToken(buyerPaysUsd)} USDT</strong>
+        <strong>
+          {formatToken(buyerPaysUsd)} <TokenSuffix />
+        </strong>
       </div>
       <div className={styles.summaryRow}>
         <span>Platform fee · 2.5%</span>
-        <strong>{formatToken(feeUsd)} USDT</strong>
+        <strong>
+          {formatToken(feeUsd)} <TokenSuffix />
+        </strong>
       </div>
       <div className={`${styles.summaryRow} ${styles.summaryRowEmphasis}`}>
         <span>You receive</span>
-        <strong>{formatToken(youReceiveUsd)} USDT</strong>
+        <strong>
+          {formatToken(youReceiveUsd)} <TokenSuffix />
+        </strong>
       </div>
       <div className={styles.summaryRow}>
         <span>Expires</span>
