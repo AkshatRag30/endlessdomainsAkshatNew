@@ -9,14 +9,31 @@ export interface FeeBreakdownRowProps {
   className?: string
 }
 
+/**
+ * The three amounts share one font-size tier, picked off whichever of them
+ * formats to the longest string, rather than each column sizing itself
+ * independently — otherwise "Buyer pays" and "You receive" (usually close
+ * in magnitude) would land at mismatched sizes next to each other. Three
+ * tiers, stepping down as a domain's price gets large enough that
+ * "16,920.00" becomes "1,234,567.00" and would otherwise overflow this
+ * row's fixed 3-column width.
+ */
+function getAmountSizeTier(...values: number[]): 'lg' | 'md' | 'sm' {
+  const longest = Math.max(...values.map((value) => formatToken(value).length))
+  if (longest > 12) return 'sm'
+  if (longest > 9) return 'md'
+  return 'lg'
+}
+
 /** Figma node 1:8779/1:8780 — the 3-column "Buyer pays − Fee = You receive" breakdown pinned above the form's primary CTA. */
 export const FeeBreakdownRow = ({ priceUsd, className = '' }: FeeBreakdownRowProps) => {
   const { buyerPays, feeAmount, youReceive } = computeFeeBreakdown(priceUsd)
   const shellClass = [styles.wrap, className].filter(Boolean).join(' ')
+  const amountSize = getAmountSizeTier(buyerPays, feeAmount, youReceive)
 
   return (
     <div className={shellClass}>
-      <div className={styles.row}>
+      <div className={styles.row} data-amount-size={amountSize}>
         <div className={styles.item}>
           <span className={styles.label}>Buyer pays</span>
           <span className={styles.value}>

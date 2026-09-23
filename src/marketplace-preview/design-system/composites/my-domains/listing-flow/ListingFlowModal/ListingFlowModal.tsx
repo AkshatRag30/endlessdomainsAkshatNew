@@ -136,8 +136,7 @@ export const ListingFlowModal = ({ isOpen, onClose, mode, domain }: ListingFlowM
     'approval-pending': 'Signing',
     confirm: 'Sign to list',
     signing: 'Signing',
-    // Figma keeps this label even on the success screen — a known copy quirk, not something to "fix" here (plan §2.1).
-    success: 'Sign to list',
+    success: 'Successfully Listed',
     'insufficient-funds': 'Signing',
   }
 
