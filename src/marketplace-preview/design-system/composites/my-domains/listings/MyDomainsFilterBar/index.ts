@@ -1,2 +1,2 @@
 export { MyDomainsFilterBar, default } from './MyDomainsFilterBar'
-export type { MyDomainsFilterBarProps } from './MyDomainsFilterBar'
+export type { MyDomainsFilterBarProps, FilterOption } from './MyDomainsFilterBar'

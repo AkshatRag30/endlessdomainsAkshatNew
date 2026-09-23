@@ -27,15 +27,34 @@ export interface MyDomainsTableProps {
  * layout at all — every domain renders as a MyDomainCard, one per row, and
  * the Status legend above the list is dropped entirely (each card already
  * carries its own status badge). MyDomainRow's own mobile fallback predates
- * that reference and was always a placeholder — see its file comment — so
- * below the mobile breakpoint this ignores the caller's viewMode and forces
- * grid regardless of the (now mobile-hidden, see MyDomainsFilterBar)
- * ViewToggle's last selection.
+ * that reference and was always a placeholder — see its file comment. This
+ * mobile cutoff always forces grid, full stop.
+ *
+ * A second, narrower range also forces grid: 1040–1279px. That's not
+ * "tablet" in this codebase's own vocabulary ($breakpoint-tablet is 1040,
+ * same as $breakpoint-desktop) — it's the width where MarketplacePageShell
+ * activates its rail-narrowed 2-column desktop grid (see that file's .grid
+ * comment) but still doesn't leave "main" enough room for MyDomainRow's own
+ * six column floors, a MacBook Air 13" browser window commonly lands right
+ * in it. True tablet widths (768–1039px, including an iPad 13" in
+ * portrait) don't have this problem at all — MarketplacePageShell collapses
+ * to a single full-width column there instead, so "main" gets nearly the
+ * whole viewport and the row grid fits comfortably — so table and card view
+ * are both freely selectable there via ViewToggle, same as at 1280px and
+ * up. A horizontal scrollbar on the table was tried for the 1040–1279 case
+ * instead of forcing grid and reverted, since forcing card there reads as
+ * the intended design rather than a workaround.
  */
 export const MyDomainsTable = ({ domains, viewMode, pageSize = 14, onList, onEditPrice }: MyDomainsTableProps) => {
   const [visibleCount, setVisibleCount] = useState(pageSize)
-  const isMobile = useIsMobile()
-  const effectiveViewMode = isMobile ? 'grid' : viewMode
+  const isMobileWidth = useIsMobile(767) // < 768px — always forces grid (Figma's own mobile frame)
+  const isBelowLaptop = useIsMobile(1279) // <= 1279px
+  const isBelowTablet = useIsMobile(1039) // <= 1039px — true tablet ends here
+  // 1040–1279px only: below true tablet's own top end, but still short of
+  // 1280px — see the comment above for why this specific range is the one
+  // that can't fit row view.
+  const isLaptopNarrow = isBelowLaptop && !isBelowTablet
+  const effectiveViewMode = isMobileWidth || isLaptopNarrow ? 'grid' : viewMode
   const visible = domains.slice(0, visibleCount)
   const remaining = domains.length - visible.length
 

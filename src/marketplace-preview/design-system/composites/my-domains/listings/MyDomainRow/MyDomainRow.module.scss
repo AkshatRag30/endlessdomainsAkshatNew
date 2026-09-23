@@ -10,67 +10,38 @@
 // rows drift out of alignment.
 .row {
   display: grid;
-  // Plain fr share below — no forced minimum on Domain at this narrowest
-  // tier (<1040px is tablet/mobile, restacked anyway) — so it truncates
-  // further via .domainName's own ellipsis. A single fixed 320px floor
-  // applied at every width used to be unconditional, which is exactly what
-  // squeezed the other columns at ~1376px (13" iPad Pro landscape is only
-  // 10px narrower than 1366px, the single most common laptop width).
-  // Domain now gets two tiers instead of one-size-fits-all: a smaller
-  // 200px floor between desktop and wide (see that bracket below — enough
-  // to stop names truncating after a handful of characters on a MacBook
-  // Air-class window, without reproducing the ~1376px squeeze a full 320px
-  // floor caused there), and the full 320px/25-character guarantee once
-  // @include wide's genuinely spacious width removes the tradeoff
-  // entirely. Must match MyDomainsTable.module.scss's .header ratio
-  // exactly (all three rules), or the header and rows drift out of
-  // alignment.
+  // MyDomainsTable forces card view below 1280px (see that file's
+  // useIsMobile(1280) call, and MyDomainCard for the tablet-friendly grid
+  // layout that range actually gets) — a MacBook Air 13" browser window
+  // commonly reports a logical width right around there, and this grid's
+  // own column floors genuinely can't all fit inside what
+  // MarketplacePageShell hands "main" below that width, even with its
+  // rail already narrowed to compensate (see that file's .grid comment).
+  // Row view only ever renders at 1280px and up now, so this base
+  // declaration is effectively the 1280–1439px tier, not a fallback for
+  // anything narrower — @include wide below is the only other tier this
+  // grid needs. Must match MyDomainsTable.module.scss's .header ratio
+  // exactly (both rules), or the header and rows drift out of alignment.
   //
-  // Interest and Renewal get their own floors unconditionally (not tiered
-  // like Domain's) — MarketplacePageShell's desktop grid reserves a fixed
-  // 240px sidebar + rail regardless of viewport (320px at wide, narrowed
-  // to 260px between desktop and wide — see that file's .grid), so the
-  // "main" column these rows live in is genuinely narrow right at the
-  // 1040px desktop cutoff and stays fairly tight through ordinary laptop
-  // widths (~694px main at 1366px). Without a floor, Interest's/Renewal's
-  // plain fr share drops below what an icon + a couple of digits or a
-  // "MMM D" date needs on one line, and .renewal/.interestStat's own
-  // white-space: nowrap (see below) then has nothing to fall back on but
-  // wrapping the icon and text across two lines instead — a much smaller
-  // ask than Domain's floors, so it doesn't reproduce the same
-  // squeeze-everything-else problem an unconditional Domain floor
-  // caused unconditionally.
-  // Action gets a floor too — its button is a fixed 110px with
-  // flex-shrink: 0 (see .actionCell below), plus this cell's own 24px of
-  // horizontal padding, 134px total it can never render narrower than
-  // without the button overflowing past the column's own right edge. A
-  // plain 1.4fr share could still drop below that on an ordinary laptop
-  // width even with MarketplacePageShell's rail narrowed at this range
-  // (see that file's .grid) — this is the guaranteed backstop regardless
-  // of exactly how much room the shell hands over.
-  grid-template-columns: 2fr 0.9fr minmax(90px, 0.8fr) minmax(96px, 0.9fr) 1.1fr minmax(134px, 1.4fr);
-
-  // A MacBook Air's browser window commonly reports a logical width right
-  // around 1440px — sometimes a few px under it once scrollbars/window
-  // chrome are subtracted — which lands it in this bracket instead of
-  // @include wide below, even though it looks like it should have plenty
-  // of room. Without a floor here, Domain drops to whatever's left after
-  // Renewal/Interest/Action take their own floors and truncates names
-  // after just a handful of characters. 200px is deliberately smaller than
-  // wide's 320px (not a 25-character guarantee, just enough to stop names
-  // from truncating this early) — MarketplacePageShell's rail is already
-  // narrowed to 260px in this same range (see that file), which is what
-  // makes room for this without squeezing Price/Est. value (still
-  // floor-less) noticeably.
-  @include between($breakpoint-desktop, $breakpoint-wide - 1px) {
-    grid-template-columns: minmax(200px, 2fr) 0.9fr minmax(90px, 0.8fr) minmax(96px, 0.9fr) 1.1fr minmax(134px, 1.4fr);
-  }
+  // Renewal's floor was bumped from 90px to 120px — it used to assume a
+  // short "Oct 21"-style date, but the real API format is dd/mm/yyyy
+  // (e.g. "23/09/2026", ~87px of icon+text at this column's font size).
+  // 90px left only ~66px after the cell's 24px of horizontal padding, too
+  // tight for that string — .renewal's white-space: nowrap (see below) had
+  // nowhere to go but spill past the column's right edge instead of
+  // wrapping. 120px keeps a small buffer above the measured need. Interest
+  // and Action keep their original floors — Domain and Renewal are the two
+  // that were actually undersized.
+  grid-template-columns: minmax(200px, 2fr) 0.9fr minmax(120px, 0.8fr) minmax(96px, 0.9fr) 1.1fr minmax(134px, 1.4fr);
 
   @include wide {
-    // minmax's floor is sized for the worst case (avatar + 25 chars @
-    // 15px/Bold + extension badge + cell padding) so the full 25
-    // characters reliably render at genuinely wide desktop widths.
-    grid-template-columns: minmax(320px, 2fr) 0.9fr minmax(90px, 0.8fr) minmax(96px, 0.9fr) 1.1fr minmax(134px, 1.4fr);
+    // Domain's floor is sized for a comfortably long name at 15px/Bold +
+    // avatar + extension badge + cell padding — the name itself no longer
+    // has a fixed character cap (see formatMyDomain.ts), so this is a
+    // generous width rather than an exact character guarantee; anything
+    // longer than that still ellipsizes via .domainName's own overflow
+    // rule below, with the full name always available in the Tooltip.
+    grid-template-columns: minmax(320px, 2fr) 0.9fr minmax(120px, 0.8fr) minmax(96px, 0.9fr) 1.1fr minmax(134px, 1.4fr);
   }
 
   // Was align-items: center — that only centers each .cell inside the grid
@@ -204,6 +175,12 @@
   flex-shrink: 0;
 }
 
+.promotedMarker {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
+
 .domainText {
   display: flex;
   flex-direction: column;
@@ -277,11 +254,12 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  // Without this, a laptop-width Renewal column (see .row's comment on its
-  // minmax floor) let "Oct 21" wrap into "Oct" / "21" on two lines instead
-  // of just relying on the floor for room — the floor gives it the space,
-  // this stops it from wrapping even if that space is ever tight again.
-  white-space: nowrap;
+  // Flex items default to min-width: auto (won't shrink below their own
+  // content width) — without this, the date span below ignored its own
+  // overflow rule entirely and just pushed .renewal past the column's
+  // right edge instead of shrinking into it, which is exactly what
+  // happened with the wider dd/mm/yyyy format at tablet widths.
+  min-width: 0;
   font-family: var(--font-satoshi);
   font-weight: var(--font-weight-medium);
   font-size: var(--text-small-13);
@@ -289,8 +267,23 @@
 
   svg {
     flex-shrink: 0;
-    color: var(--color-gray-primary);
+    // Was var(--color-gray-primary) — the icon read visibly lighter than
+    // the date text next to it instead of matching it; currentColor keeps
+    // the two in sync with .renewal's own color from here on.
+    color: currentColor;
   }
+}
+
+.renewalDate {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  // Without this, a laptop-width Renewal column (see .row's comment on its
+  // minmax floor) let the date wrap onto two lines instead of just relying
+  // on the floor for room — the floor gives it the space, this stops it
+  // from wrapping even if that space is ever tight again. text-overflow
+  // needs it too, or there's nothing for the ellipsis to truncate against.
+  white-space: nowrap;
 }
 
 .interestCell {

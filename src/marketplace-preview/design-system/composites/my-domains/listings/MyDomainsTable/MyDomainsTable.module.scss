@@ -14,8 +14,17 @@
 
   // Figma node 77:3743 (responsive frame) has no legend row above the
   // mobile card list — each MyDomainCard already carries its own status
-  // badge, so the separate legend is dropped rather than duplicated.
+  // badge, so the separate legend is dropped rather than duplicated. Card
+  // view is also forced between 1040–1279px (see MyDomainsTable.tsx), so
+  // the same reasoning applies there too — the legend explains row view's
+  // colored left edge, which cards don't have at all. True tablet widths
+  // (768–1039px) keep the legend, same as before, since row view is the
+  // default there and freely selectable.
   @include mobile {
+    display: none;
+  }
+
+  @include between(1040px, 1279px) {
     display: none;
   }
 }
@@ -35,7 +44,17 @@
   // a literal like MyDomainCard's own Figma-exact values.
   gap: 6px;
 
-  @include tablet-down {
+  // Was @include tablet-down (max-width: 1039px) — card view used to only
+  // ever render at 767px and below (MyDomainsTable forced row view from
+  // 768px up), so this rule never actually applied to anything wider.
+  // Now that card view is forced all the way up to 1280px (see that
+  // file's useIsMobile(1280) call), the plain 3fr rule above would have
+  // taken over between 1040–1279px — cramming 3 cards into the same
+  // narrow "main" column that made the 6-column row grid overflow in the
+  // first place, just as tight a fit. 1279px keeps 2 columns for this
+  // whole forced-card range instead, so the two switch to their genuinely
+  // roomy layouts (3 cards / row view) at exactly the same 1280px point.
+  @include max-width(1279px) {
     grid-template-columns: repeat(2, 1fr);
   }
 
@@ -48,21 +67,16 @@
   display: grid;
   // Must match MyDomainRow.module.scss's .row ratio exactly, including its
   // minmax floors — see that file's comments for why Action's share was
-  // widened from 1fr and now has its own 134px floor, why Domain gets a
-  // smaller floor between desktop and wide and a bigger one at wide itself
-  // rather than one unconditional value, and why Interest/Renewal each get
-  // their own smaller floor unconditionally.
-  grid-template-columns: 2fr 0.9fr minmax(90px, 0.8fr) minmax(96px, 0.9fr) 1.1fr minmax(134px, 1.4fr);
-
-  // Must mirror MyDomainRow.module.scss's .row exactly, including this
-  // bracket — see that file's comment for why Domain gets a smaller 200px
-  // floor here instead of wide's 320px one.
-  @include between($breakpoint-desktop, $breakpoint-wide - 1px) {
-    grid-template-columns: minmax(200px, 2fr) 0.9fr minmax(90px, 0.8fr) minmax(96px, 0.9fr) 1.1fr minmax(134px, 1.4fr);
-  }
+  // widened from 1fr and now has its own 134px floor, why this is
+  // effectively the 1280–1439px tier (row view never renders below that,
+  // see MyDomainsTable.tsx's useIsMobile(1280) call) rather than a fallback
+  // for anything narrower, and why Renewal's floor was bumped to 120px to
+  // fit the real dd/mm/yyyy date format instead of the shorter placeholder
+  // it was originally sized for.
+  grid-template-columns: minmax(200px, 2fr) 0.9fr minmax(120px, 0.8fr) minmax(96px, 0.9fr) 1.1fr minmax(134px, 1.4fr);
 
   @include wide {
-    grid-template-columns: minmax(320px, 2fr) 0.9fr minmax(90px, 0.8fr) minmax(96px, 0.9fr) 1.1fr minmax(134px, 1.4fr);
+    grid-template-columns: minmax(320px, 2fr) 0.9fr minmax(120px, 0.8fr) minmax(96px, 0.9fr) 1.1fr minmax(134px, 1.4fr);
   }
 
   background: var(--color-white-primary);

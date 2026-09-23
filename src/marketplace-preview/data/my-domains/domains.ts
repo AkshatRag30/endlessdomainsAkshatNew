@@ -64,6 +64,7 @@ function buildDomains(): MyDomainListing[] {
       status,
       blockchainStatus,
       isPremium: isForSale && index % 4 === 0,
+      isPromoted: isForSale && index % 6 === 0, // overlaps with isPremium at index 0/12 so at least one fixture shows both markers together
       listingId: isForSale ? `listing-${index + 1}` : undefined,
       tokenId: `${1000 + index}`,
       priceEth: isForSale ? priceEth : undefined,

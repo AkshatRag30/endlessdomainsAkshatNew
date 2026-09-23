@@ -9,7 +9,7 @@ import ChainBadge from '@/marketplace-preview/design-system/primitives/badges/ch
 import TrendIndicator from '@/marketplace-preview/design-system/primitives/badges/trend-indicator'
 import StatusChip from '@/marketplace-preview/design-system/primitives/badges/status-chip'
 import PrimaryButton from '@/marketplace-preview/design-system/primitives/buttons/primary-button'
-import { formatUsd, formatRenewal, truncateDomainName, TREND_DIRECTION, TREND_LABEL, STATUS_BADGE_LABEL } from '../formatMyDomain'
+import { formatUsd, formatRenewal, TREND_DIRECTION, TREND_LABEL, STATUS_BADGE_LABEL } from '../formatMyDomain'
 import styles from './MyDomainCard.module.scss'
 
 export interface MyDomainCardProps {
@@ -49,20 +49,23 @@ export const MyDomainCard = ({ domain, onList, onEditPrice }: MyDomainCardProps)
       </div>
 
       <div className={styles.identity}>
-        <DomainAvatar extension={domain.extension} />
+        <DomainAvatar extension={domain.extension} domainProvider={domain.domainProvider} />
         <div className={styles.identityText}>
           <div className={styles.nameRow}>
             <Tooltip label={`${domain.domainName}${domain.extension}`} placement="bottom" portal className={styles.domainNameTooltip}>
-              <span className={styles.domainName}>{truncateDomainName(domain.domainName)}</span>
+              <span className={styles.domainName}>{domain.domainName}</span>
             </Tooltip>
             <ExtensionBadge extension={domain.extension} />
+            {domain.isPremium && (
+              <Image src="/assets/img/marketplace/domain-marker.svg" alt="Premium" width={14} height={10} className={styles.marker} />
+            )}
+            {domain.isPromoted && (
+              <Image src="/assets/img/marketplace/promoted-marker.svg" alt="Promoted" width={13} height={13} className={styles.promotedMarker} />
+            )}
           </div>
           <div className={styles.metaRow}>
             <ChainBadge chain={domain.chain} />
             <span className={styles.chars}>{domain.lengthChars} chars</span>
-            {domain.isPremium && (
-              <Image src="/assets/img/marketplace/domain-marker.svg" alt="Premium" width={14} height={10} className={styles.marker} />
-            )}
           </div>
         </div>
       </div>
@@ -78,7 +81,7 @@ export const MyDomainCard = ({ domain, onList, onEditPrice }: MyDomainCardProps)
         <span className={styles.statLabel}>Renewal</span>
         <span className={styles.renewal}>
           <FiCalendar size={12} aria-hidden="true" />
-          {formatRenewal(domain.renewalTimestamp)}
+          <span className={styles.renewalDate}>{formatRenewal(domain.renewalTimestamp)}</span>
         </span>
       </div>
     </div>

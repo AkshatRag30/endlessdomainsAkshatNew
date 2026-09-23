@@ -120,6 +120,12 @@
   flex-shrink: 0;
 }
 
+.promotedMarker {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
+
 .metaRow {
   display: flex;
   align-items: center;
@@ -232,10 +238,10 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  // Same defensive rule as MyDomainRow.module.scss's .renewal — this card
-  // layout has more room per stat than the 6-column row does, but nothing
-  // stops "Oct 21" from wrapping onto two lines if a column ever gets tight.
-  white-space: nowrap;
+  // Same reasoning as MyDomainRow.module.scss's .renewal/.renewalDate — a
+  // flex item won't shrink below its own content width by default, so
+  // without this the date span's overflow rule never got a chance to fire.
+  min-width: 0;
   font-family: var(--font-satoshi);
   font-weight: var(--font-weight-medium);
   // Figma: 9.875px, matching .statValue's own corrected scale.
@@ -244,6 +250,20 @@
 
   svg {
     flex-shrink: 0;
-    color: var(--color-gray-primary);
+    // Was var(--color-gray-primary) — the icon read visibly lighter than
+    // the date text next to it instead of matching it; currentColor keeps
+    // the two in sync with .renewal's own color from here on.
+    color: currentColor;
   }
+}
+
+.renewalDate {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  // This card layout has more room per stat than the 6-column row does,
+  // but nothing stops the date from wrapping onto two lines or spilling
+  // past the stat's own width if a column ever gets tight (narrow phones,
+  // a long domain name pushing the identity row's own width around it).
+  white-space: nowrap;
 }

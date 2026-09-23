@@ -9,6 +9,13 @@ export interface SidebarNavItem {
   /** True when href has no real destination yet — points at '/' until built, same convention as the header's menuItems.ts. */
   isPlaceholder?: boolean
   /**
+   * True when this row needs a signed-in session — while signed out it
+   * renders muted and routes to /login instead of its real href, matching
+   * the account-gated destinations (My domains, Analytics, Payouts,
+   * Promotions) rather than a build-status flag like isPlaceholder.
+   */
+  requiresAuth?: boolean
+  /**
    * Figma node 70:4592 — per-row leading icon, shown whether or not the row
    * is active. Optional: a handful of items (Recently sold, Under estimate,
    * Price drops, Alerts) have no matching icon in that reference and fall

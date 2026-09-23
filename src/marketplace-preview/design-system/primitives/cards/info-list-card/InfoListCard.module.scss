@@ -35,7 +35,11 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-2);
-  padding: var(--space-2) 0;
+  // Was 0 horizontal — the icon avatar and the trailing number/button sat
+  // flush against the white .list container's own left/right edges in
+  // every row, across all three right-rail panels that share this
+  // primitive (Needs Attention, Getting the Most Views, Quick Actions).
+  padding: var(--space-2) var(--space-2-5);
   border-bottom: 1px solid #f0f1f3; // design-specific: Figma-exact
 
   &:last-child {

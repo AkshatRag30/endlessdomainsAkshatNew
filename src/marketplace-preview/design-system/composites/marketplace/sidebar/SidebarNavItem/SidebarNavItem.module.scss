@@ -20,6 +20,14 @@
   }
 }
 
+// Signed-out state for requiresAuth rows (My domains, Analytics, Payouts,
+// Promotions) — still a real link (routes to /login), so just dimmed
+// rather than pointer-events:none. No disabled/muted opacity token exists
+// in tokens.scss yet, so this is a literal value, not a guessed token name.
+.authLocked {
+  opacity: 0.45;
+}
+
 // Figma nodes 23:2916 ("Explore") / 57:9354 ("My domains") — light gray
 // row, black label, a leading icon, and a pale taper into a count pill.
 // Was a flat --color-blue-light fill with blue text before, which looked
@@ -42,7 +50,7 @@
   width: 15px;
   height: 15px;
   flex-shrink: 0;
-  color: var(--color-blue-primary); // active row's own icon tints blue instead of the row's default gray; no-op on rows whose icon has its own baked-in color (a string asset, or MyDomainsIcon's hardcoded fill)
+  color: var(--color-blue-primary); // active row's own icon tints blue instead of the row's default gray; no-op on rows whose icon has its own baked-in color (a string asset only — MyDomainsIcon now uses currentColor like every other react-icons row)
 }
 
 // Figma node 70:4592's per-row icon set — each raw asset's own fill/stroke
@@ -83,17 +91,6 @@
   font-family: var(--font-satoshi);
   font-size: var(--text-small-12);
   color: var(--color-gray-primary);
-}
-
-.badge {
-  padding: 1px var(--space-1-5);
-  border-radius: var(--radius-full);
-  background: var(--color-gray-light);
-  color: var(--color-gray-dark);
-  font-size: var(--text-small-10);
-  font-weight: var(--font-weight-medium);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
 }
 
 // ── Active trailing: count pill, no connecting line to the label ─────────

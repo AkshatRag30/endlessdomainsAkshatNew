@@ -5,14 +5,19 @@ import { Chain, MarketplaceListing } from '@/marketplace-preview/types/marketpla
  * hook boundary this feeds, and the implementation plan section 11 for how
  * this gets replaced by a real, mapped API response later.
  *
- * Chain icon paths below are placeholders (project has no chain-logo assets
- * yet) — real SVGs need to be sourced when ChainBadge is actually built.
+ * Chain icon paths point at the real logo files in
+ * public/assets/img/chain-logos/ — ChainBadge renders `chain.iconSrc`
+ * directly.
  */
 
-export const POLYGON: Chain = { id: 'polygon', label: 'Polygon', iconSrc: '/assets/img/chains/polygon.svg' }
-export const ETHEREUM: Chain = { id: 'ethereum', label: 'Ethereum', iconSrc: '/assets/img/chains/ethereum.svg' }
-export const ARBITRUM: Chain = { id: 'arbitrum', label: 'Arbitrum', iconSrc: '/assets/img/chains/arbitrum.svg' }
-export const BSC: Chain = { id: 'bsc', label: 'BNB Chain', iconSrc: '/assets/img/chains/bnb.svg' }
+export const POLYGON: Chain = { id: 'polygon', label: 'Polygon', iconSrc: '/assets/img/chain-logos/polygon.svg' }
+export const ETHEREUM: Chain = { id: 'ethereum', label: 'Ethereum', iconSrc: '/assets/img/chain-logos/ethereum.svg' }
+export const ARBITRUM: Chain = { id: 'arbitrum', label: 'Arbitrum', iconSrc: '/assets/img/chain-logos/arb.svg' }
+export const BSC: Chain = { id: 'bsc', label: 'BNB Chain', iconSrc: '/assets/img/chain-logos/bnb.svg' }
+// Not part of the marketplace's own 4-chain set below (buildListings'
+// `chains` array, the filter dropdowns, ...) — only used by
+// useMyDomainsData's deriveChain for domains whose blockchain is "UDBASE".
+export const BASE: Chain = { id: 'base', label: 'Base', iconSrc: '/assets/img/chain-logos/Base.png' }
 
 const NAME_STEMS = [
   'cryptowave', 'pixelforge', 'nebulax',

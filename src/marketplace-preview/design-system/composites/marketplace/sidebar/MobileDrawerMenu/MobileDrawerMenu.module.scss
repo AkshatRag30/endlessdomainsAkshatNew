@@ -274,19 +274,6 @@
   color: #a6a1bb; // design-specific: Figma-exact
 }
 
-.browseBadge {
-  position: relative;
-  z-index: 1; // same reason as .browseCount
-  padding: 1px var(--space-1-5);
-  border-radius: var(--radius-full);
-  background: var(--color-gray-light);
-  color: var(--color-gray-dark);
-  font-family: var(--font-satoshi);
-  font-size: var(--text-small-10);
-  font-weight: var(--font-weight-medium);
-  text-transform: uppercase;
-}
-
 // ── Footer / auth action ────────────────────────────────────────────────
 
 .footer {

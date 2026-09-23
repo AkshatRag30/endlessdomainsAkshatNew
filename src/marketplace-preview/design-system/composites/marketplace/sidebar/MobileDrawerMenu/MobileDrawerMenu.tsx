@@ -7,6 +7,7 @@ import { useRouter } from 'next/router'
 import { useAuth, deleteCookieAttribute, Cookie_Key, logoutUserApi } from '@/marketplace-preview/stubs/auth'
 import { HEADER_NAV_ITEMS } from '@/marketplace-preview/design-system/layouts/header/menuItems'
 import { mockSidebarSections } from '@/marketplace-preview/data/marketplace/navigation'
+import ComingSoonBadge from '@/marketplace-preview/design-system/primitives/badges/coming-soon-badge'
 import styles from './MobileDrawerMenu.module.scss'
 
 export interface MobileDrawerMenuProps {
@@ -119,7 +120,7 @@ export const MobileDrawerMenu = ({ onClose, previewMode }: MobileDrawerMenuProps
                 )}
                 <span className={styles.browseLabel}>{item.label}</span>
                 {typeof item.count === 'number' && <span className={styles.browseCount}>{item.count}</span>}
-                {item.badge && <span className={styles.browseBadge}>{item.badge}</span>}
+                {item.badge && <ComingSoonBadge />}
                 {isSelected && (
                   <>
                     <Image src="/assets/img/marketplace/drawer-explore-deco-1.svg" alt="" aria-hidden="true" width={80} height={10} className={styles.exploreDeco1} />

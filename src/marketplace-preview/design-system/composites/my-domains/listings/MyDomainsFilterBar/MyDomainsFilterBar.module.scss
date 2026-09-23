@@ -35,12 +35,18 @@
   }
 }
 
-// Figma node 77:3743 (responsive frame) drops the grid/list switch entirely
-// at mobile — MyDomainsTable forces card view there regardless of the last
-// selection (see its own comment), so a toggle with no effect would be
-// misleading rather than just redundant.
+// MyDomainsTable forces card view in two disjoint ranges regardless of the
+// last selection (see its own comment) — below the 768px mobile breakpoint,
+// and again between 1040–1279px (a MacBook Air 13" width, where the row
+// grid can't fit its columns) — so a toggle with no effect would be
+// misleading in either. True tablet widths (768–1039px, including an iPad
+// 13" in portrait) don't have that problem and keep the free choice.
 .viewToggle {
   @include mobile {
+    display: none;
+  }
+
+  @include between(1040px, 1279px) {
     display: none;
   }
 }

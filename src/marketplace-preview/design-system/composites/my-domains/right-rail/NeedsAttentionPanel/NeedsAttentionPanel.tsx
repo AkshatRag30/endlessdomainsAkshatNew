@@ -10,13 +10,23 @@ export interface NeedsAttentionPanelProps {
 
 const DAY_MS = 24 * 60 * 60 * 1000
 
-function formatRenewsIn(renewalTimestamp: number): string {
+function formatRenewsIn(renewalTimestamp: number | null): string {
+  // A domain in this panel is here because it's expiring/expired/in grace
+  // period (see useMyDomainsData's needsAttentionStatus), so a null
+  // (lifetime) timestamp shouldn't actually reach this panel in practice —
+  // handled anyway since the type allows it.
+  if (renewalTimestamp === null) return 'Lifetime'
   const days = Math.ceil((renewalTimestamp - Date.now()) / DAY_MS)
   if (days <= 0) return 'Expired'
   return `Renews in ${days} day${days === 1 ? '' : 's'}`
 }
 
-/** Figma node 50:6264 — domains that are expiring soon or already expired. */
+/**
+ * Figma node 50:6264 — domains that are expiring soon, in their grace
+ * period, or already expired (see useMyDomainsData's needsAttentionStatus).
+ * Every row gets a Renew action — same "no mutation wired up yet" state as
+ * every other action button on this page (List, Edit Price, Bulk List, ...).
+ */
 export const NeedsAttentionPanel = ({ domains }: NeedsAttentionPanelProps) => (
   <InfoListCard
     title="Needs attention"
@@ -27,7 +37,11 @@ export const NeedsAttentionPanel = ({ domains }: NeedsAttentionPanelProps) => (
       icon: FiUser,
       title: `${domain.domainName}${domain.extension}`,
       subtitle: formatRenewsIn(domain.renewalTimestamp),
-      trailing: <span className={styles.review}>Review</span>,
+      trailing: (
+        <button type="button" className={styles.renewButton}>
+          Renew
+        </button>
+      ),
     }))}
   />
 )

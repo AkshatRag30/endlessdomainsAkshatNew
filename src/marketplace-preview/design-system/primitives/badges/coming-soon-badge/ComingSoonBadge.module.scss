@@ -1,0 +1,54 @@
+@import '@mpstyles/_mixins.scss';
+
+// Figma node 72:9506 ("Button Container") measures 67x20px with 9px
+// horizontal / ~5.6px vertical padding around the text — var(--space-2)
+// (8px) and var(--space-1-5) (5px) are the nearest tokens. The node's own
+// border-radius/shadow values are Tailwind arbitrary numbers scaled to a
+// much larger export canvas, not this pill's real ~20px height, so they're
+// not reproduced literally — border-radius: full covers a pill this short
+// exactly the same visually, and the glow reuses the same blue
+// (rgba(87,177,255,x)) recipe InfoListCard's .avatarBlue already
+// established for this identical gradient, scaled down for a pill instead
+// of a 29px icon. The node also carries a noise-texture PNG and a diagonal
+// shine mask — @include stripe-bg substitutes for the noise texture, same
+// swap this codebase already makes for every other noise-textured panel
+// (see NeedsAttentionPanel and its siblings); the shine streak itself is
+// skipped as a minor flourish not worth a second image asset.
+.badge {
+  // z-index, not just position: relative — MobileDrawerMenu's selected
+  // browse row layers absolutely-positioned decorative flourish images
+  // (exploreDeco1/2/3) after this badge in DOM order; without an explicit
+  // z-index those would otherwise paint over it despite this being
+  // position: relative on its own (matches the old .browseBadge it
+  // replaces, which carried the same z-index for the same reason).
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-1-5) var(--space-2);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  background: linear-gradient(180deg, #2639ed, rgba(38, 57, 237, 0.47));
+  box-shadow:
+    0 8px 18px rgba(87, 177, 255, 0.34),
+    0 4px 7px rgba(87, 177, 255, 0.22),
+    0 0 0 1px rgba(255, 255, 255, 0.5),
+    inset 0 1px 2px rgba(210, 234, 255, 0.55);
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--text-small-10);
+  line-height: 1.2;
+  color: var(--color-white-primary);
+  white-space: nowrap;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    @include stripe-bg;
+    mix-blend-mode: plus-lighter;
+    opacity: 0.4;
+    pointer-events: none;
+  }
+}

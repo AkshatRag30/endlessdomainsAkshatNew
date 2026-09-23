@@ -1,6 +1,8 @@
 import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useAuth } from '@/marketplace-preview/stubs/auth'
+import ComingSoonBadge from '@/marketplace-preview/design-system/primitives/badges/coming-soon-badge'
 import type { SidebarNavItem as SidebarNavItemData } from '@/marketplace-preview/types/marketplace'
 import styles from './SidebarNavItem.module.scss'
 
@@ -23,11 +25,18 @@ export interface SidebarNavItemProps {
 }
 
 export const SidebarNavItem = ({ item, active = false, previewMode, onSelect }: SidebarNavItemProps) => {
-  const shellClass = [styles.item, active ? styles.active : ''].filter(Boolean).join(' ')
+  const { authenticated } = useAuth()
+  // requiresAuth rows (My domains, Analytics, Payouts, Promotions) render
+  // muted and route to /login instead of their real destination while
+  // signed out. previewMode's own onClick below still intercepts every
+  // click before the browser follows this href, so a preview session never
+  // actually gets bounced to /login — only the muted styling shows there.
+  const authLocked = !!item.requiresAuth && !authenticated
+  const shellClass = [styles.item, active ? styles.active : '', authLocked ? styles.authLocked : ''].filter(Boolean).join(' ')
 
   return (
     <Link
-      href={item.href}
+      href={authLocked ? '/login' : item.href}
       className={shellClass}
       onClick={
         previewMode
@@ -77,7 +86,7 @@ export const SidebarNavItem = ({ item, active = false, previewMode, onSelect }: 
         </span>
       ) : (
         <span className={styles.trailing}>
-          {item.badge && <span className={styles.badge}>{item.badge}</span>}
+          {item.badge && <ComingSoonBadge />}
           {typeof item.count === 'number' && <span className={styles.count}>{item.count}</span>}
         </span>
       )}

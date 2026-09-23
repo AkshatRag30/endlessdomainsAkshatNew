@@ -31,9 +31,16 @@ export interface MyDomainListing {
   extension: string
   lengthChars: number // Figma shows this under the name, e.g. "7 chars"
   chain: Chain
+  // Raw provider/blockchain name from the API (e.g. "Arbitrum", "UD") —
+  // DomainAvatar's own logo lookup falls back to this when `extension`
+  // alone doesn't resolve to a known naming provider. Optional since the
+  // mock fixtures don't set it.
+  domainProvider?: string
   status: DomainStatus
   blockchainStatus: BlockchainStatus
   isPremium?: boolean
+  /** Drives the small purple promoted marker shown beside the premium crown, in both MyDomainRow and MyDomainCard. */
+  isPromoted?: boolean
   listingId?: string
   tokenId?: string
   priceEth?: number // present only when status is 'for-sale'
@@ -43,7 +50,7 @@ export interface MyDomainListing {
   appraisedTrend: AppraisedTrend // drives the "High ↗ / Low ↘" indicator under EST. value — same concept as marketplace's AppraisedTrend
   views: number // "Interest" column, eye count
   savedCount: number // "Interest" column, heart count
-  renewalTimestamp: number // ms epoch — "Renewal" column / countdown badge
+  renewalTimestamp: number | null // ms epoch — "Renewal" column / countdown badge; null means the domain never expires ("Lifetime")
 }
 
 /**
