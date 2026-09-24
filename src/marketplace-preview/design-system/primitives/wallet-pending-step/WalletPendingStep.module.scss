@@ -21,6 +21,74 @@
   }
 }
 
+.iconStack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+// ── size="lg" (buying flow, Figma 1:877 / 1:156) ─────────────────────────
+// 112px ring / 101px circle / 79px loader, plus a blurred ground shadow
+// (1:885), and top-aligned: the buying drawer's pending frames place their
+// content container at y=106, 41px below the 65px header, then 20px + 24px
+// inner padding (6px extra horizontal inset) — 85px to the icon — rather
+// than centering it in the leftover height.
+.wrapLarge {
+  justify-content: flex-start;
+  gap: 0;
+  padding: 85px 26px var(--space-5);
+
+  @include mobile {
+    padding: 85px var(--space-4) var(--space-4);
+  }
+
+  .outerRing {
+    width: 112px;
+    height: 112px;
+    box-shadow: none;
+  }
+
+  .innerCircle {
+    width: 101px;
+    height: 101px;
+  }
+
+  .waveSvg {
+    width: 79px;
+    height: 79px;
+  }
+
+  .heading {
+    margin: var(--space-4) 0 0;
+    line-height: 22.8px;
+  }
+
+  .subtext {
+    max-width: 338px;
+    margin-top: var(--space-2);
+    font-size: 13.5px;
+    line-height: 1.2;
+
+    strong {
+      font-weight: var(--font-weight-regular);
+      color: var(--color-black-primary);
+    }
+  }
+}
+
+// Figma 1:885 — the SVG's own 107x26 box includes its blur filter's
+// overflow (the visible 86x5 ellipse spans y 10.7–15.6 inside it), so -7px
+// lands the ellipse itself 3.3px under the ring, per Figma's 3.294px gap.
+.groundShadow {
+  margin-top: -7px;
+}
+
+.extra {
+  width: 100%;
+  margin-top: var(--space-4);
+  text-align: left;
+}
+
 .outerRing {
   display: flex;
   align-items: center;

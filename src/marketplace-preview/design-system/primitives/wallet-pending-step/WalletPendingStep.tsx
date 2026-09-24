@@ -1,4 +1,5 @@
 import React from 'react'
+import Image from 'next/image'
 import { FiAlertCircle } from 'react-icons/fi'
 import PrimaryButton from '@/marketplace-preview/design-system/primitives/buttons/primary-button'
 import styles from './WalletPendingStep.module.scss'
@@ -6,7 +7,19 @@ import styles from './WalletPendingStep.module.scss'
 export interface WalletPendingStepProps {
   status: 'pending' | 'error'
   heading: string
-  subtext: string
+  /** ReactNode, not string — the buying flow sets the amount inside this line in a darker color (Figma 1:889/1:168). */
+  subtext: React.ReactNode
+  /**
+   * 'md' (default) is the listing flow's own 92px ring, vertically centered
+   * in the drawer (Figma 1:8505). 'lg' is the buying flow's 112px ring with
+   * a soft ground shadow underneath, top-aligned instead of centered
+   * (Figma 1:877/1:156) — same wave loader, just the other file's proportions.
+   */
+  size?: 'md' | 'lg'
+  /** Listing flow's "Waiting on your wallet" row. The buying flow's frames drop it in favor of the progress checklist passed as children. Default true. */
+  showWaitingRow?: boolean
+  /** Rendered below the subtext — the buying flow passes its TransactionChecklist card here. Listing flow callers never pass it. */
+  children?: React.ReactNode
 }
 
 // Ported from endlessdomainsAkshatNew's ScoreLoading composite (its own
@@ -39,6 +52,9 @@ const WaveLoader = () => (
 )
 
 /**
+ * Promoted from composites/my-domains/listing-flow/ (buying-flow plan §3) —
+ * shared by the listing flow and the marketplace buying flow.
+ *
  * Figma node 1:8505 ("Signing" / "Confirm the approval") for the pending
  * look, node 1:8101 ("Insufficient funds") for the error look — same shared
  * shell reused for confirm-approval / sign-order / insufficient-funds.
@@ -46,27 +62,36 @@ const WaveLoader = () => (
  * three states share one template rather than each getting bespoke copy),
  * so it's rendered unconditionally here rather than gated to status==='pending'.
  */
-export const WalletPendingStep = ({ status, heading, subtext }: WalletPendingStepProps) => (
-  <div className={styles.wrap}>
-    {status === 'pending' ? (
-      <div className={styles.outerRing}>
-        <div className={styles.innerCircle}>
-          <WaveLoader />
+export const WalletPendingStep = ({ status, heading, subtext, size = 'md', showWaitingRow = true, children }: WalletPendingStepProps) => (
+  <div className={[styles.wrap, size === 'lg' ? styles.wrapLarge : ''].filter(Boolean).join(' ')}>
+    <div className={styles.iconStack}>
+      {status === 'pending' ? (
+        <div className={styles.outerRing}>
+          <div className={styles.innerCircle}>
+            <WaveLoader />
+          </div>
         </div>
-      </div>
-    ) : (
-      <div className={styles.outerRing}>
-        <FiAlertCircle size={52} aria-hidden="true" className={styles.errorIcon} />
-      </div>
-    )}
+      ) : (
+        <div className={styles.outerRing}>
+          <FiAlertCircle size={52} aria-hidden="true" className={styles.errorIcon} />
+        </div>
+      )}
+      {size === 'lg' && (
+        <Image src="/assets/img/buying-flow/loader-shadow.svg" alt="" aria-hidden="true" width={107} height={26} className={styles.groundShadow} />
+      )}
+    </div>
 
     <h3 className={styles.heading}>{heading}</h3>
     <p className={styles.subtext}>{subtext}</p>
 
-    <div className={styles.waitingRow}>
-      {status === 'pending' && <span className={styles.spinner} aria-hidden="true" />}
-      Waiting on your wallet
-    </div>
+    {showWaitingRow && (
+      <div className={styles.waitingRow}>
+        {status === 'pending' && <span className={styles.spinner} aria-hidden="true" />}
+        Waiting on your wallet
+      </div>
+    )}
+
+    {children && <div className={styles.extra}>{children}</div>}
   </div>
 )
 

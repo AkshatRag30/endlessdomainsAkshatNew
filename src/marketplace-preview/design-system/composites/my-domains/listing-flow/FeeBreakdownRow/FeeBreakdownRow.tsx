@@ -1,7 +1,7 @@
 import React from 'react'
 import { FiLock } from 'react-icons/fi'
-import { computeFeeBreakdown, formatToken, PLATFORM_FEE_RATE } from '../format'
-import TokenSuffix from '../TokenSuffix'
+import { computeFeeBreakdown, formatToken, PLATFORM_FEE_RATE } from '@/marketplace-preview/helpers/token-format/tokenFormat'
+import TokenSuffix from '@/marketplace-preview/design-system/primitives/token-suffix'
 import styles from './FeeBreakdownRow.module.scss'
 
 export interface FeeBreakdownRowProps {

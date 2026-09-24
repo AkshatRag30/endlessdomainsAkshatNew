@@ -1,0 +1,81 @@
+// Figma node 1:891. The blue→#333 gradient card matches the listing flow's
+// own summary cards (OneTimeApprovalStep/ListingSuccessStep), and the
+// #e2e0ec pending-ring border is Figma-exact, no token match.
+
+.card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 158px; // Figma keeps the card 158px tall for both the 3- and 4-row variants
+  margin: 0;
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  background: linear-gradient(180deg, var(--color-blue-primary) 5.388%, #333 100%);
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2-5);
+  padding: 7px 0; // Figma-exact
+}
+
+// Figma's done icon sits in an 18px box with the 15.43px glyph inset 7.14%,
+// wider than the 16px active/pending icons — kept, since it's what makes the
+// done row's label start 2px further right in the reference frame.
+.doneIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+}
+
+.activeIcon {
+  flex-shrink: 0;
+  transform: rotate(180deg); // Figma renders this glyph rotated 180°
+  animation: checklist-spin 1.1s linear infinite;
+}
+
+@keyframes checklist-spin {
+  from { transform: rotate(180deg); }
+  to { transform: rotate(540deg); }
+}
+
+.pendingIcon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  border: 1px solid #e2e0ec;
+  border-radius: var(--radius-full);
+}
+
+.label {
+  font-family: var(--font-satoshi);
+  font-size: 12.5px;
+  line-height: 18.75px;
+  color: var(--color-white-primary);
+}
+
+// Figma sets the done/active labels in a semibold face, pending ones regular.
+.done .label,
+.active .label {
+  font-weight: var(--font-weight-semibold);
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .activeIcon {
+    animation: none;
+  }
+}

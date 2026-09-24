@@ -14,7 +14,8 @@ export interface TokenChainIconProps {
  * domain's own chain logo badged over its bottom-right corner, e.g. Polygon
  * for a Polygon-chain domain. Only this one price-input chip shows the
  * chain badge; every other USDT amount in the listing flow (TokenSuffix)
- * stays icon-only, per the linked Figma frame.
+ * stays icon-only, per the linked Figma frame. Promoted from
+ * composites/my-domains/listing-flow/ (buying-flow plan §3).
  */
 export const TokenChainIcon = ({ chainIconSrc, className = '' }: TokenChainIconProps) => {
   const currency = getCurrencyInfo('USDT')

@@ -57,6 +57,8 @@ export interface ListingRestCellsProps {
   listing: MarketplaceListing
   favorited: boolean
   onToggleFavorite: () => void
+  /** Opens BuyFlowModal for this listing. Optional — without it the button stays visually real but inert. */
+  onBuyNow?: () => void
 }
 
 /**
@@ -66,7 +68,7 @@ export interface ListingRestCellsProps {
  * are owned by LiveListingsTable (not local state here) so both layouts
  * share one source of truth per listing regardless of which is visible.
  */
-export const ListingRestCells = ({ listing, favorited, onToggleFavorite }: ListingRestCellsProps) => (
+export const ListingRestCells = ({ listing, favorited, onToggleFavorite, onBuyNow }: ListingRestCellsProps) => (
   <>
     <div className={styles.cell} role="cell">
       <span className={styles.value}>{formatEth(listing.priceEth)}</span>
@@ -86,8 +88,8 @@ export const ListingRestCells = ({ listing, favorited, onToggleFavorite }: Listi
     </div>
 
     <div className={`${styles.cell} ${styles.actionCell}`} role="cell">
-      {/* Static mock data — visually real, not wired to BuyNowModal or any wallet call */}
-      <button type="button" className={`${primaryBtnStyles.button} ${primaryBtnStyles.sm} ${styles.buyNow}`}>
+      {/* Opens the design-system BuyFlowModal (mock wallet, buying-flow plan §1.2) — not the real BuyNowModal */}
+      <button type="button" className={`${primaryBtnStyles.button} ${primaryBtnStyles.sm} ${styles.buyNow}`} onClick={onBuyNow}>
         {/* PrimaryButton's ::before fill layer sits above unwrapped text — span required, not decorative */}
         <span>Buy Now</span>
       </button>
@@ -108,6 +110,7 @@ export interface ListingRowProps {
   listing: MarketplaceListing
   favorited: boolean
   onToggleFavorite: () => void
+  onBuyNow?: () => void
 }
 
 /**
@@ -116,10 +119,10 @@ export interface ListingRowProps {
  * ListingDomainCell/ListingRestCells directly instead, split across
  * LiveListingsTable's fixed and scrollable panes.
  */
-export const ListingRow = ({ listing, favorited, onToggleFavorite }: ListingRowProps) => (
+export const ListingRow = ({ listing, favorited, onToggleFavorite, onBuyNow }: ListingRowProps) => (
   <div className={styles.row} role="row">
     <ListingDomainCell listing={listing} />
-    <ListingRestCells listing={listing} favorited={favorited} onToggleFavorite={onToggleFavorite} />
+    <ListingRestCells listing={listing} favorited={favorited} onToggleFavorite={onToggleFavorite} onBuyNow={onBuyNow} />
   </div>
 )
 

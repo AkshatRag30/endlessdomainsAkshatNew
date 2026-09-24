@@ -1,0 +1,79 @@
+@import '@mpstyles/_mixins.scss';
+
+// Figma nodes 1:791 / 1:856. #5b3df5 (terms link) and #7e7a93 are
+// Figma-exact, no token match. The footer's own #f6f6f6 surface, top border
+// and upward shadow come from Modal's footer slot.
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-4) var(--space-5);
+
+  @include mobile {
+    padding: var(--space-4);
+  }
+}
+
+.termsLink {
+  font-weight: var(--font-weight-medium);
+  color: #5b3df5;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.termsPeriod {
+  font-weight: var(--font-weight-medium);
+}
+
+.cta {
+  margin-top: var(--space-3);
+}
+
+// Figma component 1:67 "Default" (terms unchecked): the CTA keeps its blue
+// identity at 32% strength with a white label, instead of PrimaryButton's
+// shared gray disabled look. Local to this footer, so the listing flow and
+// every other disabled PrimaryButton are unaffected. The outer background
+// is the 1px ring PrimaryButton leaves around its ::before fill (#d9d6d6 is
+// Figma's stroke, same value PrimaryButton's own charcoal variant uses).
+// Nested under .footer to outrank PrimaryButton's .button.disabled rules.
+.footer .cta:disabled {
+  background: #d9d6d6;
+  color: var(--color-white-primary);
+
+  &::before {
+    background: rgba(38, 57, 237, 0.32); // no -32 alpha token; nearest are -30 / -50
+  }
+}
+
+.helper,
+.backLink {
+  align-self: center;
+  margin: 0;
+  padding: 9px 0 11.5px; // Figma-exact
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-13);
+  line-height: 17.25px;
+  color: #7e7a93;
+  text-align: center;
+}
+
+.backLink {
+  border: none;
+  background: none;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--color-black-primary);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}

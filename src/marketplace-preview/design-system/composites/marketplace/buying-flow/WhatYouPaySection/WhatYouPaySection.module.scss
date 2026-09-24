@@ -1,0 +1,84 @@
+@import '@mpstyles/_mixins.scss';
+
+// Figma node 1:718. #e7f6ee / #0c7a46 callout colors match the listing
+// flow's green fee pill, Figma-exact, no token match.
+
+.section {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-4) 0;
+  border-bottom: 1px solid #eeedf3;
+}
+
+// Figma draws this section's rows/balance/callout 480px wide inside the
+// 500px column (20px short of the right edge), unlike the sections around it.
+.rows,
+.balanceRow,
+.callout {
+  margin-right: var(--space-5);
+
+  @include mobile {
+    margin-right: 0;
+  }
+}
+
+.heading {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: 14px;
+  line-height: 15px;
+  letter-spacing: -0.25px;
+  color: #7e7a93;
+}
+
+.rows {
+  margin-top: var(--space-2-5);
+}
+
+// "8,460.00 USDT" reads as one bold run in Figma, with the token icon 7px
+// after the symbol (1:726). Nested to outrank TokenSuffix's own .suffix gap.
+.section .suffix {
+  gap: 7px;
+  vertical-align: middle;
+}
+
+.balanceRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--space-2-5);
+  font-family: var(--font-satoshi);
+  font-size: 12.5px;
+  line-height: 18.75px;
+  color: #7e7a93;
+
+  strong {
+    font-weight: var(--font-weight-bold);
+    color: #171429;
+    white-space: nowrap;
+  }
+}
+
+.callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin-top: var(--space-3);
+  padding: 11px var(--space-3);
+  border-radius: 11px;
+  background: #e7f6ee;
+
+  p {
+    margin: 0;
+    font-family: var(--font-satoshi);
+    font-size: 12.5px;
+    line-height: 18.75px;
+    color: #0c7a46;
+  }
+}
+
+.calloutIcon {
+  flex-shrink: 0;
+  margin-top: 2px;
+}

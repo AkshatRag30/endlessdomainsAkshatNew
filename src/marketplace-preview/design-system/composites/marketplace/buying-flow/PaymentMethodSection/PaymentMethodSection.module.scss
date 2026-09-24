@@ -1,0 +1,33 @@
+@import '@mpstyles/_mixins.scss';
+
+// Figma node 1:698.
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2-5);
+  padding: var(--space-4-5) 0;
+  border-bottom: 1px solid #eeedf3;
+}
+
+.heading {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-small-13);
+  line-height: 15.6px;
+  letter-spacing: 0.13px;
+  color: #7e7a93;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+
+  // Two 246px cards don't fit side by side in a full-bleed phone drawer —
+  // stack them rather than squeezing each sublabel onto three lines.
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}

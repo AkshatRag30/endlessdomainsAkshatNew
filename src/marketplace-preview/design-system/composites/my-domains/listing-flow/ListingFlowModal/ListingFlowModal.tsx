@@ -7,10 +7,10 @@ import { mockDomainListingInsights } from '@/marketplace-preview/data/my-domains
 import LoadingStep from '../LoadingStep'
 import ListingFormStep, { ListingFormFooter, type ListingDurationDays } from '../ListingFormStep'
 import OneTimeApprovalStep, { OneTimeApprovalFooter } from '../OneTimeApprovalStep'
-import WalletPendingStep, { WalletPendingFooter } from '../WalletPendingStep'
+import WalletPendingStep, { WalletPendingFooter } from '@/marketplace-preview/design-system/primitives/wallet-pending-step'
 import ConfirmToSignStep, { ConfirmToSignFooter } from '../ConfirmToSignStep'
 import ListingSuccessStep, { ListingSuccessFooter } from '../ListingSuccessStep'
-import { computeFeeBreakdown } from '../format'
+import { computeFeeBreakdown } from '@/marketplace-preview/helpers/token-format/tokenFormat'
 import { useListingFlowActions } from '../useListingFlowActions'
 
 const DAY_MS = 24 * 60 * 60 * 1000

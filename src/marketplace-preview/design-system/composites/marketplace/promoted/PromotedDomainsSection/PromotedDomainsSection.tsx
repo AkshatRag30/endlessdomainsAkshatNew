@@ -1,5 +1,6 @@
 import React from 'react'
 import Image from 'next/image'
+import type { MarketplaceListing } from '@/marketplace-preview/types/marketplace'
 import { mockPromotedListings } from '@/marketplace-preview/data/marketplace/domains'
 import PromotedDomainCard from '../PromotedDomainCard'
 import styles from './PromotedDomainsSection.module.scss'
@@ -16,7 +17,12 @@ const SECONDS_PER_CARD = 3.5
  * card, and drops to the plain scrollable row from before for anyone with
  * prefers-reduced-motion set.
  */
-export const PromotedDomainsSection = () => {
+export interface PromotedDomainsSectionProps {
+  /** Forwarded to every card's "Buy Now" button. */
+  onBuyNow?: (listing: MarketplaceListing) => void
+}
+
+export const PromotedDomainsSection = ({ onBuyNow }: PromotedDomainsSectionProps) => {
   const trackStyle = {
     // must include the unit — a bare number here makes the CSS custom
     // property invalid wherever animation-duration expects a <time>, which
@@ -34,7 +40,7 @@ export const PromotedDomainsSection = () => {
           {[0, 1].map((pass) => (
             <div className={styles.pass} key={pass} aria-hidden={pass === 1}>
               {mockPromotedListings.map((listing) => (
-                <PromotedDomainCard key={`${listing.id}-${pass}`} listing={listing} />
+                <PromotedDomainCard key={`${listing.id}-${pass}`} listing={listing} onBuyNow={onBuyNow && (() => onBuyNow(listing))} />
               ))}
             </div>
           ))}

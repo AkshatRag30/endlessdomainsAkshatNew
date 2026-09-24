@@ -26,3 +26,6 @@ export { MarketActivityPanel } from './analytics/MarketActivityPanel'
 export { MarketMetricCard } from './analytics/MarketMetricCard'
 
 export { MobileBottomNav } from './shared/MobileBottomNav'
+
+export { default as BuyFlowModal } from './buying-flow/BuyFlowModal'
+export type { BuyFlowModalProps } from './buying-flow/BuyFlowModal'

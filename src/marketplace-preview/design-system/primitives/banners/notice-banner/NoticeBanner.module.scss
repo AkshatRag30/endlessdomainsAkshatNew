@@ -1,0 +1,59 @@
+// Moved verbatim from ListingFormStep's .networkBanner (listing-flow Figma
+// 1:9355; buying-flow 1:1297 is the same component). Colors (#fcedef,
+// #f3d3d9, #7a1f2c, #96313f) are Figma-exact, no token match for this
+// particular red-tint hue.
+
+.banner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2-5);
+  padding: var(--space-3);
+  border: 1px solid;
+  border-radius: 7px;
+}
+
+.error {
+  border-color: #f3d3d9;
+  background: #fcedef;
+
+  .title {
+    color: #7a1f2c;
+  }
+
+  .body {
+    color: #96313f;
+  }
+}
+
+// Figma 1:1685 (buying flow "no fund"). #fdf3e0 matches the amber fee rows
+// used across both flows; #f0dfbe / #976301 are Figma-exact, no token match.
+// This variant also rounds its corners more (11px vs the red banner's 7px).
+.warning {
+  border-color: #f0dfbe;
+  border-radius: 11px;
+  background: #fdf3e0;
+
+  .title,
+  .body {
+    color: #976301;
+  }
+}
+
+.text {
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  margin: 0 0 2px;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-bold);
+  font-size: 12.5px;
+}
+
+.body {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: 12.5px;
+  line-height: 1.5;
+}

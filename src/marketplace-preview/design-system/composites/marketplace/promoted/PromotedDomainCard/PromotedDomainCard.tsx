@@ -16,13 +16,15 @@ export interface PromotedDomainCardProps {
   onToggleFavorite?: () => void
   /** LiveListingsTable's mobile card view — stretches to the list's full width instead of this card's own fixed 282px marquee width. */
   fullWidth?: boolean
+  /** Opens BuyFlowModal for this listing. Optional — without it the button stays visually real but inert. */
+  onBuyNow?: () => void
 }
 
 const formatEth = (value: number) => `${value.toFixed(2)} ETH`
 const formatUsd = (value: number) => `$${value.toLocaleString('en-US')}`
 
 /** Figma node 1:1034 — measurements, colors, and fonts taken from get_design_context, not the screenshot alone. */
-export const PromotedDomainCard = ({ listing, favorited: favoritedProp, onToggleFavorite, fullWidth }: PromotedDomainCardProps) => {
+export const PromotedDomainCard = ({ listing, favorited: favoritedProp, onToggleFavorite, fullWidth, onBuyNow }: PromotedDomainCardProps) => {
   const [favoritedState, setFavoritedState] = useState(!!listing.isFavorited)
   const favorited = favoritedProp ?? favoritedState
   const toggleFavorite = onToggleFavorite ?? (() => setFavoritedState((prev) => !prev))
@@ -63,8 +65,8 @@ export const PromotedDomainCard = ({ listing, favorited: favoritedProp, onToggle
         </div>
 
         <div className={styles.actions}>
-          {/* Static mock data — this button is visually real but not wired to BuyNowModal or any wallet call */}
-          <button type="button" className={`${primaryBtnStyles.button} ${primaryBtnStyles.sm} ${styles.buyNow}`}>
+          {/* Opens the design-system BuyFlowModal (mock wallet, buying-flow plan §1.2) — not the real BuyNowModal */}
+          <button type="button" className={`${primaryBtnStyles.button} ${primaryBtnStyles.sm} ${styles.buyNow}`} onClick={onBuyNow}>
             {/* PrimaryButton's ::before fill layer sits above unwrapped text — span required, not decorative */}
             <span>Buy Now</span>
           </button>

@@ -1,8 +1,8 @@
 import React from 'react'
 import { FiEdit3 } from 'react-icons/fi'
 import PrimaryButton from '@/marketplace-preview/design-system/primitives/buttons/primary-button'
-import { formatExpiry, formatToken } from '../format'
-import TokenSuffix from '../TokenSuffix'
+import { formatExpiry, formatToken } from '@/marketplace-preview/helpers/token-format/tokenFormat'
+import TokenSuffix from '@/marketplace-preview/design-system/primitives/token-suffix'
 import styles from './ConfirmToSignStep.module.scss'
 
 export interface ConfirmToSignStepProps {

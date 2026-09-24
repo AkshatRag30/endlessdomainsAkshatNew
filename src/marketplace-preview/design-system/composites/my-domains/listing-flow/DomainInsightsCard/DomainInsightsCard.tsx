@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react'
 import { FiBarChart2 } from 'react-icons/fi'
 import type { DomainListingInsights } from '@/marketplace-preview/types/my-domains'
-import { formatToken } from '../format'
-import TokenSuffix from '../TokenSuffix'
+import { formatToken } from '@/marketplace-preview/helpers/token-format/tokenFormat'
+import TokenSuffix from '@/marketplace-preview/design-system/primitives/token-suffix'
 import styles from './DomainInsightsCard.module.scss'
 
 export interface DomainInsightsCardProps {

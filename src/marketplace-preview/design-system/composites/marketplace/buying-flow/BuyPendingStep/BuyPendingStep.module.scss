@@ -1,0 +1,57 @@
+// Figma node 1:1111 (the "Purchase submitted" Transaction / Network card).
+// Same blue→#333 card as the checklist above it; #7e7a93 helper color is
+// Figma-exact, no token match.
+
+.submitted {
+  display: flex;
+  flex-direction: column;
+  gap: 6px; // Figma-exact
+  margin-top: var(--space-4);
+}
+
+.txCard {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 0;
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  background: linear-gradient(180deg, var(--color-blue-primary) 5.388%, #333 100%);
+}
+
+.txRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 6px 0; // Figma-exact
+  font-family: var(--font-satoshi);
+  font-size: 14px;
+  line-height: 18.75px;
+  color: var(--color-white-primary);
+
+  dt {
+    font-weight: var(--font-weight-regular); // the app's global reset bolds <dt>
+  }
+
+  dd {
+    margin: 0;
+    font-weight: var(--font-weight-bold);
+    white-space: nowrap;
+  }
+}
+
+.network {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.helper {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: 13.5px;
+  line-height: 20.25px;
+  color: #7e7a93;
+  text-align: center;
+}

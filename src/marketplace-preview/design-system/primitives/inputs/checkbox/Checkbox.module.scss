@@ -1,0 +1,58 @@
+@import '@mpstyles/_mixins.scss';
+
+// Figma component 1:67. #7e7a93 label color is Figma-exact, matching the
+// rest of the listing/buying drawer's muted-text palette (no token match).
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px; // Figma-exact, between --space-2 (8px) and --space-2-5 (10px)
+}
+
+// Figma's Checkbox:margin wrapper (1:69): 2px top / 4px left / 3px right /
+// 3px bottom around the 14px icon.
+.control {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+  padding: 2px 3px 3px 4px;
+}
+
+// Covers the icon exactly, so clicks land on the real input, but paints
+// nothing itself — the Figma icon underneath is what's visible.
+.input {
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+
+  &:focus-visible + .icon {
+    @include focus-ring;
+  }
+}
+
+.icon {
+  display: block;
+  border-radius: 2px;
+}
+
+.label {
+  font-family: var(--font-satoshi);
+  font-size: 14px;
+  line-height: 18px;
+  color: #7e7a93;
+  cursor: pointer;
+}
+
+.disabled {
+  opacity: 0.6;
+
+  .input,
+  .label {
+    cursor: not-allowed;
+  }
+}

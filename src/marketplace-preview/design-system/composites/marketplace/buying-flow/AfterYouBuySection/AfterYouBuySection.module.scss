@@ -1,0 +1,30 @@
+// Figma node 1:770. #aba7bc note color is Figma-exact, no token match.
+
+.section {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-4) 0;
+}
+
+.heading {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: 14px;
+  line-height: 15px;
+  letter-spacing: -0.25px;
+  color: #7e7a93;
+}
+
+.rows {
+  margin-top: var(--space-2-5);
+}
+
+.note {
+  margin: 0;
+  padding: var(--space-2-5) 0 11.5px; // Figma-exact 11.5px bottom
+  font-family: var(--font-satoshi);
+  font-size: 14px;
+  line-height: 17.25px;
+  color: #aba7bc;
+}

@@ -1,4 +1,4 @@
-import { Chain, MarketplaceListing } from '@/marketplace-preview/types/marketplace'
+import { Chain, MarketplaceBuyInsights, MarketplaceListing } from '@/marketplace-preview/types/marketplace'
 
 /**
  * STATIC MOCK DATA — not live. See useMarketplaceListings (Phase 3+) for the
@@ -35,6 +35,10 @@ const NAME_STEMS = [
 
 const DAY_MS = 24 * 60 * 60 * 1000
 
+// Deterministic fake seller addresses for the buying flow's "Seller" row —
+// the first one is the Figma reference frame's own "0x8A7F…3c9D".
+const SELLER_ADDRESSES = ['0x8A7F…3c9D', '0x41bE…9f02', '0xC3d9…07aA', '0x9e15…b6C4', '0x2F6a…e81D']
+
 function buildListings(): MarketplaceListing[] {
   const chains = [POLYGON, ETHEREUM, ARBITRUM, BSC]
 
@@ -61,6 +65,12 @@ function buildListings(): MarketplaceListing[] {
       isPromoted: index < 8, // matches the Figma file's own promoted row, which repeats 8 cards
       isFavorited: false,
       listedAt: new Date(Date.now() - listedDaysAgo * DAY_MS).toISOString(),
+      sellerAddress: SELLER_ADDRESSES[index % SELLER_ADDRESSES.length],
+      // 18 days out for the first listing lands on the Figma reference's
+      // "expires 12 Oct 2026" when viewed on 24 Sep 2026; the rest spread
+      // across the 90-day maximum a listing can run.
+      expiresAt: new Date(Date.now() + (18 + ((index * 11) % 70)) * DAY_MS).toISOString(),
+      isOneTimePurchase: true, // every fixture is .ud, a one-time-purchase naming service
     }
   })
 }
@@ -70,3 +80,70 @@ export const mockListings: MarketplaceListing[] = buildListings()
 export const mockPromotedListings: MarketplaceListing[] = mockListings.filter((listing) => listing.isPromoted)
 
 export const MOCK_LISTINGS_TOTAL = mockListings.length // 28, matches "28 domains" in the reference design
+
+/**
+ * Buying flow demo branches (plan §7), picked by listing — both are Polygon
+ * listings, so the banner's "Listings settle on Polygon" reads true:
+ *
+ *   listing-5 (voidrunner.ud, 32,148) — wallet starts on the wrong network,
+ *     then settles fine: Figma "wrong network" section 1:988 → Bought.
+ *   listing-13 (ironvault.ud, 26,226) — same wrong-network start, but the
+ *     transaction fails while settling: 1:988 → Reject (1:1043).
+ *   listing-3 (nebulax.ud, 20,304) — right network, affordable, but another
+ *     wallet buys it while this purchase is settling: → No longer available
+ *     (1:1478). Nothing is charged.
+ *
+ * "No fund" (1:1529) needs no flag — it's a numeric comparison. Any listing
+ * priced above the balance shows it, e.g. listing-9 (novacore.ud, 55,836)
+ * against the starting 41,200, or anything once earlier buys have spent
+ * the balance down.
+ */
+const BUY_FIXTURES: Record<string, Partial<MarketplaceBuyInsights>> = {
+  'listing-5': { walletOnWrongNetwork: true },
+  'listing-13': { walletOnWrongNetwork: true, transactionFails: true },
+  'listing-3': { alreadySold: true },
+}
+
+/**
+ * STATIC MOCK DATA — buying flow per-listing insights (buying-flow plan
+ * §6.1), keyed by listing id. Fee figures are the Figma reference frame's
+ * own (≈ 0.42 USDT purchase, ≈ 0.21 USDT approval); the model estimate
+ * mirrors each listing's appraised value.
+ */
+export const mockMarketplaceBuyInsights: Record<string, MarketplaceBuyInsights> = Object.fromEntries(
+  mockListings.map((listing) => [
+    listing.id,
+    {
+      networkFeeEstimateUsd: 0.42,
+      approvalFeeEstimateUsd: 0.21,
+      modelEstimateUsd: Math.round(listing.appraisedValueEth * 2820),
+      ...BUY_FIXTURES[listing.id],
+    },
+  ])
+)
+
+// STATIC MOCK DATA — stands in for an on-chain
+// allowance(wallet, marketplaceContract) read. Unlike listing's wallet-wide,
+// permanent NFT approval (mockWalletHasMarketplaceApproval in
+// data/my-domains/domains.ts), USDT's allowance is amount-scoped and gets
+// consumed by each purchase — approving for one price does not cover a
+// later, differently-priced one. See buying-flow-implementation-plan.md §6.2.
+// Starts at 0 so the demo's default path is "need usdt approval" (Phase A).
+// For the already-approved "normal purchase" path (Phase B), open
+// /design-preview/marketplace?usdtAllowance=20000 — that preview page seeds
+// this through setMockWalletUsdtAllowance on load.
+export let mockWalletUsdtAllowance = 0
+
+/** Same read-only-binding reasoning as setMockWalletHasMarketplaceApproval — the mock hook mutates through this setter. */
+export function setMockWalletUsdtAllowance(value: number): void {
+  mockWalletUsdtAllowance = value
+}
+
+// Stands in for an on-chain USDT balanceOf read for the connected wallet.
+// Drives both the "Pay with" card's "Balance {X} USDT" line and the "no
+// fund" scenario. 41,200 is the Figma reference frame's own figure.
+export let mockWalletUsdtBalance = 41200
+
+export function setMockWalletUsdtBalance(value: number): void {
+  mockWalletUsdtBalance = value
+}

@@ -15,45 +15,18 @@
 }
 
 // ── Wrong-network banner ──────────────────────────────────────────────────
-// Figma node 1:9355. Colors below (#fcedef, #f3d3d9, #7a1f2c, #96313f) are
-// Figma-exact, no token match for this particular red-tint hue.
+// Figma node 1:9355. The banner itself is the shared NoticeBanner primitive
+// now (extracted from here so the buying flow can reuse it); only its
+// placement and this flow's own icon styling stay local.
 
 .networkBanner {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-2-5);
   margin-top: var(--space-4);
-  padding: var(--space-3);
-  border: 1px solid #f3d3d9;
-  border-radius: 7px;
-  background: #fcedef;
 }
 
 .networkBannerIcon {
   flex-shrink: 0;
   margin-top: 2px;
   color: #7a1f2c;
-}
-
-.networkBannerText {
-  flex: 1;
-  min-width: 0;
-}
-
-.networkBannerTitle {
-  margin: 0 0 2px;
-  font-family: var(--font-satoshi);
-  font-weight: var(--font-weight-bold);
-  font-size: 12.5px;
-  color: #7a1f2c;
-}
-
-.networkBannerBody {
-  margin: 0;
-  font-family: var(--font-satoshi);
-  font-size: 12.5px;
-  line-height: 1.5;
-  color: #96313f;
 }
 
 // Shape/color come from PrimaryButton's own "error" variant now — this

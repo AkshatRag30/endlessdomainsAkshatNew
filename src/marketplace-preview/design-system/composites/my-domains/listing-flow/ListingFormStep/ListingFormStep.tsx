@@ -8,10 +8,11 @@ import PriceInput from '@/marketplace-preview/design-system/primitives/inputs/pr
 import PillButton from '@/marketplace-preview/design-system/primitives/buttons/pill-button'
 import SegmentedToggle from '@/marketplace-preview/design-system/primitives/toggles/segmented-toggle'
 import PrimaryButton from '@/marketplace-preview/design-system/primitives/buttons/primary-button'
+import NoticeBanner from '@/marketplace-preview/design-system/primitives/banners/notice-banner'
 import DomainInsightsCard from '../DomainInsightsCard'
 import FeeBreakdownRow from '../FeeBreakdownRow'
-import TokenChainIcon from '../TokenChainIcon'
-import { formatExpiry, formatToken } from '../format'
+import TokenChainIcon from '@/marketplace-preview/design-system/primitives/token-chain-icon'
+import { formatExpiry, formatToken } from '@/marketplace-preview/helpers/token-format/tokenFormat'
 import styles from './ListingFormStep.module.scss'
 
 export type HowToSell = 'fixed' | 'auction'
@@ -51,16 +52,17 @@ export const ListingFormStep = ({
   return (
     <div className={styles.form}>
       {isWrongNetwork && (
-        <div className={styles.networkBanner}>
-          <FiAlertTriangle size={16} aria-hidden="true" className={styles.networkBannerIcon} />
-          <div className={styles.networkBannerText}>
-            <p className={styles.networkBannerTitle}>Your wallet is on Ethereum</p>
-            <p className={styles.networkBannerBody}>Listings settle on Polygon, so the order cannot be signed from another network.</p>
-          </div>
-          <PrimaryButton size="sm" variant="error" loading={switchingNetwork} onClick={onSwitchNetwork} className={styles.switchButton}>
-            Switch
-          </PrimaryButton>
-        </div>
+        <NoticeBanner
+          className={styles.networkBanner}
+          icon={<FiAlertTriangle size={16} aria-hidden="true" className={styles.networkBannerIcon} />}
+          title="Your wallet is on Ethereum"
+          body="Listings settle on Polygon, so the order cannot be signed from another network."
+          action={
+            <PrimaryButton size="sm" variant="error" loading={switchingNetwork} onClick={onSwitchNetwork} className={styles.switchButton}>
+              Switch
+            </PrimaryButton>
+          }
+        />
       )}
 
       <section className={styles.section}>

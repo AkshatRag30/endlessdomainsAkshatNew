@@ -1,0 +1,76 @@
+// Figma nodes 1:721 / 1:773. Divider (#eeedf3, #e2e0ec) and text colors
+// (#7e7a93, #171429, #12a05c) are Figma-exact, same drawer palette the
+// listing flow uses, no token match. The muted value color (#474747) is
+// --color-text-body exactly.
+
+.list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+
+  & + & {
+    border-top: 1px solid #eeedf3;
+  }
+}
+
+.emphasis {
+  margin-top: var(--space-1);
+  padding: 11px 0 var(--space-2); // Figma-exact 11px top
+  align-items: center;
+
+  // Higher specificity than `.row + .row` above so the stronger divider wins.
+  .row + & {
+    border-top-color: #e2e0ec;
+  }
+
+  .label {
+    font-weight: var(--font-weight-medium);
+    font-size: 13.5px;
+    color: #171429;
+  }
+
+  .value {
+    font-size: 19px;
+    line-height: 28.5px;
+    letter-spacing: -0.38px;
+    color: var(--color-blue-primary);
+  }
+}
+
+.label {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-regular); // the app's global reset bolds <dt>
+  font-size: 14px;
+  line-height: 20.25px;
+  color: #7e7a93;
+}
+
+// Plain inline text, not flex — "8,460.00 USDT" is one text run in Figma
+// (1:727) with a normal space; a caller's TokenSuffix sets its own icon gap.
+.value {
+  margin: 0;
+  white-space: nowrap;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-bold);
+  font-size: 13px;
+  line-height: 20.25px;
+  color: #171429;
+  text-align: right;
+}
+
+.success {
+  color: #12a05c;
+}
+
+.muted {
+  color: var(--color-text-body);
+}

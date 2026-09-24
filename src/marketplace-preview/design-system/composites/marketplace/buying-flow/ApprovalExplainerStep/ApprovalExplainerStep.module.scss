@@ -1,0 +1,101 @@
+@import '@mpstyles/_mixins.scss';
+
+// Figma node 1:812. Amber tile/fee rows (#fdf3e0 / #7a5a12), text colors
+// (#171429, #7e7a93) and the blue→#333 card are Figma-exact, matching the
+// listing flow's OneTimeApprovalStep palette, no token match.
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 44px 26px var(--space-5); // 20px container + 24px/6px inner padding in Figma
+  text-align: center;
+
+  @include mobile {
+    padding: 44px var(--space-4) var(--space-4);
+  }
+}
+
+.iconTile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 17px;
+  background: #fdf3e0;
+}
+
+.heading {
+  margin: var(--space-4) 0 0;
+  font-family: var(--font-satoshi);
+  font-weight: var(--font-weight-medium);
+  font-size: 19px;
+  line-height: 22.8px;
+  letter-spacing: -0.38px;
+  color: #171429;
+}
+
+.subtext {
+  margin: var(--space-2) 0 0;
+  font-family: var(--font-satoshi);
+  font-size: 13.5px;
+  line-height: 1.2;
+  color: #7e7a93;
+}
+
+.infoCard {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  margin: var(--space-4) 0 0;
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  background: linear-gradient(180deg, var(--color-blue-primary) 5.388%, #333 100%);
+  list-style: none;
+  text-align: left;
+}
+
+.infoRow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2-5);
+  padding: 7px 0; // Figma-exact
+
+  p {
+    margin: 0;
+    font-family: var(--font-satoshi);
+    font-size: 12.5px;
+    line-height: 18.75px;
+    color: var(--color-white-primary);
+  }
+
+  strong {
+    font-weight: var(--font-weight-bold);
+  }
+}
+
+.infoCheck {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.feeRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: var(--space-2-5);
+  padding: var(--space-2-5) var(--space-3);
+  border-radius: 10px;
+  background: #fdf3e0;
+  font-family: var(--font-satoshi);
+  font-size: 12.5px;
+  line-height: 18.75px;
+  color: #7a5a12;
+
+  strong {
+    font-weight: var(--font-weight-bold);
+  }
+}

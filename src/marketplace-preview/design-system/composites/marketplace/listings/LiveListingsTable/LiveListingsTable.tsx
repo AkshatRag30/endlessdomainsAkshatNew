@@ -9,6 +9,15 @@ export interface LiveListingsTableProps {
   listings: MarketplaceListing[]
   /** How many rows a "Show N more" click reveals — 14 matches the reference design's initial page. */
   pageSize?: number
+  /** Forwarded to every row's and mobile card's "Buy Now" button. */
+  onBuyNow?: (listing: MarketplaceListing) => void
+  /**
+   * Controlled watchlist (the heart on each row/card). Optional — without it
+   * the table keeps its own local state as before. The design-preview page
+   * passes it so BuyFlowModal's "Watch this name" fills the same hearts.
+   */
+  favoritedIds?: Set<string>
+  onToggleFavorite?: (id: string) => void
 }
 
 /**
@@ -19,13 +28,24 @@ export interface LiveListingsTableProps {
  * PromotedDomainCard) — both need to agree on which listings are
  * favorited regardless of which layout is currently visible.
  */
-export const LiveListingsTable = ({ listings, pageSize = 14 }: LiveListingsTableProps) => {
+export const LiveListingsTable = ({
+  listings,
+  pageSize = 14,
+  onBuyNow,
+  favoritedIds: favoritedIdsProp,
+  onToggleFavorite: onToggleFavoriteProp,
+}: LiveListingsTableProps) => {
   const [visibleCount, setVisibleCount] = useState(pageSize)
-  const [favoritedIds, setFavoritedIds] = useState<Set<string>>(() => new Set(listings.filter((l) => l.isFavorited).map((l) => l.id)))
+  const [favoritedIdsState, setFavoritedIds] = useState<Set<string>>(() => new Set(listings.filter((l) => l.isFavorited).map((l) => l.id)))
+  const favoritedIds = favoritedIdsProp ?? favoritedIdsState
   const visible = listings.slice(0, visibleCount)
   const remaining = listings.length - visible.length
 
   const toggleFavorite = (id: string) => {
+    if (onToggleFavoriteProp) {
+      onToggleFavoriteProp(id)
+      return
+    }
     setFavoritedIds((prev) => {
       const next = new Set(prev)
       if (next.has(id)) next.delete(id)
@@ -56,6 +76,7 @@ export const LiveListingsTable = ({ listings, pageSize = 14 }: LiveListingsTable
                   listing={listing}
                   favorited={favoritedIds.has(listing.id)}
                   onToggleFavorite={() => toggleFavorite(listing.id)}
+                  onBuyNow={onBuyNow && (() => onBuyNow(listing))}
                 />
               ))}
             </div>
@@ -69,6 +90,7 @@ export const LiveListingsTable = ({ listings, pageSize = 14 }: LiveListingsTable
                 fullWidth
                 favorited={favoritedIds.has(listing.id)}
                 onToggleFavorite={() => toggleFavorite(listing.id)}
+                onBuyNow={onBuyNow && (() => onBuyNow(listing))}
               />
             ))}
           </div>

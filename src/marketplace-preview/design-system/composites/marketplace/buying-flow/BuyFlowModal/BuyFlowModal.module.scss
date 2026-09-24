@@ -1,0 +1,13 @@
+@import '@mpstyles/_mixins.scss';
+
+// Figma 1:1130 — the settling phase's "Keep browsing" footer, same 16/20px
+// rhythm as WalletPendingFooter's "Cancel in wallet".
+.footer {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-4) var(--space-5);
+
+  @include mobile {
+    padding: var(--space-4);
+  }
+}
