@@ -1,0 +1,529 @@
+<title>Nuvina Build Playbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#F5F7F2;--surface:#FFFFFF;--sunk:#EEF2EA;--ink:#14231A;--ink2:#3A4A3F;--muted:#5E6E62;--line:#DAE2D3;
+  --blue:#0047BB;--blue-tint:#E6EEFB;--green:#3C7A20;--lime:#EAF5C9;--red:#A8261D;--red-tint:#FBE9E6;
+  --amber:#8A5F00;--amber-tint:#FBF1D6;--ok:#2F6B17;--ok-tint:#E4F2DA;--code-bg:#F0F4EC;
+  --display:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;
+  --body:"Instrument Sans","Segoe UI",system-ui,-apple-system,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,"Cascadia Code",Consolas,monospace;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--ground);color:var(--ink);font-family:var(--body);font-size:15.5px;line-height:1.62;margin:0}
+.shell{display:grid;grid-template-columns:1fr;gap:40px;max-width:1240px;margin:0 auto;padding-inline:20px;padding-block:40px 96px}
+@media (min-width:1100px){.shell{grid-template-columns:230px minmax(0,1fr)}}
+nav.toc{display:none}
+@media (min-width:1100px){nav.toc{display:block;position:sticky;top:calc(env(safe-area-inset-top,0px) + 24px);align-self:start;max-height:calc(100vh - 48px);overflow:auto;font-size:13.5px}}
+nav.toc p{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:14px 0 8px}
+nav.toc p:first-child{margin-top:0}
+nav.toc ol{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+nav.toc a{display:flex;gap:8px;color:var(--ink2);text-decoration:none;padding:4px 8px;border-radius:6px}
+nav.toc a:hover{background:var(--sunk);color:var(--ink)}
+nav.toc a span{font-family:var(--mono);color:var(--muted);font-size:12px;min-width:22px}
+main{min-width:0}
+header.cover{padding-block:8px 36px;border-bottom:1px solid var(--line);margin-bottom:40px}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--green);margin:0 0 14px}
+h1,h2,h3,h4{font-family:var(--display);text-wrap:balance;color:var(--ink);margin:0}
+h1{font-size:clamp(34px,5vw,54px);line-height:1.04;font-weight:700;letter-spacing:-.02em;max-width:17ch}
+h1 em{font-style:normal;color:var(--blue)}
+.lede{font-size:18px;color:var(--ink2);max-width:64ch;margin:18px 0 0}
+.meta{display:flex;flex-wrap:wrap;gap:10px 28px;margin-top:26px;font-size:13.5px;color:var(--muted)}
+.meta b{display:block;color:var(--ink);font-weight:600;font-size:14px}
+section{padding-block:8px 44px;scroll-margin-top:24px}
+section+section{border-top:1px solid var(--line);padding-top:44px}
+h2{font-size:clamp(25px,3vw,32px);font-weight:700;letter-spacing:-.01em;line-height:1.15;margin-bottom:14px;display:flex;gap:14px;align-items:baseline;flex-wrap:wrap}
+h2 .n{font-family:var(--mono);font-size:14px;font-weight:500;color:var(--blue)}
+h3{font-size:20px;font-weight:700;margin:30px 0 10px}
+h4{font-size:15px;font-weight:700;margin:20px 0 6px;font-family:var(--body);letter-spacing:.01em}
+p{margin:0 0 14px;max-width:72ch}
+a{color:var(--blue)}
+code{font-family:var(--mono);font-size:.86em;background:var(--code-bg);border:1px solid var(--line);border-radius:4px;padding:1px 5px;overflow-wrap:anywhere}
+pre{font-family:var(--mono);font-size:12.8px;line-height:1.6;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;overflow-x:auto;margin:12px 0 18px;color:var(--ink)}
+pre code{background:none;border:0;padding:0;font-size:inherit;overflow-wrap:normal}
+pre.prompt{background:var(--blue-tint);border-color:#C9D8F4;white-space:pre-wrap}
+pre.prompt::before{content:"Prompt to Claude Code";display:block;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);margin-bottom:8px}
+.tablewrap{overflow-x:auto;margin:14px 0 22px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:640px}
+th,td{text-align:left;vertical-align:top;padding:10px 14px;border-bottom:1px solid var(--line)}
+th{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;background:var(--sunk);white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td code{white-space:nowrap}
+.chip{display:inline-block;font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.04em;padding:2px 8px;border-radius:99px;white-space:nowrap}
+.must{background:var(--red-tint);color:var(--red)}
+.nice{background:var(--sunk);color:var(--ink2)}
+.callout{background:var(--lime);border:1px solid #D3E6A0;border-radius:10px;padding:14px 18px;margin:16px 0 22px;max-width:82ch}
+.callout p:last-child{margin:0}
+.callout.blue{background:var(--blue-tint);border-color:#C9D8F4}
+.callout.warn{background:var(--amber-tint);border-color:#EED9A2}
+.list{margin:0 0 14px;padding-left:20px;display:grid;gap:6px;max-width:76ch}
+.list li::marker{color:var(--green)}
+.checks{list-style:none;margin:0 0 14px;padding:0;display:grid;gap:6px;max-width:80ch}
+.checks li{display:grid;grid-template-columns:20px 1fr;gap:8px}
+.checks li::before{content:"";width:14px;height:14px;border:1.5px solid var(--green);border-radius:3px;margin-top:4px;background:var(--surface)}
+.gantt{display:grid;gap:6px;margin:18px 0 26px;overflow-x:auto}
+.grow{display:grid;grid-template-columns:minmax(170px,230px) 1fr;gap:12px;align-items:center;font-size:13.5px;min-width:560px}
+.grow .bar{position:relative;height:22px;background:var(--sunk);border-radius:5px}
+.grow .bar i{position:absolute;top:0;bottom:0;background:var(--blue);border-radius:5px;opacity:.85}
+.grow .bar i.g{background:var(--green)} .grow .bar i.a{background:#C79A2B}
+.grow.axis{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.grow.axis .ticks{display:grid;grid-template-columns:repeat(4,1fr)}
+.phase{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:22px 22px 8px;margin:0 0 20px}
+.phase .ph{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline;margin-bottom:10px}
+.phase .ph h3{margin:0;font-size:22px}
+.phase .ph .num{font-family:var(--mono);font-size:13px;color:var(--blue)}
+.phase .ph .dur{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:8px 0 16px}
+.fact{background:var(--sunk);border-radius:8px;padding:10px 12px;font-size:13.5px}
+.fact b{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:500;margin-bottom:2px}
+.done{background:var(--ok-tint);border-radius:8px;padding:10px 14px;margin:6px 0 16px;font-size:14px;max-width:82ch}
+.done b{color:var(--ok)}
+footer.end{border-top:1px solid var(--line);padding-top:24px;color:var(--muted);font-size:13.5px}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+
+<div class="shell">
+<nav class="toc" aria-label="Contents">
+  <p>Before you code</p>
+  <ol>
+    <li><a href="#approach"><span>A</span>The approach</a></li>
+    <li><a href="#docs"><span>B</span>Five documents</a></li>
+    <li><a href="#templates"><span>C</span>Templates</a></li>
+    <li><a href="#setup"><span>D</span>Claude Code setup</a></li>
+    <li><a href="#habits"><span>E</span>Working habits</a></li>
+  </ol>
+  <p>Build phases</p>
+  <ol>
+    <li><a href="#timeline"><span>··</span>Timeline</a></li>
+    <li><a href="#p0"><span>P0</span>Documents and setup</a></li>
+    <li><a href="#p1"><span>P1</span>Clean up and foundation</a></li>
+    <li><a href="#p2"><span>P2</span>Shopify store and data</a></li>
+    <li><a href="#p3"><span>P3</span>UI and layout</a></li>
+    <li><a href="#p4"><span>P4</span>Home page</a></li>
+    <li><a href="#p5"><span>P5</span>Product page</a></li>
+    <li><a href="#p6"><span>P6</span>Cart and checkout</a></li>
+    <li><a href="#p7"><span>P7</span>Pages, QA, launch</a></li>
+    <li><a href="#ready"><span>✓</span>Ready checklist</a></li>
+  </ol>
+</nav>
+
+<main>
+<header class="cover">
+  <p class="eyebrow">Companion to the Nuvina Storefront Blueprint · small store edition</p>
+  <h1>Building the Nuvina storefront <em>with Claude Code</em></h1>
+  <p class="lede">A plan for building a small, clean Shopify storefront where visitors browse products and order through Shopify checkout. It covers the five documents to write before coding, a light Claude Code setup, and eight phases, each with example prompts, tasks and a clear finish line.</p>
+  <div class="meta">
+    <div><b>Scope</b>Visitor storefront; checkout on Shopify</div>
+    <div><b>Stack</b>Next.js 16, Tailwind v4, Storefront API</div>
+    <div><b>Design</b>Figma 0ftgtvdbr0JURIS2VDkGTZ</div>
+    <div><b>Estimate</b>3 to 4 weeks for one developer</div>
+  </div>
+</header>
+
+<section id="approach">
+  <h2><span class="n">A</span>The approach</h2>
+  <p>The site does four things: show the brand, show the products, hold a cart, and send the visitor to Shopify to pay. Shopify already handles everything else, including payments, COD, taxes, order emails, customer accounts and inventory. So the frontend stays small. It has three folders in <code>src</code>, one file per component, and one folder for all Shopify access.</p>
+  <p>Connect to a Shopify development store early, in Phase 2, instead of building a mock data layer. With real products, variants and images from the start, you build the product page against real data once, and the "swap mocks for Shopify" step disappears. If store access is delayed, a single <code>lib/shopify/sample.ts</code> file returning the same types keeps you moving.</p>
+  <p>Each phase follows the same loop with Claude Code:</p>
+  <ol class="list">
+    <li><b>Plan.</b> Turn on plan mode, point Claude at the phase in <code>docs/PLAN.md</code>, and review what it proposes.</li>
+    <li><b>Build.</b> Work one section or component at a time on a branch for the phase.</li>
+    <li><b>Check.</b> Run lint and build, and compare the running page with the Figma screenshot for that node.</li>
+    <li><b>Review.</b> Run <code>/code-review</code>, fix the findings, read the diff yourself, commit, and tick <code>PLAN.md</code>.</li>
+    <li><b>Reset.</b> Run <code>/clear</code> before the next phase.</li>
+  </ol>
+</section>
+
+<section id="docs">
+  <h2><span class="n">B</span>Five documents to write before coding</h2>
+  <p>A small project needs a small set of documents. Architecture, conventions and token rules all fit inside <code>CLAUDE.md</code>. Claude Code can draft each document from the blueprint, and you correct it.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Document</th><th>Need</th><th>What goes in it</th><th>Why Claude needs it</th></tr></thead>
+    <tbody>
+      <tr><td><code>CLAUDE.md</code></td><td><span class="chip must">Must</span></td><td>What the site is, the stack, commands, the folder tree, the six rules, naming, tokens, and things never to do</td><td>Loaded automatically in every session, so the rules are applied without being repeated</td></tr>
+      <tr><td><code>docs/SCOPE.md</code></td><td><span class="chip must">Must</span></td><td>The pages to build, what is out of scope, target devices, placeholder copy to avoid, and open questions with owners</td><td>Keeps it from building extra pages or copying template filler</td></tr>
+      <tr><td><code>docs/FIGMA_MAP.md</code></td><td><span class="chip must">Must</span></td><td>Each Figma section with its node id, the file it becomes and its status</td><td>Lets it fetch one section at a time; whole page frames are too large to read at once</td></tr>
+      <tr><td><code>docs/SHOPIFY_SETUP.md</code></td><td><span class="chip must">Must</span></td><td>Product options, the eight metafield definitions, collections, menus, pages, reviews app, env variables and the webhook</td><td>It is the data contract; Claude writes the queries and types from it</td></tr>
+      <tr><td><code>docs/PLAN.md</code></td><td><span class="chip must">Must</span></td><td>The eight phases below as checkboxes, each with its finish line</td><td>Progress survives between sessions and <code>/clear</code></td></tr>
+      <tr><td><code>docs/QA.md</code></td><td><span class="chip nice">Optional</span></td><td>A short launch checklist, which can also live at the bottom of <code>PLAN.md</code></td><td>Used in Phase 7</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout warn"><p><b>Get these answers before Phase 3.</b> You need mobile frames from the designer, or at least agreed rules for mobile, which go in <code>SCOPE.md</code>. You also need store access and a Storefront API token from the store owner, and a decision from the brand team on whether nutrition facts must appear on the product page.</p></div>
+</section>
+
+<section id="templates">
+  <h2><span class="n">C</span>Templates</h2>
+
+  <h3>CLAUDE.md</h3>
+<pre><code># Nuvina storefront
+
+Small headless Shopify storefront for Nuvina effervescent supplements. Visitors browse
+products, add to cart, and pay on Shopify checkout (cart.checkoutUrl). No accounts, no
+custom checkout, no global state library.
+
+Stack: Next.js 16 App Router, React 19, Tailwind v4, TypeScript strict, Shopify Storefront API.
+
+## Commands
+npm run dev | npm run lint | npm run typecheck | npm run build
+
+## Structure
+src/app/            routes; (shop)/layout.tsx holds header, footer, cart drawer
+src/components/ui/        generic pieces, no data knowledge (Button, Price, Carousel...)
+src/components/layout/    on every page (Header, Footer, AnnouncementBar...)
+src/components/sections/  used on two or more pages (MostLoved, Faq, Reels...)
+src/components/home/      home page only
+src/components/product/   product cards and product page
+src/components/cart/      drawer, provider, add to cart button
+src/lib/shopify/          the ONLY place that talks to Shopify
+src/lib/actions.ts        server actions for the cart and newsletter
+src/lib/content.ts        brand copy that is not in Shopify
+src/lib/utils.ts          cn, formatMoney, discountPercent
+
+## Rules
+1. Pages fetch, components display. Only src/app and src/lib/actions.ts import from lib/shopify.
+2. Put a file where it is used. Move home or product files to sections once a second page uses them.
+3. Server components by default. Put state in a small sibling file with "use client" (MostLovedTabs.tsx).
+4. Colors, fonts and widths come from tokens in globals.css. No hex values or max-w-[...] in components.
+5. Product content comes from Shopify; brand copy from lib/content.ts. Never type content into a component.
+6. One component per file, PascalCase, named export, props type in the same file.
+7. Figma: read one node from docs/FIGMA_MAP.md at a time. Never fetch a whole page frame.
+8. Before finishing: run lint, typecheck and build, then tick docs/PLAN.md.
+
+## Never
+Expose SHOPIFY_STOREFRONT_TOKEN to the client. Add Redux, a slider library or new top level
+folders without asking. Copy placeholder text listed in docs/SCOPE.md.</code></pre>
+
+  <h3>SCOPE.md</h3>
+<pre><code># Scope
+
+## In
+Home, product (every product from one route), collections (shop all, best sellers,
+new arrivals, one per health goal), search, policy pages, cart drawer, Shopify checkout,
+newsletter signup, WhatsApp button, SEO basics.
+
+## Out (for now)
+Custom checkout, customer account pages (link to Shopify accounts), subscriptions,
+quiz, loyalty, multiple currencies, blog article pages (optional in P7).
+
+## Devices
+Mobile first. Check at 375, 768, 1024, 1280, 1512. Latest Chrome, Safari, Firefox, Samsung Internet.
+
+## Mobile rules (until the designer sends frames)
+Header: logo, search icon, cart; nav in a menu. Product hero: gallery above info.
+Card rows: horizontal scroll with snap, 1.3 cards visible. FAQ: one column.
+
+## Placeholder copy in Figma, do not use
+"Remap" testimonial, Webflow and BRIX FAQ, Latin blog text,
+"Building coordination tools..." footer line, "firat" typo, five "Hydration" cards.
+
+## Open questions
+| Question                       | Owner       | Needed by | Answer |
+| Mobile frames                  | Designer    | P3        |        |
+| Nutrition facts on PDP         | Brand       | P5        |        |
+| Reviews app                    | Store owner | P2        |        |
+| Newsletter provider, WhatsApp  | Marketing   | P4        |        |</code></pre>
+
+  <h3>FIGMA_MAP.md, with real node ids</h3>
+<pre><code>File: 0ftgtvdbr0JURIS2VDkGTZ
+
+| Page | Section                | Node   | File                               | Status |
+|------|------------------------|--------|------------------------------------|--------|
+| Both | Announcement bar       | 1:3848 | layout/AnnouncementBar.tsx         | todo   |
+| Both | Header                 | 1:3773 | layout/Header.tsx                  | todo   |
+| Both | Footer                 | 1:3851 | layout/Footer.tsx                  | todo   |
+| Home | Hero copy and CTAs     | 1:3816 | home/HomeHero.tsx                  | todo   |
+| Home | Hero image, badge      | 1:3839, 1:3840 | home/HomeHero.tsx          | todo   |
+| Home | Claims marquee         | 1:3807 | sections/ClaimsMarquee.tsx         | todo   |
+| Home | Shop by health goal    | 1:3902 | sections/HealthGoals.tsx           | todo   |
+| Home | Most loved             | 1:3965 | sections/MostLoved.tsx             | todo   |
+| Home | Why NUVINA banner      | 1:4172 | home/WhyNuvina.tsx                 | todo   |
+| Home | Glow up timeline       | 1:4177 | sections/RitualTimeline.tsx        | todo   |
+| Home | Reels                  | 1:4186 | sections/Reels.tsx                 | todo   |
+| Home | Testimonials           | 1:4303 | sections/Testimonials.tsx          | todo   |
+| Home | Blog cards             | 1:4354 | home/BlogCards.tsx                 | todo   |
+| Home | FAQ                    | 1:4410 | sections/Faq.tsx                   | todo   |
+| Home | Newsletter             | 1:4448 | sections/Newsletter.tsx            | todo   |
+| PDP  | Gallery                | 1:4544 | product/ProductGallery.tsx         | todo   |
+| PDP  | Product info           | 1:4591 | product/ProductInfo.tsx            | todo   |
+| PDP  | WhatsApp button        | 1:4842 | layout/WhatsAppButton.tsx          | todo   |
+| PDP  | Trust strip            | 1:4698 | sections/TrustStrip.tsx            | todo   |
+| PDP  | Our lab tests          | 1:4791 | product/LabTests.tsx               | todo   |
+| PDP  | Key benefits           | 1:4804 | product/KeyBenefits.tsx            | todo   |
+| PDP  | How to use timeline    | 1:4833 | sections/RitualTimeline.tsx        | todo   |
+| PDP  | What's inside matters  | 1:4846 | product/Ingredients.tsx            | todo   |
+| PDP  | What makes it better   | 1:4865 | product/WhatMakesItBetter.tsx      | todo   |</code></pre>
+
+  <h3>SHOPIFY_SETUP.md</h3>
+<pre><code># Shopify setup
+
+## Products
+5 products: hydrate, glow, multi-plus, immune-plus, reset (handles).
+Options: "Flavor" (with swatch colors) and "Pack". Set compare at price for sale variants.
+Images: first image = card image; add variant images per flavor.
+
+## Product metafields (namespace: custom)
+| Key          | Type                   | Used by               |
+| tagline      | single_line_text_field | ProductInfo kicker    |
+| claims       | list.single_line_text  | badges, attributes    |
+| key_benefits | list.single_line_text  | KeyBenefits           |
+| ritual       | json                   | RitualTimeline        |  [{ "label": "Day 1", "text": "..." }]
+| ingredients  | json                   | Ingredients           |  [{ "name": "...", "benefit": "..." }]
+| free_from    | list.single_line_text  | WhatMakesItBetter     |
+| faqs         | json                   | Faq                   |  [{ "q": "...", "a": "..." }]
+| lab_report   | file_reference         | LabTests              |
+Expose each one to the Storefront API (tick "Storefront access" in the definition).
+
+## Collections
+best-sellers, new-arrivals, and one per health goal:
+hydration, skin-beauty, daily-nutrition, immune-support, digestive-wellness.
+
+## Menus and pages
+Menus: main-menu, footer. Pages: shipping, returns, privacy, terms.
+
+## Apps
+Headless channel (gives the Storefront token). Judge.me for reviews (writes reviews.rating).
+
+## Env
+SHOPIFY_STORE_DOMAIN, SHOPIFY_STOREFRONT_TOKEN, SHOPIFY_API_VERSION=2026-07,
+SHOPIFY_WEBHOOK_SECRET, NEXT_PUBLIC_SITE_URL, NEXT_PUBLIC_WHATSAPP_NUMBER
+
+## Webhook
+products/update, products/delete, collections/update → POST /api/revalidate</code></pre>
+
+  <h3>PLAN.md</h3>
+<pre><code># Plan
+## P0 Documents and setup
+- [ ] CLAUDE.md, SCOPE, FIGMA_MAP, SHOPIFY_SETUP written and reviewed
+- [ ] .claude/settings.json and format hook
+Done when: Figma screenshot of node 1:3965 fetched from Claude Code
+## P1 Clean up and foundation
+- [ ] ...
+(copy each phase's checklist from this playbook)</code></pre>
+</section>
+
+<section id="setup">
+  <h2><span class="n">D</span>Claude Code setup</h2>
+  <p>Run <code>/mcp</code> to confirm the Figma server is connected. The three calls you will use are <code>get_design_context</code> for one node's styles, <code>get_screenshot</code> for a visual reference, and <code>get_variable_defs</code> for tokens. Then add one settings file.</p>
+<pre><code>// .claude/settings.json
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run lint)", "Bash(npm run lint:fix)", "Bash(npm run typecheck)",
+      "Bash(npm run build)", "Bash(npx prettier:*)", "Bash(git status)", "Bash(git diff:*)"
+    ],
+    "deny": ["Bash(git push:*)", "Read(./.env*)"]
+  },
+  "hooks": {
+    "PostToolUse": [
+      { "matcher": "Edit|Write", "hooks": [{ "type": "command", "command": "node .claude/hooks/format.mjs" }] }
+    ]
+  }
+}</code></pre>
+<pre><code>// .claude/hooks/format.mjs : runs Prettier on each file Claude edits
+import { execFileSync } from 'node:child_process'
+let raw = ''
+process.stdin.on('data', (c) => (raw += c)).on('end', () => {
+  const file = JSON.parse(raw).tool_input?.file_path
+  if (file &amp;&amp; /\.(tsx?|css|md)$/.test(file)) {
+    try { execFileSync('npx', ['prettier', '--write', file], { stdio: 'ignore', shell: true }) } catch {}
+  }
+})</code></pre>
+  <p>At this size, custom skills and slash commands are optional. The rules in <code>CLAUDE.md</code> do the same job. Add a skill later if you notice yourself repeating the same instructions.</p>
+</section>
+
+<section id="habits">
+  <h2><span class="n">E</span>Working habits</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Habit</th><th>How</th></tr></thead>
+    <tbody>
+      <tr><td>Plan before each phase</td><td>Press Shift+Tab until plan mode is on, then paste the phase prompt</td></tr>
+      <tr><td>One branch per phase</td><td><code>feat/p4-home</code>, merged through a pull request</td></tr>
+      <tr><td>One section per request</td><td>"Build MostLoved from node 1:3965", not "build the home page"</td></tr>
+      <tr><td>Point at files</td><td><code>@docs/FIGMA_MAP.md</code>, <code>@src/lib/shopify/types.ts</code></td></tr>
+      <tr><td>Check it visually</td><td>Ask Claude to run the dev server, screenshot the section at 1512 and 375 wide, and list the differences from the Figma screenshot</td></tr>
+      <tr><td>Review, then commit</td><td><code>/code-review</code>, fix the findings, read the diff yourself, commit</td></tr>
+      <tr><td>Fresh context</td><td><code>/clear</code> between phases; <code>/compact</code> if one phase runs long</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="timeline">
+  <h2><span class="n">··</span>Timeline</h2>
+  <div class="gantt" role="img" aria-label="Four week timeline across eight phases">
+    <div class="grow axis"><span></span><div class="ticks"><span>Week 1</span><span>Week 2</span><span>Week 3</span><span>Week 4</span></div></div>
+    <div class="grow"><span>P0 Documents and setup</span><div class="bar"><i class="a" style="left:0%;width:5%"></i></div></div>
+    <div class="grow"><span>P1 Clean up and foundation</span><div class="bar"><i style="left:5%;width:10%"></i></div></div>
+    <div class="grow"><span>P2 Shopify store and data</span><div class="bar"><i style="left:15%;width:10%"></i></div></div>
+    <div class="grow"><span>P3 UI and layout</span><div class="bar"><i style="left:25%;width:15%"></i></div></div>
+    <div class="grow"><span>P4 Home page</span><div class="bar"><i class="g" style="left:40%;width:20%"></i></div></div>
+    <div class="grow"><span>P5 Product page</span><div class="bar"><i class="g" style="left:60%;width:20%"></i></div></div>
+    <div class="grow"><span>P6 Cart and checkout</span><div class="bar"><i style="left:80%;width:10%"></i></div></div>
+    <div class="grow"><span>P7 Pages, QA, launch</span><div class="bar"><i class="a" style="left:88%;width:12%"></i></div></div>
+  </div>
+</section>
+
+<section id="p0">
+  <div class="phase">
+    <div class="ph"><span class="num">P0</span><h3>Documents and setup</h3><span class="dur">1 day</span></div>
+    <div class="facts"><div class="fact"><b>Goal</b>Rules written down before any code</div><div class="fact"><b>Branch</b>chore/p0-docs</div><div class="fact"><b>Output</b>CLAUDE.md, 4 docs, settings</div></div>
+    <ul class="checks">
+      <li>Draft the five documents from the templates above</li>
+      <li>Check each <code>FIGMA_MAP.md</code> node against a screenshot</li>
+      <li>Add <code>.claude/settings.json</code> and the format hook</li>
+      <li>Send the open questions to their owners</li>
+    </ul>
+<pre class="prompt">Read @docs/reports/nuvina-frontend-blueprint.html. Using its sections 06 to 09, draft CLAUDE.md, docs/SCOPE.md, docs/SHOPIFY_SETUP.md and docs/PLAN.md for a small Shopify storefront. Keep CLAUDE.md under 80 lines. Show me each file before saving it. Don't write any app code.</pre>
+    <div class="done"><b>Done when</b> Claude can fetch the screenshot of node 1:3965, and you agree with every rule in <code>CLAUDE.md</code>.</div>
+  </div>
+</section>
+
+<section id="p1">
+  <div class="phase">
+    <div class="ph"><span class="num">P1</span><h3>Clean up and foundation</h3><span class="dur">2 days</span></div>
+    <div class="facts"><div class="fact"><b>Goal</b>Strict, tidy base with real tokens and fonts</div><div class="fact"><b>Branch</b>chore/p1-foundation</div><div class="fact"><b>Figma</b>get_variable_defs on 1:3771</div></div>
+    <ul class="checks">
+      <li>Delete the three <code>debug.log</code> files and <code>tsconfig.tsbuildinfo</code>, and add them to <code>.gitignore</code></li>
+      <li>Move <code>app</code>, <code>components</code> and <code>lib</code> into <code>src/</code> and keep the <code>@/*</code> alias</li>
+      <li>Turn on <code>strict</code> and fix every error</li>
+      <li>Add ESLint (Next config plus import sort) and Prettier with the Tailwind plugin, plus a GitHub Actions job</li>
+      <li>Rename the tokens by role in <code>globals.css</code>, remove the legacy set, and add <code>--container-page</code></li>
+      <li>Load the Figma fonts with <code>next/font</code></li>
+      <li>Remove the stale comment, the nested copy exclusions and the "Figma" import names, and fix <code>max-w-w8xl</code></li>
+    </ul>
+<pre class="prompt">Plan P1 from @docs/PLAN.md. Move the app into src/ without changing how it looks. Turn on TypeScript strict and fix errors properly (no any, no ts-ignore). Call get_variable_defs on Figma node 1:3771, then rename the tokens in globals.css by role as in the blueprint section 07, and replace every figma-* class and hex value in components. Show me the old to new class table before editing.</pre>
+    <div class="done"><b>Done when</b> lint, typecheck and build pass, the home page looks unchanged, and no <code>figma-</code> class or hex value remains in components.</div>
+  </div>
+</section>
+
+<section id="p2">
+  <div class="phase">
+    <div class="ph"><span class="num">P2</span><h3>Shopify store and data layer</h3><span class="dur">2 days</span></div>
+    <div class="facts"><div class="fact"><b>Goal</b>Real, typed product data in the app</div><div class="fact"><b>Branch</b>feat/p2-shopify</div><div class="fact"><b>Docs</b>SHOPIFY_SETUP.md</div></div>
+    <ul class="checks">
+      <li>In Shopify admin: install the Headless channel, create the five products with Flavor and Pack variants, the eight metafield definitions, collections, menus, policy pages and Judge.me</li>
+      <li>Add <code>.env.local</code> (not committed) and <code>.env.example</code> (committed)</li>
+      <li>Allow <code>cdn.shopify.com</code> in <code>next.config.ts</code></li>
+      <li>Build <code>lib/shopify/client.ts</code>, <code>queries.ts</code>, <code>types.ts</code> and <code>index.ts</code> with <code>getProduct</code>, <code>getProductHandles</code>, <code>getCollectionProducts</code>, <code>getRecommendations</code>, <code>getMenu</code>, <code>getPage</code> and <code>searchProducts</code></li>
+      <li>Parse the JSON metafields in one place, with safe fallbacks when a field is empty</li>
+      <li>Add <code>formatMoney</code> and <code>discountPercent</code> to <code>lib/utils.ts</code></li>
+    </ul>
+<pre class="prompt">Following @docs/SHOPIFY_SETUP.md, build src/lib/shopify. client.ts has shopifyFetch with next cache tags and imports server-only. types.ts defines our app types (Product, Variant, Image, Money, Collection, MenuItem), not raw Shopify shapes. index.ts exposes getProduct, getProductHandles, getCollectionProducts, getRecommendations, getMenu, getPage and searchProducts, and reshapes the responses (flatten nodes, parse JSON metafields, return null when missing). Then write a tiny temporary page that prints getProduct('hydrate') so I can check it.</pre>
+    <div class="done"><b>Done when</b> the temporary page shows typed data for all five products, including variants and metafields. Delete the page afterwards.</div>
+  </div>
+</section>
+
+<section id="p3">
+  <div class="phase">
+    <div class="ph"><span class="num">P3</span><h3>UI and layout components</h3><span class="dur">3 days</span></div>
+    <div class="facts"><div class="fact"><b>Goal</b>Building blocks and the page shell</div><div class="fact"><b>Branch</b>feat/p3-ui-layout</div><div class="fact"><b>Figma</b>1:3848, 1:3773, 1:3851, 1:4842</div></div>
+    <div class="tablewrap"><table>
+      <thead><tr><th>File</th><th>What it covers</th></tr></thead>
+      <tbody>
+        <tr><td><code>ui/Button.tsx</code></td><td>Primary (green gradient), secondary, ghost; sizes; loading and disabled; renders as a link when given <code>href</code></td></tr>
+        <tr><td><code>ui/Price.tsx</code></td><td>Sale price, struck price, save percentage</td></tr>
+        <tr><td><code>ui/StarRating.tsx</code></td><td>Value and review count</td></tr>
+        <tr><td><code>ui/QuantityStepper.tsx</code></td><td>Minus, value, plus, with limits</td></tr>
+        <tr><td><code>ui/Accordion.tsx</code></td><td>Built on <code>details</code> and <code>summary</code>, so it needs no JavaScript</td></tr>
+        <tr><td><code>ui/Carousel.tsx</code></td><td>From <code>SliderControls.tsx</code>: scroll snap, arrows, optional dots</td></tr>
+        <tr><td><code>ui/Container.tsx</code>, <code>ui/SectionHeading.tsx</code>, <code>ui/Icon.tsx</code></td><td>Page width, heading with an actions slot, custom SVGs</td></tr>
+        <tr><td><code>layout/*</code></td><td>AnnouncementBar, Header (with MobileMenu and SearchBar as client files), Footer and WhatsAppButton</td></tr>
+        <tr><td><code>app/(shop)/layout.tsx</code></td><td>Composes the layout, loading menus with <code>getMenu()</code></td></tr>
+      </tbody>
+    </table></div>
+<pre class="prompt">Build src/app/(shop)/layout.tsx. Move Header, Footer and AnnouncementBar from src/components/home into src/components/layout, and fetch Figma nodes 1:3773 and 1:3851 one at a time to check them. Keep the existing search and menu behavior, but make Header a server component, with MobileMenu.tsx and SearchBar.tsx as small client files. Links come from getMenu('main-menu') and getMenu('footer') and use next/link. Remove the header and footer imports from the home page.</pre>
+    <div class="done"><b>Done when</b> the header stays mounted when moving between pages, matches Figma at 1512px, and works with the keyboard at 375px.</div>
+  </div>
+</section>
+
+<section id="p4">
+  <div class="phase">
+    <div class="ph"><span class="num">P4</span><h3>Home page</h3><span class="dur">4 days</span></div>
+    <div class="facts"><div class="fact"><b>Goal</b>The full Figma home page on Shopify data</div><div class="fact"><b>Branch</b>feat/p4-home</div><div class="fact"><b>Figma</b>see FIGMA_MAP, Home rows</div></div>
+    <p>Build <code>ProductCard</code> first, then the sections in page order, one commit each: HomeHero, ClaimsMarquee, HealthGoals, MostLoved (with MostLovedTabs), WhyNuvina, RitualTimeline, Reels, Testimonials, BlogCards, Faq and Newsletter.</p>
+    <ul class="checks">
+      <li>Move the remaining brand copy from <code>figmaLandingData.ts</code> into <code>lib/content.ts</code> with real text (no placeholders)</li>
+      <li>In the home page, load best sellers and new arrivals with <code>Promise.all</code> and pass them down</li>
+      <li>Wire the Newsletter form to a server action in <code>lib/actions.ts</code>, with success and error messages</li>
+      <li>Add home metadata and an Open Graph image</li>
+      <li>Delete <code>components/home/PlaceholderArt.tsx</code>, <code>SliderControls.tsx</code> and <code>lib/figmaLandingData.ts</code> once nothing imports them</li>
+    </ul>
+<pre class="prompt">Build src/components/sections/MostLoved.tsx from Figma node 1:3965, using ProductCard, Carousel and SectionHeading. MostLoved is a server component taking bestSellers and newArrivals as props. Only the tab switch goes in MostLovedTabs.tsx with "use client". Follow the mobile rules in @docs/SCOPE.md. Then run the dev server, screenshot it at 1512 and 375 wide, and list the differences from the Figma screenshot.</pre>
+    <div class="done"><b>Done when</b> the home page matches Figma section by section with real products, and Lighthouse mobile performance is 90 or better.</div>
+  </div>
+</section>
+
+<section id="p5">
+  <div class="phase">
+    <div class="ph"><span class="num">P5</span><h3>Product page</h3><span class="dur">4 days</span></div>
+    <div class="facts"><div class="fact"><b>Goal</b>One route for every product</div><div class="fact"><b>Branch</b>feat/p5-product</div><div class="fact"><b>Figma</b>1:4544, 1:4591, then PDP rows</div></div>
+    <ul class="checks">
+      <li>Create <code>products/[handle]/page.tsx</code> with <code>generateStaticParams</code>, <code>generateMetadata</code>, Product JSON-LD and <code>notFound()</code></li>
+      <li><code>ProductGallery</code>: vertical thumbnails with a "+6" overflow, arrows, swipe on mobile, and switching to the chosen flavor's image</li>
+      <li><code>ProductInfo</code> (server) containing <code>VariantPicker</code> (client, keeps <code>?variant=</code> in the URL), <code>Price</code>, <code>QuantityStepper</code> and <code>AddToCartButton</code></li>
+      <li><code>LabTests</code>, <code>KeyBenefits</code>, <code>Ingredients</code> and <code>WhatMakesItBetter</code>, each hidden when its metafield is empty</li>
+      <li>Reuse TrustStrip, HealthGoals, RitualTimeline, MostLoved (recommendations), Reels, Testimonials and Faq</li>
+    </ul>
+<pre class="prompt">Build src/app/(shop)/products/[handle]/page.tsx. For reference only, read the old page with git show 9ddeb2e:"app/(main)/products/hydrate/page.tsx" and 9ddeb2e:components/product/ProductInfo.tsx; they read global data, so don't copy that pattern. Start with Figma nodes 1:4544 and 1:4591. Choosing a flavor must update the price, struck price, image and the ?variant= URL without a full reload, and disable variants that are sold out.</pre>
+    <div class="done"><b>Done when</b> all five products render from one route, an unknown handle shows the not found page, and a shared <code>?variant=</code> link opens with that flavor selected.</div>
+  </div>
+</section>
+
+<section id="p6">
+  <div class="phase">
+    <div class="ph"><span class="num">P6</span><h3>Cart and checkout</h3><span class="dur">2 days</span></div>
+    <div class="facts"><div class="fact"><b>Goal</b>Visitors can order</div><div class="fact"><b>Branch</b>feat/p6-cart</div><div class="fact"><b>Files</b>lib/shopify/cart.ts, lib/actions.ts, components/cart</div></div>
+    <ul class="checks">
+      <li>Add cart queries and mutations to <code>lib/shopify/cart.ts</code>: create, get, add lines, update lines, remove lines</li>
+      <li>Add server actions to <code>lib/actions.ts</code>, storing the cart id in an httpOnly cookie</li>
+      <li><code>CartProvider</code> only holds whether the drawer is open. The cart itself is read in the layout and passed to <code>CartDrawer</code>.</li>
+      <li><code>CartDrawer</code> shows lines, quantity controls, the subtotal, progress toward free shipping at ₹699, and a checkout link to <code>cart.checkoutUrl</code></li>
+      <li>Add a quick add button on <code>ProductCard</code> and the count on <code>CartButton</code></li>
+    </ul>
+<pre class="prompt">Build the cart. Add Storefront cart operations to src/lib/shopify/cart.ts and server actions addToCart, updateCartLine and removeCartLine to src/lib/actions.ts, keeping the cart id in an httpOnly cookie. Read the cart in (shop)/layout.tsx and pass it to CartDrawer. AddToCartButton uses useTransition for a pending state and opens the drawer when done. Checkout is a plain link to cart.checkoutUrl.</pre>
+    <div class="done"><b>Done when</b> a test order placed from the storefront appears in Shopify admin, and the cart survives a page reload.</div>
+  </div>
+</section>
+
+<section id="p7">
+  <div class="phase">
+    <div class="ph"><span class="num">P7</span><h3>Remaining pages, QA and launch</h3><span class="dur">3 days</span></div>
+    <div class="facts"><div class="fact"><b>Goal</b>No dead links, ready for visitors</div><div class="fact"><b>Branch</b>feat/p7-launch</div><div class="fact"><b>Host</b>Vercel</div></div>
+    <ul class="checks">
+      <li><code>collections/[handle]</code> with a <code>ProductGrid</code> and sort options, used for shop all, best sellers and each health goal</li>
+      <li><code>search</code> page using <code>searchProducts</code></li>
+      <li><code>pages/[handle]</code> for shipping, returns, privacy and terms</li>
+      <li><code>sitemap.ts</code>, <code>robots.ts</code>, canonical URLs, and a <code>not-found.tsx</code> in the brand style</li>
+      <li><code>api/revalidate/route.ts</code> with HMAC verification, and the webhook registered in Shopify</li>
+      <li>Responsive pass at 375, 768, 1024, 1280 and 1512; a keyboard walkthrough; alt text; contrast of the lime and green tokens</li>
+      <li>Lighthouse mobile 90 or better on the home and product pages</li>
+      <li>One Playwright smoke test: open home, open a product, add to cart, check that the checkout link exists</li>
+      <li>Deploy to Vercel with the environment variables, and connect the domain</li>
+    </ul>
+<pre class="prompt">Go through the launch checklist in @docs/PLAN.md for the home, product and collection pages. Run the dev server and give me a pass or fail table with file and line for each failure. Don't fix anything until I've read it.</pre>
+    <div class="done"><b>Done when</b> every header and footer link opens a real page, the smoke test passes in CI, and a real order completes on the live domain.</div>
+  </div>
+</section>
+
+<section id="ready">
+  <h2><span class="n">✓</span>Ready to start checklist</h2>
+  <ul class="checks">
+    <li><code>CLAUDE.md</code>, <code>SCOPE.md</code>, <code>FIGMA_MAP.md</code>, <code>SHOPIFY_SETUP.md</code> and <code>PLAN.md</code> written and reviewed</li>
+    <li>Figma MCP connected, and one node screenshot fetched</li>
+    <li>Shopify development store access and a Storefront token, or a date for when they will arrive</li>
+    <li><code>.claude/settings.json</code> and the format hook in place</li>
+    <li>Questions sent about mobile frames, real copy and nutrition facts</li>
+    <li>A GitHub repository with pull requests required for <code>main</code></li>
+  </ul>
+  <div class="callout blue"><p><b>Staying small.</b> The biggest risk for a small store is gradual sprawl: a <code>hooks</code> folder here, a <code>types</code> folder there, a state library "just for the cart". Every addition should pass the rules in <code>CLAUDE.md</code>. Section 14 of the blueprint lists the signals that mean it is actually time to grow.</p></div>
+</section>
+
+<footer class="end">
+  <p>Companion to the Nuvina Storefront Blueprint, small store edition. Figma node ids from file 0ftgtvdbr0JURIS2VDkGTZ. Revised 25 September 2026.</p>
+</footer>
+</main>
+</div>
