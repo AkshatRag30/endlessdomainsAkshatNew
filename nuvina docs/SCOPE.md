@@ -5,6 +5,8 @@
 Home, product page (every product from one route), collections (shop all, best sellers,
 new arrivals, one per health goal), search, policy pages, cart drawer, Shopify checkout
 handoff, newsletter signup, WhatsApp button, SEO basics (metadata, sitemap, robots, Product JSON-LD).
+Product page actions: Add to Cart (adds and opens the drawer) and Buy Now (adds, then goes
+straight to cart.checkoutUrl). Image zoom lightbox and product video in the gallery.
 
 ## Out (for now)
 
@@ -36,6 +38,14 @@ coordination tools for organizations of all shapes and sizes", "firat" typo in t
 newsletter line, all five health goal cards titled "Hydration", the same product on every
 Most Loved card, duplicate "Why NUVINA" and "Useful resources" headings on the home page.
 
+Also placeholder in the current /product prototype (lib/figmaProductData.ts):
+"Provides antioxidant" on every health goal and key benefit chip; "All About ACV CQR Plus
+Effervescent" on all seven video cards; "Performance Hydration Powder, Citrus Charge" in
+the What's inside banner while the page sells ACV Moringa; every recommendation card is
+"HYDRATE ₹363.44"; prices for the 1, 3 and 6 pack sizes (only Pack of 12 at ₹799 / ₹1,099
+comes from Figma); gallery photos show Glow, not ACV Moringa; page title
+"NUVINA — Figma product page test build".
+
 ## Open questions
 
 | Question                                         | Owner       | Needed by | Answer |
@@ -47,3 +57,8 @@ Most Loved card, duplicate "Why NUVINA" and "Useful resources" headings on the h
 | Newsletter provider (Klaviyo or Shopify)         | Marketing   | P4        |        |
 | WhatsApp Business number                         | Marketing   | P3        |        |
 | Store access and Storefront API token            | Store owner | P2        |        |
+| Which Figma file is final: 0ftgtvdbr0 (docs) or U801ftFDIs7 (used for /product)? | Designer | P3 | |
+| Keep the in-page section tab row? (only in old file) | Designer | P5     |        |
+| Real pack sizes and prices (1, 3, 6, 12 packs?)  | Brand team  | P2        |        |
+| Image hosting: Shopify media for products, Cloudinary for marketing video only? | Store owner | P2 | |
+| Are the ChatGPT-generated gallery images approved for production, and who owns the Cloudinary account (qstekdyi)? | Brand team | P5 | |

@@ -6,11 +6,22 @@ custom checkout, no global state library.
 
 Stack: Next.js 16 App Router, React 19, Tailwind v4, TypeScript strict, Shopify Storefront API.
 
-## Current state
+## Current state (as of commit 72f0b6f, 26 Sep 2026)
 
-The repo is still the original landing page (app/(main)/page.tsx, components/home/*,
-lib/figmaLandingData.ts). The structure below is the target. Migration happens phase by
-phase; check docs/PLAN.md for what is done. Do not restructure ahead of the current phase.
+Two static routes, both still prototypes built straight from Figma with hardcoded data:
+
+  /          app/(main)/page.tsx   components/home/*     lib/figmaLandingData.ts
+  /product   app/product/page.tsx  components/product/*  lib/figmaProductData.ts
+
+Images and video are served from Cloudinary (lib/cloudinary.ts, components/CloudinaryImage.tsx).
+Both pages render the header and footer themselves; there is no shared layout, no Shopify
+connection and no cart yet (Add to Cart only shows a timed "Added" label).
+
+The /product page was built from the OLD Figma file (U801ftFDIs7CewVfx4jFdl, node 224:7322).
+The source of truth is now 0ftgtvdbr0JURIS2VDkGTZ; see docs/FIGMA_MAP.md for the differences.
+
+The structure below is the target. Migration happens phase by phase; check docs/PLAN.md for
+what is done. Do not restructure ahead of the current phase.
 
 ## Commands
 
@@ -35,6 +46,8 @@ src/lib/shopify/          the ONLY place that talks to Shopify (client, queries,
 src/lib/actions.ts        server actions for the cart and newsletter
 src/lib/content.ts        brand copy that is not in Shopify
 src/lib/utils.ts          cn, formatMoney, discountPercent
+src/lib/cloudinary.ts     Cloudinary loader and video URLs (marketing media only; see SCOPE.md)
+src/components/ui/CloudinaryImage.tsx   next/image preset to the Cloudinary loader
 
 ## Rules
 
@@ -47,6 +60,10 @@ src/lib/utils.ts          cn, formatMoney, discountPercent
 7. Figma: read one node from docs/FIGMA_MAP.md at a time. Never fetch a whole page frame.
 8. Before finishing a task: run lint, typecheck and build, then tick docs/PLAN.md.
 9. One concern per commit. Never mix dependency upgrades with deletions.
+10. Never build a second copy of a section. Before creating a component, search components/ for
+    one that already renders the same Figma block (see the duplicate list in docs/PLAN.md).
+11. A component file never imports from another page's folder (product/* must not import
+    home/*). If two pages need it, it belongs in ui/ or sections/.
 
 ## Tokens (role names; replace the old figma-* names in P1)
 

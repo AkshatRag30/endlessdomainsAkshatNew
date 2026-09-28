@@ -6,10 +6,29 @@ the queries are written from this file. Change this file first when the data cha
 ## Products
 
 Five products (handles): hydrate, glow, multi-plus, immune-plus, reset.
-Options: "Flavor" (with swatch colors) and "Pack" (for example "Pack of 12 (180 Tablets)").
+Options: "Flavor" (with swatch colors) and "Pack".
+Flavor values seen in Figma: Green Apple, Lemon Masala, Hot Mix Desi Kahwa.
+Pack values used by the /product prototype (confirm with the brand team):
+
+| Pack          | Tablets | Price  | Compare at | Badge      | Source                    |
+|---------------|---------|--------|------------|------------|---------------------------|
+| Pack of 1     | 15      | ₹149   | ₹199       |            | placeholder               |
+| Pack of 3     | 45      | ₹349   | ₹499       |            | placeholder               |
+| Pack of 6     | 90      | ₹549   | ₹799       |            | placeholder               |
+| Pack of 12    | 180     | ₹799   | ₹1,099     | Best Value | Figma                     |
+
+The subtitle under the title ("Lemon Masala, Pack of 12 (180 Tablets)") is built from the
+selected variant's options plus the tablets metafield below.
 Set a compare at price on sale variants; the frontend computes the save percentage.
-Images: the first image is the card image. Attach a variant image to each flavor.
 SEO title and description filled for every product.
+
+## Media
+
+Product photos and the product video go in Shopify product media (served from cdn.shopify.com,
+so they follow the product and editors can change them). The first image is the card image;
+attach a variant image to each flavor.
+Cloudinary (lib/cloudinary.ts) stays for marketing media that is not tied to a product: home hero,
+reels, lifestyle banners. Pending the open question in SCOPE.md.
 
 ## Product metafields (namespace: custom)
 
@@ -26,7 +45,16 @@ Tick "Storefront access" on every definition, or the API will not return it.
 | faqs         | json                              | Faq                     | [{ "q": "...", "a": "..." }]                 |
 | lab_report   | file_reference                    | LabTests                | PDF of the lab report                        |
 
-Variant metafield: custom.flavor_note (single_line_text_field), shown under the flavor picker.
+Variant metafields:
+
+| Key          | Type                    | Used by                         | Example                           |
+|--------------|-------------------------|---------------------------------|-----------------------------------|
+| flavor_note  | single_line_text_field  | text under the flavor picker    | Tangy, refreshing flavor with...  |
+| tablets      | number_integer          | subtitle and pack selector      | 180                               |
+| badge        | single_line_text_field  | tag on a pack option            | Best Value                        |
+
+Shop metafield custom.perks (single_line_text_field) for the line under Add to Cart:
+"10% Off on Prepaid Orders · Delivers within 2 to 6 days".
 
 Reviews: Judge.me writes reviews.rating and reviews.rating_count automatically.
 

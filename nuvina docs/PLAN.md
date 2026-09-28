@@ -4,10 +4,31 @@ Eight phases, about 3 to 4 weeks for one developer. One branch and one pull requ
 Tick items as they are finished. Prompts for each phase are in
 docs/reports/nuvina-claude-code-plan.html.
 
+## Change log
+
+| Date        | Commit  | What changed in the repo                                   | Effect on this plan |
+|-------------|---------|------------------------------------------------------------|---------------------|
+| 25 Sep 2026 | 33595c6 | Baseline: home page prototype only                         | Plan written        |
+| 26 Sep 2026 | 72f0b6f | /product prototype added: 11 components in components/product, lib/figmaProductData.ts, Cloudinary images and video, built from the old Figma file | P5 now starts from this code; new duplicates and literals added to P1, P3 and P5 |
+
+## Known duplicates to merge (never build a third copy)
+
+| Figma block     | Home version                      | Product version                              | Merge into                  | Phase |
+|-----------------|-----------------------------------|----------------------------------------------|-----------------------------|-------|
+| Most Loved      | components/home/MostLoved.tsx     | components/product/ProductRecommendations.tsx | sections/MostLoved.tsx      | P4    |
+| Useful resources| components/home/UsefulResources.tsx | components/product/UsefulResources.tsx     | sections/Reels.tsx          | P4    |
+| FAQ             | components/home/FAQ.tsx           | components/product/ProductFAQ.tsx            | sections/Faq.tsx            | P4    |
+| Health goals    | components/home/HealthGoals.tsx   | components/product/HealthGoalChips.tsx       | sections/HealthGoals.tsx (cards, per new Figma) | P4 |
+| Glow up timeline| components/home/WhyNuvina.tsx (part) | components/product/HowToUse.tsx           | sections/RitualTimeline.tsx | P4    |
+| Page chrome     | app/(main)/page.tsx               | app/product/page.tsx                         | app/(shop)/layout.tsx       | P3    |
+
 ## P0 Documents and setup (1 day) · branch chore/p0-docs
 
 * [x] CLAUDE.md
+* [ ] Keep CLAUDE.md at the repo root (it is currently in docs/). Claude Code only loads it
+      automatically from the root or .claude/, so rules in docs/CLAUDE.md are skipped at session start
 * [x] docs/SCOPE.md, docs/FIGMA_MAP.md, docs/SHOPIFY_SETUP.md, docs/PLAN.md
+* [x] Docs updated for commit 72f0b6f (product page prototype)
 * [ ] Review every document and correct anything wrong
 * [ ] Check each FIGMA_MAP node against a screenshot
 * [ ] Send the open questions in SCOPE.md to their owners
@@ -24,9 +45,15 @@ Done when: Claude Code fetches the screenshot of node 1:3965 and you agree with 
 * [ ] Add lint, typecheck and format scripts and a GitHub Actions job (install, lint, typecheck, build)
 * [ ] Rename tokens by role in globals.css, remove the legacy cream/forest/gold set, add --container-page
 * [ ] Replace every figma-* class and hex value in components
+* [ ] Fold the product page literals into tokens or existing ones: #004141, #0B4A3F, #0245B1,
+      #A0342A, #179D46, #4F85F9, #170F49, #74AA50, #F9FFF7, #FBF4EC, #FBF9D9, #EEF0F4, #E0E0E0
+      (about 40 uses across components/product), and the arbitrary sizes like text-[15px]
 * [ ] Load the Figma fonts with next/font
-* [ ] Remove the stale comment in the home page, the nested copy exclusions and the "Figma" import names
+* [ ] Remove the stale comments in app/(main)/page.tsx and app/product/page.tsx (both point to
+      the old Figma file and a /figma-landing route that no longer exists), the nested copy
+      exclusions, and the "Figma" import names (FigmaHeader, FigmaProductPage...)
 * [ ] Fix max-w-w8xl in Header.tsx
+* [ ] Set a real git author name and email on every machine (72f0b6f was committed as "unknown")
 
 Done when: lint, typecheck and build pass, the home page looks unchanged, and no figma- class or hex value remains in components.
 
@@ -47,15 +74,20 @@ Done when: a temporary page prints typed data for all five products, including v
 
 * [ ] ui/Button, Price, StarRating, QuantityStepper, Accordion (details/summary), Carousel (from SliderControls), Container, SectionHeading, Icon
 * [ ] layout/AnnouncementBar, Header (server) with MobileMenu and SearchBar (client), Footer, WhatsAppButton
+* [ ] Move components/CloudinaryImage.tsx to ui/CloudinaryImage.tsx; keep lib/cloudinary.ts
+* [ ] SliderControls becomes ui/Carousel; ProductRecommendations and product/UsefulResources stop importing from components/home
+* [ ] PlaceholderArt GoalIcon (used by HealthGoalChips) moves to ui/Icon.tsx
 * [ ] app/(shop)/layout.tsx composing the layout, menus from getMenu()
+* [ ] Move app/(main)/page.tsx and app/product/page.tsx under app/(shop)/ (keep /product working until P5)
 * [ ] next/link everywhere; no href="#"
-* [ ] Header and footer imports removed from the home page
+* [ ] Header and footer imports removed from both pages
 
 Done when: the header stays mounted between pages, matches Figma at 1512px, and works with the keyboard at 375px.
 
 ## P4 Home page (4 days) · branch feat/p4-home
 
-* [ ] product/ProductCard (with quick add slot)
+* [ ] Merge the duplicates in the table at the top of this file; both pages use the merged sections
+* [ ] product/ProductCard (with quick add slot), shared by MostLoved on both pages
 * [ ] home/HomeHero, sections/ClaimsMarquee, sections/HealthGoals
 * [ ] sections/MostLoved with MostLovedTabs (client)
 * [ ] home/WhyNuvina, sections/RitualTimeline, sections/Reels, sections/Testimonials
@@ -67,14 +99,27 @@ Done when: the header stays mounted between pages, matches Figma at 1512px, and 
 
 Done when: the home page matches Figma section by section with real products and Lighthouse mobile performance is 90 or better.
 
-## P5 Product page (4 days) · branch feat/p5-product
+## P5 Product page (3 to 4 days) · branch feat/p5-product
+
+Starting point: the /product prototype from 72f0b6f. Keep what works (gallery with thumbnails,
+"+N" overflow, video with poster, lightbox with zoom and Escape, pack and flavor selection,
+quantity limits, aria labels). Change how it gets data and where it lives.
 
 * [ ] app/(shop)/products/[handle]/page.tsx with generateStaticParams, generateMetadata, Product JSON-LD, notFound()
-* [ ] product/ProductGallery (vertical thumbnails, +6 overflow, arrows, swipe, flavor image switch)
-* [ ] product/ProductInfo (server) with VariantPicker (client, ?variant= in URL), Price, QuantityStepper, AddToCartButton
-* [ ] product/LabTests, KeyBenefits, Ingredients, WhatMakesItBetter (hidden when empty)
-* [ ] Shared sections reused: TrustStrip, HealthGoals, RitualTimeline, MostLoved (recommendations), Reels, Testimonials, Faq
+* [ ] Delete app/product/page.tsx and add a redirect from /product to the first product
+* [ ] ProductGallery takes media as props (Shopify media) instead of importing productHero.gallery
+* [ ] Split ProductInfo (235 lines, fully client) into a server ProductInfo plus client VariantPicker
+      (flavor and pack, ?variant= in URL), QuantityStepper and AddToCartButton
+* [ ] Flavor and pack come from Shopify options and variants; remove packSizes from figmaProductData
+* [ ] Buy Now wired in P6 (add, then go to checkoutUrl); until then it stays disabled, not fake
+* [ ] Rename to the target files: LabTestBanner → LabTests, WhatsInside → Ingredients + WhatMakesItBetter,
+      TrustRow → sections/TrustStrip, HealthGoalChips → KeyBenefits (health goals use sections/HealthGoals)
+* [ ] Decide on KeyBenefitsTabs (section links; not in new Figma). Remove it, or keep it as
+      product/SectionNav.tsx if the designer approves
+* [ ] Recheck every block against the NEW Figma nodes in docs/FIGMA_MAP.md (differences table)
+* [ ] Sections hidden when their metafield is empty
 * [ ] Sold out variants disabled
+* [ ] Delete lib/figmaProductData.ts once nothing imports it
 
 Done when: all five products render from one route, an unknown handle shows not found, and a shared ?variant= link opens with that flavor selected.
 
@@ -85,6 +130,8 @@ Done when: all five products render from one route, an unknown handle shows not 
 * [ ] cart/CartProvider (drawer open state only), CartDrawer, CartButton with count, AddToCartButton with useTransition
 * [ ] Free shipping progress toward ₹699 in the drawer
 * [ ] Checkout button links to cart.checkoutUrl
+* [ ] Replace the timed "Added" label in ProductInfo with the real addToCart action
+* [ ] Buy Now: add the selected variant, then redirect to cart.checkoutUrl
 * [ ] Quick add on ProductCard
 
 Done when: a test order placed from the storefront appears in Shopify admin and the cart survives a reload.

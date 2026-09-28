@@ -107,6 +107,7 @@ footer.end{border-top:1px solid var(--line);padding-top:24px;color:var(--muted);
     <li><a href="#summary"><span>01</span>Summary and sizing</a></li>
     <li><a href="#current"><span>02</span>Current repo audit</a></li>
     <li><a href="#hydrate"><span>03</span>The deleted hydrate page</a></li>
+    <li><a href="#update"><span>03+</span>Update: product page commit</a></li>
     <li><a href="#endless"><span>04</span>What to borrow from Endless</a></li>
     <li><a href="#figma"><span>05</span>Figma: home and product</a></li>
     <li><a href="#target"><span>06</span>Folder structure</a></li>
@@ -137,6 +138,7 @@ footer.end{border-top:1px solid var(--line);padding-top:24px;color:var(--muted);
 
 <section id="summary">
   <h2><span class="n">01</span>Summary and sizing</h2>
+  <div class="callout warn"><p><b>Updated 28 September 2026.</b> Commit <code>72f0b6f</code> added a <code>/product</code> prototype after this audit was written. The findings below still describe the home page. The <a href="#update">product page review</a> covers what changed.</p></div>
   <p>Today the repository is a single landing page. All fourteen components sit together in <code>components/home/</code>, and every piece of content lives in one hardcoded file. There is no Shopify connection, no product route and no cart. The first commit had a product page for HYDRATE, which was later deleted. Its breakdown into sections was sound, but it was hardwired to that one product.</p>
   <p>Nuvina does not need the scale of the Endless Domains webui. There are no user dashboards, wallets or domain management tools, and Shopify handles checkout, payments, orders and customer accounts. The frontend has four jobs: show the brand, show the products, keep a cart, and hand the visitor to Shopify checkout. The structure below is built for exactly that. It uses a few folders grouped by purpose, one file per component, a single <code>lib/shopify</code> folder for all store access, and no global state library.</p>
   <div class="callout blue">
@@ -219,6 +221,39 @@ footer.end{border-top:1px solid var(--line);padding-top:24px;color:var(--muted);
   </div>
 <pre><code>git switch -c archive/hydrate-v1 9ddeb2e          <span class="c"># browse the original tree</span>
 git show 9ddeb2e:components/product/ProductInfo.tsx <span class="c"># read one file for reference</span></code></pre>
+</section>
+
+<section id="update">
+  <h2><span class="n">03+</span>Update: the product page commit</h2>
+  <p>Commit <code>72f0b6f</code> ("added the product page", 26 September 2026) adds 15 files and 1,447 lines: a static <code>/product</code> route, 11 components in <code>components/product/</code>, the content file <code>lib/figmaProductData.ts</code>, and a Cloudinary image loader. <code>npm run build</code> passes and prerenders both <code>/</code> and <code>/product</code>.</p>
+
+  <h3>What is good and worth keeping</h3>
+  <div class="two">
+    <div class="panel"><h4>Gallery</h4><p>Vertical thumbnails, a "+N" overflow, prev and next arrows, a product video with a poster frame, and a full screen lightbox with cursor zoom that closes with Escape. The first image uses <code>priority</code>, and the controls have proper <code>aria</code> labels.</p></div>
+    <div class="panel"><h4>Product info</h4><p>Flavor and pack selection, where the subtitle ("Green Apple, Pack of 12 (180 Tablets)") and the price row are derived from the selected pack. Quantity is limited to 10. Header, footer, testimonials and newsletter are reused from the home page rather than copied.</p></div>
+    <div class="panel"><h4>Real imagery</h4><p>A Cloudinary loader in <code>lib/cloudinary.ts</code> requests the right width and <code>f_auto</code> format from Cloudinary directly, and <code>CloudinaryImage</code> makes it usable from server components.</p></div>
+    <div class="panel"><h4>In page navigation</h4><p>Sections carry <code>id</code> anchors with <code>scroll-mt</code> offsets, which is cleaner than the fixed 84px offset in the old hydrate page.</p></div>
+  </div>
+
+  <h3>Findings</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Severity</th><th>Finding</th><th>Where</th></tr></thead>
+    <tbody>
+      <tr><td><span class="chip hi">High</span></td><td>It was built from the old Figma file (<code>U801ftFDIs7CewVfx4jFdl</code>, node <code>224:7322</code>), not the file the docs use (<code>0ftgtvdbr0JURIS2VDkGTZ</code>, node <code>1:4505</code>). The two are close, but the new one drops the section tab row, shows health goals as cards instead of chips, and moves the trust strip.</td><td class="wrap"><code>app/product/page.tsx</code>, <code>docs/FIGMA_MAP.md</code></td></tr>
+      <tr><td><span class="chip hi">High</span></td><td>It repeats the hydrate pattern: one static route, and 9 components that import <code>lib/figmaProductData.ts</code> directly instead of taking props. A second product would need a second page.</td><td class="wrap"><code>app/product/page.tsx</code>, <code>components/product/*</code></td></tr>
+      <tr><td><span class="chip hi">High</span></td><td>The header and footer are now rendered separately by two pages. A shared <code>(shop)</code> layout is overdue.</td><td class="wrap"><code>app/(main)/page.tsx</code>, <code>app/product/page.tsx</code></td></tr>
+      <tr><td><span class="chip me">Medium</span></td><td>There are four duplicate sections. <code>ProductRecommendations</code> copies MostLoved, <code>product/UsefulResources</code> copies home reels, <code>ProductFAQ</code> copies FAQ, and <code>HealthGoalChips</code> sits next to <code>HealthGoals</code>. <code>HowToUse</code> is the same block as the home glow up timeline.</td><td class="wrap"><code>components/product/</code></td></tr>
+      <tr><td><span class="chip me">Medium</span></td><td>There are about 40 new hardcoded color literals (such as <code>#004141</code>, <code>#0B4A3F</code>, <code>#0245B1</code> and <code>#A0342A</code>) and arbitrary text sizes, none of them tokens.</td><td class="wrap"><code>ProductInfo.tsx</code>, <code>WhatsInside.tsx</code>, <code>HowToUse.tsx</code></td></tr>
+      <tr><td><span class="chip me">Medium</span></td><td>6 of 11 product components are client components. <code>ProductInfo</code> is 235 lines and runs entirely in the browser.</td><td class="wrap"><code>ProductInfo.tsx</code>, <code>ProductGallery.tsx</code> and others</td></tr>
+      <tr><td><span class="chip me">Medium</span></td><td>Add to Cart only shows "Added" for two seconds, and Buy Now does nothing.</td><td class="wrap"><code>ProductInfo.tsx</code></td></tr>
+      <tr><td><span class="chip me">Medium</span></td><td>Product components import from the home folder (<code>SliderControls</code>, <code>PlaceholderArt</code>). Those pieces belong in <code>ui/</code>.</td><td class="wrap"><code>ProductRecommendations.tsx</code>, <code>UsefulResources.tsx</code>, <code>HealthGoalChips.tsx</code></td></tr>
+      <tr><td><span class="chip me">Medium</span></td><td>The gallery images are Glow product shots, and their file names show they were generated with ChatGPT. They are hosted on a Cloudinary account called <code>qstekdyi</code>, while the page sells ACV Moringa. The account owner and whether the images are approved both need confirming before launch.</td><td class="wrap"><code>lib/figmaProductData.ts</code>, <code>lib/cloudinary.ts</code></td></tr>
+      <tr><td><span class="chip lo">Low</span></td><td>Prices for the 1, 3 and 6 packs are placeholders, and only the Pack of 12 comes from Figma.</td><td class="wrap"><code>lib/figmaProductData.ts</code></td></tr>
+      <tr><td><span class="chip lo">Low</span></td><td>The header comment is 55 lines and mentions a <code>/figma-landing</code> route that no longer exists. The page title reads "Figma product page test build".</td><td class="wrap"><code>app/product/page.tsx</code></td></tr>
+      <tr><td><span class="chip lo">Low</span></td><td>The commit author is "unknown", because git identity is not configured on that machine.</td><td class="wrap">git history</td></tr>
+    </tbody>
+  </table></div>
+  <p>None of this changes the target structure. It gives Phase 5 a head start. The plan in <code>docs/PLAN.md</code> now lists these duplicates, the literals to tokenize, and how each prototype file maps onto its target file.</p>
 </section>
 
 <section id="endless">
@@ -604,7 +639,7 @@ NEXT_PUBLIC_WHATSAPP_NUMBER=</code></pre>
 </section>
 
 <footer class="end">
-  <p>Sources: <code>nuvina-figma-landing-page</code> at commits 9ddeb2e, 8710ea2 and 33595c6; <code>feature-reputation/webui</code> at 9e818629; Figma file 0ftgtvdbr0JURIS2VDkGTZ, frames 1:3771 and 1:4505. Revised for a small store on 25 September 2026.</p>
+  <p>Sources: <code>nuvina-figma-landing-page</code> at commits 9ddeb2e, 8710ea2 and 33595c6; <code>feature-reputation/webui</code> at 9e818629; Figma file 0ftgtvdbr0JURIS2VDkGTZ, frames 1:3771 and 1:4505. Revised for a small store on 25 September 2026; updated for commit 72f0b6f on 28 September 2026.</p>
 </footer>
 </main>
 </div>
