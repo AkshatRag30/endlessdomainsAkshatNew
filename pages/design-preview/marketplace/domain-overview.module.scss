@@ -1,0 +1,129 @@
+@import '@mpstyles/_mixins.scss';
+
+// Page states for the domain overview preview. None of these are in Figma
+// (plan §7) — sized to the real hero/tiles so nothing shifts when data lands.
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+
+  @include mobile {
+    gap: 15px;
+  }
+}
+
+%skeletonBlock {
+  background: var(--color-gray-light);
+  animation: pulse 1.4s ease-in-out infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+.skeletonHero {
+  @extend %skeletonBlock;
+  height: 157px;
+  border-radius: 4px;
+
+  @include mobile {
+    height: 341px;
+  }
+}
+
+.skeletonTiles {
+  display: grid;
+  grid-template-columns: 212fr 321fr 212fr 210fr;
+  gap: 25px;
+  padding: 0 4px;
+
+  @include tablet {
+    grid-template-columns: 1fr 1fr;
+    row-gap: 22px;
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+    gap: 13px;
+    padding: 0 3px;
+  }
+}
+
+.skeletonTile {
+  @extend %skeletonBlock;
+  height: 76px;
+  border-radius: 10px;
+
+  @include mobile {
+    height: 60px;
+    border-radius: 7.86px;
+  }
+}
+
+.notFound {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-10) var(--space-4);
+  text-align: center;
+}
+
+.notFoundTitle {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: 20px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+}
+
+.notFoundText {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  color: #7e7a93;
+}
+
+.notFoundLink {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// ── Overview tab (Figma 5:3685 / 5:4317) ─────────────────────────────────
+// 2×2 on desktop and tablet (22px across, 19px down), one column on mobile
+// 17px apart, in Figma's order: facts, seller, interest, activity.
+
+.overviewGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 19px 22px;
+  padding-right: 1px; // Figma's cards end 11px from the panel edge, 10px on the left
+
+  @include mobile {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 17px;
+    padding-right: 0;
+  }
+}

@@ -153,6 +153,21 @@
   }
 }
 
+// The name links to the domain overview page (domain-overview plan §4.2).
+// Not in Figma: no underline, a blue hover, and the shared focus ring.
+.domainLink {
+  color: inherit;
+  text-decoration: none;
+
+  &:hover .domainName {
+    color: var(--color-blue-primary);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
 // Figma node 72:9039 — same 15px/Bold treatment as My Domains' domain name
 // (MyDomainRow/MyDomainCard), up from 13px/Medium.
 .domainName {

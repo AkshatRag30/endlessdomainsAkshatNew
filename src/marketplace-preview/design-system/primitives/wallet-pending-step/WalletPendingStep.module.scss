@@ -117,18 +117,7 @@
   display: block;
 }
 
-.waveBack {
-  animation: listing-wave-move 5s linear infinite;
-}
-
-.waveFront {
-  animation: listing-wave-move 3s linear infinite;
-}
-
-@keyframes listing-wave-move {
-  from { transform: translateX(0); }
-  to { transform: translateX(-22px); }
-}
+// The wave motion itself is SMIL inside the SVG (see WaveLoader in the .tsx).
 
 // Error look (Figma node 1:8109) reuses .outerRing's own ring color
 // (rgba(239, 68, 68, 0.26)) directly — Figma uses the exact same light-red

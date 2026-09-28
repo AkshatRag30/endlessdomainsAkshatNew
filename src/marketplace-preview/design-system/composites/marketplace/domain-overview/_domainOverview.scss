@@ -1,0 +1,43 @@
+// Shared by the domain overview composites (domain-overview plan §5.2).
+// Import after '@mpstyles/_mixins.scss'.
+
+// The faint bordered surface with Figma's 4.86px noise tile at 5% opacity —
+// the hero (5:3587) and the tab panel (5:3685) draw it identically. 0.08
+// alpha border has no token (nearest blue alphas are -10/-18). Children are
+// lifted above the noise layer.
+@mixin noise-surface {
+  position: relative;
+  overflow: hidden;
+  border: 0.97px solid rgba(38, 57, 237, 0.08);
+  border-radius: 4px;
+  background-color: rgba(249, 249, 249, 0.2);
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: url('/assets/img/domain-overview/hero-noise.png') top left / 4.86px 4.86px repeat;
+    opacity: 0.05;
+    pointer-events: none;
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+// Figma's mobile frames draw the Price history (5:5549) and Comparable sales
+// (5:7060) cards as the plain white card, not frosted. For a GlassCard with
+// variant="glass"; the caller nests it to outrank GlassCard's own rules.
+@mixin plain-card-on-mobile {
+  @include mobile {
+    border: 0.19px solid rgba(0, 0, 0, 0.22);
+    border-radius: 5px;
+    background: var(--color-white-primary);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow: none;
+  }
+}

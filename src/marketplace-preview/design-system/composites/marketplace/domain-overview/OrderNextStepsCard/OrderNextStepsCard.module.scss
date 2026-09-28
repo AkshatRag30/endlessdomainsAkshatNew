@@ -1,0 +1,47 @@
+@import '@mpstyles/_mixins.scss';
+@import '../domainOverview';
+
+// Figma 5:7690 (1158×132). Three 65px tiles 11px apart, 13px under the
+// title. Mobile (5:8167) stacks them full width on the plain white card.
+
+// Nested to outrank GlassCard's own single-class rules.
+.card.card {
+  @include plain-card-on-mobile;
+  padding: 17px 17px 18px;
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 11px;
+  margin-top: 13px;
+
+  @include tablet {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  @include mobile {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 9px;
+  }
+}
+
+// Figma 5:7718: the 20.4px frame with its bars at 45.8% / 25%.
+.plus {
+  position: relative;
+  display: flex;
+  width: 20.41px;
+  height: 20.41px;
+}
+
+.plusV {
+  position: absolute;
+  top: 5.1px;
+  left: 9.36px;
+}
+
+.plusH {
+  position: absolute;
+  top: 9.36px;
+  left: 5.1px;
+}

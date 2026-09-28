@@ -1,0 +1,96 @@
+@import '@mpstyles/_mixins.scss';
+
+// Figma 5:3764 (desktop) / 5:4416 (mobile). Bar fills #ff718b / #7fe47e,
+// label #615e83, value #171429, deltas #ef4444 / #12a05c are Figma-exact
+// (the first three are the file's own "Red 400" / "Green 300" / "Text Gray"
+// styles). Bars are 60px tall, 8px apart (5px on mobile), 28px above the stats.
+
+.grid {
+  display: grid;
+  column-gap: var(--space-2);
+
+  @include mobile {
+    column-gap: 5px;
+  }
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  min-width: 0;
+}
+
+// The noise tile (same asset as the hero, 13% / 10% here) sits on ::before;
+// the inner highlight comes from the left because Figma draws these bars
+// rotated -90°, which turns its "0 4px" inset shadow sideways.
+.bar {
+  position: relative;
+  height: 60px;
+  overflow: hidden;
+  border-radius: 10.6px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('/assets/img/domain-overview/hero-noise.png') top left / 4.86px 4.86px repeat;
+  }
+
+  [data-tone='negative'] > & {
+    background: #ff718b;
+    box-shadow: inset 4px 0 9.3px rgba(255, 255, 255, 0.62);
+
+    &::before {
+      opacity: 0.13;
+    }
+  }
+
+  [data-tone='positive'] > & {
+    background: #7fe47e;
+    box-shadow: inset 4px 0 12.7px rgba(255, 255, 255, 0.76);
+
+    &::before {
+      opacity: 0.1;
+    }
+  }
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+// Inter in Figma — Satoshi stands in (Inter isn't loaded by this app).
+.label {
+  font-family: var(--font-satoshi);
+  font-size: 15px;
+  line-height: 16.7px;
+  color: #615e83;
+  white-space: nowrap;
+}
+
+.valueRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.mood {
+  flex-shrink: 0;
+}
+
+.value {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-15);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.2;
+  letter-spacing: -0.36px;
+  color: #171429;
+}
+
+// 10px after the value (Figma), 12px of it from .valueRow's gap.
+.delta {
+  margin-left: -2px;
+}

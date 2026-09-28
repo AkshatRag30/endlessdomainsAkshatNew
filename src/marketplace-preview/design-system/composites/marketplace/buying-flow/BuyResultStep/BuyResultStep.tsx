@@ -54,7 +54,7 @@ export default BuyResultStep
 
 export interface BuyResultFooterProps {
   primaryLabel: string
-  /** Optional — "View receipt" has no receipt view to open yet, so Bought leaves it visually real but inert, same convention as the rest of this preview. */
+  /** Optional — without it the button stays visually real but inert (e.g. "Add Funds", which has no top-up flow yet). */
   onPrimary?: () => void
   secondaryLabel?: string
   onSecondary?: () => void

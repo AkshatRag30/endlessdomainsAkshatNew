@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/router'
 import Modal from '@/marketplace-preview/design-system/primitives/modal'
 import StatusIcon from '@/marketplace-preview/design-system/primitives/badges/status-icon'
 import TokenSuffix from '@/marketplace-preview/design-system/primitives/token-suffix'
@@ -8,7 +9,8 @@ import ToastMessage from '@/design-system/primitives/toast-message'
 import { TOAST_TYPE } from '@/core/enum/toast-type.enum'
 import type { MarketplaceListing } from '@/marketplace-preview/types/marketplace'
 import { mockMarketplaceBuyInsights } from '@/marketplace-preview/data/marketplace/domains'
-import { formatToken } from '@/marketplace-preview/helpers/token-format/tokenFormat'
+import { formatToken, truncateHash } from '@/marketplace-preview/helpers/token-format/tokenFormat'
+import { orderReceiptHref } from '@/marketplace-preview/helpers/marketplace/routes'
 import ReviewPurchaseStep, { chainShortName, type ReviewPurchaseNotice } from '../ReviewPurchaseStep'
 import ApprovalExplainerStep from '../ApprovalExplainerStep'
 import PurchaseTermsFooter from '../PurchaseTermsFooter'
@@ -48,6 +50,12 @@ export interface BuyFlowModalProps {
    * new state (plan §2.1), so the caller passes its own add-to-watchlist.
    */
   onWatch?: (listing: MarketplaceListing) => void
+  /**
+   * The purchase settled and an order was recorded — e.g. so a domain
+   * overview page can refetch and flip to Sold (domain-overview plan §7).
+   * Fires whether or not the drawer is still open.
+   */
+  onPurchased?: (listing: MarketplaceListing, orderId: string) => void
 }
 
 // Both wallet prompts are non-dismissible, same reasoning as the listing
@@ -70,9 +78,6 @@ const TITLE_BY_STEP: Record<BuyFlowStep, string> = {
 
 const BOUGHT_SUBTEXT = 'Ownership transferred in the same transaction as the payment. It will appear in your account within 10 to 15 minutes.'
 
-/** "0x7f3a…456e8" — Figma 1:973's own truncation: 6 leading characters, 5 trailing. */
-const truncateHash = (hash: string) => `${hash.slice(0, 6)}…${hash.slice(-5)}`
-
 interface NetworkState {
   ok: boolean
   walletChainName?: string
@@ -80,7 +85,8 @@ interface NetworkState {
 }
 
 /** Orchestrates the buying flow across the shared right-edge drawer (the listing flow's Modal, unmodified). */
-export const BuyFlowModal = ({ isOpen, onClose, listing, onWatch }: BuyFlowModalProps) => {
+export const BuyFlowModal = ({ isOpen, onClose, listing, onWatch, onPurchased }: BuyFlowModalProps) => {
+  const router = useRouter()
   const [step, setStep] = useState<BuyFlowStep>('review')
   const [termsAccepted, setTermsAccepted] = useState(false)
   // Snapshotted on open (not re-read every render) so the balance a buyer is
@@ -94,6 +100,8 @@ export const BuyFlowModal = ({ isOpen, onClose, listing, onWatch }: BuyFlowModal
   // balance (plan §6.2), not a fixture flag. Snapshotted with the balance.
   const [hasFunds, setHasFunds] = useState(true)
   const [txHash, setTxHash] = useState('')
+  // The order a successful purchase recorded — "View receipt" opens it.
+  const [orderId, setOrderId] = useState('')
   // null = the mock network read is still in flight: no banner yet, but the
   // CTA stays disabled until the wallet's chain is confirmed.
   const [network, setNetwork] = useState<NetworkState | null>(null)
@@ -122,6 +130,7 @@ export const BuyFlowModal = ({ isOpen, onClose, listing, onWatch }: BuyFlowModal
     setStep('review')
     setTermsAccepted(false)
     setTxHash('')
+    setOrderId('')
     setBalanceUsd(getUsdtBalance())
     setHasFunds(hasSufficientBalance(priceUsd))
     // Re-read per open, never cached across opens — plan §11's allowance
@@ -159,6 +168,7 @@ export const BuyFlowModal = ({ isOpen, onClose, listing, onWatch }: BuyFlowModal
     setStep('pending-settling')
 
     const settled = await actions.awaitSettlement(submitted.txHash)
+    if (settled.ok && settled.orderId) onPurchased?.(listing, settled.orderId)
     // "We will notify you either way" (1:1128): once the buyer has closed the
     // drawer or moved on to another listing, the result arrives as a toast
     // instead. Toast copy reuses Figma's own lines (Bought 1:942/1:944,
@@ -170,7 +180,10 @@ export const BuyFlowModal = ({ isOpen, onClose, listing, onWatch }: BuyFlowModal
       else ToastMessage(TOAST_TYPE.ERROR, 'Transaction fail', 'Nothing was charged to you.')
       return
     }
-    if (settled.ok) setStep('success')
+    if (settled.ok) {
+      setOrderId(settled.orderId)
+      setStep('success')
+    }
     else setStep(settled.reason === 'already-sold' ? 'no-longer-available' : 'reject')
   }
 
@@ -317,7 +330,14 @@ export const BuyFlowModal = ({ isOpen, onClose, listing, onWatch }: BuyFlowModal
         ]}
       />
     )
-    footer = <BuyResultFooter primaryLabel="View receipt" secondaryLabel="Keep browsing" onSecondary={onClose} />
+    footer = (
+      <BuyResultFooter
+        primaryLabel="View receipt"
+        onPrimary={orderId ? () => router.push(orderReceiptHref(orderId)) : undefined}
+        secondaryLabel="Keep browsing"
+        onSecondary={onClose}
+      />
+    )
   } else if (step === 'reject') {
     body = (
       <BuyResultStep

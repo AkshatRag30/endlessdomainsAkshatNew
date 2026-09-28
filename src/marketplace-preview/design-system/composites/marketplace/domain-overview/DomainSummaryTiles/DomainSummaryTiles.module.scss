@@ -1,0 +1,103 @@
+@import '@mpstyles/_mixins.scss';
+
+// Figma node 5:3646: four tiles at 212 / 321 / 212 / 210px with 25px gaps
+// (1030px, 5px short of the hero's 1035px). Kept as proportional fr tracks so
+// the row shrinks with the column instead of overflowing it. The 4px outer
+// rings sit in the gaps, so the grid gets 4px of its own inset to keep the
+// first and last ring from being clipped by anything that clips the column.
+
+.grid {
+  display: grid;
+  grid-template-columns: 212fr 321fr 212fr 210fr;
+  gap: 25px;
+  margin-top: 22px;
+  padding: 0 4px;
+
+  // Four across leaves each tile ~150px at the narrow end of tablet, too
+  // tight for "Interest, 7 days"; two across uses the full width the shell
+  // now hands this column instead (design-system CLAUDE.md §5).
+  @include tablet {
+    grid-template-columns: 1fr 1fr;
+    row-gap: 22px;
+  }
+
+  // Figma 5:4261: stacked, full width, 13px apart, 15px under the hero.
+  @include mobile {
+    grid-template-columns: 1fr;
+    gap: 13px;
+    margin-top: 15px;
+    padding: 0 3px;
+  }
+}
+
+.stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.eyeIcon {
+  flex-shrink: 0;
+
+  @include mobile {
+    width: 11.8px;
+    height: 11.8px;
+  }
+}
+
+// Figma 5:3660: a 25px hairline, 8px either side.
+.divider {
+  flex-shrink: 0;
+  width: 1px;
+  height: 25px;
+  margin: 0 var(--space-2);
+  background: var(--color-black-primary);
+
+  @include mobile {
+    height: 19.7px;
+    margin: 0 6px;
+  }
+}
+
+.bookmarkBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 13px;
+  height: 13px;
+
+  @include mobile {
+    width: 10.2px;
+    height: 10.2px;
+  }
+}
+
+.bookmarkIcon {
+  @include mobile {
+    width: 7.5px;
+    height: 8.7px;
+  }
+}
+
+.calendarBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 17px;
+  height: 18.3px;
+  margin-right: 1px; // Figma's 4px icon/text gap, 3px of it from .stat
+
+  @include mobile {
+    width: 13.4px;
+    height: 14.4px;
+  }
+}
+
+.calendarIcon {
+  @include mobile {
+    width: 10.4px;
+    height: 11.9px;
+  }
+}

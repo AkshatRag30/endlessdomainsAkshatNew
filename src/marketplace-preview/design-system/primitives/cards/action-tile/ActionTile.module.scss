@@ -1,0 +1,113 @@
+@import '@mpstyles/_mixins.scss';
+
+// Figma 5:7693. Surface as SummaryTile (#f4f4f4 → #fefefe, 3px white border,
+// 10px radius). The badge is a black → 47% black gradient with the shared
+// grain at 40% plus-lighter, a soft #57b1ff glow, a #e0e9f2 + white double
+// ring and a #d2eaff inner light, all Figma-exact. Title #2639ed, subtitle
+// #7e7a93.
+
+.tile {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  min-width: 0;
+  min-height: 65px;
+  padding: 11px;
+  border: 3px solid var(--color-white-primary);
+  border-radius: 10px;
+  background: linear-gradient(180deg, #f4f4f4 0%, #fefefe 100%);
+  box-shadow: 0 0 0 1px #f2f2f2;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+}
+
+// Not in Figma: tiles that go somewhere get a hover and focus state.
+.interactive {
+  cursor: pointer;
+  transition: box-shadow 0.15s ease;
+
+  &:hover {
+    box-shadow: 0 0 0 1px var(--color-blue-primary-alpha-30);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.badge {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 29px;
+  height: 29px;
+  overflow: hidden;
+  border-radius: 9.4px;
+  background: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.47) 100%);
+  box-shadow:
+    0 10px 25.6px rgba(87, 177, 255, 0.34),
+    0 5.9px 7.7px rgba(87, 177, 255, 0.19),
+    0 2.5px 3.2px rgba(87, 177, 255, 0.22),
+    0 0.9px 1.2px rgba(87, 177, 255, 0.15),
+    0 0 0 0.96px #e0e9f2,
+    0 0 0 1.2px var(--color-white-primary),
+    inset 0 0.24px 4.3px 0.48px #d2eaff,
+    inset 0 0.24px 0.96px 0.48px #d2eaff;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('/assets/img/buying-flow/status-grain.png') top left / 73.5px 73.5px;
+    mix-blend-mode: plus-lighter;
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  > * {
+    position: relative;
+  }
+
+  &[data-size='lg'] {
+    width: 37px;
+    height: 37px;
+    border-radius: 12px;
+    box-shadow:
+      0 12.8px 32.7px rgba(87, 177, 255, 0.34),
+      0 7.5px 9.8px rgba(87, 177, 255, 0.19),
+      0 3.1px 4.1px rgba(87, 177, 255, 0.22),
+      0 1.1px 1.5px rgba(87, 177, 255, 0.15),
+      0 0 0 1.22px #e0e9f2,
+      0 0 0 1.53px var(--color-white-primary),
+      inset 0 0.3px 5.5px 0.61px #d2eaff,
+      inset 0 0.3px 1.22px 0.61px #d2eaff;
+
+    &::before {
+      background-size: 93.8px 93.8px;
+    }
+  }
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font-family: var(--font-satoshi);
+}
+
+.title {
+  font-size: 13px;
+  font-weight: var(--font-weight-medium);
+  line-height: 19.5px;
+  color: var(--color-blue-primary);
+}
+
+.subtitle {
+  font-size: var(--text-small-12);
+  line-height: 17.25px;
+  color: #7e7a93;
+}

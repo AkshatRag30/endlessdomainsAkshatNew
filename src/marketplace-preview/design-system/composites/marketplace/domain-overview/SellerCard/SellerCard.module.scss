@@ -1,0 +1,85 @@
+@import '@mpstyles/_mixins.scss';
+@import '../domainOverview';
+
+// Figma 5:3889 (desktop) / 5:4380 (mobile). The 36px seller row sits 9px
+// under the title, the rows' well 16px under that, and the button 9px under
+// the well (15px under the last row), indented 8.6px. #171429 / #7e7a93 text
+// and the peach gradient are Figma-exact.
+
+.card {
+  min-width: 0;
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2-5);
+  margin-top: 9px;
+  min-width: 0;
+}
+
+.avatar {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #ffd9a0 0%, #f0996b 100%);
+}
+
+.identityText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font-family: var(--font-satoshi);
+  white-space: nowrap;
+}
+
+.address {
+  font-size: 14px;
+  line-height: 18.75px;
+  color: #171429;
+}
+
+.meta {
+  overflow: hidden;
+  font-size: var(--text-small-12);
+  line-height: 17.25px;
+  color: #7e7a93;
+  text-overflow: ellipsis;
+}
+
+.rows {
+  margin-top: 16px;
+}
+
+.expiry {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+// The 10.2×11.6 glyph centred in Figma's 13×14 box.
+.calendar {
+  margin: 1.2px 1.4px;
+}
+
+// Figma 5:3915: the charcoal PrimaryButton at its standard shape (Figma's
+// custom bevel dropped to match the rest of the marketplace). Figma's
+// width and position are kept, full width on mobile (5:4406).
+.card .portfolio {
+  width: 247px;
+  margin: 9px 0 0 8.6px;
+
+  @include mobile {
+    width: auto;
+    align-self: stretch;
+    margin-right: 8.6px;
+  }
+}
+
+.empty {
+  margin: var(--space-4) 0 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  color: #7e7a93;
+}

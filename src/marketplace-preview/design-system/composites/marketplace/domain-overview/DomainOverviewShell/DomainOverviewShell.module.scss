@@ -1,0 +1,74 @@
+@import '@mpstyles/_mixins.scss';
+
+// Figma 5:3570 (desktop) / 5:4161 (mobile). Desktop: breadcrumb 13px under
+// the header and 29px in from the sidebar edge, content 43px under the
+// breadcrumb. Mobile: 34px under the header, the same 18px side inset for
+// both, 41px between them.
+// The code's sidebar is 240px where Figma draws 279px, so the content column
+// is centred in whatever width is left instead of copying Figma's x offset.
+
+.main {
+  min-height: calc(100vh - 59px); // Header.module.scss's .bar height
+  padding: 13px 29px var(--space-8);
+  background: var(--color-gray-page-bg);
+
+  @include tablet-down {
+    padding: 13px var(--space-4) var(--space-8);
+  }
+
+  // Clears MobileBottomNav's fixed bar, same 76px MarketplacePageShell uses.
+  @include mobile {
+    padding: 34px 18px 76px;
+  }
+}
+
+.breadcrumb {
+  display: flex;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 1035px;
+  margin: 43px auto 0;
+
+  @include mobile {
+    margin-top: 41px;
+  }
+}
+
+// The receipt (Figma 5:7454) starts 23px under the breadcrumb, 33px on
+// mobile (5:7980), closer than the overview's 43px / 41px.
+.contentWide {
+  max-width: 1158px;
+  margin-top: 23px;
+  margin-left: 0;
+
+  @include mobile {
+    margin-top: 33px;
+  }
+}
+
+// ── Print (the receipt's "Download receipt") ─────────────────────────────
+
+.noPrint {
+  @media print {
+    display: none;
+  }
+}
+
+.main {
+  @media print {
+    min-height: 0;
+    padding: 0;
+    background: none;
+  }
+}
+
+.content {
+  @media print {
+    max-width: none;
+    margin: 0;
+  }
+}

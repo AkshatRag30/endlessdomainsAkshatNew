@@ -1,0 +1,231 @@
+@import '@mpstyles/_mixins.scss';
+@import '../domainOverview';
+
+// Figma 5:6145 (desktop) / 5:7060 (mobile). Like Price history, the card
+// sits 19px under the tab bar (the panel's gap is 27px, so it pulls up 8px);
+// mobile draws it 29px under. Title 16px down and 13px in; a 230px gradient
+// well 12.8px under the title running to the card's bottom edge; white 29px
+// rows 4px apart, 7px in from the well. Mono name #171429, price
+// rgba(0,0,0,0.59), date rgba(0,0,0,0.63) are Figma-exact. Mobile shrinks the
+// price and date to Figma's 9.1px, with the icons scaled to match.
+
+// Nested to outrank GlassCard's own single-class .card / .glass rules.
+.card.card {
+  @include plain-card-on-mobile;
+  margin-top: -8px;
+  padding: 16px 9px 0 13px;
+  overflow: hidden;
+
+  @include mobile {
+    margin-top: -3px;
+    padding: 16.9px 7px 0;
+
+    > h2 {
+      padding-left: 6.9px;
+    }
+  }
+}
+
+.well {
+  max-height: 230px;
+  margin: 12.8px 0 0;
+  padding: 6px 12px 6px 7px;
+  border-radius: 6px 6px 0 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.03) 0%, rgba(0, 0, 0, 0) 100%);
+
+  @include mobile {
+    padding-right: 5px;
+  }
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+// Only in the loading state, where the list itself is the well.
+.well.list {
+  padding-bottom: var(--space-4);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  height: 29px;
+  padding: 0 6px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 5px;
+  background: var(--color-white-primary);
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 0.15s ease;
+
+  // Not in Figma: rows are links now, so they get a hover and focus state.
+  &:hover {
+    border-color: var(--color-blue-primary-alpha-30);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+    outline-offset: -2px;
+  }
+
+  @include mobile {
+    gap: var(--space-3);
+  }
+}
+
+.domain {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+// Figma 5:6152: a 19px ringed token with a 16px provider logo. Nested to
+// outrank DomainAvatar's own single-class rules.
+.domain .avatar {
+  width: 19px;
+  height: 19px;
+  border: 0.41px solid rgba(38, 57, 237, 0.36);
+  box-shadow: 0 0.41px 2.21px var(--color-blue-primary-alpha-20);
+
+  img {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+// Consolas in Figma — Space Grotesk stands in, as for the other mono text.
+.name {
+  overflow: hidden;
+  font-family: var(--font-space-grotesk);
+  font-size: 12.5px;
+  line-height: 18.75px;
+  color: #171429;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+  flex-shrink: 0;
+
+  @include mobile {
+    gap: 25.2px;
+  }
+}
+
+// A word space between the amount and "USDT" (Figma sets them as one text
+// run); the icon's own 7px gap lives on .token below.
+.price {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28em;
+  font-family: var(--font-satoshi);
+  font-size: 13px;
+  font-weight: var(--font-weight-medium);
+  line-height: 20.25px;
+  color: rgba(0, 0, 0, 0.59);
+  white-space: nowrap;
+
+  @include mobile {
+    font-size: 9.1px;
+    line-height: 14.2px;
+  }
+}
+
+// "8,460.00 USDT" + icon: one text run, 7px before the icon. Nested to
+// outrank TokenSuffix's own .suffix gap.
+.price .token {
+  gap: 7px;
+
+  @include mobile {
+    gap: 4.9px;
+
+    img {
+      width: 10.5px;
+      height: 10.5px;
+    }
+  }
+}
+
+// Fixed width so the calendar icons line up down the list whatever the
+// date's length ("1 Aug" vs "12 Aug"); Figma's identical rows hide this.
+.date {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  width: 70px;
+  font-family: var(--font-satoshi);
+  font-size: 13px;
+  line-height: 18.75px;
+  color: rgba(0, 0, 0, 0.63);
+  white-space: nowrap;
+
+  @include mobile {
+    gap: 4.9px;
+    width: 46px;
+    font-size: 9.1px;
+    line-height: 13.1px;
+  }
+}
+
+// Figma's 17×18.3 box (11.9×12.8 on mobile) with the calendar glyph inset.
+.calendarBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 17px;
+  height: 18.3px;
+
+  @include mobile {
+    width: 11.9px;
+    height: 12.8px;
+  }
+}
+
+.calendar {
+  @include mobile {
+    width: 9.3px;
+    height: 10.6px;
+  }
+}
+
+// ── States (not in Figma, plan §7) ───────────────────────────────────────
+
+.skeletonRow {
+  height: 29px;
+  border-radius: 5px;
+  background: var(--color-gray-light);
+}
+
+.message {
+  margin: var(--space-6) 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  color: #7e7a93;
+  text-align: center;
+}
+
+.retry {
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: var(--color-blue-primary);
+  cursor: pointer;
+  text-decoration: underline;
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}

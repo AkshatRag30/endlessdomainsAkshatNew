@@ -1,0 +1,25 @@
+@import '@mpstyles/_mixins.scss';
+@import '../domainOverview';
+
+// Figma 5:7590 (571×403). The steps start 30px under the title and the note
+// sits 35px under the last one; the note wraps at 508px. Mobile is the
+// plain white card (5:8096).
+
+// Nested to outrank GlassCard's own single-class rules.
+.card.card {
+  @include plain-card-on-mobile;
+  padding: 17px 17px 22px;
+}
+
+.list {
+  margin-top: 30px;
+}
+
+.note {
+  max-width: 508px;
+  margin-top: 35px;
+
+  @include mobile {
+    margin-top: 20px;
+  }
+}

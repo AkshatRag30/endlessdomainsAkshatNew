@@ -1,0 +1,60 @@
+@import '@mpstyles/_mixins.scss';
+
+// Figma node 5:3647 (desktop) / 5:4262 (mobile). The #f4f4f4 → #fefefe
+// gradient, #f2f2f2 ring, rgba(0,0,0,0.64) label and #353232 value are
+// Figma-exact; none has a token (nearest greys differ visibly on this
+// surface). Mobile scales the whole tile by Figma's own ~0.786 factor
+// rather than just reflowing it.
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  min-width: 0;
+  height: 76px;
+  padding: 5px 9px;
+  overflow: hidden;
+  border: 3px solid var(--color-white-primary);
+  border-radius: 10px;
+  background: linear-gradient(180deg, #f4f4f4 0%, #fefefe 100%);
+  box-shadow: 0 0 0 4px #f2f2f2;
+
+  @include mobile {
+    gap: 7px;
+    height: 60px;
+    padding: 4px 7px;
+    border-width: 2.36px;
+    border-radius: 7.86px;
+    box-shadow: 0 0 0 3.15px #f2f2f2;
+  }
+}
+
+.label {
+  font-family: var(--font-satoshi);
+  font-size: 14px;
+  font-weight: var(--font-weight-medium);
+  line-height: 16.5px;
+  color: rgba(0, 0, 0, 0.64);
+  white-space: nowrap;
+
+  @include mobile {
+    font-size: 11px;
+    line-height: 13px;
+  }
+}
+
+.value {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  font-family: var(--font-satoshi);
+  font-size: 17px;
+  font-weight: var(--font-weight-medium);
+  line-height: 1.2;
+  color: #353232;
+  white-space: nowrap;
+
+  @include mobile {
+    font-size: 13.4px;
+  }
+}

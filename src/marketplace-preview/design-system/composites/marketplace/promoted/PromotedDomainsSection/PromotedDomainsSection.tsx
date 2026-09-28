@@ -20,9 +20,11 @@ const SECONDS_PER_CARD = 3.5
 export interface PromotedDomainsSectionProps {
   /** Forwarded to every card's "Buy Now" button. */
   onBuyNow?: (listing: MarketplaceListing) => void
+  /** Forwarded to every card's name link. Defaults to the domain overview page. */
+  getDomainHref?: (listing: MarketplaceListing) => string
 }
 
-export const PromotedDomainsSection = ({ onBuyNow }: PromotedDomainsSectionProps) => {
+export const PromotedDomainsSection = ({ onBuyNow, getDomainHref }: PromotedDomainsSectionProps) => {
   const trackStyle = {
     // must include the unit — a bare number here makes the CSS custom
     // property invalid wherever animation-duration expects a <time>, which
@@ -40,7 +42,13 @@ export const PromotedDomainsSection = ({ onBuyNow }: PromotedDomainsSectionProps
           {[0, 1].map((pass) => (
             <div className={styles.pass} key={pass} aria-hidden={pass === 1}>
               {mockPromotedListings.map((listing) => (
-                <PromotedDomainCard key={`${listing.id}-${pass}`} listing={listing} onBuyNow={onBuyNow && (() => onBuyNow(listing))} />
+                <PromotedDomainCard
+                  key={`${listing.id}-${pass}`}
+                  listing={listing}
+                  onBuyNow={onBuyNow && (() => onBuyNow(listing))}
+                  getDomainHref={getDomainHref}
+                  linkTabIndex={pass === 1 ? -1 : undefined}
+                />
               ))}
             </div>
           ))}

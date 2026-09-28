@@ -1,0 +1,113 @@
+@import '@mpstyles/_mixins.scss';
+
+// Figma 5:7438 (desktop) / 5:7965 (mobile). Receipt and What happened sit
+// side by side 16px apart, 20px under the header card; What next is 23px
+// below them. Everything stacks 20px apart on mobile and tablet.
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin-top: 20px;
+
+  @include tablet-down {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  // Printed receipts keep both cards, one under the other.
+  @media print {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.nextSteps {
+  margin-top: 23px;
+
+  @include tablet-down {
+    margin-top: 20px;
+  }
+
+  @media print {
+    display: none;
+  }
+}
+
+// ── States (not in Figma, plan §7) ───────────────────────────────────────
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+%skeletonBlock {
+  background: var(--color-gray-light);
+  animation: pulse 1.4s ease-in-out infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+.skeleton {
+  display: flex;
+  flex-direction: column;
+}
+
+.skeletonHeader {
+  @extend %skeletonBlock;
+  height: 77px;
+  border-radius: 4px;
+}
+
+.skeletonCard {
+  @extend %skeletonBlock;
+  height: 403px;
+  border-radius: 7px;
+}
+
+.notFound {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-10) var(--space-4);
+  text-align: center;
+}
+
+.notFoundTitle {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: 20px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+}
+
+.notFoundText {
+  max-width: 420px;
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  color: #7e7a93;
+}
+
+.notFoundLink {
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-blue-primary);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}

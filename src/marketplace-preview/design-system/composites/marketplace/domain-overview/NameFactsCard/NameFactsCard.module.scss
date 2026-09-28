@@ -1,0 +1,43 @@
+// Figma 5:3700. The well sits 17px under the title (45.9 − 12.9 − 16.2).
+
+.card {
+  min-width: 0;
+}
+
+.rows {
+  margin-top: 17px;
+}
+
+// The extension value's avatar is 5px from the text (the other icon rows use 7px).
+.extension {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+// Figma 5:3709: a 16px ringed token with a 13.5px provider logo. Nested to
+// outrank DomainAvatar's own single-class rules.
+.extension .avatar {
+  width: 16px;
+  height: 16px;
+  border: 0.35px solid rgba(38, 57, 237, 0.36);
+  box-shadow: 0 0.35px 1.86px var(--color-blue-primary-alpha-20);
+
+  img {
+    width: 13.5px;
+    height: 13.5px;
+  }
+}
+
+// "8,460.00 USDT" + icon: one text run (a word space between amount and
+// "USDT", not the row value's 7px icon gap), then 7px before the icon.
+.estimate {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28em;
+}
+
+// Nested to outrank TokenSuffix's own .suffix gap.
+.rows .token {
+  gap: 7px;
+}

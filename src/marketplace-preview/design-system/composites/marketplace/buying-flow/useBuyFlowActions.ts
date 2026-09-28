@@ -7,6 +7,8 @@ import {
   setMockWalletUsdtAllowance,
   setMockWalletUsdtBalance,
 } from '@/marketplace-preview/data/marketplace/domains'
+import { resolveDomainOverview } from '@/marketplace-preview/data/marketplace/overview'
+import { recordMockOrder } from '@/marketplace-preview/data/marketplace/orders'
 
 export interface BuyFlowActions {
   checkNetwork: () => Promise<{ ok: boolean; walletChainName?: string; requiredChainName?: string }>
@@ -25,8 +27,10 @@ export interface BuyFlowActions {
    * consumes the allowance and debits the balance. 'failed' = reverted on
    * chain (Figma's Reject screen); 'already-sold' = another wallet bought it
    * first ("No longer available", 1:1478). Either way nothing is charged.
+   * On success it also records the order and returns its id, so "View
+   * receipt" can open it (domain-overview plan §6.5).
    */
-  awaitSettlement: (txHash: string) => Promise<{ ok: true } | { ok: false; reason: 'failed' | 'already-sold' }>
+  awaitSettlement: (txHash: string) => Promise<{ ok: true; orderId: string } | { ok: false; reason: 'failed' | 'already-sold' }>
 }
 
 const MOCK_DELAY_MS = 1100
@@ -101,9 +105,14 @@ export function useBuyFlowActions(listing: MarketplaceListing): BuyFlowActions {
       // balance the "Pay with" card and "Your balance after" row read.
       setMockWalletUsdtAllowance(Math.max(0, mockWalletUsdtAllowance - order.priceUsd))
       setMockWalletUsdtBalance(Math.max(0, mockWalletUsdtBalance - order.priceUsd))
-      return { ok: true as const }
+      const fullName = `${listing.domainName}${listing.extension}`
+      const facts = resolveDomainOverview(fullName)?.facts
+      const orderId = facts
+        ? recordMockOrder({ listing, facts, networkFeeUsd: insights?.networkFeeEstimateUsd ?? 0, txHash })
+        : ''
+      return { ok: true as const, orderId }
     },
-    [insights]
+    [insights, listing]
   )
 
   return { checkNetwork, switchNetwork, needsUsdtApproval, approveUsdt, hasSufficientBalance, getUsdtBalance, confirmPurchase, awaitSettlement }

@@ -13,6 +13,13 @@ export interface KeyValueRow {
 
 export interface KeyValueRowsProps {
   rows: KeyValueRow[]
+  /**
+   * 'plain' (default) is the buying flow's receipt list. 'boxed' is the domain
+   * overview's white 29px rows, 3px apart, inside a soft gradient well
+   * (Figma 5:3701 / 5:3890). 'ruled' is the order receipt's list: a hairline
+   * above every row including the first, 13px muted labels (Figma 5:7540).
+   */
+  variant?: 'plain' | 'boxed' | 'ruled'
   className?: string
 }
 
@@ -23,8 +30,8 @@ export interface KeyValueRowsProps {
  * FeeBreakdownRow (buying-flow plan §4.3): the two files draw the seller-
  * and buyer-side breakdowns in different shapes.
  */
-export const KeyValueRows = ({ rows, className = '' }: KeyValueRowsProps) => (
-  <dl className={[styles.list, className].filter(Boolean).join(' ')}>
+export const KeyValueRows = ({ rows, variant = 'plain', className = '' }: KeyValueRowsProps) => (
+  <dl className={[styles.list, variant !== 'plain' ? styles[variant] : '', className].filter(Boolean).join(' ')}>
     {rows.map((row) => (
       <div key={row.label} className={[styles.row, row.emphasis ? styles.emphasis : ''].filter(Boolean).join(' ')}>
         <dt className={styles.label}>{row.label}</dt>

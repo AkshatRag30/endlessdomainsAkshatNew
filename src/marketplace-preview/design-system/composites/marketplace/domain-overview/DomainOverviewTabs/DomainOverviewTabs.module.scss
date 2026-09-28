@@ -1,0 +1,30 @@
+@import '@mpstyles/_mixins.scss';
+@import '../domainOverview';
+
+// Figma 5:3685 (desktop) / 5:4300 (mobile). Desktop: 17px under the summary
+// tiles, 10px inset, content 27px under the tab bar. Mobile: 28px under the
+// tiles, 8px inset (the stacked cards are 338px of the 355px panel), content
+// 32px under the bar.
+
+.panel {
+  @include noise-surface;
+  display: flex;
+  flex-direction: column;
+  gap: 27px;
+  margin-top: 17px;
+  padding: 10px;
+
+  @include mobile {
+    gap: 32px;
+    margin-top: 28px;
+    padding: 10px 8px 8px;
+  }
+}
+
+.content {
+  min-width: 0;
+
+  @include mobile {
+    padding: 0 0.5px;
+  }
+}

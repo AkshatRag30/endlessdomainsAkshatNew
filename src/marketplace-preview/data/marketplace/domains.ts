@@ -31,6 +31,11 @@ const NAME_STEMS = [
   // the Length filter's "1-3 characters" and "4-6 characters" buckets with
   // nothing to ever match.
   'nx', 'qi', 'vox', 'nova', 'zeta', 'flux', 'echo',
+  // Domain overview Figma fixture (domain-overview plan §6.3) — appended, not
+  // inserted, so the index-based ids BUY_FIXTURES keys on don't shift. Its
+  // index lands on 3 ETH (8,460.00) and a "high" appraisal like Figma's
+  // hero; chain/seller/expiry are pinned in FIGMA_LISTING_OVERRIDES below.
+  'banking',
 ]
 
 const DAY_MS = 24 * 60 * 60 * 1000
@@ -75,7 +80,23 @@ function buildListings(): MarketplaceListing[] {
   })
 }
 
-export const mockListings: MarketplaceListing[] = buildListings()
+// Pins the domain overview fixture to the exact values drawn in Figma 5:3570
+// (hero "bnb", seller "0x8A7F…3c9D", "Listing expires 12 Oct 2026", the
+// Activity card's "Listed … 9m ago") so the page can be compared against the
+// frame directly. Keyed by stem.
+const FIGMA_LISTING_OVERRIDES: Record<string, Partial<MarketplaceListing>> = {
+  banking: {
+    chain: BSC,
+    sellerAddress: '0x8A7F…3c9D',
+    expiresAt: '2026-10-12T12:00:00.000Z',
+    listedAt: new Date(Date.now() - 9 * 60 * 1000).toISOString(),
+  },
+}
+
+export const mockListings: MarketplaceListing[] = buildListings().map((listing) => ({
+  ...listing,
+  ...FIGMA_LISTING_OVERRIDES[listing.domainName],
+}))
 
 export const mockPromotedListings: MarketplaceListing[] = mockListings.filter((listing) => listing.isPromoted)
 

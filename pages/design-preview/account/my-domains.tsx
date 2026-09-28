@@ -1,4 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
+import ToastMessage from '@/design-system/primitives/toast-message'
+import { TOAST_TYPE } from '@/core/enum/toast-type.enum'
 import Header from '@/marketplace-preview/design-system/layouts/header'
 import MarketplacePageShell from '@/marketplace-preview/design-system/composites/marketplace/shared/MarketplacePageShell'
 import MarketplaceSidebar from '@/marketplace-preview/design-system/composites/marketplace/sidebar/MarketplaceSidebar'
@@ -69,6 +72,22 @@ export default function MyDomainsPreview() {
   }
   const openEditPriceModal = (domain: MyDomainListing) => setListingModal({ isOpen: true, mode: 'edit', domain })
   const closeListingModal = () => setListingModal((prev) => (prev ? { ...prev, isOpen: false } : null))
+
+  // ?list=<name> (the order receipt's "List it for sale", domain-overview
+  // plan §4.3) opens the listing drawer for that name. A name bought moments
+  // ago isn't in the portfolio until it's indexed (the receipt's own "within
+  // 10 to 15 minutes"), so that case says so instead of opening the drawer.
+  // PRIMARY, not INFO: the INFO toast drops its title, which names the domain.
+  const router = useRouter()
+  useEffect(() => {
+    if (!router.isReady || typeof router.query.list !== 'string') return
+    const wanted = router.query.list.toLowerCase()
+    const match = summary.domains.find((d) => `${d.domainName}${d.extension}`.toLowerCase() === wanted)
+    if (match) setListingModal({ isOpen: true, mode: 'list', domain: match })
+    else ToastMessage(TOAST_TYPE.PRIMARY, `${wanted} isn't here yet`, 'New purchases appear in My domains within 10 to 15 minutes. You can list it once it shows up.')
+    // Drop the param so a reload doesn't reopen it.
+    router.replace(router.pathname, undefined, { shallow: true })
+  }, [router, summary.domains])
 
   return (
     <div data-marketplace-preview>

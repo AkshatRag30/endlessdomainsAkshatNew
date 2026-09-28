@@ -1,0 +1,312 @@
+@import '@mpstyles/_mixins.scss';
+@import '../domainOverview';
+
+// Figma node 5:3587 (desktop, 1035×157) / 5:4199 (mobile, 355×341).
+// #070707 name, #a6a1bb meta, #7e7a93 note and rgba(7,7,7,0.69) price label
+// are Figma-exact, the same palette ReviewPurchaseStep's domain header uses.
+
+.card {
+  @include noise-surface;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  min-height: 157px;
+  // Figma centres a 558 + 188 + 253px row in the 1035px card, leaving ~18px
+  // either side; the 188px gap becomes space-between so narrower widths shrink it.
+  padding: 13px 18px;
+
+  @include mobile {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 29px;
+    min-height: 341px;
+    padding: 13px 21px 11px;
+  }
+}
+
+// ── Left: identity + note ────────────────────────────────────────────────
+
+.identity {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  flex: 0 1 558px;
+  min-width: 0;
+
+  @include mobile {
+    flex-basis: auto;
+    gap: 20px;
+  }
+}
+
+.domainHeader {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+
+  // Avatar + name on the first row, the meta line spanning under both
+  // (5:4201 / 5:4230) — .domainText flattens into this grid below.
+  @include mobile {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 9px;
+    row-gap: 15px;
+  }
+}
+
+// Same 40px ringed token as ReviewPurchaseStep's header (Figma 5:3591); 54px
+// on mobile (5:4202). Nested to outrank DomainAvatar's own .avatar rules.
+.domainHeader .avatar {
+  width: 40px;
+  height: 40px;
+  border: 0.87px solid rgba(38, 57, 237, 0.36);
+  box-shadow: 0 0.87px 4.67px var(--color-blue-primary-alpha-20);
+
+  img {
+    width: 32px;
+    height: 32px;
+  }
+
+  @include mobile {
+    width: 54px;
+    height: 54px;
+    border-width: 1.17px;
+    box-shadow: 0 1.17px 6.28px var(--color-blue-primary-alpha-20);
+
+    img {
+      width: 43px;
+      height: 43px;
+    }
+  }
+}
+
+.domainText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+
+  @include mobile {
+    display: contents;
+  }
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: 6.3px;
+  min-width: 0;
+}
+
+.domainName {
+  margin: 0;
+  overflow: hidden;
+  font-family: var(--font-satoshi);
+  font-size: 20px;
+  font-weight: var(--font-weight-medium);
+  line-height: normal;
+  color: #070707;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// The 29px amber pill (5:3618), same scale-up ReviewPurchaseStep applies.
+.nameRow .extension {
+  flex-shrink: 0;
+  min-height: 29px;
+  padding: 0 11px;
+  font-size: 17.6px;
+  line-height: 15.7px;
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  gap: 7.8px;
+  min-height: 22.7px;
+  padding-top: 1.3px;
+
+  @include mobile {
+    grid-column: 1 / -1;
+    gap: 6px;
+    min-height: 0;
+    padding-top: 0;
+  }
+}
+
+.chainIcon {
+  flex-shrink: 0;
+}
+
+// JetBrains Mono in Figma — Space Grotesk stands in, the same substitution
+// ReviewPurchaseStep and ActivityItem make.
+.meta {
+  font-family: var(--font-space-grotesk);
+  font-size: 14.5px;
+  color: #a6a1bb;
+  white-space: nowrap;
+
+  @include mobile {
+    font-size: var(--text-small-12);
+    white-space: normal;
+  }
+}
+
+// Indented 48px so the note lines up under the name (5:3625). Mobile
+// (5:4255) hangs the shield out to the left instead, so the text lines up
+// with the price block below (both at x≈47 in the 390px frame).
+.note {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding-left: 48px;
+
+  @include mobile {
+    margin-left: -13px;
+    padding-left: 0;
+  }
+}
+
+.noteIcon {
+  flex-shrink: 0;
+}
+
+// Segoe UI in Figma — Satoshi stands in (not loaded by this app).
+.noteText {
+  max-width: 466px;
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  line-height: 18px;
+  color: #7e7a93;
+}
+
+// ── Right: price + Buy Now ───────────────────────────────────────────────
+
+.purchase {
+  display: flex;
+  flex-direction: column;
+  gap: 17px;
+  flex: 0 0 253.5px;
+
+  @include mobile {
+    flex-basis: auto;
+    padding-left: 9px; // Figma 5:4239 sits at 30px, 9px in from the identity block
+  }
+}
+
+.priceBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.priceLabel {
+  font-family: var(--font-satoshi);
+  font-size: 13.6px;
+  font-weight: var(--font-weight-medium);
+  line-height: normal;
+  color: rgba(7, 7, 7, 0.69);
+}
+
+.priceStack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+}
+
+.priceAmount {
+  font-family: var(--font-satoshi);
+  font-size: 30px;
+  font-weight: var(--font-weight-bold);
+  line-height: 25.5px;
+  color: var(--color-blue-primary);
+}
+
+// Consolas in Figma, same Space Grotesk stand-in as ReviewPurchaseStep.
+// Nested to outrank TokenSuffix's own .suffix gap.
+.priceStack .priceSymbol {
+  gap: 2px;
+  font-family: var(--font-space-grotesk);
+  font-size: 11.5px;
+  line-height: 1.2;
+  color: var(--color-black-primary);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12.6px;
+}
+
+// Figma 5:3643 draws Buy Now as a beveled blue gradient; it uses the
+// standard PrimaryButton instead, to match the rest of the marketplace.
+// Only the Figma width is kept (nested to outrank its fit-content width).
+.actions .buyNow {
+  width: 228.6px;
+}
+
+.favorite {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  flex-shrink: 0;
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// Same colours as PromotedDomainCard's heart.
+.favoriteIcon {
+  width: 14px;
+  height: 13px;
+  color: #a6a1bb;
+}
+
+.favoriteIconActive {
+  width: 14px;
+  height: 13px;
+  color: var(--color-error);
+}
+
+// Not in Figma (plan §7): replaces the price block when nothing is for sale.
+.unavailable {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.unavailableText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-15);
+  font-weight: var(--font-weight-medium);
+  color: rgba(7, 7, 7, 0.69);
+}
+
+.receiptLink {
+  font-size: 13px;
+  color: var(--color-blue-primary);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}

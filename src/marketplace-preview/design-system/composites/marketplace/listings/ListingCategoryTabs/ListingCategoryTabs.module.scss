@@ -80,3 +80,74 @@
     color: rgba(255, 255, 255, 0.82);
   }
 }
+
+.tab:focus-visible {
+  @include focus-ring;
+}
+
+// ── Disabled tab + badge (domain overview "Offers · Soon", Figma 5:3689) ──
+// A faint 31px plate instead of the pill, 4px label/chip gap, not clickable.
+// rgba(64,64,64,0.06) plate and the #404040 → #1a1a1a chip are Figma-exact.
+
+.tabDisabled {
+  gap: var(--space-1);
+  height: 31px;
+  padding: 0 3px;
+  border-radius: 4.3px;
+  background: rgba(64, 64, 64, 0.06);
+  box-shadow: inset 0 0.86px 0.86px rgba(255, 255, 255, 0.25);
+  cursor: default;
+}
+
+.badge {
+  padding: 3px 5px 2px;
+  border-radius: 4.3px;
+  background: linear-gradient(180deg, #404040 0%, #1a1a1a 100%);
+  box-shadow: inset 0 0.86px 0.86px rgba(255, 255, 255, 0.25);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  font-weight: var(--font-weight-medium);
+  line-height: 1;
+  color: var(--color-white-primary);
+}
+
+// ── 'section' variant (domain overview tab bar, Figma 5:3687) ────────────
+// Same glass bar; 13.6px tab padding, 7px/6.4px bar inset, 9px after the
+// active pill, a medium-weight white active label and no counts. The bar
+// scrolls at every width instead of squashing labels (the mobile frame
+// 5:4304 keeps the full 1011px bar and clips it).
+
+.section {
+  gap: 0;
+  padding: 6.4px 7px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tab {
+    flex-shrink: 0;
+    padding: 7.8px 13.6px;
+  }
+
+  .label {
+    line-height: 19.7px;
+  }
+
+  .tabActive {
+    margin-right: 9px;
+    border-width: 0.33px;
+    box-shadow: 0 1.3px 4.6px rgba(0, 0, 0, 0.05), 0 0.33px 0 rgba(0, 0, 0, 0.1), inset 0 0.65px 4.6px var(--color-white-primary);
+
+    .label {
+      font-weight: var(--font-weight-medium);
+    }
+  }
+
+  .tabDisabled {
+    padding: 0 3px;
+  }
+}

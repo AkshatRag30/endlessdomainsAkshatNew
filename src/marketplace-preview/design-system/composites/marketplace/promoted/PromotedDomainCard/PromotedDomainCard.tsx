@@ -1,11 +1,13 @@
 import React, { useState } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { FiHeart } from 'react-icons/fi'
 import type { MarketplaceListing } from '@/marketplace-preview/types/marketplace'
 import ExtensionBadge from '@/marketplace-preview/design-system/primitives/badges/extension-badge'
 import ChainBadge from '@/marketplace-preview/design-system/primitives/badges/chain-badge'
 import TrendIndicator from '@/marketplace-preview/design-system/primitives/badges/trend-indicator'
 import Tooltip from '@/marketplace-preview/design-system/primitives/tooltip'
+import { domainOverviewHref } from '@/marketplace-preview/helpers/marketplace/routes'
 import primaryBtnStyles from '@/marketplace-preview/design-system/primitives/buttons/primary-button/Primarybutton.module.scss'
 import styles from './PromotedDomainCard.module.scss'
 
@@ -18,13 +20,27 @@ export interface PromotedDomainCardProps {
   fullWidth?: boolean
   /** Opens BuyFlowModal for this listing. Optional — without it the button stays visually real but inert. */
   onBuyNow?: () => void
+  /** Where the name links to. Defaults to the domain overview page (domain-overview plan §4.2). */
+  getDomainHref?: (listing: MarketplaceListing) => string
+  /** -1 for the promoted marquee's aria-hidden duplicate pass, so keyboard users don't tab through every name twice. */
+  linkTabIndex?: number
 }
+
+const defaultDomainHref = (listing: MarketplaceListing) => domainOverviewHref(`${listing.domainName}${listing.extension}`)
 
 const formatEth = (value: number) => `${value.toFixed(2)} ETH`
 const formatUsd = (value: number) => `$${value.toLocaleString('en-US')}`
 
 /** Figma node 1:1034 — measurements, colors, and fonts taken from get_design_context, not the screenshot alone. */
-export const PromotedDomainCard = ({ listing, favorited: favoritedProp, onToggleFavorite, fullWidth, onBuyNow }: PromotedDomainCardProps) => {
+export const PromotedDomainCard = ({
+  listing,
+  favorited: favoritedProp,
+  onToggleFavorite,
+  fullWidth,
+  onBuyNow,
+  getDomainHref = defaultDomainHref,
+  linkTabIndex,
+}: PromotedDomainCardProps) => {
   const [favoritedState, setFavoritedState] = useState(!!listing.isFavorited)
   const favorited = favoritedProp ?? favoritedState
   const toggleFavorite = onToggleFavorite ?? (() => setFavoritedState((prev) => !prev))
@@ -36,7 +52,10 @@ export const PromotedDomainCard = ({ listing, favorited: favoritedProp, onToggle
         <span className={styles.domainLabel}>domain name</span>
         <div className={styles.domainRow}>
           <Tooltip label={listing.domainName} placement="bottom" portal className={styles.domainNameTooltip}>
-            <span className={styles.domainName}>{listing.domainName}</span>
+            {/* Only the name links, not the whole card (plan O7), so Buy Now and the heart never navigate. */}
+            <Link href={getDomainHref(listing)} className={`${styles.domainName} ${styles.domainLink}`} tabIndex={linkTabIndex}>
+              {listing.domainName}
+            </Link>
           </Tooltip>
           <ExtensionBadge extension={listing.extension} />
         </div>

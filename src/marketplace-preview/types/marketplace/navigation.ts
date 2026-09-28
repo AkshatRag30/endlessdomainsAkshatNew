@@ -38,7 +38,12 @@ export interface SidebarSection {
 export interface ListingCategory {
   id: string
   label: string
-  count: number
+  /** Omitted for tab bars that don't show counts (the domain overview's section tabs). */
+  count?: number
+  /** Drawn but not selectable, e.g. the domain overview's "Offers" tab. */
+  disabled?: boolean
+  /** A short chip after the label, e.g. "Soon". */
+  badge?: string
 }
 
 export interface HeroCategoryChip {

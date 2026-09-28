@@ -1,12 +1,10 @@
 import React from 'react'
 import Image from 'next/image'
 import type { MarketplaceBuyInsights, MarketplaceListing } from '@/marketplace-preview/types/marketplace'
-import DomainAvatar from '@/marketplace-preview/design-system/primitives/avatars/domain-avatar'
-import ExtensionBadge from '@/marketplace-preview/design-system/primitives/badges/extension-badge'
-import TokenSuffix from '@/marketplace-preview/design-system/primitives/token-suffix'
 import NoticeBanner from '@/marketplace-preview/design-system/primitives/banners/notice-banner'
 import PrimaryButton from '@/marketplace-preview/design-system/primitives/buttons/primary-button'
-import { formatToken } from '@/marketplace-preview/helpers/token-format/tokenFormat'
+import { chainShortName } from '@/marketplace-preview/helpers/marketplace/chain'
+import DomainPriceHeader from '../../shared/DomainPriceHeader'
 import PaymentMethodSection from '../PaymentMethodSection'
 import WhatYouPaySection from '../WhatYouPaySection'
 import AfterYouBuySection from '../AfterYouBuySection'
@@ -30,13 +28,8 @@ export interface ReviewPurchaseStepProps {
   notice?: ReviewPurchaseNotice
 }
 
-/**
- * Figma writes the chain in lowercase short form inside meta lines ("bnb ·
- * 7 chars", "Balance … USDT on polygon") — the first word of the chain's own
- * label gives exactly that for every chain in the mock set ("BNB Chain" →
- * "bnb", "Polygon" → "polygon").
- */
-export const chainShortName = (listing: MarketplaceListing) => listing.chain.label.split(' ')[0].toLowerCase()
+// Moved to helpers/marketplace/chain.ts; re-exported for existing importers.
+export { chainShortName }
 
 /**
  * Figma node 1:650 ("Review purchase", need-usdt-approval scenario) — the
@@ -77,26 +70,14 @@ export const ReviewPurchaseStep = ({ listing, insights, balanceUsd, notice }: Re
     )}
 
     <section className={styles.domainSection}>
-      <div className={styles.domainHeader}>
-        <DomainAvatar extension={listing.extension} className={styles.avatar} />
-        <div className={styles.domainText}>
-          <div className={styles.nameRow}>
-            <span className={styles.domainName}>{listing.domainName}</span>
-            <ExtensionBadge extension={listing.extension} className={styles.extension} />
-          </div>
-          <div className={styles.metaRow}>
-            {listing.chain.iconSrc && <Image src={listing.chain.iconSrc} alt="" aria-hidden="true" width={12} height={12} />}
-            <span className={styles.meta}>
-              {chainShortName(listing)} · {listing.domainName.length} chars
-              {listing.isOneTimePurchase && ' · one time · no renewal'}
-            </span>
-          </div>
-        </div>
-      </div>
-      <div className={styles.price}>
-        <span className={styles.priceAmount}>{formatToken(listing.priceUsd)}</span>
-        <TokenSuffix iconSize={15} iconFirst className={styles.priceSymbol} />
-      </div>
+      <DomainPriceHeader
+        label={listing.domainName}
+        extension={listing.extension}
+        chain={listing.chain}
+        characterCount={listing.domainName.length}
+        oneTimePurchase={listing.isOneTimePurchase}
+        priceUsd={listing.priceUsd}
+      />
     </section>
 
     <PaymentMethodSection balanceUsd={balanceUsd} chainName={chainShortName(listing)} />

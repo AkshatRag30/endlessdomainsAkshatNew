@@ -1,0 +1,56 @@
+@import '@mpstyles/_mixins.scss';
+@import '../domainOverview';
+
+// Figma 5:7492 (571×403). 17px inset; the name 18px under the title, the
+// rows 16px under the name, the note 13px under the rows. Amounts are
+// Medium 14px #171429, the transaction Bold 12.5px #5b3df5 (Figma-exact).
+// Mobile is the plain white card (5:7998).
+
+// Nested to outrank GlassCard's own single-class rules.
+.card.card {
+  @include plain-card-on-mobile;
+  padding: 17px 17px 22px;
+}
+
+.domain {
+  margin: 18px -1px 0;
+}
+
+.rows {
+  margin-top: 16px;
+}
+
+.amount {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28em; // a word space between amount and "USDT", then 7px to the icon
+  font-weight: var(--font-weight-medium);
+  font-size: 14px;
+  line-height: 20.25px;
+}
+
+// Nested to outrank TokenSuffix's own .suffix gap.
+.amount .token {
+  gap: 7px;
+}
+
+.tx {
+  font-size: 12.5px;
+  line-height: 18.75px;
+  color: #5b3df5;
+  text-decoration: none;
+
+  @at-root a#{&} {
+    &:hover {
+      text-decoration: underline;
+    }
+
+    &:focus-visible {
+      @include focus-ring;
+    }
+  }
+}
+
+.note {
+  margin-top: 13px;
+}

@@ -1,0 +1,147 @@
+@import '@mpstyles/_mixins.scss';
+@import '../domainOverview';
+
+// Figma 5:7454 (1156×77). The hero's noise surface with a faint green
+// border (rgba(55,205,0,0.08)); 15px inset; #1f1f21 23px title with -0.46px
+// tracking, rgba(0,0,0,0.74) meta — all Figma-exact. Actions sit ~31px from
+// the right edge.
+
+.card {
+  @include noise-surface;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  min-height: 77px;
+  padding: 11px 31px 11px 15px;
+  border-color: rgba(55, 205, 0, 0.08);
+
+  @include mobile {
+    min-height: 94px;
+    padding: 20px 15px;
+  }
+}
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+.titleRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: 23px;
+  font-weight: var(--font-weight-medium);
+  line-height: 27.6px;
+  letter-spacing: -0.46px;
+  color: #1f1f21;
+
+  // Figma 5:7981 sets the title ~16px on mobile, small enough for the chip
+  // to stay on the same line at 390px.
+  @include mobile {
+    font-size: 16px;
+    line-height: 20px;
+    letter-spacing: -0.32px;
+  }
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-satoshi);
+  font-size: 13px;
+  line-height: 19.5px;
+  color: rgba(0, 0, 0, 0.74);
+}
+
+.metaItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  white-space: nowrap;
+}
+
+.time {
+  gap: var(--space-1);
+}
+
+// Figma's 17×18.3 box with the 13.3×15.2 calendar glyph inset.
+.calendarBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 17px;
+  height: 18.3px;
+}
+
+.clock {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+  width: 17px;
+  height: 17px;
+}
+
+// Figma 5:7475: the hands sit at 46.1% / 23.2% of the 17px face.
+.clockHands {
+  position: absolute;
+  top: 3.94px;
+  left: 7.84px;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  flex-shrink: 0;
+
+  // Figma's mobile frame (5:7980) has no Download or Share.
+  @include mobile {
+    display: none;
+  }
+
+  @media print {
+    display: none;
+  }
+}
+
+// Figma 5:7484: the charcoal PrimaryButton at its standard shape (Figma's
+// custom bevel dropped to match the rest of the marketplace). Only the
+// Figma width is kept (nested to outrank its fit-content width).
+.actions .download {
+  width: 199px;
+}
+
+// Segoe UI Semibold in Figma — Satoshi stands in.
+.share {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: var(--font-satoshi);
+  font-size: 13px;
+  font-weight: var(--font-weight-semibold);
+  line-height: 19.5px;
+  color: #171429;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--color-blue-primary);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}

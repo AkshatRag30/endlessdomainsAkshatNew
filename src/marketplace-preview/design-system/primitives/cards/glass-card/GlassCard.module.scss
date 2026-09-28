@@ -1,0 +1,45 @@
+@import '@mpstyles/_mixins.scss';
+
+// Figma 5:3700 (desktop) / 5:4318 (mobile). 0.19px rgba(0,0,0,0.22) hairline,
+// #313135 title with -0.27px tracking, 12.9px / 9.9px title inset, all
+// Figma-exact. Mobile rounds the corners to 5px.
+
+.card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 12.9px 9.9px 7px;
+}
+
+.plain {
+  min-height: 222px;
+  border: 0.19px solid rgba(0, 0, 0, 0.22);
+  border-radius: 3px;
+  background: var(--color-white-primary);
+
+  @include mobile {
+    border-radius: 5px;
+  }
+}
+
+// Figma 5:4719: white 78% → 92% frosted over a 21px blur, a 70% white
+// hairline, a soft drop shadow and a 90% white inner top highlight — the
+// same glass as ListingCategoryTabs' bar. rgba(18,14,31,0.05) is Figma-exact.
+.glass {
+  border: 0.97px solid rgba(255, 255, 255, 0.7);
+  border-radius: 7px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.78) 0%, rgba(255, 255, 255, 0.92) 100%);
+  backdrop-filter: blur(21.4px);
+  -webkit-backdrop-filter: blur(21.4px);
+  box-shadow: 0 2.9px 9.7px rgba(18, 14, 31, 0.05), inset 0 0.97px 0 rgba(255, 255, 255, 0.9);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: 14px;
+  font-weight: var(--font-weight-medium);
+  line-height: 16.2px;
+  letter-spacing: -0.27px;
+  color: #313135;
+}

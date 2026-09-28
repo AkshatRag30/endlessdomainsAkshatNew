@@ -1,0 +1,26 @@
+// #ef4444 / #12a05c are Figma-exact (the same pair the buying flow uses for
+// error and success values).
+
+.delta {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  line-height: 1.2;
+  white-space: nowrap;
+
+  &[data-tone='negative'] {
+    color: #ef4444;
+  }
+
+  &[data-tone='positive'] {
+    color: #12a05c;
+  }
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

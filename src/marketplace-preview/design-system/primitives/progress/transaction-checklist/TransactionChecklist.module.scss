@@ -79,3 +79,46 @@
     animation: none;
   }
 }
+
+.text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+// ── 'plain' variant (order receipt "What happened", Figma 5:7594) ────────
+// 9px between rows, each 9px padded with an 11px icon/text gap; #171429
+// Medium 13px labels over a 10.8px rgba(0,0,0,0.53) detail line. The done
+// icon is the same asset as the card variant's.
+
+.plain {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  .row {
+    align-items: flex-start;
+    gap: 11px;
+    padding: 9px 0;
+  }
+
+  .label {
+    font-size: 13px;
+    font-weight: var(--font-weight-medium);
+    line-height: 19.5px;
+    color: #171429;
+  }
+}
+
+.detail {
+  display: flex;
+  align-items: center;
+  gap: 5.8px;
+  font-family: var(--font-satoshi);
+  font-size: 10.8px;
+  line-height: 16.2px;
+  color: rgba(0, 0, 0, 0.53);
+}

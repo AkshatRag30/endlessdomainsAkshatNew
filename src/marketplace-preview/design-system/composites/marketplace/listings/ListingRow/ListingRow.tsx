@@ -1,11 +1,13 @@
 import React from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { FiHeart } from 'react-icons/fi'
 import type { MarketplaceListing } from '@/marketplace-preview/types/marketplace'
 import ExtensionBadge from '@/marketplace-preview/design-system/primitives/badges/extension-badge'
 import ChainBadge from '@/marketplace-preview/design-system/primitives/badges/chain-badge'
 import TrendIndicator from '@/marketplace-preview/design-system/primitives/badges/trend-indicator'
 import Tooltip from '@/marketplace-preview/design-system/primitives/tooltip'
+import { domainOverviewHref } from '@/marketplace-preview/helpers/marketplace/routes'
 import primaryBtnStyles from '@/marketplace-preview/design-system/primitives/buttons/primary-button/Primarybutton.module.scss'
 import styles from './ListingRow.module.scss'
 
@@ -20,7 +22,11 @@ const truncateDomainName = (name: string, max = DOMAIN_NAME_MAX_CHARS) =>
 
 export interface ListingDomainCellProps {
   listing: MarketplaceListing
+  /** Where the name links to. Defaults to the domain overview page (domain-overview plan §4.2). */
+  getDomainHref?: (listing: MarketplaceListing) => string
 }
+
+const defaultDomainHref = (listing: MarketplaceListing) => domainOverviewHref(`${listing.domainName}${listing.extension}`)
 
 /**
  * Just the Domain Name cell. Reused as-is by both the desktop row below and
@@ -33,8 +39,11 @@ export interface ListingDomainCellProps {
  * truncating with an ellipsis, while the extension badge stays put on the
  * right regardless of how far the name is scrolled. Desktop is unaffected,
  * it still just truncates.
+ *
+ * Only the name links to the domain's overview page, not the whole row
+ * (plan O7), so Buy Now and the heart never navigate by accident.
  */
-export const ListingDomainCell = ({ listing }: ListingDomainCellProps) => (
+export const ListingDomainCell = ({ listing, getDomainHref = defaultDomainHref }: ListingDomainCellProps) => (
   <div className={styles.cell} role="cell">
     <div className={styles.domain}>
       {listing.isPremium && (
@@ -44,9 +53,9 @@ export const ListingDomainCell = ({ listing }: ListingDomainCellProps) => (
           browser-controlled delay. Themed Tooltip primitive instead, same
           reasoning applied across both marketplace and My Domains now. */}
       <Tooltip label={listing.domainName} portal className={styles.domainNameTooltip}>
-        <span className={styles.domainNameScroll}>
+        <Link href={getDomainHref(listing)} className={`${styles.domainNameScroll} ${styles.domainLink}`}>
           <span className={styles.domainName}>{truncateDomainName(listing.domainName)}</span>
-        </span>
+        </Link>
       </Tooltip>
       <ExtensionBadge extension={listing.extension} />
     </div>
@@ -111,6 +120,7 @@ export interface ListingRowProps {
   favorited: boolean
   onToggleFavorite: () => void
   onBuyNow?: () => void
+  getDomainHref?: (listing: MarketplaceListing) => string
 }
 
 /**
@@ -119,9 +129,9 @@ export interface ListingRowProps {
  * ListingDomainCell/ListingRestCells directly instead, split across
  * LiveListingsTable's fixed and scrollable panes.
  */
-export const ListingRow = ({ listing, favorited, onToggleFavorite, onBuyNow }: ListingRowProps) => (
+export const ListingRow = ({ listing, favorited, onToggleFavorite, onBuyNow, getDomainHref }: ListingRowProps) => (
   <div className={styles.row} role="row">
-    <ListingDomainCell listing={listing} />
+    <ListingDomainCell listing={listing} getDomainHref={getDomainHref} />
     <ListingRestCells listing={listing} favorited={favorited} onToggleFavorite={onToggleFavorite} onBuyNow={onBuyNow} />
   </div>
 )

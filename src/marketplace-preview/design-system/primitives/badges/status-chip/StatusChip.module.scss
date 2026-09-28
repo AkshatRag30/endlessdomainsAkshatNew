@@ -43,3 +43,29 @@
 .forSale {
   background: linear-gradient(180deg, #12a05c, rgba(18, 160, 92, 0.47));
 }
+
+.expired {
+  background: linear-gradient(180deg, #c90000, rgb(109 0 0 / 60%));
+}
+
+// Figma 5:7458 (order receipt header): a 20px bright green pill with a dark
+// green label, a wide green glow and a white inner light. Colours and
+// shadows are Figma-exact; the grain tile is drawn larger here (370px).
+.completed {
+  height: 20px;
+  padding: 0 13.5px;
+  border-radius: 56px;
+  background: linear-gradient(180deg, #27ff00 0%, rgba(39, 255, 0, 0.47) 100%);
+  box-shadow:
+    0 50.6px 129px rgba(55, 205, 0, 0.34),
+    0 29.8px 38.9px rgba(55, 205, 0, 0.19),
+    0 12.4px 16.2px rgba(55, 205, 0, 0.22),
+    inset 0 1.2px 4.8px 2.4px var(--color-white-primary);
+  letter-spacing: -0.46px;
+  line-height: 13.2px;
+  color: #124206;
+
+  &::before {
+    background-size: 370px 370px;
+  }
+}

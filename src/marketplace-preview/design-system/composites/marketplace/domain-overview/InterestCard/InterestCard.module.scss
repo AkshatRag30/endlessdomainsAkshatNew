@@ -1,0 +1,10 @@
+// Figma 5:3762: bars 30px under the title (59 − 12.9 − 16.2), and they end
+// ~12px short of the card's right edge (484 of 496).
+
+.card {
+  min-width: 0;
+}
+
+.bars {
+  margin: 30px 2px 0 0;
+}

@@ -74,3 +74,71 @@
 .muted {
   color: var(--color-text-body);
 }
+
+// ── 'boxed' variant (domain overview, Figma 5:3701 / 5:3890) ─────────────
+// A rgba(0,0,0,0.03) → transparent well, radius 6, 6px/5px inset, holding
+// white 29px rows with a rgba(0,0,0,0.05) border, radius 5, 3px apart.
+// Label Regular / value Medium, both 14px; #7e7a93 / #171429 as above.
+// Nested under .boxed so it outranks the plain rules regardless of order.
+
+.boxed {
+  gap: 3px;
+  padding: 6px 5px;
+  border-radius: 6px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.03) 0%, rgba(0, 0, 0, 0) 100%);
+
+  .row {
+    align-items: center;
+    height: 29px;
+    padding: 0 5px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 5px;
+    background: var(--color-white-primary);
+  }
+
+  .row + .row {
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  .label {
+    line-height: 19.5px;
+    white-space: nowrap;
+  }
+
+  // Flex, so a trailing icon (provider avatar, chain, USDT) centres on the text.
+  .value {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-width: 0;
+    font-weight: var(--font-weight-medium);
+    font-size: 14px;
+    line-height: 19.5px;
+  }
+}
+
+// ── 'ruled' variant (order receipt, Figma 5:7540) ────────────────────────
+// 36.5px rows 3px apart, each with a #eeedf3 hairline on top (the first
+// too), 13px rgba(0,0,0,0.68) labels. Values keep the plain Bold 13px;
+// amounts pass their own Medium 14px styling.
+
+.ruled {
+  gap: 3px;
+
+  .row {
+    align-items: center;
+    min-height: 36.5px;
+    padding: var(--space-2) 0;
+    border-top: 1px solid #eeedf3;
+  }
+
+  .label {
+    font-size: 13px;
+    line-height: 19.5px;
+    color: rgba(0, 0, 0, 0.68);
+  }
+
+  .value {
+    line-height: 19.5px;
+  }
+}

@@ -17,6 +17,7 @@ import type { MarketplaceListing } from '@/marketplace-preview/types/marketplace
 import { useListingFilters, filterListings } from '@/marketplace-preview/hooks/marketplace/useListingFilters'
 import { mockListings, setMockWalletUsdtAllowance } from '@/marketplace-preview/data/marketplace/domains'
 import { mockListingCategories } from '@/marketplace-preview/data/marketplace/categories'
+import { useMockWatchlist } from '@/marketplace-preview/data/marketplace/watchlist'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import shellStyles from '@/marketplace-preview/design-system/composites/marketplace/shared/MarketplacePageShell/MarketplacePageShell.module.scss'
@@ -34,17 +35,10 @@ export default function MarketplacePreview() {
   const [buyModal, setBuyModal] = useState<{ isOpen: boolean; listing: MarketplaceListing } | null>(null)
   const openBuyModal = (listing: MarketplaceListing) => setBuyModal({ isOpen: true, listing })
 
-  // The listings table's watchlist (its hearts), lifted here so the buy
-  // drawer's "Watch this name" adds to the same list.
-  const [favoritedIds, setFavoritedIds] = useState<Set<string>>(() => new Set(mockListings.filter((l) => l.isFavorited).map((l) => l.id)))
-  const toggleFavorite = (id: string) =>
-    setFavoritedIds((prev) => {
-      const next = new Set(prev)
-      if (next.has(id)) next.delete(id)
-      else next.add(id)
-      return next
-    })
-  const watchListing = (listing: MarketplaceListing) => setFavoritedIds((prev) => new Set(prev).add(listing.id))
+  // The listings table's watchlist (its hearts). A shared mock store
+  // (domain-overview plan §6.4) rather than page state, so the buy drawer's
+  // "Watch this name" and a domain overview page's heart fill the same list.
+  const watchlist = useMockWatchlist()
 
   // Preview-only QA switch (buying-flow plan §9): ?usdtAllowance=20000 seeds
   // the mock wallet's USDT allowance on load, so the already-approved
@@ -93,8 +87,8 @@ export default function MarketplacePreview() {
               listings={filtered}
               pageSize={14}
               onBuyNow={openBuyModal}
-              favoritedIds={favoritedIds}
-              onToggleFavorite={toggleFavorite}
+              favoritedIds={watchlist.ids}
+              onToggleFavorite={watchlist.toggle}
             />
           </div>
         </div>
@@ -105,7 +99,7 @@ export default function MarketplacePreview() {
         <BuyFlowModal
           isOpen={buyModal.isOpen}
           listing={buyModal.listing}
-          onWatch={watchListing}
+          onWatch={(listing) => watchlist.add(listing.id)}
           onClose={() => setBuyModal((prev) => (prev ? { ...prev, isOpen: false } : prev))}
         />
       )}

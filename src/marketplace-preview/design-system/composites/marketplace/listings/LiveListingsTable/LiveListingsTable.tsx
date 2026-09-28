@@ -16,8 +16,10 @@ export interface LiveListingsTableProps {
    * the table keeps its own local state as before. The design-preview page
    * passes it so BuyFlowModal's "Watch this name" fills the same hearts.
    */
-  favoritedIds?: Set<string>
+  favoritedIds?: ReadonlySet<string>
   onToggleFavorite?: (id: string) => void
+  /** Forwarded to every row's and mobile card's name link. Defaults to the domain overview page. */
+  getDomainHref?: (listing: MarketplaceListing) => string
 }
 
 /**
@@ -34,9 +36,10 @@ export const LiveListingsTable = ({
   onBuyNow,
   favoritedIds: favoritedIdsProp,
   onToggleFavorite: onToggleFavoriteProp,
+  getDomainHref,
 }: LiveListingsTableProps) => {
   const [visibleCount, setVisibleCount] = useState(pageSize)
-  const [favoritedIdsState, setFavoritedIds] = useState<Set<string>>(() => new Set(listings.filter((l) => l.isFavorited).map((l) => l.id)))
+  const [favoritedIdsState, setFavoritedIds] = useState<ReadonlySet<string>>(() => new Set(listings.filter((l) => l.isFavorited).map((l) => l.id)))
   const favoritedIds = favoritedIdsProp ?? favoritedIdsState
   const visible = listings.slice(0, visibleCount)
   const remaining = listings.length - visible.length
@@ -77,6 +80,7 @@ export const LiveListingsTable = ({
                   favorited={favoritedIds.has(listing.id)}
                   onToggleFavorite={() => toggleFavorite(listing.id)}
                   onBuyNow={onBuyNow && (() => onBuyNow(listing))}
+                  getDomainHref={getDomainHref}
                 />
               ))}
             </div>
@@ -91,6 +95,7 @@ export const LiveListingsTable = ({
                 favorited={favoritedIds.has(listing.id)}
                 onToggleFavorite={() => toggleFavorite(listing.id)}
                 onBuyNow={onBuyNow && (() => onBuyNow(listing))}
+                getDomainHref={getDomainHref}
               />
             ))}
           </div>

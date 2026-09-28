@@ -1,3 +1,5 @@
+@import '@mpstyles/_mixins.scss';
+
 // Figma node 1:1034 — one of 8 identical placeholder cards in a horizontal
 // scroller. Measurements below are Figma-exact unless noted otherwise.
 
@@ -80,6 +82,20 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+// The name links to the domain overview page (domain-overview plan §4.2).
+// Not in Figma: no underline, a blue hover, and the shared focus ring.
+.domainLink {
+  text-decoration: none;
+
+  &:hover {
+    color: var(--color-blue-primary);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
 }
 
 // ── Middle row: appraised value | chain ─────────────────────────────────────
