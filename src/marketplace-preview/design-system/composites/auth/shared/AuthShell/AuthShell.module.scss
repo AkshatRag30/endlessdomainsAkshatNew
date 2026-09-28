@@ -1,0 +1,105 @@
+@import '@mpstyles/_mixins.scss';
+
+// loginimage.png is a 2361 × 2814 canvas whose artwork is only 2247px
+// wide: the last 114px on the right are transparent.
+$art-ratio: calc(2247 / 2814);
+$canvas-over-art: calc(2361 / 2247 * 100%); // 105.07%
+
+// Figma 16:511 (1512 × 982): a 22px inset, the artwork panel, a 21px gap,
+// then the right column. The panel is sized to the artwork's own
+// proportions so none of it is ever cropped (Figma crops 6.29% off its
+// left and stretches it to 787 × 938); the right column takes the rest.
+
+.page {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 21px;
+  min-height: 100vh;
+  padding: 22px;
+  background: var(--color-white-primary);
+  // The Figma hairlines are drawn wider than the column (710 in a 660
+  // column, 478 on a 390 screen), so they run off the edge rather than
+  // widen the page. clip, not hidden: hidden would make the page its own
+  // scroll container and break the artwork panel's position: sticky.
+  overflow-x: clip;
+
+  // Figma has no tablet frame. Two columns stop fitting the 461px buttons
+  // plus their rails well before 1040px, so tablet uses the mobile stack
+  // (banner above, content below) at the desktop control sizes.
+  @include tablet-down {
+    grid-template-columns: minmax(0, 1fr);
+    // Stacked from the top: without this the rows stretch to fill 100vh
+    // and the centred column opens a gap under the banner.
+    align-content: start;
+    gap: 41px;
+    padding: var(--space-4);
+  }
+
+  // Figma 16:416: the banner sits 8px under the (browser) status bar.
+  @include mobile {
+    padding: 8px var(--space-4) var(--space-8);
+  }
+}
+
+// As tall as the window allows, but never wider than half the page, so the
+// right column keeps room for its 461px buttons.
+.art {
+  position: sticky;
+  top: 22px;
+  align-self: center;
+  height: min(calc(100vh - 44px), calc((50vw - 32px) / #{$art-ratio}));
+  aspect-ratio: 2247 / 2814;
+  overflow: hidden;
+
+  @include tablet-down {
+    position: relative;
+    top: 0;
+    aspect-ratio: auto;
+    height: 320px; // Not in Figma: between the desktop panel and the 235px mobile banner.
+    border-radius: 4px; // Figma 16:508's 4px radius — no radius token maps to 4px.
+  }
+
+  @include mobile {
+    height: 235px;
+  }
+}
+
+// The canvas is drawn at its full width from the left edge, so only its
+// transparent strip falls outside the panel.
+.artCrop {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: $canvas-over-art;
+}
+
+// Desktop: the panel has the artwork's proportions, so this crops nothing.
+// Tablet and mobile (Figma 16:509) show a banner from the upper part of it,
+// with the search bar near its bottom edge.
+.artImage {
+  object-fit: cover;
+  object-position: center;
+
+  @include tablet-down {
+    object-position: 50% 23%;
+  }
+}
+
+.column {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  // Figma's hairlines are wider than a narrow column: stop them at its
+  // edge rather than over the artwork.
+  overflow-x: clip;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 660px;
+}

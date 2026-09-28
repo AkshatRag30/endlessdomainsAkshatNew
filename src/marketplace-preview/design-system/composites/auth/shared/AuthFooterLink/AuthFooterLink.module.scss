@@ -1,0 +1,25 @@
+@import '@mpstyles/_mixins.scss';
+
+.footer {
+  margin: 43px 0 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav); // 14px
+  font-weight: var(--font-weight-medium);
+  text-align: center;
+  color: var(--color-black-primary);
+}
+
+// Bootstrap underlines every link; Figma 16:1076 doesn't.
+.link {
+  color: var(--color-blue-primary);
+  text-decoration: none;
+  text-transform: capitalize;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}

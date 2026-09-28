@@ -1,0 +1,163 @@
+@import '@mpstyles/_mixins.scss';
+
+// Figma 16:1009 (desktop, 696 × 111) and 16:424 (mobile, 432.6 × 69, the
+// same drawing at 0.62 scale). Hairlines and fills below are Figma-exact:
+// #dad8d8 rules, #e8e8e8 track, #f4f4f4 → #fefefe active tab, #808080
+// inactive label; none has a token.
+
+$rule: 0.3px solid #dad8d8;
+
+// 52px under the header (32px on mobile, 16:418).
+.frame {
+  position: relative;
+  flex-shrink: 0;
+  width: 696px;
+  height: 111px;
+  margin-top: 52px;
+
+  // The two horizontal rules, 9px in from the top and bottom (16:1010).
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    border-top: $rule;
+  }
+
+  &::before {
+    top: 9px;
+  }
+
+  &::after {
+    bottom: 12.7px;
+  }
+
+  @include mobile {
+    width: 432.6px;
+    height: 69px;
+    margin-top: 32px;
+
+    &::before {
+      top: 5.6px;
+    }
+
+    &::after {
+      bottom: 8px;
+      border-top-width: 0.19px;
+    }
+  }
+}
+
+// 16:1015 / 16:1025: 6.4px wide, 45px in from each end (28px on mobile).
+.rail {
+  position: absolute;
+  top: 0;
+  width: 6.4px;
+  height: 111px;
+
+  @include mobile {
+    width: 3.98px;
+    height: 69px;
+  }
+}
+
+.railLeft {
+  left: 45px;
+
+  @include mobile {
+    left: 28px;
+  }
+}
+
+.railRight {
+  right: 44.6px;
+
+  @include mobile {
+    right: 27.1px;
+  }
+}
+
+// The SVG's own box is the rail; preserveAspectRatio="none" in the file,
+// and the mobile size is the same 0.62 scale, so the dots stay round.
+.railImage {
+  object-fit: fill;
+}
+
+// 16:1013: 592 × 82, 12px from the top, white → #f6f6f6 → white.
+.band {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 592px;
+  height: 82px;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, var(--color-white-primary) 0%, #f6f6f6 50%, var(--color-white-primary) 100%);
+
+  @include mobile {
+    top: 7.46px;
+    width: 368px;
+    height: 51px;
+  }
+}
+
+// 16:1035: 434 × 52 with the active tab inset 4px / 3px. Figma sits it 18px
+// down an 82px band; centred here (15px).
+.track {
+  display: flex;
+  width: 434px;
+  height: 52px;
+  padding: 3px 4px;
+  background: #e8e8e8;
+
+  @include mobile {
+    width: 320px;
+    height: 38.4px;
+    padding: 2.2px 3px;
+  }
+}
+
+// Figma's active tab is 204px and the Email half 222px; two equal halves here.
+.tab {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 3px solid transparent;
+  background: transparent;
+  font-family: var(--font-satoshi);
+  font-size: 22px;
+  font-weight: var(--font-weight-regular);
+  line-height: 1.2;
+  letter-spacing: -1.12px;
+  color: #808080;
+  cursor: pointer;
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  @include mobile {
+    border-width: 2.2px;
+    font-size: 14px;
+    letter-spacing: -0.83px;
+  }
+}
+
+.tabActive {
+  border-color: var(--color-white-primary);
+  background: linear-gradient(180deg, #f4f4f4 0%, #fefefe 100%);
+  font-weight: var(--font-weight-medium);
+  cursor: default;
+
+  // 16:1040: blue → lilac gradient text.
+  .tabLabel {
+    background: linear-gradient(125.93deg, var(--color-blue-primary) 9.36%, #a6aeff 94.74%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}

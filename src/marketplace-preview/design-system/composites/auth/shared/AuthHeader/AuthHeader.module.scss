@@ -1,0 +1,88 @@
+@import '@mpstyles/_mixins.scss';
+
+// Figma 16:988 (desktop): logo 148 × 49, 47px to the text, heading and
+// subtext 3px apart. Figma 16:419 (mobile): logo 129 × 43, then 32px to
+// the 22px heading and 14px subtext.
+
+.header {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 47px;
+  width: 100%;
+  text-align: center;
+
+  @include mobile {
+    gap: 32px;
+  }
+}
+
+// Figma 16:522 starts 13px above the logo. Figma puts it 11px left of
+// centre; centred here.
+.grid {
+  position: absolute;
+  top: -13px;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+
+  @include mobile {
+    display: none;
+  }
+}
+
+.logoLink {
+  position: relative;
+  display: block;
+  line-height: 0;
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.logo {
+  width: 148px;
+  height: auto;
+
+  @include mobile {
+    width: 129px;
+  }
+}
+
+.text {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.heading {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: 33px;
+  font-weight: var(--font-weight-medium);
+  line-height: normal;
+  color: var(--color-black-primary);
+
+  @include mobile {
+    font-size: 22px;
+  }
+}
+
+// Figma breaks the subtext onto two lines in a 424px box.
+.subtext {
+  max-width: 424px;
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-size: 17px;
+  line-height: normal;
+  color: #525252; // Figma-exact; no gray token matches.
+
+  @include mobile {
+    max-width: 330px;
+    font-size: 14px;
+  }
+}
