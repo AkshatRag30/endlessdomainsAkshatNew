@@ -25,15 +25,13 @@ export function IdentityOsHero() {
           <h1>
             <span aria-hidden="true">
               <span>Own your</span> <br />
-              <span className={styles.txt_gradient}>
-                <TypeWord words={HERO_WORDS} /> forever.
-              </span>
+              <TypeWord words={HERO_WORDS} className={styles.txt_gradient} /> forever.
             </span>
             {/* Real accessible text lives outside .txt_gradient — its background-clip: text nests badly with hidden fallback content. */}
             <span className={styles.srOnly}>Own your reputation forever.</span>
           </h1>
           <p>
-            Your email, social media, and payment methods all belong to someone else. One domain on Endless changes that. Claim it once. No renewals. No landlord. No platform that can revoke it.
+            Your email, social media, and payment methods all belong to someone else. One domain on Endless changes that. No landlord. No platform that can revoke it. Own your identity starting from $2.
           </p>
         </div>
       </div>

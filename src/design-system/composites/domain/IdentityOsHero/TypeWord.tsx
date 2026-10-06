@@ -75,7 +75,13 @@ export default function TypeWord({
 
   return (
     <span className={`${styles.slot} ${className ?? ''}`}>
-      <span aria-hidden="true">{text}</span>
+      {/* Invisible copies of every word reserve the widest one's width so trailing text never shifts. */}
+      {words.map(word => (
+        <span key={word} className={styles.sizer} aria-hidden="true">
+          {word}
+        </span>
+      ))}
+      <span className={styles.text} aria-hidden="true">{text}</span>
     </span>
   )
 }

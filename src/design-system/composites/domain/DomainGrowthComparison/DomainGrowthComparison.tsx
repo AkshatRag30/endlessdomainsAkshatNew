@@ -187,7 +187,7 @@ export function DomainGrowthComparison() {
             <span className={styles.eyebrowBracketTR} />
             <span className={styles.eyebrowBracketBL} />
             <span className={styles.eyebrowBracketBR} />
-            <p className={styles.eyebrowText}>Growth Comparison</p>
+            <p className={styles.eyebrowText}>After Market Comparison</p>
           </div>
 
           <h2 id="growth-comparison-heading" className={styles.heading}>

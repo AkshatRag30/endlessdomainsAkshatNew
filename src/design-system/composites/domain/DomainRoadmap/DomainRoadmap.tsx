@@ -36,14 +36,15 @@ const MILESTONES: Milestone[] = [
     id: 'works-for-you',
     year: '2026',
     title: 'Your identity starts working for you',
-    description: 'One reputation score that follows you everywhere. Your identity earns rewards in the background, and any app can plug into it with one line of code.',
+    description:
+      "One reputation score that follows you everywhere. Your identity earns rewards in the background, and any app can plug into it with one line of code. We're also upgrading our secondary marketplace with a new interface and new features, making it easier to buy, sell, and manage domains.",
     tags: [],
   },
   {
     id: 'own-the-internet',
-    year: '2027 & Beyond',
-    title: 'Own the internet. Stop renting it.',
-    description: 'Email, messaging, and social media, all rebuilt so you own them.',
+    year: '2027 and Beyond',
+    title: 'Building the dApp Store around your identity',
+    description: 'New apps, new tools, and new integrations, all built to give your web3 identity real use cases across the internet.',
     tags: ['dMail', 'dChat', 'dSocial', 'Full Ecosystem'],
   },
 ]
@@ -89,8 +90,7 @@ export function DomainRoadmap() {
         </h2>
 
         <p className={styles.description}>
-          Your username on social platforms belongs to them. They can delete it anytime. We&apos;re building a world where your identity on the internet
-          is yours forever.
+          One domain becomes your wallet, social, email, and login, all connected to a reputation you actually own. Explore, claim, and build your Web3 identity with Endless Domains.
         </p>
       </div>
 

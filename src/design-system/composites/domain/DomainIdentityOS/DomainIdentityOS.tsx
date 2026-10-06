@@ -12,7 +12,7 @@ interface IdentityStat {
 const STATS: IdentityStat[] = [
   { id: 'rented', value: '401.6M', label: 'Domain Names Rented Worldwide' },
   { id: 'aftermarket', value: '$290M', label: 'In Annual Aftermarket Sales' },
-  { id: 'revoke', value: 'Zero', label: 'Platforms That Can Revoke It' },
+  { id: 'revoke', value: 'Zero', label: 'Platforms with Ownership' },
 ]
 
 export function DomainIdentityOS() {
@@ -33,8 +33,7 @@ export function DomainIdentityOS() {
         </h2>
 
         <p className={styles.description}>
-          Your email, social handles, logins, and wallets all live in a rental model. Platforms hold them and can take them back, and zero of it is
-          actually yours.
+          Every time a platform changes its rules, you start over. New handle, new followers, new trust, from zero. Endless makes that identity portable. Build it once, carry it everywhere.
         </p>
       </div>
 

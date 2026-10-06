@@ -325,8 +325,7 @@ export function OnchainIdentityNetwork() {
               <span className={styles.headingLine2}>Whole Onchain Identity</span>
             </h2>
             <p className={styles.description}>
-              Your onchain domain sits at the center. Every ray is something it becomes: one name radiating out into your whole
-              presence on the internet.
+              Your domain becomes the hub. Every identity you use online, wallet, social, mail, login, app, brand, plugs into it.
             </p>
           </header>
 
