@@ -116,6 +116,9 @@
   max-width: var(--container-max-width);
   margin: 0;
   padding: 0;
+  // Figma's 241px column, shrunk to a fifth of the row (minus 4 gutters) when the row
+  // is narrower than 5×241px — small laptops / iPad Pro portrait — so it never overflows.
+  --milestone-w: min(241px, calc((100% - 4 * var(--space-4)) / 5));
 
   // At tablet and below, keep the desktop row layout intact (same cards, same zigzag
   // stagger) instead of stacking into a column — this scrolls horizontally instead.
@@ -149,10 +152,11 @@
   background: var(--color-black-alpha-15); // rgba(0,0,0,0.2) ≈ 0.15 Figma value, nearest token
   pointer-events: none;
 
-  &[data-position='1'] { left: calc(12.5% + 90.375px); }
-  &[data-position='2'] { left: calc(37.5% + 30.125px); }
-  &[data-position='3'] { left: calc(62.5% - 30.125px); }
-  &[data-position='4'] { left: calc(87.5% - 90.375px); }
+  // Same gap-center formula, generalised to --milestone-w (equals the old fixed values at 241px).
+  &[data-position='1'] { left: calc(1 * var(--milestone-w) + 0.5 * (100% - 5 * var(--milestone-w)) / 4); }
+  &[data-position='2'] { left: calc(2 * var(--milestone-w) + 1.5 * (100% - 5 * var(--milestone-w)) / 4); }
+  &[data-position='3'] { left: calc(3 * var(--milestone-w) + 2.5 * (100% - 5 * var(--milestone-w)) / 4); }
+  &[data-position='4'] { left: calc(4 * var(--milestone-w) + 3.5 * (100% - 5 * var(--milestone-w)) / 4); }
 
   @include tablet-down { display: none; }
 }
@@ -193,7 +197,7 @@
   flex-direction: column;
   align-items: flex-start;
   gap: var(--space-4); // ≈14px Figma gap, nearest token
-  width: 241px;
+  width: var(--milestone-w);
   flex-shrink: 0;
 
   // design-specific: Figma's alternating top/bottom stagger — odd items (2nd, 4th)

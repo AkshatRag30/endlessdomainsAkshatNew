@@ -1,0 +1,119 @@
+@import '@mpstyles/_mixins.scss';
+
+// Figma 25:17266 (in the 660px right column): logo at y 172, the check
+// illustration 91px below the logo, the text 24px below that, the 445px
+// action 52px below the text.
+
+.panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  text-align: center;
+}
+
+// 25:17270 sits 77px above the logo; Figma centres it 11px left of the
+// column, centred here as on the other auth pages.
+.grid {
+  position: absolute;
+  top: -77px;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+
+  @include mobile {
+    display: none;
+  }
+}
+
+.logoLink {
+  position: relative;
+  display: block;
+  line-height: 0;
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.logo {
+  width: 148px;
+  height: auto;
+
+  @include mobile {
+    width: 129px;
+  }
+}
+
+// The export is 328 × 139 (the 320 × 132 group plus its glow); centred.
+.illustration {
+  position: relative;
+  max-width: 100%;
+  height: auto;
+  margin-top: 88px;
+
+  @include mobile {
+    width: 260px;
+    margin-top: 40px;
+  }
+}
+
+.text {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  margin-top: 21px;
+}
+
+.heading {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: 33px;
+  font-weight: var(--font-weight-medium);
+  line-height: normal;
+  color: var(--color-black-primary);
+
+  @include mobile {
+    font-size: 22px;
+  }
+}
+
+// Figma's 374px text box is sized for a two line message; this page's
+// message is longer, so it gets the 445px button width instead.
+.body {
+  max-width: 445px;
+  margin: 0;
+  font-family: var(--font-space-grotesk);
+  font-size: 17px;
+  line-height: normal;
+  color: #525252; // Figma-exact; no gray token matches.
+
+  strong {
+    font-weight: var(--font-weight-medium);
+    color: var(--color-black-primary);
+    text-decoration: underline;
+    overflow-wrap: anywhere; // long email addresses
+  }
+
+  @include mobile {
+    max-width: 330px;
+    font-size: 14px;
+  }
+}
+
+// 445 × 50 in Figma. Nested to outrank PrimaryButton's fit-content width.
+.panel .action {
+  position: relative;
+  width: 445px;
+  max-width: 100%;
+  margin-top: 52px;
+  text-decoration: none;
+
+  @include mobile {
+    width: 316.5px;
+    margin-top: 32px;
+  }
+}

@@ -1,5 +1,5 @@
 import React from 'react'
-import Image from 'next/image'
+import { CalendarIcon, ClockFaceIcon, ClockHandsIcon, ShareIcon } from '@/marketplace-preview/design-system/primitives/icons/overview-icons'
 import type { MarketplaceOrder, OrderStatus } from '@/marketplace-preview/types/marketplace'
 import StatusChip, { type StatusChipVariant } from '@/marketplace-preview/design-system/primitives/badges/status-chip'
 import PrimaryButton from '@/marketplace-preview/design-system/primitives/buttons/primary-button'
@@ -37,15 +37,15 @@ export const OrderHeaderCard = ({ order, onDownload, onShare }: OrderHeaderCardP
         <div className={styles.meta}>
           <span className={styles.metaItem}>
             <span className={styles.calendarBox}>
-              <Image src="/assets/img/domain-overview/calendar.svg" alt="" aria-hidden="true" width={13.3} height={15.2} />
+              <CalendarIcon width={13.3} height={15.2} className={styles.icon} />
             </span>
             Placed {formatDate(order.placedAt)}
           </span>
           <span className={`${styles.metaItem} ${styles.time}`}>
             {/* Figma's clock is two layers: the face, and the hands inset over it. */}
             <span className={styles.clock} aria-hidden="true">
-              <Image src="/assets/img/domain-overview/clock-face.svg" alt="" width={17} height={17} />
-              <Image src="/assets/img/domain-overview/clock-hands.svg" alt="" width={3.95} height={7.24} className={styles.clockHands} />
+              <ClockFaceIcon width={17} height={17} className={styles.icon} />
+              <ClockHandsIcon width={3.95} height={7.24} className={`${styles.icon} ${styles.clockHands}`} />
             </span>
             <time dateTime={order.placedAt}>{formatTime(order.placedAt)}</time>
           </span>
@@ -58,7 +58,7 @@ export const OrderHeaderCard = ({ order, onDownload, onShare }: OrderHeaderCardP
           Download Receipt
         </PrimaryButton>
         <button type="button" className={styles.share} onClick={onShare}>
-          <Image src="/assets/img/domain-overview/share.svg" alt="" aria-hidden="true" width={12.4} height={13.5} />
+          <ShareIcon width={12.4} height={13.5} className={styles.icon} />
           Share
         </button>
       </div>

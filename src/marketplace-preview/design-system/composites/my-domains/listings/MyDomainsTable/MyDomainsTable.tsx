@@ -4,6 +4,7 @@ import type { MyDomainListing } from '@/marketplace-preview/types/my-domains'
 import StatusChip from '@/marketplace-preview/design-system/primitives/badges/status-chip'
 import DefaultButton from '@/marketplace-preview/design-system/primitives/buttons/default-buttons'
 import type { ViewMode } from '@/marketplace-preview/design-system/primitives/toggles/view-toggle'
+import { WaveLoader } from '@/marketplace-preview/design-system/primitives/wallet-pending-step'
 import MyDomainRow from '../MyDomainRow'
 import MyDomainCard from '../MyDomainCard'
 import styles from './MyDomainsTable.module.scss'
@@ -15,6 +16,17 @@ export interface MyDomainsTableProps {
   pageSize?: number
   onList?: (domain: MyDomainListing) => void
   onEditPrice?: (domain: MyDomainListing) => void
+  /** MyDomainsFilterBar's "Sync Now" (useSyncListingStatus) is in flight — shows a loading overlay over the table itself, since that's what a sync actually updates. */
+  isSyncing?: boolean
+  /**
+   * The initial fetch (useMyDomainsData's own `isLoading`). Shows a
+   * skeleton instead of `domains`, which is empty during this window
+   * regardless of whether any real domain would actually match — without
+   * this, "No domains match these filters" flashed on every load before
+   * the real page arrived, which is wrong: the filters hadn't been
+   * evaluated against anything yet.
+   */
+  isLoading?: boolean
 }
 
 /**
@@ -45,7 +57,10 @@ export interface MyDomainsTableProps {
  * instead of forcing grid and reverted, since forcing card there reads as
  * the intended design rather than a workaround.
  */
-export const MyDomainsTable = ({ domains, viewMode, pageSize = 14, onList, onEditPrice }: MyDomainsTableProps) => {
+const SKELETON_COUNT = 6
+const SKELETON_KEYS = Array.from({ length: SKELETON_COUNT }, (_, i) => i)
+
+export const MyDomainsTable = ({ domains, viewMode, pageSize = 14, onList, onEditPrice, isSyncing, isLoading }: MyDomainsTableProps) => {
   const [visibleCount, setVisibleCount] = useState(pageSize)
   const isMobileWidth = useIsMobile(767) // < 768px — always forces grid (Figma's own mobile frame)
   const isBelowLaptop = useIsMobile(1279) // <= 1279px
@@ -66,7 +81,38 @@ export const MyDomainsTable = ({ domains, viewMode, pageSize = 14, onList, onEdi
         <StatusChip variant="for-sale">For sale</StatusChip>
       </div>
 
-      {visible.length === 0 ? (
+      {isLoading ? (
+        effectiveViewMode === 'grid' ? (
+          <div className={styles.grid} aria-busy="true" aria-label="Loading domains">
+            {SKELETON_KEYS.map((key) => (
+              <div key={key} className={styles.skeletonCard} />
+            ))}
+          </div>
+        ) : (
+          <>
+            <div className={styles.header} role="row">
+              <span role="columnheader">Domain Name</span>
+              <span role="columnheader">Price</span>
+              <span role="columnheader">Renewal</span>
+              <span role="columnheader">Interest</span>
+              <span role="columnheader">EST. value</span>
+              <span role="columnheader">Action</span>
+            </div>
+
+            <div className={styles.rows} role="rowgroup" aria-busy="true" aria-label="Loading domains">
+              {SKELETON_KEYS.map((key) => (
+                <div key={key} className={styles.skeletonRow}>
+                  {SKELETON_KEYS.map((cell) => (
+                    <span key={cell} className={styles.skeletonCell}>
+                      <span className={styles.skeletonBlock} />
+                    </span>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </>
+        )
+      ) : visible.length === 0 ? (
         <p className={styles.empty}>No domains match these filters.</p>
       ) : effectiveViewMode === 'grid' ? (
         <div className={styles.grid}>
@@ -93,11 +139,22 @@ export const MyDomainsTable = ({ domains, viewMode, pageSize = 14, onList, onEdi
         </>
       )}
 
-      {remaining > 0 && (
+      {!isLoading && remaining > 0 && (
         <div className={styles.showMore}>
           <DefaultButton onClick={() => setVisibleCount((prev) => prev + pageSize)}>
             Show {Math.min(remaining, pageSize)} more
           </DefaultButton>
+        </div>
+      )}
+
+      {isSyncing && (
+        <div className={styles.syncOverlay} aria-busy="true" aria-label="Syncing listing status">
+          <span className={styles.syncWaveRing} aria-hidden="true">
+            <span className={styles.syncWaveCircle}>
+              <WaveLoader />
+            </span>
+          </span>
+          <p className={styles.syncText}>Syncing listing status…</p>
         </div>
       )}
     </div>

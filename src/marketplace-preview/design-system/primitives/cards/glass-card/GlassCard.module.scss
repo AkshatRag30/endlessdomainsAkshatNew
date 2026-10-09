@@ -1,7 +1,7 @@
 @import '@mpstyles/_mixins.scss';
 
-// Figma 5:3700 (desktop) / 5:4318 (mobile). 0.19px rgba(0,0,0,0.22) hairline,
-// #313135 title with -0.27px tracking, 12.9px / 9.9px title inset, all
+// Figma 5:3700 (desktop) / 5:4318 (mobile). 0.19px strong-border hairline,
+// primary-text title with -0.27px tracking, 12.9px / 9.9px title inset, all
 // Figma-exact. Mobile rounds the corners to 5px.
 
 .card {
@@ -13,9 +13,9 @@
 
 .plain {
   min-height: 222px;
-  border: 0.19px solid rgba(0, 0, 0, 0.22);
+  border: 0.19px solid var(--color-border-strong);
   border-radius: 3px;
-  background: var(--color-white-primary);
+  background: var(--color-bg-surface);
 
   @include mobile {
     border-radius: 5px;
@@ -41,5 +41,5 @@
   font-weight: var(--font-weight-medium);
   line-height: 16.2px;
   letter-spacing: -0.27px;
-  color: #313135;
+  color: var(--color-text-primary);
 }

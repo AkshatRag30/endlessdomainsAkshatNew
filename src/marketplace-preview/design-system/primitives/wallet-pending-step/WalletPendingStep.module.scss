@@ -71,7 +71,7 @@
 
     strong {
       font-weight: var(--font-weight-regular);
-      color: var(--color-black-primary);
+      color: var(--color-text-primary);
     }
   }
 }
@@ -117,14 +117,25 @@
   display: block;
 }
 
-// The wave motion itself is SMIL inside the SVG (see WaveLoader in the .tsx).
+.waveBack {
+  animation: listing-wave-move 5s linear infinite;
+}
+
+.waveFront {
+  animation: listing-wave-move 3s linear infinite;
+}
+
+@keyframes listing-wave-move {
+  from { transform: translateX(0); }
+  to { transform: translateX(-22px); }
+}
 
 // Error look (Figma node 1:8109) reuses .outerRing's own ring color
 // (rgba(239, 68, 68, 0.26)) directly — Figma uses the exact same light-red
 // ring for both the pending and error variants of this shell, only the
 // content inside it differs (animated wave vs a plain alert icon).
 .errorIcon {
-  color: #ef4444;
+  color: var(--color-status-error);
 }
 
 .heading {
@@ -133,7 +144,7 @@
   font-weight: var(--font-weight-medium);
   font-size: 19px;
   letter-spacing: -0.38px;
-  color: #171429;
+  color: var(--color-text-primary);
 }
 
 .subtext {
@@ -142,7 +153,7 @@
   font-family: var(--font-satoshi);
   font-size: 14px;
   line-height: 1.45;
-  color: #7e7a93;
+  color: var(--color-text-secondary);
 }
 
 .waitingRow {
@@ -152,14 +163,14 @@
   margin-top: var(--space-2);
   font-family: var(--font-satoshi);
   font-size: 12.5px;
-  color: #7e7a93;
+  color: var(--color-text-secondary);
 }
 
 .spinner {
   width: 12px;
   height: 12px;
-  border: 2px solid var(--color-gray-light);
-  border-top-color: var(--color-gray-primary);
+  border: 2px solid var(--color-bg-surface-active);
+  border-top-color: var(--color-text-secondary);
   border-radius: 50%;
   animation: listing-pending-spin 0.8s linear infinite;
 }

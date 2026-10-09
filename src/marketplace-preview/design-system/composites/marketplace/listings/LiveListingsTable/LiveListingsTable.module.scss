@@ -31,8 +31,8 @@
     grid-template-columns: minmax(310px, 2.4fr) 1fr 1.4fr 1.2fr 1.9fr;
   }
 
-  background: var(--color-white-primary);
-  border: 1px solid var(--color-border-black-subtle);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
   border-radius: 3px;
 
   span {
@@ -40,10 +40,10 @@
     font-family: var(--font-satoshi);
     font-weight: var(--font-weight-medium);
     font-size: var(--text-small-13);
-    color: var(--color-black-alpha-55);
+    color: var(--color-text-secondary);
 
     &:not(:first-child) {
-      border-left: 1px solid var(--color-border-black-subtle);
+      border-left: 1px solid var(--color-border-subtle);
     }
   }
 }
@@ -79,7 +79,74 @@
   text-align: center;
   font-family: var(--font-satoshi);
   font-size: var(--text-small-13);
-  color: var(--color-gray-primary);
+  color: var(--color-text-secondary);
+}
+
+// ── Loading (not in Figma) — the initial fetch, before there's a real
+// `listings` array to check against the empty state at all. Reuses .row's
+// own box shape (56px, white, bordered, radius 3px) and .header's grid so
+// nothing shifts once the real rows swap in.
+
+@keyframes listingsSkeletonPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.skeletonRow {
+  display: grid;
+  grid-template-columns: 2.4fr 1fr 1.4fr 1.2fr 1.9fr;
+  min-height: 56px;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 3px;
+
+  @include dark {
+    background: var(--color-bg-page); // matches the black rows
+  }
+
+  @include wide {
+    grid-template-columns: minmax(310px, 2.4fr) 1fr 1.4fr 1.2fr 1.9fr;
+  }
+}
+
+.skeletonCell {
+  display: flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  min-width: 0;
+
+  &:not(:first-child) {
+    border-left: 1px solid var(--color-border-subtle);
+  }
+}
+
+.skeletonBlock {
+  width: 100%;
+  max-width: 96px;
+  height: 12px;
+  border-radius: 4px;
+  background: var(--color-bg-surface-active);
+  animation: listingsSkeletonPulse 1.4s ease-in-out infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+.skeletonCard {
+  min-height: 192px;
+  border-radius: 8px;
+  background: var(--color-bg-surface-active);
+  animation: listingsSkeletonPulse 1.4s ease-in-out infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
 }
 
 .showMore {

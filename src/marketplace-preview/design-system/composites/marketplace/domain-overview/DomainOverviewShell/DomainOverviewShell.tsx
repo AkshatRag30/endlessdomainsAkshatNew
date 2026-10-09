@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
 import Header from '@/marketplace-preview/design-system/layouts/header'
-import MarketplaceSidebar from '../../sidebar/MarketplaceSidebar'
-import MobileDrawerMenu from '../../sidebar/MobileDrawerMenu'
+import MarketplaceSidebar from '@/marketplace-preview/design-system/composites/marketplace/sidebar/MarketplaceSidebar'
+import MobileDrawerMenu from '@/marketplace-preview/design-system/composites/marketplace/sidebar/MobileDrawerMenu'
 import MobileBottomNav from '../../shared/MobileBottomNav'
 import layoutStyles from '@/marketplace-preview/design-system/layouts/main-layout/MainLayout.module.scss'
 import styles from './DomainOverviewShell.module.scss'
+import { ThemeProvider } from '@/marketplace-preview/context/ThemeContext'
 
 export interface DomainOverviewShellProps {
   /** Pinned to the top-left of the main column, above the centred content. */
@@ -32,6 +33,7 @@ export const DomainOverviewShell = ({ breadcrumb, children, contentLayout = 'cen
   return (
     // data-marketplace-preview: this project scopes the preview's tokens to
     // that attribute (see styles/tokens.scss), like the marketplace page.
+    <ThemeProvider>
     <div data-marketplace-preview>
       {/* Site chrome is dropped when printing (the receipt's "Download receipt"). */}
       <div className={styles.noPrint}>
@@ -55,6 +57,7 @@ export const DomainOverviewShell = ({ breadcrumb, children, contentLayout = 'cen
 
       {menuOpen && <div className={layoutStyles.scrim} onClick={() => setMenuOpen(false)} aria-hidden="true" />}
     </div>
+    </ThemeProvider>
   )
 }
 

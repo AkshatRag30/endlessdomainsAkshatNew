@@ -16,6 +16,8 @@ $breakpoint-mobile: 768px;
 // two. No other file references this variable or the
 // tablet/tablet-down/tablet-up mixins it drives (checked), so this only
 // affects the marketplace preview that uses them today.
+
+
 $breakpoint-tablet: 1040px;
 $breakpoint-desktop: 1040px;
 $breakpoint-wide: 1440px;
@@ -146,6 +148,17 @@ $breakpoint-wide: 1440px;
 @mixin focus-ring {
   outline: 2px solid var(--color-blue-primary);
   outline-offset: 2px;
+}
+
+// ─── Dark theme override ──────────────────────────────────────────────────────
+
+// For the few places where Figma's dark design changes the hierarchy, not
+// just the colour (e.g. a gray light mode label that turns white in dark).
+// Prefer a role token; reach for this only when no role expresses it.
+@mixin dark {
+  :global(:root[data-theme='dark']) & {
+    @content;
+  }
 }
 
 // ─── Stripe Background ────────────────────────────────────────────────────────

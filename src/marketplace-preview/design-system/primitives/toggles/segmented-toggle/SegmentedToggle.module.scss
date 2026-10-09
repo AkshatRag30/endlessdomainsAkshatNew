@@ -1,8 +1,7 @@
 @import '@mpstyles/_mixins.scss';
 
 // Figma nodes 1:8648 ("How to sell", variant="radio") and 1:8752 ("How long
-// it runs", variant="centered"). Border #e2e0ec and the black selected-state
-// gradient are Figma-exact, no token match for either.
+// it runs", variant="centered").
 
 .group {
   display: grid;
@@ -15,9 +14,9 @@
 .option {
   display: flex;
   flex-direction: column;
-  border: 1px solid #e2e0ec;
+  border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-sm);
-  background: var(--color-white-primary);
+  background: var(--color-bg-surface);
   cursor: pointer;
   text-align: left;
   transition: opacity 0.15s ease;
@@ -34,7 +33,7 @@
 
 .optionActive {
   border-color: transparent;
-  background: linear-gradient(180deg, #000 5.388%, #333 100%);
+  background: var(--color-bg-option-selected);
 }
 
 // ── radio variant ("How to sell") ────────────────────────────────────────
@@ -55,20 +54,20 @@
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  border: 1px solid #e2e0ec;
+  border: 1px solid var(--color-border-strong);
   flex-shrink: 0;
   position: relative;
 }
 
 .optionActive .radio {
-  border-color: var(--color-white-primary);
+  border-color: var(--color-text-on-dark);
 
   &::after {
     content: '';
     position: absolute;
     inset: 4px;
     border-radius: 50%;
-    background: var(--color-white-primary);
+    background: var(--color-text-on-dark);
   }
 }
 
@@ -76,22 +75,22 @@
   font-family: var(--font-satoshi);
   font-weight: var(--font-weight-bold);
   font-size: 13.5px;
-  color: #171429;
+  color: var(--color-text-primary);
 }
 
 .optionActive .label {
-  color: var(--color-white-primary);
+  color: var(--color-text-on-dark);
 }
 
 .sublabel {
   font-family: var(--font-satoshi);
   font-size: 11.5px;
   line-height: 1.4;
-  color: #171429;
+  color: var(--color-text-primary);
 }
 
 .optionActive .sublabel {
-  color: var(--color-white-primary);
+  color: var(--color-text-on-dark);
 }
 
 .badge {
@@ -127,19 +126,19 @@
   font-family: var(--font-satoshi);
   font-weight: var(--font-weight-bold);
   font-size: 17px;
-  color: #171429;
+  color: var(--color-text-primary);
 }
 
 .optionActive .bigLabel {
-  color: var(--color-white-primary);
+  color: var(--color-text-on-dark);
 }
 
 .caption {
   font-family: var(--font-satoshi);
   font-size: var(--text-small-13);
-  color: var(--color-gray-primary);
+  color: var(--color-text-secondary);
 }
 
 .optionActive .caption {
-  color: var(--color-white-primary);
+  color: var(--color-text-on-dark);
 }

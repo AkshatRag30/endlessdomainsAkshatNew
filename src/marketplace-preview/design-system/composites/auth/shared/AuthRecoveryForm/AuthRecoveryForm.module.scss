@@ -1,0 +1,75 @@
+@import '@mpstyles/_mixins.scss';
+
+// Figma 25:16733. Values without a token are Figma-exact: the #ded2d9
+// field border and #868686 placeholder.
+
+// 52px under the header, as on the login page (32px on mobile).
+.form {
+  // Positioned so it paints above the header's (positioned) grid image.
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 29px;
+  width: 445px;
+  max-width: 100%;
+  margin-top: 52px;
+
+  @include mobile {
+    width: 316.5px; // Same column as the mobile login buttons.
+    margin-top: 32px;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1); // 4px
+}
+
+.label {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav); // 14px
+  font-weight: var(--font-weight-medium);
+  line-height: normal;
+  color: var(--color-black-primary);
+}
+
+// 13px / 10px padding around 14px text, no radius.
+.input {
+  width: 100%;
+  margin: 0;
+  padding: 13px 10px;
+  border: 1px solid #ded2d9;
+  border-radius: 0;
+  background: var(--color-white-primary);
+  font-family: var(--font-space-grotesk);
+  font-size: var(--text-nav);
+  line-height: normal;
+  color: var(--color-black-primary);
+  outline: none;
+  transition: border-color 150ms ease;
+
+  &::placeholder {
+    color: #868686;
+  }
+
+  &:focus-visible {
+    border-color: var(--color-blue-primary);
+  }
+}
+
+.inputError {
+  border-color: var(--color-error);
+
+  &:focus-visible {
+    border-color: var(--color-error);
+  }
+}
+
+.error {
+  margin-top: var(--space-1);
+  font-family: var(--font-satoshi);
+  font-size: 13px;
+  color: var(--color-error);
+}

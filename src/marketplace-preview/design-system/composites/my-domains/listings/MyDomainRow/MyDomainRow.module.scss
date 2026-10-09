@@ -52,15 +52,20 @@
   // keeps the content itself vertically centered now that the box is full
   // height.
   min-height: 60px;
-  background: var(--color-white-primary);
-  border: 1px solid var(--color-border-black-subtle);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
   // 3px reserved on every row, not just 'for-sale' — was transparent by
   // default, which made every non-for-sale row read as missing its left
   // border entirely instead of the plain neutral edge the rest of the row
   // has. Same width in both states so the colored one below doesn't shift
   // the row's content by 2px when it swaps in.
-  border-left: 3px solid var(--color-border-black-subtle);
+  border-left: 3px solid var(--color-border-subtle);
   border-radius: 3px;
+
+  // Figma dark (93:49561): rows are black inside the surface panel
+  @include dark {
+    background: var(--color-bg-page);
+  }
 
   @include mobile {
     display: flex;
@@ -76,7 +81,7 @@
 // rather than the marketplace table's fixed + scroll-pane split — full
 // mobile-split fidelity is deferred to the plan's dedicated Phase 11
 // responsive pass.
-.statusForSale { border-left-color: var(--color-status-available); }
+.statusForSale { border-left-color: var(--color-status-success); }
 
 .cell {
   display: flex;
@@ -88,7 +93,7 @@
   min-width: 0;
 
   &:not(:first-child) {
-    border-left: 1px solid var(--color-border-black-subtle);
+    border-left: 1px solid var(--color-border-subtle);
 
     @include mobile {
       border-left: none;
@@ -120,7 +125,7 @@
   // (not !important) is enough to win over .value's own color regardless
   // of source order.
   .value {
-    color: var(--color-blue-primary);
+    color: var(--color-accent);
   }
 }
 
@@ -210,7 +215,7 @@
   font-family: var(--font-satoshi);
   font-weight: var(--font-weight-bold);
   font-size: var(--text-small-15);
-  color: var(--color-black-primary);
+  color: var(--color-text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -225,7 +230,7 @@
 .chars {
   font-family: var(--font-space-grotesk);
   font-size: 10px;
-  color: var(--color-gray-primary);
+  color: var(--color-text-secondary);
   white-space: nowrap;
 }
 
@@ -236,18 +241,18 @@
   font-weight: var(--font-weight-medium);
   font-size: var(--text-small-13);
   line-height: 1.2;
-  color: var(--color-black-primary);
+  color: var(--color-text-primary);
 }
 
 .usd {
   font-family: var(--font-space-grotesk);
   font-size: var(--text-small-10);
   line-height: 1.2;
-  color: #a6a1bb; // design-specific: Figma-exact, matches ListingRow's .usd
+  color: var(--color-text-mono-muted); // matches ListingRow's .usd
 }
 
 .dash {
-  color: var(--color-gray-medium);
+  color: var(--color-text-tertiary);
 }
 
 .renewal {
@@ -263,7 +268,7 @@
   font-family: var(--font-satoshi);
   font-weight: var(--font-weight-medium);
   font-size: var(--text-small-13);
-  color: var(--color-black-primary);
+  color: var(--color-text-primary);
 
   svg {
     flex-shrink: 0;
@@ -321,7 +326,7 @@
   white-space: nowrap;
   font-family: var(--font-space-grotesk);
   font-size: var(--text-small-12);
-  color: var(--color-gray-dark);
+  color: var(--color-text-secondary);
 }
 
 .heartIcon {
@@ -330,5 +335,5 @@
   // Matches the original favorite.svg's own stroke="#a6a1bb" — a distinct,
   // slightly warmer tone from .interestStat's gray-dark that the eye icon
   // next to it inherits via currentColor, not a mismatch to fix.
-  color: #a6a1bb; // design-specific: Figma-exact, matches the $ labels elsewhere in this build
+  color: var(--color-text-mono-muted);
 }

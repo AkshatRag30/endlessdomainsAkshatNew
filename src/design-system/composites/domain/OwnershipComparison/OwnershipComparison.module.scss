@@ -24,7 +24,9 @@
 
   // Below desktop, OwnershipComparisonMobile takes over with a plain stacked layout —
   // this sticky/scrubbed 400vh version doesn't translate to a phone or tablet viewport.
-  @include tablet-down {
+  // Up to 1179px (incl. small laptops / iPad Pro portrait) the stacked version is used —
+  // this pinned layout's side cards/labels clip off-screen below that width.
+  @media (max-width: 1179px) {
     display: none;
   }
 }

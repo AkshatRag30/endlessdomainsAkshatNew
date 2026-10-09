@@ -9,7 +9,7 @@ import styles from './MarketplaceHero.module.scss'
  * separately positioned chips and goes unused here as a result.
  *
  * The floating "Endless Domains" badge that used to sit centered on top of
- * the background is gone — the current background (hero-network-bg.png)
+ * the background is gone — the current background (hero-network-bg.jpg)
  * already has its own centered logo mark and headline baked in, so the
  * badge just duplicated on top of it.
  */

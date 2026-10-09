@@ -76,6 +76,12 @@
   font-size: 34px; // Figma: 36.818px, rounded
   line-height: 1.2;
   color: var(--color-white-primary);
+  // Backstop only: callers format values short enough to fit (see
+  // formatStatPrice), but anything longer ellipsizes instead of spilling
+  // past the card's rounded edge.
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .sublabel {

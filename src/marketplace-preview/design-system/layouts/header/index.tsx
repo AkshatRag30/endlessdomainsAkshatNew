@@ -10,6 +10,7 @@ import { useIsMobile } from '@/marketplace-preview/stubs/useIsMobile'
 import primaryBtnStyles from '@/marketplace-preview/design-system/primitives/buttons/primary-button/Primarybutton.module.scss'
 import styles from './Header.module.scss'
 import { HEADER_NAV_ITEMS } from './menuItems'
+import ThemeToggle from '@/marketplace-preview/design-system/primitives/toggles/theme-toggle'
 
 type HeaderProps = {
   transparent?: boolean // accepted for drop-in compatibility with the old Header's prop contract; Figma has no transparent variant of this design yet
@@ -74,7 +75,9 @@ const Header: React.FC<HeaderProps> = ({ hidden, onMenuClick, menuOpen, previewM
         )}
 
         <Link href="/" className={styles.logo}>
-          <Image src="/assets/img/logo.svg" alt="Endless Domains" width={148} height={48} />
+          <Image src="/endless-logo.svg" alt="Endless Domains" width={148} height={48} className={styles.logoLight} />
+          {/* White text version for dark mode; CSS on the theme attribute shows one (same as the marketplace project). */}
+          <Image src="/endless-logo-white.svg" alt="" aria-hidden="true" width={148} height={48} className={styles.logoDark} />
         </Link>
 
         <nav className={styles.nav}>
@@ -189,6 +192,9 @@ const Header: React.FC<HeaderProps> = ({ hidden, onMenuClick, menuOpen, previewM
         <button type="button" className={styles.mobileSearchButton} aria-label="Search">
           <Image src="/assets/img/marketplace/header-search-chip.svg" alt="" aria-hidden="true" width={37} height={31} className={styles.mobileSearchIcon} />
         </button>
+
+        {/* Dark mode toggle (Figma 93:54892), always shown in the preview. */}
+        <ThemeToggle />
       </div>
     </header>
   )

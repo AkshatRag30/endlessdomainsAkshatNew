@@ -1,3 +1,5 @@
+@import '@mpstyles/_mixins.scss';
+
 // Same edge-to-edge divider convention as PromotedDomainCard.module.scss
 // (Figma node 1:1034): the card itself carries no padding, every divider
 // lives on a full-width row so its border-bottom runs card-edge to
@@ -7,8 +9,12 @@
 .card {
   display: flex;
   flex-direction: column;
-  background: var(--color-white-primary);
-  border: 1px solid var(--color-border-black-subtle);
+  background: var(--color-bg-surface);
+
+  @include dark {
+    background: var(--color-bg-page); // black like the table rows, inside the dark panel
+  }
+  border: 1px solid var(--color-border-subtle);
   border-radius: 3px;
   overflow: hidden;
 }
@@ -26,7 +32,7 @@
   flex-direction: column;
   gap: 3px; // Figma-exact (60:13506's own gap, 3.16px rounded)
   padding: var(--space-1) var(--space-2-5); // Figma: ~4px top/bottom, ~10px sides
-  border-bottom: 1px solid var(--color-border-black-subtle);
+  border-bottom: 1px solid var(--color-border-subtle);
 }
 
 .headerTop {
@@ -50,7 +56,7 @@
   // Figma: 7.828px in this card's own scale — var(--text-small-10) is the
   // nearest token below it.
   font-size: var(--text-small-10);
-  color: var(--color-gray-dark);
+  color: var(--color-text-secondary);
 }
 
 .heartIcon {
@@ -59,7 +65,7 @@
   // Matches the original favorite.svg's own stroke="#a6a1bb" — a distinct,
   // slightly warmer tone from .interestStat's gray-dark that the eye icon
   // next to it inherits via currentColor, not a mismatch to fix.
-  color: #a6a1bb; // design-specific: Figma-exact, matches the $ labels elsewhere in this build
+  color: var(--color-text-mono-muted);
 }
 
 // ── Identity row ─────────────────────────────────────────────────────────
@@ -106,7 +112,7 @@
   font-family: var(--font-satoshi);
   font-weight: var(--font-weight-medium);
   font-size: var(--text-small-13);
-  color: var(--color-black-primary);
+  color: var(--color-text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -135,7 +141,7 @@
 .chars {
   font-family: var(--font-space-grotesk);
   font-size: 10px;
-  color: var(--color-gray-primary);
+  color: var(--color-text-secondary);
   white-space: nowrap;
 }
 
@@ -144,7 +150,7 @@
 .statsRow {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  border-bottom: 1px solid var(--color-border-black-subtle);
+  border-bottom: 1px solid var(--color-border-subtle);
 
   &:last-child {
     border-bottom: none;
@@ -157,7 +163,7 @@
   gap: 3px;
   min-width: 0;
   padding: var(--space-2) var(--space-2-5); // Figma: ~10px sides (60:13598/60:13582 both start at x:10)
-  border-right: 1px solid var(--color-border-black-subtle);
+  border-right: 1px solid var(--color-border-subtle);
 
   &:last-child {
     border-right: none;
@@ -186,7 +192,7 @@
 .statsRow + .statsRow .stat:first-child .statValue {
   font-weight: var(--font-weight-bold);
   font-size: var(--text-small-13);
-  color: var(--color-black-primary);
+  color: var(--color-text-primary);
 }
 
 .actionStat {
@@ -213,7 +219,7 @@
   font-family: var(--font-satoshi);
   // Figma: 10.271px — var(--text-small-10) is the nearest token.
   font-size: var(--text-small-10);
-  color: var(--color-black-alpha-55);
+  color: var(--color-text-secondary);
   text-transform: capitalize;
 }
 
@@ -223,7 +229,21 @@
   // Figma: 10.751px in this card's own scale — var(--text-small-10) is the
   // nearest token (was var(--text-small-13), sized for a larger reference).
   font-size: var(--text-small-10);
-  color: var(--color-black-primary);
+  color: var(--color-text-primary);
+}
+
+// "USDT" and its Tether icon stay together as one unit, same as ListingRow's.
+.currency {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  white-space: nowrap;
+}
+
+.usdtIcon {
+  flex-shrink: 0;
+  width: 12px;
+  height: 12px;
 }
 
 .dash {
@@ -231,7 +251,7 @@
   font-size: var(--text-small-10);
   // Figma: #070707 (near-black), not the gray-medium placeholder tone this
   // used before.
-  color: var(--color-black-primary);
+  color: var(--color-text-primary);
 }
 
 .renewal {
@@ -246,7 +266,7 @@
   font-weight: var(--font-weight-medium);
   // Figma: 9.875px, matching .statValue's own corrected scale.
   font-size: var(--text-small-10);
-  color: var(--color-black-primary);
+  color: var(--color-text-primary);
 
   svg {
     flex-shrink: 0;

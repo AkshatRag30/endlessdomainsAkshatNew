@@ -12,3 +12,7 @@ export { AuthEmailForm, AuthTextField, AuthRememberRow, AuthDivider } from './sh
 export type { AuthTextFieldProps } from './shared/AuthEmailFields'
 export { default as AuthFooterLink } from './shared/AuthFooterLink'
 export type { AuthFooterLinkProps } from './shared/AuthFooterLink'
+export { AuthRecoveryForm, AuthRecoveryField } from './shared/AuthRecoveryForm'
+export type { AuthRecoveryFieldProps } from './shared/AuthRecoveryForm'
+export { default as AuthResultPanel } from './shared/AuthResultPanel'
+export type { AuthResultPanelProps } from './shared/AuthResultPanel'

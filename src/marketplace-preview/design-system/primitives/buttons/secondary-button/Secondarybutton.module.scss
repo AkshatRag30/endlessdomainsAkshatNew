@@ -13,14 +13,14 @@ $corner-clip: path("M5 2 H14 C15 2 15.5 3.2 14.7 3.8 C11 7 7 11 3.8 14.7 C3.2 15
   align-items:     center;
   height:          var(--button-height);
   width:           200px; // design-specific: Figma-exact default button width
-  background:      var(--color-white-primary);
+  background:      var(--color-bg-surface);
   border:          none;
   cursor:          pointer;
 
   font-family:    var(--font-satoshi);
   font-size:      var(--text-button);
   font-weight:    var(--font-weight-medium);
-  color:          var(--color-gray-primary);
+  color:          var(--color-text-secondary);
   letter-spacing: 1px; // design-specific: Figma-exact button letter-spacing
   @include mobile{
     height:  var(--button-height-sm)
@@ -29,7 +29,7 @@ $corner-clip: path("M5 2 H14 C15 2 15.5 3.2 14.7 3.8 C11 7 7 11 3.8 14.7 C3.2 15
   // CSS custom property drives all four corner decoration backgrounds.
   // Setting --_corner-bg on the button element cascades into ::before/::after
   // and into the .corner child span's pseudo-elements — no specificity conflicts.
-  --_corner-bg: var(--color-gray-primary);
+  --_corner-bg: var(--color-text-secondary);
 
   transition: color 0.3s ease;
 
@@ -42,8 +42,8 @@ $corner-clip: path("M5 2 H14 C15 2 15.5 3.2 14.7 3.8 C11 7 7 11 3.8 14.7 C3.2 15
 }
 
   &:hover:not(:disabled) {
-    color: var(--color-blue-primary);
-    --_corner-bg: var(--color-blue-primary);
+    color: var(--color-accent);
+    --_corner-bg: var(--color-accent);
   }
 
   &:active:not(:disabled) {
@@ -57,8 +57,8 @@ $corner-clip: path("M5 2 H14 C15 2 15.5 3.2 14.7 3.8 C11 7 7 11 3.8 14.7 C3.2 15
 
   &:focus-visible {
     @include focus-ring;
-    color: var(--color-blue-primary);
-    --_corner-bg: var(--color-blue-primary);
+    color: var(--color-accent);
+    --_corner-bg: var(--color-accent);
   }
 }
 
@@ -85,21 +85,21 @@ $corner-clip: path("M5 2 H14 C15 2 15.5 3.2 14.7 3.8 C11 7 7 11 3.8 14.7 C3.2 15
 // ── Error variant ──────────────────────────────────────────────────────────
 
 .variantError {
-  color: var(--color-error);
-  --_corner-bg: var(--color-error);
+  color: var(--color-status-error);
+  --_corner-bg: var(--color-status-error);
 
   &:hover:not(:disabled) {
-    color: var(--color-error-text-dark);
-    --_corner-bg: var(--color-error-text-dark);
+    color: var(--color-status-error-text);
+    --_corner-bg: var(--color-status-error-text);
   }
 
   &:active:not(:disabled) {
-    color: var(--color-error-text-dark);
+    color: var(--color-status-error-text);
   }
 
   &:focus-visible {
-    color: var(--color-error-text-dark);
-    --_corner-bg: var(--color-error-text-dark);
+    color: var(--color-status-error-text);
+    --_corner-bg: var(--color-status-error-text);
   }
 }
 
@@ -152,7 +152,7 @@ $corner-clip: path("M5 2 H14 C15 2 15.5 3.2 14.7 3.8 C11 7 7 11 3.8 14.7 C3.2 15
   position:   absolute;
   width:      $corner-size;
   height:     $corner-size;
-  background: var(--_corner-bg, var(--color-gray-primary));
+  background: var(--_corner-bg, var(--color-text-secondary));
   clip-path:  $corner-clip;
   transition: background 0.3s ease;
 }

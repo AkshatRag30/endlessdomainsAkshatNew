@@ -1,7 +1,6 @@
 @import '@mpstyles/_mixins.scss';
 
-// Figma component 1:67. #7e7a93 label color is Figma-exact, matching the
-// rest of the listing/buying drawer's muted-text palette (no token match).
+// Figma component 1:67.
 
 .row {
   display: flex;
@@ -44,7 +43,7 @@
   font-family: var(--font-satoshi);
   font-size: 14px;
   line-height: 18px;
-  color: #7e7a93;
+  color: var(--color-text-secondary);
   cursor: pointer;
 }
 

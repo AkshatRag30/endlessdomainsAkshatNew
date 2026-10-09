@@ -27,6 +27,13 @@
     overflow-x: auto;
     justify-content: flex-start;
   }
+
+  // Same bar in dark, only its colours change: the glass gradient and white
+  // edge become the dark surface and a subtle border.
+  @include dark {
+    background: var(--color-bg-surface);
+    border-color: var(--color-border-subtle);
+  }
 }
 
 .tab {
@@ -53,7 +60,7 @@
   font-weight: var(--font-weight-regular);
   font-size: 13.1px;
   line-height: 1.2;
-  color: #78738f; // design-specific: Figma-exact
+  color: var(--color-text-secondary); // was #78738f
 }
 
 .count {
@@ -61,7 +68,7 @@
   font-weight: var(--font-weight-regular);
   font-size: 10.7px;
   line-height: 1.2;
-  color: #a6a1bb; // design-specific: Figma-exact, same muted tone used for USD labels elsewhere in this build
+  color: var(--color-text-mono-muted);
 }
 
 .tabActive {
@@ -118,7 +125,7 @@
 // 5:4304 keeps the full 1011px bar and clips it).
 
 .section {
-  gap: 0;
+  gap: 10px;
   padding: 6.4px 7px;
   overflow-x: auto;
   scrollbar-width: none;

@@ -1,4 +1,4 @@
-// Figma node 1:8674. Border color #e2e0ec is Figma-exact, no token match.
+// Figma node 1:8674.
 
 .field {
   position: relative;
@@ -6,8 +6,8 @@
   align-items: center;
   width: 100%;
   height: 45px;
-  background: var(--color-white-primary);
-  border: 1px solid #e2e0ec;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-strong);
   border-radius: 6px;
   padding: 0 var(--space-3);
 
@@ -27,15 +27,15 @@
   font-weight: var(--font-weight-medium);
   font-size: 23px;
   letter-spacing: -0.46px;
-  color: #171429;
+  color: var(--color-text-primary);
 
   &:disabled {
-    color: var(--color-gray-primary);
+    color: var(--color-text-secondary); // was #7c7c7c; the disabled role (#b2b2b2) would be a visible change
     cursor: not-allowed;
   }
 
   &::placeholder {
-    color: var(--color-input-placeholder);
+    color: var(--color-text-tertiary);
   }
 }
 
@@ -47,10 +47,20 @@
   font-family: var(--font-satoshi);
   font-weight: var(--font-weight-medium);
   font-size: var(--text-small-13);
-  color: var(--color-gray-primary);
+  color: var(--color-text-secondary);
   white-space: nowrap;
 }
 
 .tokenIcon {
   border-radius: var(--radius-full);
+}
+
+// Shown under the field when a keystroke would push the price past
+// MAX_PRICE. Sits as the field's sibling, so the parent's own flex gap
+// spaces it (the listing form's .section).
+.limitNote {
+  margin: 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  color: var(--color-status-error);
 }

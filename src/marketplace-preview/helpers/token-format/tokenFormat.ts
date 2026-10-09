@@ -8,7 +8,36 @@
 export const formatToken = (value: number): string =>
   value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
-export const formatExpiry = (timestamp: number): string =>
+const compactFormatter = new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 })
+
+/**
+ * Listing price displays only: the marketplace table (ListingRow), its cards
+ * (PromotedDomainCard), and My Domains' table price column (MyDomainRow).
+ * A million and up is shortened ("2M", "3.5M", "1.2B") so huge listings don't
+ * blow the column apart; anything smaller shows in full with separators
+ * ("8,000", "8,000.25"), dropping ".00" on whole amounts. Everywhere else,
+ * the buy and listing flows included, keeps the full formatToken amount.
+ */
+export const formatTablePrice = (value: number): string => {
+  if (Math.abs(value) >= 1_000_000) return compactFormatter.format(value)
+  const hasCents = Math.round(value * 100) % 100 !== 0
+  return value.toLocaleString('en-US', hasCents ? { minimumFractionDigits: 2, maximumFractionDigits: 2 } : { maximumFractionDigits: 0 })
+}
+
+/**
+ * My Domains' portfolio stat tiles (PortfolioStatsRow → StatCard): a 34px
+ * figure in a ~124px wide tile, so roughly six characters is all that fits.
+ * 100,000 and up is shortened ("123.1K", "12.3M"), 1,000 and up drops cents
+ * ("8,000", "99,999"), and anything smaller keeps up to 2 decimals without a
+ * trailing ".00" ("250", "99.5").
+ */
+export const formatStatPrice = (value: number): string => {
+  if (Math.abs(value) >= 100_000) return compactFormatter.format(value)
+  if (Math.abs(value) >= 1_000) return value.toLocaleString('en-US', { maximumFractionDigits: 0 })
+  return value.toLocaleString('en-US', { maximumFractionDigits: 2 })
+}
+
+export const formatExpiry =(timestamp: number): string =>
   new Date(timestamp)
     .toLocaleString('en-GB', {
       day: '2-digit',
@@ -73,10 +102,6 @@ export const formatStatNumber = (value: number): string => {
 /** "0x7f3a…456e8" — Figma 1:973's own truncation: 6 leading characters, 5 trailing. Shared by the buy flow and the receipt. */
 export const truncateHash = (hash: string): string => `${hash.slice(0, 6)}…${hash.slice(-5)}`
 
-// The source project reads this from its Seaport order client
-// (DEFAULTS.feeBps / 10000) and splits in integer USDT minor units; this
-// preview has no order client or ethers, so it keeps the same 2.5% as a
-// plain float split.
 export const PLATFORM_FEE_RATE = 0.025
 
 export function computeFeeBreakdown(priceUsd: number) {

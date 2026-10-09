@@ -1,0 +1,94 @@
+// Figma node 93:54892 (dark state only): white pill, black knob over the moon,
+// sun at 35%. Figma has no light state, so light mirrors it: black pill,
+// white knob over the sun, moon at 35%. Positions are Figma's, measured
+// inside the 1.25px border.
+
+.toggle {
+  --toggle-pill: var(--color-black-primary);
+  --toggle-knob: var(--color-white-primary);
+
+  position: relative;
+  flex-shrink: 0;
+  width: 54px; // design-specific: Figma-exact
+  height: 22px; // design-specific: Figma-exact
+  padding: 0;
+  border: 1.25px solid var(--toggle-pill); // design-specific: Figma-exact
+  border-radius: var(--radius-full);
+  background: var(--toggle-pill);
+  cursor: pointer;
+  // design-specific: Figma-exact drop and inset shadows
+  box-shadow:
+    0 1.25px 0 0 #3c3c3c,
+    -9.375px 11.25px 4.375px 0 rgba(0, 0, 0, 0.01),
+    -6.25px 7.5px 3.75px 0 rgba(0, 0, 0, 0.04),
+    -3.125px 4.375px 3.125px 0 rgba(0, 0, 0, 0.15),
+    -1.25px 1.875px 2.5px 0 rgba(0, 0, 0, 0.26),
+    -0.625px 0.625px 1.25px 0 rgba(0, 0, 0, 0.29),
+    inset 1.562px -0.625px 0 0 rgba(255, 255, 255, 0.37),
+    inset 0 -1.562px 0 0 rgba(255, 255, 255, 0.37),
+    inset 0 1.875px 0 0.625px rgba(0, 0, 0, 0.16),
+    inset -1.875px 2.5px 3.75px 0.625px var(--color-black-alpha-25);
+
+  &:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+}
+
+:global(:root[data-theme='dark']) .toggle {
+  --toggle-pill: var(--color-white-primary);
+  --toggle-knob: var(--color-black-primary);
+}
+
+.knob {
+  position: absolute;
+  top: 1.75px; // design-specific: Figma-exact
+  left: 2.625px; // design-specific: centred on the sun, mirroring the dark position
+  width: 16.25px; // design-specific: Figma-exact
+  height: 16.25px;
+  border: 0.677px solid var(--toggle-pill); // design-specific: Figma-exact
+  border-radius: var(--radius-full);
+  background: var(--toggle-knob);
+  transition: left 0.2s ease;
+
+  :global(:root[data-theme='dark']) & {
+    left: 31.75px; // design-specific: Figma-exact
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+.slot {
+  position: absolute;
+  top: 3.75px; // design-specific: Figma-exact
+  display: flex;
+  width: 12px;
+  height: 12px;
+  color: var(--toggle-knob);
+  opacity: 0.35;
+}
+
+.sun {
+  left: 4.75px; // design-specific: Figma-exact
+
+  // In light the knob sits on the sun, so it takes the pill colour at full strength.
+  :global(:root:not([data-theme='dark'])) & {
+    color: var(--toggle-pill);
+    opacity: 1;
+  }
+}
+
+.moon {
+  left: 33.75px; // design-specific: Figma-exact
+
+  :global(:root[data-theme='dark']) & {
+    color: var(--toggle-pill);
+    opacity: 1;
+  }
+}
+
+.icon {
+  display: block;
+}

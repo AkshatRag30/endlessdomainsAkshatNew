@@ -336,6 +336,108 @@
   --color-toast-secondary: #4e8d7c;
   --color-toast-info: #474747;
   --color-toast-info-success: #39654d;
+
+  // ══ Semantic theme roles ══════════════════════════════════════════════════════
+  // Components use these roles instead of raw colours or the palette tokens above,
+  // so dark mode only has to redefine this block (see dev-docs/darkmodeplan.html).
+  // Values here are today's light colours, so adopting a role changes nothing
+  // visually. Keep this list short: map a new colour to the nearest role before
+  // adding one.
+
+  // ── Surfaces ──────────────────────────────────────────────────────────────────
+  --color-bg-page: var(--color-gray-page-bg); // page and drawer background
+  --color-bg-surface: var(--color-white-primary); // every card, table, row, panel, drawer section, input and the header
+  --color-bg-surface-active: var(--color-gray-light); // hover, active, and tiles nested inside a surface
+  --color-bg-option-selected: linear-gradient(180deg, var(--color-black-primary) 5.388%, #333 100%); // design-specific: selected option card and duration chip
+
+  // ── Text ──────────────────────────────────────────────────────────────────────
+  --color-text-primary: #171429; // design-specific: headings, values, body copy
+  --color-text-secondary: #7e7a93; // design-specific: labels, supporting copy
+  --color-text-tertiary: #aba7bc; // design-specific: hints, captions, placeholders
+  --color-text-disabled: var(--color-gray-medium);
+  --color-text-mono-muted: #a6a1bb; // design-specific: mono timestamps, addresses and table meta
+  --color-text-on-dark: var(--color-white-primary); // text on the selected option and other dark fills
+
+  // ── Borders ───────────────────────────────────────────────────────────────────
+  --color-border-subtle: #eeedf3; // design-specific: dividers, card outlines, nested card separation
+  --color-border-strong: #e2e0ec; // design-specific: inputs, option cards, toggles
+  --color-border-emphasis: var(--color-border-muted); // note boxes, chain chips
+
+  // ── Controls and brand ────────────────────────────────────────────────────────
+  --color-control-selected-bg: var(--color-blue-primary); // active tab, chip, segmented option
+  --color-control-selected-text: var(--color-white-primary);
+  --color-accent: var(--color-blue-primary);
+  --color-badge-extension: var(--color-amber);
+
+  // ── Status ────────────────────────────────────────────────────────────────────
+  --color-status-success: #11d000; // design-specific: sale amounts, success icons
+  --color-status-success-text: #12a05c; // design-specific: success sentences and badges
+  --color-status-success-bg: #e7f6ee; // design-specific
+  --color-status-error: #ef4444; // design-specific
+  --color-status-error-text: #7a1f2c; // design-specific
+  --color-status-error-bg: #fcedef; // design-specific
+  --color-status-warning: #976301; // design-specific
+  --color-status-warning-bg: #fdf3e0; // design-specific
+
+  // ── Data ──────────────────────────────────────────────────────────────────────
+  --color-data-primary: #5b3df5; // design-specific: chart lines, bars and inline links
+  --color-data-secondary: #dcd3fb; // design-specific: chart fills and second series
+}
+
+// ── Dark theme ────────────────────────────────────────────────────────────────
+// Set on <html> by ThemeContext (src/context/ThemeContext.tsx). Redefines only
+// the semantic roles; palette tokens above stay the same in both themes.
+// Values are the proposed dark scale in dev-docs/darkmodeplan.html, pending
+// designer approval: black page, one solid surface for every card/table/panel,
+// white at fixed opacities for text and borders.
+:root[data-theme='dark'] [data-marketplace-preview] {
+  color-scheme: dark;
+
+  // ── Surfaces ──────────────────────────────────────────────────────────────────
+  --color-bg-page: #000000;
+  --color-bg-surface: #141415;
+  --color-bg-surface-active: #2f2f2f;
+  --color-bg-option-selected: linear-gradient(180deg, #000000 5.388%, #333333 100%); // design-specific: paired with a white border on the component
+
+  // ── Text ──────────────────────────────────────────────────────────────────────
+  --color-text-primary: #ffffff;
+  --color-text-secondary: rgba(255, 255, 255, 0.7);
+  --color-text-tertiary: rgba(255, 255, 255, 0.5);
+  --color-text-disabled: rgba(255, 255, 255, 0.25);
+  --color-text-mono-muted: #a6a1bb;
+  --color-text-on-dark: #ffffff;
+
+  // ── Borders ───────────────────────────────────────────────────────────────────
+  --color-border-subtle: rgba(255, 255, 255, 0.1);
+  --color-border-strong: rgba(255, 255, 255, 0.3);
+  --color-border-emphasis: rgba(255, 255, 255, 0.57);
+
+  // ── Controls and brand ────────────────────────────────────────────────────────
+  --color-control-selected-bg: #ffffff;
+  --color-control-selected-text: #000000;
+  --color-accent: #6b7bff; // design-specific: not in Figma; #2639ED is only 2.5:1 as text on the dark surface, this is 5.2:1. Brand fills keep #2639ED via --color-blue-primary
+  --color-badge-extension: var(--color-amber);
+
+  // ── Status ────────────────────────────────────────────────────────────────────
+  --color-status-success: #27ff00;
+  --color-status-success-text: #1fff95;
+  --color-status-success-bg: rgba(31, 255, 149, 0.13);
+  --color-status-error: #ef4444;
+  --color-status-error-text: #f87171; // design-specific: not in Figma; a lighter red readable on the dark surface
+  --color-status-error-bg: rgba(239, 68, 68, 0.13);
+  --color-status-warning: #ffab0b;
+  --color-status-warning-bg: rgba(255, 171, 11, 0.13);
+
+  // ── Data ──────────────────────────────────────────────────────────────────────
+  --color-data-primary: #5b3df5;
+  --color-data-secondary: #dcd3fb;
+}
+
+// The legacy global stylesheets paint body white; below a short page that
+// shows as a white band under the dark shell. Light mode is left as it was.
+// Preview: the dark page colour behind the preview pages (tokens live on the wrapper, not body)
+:root[data-theme='dark'] body:has([data-marketplace-preview]) {
+  background-color: #000000;
 }
  
  
@@ -420,16 +522,17 @@
   h6 {
     margin-bottom: 0;
   }
-
+   
   ul {
     padding: 0;
   }
-
+   
   ul li {
     list-style: none;
   }
-
+   
   ul li a {
     text-decoration: none;
   }
+   
 }

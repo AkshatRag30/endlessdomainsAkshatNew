@@ -2,7 +2,7 @@
 
 // Figma node 50:6510. Background is a single exported PNG — the gradient,
 // noise texture, and faint rounded-square accents are all baked into
-// bannerbg.png itself now, not reconstructed in CSS. An earlier pass tried
+// bannerbg.jpg itself now, not reconstructed in CSS. An earlier pass tried
 // a CSS-only stripe-bg mixin here instead of a real background-image, which
 // silently overwrote the gradient it was layered on top of (background-image
 // is a longhand the `background` shorthand also sets, and the later
@@ -19,7 +19,10 @@
   padding: var(--space-4) var(--space-5);
   border-radius: 4px;
   overflow: hidden;
-  background-image: url('/assets/img/hero/bannerbg.png');
+  // Was a 708KB PNG served raw (background-image, unlike next/image, is
+  // never resized/optimized) - recompressed as a JPEG instead, ~261KB, no
+  // visible quality loss at this size.
+  background-image: url('/assets/img/hero/bannerbg.jpg');
   background-size: cover;
   background-position: center;
 

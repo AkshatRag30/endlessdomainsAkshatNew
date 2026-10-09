@@ -1,10 +1,9 @@
 @import '@mpstyles/_mixins.scss';
 
-// Figma node 5:3647 (desktop) / 5:4262 (mobile). The #f4f4f4 → #fefefe
-// gradient, #f2f2f2 ring, rgba(0,0,0,0.64) label and #353232 value are
-// Figma-exact; none has a token (nearest greys differ visibly on this
-// surface). Mobile scales the whole tile by Figma's own ~0.786 factor
-// rather than just reflowing it.
+// Figma node 5:3647 (desktop) / 5:4262 (mobile). The surface-active → surface
+// gradient and primary-text label/value use role tokens; the #f2f2f2 ring is
+// Figma-exact (box-shadow, left as is). Mobile scales the whole tile by
+// Figma's own ~0.786 factor rather than just reflowing it.
 
 .tile {
   display: flex;
@@ -14,9 +13,9 @@
   height: 76px;
   padding: 5px 9px;
   overflow: hidden;
-  border: 3px solid var(--color-white-primary);
+  border: 3px solid var(--color-bg-surface);
   border-radius: 10px;
-  background: linear-gradient(180deg, #f4f4f4 0%, #fefefe 100%);
+  background: linear-gradient(180deg, var(--color-bg-surface-active) 0%, var(--color-bg-surface) 100%);
   box-shadow: 0 0 0 4px #f2f2f2;
 
   @include mobile {
@@ -34,7 +33,7 @@
   font-size: 14px;
   font-weight: var(--font-weight-medium);
   line-height: 16.5px;
-  color: rgba(0, 0, 0, 0.64);
+  color: var(--color-text-primary);
   white-space: nowrap;
 
   @include mobile {
@@ -51,7 +50,7 @@
   font-size: 17px;
   font-weight: var(--font-weight-medium);
   line-height: 1.2;
-  color: #353232;
+  color: var(--color-text-primary);
   white-space: nowrap;
 
   @include mobile {

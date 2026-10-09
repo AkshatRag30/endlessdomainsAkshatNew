@@ -23,3 +23,9 @@
     margin-top: 20px;
   }
 }
+
+// The calendar glyph in each step detail draws in currentColor (see primitives/icons/overview-icons).
+.calendarIcon {
+  flex-shrink: 0;
+  color: var(--color-text-primary);
+}

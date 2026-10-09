@@ -29,7 +29,7 @@ const FAQS: FaqsType[] = [
     position: 1,
     question: 'Is it really lifetime ownership? No renewals?',
     answer:
-      "Correct. One mint, zero renewals, zero rent. There are no annual fees and no protocol fees. Your domain, and the identity it carries, lives on-chain as long as the chain does. That's the whole point.",
+      "It depends on the domain. Endless brings names from many providers into one place, so renewal rules vary. Some, like .og, .crypto, and .x, are yours with no renewals at all. Others, like .eth, .bnb, and .arb, need periodic renewal. Where a domain is permanent, there are no recurring fees and your ownership lives onchain for as long as the network does. Always check a domain's terms before minting.",
   },
   {
     id: 'chains-supported',

@@ -1,5 +1,5 @@
 import React from 'react'
-import Image from 'next/image'
+import { CalendarIcon } from '@/marketplace-preview/design-system/primitives/icons/overview-icons'
 import Link from 'next/link'
 import type { ComparableSale } from '@/marketplace-preview/types/marketplace'
 import GlassCard from '@/marketplace-preview/design-system/primitives/cards/glass-card'
@@ -72,7 +72,7 @@ export const ComparableSalesPanel = ({ sales, isLoading, isError, onRetry, getSa
                   </span>
                   <span className={styles.date}>
                     <span className={styles.calendarBox}>
-                      <Image src="/assets/img/domain-overview/calendar.svg" alt="" aria-hidden="true" width={13.3} height={15.2} className={styles.calendar} />
+                      <CalendarIcon width={13.3} height={15.2} className={styles.calendar} />
                     </span>
                     <time dateTime={sale.soldAt}>{formatShortDate(sale.soldAt)}</time>
                   </span>

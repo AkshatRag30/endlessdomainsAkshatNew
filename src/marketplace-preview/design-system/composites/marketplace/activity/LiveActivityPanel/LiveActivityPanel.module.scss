@@ -11,11 +11,16 @@
   background: rgba(249, 249, 249, 0.2);
   @include stripe-bg;
   overflow: hidden; // keeps the stripe pattern inside the rounded corners, same pairing the main site always uses
-  border: 1px solid var(--color-blue-primary-alpha-07); // closest existing token to Figma's rgba(38,57,237,0.08)
+  border: 1px solid var(--color-border-subtle); // was the blue at 7%
   border-radius: 4px;
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+
+  // Figma dark (93:53457): the single surface panel
+  @include dark {
+    background-color: var(--color-bg-surface);
+  }
 
   // Figma's revised mobile mockup (node 34:1041) drops this panel entirely
   // in favor of the new LiveActivityTicker under the header — tablet and
@@ -31,10 +36,15 @@
   gap: var(--space-1);
   align-self: flex-start;
   padding: 3px;
-  background: var(--color-white-primary);
-  border: 1px solid var(--color-border-black-subtle);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
   border-radius: 6px;
   box-shadow: 0 1.3px 4.6px rgba(0, 0, 0, 0.05);
+
+  // Figma dark (93:53460): the chip group sits on black
+  @include dark {
+    background: var(--color-bg-page);
+  }
 }
 
 .tab {
@@ -45,7 +55,7 @@
   cursor: pointer;
   font-family: var(--font-satoshi);
   font-size: var(--text-small-12);
-  color: var(--color-black-alpha-55);
+  color: var(--color-text-secondary);
   text-transform: capitalize;
   white-space: nowrap;
 }
@@ -55,10 +65,17 @@
   color: var(--color-white-primary);
   font-weight: var(--font-weight-medium);
   box-shadow: inset 0 1px 4.6px rgba(255, 255, 255, 0.6);
+
+  // Figma dark: the active chip is white with black text
+  @include dark {
+    background: var(--color-control-selected-bg);
+    color: var(--color-control-selected-text);
+    box-shadow: none;
+  }
 }
 
 .card {
-  background: var(--color-white-primary);
+  background: var(--color-bg-surface);
   border-radius: 2px;
   padding: var(--space-2) var(--space-3);
 }
@@ -71,7 +88,7 @@
   font-family: var(--font-satoshi);
   font-weight: var(--font-weight-medium);
   font-size: var(--text-small-13);
-  color: #454e43; // design-specific: Figma-exact
+  color: var(--color-text-primary); // was #454e43
   text-transform: capitalize;
 }
 
@@ -79,7 +96,7 @@
   width: 8px;
   height: 8px;
   border-radius: var(--radius-full);
-  background: var(--color-status-available);
+  background: var(--color-status-success);
   flex-shrink: 0;
   animation: pulse 2s ease-in-out infinite;
 
@@ -163,5 +180,5 @@
   text-align: center;
   font-family: var(--font-satoshi);
   font-size: var(--text-small-12);
-  color: var(--color-gray-primary);
+  color: var(--color-text-secondary);
 }

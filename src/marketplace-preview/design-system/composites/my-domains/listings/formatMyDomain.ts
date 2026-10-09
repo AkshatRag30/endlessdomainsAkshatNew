@@ -3,7 +3,7 @@ import type { MyDomainListing } from '@/marketplace-preview/types/my-domains'
 // Shared between MyDomainRow (list view) and MyDomainCard (grid view) —
 // both render the exact same fields, just laid out differently.
 
-export const formatUsd = (value: number) => `$${value.toLocaleString('en-US')}`
+export const formatUsd = (value: number) => `${value.toLocaleString('en-US')}`
 
 // null means the domain never expires (the API returns `expiryDate: null`
 // for those) — shown as "Lifetime" rather than a bogus epoch date.

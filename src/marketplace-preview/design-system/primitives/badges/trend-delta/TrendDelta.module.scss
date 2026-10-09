@@ -1,6 +1,3 @@
-// #ef4444 / #12a05c are Figma-exact (the same pair the buying flow uses for
-// error and success values).
-
 .delta {
   font-family: var(--font-satoshi);
   font-size: var(--text-small-12);
@@ -8,11 +5,11 @@
   white-space: nowrap;
 
   &[data-tone='negative'] {
-    color: #ef4444;
+    color: var(--color-status-error);
   }
 
   &[data-tone='positive'] {
-    color: #12a05c;
+    color: var(--color-status-success-text);
   }
 }
 

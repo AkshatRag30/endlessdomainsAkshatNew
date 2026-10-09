@@ -35,7 +35,7 @@ $clip-sm: polygon(
   border: none;
   cursor: pointer;
   clip-path: #{$clip};
-  background: var(--color-gray-medium);
+  background: var(--color-border-emphasis);
   overflow: hidden;
   display: inline-flex;
   align-items: center;
@@ -62,13 +62,13 @@ $clip-sm: polygon(
 
   &.disabled {
     cursor: not-allowed;
-    background: var(--color-gray-light);
-    color: var(--color-gray-light-active);
+    background: var(--color-border-subtle);
+    color: var(--color-text-disabled);
   }
 
   &.transparent {
-    background: var(--color-gray-light-hover);
-    color: var(--color-black-primary);
+    background: var(--color-border-subtle);
+    color: var(--color-text-primary);
   }
 
   &.dark {
@@ -136,16 +136,16 @@ $clip-sm: polygon(
   }
 
   &.disabled::before {
-    background: var(--color-gray-light-hover);
+    background: var(--color-bg-surface-active);
     box-shadow: none;
   }
 
   &.transparent::before {
-    background: var(--color-white-primary);
+    background: var(--color-bg-surface);
   }
 
   &.transparent:not(.disabled):hover::before {
-    background: var(--color-white-light-hover);
+    background: var(--color-bg-surface-active);
   }
 
   &.transparent.disabled::before {
@@ -193,7 +193,7 @@ $clip-sm: polygon(
   }
 
   &.error:focus-visible {
-    outline-color: var(--color-blue-primary);
+    outline-color: var(--color-accent);
   }
 
   &.green::before {

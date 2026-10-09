@@ -12,7 +12,7 @@ export interface OrderNextStepsCardProps {
 
 /**
  * Figma node 5:7690 ("What next"): three action tiles. "See it in My
- * domains" and "List it for sale" go to the My Domains preview (the second
+ * domains" and "List it for sale" go to the real My Domains page (the second
  * with the name in `?list=`, which opens its listing drawer once the name is
  * in the portfolio). "Point it somewhere" has no records manager page yet
  * (plan §9), so it stays visually real but inert.

@@ -30,7 +30,7 @@ const MILESTONES: Milestone[] = [
     year: '2024',
     title: 'Expansion & .og launch',
     description: 'Added Arbitrum, Starknet, and Avalanche. Launched .og with 4,000+ claimed. Shipped Parked Identities and the Marketplace.',
-    tags: ['Latest'],
+    tags: ['Latest', 'Marketplace'],
   },
   {
     id: 'works-for-you',
