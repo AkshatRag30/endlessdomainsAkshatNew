@@ -1,7 +1,5 @@
-// Figma nodes 1:721 / 1:773. Divider (#eeedf3, #e2e0ec) and text colors
-// (#7e7a93, #171429, #12a05c) are Figma-exact, same drawer palette the
-// listing flow uses, no token match. The muted value color (#474747) is
-// --color-text-body exactly.
+// Figma nodes 1:721 / 1:773. Dividers and text use the role tokens (same
+// drawer palette the listing flow uses).
 
 .list {
   display: flex;
@@ -17,7 +15,7 @@
   padding: var(--space-2) 0;
 
   & + & {
-    border-top: 1px solid #eeedf3;
+    border-top: 1px solid var(--color-border-subtle);
   }
 }
 
@@ -28,20 +26,20 @@
 
   // Higher specificity than `.row + .row` above so the stronger divider wins.
   .row + & {
-    border-top-color: #e2e0ec;
+    border-top-color: var(--color-border-strong);
   }
 
   .label {
     font-weight: var(--font-weight-medium);
     font-size: 13.5px;
-    color: #171429;
+    color: var(--color-text-primary);
   }
 
   .value {
     font-size: 19px;
     line-height: 28.5px;
     letter-spacing: -0.38px;
-    color: var(--color-blue-primary);
+    color: var(--color-accent);
   }
 }
 
@@ -51,7 +49,7 @@
   font-weight: var(--font-weight-regular); // the app's global reset bolds <dt>
   font-size: 14px;
   line-height: 20.25px;
-  color: #7e7a93;
+  color: var(--color-text-secondary);
 }
 
 // Plain inline text, not flex — "8,460.00 USDT" is one text run in Figma
@@ -63,22 +61,22 @@
   font-weight: var(--font-weight-bold);
   font-size: 13px;
   line-height: 20.25px;
-  color: #171429;
+  color: var(--color-text-primary);
   text-align: right;
 }
 
 .success {
-  color: #12a05c;
+  color: var(--color-status-success-text);
 }
 
 .muted {
-  color: var(--color-text-body);
+  color: var(--color-text-secondary);
 }
 
 // ── 'boxed' variant (domain overview, Figma 5:3701 / 5:3890) ─────────────
 // A rgba(0,0,0,0.03) → transparent well, radius 6, 6px/5px inset, holding
-// white 29px rows with a rgba(0,0,0,0.05) border, radius 5, 3px apart.
-// Label Regular / value Medium, both 14px; #7e7a93 / #171429 as above.
+// surface 29px rows with a subtle border, radius 5, 3px apart.
+// Label Regular / value Medium, both 14px; secondary / primary text as above.
 // Nested under .boxed so it outranks the plain rules regardless of order.
 
 .boxed {
@@ -91,13 +89,13 @@
     align-items: center;
     height: 29px;
     padding: 0 5px;
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--color-border-subtle);
     border-radius: 5px;
-    background: var(--color-white-primary);
+    background: var(--color-bg-surface);
   }
 
   .row + .row {
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    border-top: 1px solid var(--color-border-subtle);
   }
 
   .label {
@@ -118,8 +116,8 @@
 }
 
 // ── 'ruled' variant (order receipt, Figma 5:7540) ────────────────────────
-// 36.5px rows 3px apart, each with a #eeedf3 hairline on top (the first
-// too), 13px rgba(0,0,0,0.68) labels. Values keep the plain Bold 13px;
+// 36.5px rows 3px apart, each with a subtle hairline on top (the first
+// too), 13px primary-text labels. Values keep the plain Bold 13px;
 // amounts pass their own Medium 14px styling.
 
 .ruled {
@@ -129,13 +127,13 @@
     align-items: center;
     min-height: 36.5px;
     padding: var(--space-2) 0;
-    border-top: 1px solid #eeedf3;
+    border-top: 1px solid var(--color-border-subtle);
   }
 
   .label {
     font-size: 13px;
     line-height: 19.5px;
-    color: rgba(0, 0, 0, 0.68);
+    color: var(--color-text-primary);
   }
 
   .value {

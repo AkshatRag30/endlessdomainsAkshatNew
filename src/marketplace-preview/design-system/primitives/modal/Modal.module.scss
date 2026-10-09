@@ -1,8 +1,6 @@
 @import '@mpstyles/_mixins.scss';
 
-// Figma node 6:8705. Border/surface colors below (#eeedf3, #171429, #7e7a93,
-// #f6f6f6) are Figma-exact — no existing token matches this drawer's own
-// light-neutral palette closely enough to reuse.
+// Figma node 6:8705.
 
 .root {
   position: fixed;
@@ -33,13 +31,23 @@
   flex-direction: column;
   width: 540px;
   height: 100vh;
-  background: var(--color-white-primary);
+  background: var(--color-bg-surface);
   box-shadow: -5px 0 7.4px rgba(0, 0, 0, 0.08);
   transform: translateX(100%);
   transition: transform 0.3s ease;
 
+  // Mobile: 100vh is the viewport with the browser toolbars collapsed, so
+  // on Chrome (whose bottom toolbar stays open while the body is scroll
+  // locked) the pinned footer and its CTA ended up hidden behind it. Size
+  // to the visible viewport instead (100dvh, with 100vh as the fallback),
+  // and let the whole panel scroll so the footer is always reachable even
+  // when it's tall (the buy flow's fee breakdown) on a short screen.
   @include mobile {
     width: 100%;
+    height: 100dvh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
   }
 }
 
@@ -54,7 +62,7 @@
   justify-content: space-between;
   gap: var(--space-2-5);
   padding: var(--space-4) var(--space-5);
-  border-bottom: 1px solid #eeedf3;
+  border-bottom: 1px solid var(--color-border-subtle);
 
   // Figma node 1:11808 (mobile "first listing" responsive frame) — 16px
   // horizontal inset on mobile, down from the desktop frame's 20px.
@@ -68,7 +76,7 @@
   font-weight: var(--font-weight-medium);
   font-size: 16.5px;
   letter-spacing: -0.33px;
-  color: #171429;
+  color: var(--color-text-primary);
   margin: 0;
 }
 
@@ -82,12 +90,12 @@
   border: none;
   border-radius: var(--radius-sm);
   background: none;
-  color: #7e7a93;
+  color: var(--color-text-secondary);
   cursor: pointer;
   flex-shrink: 0;
 
   &:hover {
-    background: var(--color-gray-light);
+    background: var(--color-bg-surface-active);
   }
 
   &:focus-visible {
@@ -99,11 +107,24 @@
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
+
+  // Mobile: the panel itself scrolls (see .panel), so the body grows with
+  // its content instead of being its own scroll container. flex-grow keeps
+  // the footer at the bottom when the content is short.
+  @include mobile {
+    flex: 1 0 auto;
+    overflow-y: visible;
+  }
 }
 
 .footer {
   flex-shrink: 0;
-  background: #f6f6f6;
-  border-top: 1px solid #eeedf3;
+  background: var(--color-bg-surface-active);
+  border-top: 1px solid var(--color-border-subtle);
   box-shadow: 0 -8px 11.3px rgba(0, 0, 0, 0.12);
+
+  // Keeps the CTA clear of the iPhone home indicator.
+  @include mobile {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
 }

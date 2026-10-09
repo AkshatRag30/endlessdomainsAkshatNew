@@ -1,7 +1,6 @@
 // Moved verbatim from ListingFormStep's .networkBanner (listing-flow Figma
-// 1:9355; buying-flow 1:1297 is the same component). Colors (#fcedef,
-// #f3d3d9, #7a1f2c, #96313f) are Figma-exact, no token match for this
-// particular red-tint hue.
+// 1:9355; buying-flow 1:1297 is the same component). Fill and text use the
+// status error roles; the #f3d3d9 border is Figma-exact with no role yet.
 
 .banner {
   display: flex;
@@ -14,28 +13,48 @@
 
 .error {
   border-color: #f3d3d9;
-  background: #fcedef;
+  background: var(--color-status-error-bg);
 
   .title {
-    color: #7a1f2c;
+    color: var(--color-status-error-text);
   }
 
   .body {
-    color: #96313f;
+    color: var(--color-status-error-text);
   }
 }
 
-// Figma 1:1685 (buying flow "no fund"). #fdf3e0 matches the amber fee rows
-// used across both flows; #f0dfbe / #976301 are Figma-exact, no token match.
+// Figma 1:1685 (buying flow "no fund"). Fill and text use the status warning
+// roles; the #f0dfbe border is Figma-exact with no role yet.
 // This variant also rounds its corners more (11px vs the red banner's 7px).
 .warning {
   border-color: #f0dfbe;
   border-radius: 11px;
-  background: #fdf3e0;
+  background: var(--color-status-warning-bg);
 
   .title,
   .body {
-    color: #976301;
+    color: var(--color-status-warning);
+  }
+}
+
+// Watchlist 20:12143, "Since you last looked". #f1eefe / #dcd3fb / #5d6dff
+// are Figma-exact, no token match for this lavender. Roomier padding (13px
+// 15px) and a 6px radius; the action is centred on the whole banner rather
+// than top aligned with the title.
+.info {
+  align-items: center;
+  padding: 13px 15px;
+  border-color: #dcd3fb;
+  border-radius: 6px;
+  background: #f1eefe;
+
+  .title {
+    color: #5d6dff;
+  }
+
+  .body {
+    color: var(--color-text-primary);
   }
 }
 

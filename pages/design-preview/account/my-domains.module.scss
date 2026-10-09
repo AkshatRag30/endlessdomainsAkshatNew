@@ -50,6 +50,15 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
+
+  // Figma dark (93:49561): category tabs, heading, filters and the table sit
+  // in one surface panel with black rows inside, same as the home listings.
+  @include dark {
+    padding: 14px; // design-specific: same inset as the home listings panel
+    background: var(--color-bg-surface);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 4px;
+  }
 }
 
 // Pulls "Live Listings" and the search/filter row right under it closer

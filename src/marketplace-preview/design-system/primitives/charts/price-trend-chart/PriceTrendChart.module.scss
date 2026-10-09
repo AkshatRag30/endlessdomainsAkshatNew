@@ -1,9 +1,9 @@
 @import '@mpstyles/_mixins.scss';
 
 // Figma 5:4718 (desktop) / 5:5549 (mobile). Axis text is Inter SemiBold
-// 9.23px #9c907f with 0.28px tracking in Figma — Satoshi stands in (Inter
-// isn't loaded). Grid lines are #1d170f at 10%, 24.6px apart across and on
-// the price ticks down; volume columns are #f2eee7 and fill the bottom 24%
+// 9.23px with 0.28px tracking in Figma — Satoshi stands in (Inter
+// isn't loaded). Grid lines are 24.6px apart across and on
+// the price ticks down; volume columns fill the bottom 24%
 // of the plot. The plot is 105.5px tall on desktop and 174px on mobile.
 
 .chart {
@@ -25,7 +25,7 @@
   font-weight: var(--font-weight-semibold);
   line-height: 9.23px;
   letter-spacing: 0.28px;
-  color: #9c907f;
+  color: var(--color-text-tertiary);
   white-space: nowrap;
 }
 
@@ -43,10 +43,10 @@
   position: relative;
   min-width: 0;
   // Figma's 0.32px lines at 10% render as a faint but visible hairline;
-  // 1px at 7% reads the same (a literal 0.32px line nearly vanishes here).
+  // a 1px subtle border line reads the same (a literal 0.32px line nearly vanishes here).
   background-image:
-    linear-gradient(to right, rgba(29, 23, 15, 0.07) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(29, 23, 15, 0.07) 1px, transparent 1px);
+    linear-gradient(to right, var(--color-border-subtle) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-border-subtle) 1px, transparent 1px);
   background-size: 24.6px 100%, 100% 25%;
   box-shadow: inset 0 -1px 0 rgba(29, 23, 15, 0.07);
 }
@@ -64,7 +64,7 @@
   span {
     flex: 1;
     min-width: 0;
-    background: #f2eee7;
+    background: var(--color-bg-surface-active);
   }
 }
 
@@ -95,7 +95,7 @@
       left: 50%;
       width: 0.5px;
       height: 3px;
-      background: rgba(156, 144, 127, 0.5);
+      background: var(--color-border-strong);
     }
   }
 

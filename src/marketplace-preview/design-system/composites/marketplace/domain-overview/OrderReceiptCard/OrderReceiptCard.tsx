@@ -34,7 +34,7 @@ const Amount = ({ value }: { value: number }) => (
 export const OrderReceiptCard = ({ order }: OrderReceiptCardProps) => {
   const { domain } = order
   const feePercent = `${(PLATFORM_FEE_RATE * 100).toFixed(1).replace(/\.0$/, '')}%`
-  const explorerHref = txExplorerHref(domain.chain.id, order.txHash)
+  const explorerHref = order.txHash ? txExplorerHref(domain.chain.id, order.txHash) : null
 
   return (
     <GlassCard variant="glass" title="Receipt" titleId="order-receipt-title" className={styles.card}>
@@ -53,18 +53,22 @@ export const OrderReceiptCard = ({ order }: OrderReceiptCardProps) => {
         className={styles.rows}
         rows={[
           { label: 'You paid', value: <Amount value={order.pricePaidUsd} /> },
-          { label: 'Network fee', value: `${formatToken(order.networkFeeUsd)} USDT equivalent` },
+          ...(order.networkFeeUsd != null ? [{ label: 'Network fee', value: `${formatToken(order.networkFeeUsd)} USDT equivalent` }] : []),
           { label: 'Seller received', value: <Amount value={order.sellerReceivedUsd} /> },
           { label: 'Marketplace fee, paid by seller', value: <Amount value={order.marketplaceFeeUsd} /> },
-          { label: 'Order ID', value: `#${order.id}` },
+          { label: 'Order ID', value: order.id.startsWith('0x') ? <span className={styles.tx}>{truncateHash(order.id)}</span> : `#${order.id}` },
           {
             label: 'Transaction',
-            value: explorerHref ? (
-              <Link href={explorerHref} target="_blank" rel="noopener noreferrer" className={styles.tx}>
-                {truncateHash(order.txHash)}
-              </Link>
+            value: order.txHash ? (
+              explorerHref ? (
+                <Link href={explorerHref} target="_blank" rel="noopener noreferrer" className={styles.tx}>
+                  {truncateHash(order.txHash)}
+                </Link>
+              ) : (
+                <span className={styles.tx}>{truncateHash(order.txHash)}</span>
+              )
             ) : (
-              <span className={styles.tx}>{truncateHash(order.txHash)}</span>
+              <span className={styles.tx}>Not available yet</span>
             ),
           },
         ]}

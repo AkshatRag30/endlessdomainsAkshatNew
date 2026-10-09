@@ -12,19 +12,19 @@
 }
 
 .neutral {
-  background: var(--color-gray-light);
-  color: var(--color-gray-dark);
+  background: var(--color-bg-surface-active);
+  color: var(--color-text-secondary);
 }
 
 .accent {
   background: var(--color-blue-light);
-  color: var(--color-blue-primary);
+  color: var(--color-accent);
 }
 
-// Figma node 1:1645 (Market Activity's percent-change badge) — exact colors.
+// Figma node 1:1645 (Market Activity's percent-change badge) — status success role colours.
 .success {
-  background: #e7f6ee;
-  color: #12a05c;
+  background: var(--color-status-success-bg);
+  color: var(--color-status-success-text);
 }
 
 .warning {
@@ -33,6 +33,6 @@
 }
 
 .danger {
-  background: var(--color-error-soft-bg);
-  color: var(--color-error);
+  background: var(--color-status-error-bg);
+  color: var(--color-status-error);
 }

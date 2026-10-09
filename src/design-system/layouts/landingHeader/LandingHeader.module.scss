@@ -149,6 +149,8 @@
   margin: 0 var(--gap-inline-sm);
   transition: color 0.3s ease;
   position: relative;
+  // Keeps "[ Perks ]" on one line — it wrapped the closing bracket below at ~1000–1280px.
+  white-space: nowrap;
 
   &::before,
   &::after {
@@ -166,6 +168,14 @@
   &::after {
     content: ']';
     margin-left: var(--space-5);
+  }
+
+  // Small laptops / iPad Pro portrait: tighter bracket spacing so the nav still fits.
+  @include laptop {
+    margin: 0;
+
+    &::before { margin-right: var(--space-2); }
+    &::after { margin-left: var(--space-2); }
   }
 
   &:hover {

@@ -112,6 +112,10 @@
   max-width: var(--container-max-width);
   margin: 0 auto;
 
+  // Two 592px cards + gutter need ~1256px; below that (small laptops / iPad Pro
+  // portrait) the second card wraps under the first instead of overflowing the page.
+  @include laptop { flex-wrap: wrap; row-gap: var(--space-7); }
+
   @include tablet-down { flex-direction: column; align-items: center; gap: var(--space-7); }
 }
 

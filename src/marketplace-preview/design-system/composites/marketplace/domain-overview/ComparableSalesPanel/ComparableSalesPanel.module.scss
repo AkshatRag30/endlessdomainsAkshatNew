@@ -194,6 +194,7 @@
 }
 
 .calendar {
+  color: var(--color-text-primary);
   @include mobile {
     width: 9.3px;
     height: 10.6px;

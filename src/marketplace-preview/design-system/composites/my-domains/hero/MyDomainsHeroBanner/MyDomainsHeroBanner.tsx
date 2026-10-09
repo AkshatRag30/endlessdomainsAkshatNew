@@ -9,7 +9,7 @@ export interface MyDomainsHeroBannerProps {
 }
 
 /**
- * Figma node 50:6510. Background is a single exported PNG (bannerbg.png) —
+ * Figma node 50:6510. Background is a single exported image (bannerbg.jpg) —
  * the gradient, the noise texture, and the faint rounded-square accents are
  * all baked into that one image now, replacing the earlier three-layer
  * reconstruction (CSS gradient + a separate noise-texture pseudo-element +

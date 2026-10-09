@@ -1,0 +1,69 @@
+import React from 'react'
+import { toast } from 'react-toastify'
+
+import { TOAST_TYPE } from '@/core/enum/toast-type.enum'
+
+import ToastErrorMessage from './error'
+import ToastInfoMessage from './info-primary'
+import ToastInfoSuccessMessage from './info-success'
+import ToastPrimaryMessage from './primary'
+import ToastSecondaryMessage from './secondary'
+import ToastSuccessMessage from './success'
+import ToastWarningMessage from './warning'
+
+// react-toastify v11 dropped the toast.POSITION enum in favor of plain
+// ToastPosition string literals — toast.POSITION.BOTTOM_RIGHT etc. no
+// longer exists at all (a type error, not just deprecated), so every call
+// below is now a literal instead.
+const isWideViewport = () => (typeof window !== 'undefined' ? window.innerWidth : 0) > 600
+
+// items: optional bullet-list entries, used by the ERROR variant
+const ToastMessage = (type: string, title = '', message: string, items?: string[]) => {
+  if (type === TOAST_TYPE.PRIMARY) {
+    return toast(<ToastPrimaryMessage title={title} message={message} />, {
+      position: 'bottom-right',
+      closeButton: false,
+    })
+  }
+  if (type === TOAST_TYPE.SECONDARY) {
+    return toast(<ToastSecondaryMessage title={title} message={message} />, {
+      position: 'bottom-right',
+      closeButton: false,
+    })
+  }
+  if (type === TOAST_TYPE.ERROR) {
+    return toast(<ToastErrorMessage title={title} message={message} items={items} />, {
+      position: 'bottom-right',
+      closeButton: false,
+    })
+  }
+  if (type === TOAST_TYPE.WARNING) {
+    return toast(<ToastWarningMessage title={title} message={message} />, {
+      position: 'bottom-right',
+      closeButton: false,
+    })
+  }
+  if (type === TOAST_TYPE.SUCCESS) {
+    // closeToast is injected by react-toastify into the custom component
+    return toast((props: any) => <ToastSuccessMessage message={message} closeToast={props.closeToast} />, {
+      position: 'bottom-right',
+      closeButton: false,
+    })
+  }
+  if (type === TOAST_TYPE.INFO) {
+    return toast((props: any) => <ToastInfoMessage message={message} closeToast={props.closeToast} />, {
+      position: isWideViewport() ? 'bottom-left' : 'bottom-right',
+      closeButton: false,
+    })
+  }
+  if (type === TOAST_TYPE.INFO_SUCCESS) {
+    return toast(<ToastInfoSuccessMessage title={title} message={message} />, {
+      position: isWideViewport() ? 'bottom-left' : 'bottom-right',
+      closeButton: false,
+    })
+  }
+
+  return null
+}
+
+export default ToastMessage

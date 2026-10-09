@@ -32,6 +32,11 @@
   }
 }
 
+// Figma 25:16248 (forgot password): 161px above the logo.
+.gridRaised {
+  top: -161px;
+}
+
 .logoLink {
   position: relative;
   display: block;

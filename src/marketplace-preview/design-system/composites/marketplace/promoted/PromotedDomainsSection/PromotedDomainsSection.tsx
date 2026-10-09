@@ -35,7 +35,9 @@ export const PromotedDomainsSection = ({ onBuyNow, getDomainHref }: PromotedDoma
 
   return (
     <section className={styles.section}>
-      <Image src="/assets/img/marketplace/promoted-glow.png" alt="" aria-hidden="true" width={860} height={35} className={styles.glow} />
+      <Image src="/assets/img/marketplace/promoted-glow.png" alt="" aria-hidden="true" width={860} height={35} className={`${styles.glow} ${styles.glowLight}`} />
+      {/* Figma dark (93:53945): the same notched strip in white at 15%; CSS shows one per theme. */}
+      <Image src="/assets/img/marketplace/promoted-glow-dark.svg" alt="" aria-hidden="true" width={842} height={35} className={`${styles.glow} ${styles.glowDark}`} />
       <p className={styles.heading}>Promoted domains</p>
       <div className={styles.marquee}>
         <div className={styles.track} style={trackStyle}>

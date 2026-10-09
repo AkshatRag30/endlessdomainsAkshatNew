@@ -21,7 +21,7 @@
     display: flex;
     align-items: center;
     height: 30px;
-    background: var(--color-white-primary); // was --color-blue-darker — direct request
+    background: var(--color-bg-surface); // was --color-blue-darker, then white on request
     // No overflow: hidden here — .marquee below already clips its own
     // horizontal scroll on its own, and this bar being the clipping
     // ancestor was cutting the dropdown menu off before it could ever
@@ -85,7 +85,7 @@
   padding: var(--space-1);
   min-width: 100px;
   list-style: none;
-  background: var(--color-white-primary);
+  background: var(--color-bg-surface);
   border-radius: var(--radius-sm);
   box-shadow: var(--shadow-panel);
 }
@@ -101,20 +101,20 @@
   text-align: left;
   font-family: var(--font-satoshi);
   font-size: var(--text-small-13);
-  color: var(--color-gray-dark);
+  color: var(--color-text-secondary);
 
   &:hover {
-    background: var(--color-gray-light-hover);
+    background: var(--color-bg-surface-active);
   }
 }
 
 .menuOptionActive {
-  background: var(--color-blue-light);
-  color: var(--color-blue-primary);
+  background: var(--color-bg-surface-active);
+  color: var(--color-accent);
   font-weight: var(--font-weight-medium);
 
   &:hover {
-    background: var(--color-blue-light-hover);
+    background: var(--color-bg-surface-active);
   }
 }
 
@@ -123,7 +123,7 @@
   padding: 0 var(--space-4);
   font-family: var(--font-space-grotesk);
   font-size: var(--text-small-12);
-  color: var(--color-gray-dark); // was #8880a6 — a light-on-dark color, washed out now the bar is white
+  color: var(--color-text-secondary);
   white-space: nowrap;
   line-height: 30px;
 }
@@ -192,7 +192,7 @@
 .domain {
   font-family: var(--font-space-grotesk); // closest already-loaded face to Figma's JetBrains Mono
   font-size: var(--text-small-12);
-  color: var(--color-black-primary); // was #eae8f4 — direct request, bar background is now white
+  color: var(--color-text-primary);
 }
 
 .price {
@@ -226,7 +226,7 @@
 .time {
   font-family: var(--font-space-grotesk);
   font-size: var(--text-small-12);
-  color: var(--color-gray-dark); // was #8880a6 — a light-on-dark color, washed out now the bar is white
+  color: var(--color-text-secondary);
 }
 
 @keyframes ticker-marquee {

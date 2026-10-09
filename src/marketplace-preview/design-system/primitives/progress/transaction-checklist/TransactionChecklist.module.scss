@@ -109,7 +109,7 @@
     font-size: 13px;
     font-weight: var(--font-weight-medium);
     line-height: 19.5px;
-    color: #171429;
+    color: var(--color-text-primary);
   }
 }
 
@@ -120,5 +120,5 @@
   font-family: var(--font-satoshi);
   font-size: 10.8px;
   line-height: 16.2px;
-  color: rgba(0, 0, 0, 0.53);
+  color: var(--color-text-secondary);
 }

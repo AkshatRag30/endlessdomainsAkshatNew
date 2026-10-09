@@ -1,3 +1,5 @@
+@import '@mpstyles/_mixins.scss';
+
 .section {
   display: flex;
   flex-direction: column;
@@ -12,7 +14,11 @@
   font-weight: var(--font-weight-semibold);
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--color-gray-primary);
+  color: var(--color-text-secondary);
+
+  @include dark {
+    color: var(--color-text-primary); // Figma dark (93:54656): section titles are white
+  }
 }
 
 .list {

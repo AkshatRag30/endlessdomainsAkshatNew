@@ -1,16 +1,7 @@
 .slot {
-  display: inline-grid;
-  text-align: right;
+  display: inline-block;
+  text-align: left;
   // Room for descenders (y, g, p) so background-clip: text doesn't crop them; negative margin keeps line spacing unchanged.
   padding-bottom: 0.2em;
   margin-bottom: -0.2em;
-}
-
-.sizer,
-.text {
-  grid-area: 1 / 1;
-}
-
-.sizer {
-  visibility: hidden;
 }

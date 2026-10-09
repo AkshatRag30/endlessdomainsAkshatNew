@@ -36,7 +36,7 @@ export interface WalletPendingStepProps {
 // wave along the SVG's right and bottom edges. SMIL animates in the normal
 // paint, so clip and waves are rasterized together. useId keeps the clip id
 // unique if two loaders are ever on the page at once.
-const WaveLoader = () => {
+export const WaveLoader = () => {
   const clipId = `wallet-pending-wave-${React.useId().replace(/:/g, '')}`
   return (
     <svg className={styles.waveSvg} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" fill="none" aria-hidden="true">
@@ -111,10 +111,27 @@ export const WalletPendingStep = ({ status, heading, subtext, size = 'md', showW
 
 export default WalletPendingStep
 
-export const WalletPendingFooter = () => (
+export interface WalletPendingFooterProps {
+  /**
+   * A real, enabled way out of an otherwise non-dismissible pending step
+   * (the buying flow's "Confirm in wallet"/approving steps) - without it,
+   * a wallet that never responds (a crashed extension, a dismissed prompt
+   * that neither resolves nor rejects) left the buyer stuck with no way to
+   * back out short of reloading the page. Closing here is safe even if the
+   * wallet call eventually does resolve after all: the caller's own
+   * run/isOpen staleness check (see BuyFlowModal's runId/isOpenRef) already
+   * treats that as "notify by toast instead of updating a closed screen",
+   * the same handling a settlement finishing after a deliberate close
+   * already gets. Omitted (the default) keeps the previous inert button,
+   * e.g. the listing flow's own approval/signing steps.
+   */
+  onCancel?: () => void
+}
+
+export const WalletPendingFooter = ({ onCancel }: WalletPendingFooterProps = {}) => (
   <div className={styles.footer}>
-    <PrimaryButton fullWidth disabled>
-      Cancel in wallet
+    <PrimaryButton fullWidth disabled={!onCancel} onClick={onCancel}>
+      {onCancel ? 'Cancel' : 'Cancel in wallet'}
     </PrimaryButton>
   </div>
 )

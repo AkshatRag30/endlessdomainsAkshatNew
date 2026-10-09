@@ -15,12 +15,12 @@
   background: none;
   font-family: var(--font-satoshi);
   font-size: var(--text-small-13);
-  color: rgba(0, 0, 0, 0.63);
+  color: var(--color-text-primary);
   white-space: nowrap;
   cursor: pointer;
 
   &:hover {
-    color: var(--color-black-primary);
+    color: var(--color-text-primary);
   }
 
   &:focus-visible {

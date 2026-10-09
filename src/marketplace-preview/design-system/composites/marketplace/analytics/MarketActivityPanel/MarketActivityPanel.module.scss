@@ -10,11 +10,16 @@
   background: rgba(255, 255, 255, 0.2);
   @include stripe-bg;
   overflow: hidden;
-  border: 1px solid var(--color-blue-primary-alpha-07); // closest existing token to Figma's rgba(38,57,237,0.08)
+  border: 1px solid var(--color-border-subtle); // was the blue at 7%
   border-radius: 4px;
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+
+  // Figma dark (93:54496): the single surface panel
+  @include dark {
+    background-color: var(--color-bg-surface);
+  }
 }
 
 .header {
@@ -33,14 +38,14 @@
 .title {
   font-family: var(--font-satoshi);
   font-size: 17px;
-  color: var(--color-black-primary);
+  color: var(--color-text-primary);
   text-transform: capitalize;
 }
 
 .updated {
   font-family: var(--font-satoshi);
   font-size: var(--text-small-12);
-  color: var(--color-black-alpha-74);
+  color: var(--color-text-secondary);
 }
 
 .toggle {
@@ -59,13 +64,25 @@
   font-family: var(--font-satoshi);
   font-weight: var(--font-weight-medium);
   font-size: var(--text-small-12);
-  color: var(--color-black-alpha-65);
+  // --color-black-alpha-65 doesn't exist in tokens.scss (closest are -60
+  // and -55) — this silently fell back to inherited text color instead of
+  // a muted one, since an undefined var() reference makes `color` invalid
+  // rather than erroring. Nearest real token used instead, per root
+  // CLAUDE.md §11.2's own "no exact token" convention.
+  color: var(--color-text-secondary);
 }
 
 .toggleOptionActive {
   background: linear-gradient(180deg, #404040, #1a1a1a); // same dark gradient as the filter buttons/search submit — established this session
   color: var(--color-white-primary);
   box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25);
+
+  // Figma dark: the active chip is white with black text
+  @include dark {
+    background: var(--color-control-selected-bg);
+    color: var(--color-control-selected-text);
+    box-shadow: none;
+  }
 }
 
 .cards {
@@ -113,8 +130,8 @@
   gap: var(--space-1);
   align-self: flex-start;
   padding: 3px;
-  background: var(--color-white-primary);
-  border: 1px solid var(--color-border-black-subtle);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
   border-radius: 6px;
   box-shadow: 0 1.3px 4.6px rgba(0, 0, 0, 0.05);
 }
@@ -127,7 +144,7 @@
   cursor: pointer;
   font-family: var(--font-satoshi);
   font-size: var(--text-small-12);
-  color: var(--color-black-alpha-55);
+  color: var(--color-text-secondary);
   white-space: nowrap;
 }
 
@@ -136,6 +153,13 @@
   color: var(--color-white-primary);
   font-weight: var(--font-weight-medium);
   box-shadow: inset 0 1px 4.6px rgba(255, 255, 255, 0.6);
+
+  // Figma dark: the active chip is white with black text
+  @include dark {
+    background: var(--color-control-selected-bg);
+    color: var(--color-control-selected-text);
+    box-shadow: none;
+  }
 }
 
 .expandedValueRow {
@@ -150,7 +174,7 @@
   font-weight: var(--font-weight-medium);
   font-size: 1.4rem;
   letter-spacing: -0.02em;
-  color: #191627; // design-specific: Figma-exact, matches MarketMetricCard's .value
+  color: var(--color-text-primary); // was #191627, matches MarketMetricCard's .value
 }
 
 .expandedValueRow .toggle {
@@ -160,7 +184,7 @@
 .expandedSecondary {
   font-family: var(--font-satoshi);
   font-size: var(--text-small-12);
-  color: #aba7bc; // design-specific: Figma-exact, matches MarketMetricCard's .secondary
+  color: var(--color-text-tertiary); // matches MarketMetricCard's .secondary
 }
 
 .expandedChart {
@@ -174,5 +198,5 @@
   justify-content: space-between;
   font-family: var(--font-space-grotesk); // closest already-loaded face to Figma's Consolas
   font-size: var(--text-small-12);
-  color: #aba7bc; // design-specific: Figma-exact
+  color: var(--color-text-tertiary);
 }

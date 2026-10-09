@@ -9,7 +9,9 @@
 
   // Below desktop, OnchainIdentityNetworkMobile takes over with a plain stacked list —
   // the sticky/scrubbed, path-drawing reveal below has no room to work with on a phone or tablet.
-  @include tablet-down {
+  // Up to 1179px (incl. small laptops / iPad Pro portrait) the stacked version is used —
+  // this pinned layout's side cards/labels clip off-screen below that width.
+  @media (max-width: 1179px) {
     display: none;
   }
 }
