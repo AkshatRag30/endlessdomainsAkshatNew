@@ -1,0 +1,795 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dark Mode Progress</title>
+<script>
+  try {
+    var saved = localStorage.getItem('dmplan-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  } catch (e) {}
+</script>
+<style>
+  :root {
+    --bg: #f9f9f9; --surface: #ffffff; --surface-soft: #f3f4fe;
+    --text: #111111; --text-muted: #5b5b66; --border: #e6e6e6;
+    --accent: #2639ED; --accent-soft: #e9ebfd;
+    --wait: #9457f6; --wait-soft: #f4eefe;
+    --ok: #12805c; --ok-soft: #e4f5ee;
+    --warn: #b4540a; --warn-soft: #fdf1e4;
+    --bad: #c4314b; --bad-soft: #fdecef;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+      --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+      --accent: #7f8cff; --accent-soft: #1d2150;
+      --wait: #b996fa; --wait-soft: #2c2142;
+      --ok: #4fd1a0; --ok-soft: #173229;
+      --warn: #f5a35c; --warn-soft: #3a2614;
+      --bad: #ff7d93; --bad-soft: #3a1c24;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+    --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+    --accent: #7f8cff; --accent-soft: #1d2150;
+    --wait: #b996fa; --wait-soft: #2c2142;
+    --ok: #4fd1a0; --ok-soft: #173229;
+    --warn: #f5a35c; --warn-soft: #3a2614;
+    --bad: #ff7d93; --bad-soft: #3a1c24;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: "Satoshi", system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.6; }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 48px 16px 80px; }
+  header.top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+  .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; }
+  h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.15; margin: 0 0 12px; }
+  .lede { color: var(--text-muted); margin: 0; max-width: 680px; }
+  .lede a { color: var(--accent); }
+  .toggle { flex-shrink: 0; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 14px; cursor: pointer; }
+  .toggle:hover { border-color: var(--accent); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 32px; }
+  nav.toc a { font-size: 14px; text-decoration: none; color: var(--accent); background: var(--accent-soft); padding: 6px 12px; border-radius: 999px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 0 0 16px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+  .stat b { display: block; font-size: 26px; line-height: 1.2; }
+  .stat span { font-size: 13px; color: var(--text-muted); }
+  h2 { font-size: 22px; margin: 52px 0 16px; }
+  h3 { font-size: 18px; margin: 0; }
+  h4 { font-size: 15px; margin: 22px 0 8px; color: var(--accent); }
+  p { margin: 0 0 12px; }
+  .muted { color: var(--text-muted); font-size: 15px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
+  .card p:last-child { margin-bottom: 0; }
+  .card ul, .card ol { margin: 8px 0 0; padding-left: 20px; }
+  .card li { margin-bottom: 6px; }
+  code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .86em; background: var(--surface-soft); border-radius: 6px; padding: 1px 6px; word-break: break-word; }
+  .findings { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .finding { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+  .finding h3 { font-size: 16px; margin-bottom: 6px; }
+  .finding p { font-size: 15px; margin: 0; color: var(--text-muted); }
+  .tablecard { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow-x: auto; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: 0; }
+  th { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+  td.grp { font-weight: 600; color: var(--accent); background: var(--surface-soft); font-size: 13px; }
+  .sw { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .chip { width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(128,128,128,.45); flex-shrink: 0; }
+  .callout { border-left: 4px solid var(--wait); background: var(--wait-soft); border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; }
+  .callout p { margin: 0; }
+  .callout.ok { border-color: var(--ok); background: var(--ok-soft); }
+  .callout.warn { border-color: var(--warn); background: var(--warn-soft); }
+  .issue { display: grid; grid-template-columns: 28px 1fr; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--bad); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+  .issue .n { font-weight: 700; color: var(--bad); }
+  .issue p { margin: 0; font-size: 15px; }
+  .issue .where { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+  .phase { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px 24px; margin-bottom: 14px; }
+  .phase-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  .num { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 15px; flex-shrink: 0; }
+  .tag { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+  .tag.now { background: var(--ok-soft); color: var(--ok); }
+  .tag.wait { background: var(--wait-soft); color: var(--wait); }
+  .tag.size { background: var(--surface-soft); color: var(--text-muted); }
+  .tag.new { background: var(--warn-soft); color: var(--warn); }
+  .rows { display: grid; grid-template-columns: 130px 1fr; gap: 6px 16px; font-size: 15px; }
+  .rows dt { color: var(--text-muted); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; padding-top: 2px; }
+  .rows dd { margin: 0; }
+  ol.qs { counter-reset: q; list-style: none; padding: 0; margin: 0; }
+  ol.qs li { counter-increment: q; position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px 14px 56px; margin-bottom: 10px; }
+  ol.qs li::before { content: counter(q); position: absolute; left: 16px; top: 14px; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  ol.qs.team li::before { background: var(--wait-soft); color: var(--wait); }
+  ol.qs b { display: block; margin-bottom: 2px; }
+  ol.qs span { color: var(--text-muted); font-size: 15px; }
+  footer { margin-top: 56px; font-size: 13px; color: var(--text-muted); }
+  @media (max-width: 700px) {
+    header.top { flex-direction: column; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .findings { grid-template-columns: 1fr; }
+    .card, .phase { padding: 18px; }
+    .rows { grid-template-columns: 1fr; }
+    .rows dt { padding-top: 8px; }
+    ol.qs li { padding-left: 50px; }
+  }
+</style>
+<style>
+  .tag.done { background: var(--ok-soft); color: var(--ok); }
+  .tag.review { background: var(--warn-soft); color: var(--warn); }
+  .tag.todo { background: var(--surface-soft); color: var(--text-muted); }
+  .meta { font-size: 14px; color: var(--text-muted); margin: 0 0 14px; }
+  .phase h4:first-of-type { margin-top: 14px; }
+  .phase ul { margin: 6px 0 0; padding-left: 20px; font-size: 15px; }
+  .phase li { margin-bottom: 6px; }
+  .preview { display: flex; gap: 12px; flex-wrap: wrap; margin: 8px 0 4px; }
+  .pill { position: relative; width: 108px; height: 44px; border-radius: 999px; border: 2.5px solid; }
+  .pill i { position: absolute; top: 3.5px; width: 32.5px; height: 32.5px; border-radius: 50%; border: 1.4px solid; }
+  .pill.l { background: #000; border-color: #000; } .pill.l i { left: 5px; background: #fff; border-color: #000; }
+  .pill.d { background: #fff; border-color: #fff; box-shadow: 0 0 0 1px var(--border); } .pill.d i { left: 63.5px; background: #000; border-color: #fff; }
+  .preview span { font-size: 13px; color: var(--text-muted); display: block; margin-top: 4px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">Marketplace V2 · Dark mode · Progress log</p>
+      <h1>Dark Mode Progress</h1>
+      <p class="lede">A running record of the dark mode work: what each phase changed, which files it touched, the decisions taken along the way and what is still open. Updated after every phase. The plan itself lives in <a href="darkmodeplan.html">darkmodeplan.html</a>.</p>
+    </div>
+    <button class="toggle" id="toggle" type="button">Toggle theme</button>
+  </header>
+
+  <nav class="toc">
+    <a href="#status">Status</a>
+    <a href="#log">Phase log</a>
+    <a href="#decisions">Decisions</a>
+    <a href="#open">Open items</a>
+    <a href="#tokens">Token reference</a>
+    <a href="#testing">How to test</a>
+  </nav>
+
+  <div class="stats">
+    <div class="stat"><b>10 / 13</b><span>phases built (phases 1 to 10)</span></div>
+    <div class="stat"><b>27</b><span>semantic role tokens, now used by 38 primitive and composite stylesheets</span></div>
+    <div class="stat"><b>10</b><span>dark icons that would vanish, converted to currentColor (one still commented out)</span></div>
+    <div class="stat"><b>1</b><span>commit so far; phases 2 to 12 held back on request</span></div>
+  </div>
+
+  <div class="callout ok"><p><b>Where the work lives.</b> Branch <code>dark-mode</code>, cut from <code>marketplace-v2</code> on 9 October 2026. Everything is hidden behind <code>NEXT_PUBLIC_DARK_MODE</code>, so merging any phase is safe: with the flag off the site looks and behaves exactly as before.</p></div>
+
+  <h2 id="status">Status by phase</h2>
+  <div class="tablecard">
+    <table>
+      <thead><tr><th>Phase</th><th>What</th><th>Status</th><th>Commit</th></tr></thead>
+      <tbody>
+        <tr><td>0</td><td>Design alignment with the designer</td><td><span class="tag todo">Not started</span></td><td>No code</td></tr>
+        <tr><td>1</td><td>Semantic tokens, light values only</td><td><span class="tag done">Done</span></td><td><code>3e15b9f</code></td></tr>
+        <tr><td>2</td><td>Theme mechanism and hidden toggle</td><td><span class="tag review">Built, not committed (on hold)</span></td><td>Not committed</td></tr>
+        <tr><td>3</td><td>Primitives migrated to tokens</td><td><span class="tag review">Built and checked, not committed</span></td><td>Not committed</td></tr>
+        <tr><td>4</td><td>Dark values, shell and shared assets</td><td><span class="tag review">Built and checked, not committed</span></td><td>Not committed</td></tr>
+        <tr><td>5</td><td>Home page</td><td><span class="tag review">Built and checked, not committed</span></td><td>Not committed</td></tr>
+        <tr><td>6</td><td>My Domains</td><td><span class="tag review">Built, needs visual check</span></td><td>Not committed</td></tr>
+        <tr><td>7</td><td>Watchlist</td><td><span class="tag review">Built, needs visual check</span></td><td>Not committed</td></tr>
+        <tr><td>8</td><td>Listing flow drawer</td><td><span class="tag review">Built, needs visual check</span></td><td>Not committed</td></tr>
+        <tr><td>9</td><td>Buying flow, domain page and receipt</td><td><span class="tag review">Domain page checked; buy drawer and receipt need a wallet</span></td><td>Not committed</td></tr>
+        <tr><td>10</td><td>Login, signup and recovery</td><td><span class="tag review">Built and checked, not committed</span></td><td>Not committed</td></tr>
+        <tr><td>11</td><td>404 and pages without a dark design</td><td><span class="tag review">Built and checked, not committed</span></td><td>Not committed</td></tr>
+        <tr><td>12</td><td>Final QA, enable the toggle, lock it in</td><td><span class="tag review">QA and lock in done; production release waits on the team</span></td><td>Not committed</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="log">Phase log</h2>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">12</span><h3>Final QA, enable the toggle, lock it in</h3><span class="tag review">QA and lock in done; release waits on the team</span></div>
+    <p class="meta">9 October 2026 · branch <code>dark-mode</code> · not committed (held on request)</p>
+    <h4>QA</h4><ul>
+      <li>Screenshots in dark at 390, 834, 1024 and 1440 through your dev server for home, the domain page, login, signup, forgot password, reset success, privacy policy and 404; light spot checks on the pages that changed.</li>
+      <li>Theme behaviour tested in a real browser: a first visit starts light; the toggle switches and saves; the theme survives a client side route change and a full reload; toggling back works. The init script runs in the head before paint, so there's no flash.</li>
+      <li>A raw colour sweep over every module stylesheet with no dark block. What's left is brand or decorative (buttons, status chips, hero banners) and was reviewed in phase 3, except the overlays fixed below.</li>
+      <li>Contrast of every dark text role on the page, the surface and the active surface: all pass 4.5:1 on page and surface except disabled text (exempt) and the data purple (fixed below).</li>
+    </ul>
+    <h4>Fixed during QA</h4>
+    <div class="tablecard"><table><thead><tr><th>File</th><th>Problem</th><th>Fix</th></tr></thead><tbody>
+      <tr><td><code>Tooltip.module.scss</code></td><td>Pure black bubble, invisible on the black page</td><td>Dark: active surface with a hairline border; the light card variant stays on the surface</td></tr>
+      <tr><td><code>Toast.module.scss</code></td><td>Success toasts had dark teal text on translucent green, unreadable on the dark surface; light grey avatar circle</td><td>Dark: success text role (<code>#1fff95</code>); avatar on the active surface</td></tr>
+      <tr><td><code>AuthHeader.module.scss</code></td><td>Forgot password at tablet: the raised logo grid (an opaque image) covered the bottom of the artwork, as a white box in light and a black box in dark; existing layout bug</td><td>Below desktop the grid sits behind the logo, as on login</td></tr>
+      <tr><td><code>AuthResultPanel</code> (tsx, scss)</td><td>Same grid overlap at tablet; the success check art had a baked-in white background</td><td>Same grid fix; dark check exported from Figma 93:42417 (<code>success-check-dark.png</code>, transparent, green ring on black) swapped by CSS</td></tr>
+      <tr><td><code>tokens.scss</code></td><td><code>--color-data-primary</code> <code>#5b3df5</code> was 3.0:1 as text on dark (receipt tx id, terms link, insights header, link hovers)</td><td>Dark value <code>#8b7bff</code>, 5.6:1</td></tr>
+    </tbody></table></div>
+    <h4>Lock in</h4><ul>
+      <li><code>CLAUDE.md</code> section 7, Dark Mode: how the theme works, roles only for surfaces, text and borders, the single surface rule, how and where to use <code>@include dark</code>, CSS image swaps, contrast, and checking both themes.</li>
+      <li>Flag comments in <code>ThemeContext</code> and the header now describe <code>NEXT_PUBLIC_DARK_MODE</code> as the release and kill switch.</li>
+    </ul>
+    <h4>Release (not done here)</h4><ul>
+      <li>The flag is read from the environment, and <code>.env</code> is untracked, so production gets it from the deployment settings: set <code>NEXT_PUBLIC_DARK_MODE=true</code> there and rebuild.</li>
+      <li>Still open for the team: the default theme (currently light for a first visit; following the OS setting is a small change to the init script), whether the choice should follow the account, and whether privacy policy and redirect stay themed.</li>
+    </ul>
+    <h4>Not verified yet</h4><ul><li>Screens behind login or a wallet: My Domains, watchlist, the listing drawer, the buy drawer and the receipt.</li></ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">11</span><h3>404 and pages without a dark design</h3><span class="tag review">Built and checked, not committed</span></div>
+    <p class="meta">9 October 2026 · branch <code>dark-mode</code> · not committed (held on request)</p>
+    <p>The 404 follows its dark Figma frames (desktop 93:89003, mobile 93:77158). Privacy policy and the redirect page have no dark design, so they follow the colour roles (team question 4 still open; reverting them to always light is a one file change each).</p>
+    <h4>Files changed</h4>
+    <div class="tablecard"><table><thead><tr><th>File</th><th>Change</th></tr></thead><tbody>
+      <tr><td><code>pages/404.tsx</code></td><td>Second illustration, <code>404-illustration-dark.png</code> (Figma 93:89299, 459 × 332, transparent, the two 4s drawn white), rendered beside the light one; CSS shows one, so nothing flashes</td></tr>
+      <tr><td><code>pages/404.module.scss</code></td><td>Panel to the surface role; in dark a subtle border and 4px radius; message to secondary text in dark; Back To Previous has no fill and a white label in dark, hover repeated so it still turns blue</td></tr>
+      <tr><td><code>public/assets/img/not-found/404-illustration-dark.png</code></td><td>New, 88 KB</td></tr>
+      <tr><td><code>pages/privacy-policy/PrivacyPolicy.module.scss</code></td><td>Title band and card to surface, hairlines to the subtle border, headings and bold labels to primary text, body grey to secondary text in dark</td></tr>
+      <tr><td><code>tokens.scss</code></td><td>The dark body rule also sets the text colour to primary text, because Bootstrap paints body text <code>#212529</code>, which any screen without its own colours (the redirect page) inherited as dark grey on black</td></tr>
+    </tbody></table></div>
+    <h4>Decisions</h4><ul>
+      <li>Figma draws the dark 404 panel as white 5% over black with a 5% noise tile; the single surface stands in for both, the same call as the domain page's noise cards.</li>
+      <li>Figma's dark 404 still has the light message colour (black 70%), which can't be read on black, so it uses the secondary text role (white 70%).</li>
+    </ul>
+    <h4>Light mode shifts</h4><ul><li>Privacy policy headings <code>#000</code> to <code>#171429</code> and hairlines black 8% to <code>#eeedf3</code>, near identical by eye.</li></ul>
+    <h4>Verified</h4><ul><li>Type check and stylesheets clean. Screenshots through your dev server: 404 dark on desktop and mobile matches the Figma, 404 light looks as before, privacy policy dark reads well.</li></ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">10</span><h3>Login, signup and recovery</h3><span class="tag review">Built and checked, not committed</span></div>
+    <p class="meta">9 October 2026 · branch <code>dark-mode</code> · not committed (held on request)</p>
+    <p>Colours only, following Figma 93:38530 (desktop login 93:38626). The form column is black in dark, text, inputs, links, errors and hairlines use roles, and three images get dark versions swapped by CSS so nothing flashes.</p>
+    <h4>Files changed</h4>
+    <div class="tablecard"><table><thead><tr><th>File</th><th>Change</th></tr></thead><tbody>
+      <tr><td><code>AuthShell</code> (tsx, scss)</td><td>Page white in light, black in dark; the dark artwork (Figma 93:38627, <code>public/loginimage-dark.jpg</code>, 122 KB) renders beside the light one and CSS shows one; the dark art has no transparent apron, so it fills the frame directly; the blurred backdrop swap is desktop only</td></tr>
+      <tr><td><code>AuthHeader</code>, <code>AuthResultPanel</code> (tsx, scss)</td><td>Dark grid (<code>logo-grid-dark.png</code>, Figma 93:38630) and white text logo (<code>logo-white.svg</code>, the auth logo with its 8 black fills turned white) swapped by CSS; the dark grid stays hidden on mobile like the light one</td></tr>
+      <tr><td><code>AuthEmailFields</code>, <code>AuthRecoveryForm</code></td><td>Labels, fields (surface, strong border, text, placeholder), focus and links (accent), errors (status), hairlines</td></tr>
+      <tr><td><code>AuthMethodTabs</code></td><td>Rules, band and track to border and surface roles, inactive label to secondary text; the active tab stays light, as in Figma</td></tr>
+      <tr><td><code>AuthProviderButton</code></td><td>Only the hairlines; the buttons stay white with dark text in dark, as in Figma</td></tr>
+      <tr><td><code>AuthHeader</code>, <code>AuthResultPanel</code>, <code>AuthFooterLink</code> text</td><td>Headings, subtext, footer link</td></tr>
+    </tbody></table></div>
+    <h4>Light mode shifts</h4><ul><li>Gray texts <code>#525252</code>, <code>#808080</code>, <code>#282828</code> to the text roles; the tabs track <code>#e8e8e8</code> to <code>#f5f5f5</code>; field borders to <code>#e2e0ec</code>.</li></ul>
+    <h4>Verified</h4><ul><li>Type check and stylesheets clean. Login screenshots through your dev server: dark desktop and mobile match the Figma (dark artwork, white logo, faint grid, white headings, white active tab, light provider button); light looks as before.</li></ul>
+    <h4>Also fixed while checking phase 9</h4><ul>
+      <li>Domain page in dark verified through your dev server: hero card, tiles, tabs and panels on the surface, black page.</li>
+      <li>Summary and action tiles had a <code>#f2f2f2</code> ring drawn as a box shadow (logged in phase 3) that showed as a thick white ring; it now uses the subtle border role (near shade in light, faint edge in dark).</li>
+      <li>The category tab bar's white top highlight is toned down in dark (white 10%), so the domain page and home tab bars no longer show a bright line.</li>
+    </ul>
+    <h4>Not verified yet</h4><ul><li>Signup, forgot password, reset and the success panel screens (same components, so they should follow).</li></ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">9</span><h3>Buying flow, domain page and receipt</h3><span class="tag review">Built, visual check pending (dev server not running)</span></div>
+    <p class="meta">9 October 2026 · branch <code>dark-mode</code> · not committed (held on request)</p>
+    <p>Colours only, following Figma 93:91182 (overview 93:94579, receipt 93:98454, buy dialogs 93:91899 and siblings): black page, every card and panel on the single surface, the buy drawer on the Modal surface. Summary tiles, What next tiles, option cards, checklist, wallet pending step and tooltips were already done in phase 3.</p>
+    <h4>Files changed</h4>
+    <div class="tablecard"><table><thead><tr><th>Area</th><th>Change</th></tr></thead><tbody>
+      <tr><td><code>domain-overview/_domainOverview.scss</code></td><td>The shared frosted panel (hero card, tab panel, order cards) turns into the single surface in dark; its border and the mobile plain card use the border and surface roles. One rule covers every domain page and receipt card.</td></tr>
+      <tr><td>Domain page composites (hero card, summary tiles, activity, seller, interest, name facts, price history, comparable sales, overview shell)</td><td>Names, meta, notes, price labels, links, sale amounts (success), favourite heart (error), skeletons, retry links to roles; the page background to the page role</td></tr>
+      <tr><td><code>PriceHistoryPanel</code></td><td>The pale blue stat chips with a double ring keep their light design; in dark (desktop only) they sit on the active surface with role coloured rings</td></tr>
+      <tr><td>Receipt composites (order header, receipt card, timeline) and <code>pages/details</code>, <code>pages/receipt</code></td><td>Title, meta, share link, transaction link (data purple), skeletons, not found text</td></tr>
+      <tr><td>Buying flow steps (review, payment method, what you pay, after you buy, approval explainer, pending, result, terms footer) and <code>shared/DomainPriceHeader</code></td><td>Dividers, headings, helper and note text, amber approval tile and fee row (warning roles), green callout (success roles), terms link (data purple), the sticky notice slot (surface)</td></tr>
+    </tbody></table></div>
+    <h4>Unchanged on purpose</h4><ul><li>The blue to #333 summary and transaction cards and their white text, the green success circle with its light ring (Figma keeps it in dark), the peach seller avatar gradient, the faint green edge on the order header, the disabled Buy Now ring.</li></ul>
+    <h4>Light mode shifts</h4><ul><li>Domain page and receipt card borders: blue 8% to <code>#eeedf3</code>.</li><li>Order title <code>#1f1f21</code> and meta (black 74%) to <code>#171429</code>; price and date texts (black 59 to 63%) to the text roles.</li><li>Amber approval text <code>#7a5a12</code> to <code>#976301</code>; green callout text <code>#0c7a46</code> to <code>#12a05c</code>.</li></ul>
+    <h4>Verified</h4><ul><li>All 27 changed stylesheets compile; no build was run.</li></ul>
+    <h4>Not verified yet</h4><ul><li>Screenshots: your dev server on 3002 was not running. The domain page and receipt need no login, so they can be checked as soon as it is up. The buy drawer needs a wallet.</li></ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">8</span><h3>Listing flow drawer</h3><span class="tag review">Built, needs your visual check (login only)</span></div>
+    <p class="meta">9 October 2026 · branch <code>dark-mode</code> · not committed (held on request)</p>
+    <p>Colours only, following Figma 93:77717 (form 93:84978, approval 93:84522). The drawer itself is the Modal primitive (phase 3), so it is the single surface in dark; option cards, price input, segmented chips and the wallet pending step were done in phase 3 too. This phase covers the steps and the insights card, plus the banner colours that phase 3 left without a role.</p>
+    <h4>Files changed</h4>
+    <div class="tablecard"><table><thead><tr><th>File</th><th>Change</th></tr></thead><tbody>
+      <tr><td><code>ListingFormStep</code></td><td>Section dividers, headings, domain name and meta, info note, expiry (error role), helper, gas note</td></tr>
+      <tr><td><code>DomainInsightsCard</code></td><td>Card and tiles to surface roles; black card in dark so the tiles stand out; demand high, medium and low to success, warning and error; comparables bars to the data roles; heading turns white in dark</td></tr>
+      <tr><td><code>OneTimeApprovalStep</code>, <code>ConfirmToSignStep</code>, <code>ListingSuccessStep</code></td><td>Heading and subtext roles; amber and green fee rows to the status roles; the 6px ring around the status icon takes the drawer colour in dark</td></tr>
+      <tr><td><code>FeeBreakdownRow</code>, <code>LoadingStep</code></td><td>Labels, values, operators, note; loading shimmer between the surface roles</td></tr>
+      <tr><td><code>primitives/banners/notice-banner</code></td><td>Dark edges for the error (red 35%) and warning (amber 35%) banners; the info banner becomes a deep blue panel with a blue edge and white title, as in Figma 93:89796</td></tr>
+    </tbody></table></div>
+    <h4>Unchanged on purpose</h4><ul><li>The blue gradient summary and info cards and their white text, the green and red status icon circles, the Sign to list button.</li></ul>
+    <h4>Light mode shifts</h4><ul><li>Green fee pill and callout text <code>#0c7a46</code> to <code>#12a05c</code>; amber fee row <code>#b27400</code> to <code>#976301</code>.</li><li>Insights card <code>#fcfbff</code> to white; loading shimmer tints to the surface grays.</li></ul>
+    <h4>Verified</h4><ul><li>Every changed stylesheet compiles; no build was run.</li></ul>
+    <h4>Not verified yet</h4><ul><li>The drawer opens from My Domains, which needs a login: please check the form (with insights open), approval, confirm, signing and success steps, and the wrong network banner, in both themes.</li></ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">7</span><h3>Watchlist</h3><span class="tag review">Built, needs your visual check (login only)</span></div>
+    <p class="meta">9 October 2026 · branch <code>dark-mode</code> · not committed (held on request)</p>
+    <p>Colours only, same pattern as home and My Domains (Figma 93:89796): the existing main panel around tabs, filters and list becomes the single surface in dark; rows, grid cards and loading rows are black inside it; the right rail panels already use the surface through InfoListCard. The blue hero banner, the charcoal undo toast and the coloured status edges on rows stay as designed.</p>
+    <h4>Files changed</h4>
+    <div class="tablecard"><table><thead><tr><th>File</th><th>Change</th></tr></thead><tbody>
+      <tr><td><code>pages/watchlist/watchlist.module.scss</code></td><td>Main panel: page role in light (<code>#f9f9f9</code>, unchanged), surface in dark; border to the subtle role</td></tr>
+      <tr><td><code>WatchlistRow</code>, <code>WatchlistCard</code></td><td>Surface and strong border roles; black in dark</td></tr>
+      <tr><td><code>WatchlistTable</code></td><td>Header, legend, empty state, clear link, skeletons (black in dark)</td></tr>
+      <tr><td><code>WatchlistDomainIdentity</code>, <code>WatchlistPriceCell</code></td><td>Name, meta, price, saved and none texts</td></tr>
+      <tr><td><code>WatchlistNeedsLookPanel</code>, <code>WatchlistOverviewPanel</code></td><td>Counts and actions to text roles; purple links to the data role</td></tr>
+      <tr><td><code>WatchlistFilterBar</code>, <code>WatchlistHeroBanner</code>, <code>WatchlistActions</code></td><td>Divider and banner border to the subtle role; heart to the error role</td></tr>
+    </tbody></table></div>
+    <h4>Light mode shifts</h4>
+    <ul><li>Row and card borders: <code>rgba(210,207,207,.67)</code> to <code>#e2e0ec</code>.</li><li>Domain name <code>#070707</code> and panel counts (black 83%) to <code>#171429</code>.</li><li>Main panel and hero border: blue 7% to <code>#eeedf3</code>.</li></ul>
+    <h4>Verified</h4><ul><li>Every changed stylesheet compiles; no build was run.</li></ul>
+    <h4>Not verified yet</h4><ul><li>Visual check in both themes needs a login: list and grid view, empty state, right rail, undo toast.</li></ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">↗</span><h3>Synced to endlessdomainsAkshatNew for the seniors' demo</h3><span class="tag review">Done, uncommitted on branch dark-mode-preview</span></div>
+    <p class="meta">9 October 2026 · target <code>D:Akshat EndlessendlessAkshat-mainendlessdomainsAkshatNew</code> · branch <code>dark-mode-preview</code></p>
+    <p>A visual refresh of the target's mock data preview (<code>src/marketplace-preview</code> and <code>/design-preview/*</code> pages) so the dark mode work through phase 6 can be shown there. The target keeps its own mock data, hooks and types; the toggle is always on in the preview.</p>
+    <h4>What was done</h4>
+    <ul>
+      <li>A dry run classified every design system file: 202 component files whose imports exist in the target were copied with import rewrites; 9 that need real wallet or API code (header, sidebar, drawer, live activity, market stats, My Domains rows and cards) kept the target's code.</li>
+      <li>Tokens copied with the dark block, scoped to <code>[data-marketplace-preview]</code> under a dark <code>&lt;html&gt;</code>, so the target's own pages never change.</li>
+      <li>Stylesheets where the target's older code needs different classes (page shell, ticker, drawer, My Domains row and table) got only the dark edits, via three way merges against this repo's pre dark mode commit.</li>
+      <li>Preview only patches restored after the copy (routes to <code>/design-preview</code>, <code>previewMode</code>, mock data use, the preview wrapper in the domain page shell); the target's types kept so its mock data still fits.</li>
+      <li>New: a preview ThemeContext (always enabled, applies the saved theme on mount), the toggle and logo swap in the target header, the provider around each preview root, the My Domains dark panel, and missing images (hero, banner, success check, logos, dark glow).</li>
+    </ul>
+    <h4>Verified</h4>
+    <ul>
+      <li>Target type check clean; all 119 preview stylesheets compile; every class used exists in its stylesheet.</li>
+      <li>Target dev server on port 3005: all five preview routes return 200; screenshots of the marketplace and My Domains in dark and light look right; the domain page is partly dark and login light, matching this repo's progress (phases 9 and 10 not done).</li>
+    </ul>
+    <h4>Known</h4>
+    <ul>
+      <li>The My Domains table is tight at 1440px in the target preview (its sidebar is wider), so the estimated value column clips; this was already the case before the sync.</li>
+      <li>No inline init script in the target, so a saved dark choice can show light for a moment on a hard reload.</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">6</span><h3>My Domains</h3><span class="tag review">Built, needs your visual check (login only)</span></div>
+    <p class="meta">9 October 2026 · branch <code>dark-mode</code> · not committed (held on request)</p>
+    <p>Colours only, following the same pattern as the home page and Figma 93:49561: the tabs, heading, filters and table sit in one surface panel in dark, rows and grid cards are black inside it, and the right rail panels use the single surface. Component designs are unchanged; the gradient stat tiles, hero banner, dark filter pills and view toggle stay as they are.</p>
+
+    <h4>Files changed</h4>
+    <div class="tablecard">
+      <table>
+        <thead><tr><th>File</th><th>Change</th></tr></thead>
+        <tbody>
+          <tr><td><code>MyDomainRow</code></td><td>Roles for row, borders, names, values, USD and heart grays, renewal, interest; for sale edge uses the success role; black row in dark</td></tr>
+          <tr><td><code>MyDomainCard</code></td><td>Same roles for the grid card; black card in dark</td></tr>
+          <tr><td><code>MyDomainsTable</code></td><td>Header, legend, empty state, skeletons (black in dark), sync overlay (dark surface at 94% in dark)</td></tr>
+          <tr><td><code>MyDomainsFilterBar</code></td><td>Divider border</td></tr>
+          <tr><td><code>MostViewedPanel</code>, <code>NeedsAttentionPanel</code></td><td>Stat text, renew button and its purple hover (data role)</td></tr>
+          <tr><td><code>primitives/cards/info-list-card</code></td><td>Panel border to the subtle role; single surface panel in dark (used by all three right rail panels)</td></tr>
+          <tr><td><code>pages/seller-hub/my-domains/my-domains.module.scss</code></td><td>Dark surface panel around tabs, filters and table (14px inset)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4>Light mode shifts</h4>
+    <ul>
+      <li>Price value in rows uses the accent role (same blue in light).</li>
+      <li>"For sale" left edge: <code>#22c55e</code> to the success role <code>#11d000</code>.</li>
+      <li>Most viewed stat text: black 74% to <code>#171429</code>; secondary <code>#5d5d5d</code> to <code>#7e7a93</code>.</li>
+      <li>Right rail panel border: blue 7% to <code>#eeedf3</code>.</li>
+    </ul>
+
+    <h4>Verified</h4>
+    <ul>
+      <li>Every changed stylesheet compiles. No production build was run.</li>
+    </ul>
+    <h4>Not verified yet</h4>
+    <ul>
+      <li>Visual check in both themes: the page needs a login, which the headless browser doesn't have. Please check list and grid view, the right rail, and the sync overlay.</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">5</span><h3>Home page</h3><span class="tag review">Built and checked, not committed</span></div>
+    <p class="meta">9 October 2026 · branch <code>dark-mode</code> · not committed (held on request)</p>
+    <p>The home page follows the theme: hero, promoted domains, category tabs, live listings, live activity, market activity and the mobile activity ticker. Rule agreed during this phase: <b>only colours change in dark; component designs (shapes, layouts, active states) stay as they are in light</b>, except where you ask for a specific change.</p>
+
+    <h4>Work done</h4>
+    <ul>
+      <li>All home composites moved to role tokens: labels and values, borders, the USD and favourite grays (mono muted), success/error colours, link hovers.</li>
+      <li>Your request: in dark, the block from the category tabs down to the table sits in one surface panel (14px inset, subtle border, 4px radius), and the listing rows are black inside it. Light mode has no panel, and its rows stay white.</li>
+      <li>Panels (promoted, live activity, market activity) use the single surface in dark; promoted cards get a stronger border so they read on the same surface; the activity chip group sits on black.</li>
+      <li>Category bar: same glass bar, blue active tab and label colours as light; only the bar background and border go dark.</li>
+      <li>Promoted domains (on request, matching Figma 93:53718): in dark the panel is white 5% over black, darker than its cards; three gradients fade it to black at the left, right and bottom edges; the top strip swaps to Figma's white 15% version (<code>public/assets/img/marketplace/promoted-glow-dark.svg</code>, shown by CSS per theme); heading and strip sit above the fades.</li>
+      <li>Dark page background on <code>body</code>, so short pages no longer show a white band below the shell (light untouched).</li>
+    </ul>
+
+    <h4>Files changed</h4>
+    <div class="tablecard">
+      <table>
+        <thead><tr><th>Area</th><th>Files</th></tr></thead>
+        <tbody>
+          <tr><td>Listings</td><td>ListingCategoryTabs, ListingsHeading, ListingFilterBar, LiveListingsTable, ListingRow</td></tr>
+          <tr><td>Promoted</td><td>PromotedDomainsSection, PromotedDomainCard</td></tr>
+          <tr><td>Activity and analytics</td><td>ActivityItem, LiveActivityPanel, LiveActivityTicker, MarketActivityPanel, MarketMetricCard</td></tr>
+          <tr><td>Shell and global</td><td>MarketplacePageShell (dark listings panel), tokens.scss (dark body background)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4>Course corrections</h4>
+    <ul>
+      <li>A first pass restyled the category tabs to Figma's dark design (white active chip, white labels, flat bar). Reverted on request: the design stays as in light and only colours change.</li>
+      <li>An interrupted command had already added a header ellipsis and a duplicate body rule; both were removed.</li>
+    </ul>
+
+    <h4>Verified</h4>
+    <ul>
+      <li>Every changed stylesheet compiles; no production build was run.</li>
+      <li>Dark and light screenshots of the home page through your dev server. Light looks the same as before.</li>
+    </ul>
+
+    <h4>Open</h4>
+    <ul>
+      <li>In dark, the table header's "Appraised Value" wraps to two lines at 1440px because the panel inset narrows the table. Decided: leave it as is.</li>
+      <li>Polygon logo is low contrast on black (2.6:1).</li>
+      <li>Hero image stays as is (already dark in both themes).</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">4</span><h3>Dark values, shell and shared assets</h3><span class="tag review">Built and checked, not committed</span></div>
+    <p class="meta">9 October 2026 · branch <code>dark-mode</code> · not committed (held on request)</p>
+    <p>Dark mode now has real colours. Every role token has a dark value, and the parts every page shares (header, sidebar, mobile drawer, bottom nav, footer, page backgrounds) follow the theme. With the flag on and dark selected, the shell matches the Figma dark frame; page content stays light until its own phase (home is phase 5), so a dark shell around light cards is expected for now.</p>
+
+    <h4>Work done</h4>
+    <ul>
+      <li>Dark values for all 27 roles in <code>tokens.scss</code> under <code>:root[data-theme='dark']</code>, taken from the proposed scale (page <code>#000</code>, surface <code>#141415</code>, active <code>#2f2f2f</code>, white at 100/70/50/25% for text and 10/30/57% for borders).</li>
+      <li>Two dark values not in Figma, chosen for readability: accent <code>#6b7bff</code> (brand <code>#2639ED</code> is only 2.5:1 as text on the dark surface; this is 5.2:1) and error text <code>#f87171</code>. Brand blue fills such as Buy Now keep <code>#2639ED</code>.</li>
+      <li>A <code>dark</code> mixin in <code>_mixins.scss</code> for the few places where Figma's dark hierarchy differs from light (gray labels that turn white, blue active links that turn white).</li>
+      <li>Shell migrated to roles: header bar, nav links and arrows, search and keyboard hints, sidebar panel, section titles, nav rows, counts, active row, mobile drawer, bottom nav, footer stripe, main layout and page shell backgrounds.</li>
+      <li>White text logo for the dark header: <code>public/endless-logo-white.svg</code>, the existing logo file with its 8 black fills turned white (same geometry, so no layout shift). Both logos render and CSS on the theme attribute shows one.</li>
+      <li>Contrast check of the coloured icons on the dark surface.</li>
+    </ul>
+
+    <h4>Files changed</h4>
+    <div class="tablecard">
+      <table>
+        <thead><tr><th>File</th><th>Change</th></tr></thead>
+        <tbody>
+          <tr><td><code>styles/tokens.scss</code></td><td>Dark values for every role</td></tr>
+          <tr><td><code>styles/_mixins.scss</code></td><td>New <code>dark</code> mixin</td></tr>
+          <tr><td><code>layouts/header/Header.module.scss</code>, <code>index.tsx</code></td><td>Roles for bar, nav, search, kbd; white active link in dark; light and dark logo swap</td></tr>
+          <tr><td><code>layouts/sidebar/</code> MarketplaceSidebar, SidebarSection, SidebarNavItem</td><td>Roles for panel, border, divider, titles, rows, counts, active row; white titles and 50% rows in dark (Figma 93:54651)</td></tr>
+          <tr><td><code>layouts/sidebar/MobileDrawerMenu</code></td><td>Roles throughout; white titles and active link in dark</td></tr>
+          <tr><td><code>layouts/footer-stripe</code>, <code>layouts/main-layout</code>, <code>MarketplacePageShell</code>, <code>MobileBottomNav</code></td><td>Page and surface backgrounds, links, borders; white active tab in dark</td></tr>
+          <tr><td><code>public/endless-logo-white.svg</code></td><td>New white text logo</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4>Contrast check (on the dark surface <code>#141415</code>; icons need 3:1, text 4.5:1)</h4>
+    <div class="tablecard">
+      <table>
+        <thead><tr><th>Colour</th><th>Used for</th><th>Ratio</th><th>Result</th></tr></thead>
+        <tbody>
+          <tr><td><code>#0c7a46</code></td><td>Green shield icon</td><td>3.41</td><td>Passes for an icon</td></tr>
+          <tr><td><code>#5b3df5</code></td><td>Purple shield icon, chart line</td><td>3.01</td><td>Just passes for an icon; too low for text</td></tr>
+          <tr><td><code>#6c00f6</code></td><td>Polygon logo</td><td>2.60</td><td>Fails; needs a lighter variant in its page phase</td></tr>
+          <tr><td><code>#2639ED</code></td><td>Accent as text</td><td>2.53</td><td>Fails; dark accent set to <code>#6b7bff</code> (5.17)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4>Decided differently from Figma</h4>
+    <ul>
+      <li>Sidebar uses the single surface <code>#141415</code> like the header, where Figma shows it black. Keeps one surface for every panel and frames the page as one piece. A one line change if the designer prefers black.</li>
+      <li>The 5% noise texture on the dark header and sidebar is not added yet.</li>
+    </ul>
+
+    <h4>Moved to the page phases</h4>
+    <ul>
+      <li>Dark versions of the multicolour files that only appear inside pages: auth logo and tabs rail (phase 10); Ethereum logo, checkboxes, status exclamation and network alert (phase 9); a Polygon logo variant wherever it shows. The header chip and search chip are commented out in the header, so they wait until those come back.</li>
+      <li>The sidebar's active row pill (<code>sidebar-active-pill.png</code>) is a pale image; it reads acceptably on dark but should get a dark export.</li>
+      <li>Colours with no role from phase 3 (banner borders, dark tooltip, warning toast and the rest) get decided as their pages are done.</li>
+    </ul>
+
+    <h4>Verified</h4>
+    <ul>
+      <li>Type check passes; lint shows no errors and no new warnings; every changed stylesheet compiles with the dark rules in place. No production build was run.</li>
+      <li>Through your dev server with dark saved in the browser: desktop home shows the dark header with the white logo, dark sidebar with white titles and the gray active row, dark footer, and the toggle on the moon. Mobile (390px) shows the dark header, toggle and dark bottom nav with the white active tab.</li>
+      <li>A light mode screenshot of the home page looks the same as before.</li>
+    </ul>
+
+    <h4>Not verified yet</h4>
+    <ul>
+      <li>Tablet width, the open mobile drawer, and the logged in header and sidebar states (wallet button, counts).</li>
+      <li>Dark values are still pending the designer session (phase 0).</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">3</span><h3>Primitives migrated to tokens</h3><span class="tag review">Built and checked, not committed</span></div>
+    <p class="meta">9 October 2026 · branch <code>dark-mode</code> · not committed (held on request)</p>
+    <p>Every colour in the primitives that should change between light and dark now reads from a role token. Brand fills, glows, shadows and decorative gradients look the same in both themes, so they were left as they are. The 10 dark icons that would have vanished on black are now drawn in <code>currentColor</code>. With the team's decision to map near shades to their role, light mode shifts slightly in places; every shift is listed below.</p>
+
+    <h4>How it was done</h4>
+    <ul>
+      <li>A written rulebook decided each colour by what it does (card fill, text, divider, status, chart, brand), not just its value. White as a card fill became the surface role; white text on a blue button stayed white.</li>
+      <li>The primitives were split into four groups (buttons; cards and toast; badges, banners, tooltip and modal; inputs, toggles, charts and the rest) and migrated in parallel against the same rulebook, then reviewed together.</li>
+      <li>One exception to the near shade rule: the disabled price input text uses the secondary role, because the disabled role would have made it visibly lighter (<code>#7c7c7c</code> to <code>#b2b2b2</code>).</li>
+    </ul>
+
+    <h4>Files changed</h4>
+    <div class="tablecard">
+      <table>
+        <thead><tr><th>Area</th><th>Files</th><th>What moved to roles</th></tr></thead>
+        <tbody>
+          <tr><td>Buttons</td><td>primary, secondary, default, tab, pill, cart</td><td>Light variant fills and text, disabled states, outer rings, focus colours, error text on the secondary button, active tab fill</td></tr>
+          <tr><td>Cards</td><td>action tile, key value rows, info list, payment method, glass, summary tile</td><td>Card fills and bezels, headings, labels, values, dividers, selected option gradient and its text</td></tr>
+          <tr><td>Toast</td><td>Toast.module.scss</td><td>Container fill, info toast border and text</td></tr>
+          <tr><td>Badges</td><td>badge, chain, extension, trend delta, trend indicator</td><td>Neutral and status badge fills and text, extension border, trend colours</td></tr>
+          <tr><td>Banners</td><td>notice banner, info note</td><td>Error and warning fills and text, info body text</td></tr>
+          <tr><td>Overlays</td><td>tooltip, modal</td><td>Light bubble, modal panel, header, footer, close button</td></tr>
+          <tr><td>Inputs and toggles</td><td>search, price, filter dropdown, checkbox, segmented toggle</td><td>Field fills, borders, text, placeholders, dropdown panel, selected segment</td></tr>
+          <tr><td>Other</td><td>wallet pending step, transaction checklist, interest bars, price trend chart, sparkline, domain avatar, breadcrumb</td><td>Text, spinner, chart text and grid, logo backdrop, crumb colours</td></tr>
+          <tr><td>Icons (new)</td><td><code>primitives/icons/overview-icons/</code></td><td>Bookmark, calendar, calendar small, clock face, clock hands, eye, info and share, generated from the SVG files with Figma's opacity kept</td></tr>
+          <tr><td>Icons (callers)</td><td>ComparableSalesPanel, DomainSummaryTiles, OrderHeaderCard, OrderTimelineCard, SellerCard, InfoNote</td><td>Image tags swapped for the icon components, coloured with the primary text role</td></tr>
+          <tr><td>Breadcrumb icons</td><td>Breadcrumb.tsx and .module.scss</td><td>Back arrow inlined in <code>currentColor</code>; slash drawn as a CSS mask in the primary text colour</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="muted">Unchanged on purpose: status icon, status chip, coming soon badge, stat card and view toggle (all brand or decorative), fade scroll list (its fade is a mask, so it already works on any surface), token chain icon and my domains icon.</p>
+
+    <h4>Noticeable light mode shifts</h4>
+    <p class="muted">Most changes are exact matches or tiny near shades (for example black text to <code>#171429</code>, <code>#f4f4f4</code> to <code>#f5f5f5</code>). These are the ones someone might notice:</p>
+    <div class="tablecard">
+      <table>
+        <thead><tr><th>Where</th><th>Before</th><th>After</th></tr></thead>
+        <tbody>
+          <tr><td>Error colour in badges, trend indicator, price input, secondary button</td><td><code>#dc3545</code></td><td><code>#ef4444</code></td></tr>
+          <tr><td>Trend indicator "up"</td><td><code>#22c55e</code></td><td><code>#11d000</code></td></tr>
+          <tr><td>Gray labels in buttons, badges, toggles, inputs (gray primary and gray dark)</td><td><code>#7c7c7c</code>, <code>#6b7280</code></td><td><code>#7e7a93</code></td></tr>
+          <tr><td>Toast info text and key value muted text</td><td><code>#474747</code></td><td><code>#7e7a93</code> (lighter)</td></tr>
+          <tr><td>Info list heading, glass card title, summary tile value</td><td><code>#454e43</code>, <code>#313135</code>, <code>#353232</code></td><td><code>#171429</code> (darker)</td></tr>
+          <tr><td>Interest bars labels</td><td><code>#615e83</code></td><td><code>#7e7a93</code></td></tr>
+          <tr><td>Price trend chart axis, grid and volume (warm tones)</td><td><code>#9c907f</code>, warm grays</td><td>Cool grays of the text, border and surface roles</td></tr>
+          <tr><td>Glass card hairline</td><td>black 22%</td><td><code>#e2e0ec</code> (lighter)</td></tr>
+          <tr><td>Search input field</td><td>white 88% (slightly see through)</td><td>solid white</td></tr>
+          <tr><td>Error banner body text</td><td><code>#96313f</code></td><td><code>#7a1f2c</code>, same as its title</td></tr>
+          <tr><td>Primary button disabled text</td><td><code>#d4d4d4</code></td><td><code>#b2b2b2</code> (darker)</td></tr>
+          <tr><td>Error button text on the secondary button</td><td><code>#991b1b</code></td><td><code>#7a1f2c</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4>No role yet (left raw, decided in phase 4 or the page phases)</h4>
+    <ul>
+      <li>Notice banner borders (<code>#f3d3d9</code>, <code>#f0dfbe</code>, <code>#dcd3fb</code>) and the info banner fill and title (<code>#f1eefe</code>, <code>#5d6dff</code>).</li>
+      <li>Badge accent tint (<code>#e9ebfd</code>), warning badge tint and amber text.</li>
+      <li>Dark tooltip bubble (black). Open question: stay dark or invert in dark mode.</li>
+      <li>Warning toast: yellow fill and stripe, and its brown and dark text, which stay together until the yellow gets a dark value.</li>
+      <li>Toast blue check badge colours and avatar circle.</li>
+      <li>Transaction checklist pending ring (<code>#e2e0ec</code>), shared by the blue card and the plain variant; dark mode needs a plain variant override.</li>
+      <li>Wallet pending step red outer ring.</li>
+      <li>Secondary button pressed blue (<code>#1d2bb2</code>).</li>
+      <li>Glass card frosted variant (translucent white) and the boxed key value well gradient.</li>
+      <li>Info list card translucent panel fill.</li>
+    </ul>
+
+    <h4>Things to check in phase 4</h4>
+    <ul>
+      <li>Action tile and summary tile have a <code>#f2f2f2</code> outer ring drawn as a box shadow; it will show as a light ring on black.</li>
+      <li>Token chain icon has a white ring drawn as a box shadow.</li>
+      <li>Price trend chart baseline is an inset shadow, so it won't switch with the grid lines.</li>
+      <li>Domain avatar's logo backdrop now follows the surface; if chain logos need a white plate, revert that line.</li>
+      <li>Primary button's 1px outer ring now uses the emphasis border role, so it becomes white 57% in dark.</li>
+      <li>The shared focus ring mixin in <code>styles/_mixins.scss</code> still uses the brand blue directly (unchanged in dark anyway).</li>
+      <li>The share icon in OrderHeaderCard is commented out in the code; its commented markup already uses <code>ShareIcon</code>, so re-enabling it only needs <code>ShareIcon</code> added to the file's import.</li>
+    </ul>
+
+    <h4>Verified</h4>
+    <ul>
+      <li>Type check passes. Lint shows no errors and no new warnings in changed files.</li>
+      <li>No <code>!important</code> added, and every role referenced exists in <code>tokens.scss</code>.</li>
+      <li>Production build with the flag off succeeds (this also covers the flag off path from phase 2).</li>
+      <li>All 25 icon paths came across from the SVG files; no image references to the 9 converted files remain.</li>
+    </ul>
+
+      <li>Visual pass through the dev server (after its restart) on the home page, login and a domain page (<code>/details/…</code>): buttons, tables, panels, badges, tabs, breadcrumb arrow and slash, calendar icons, summary tiles, key value rows and the seller card all render correctly in light mode.</li>
+    </ul>
+
+    <h4>Not verified yet</h4>
+    <ul>
+      <li>My Domains, watchlist, the listing drawer and the buying flow, which need a logged in session. The eye and bookmark icons only show on a listing with interest data.</li>
+      <li>The design preview routes mentioned in CLAUDE.md no longer exist, so there was no mock data page to compare against.</li>
+    </ul>
+    <div class="callout warn"><p><b>Process note.</b> The first visual attempt ran a production build while the dev server was running, which overwrote <code>.next</code> and made the dev server return 500s until it was restarted. From now on Claude never starts, builds or stops servers; it verifies only through the dev server you run.</p></div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">2</span><h3>Theme mechanism and hidden toggle</h3><span class="tag review">Built, awaiting commit</span></div>
+    <p class="meta">9 October 2026 · branch <code>dark-mode</code> · not committed yet</p>
+    <p>The site can now switch between light and dark, and remembers the choice. Users can't see the switch yet because the toggle only renders when the flag is on. Dark colour values arrive in phase 4, so for now switching only moves the toggle knob, darkens native scrollbars and form controls, and turns the mobile address bar black.</p>
+
+    <h4>Work done</h4>
+    <ul>
+      <li>New theme context holding the current theme, a setter and a toggle, plus the flag check and the saved choice in browser storage.</li>
+      <li>A tiny inline script in the document head that applies the saved choice before the page paints, so a dark choice never flashes light first. It is only emitted when the flag is on.</li>
+      <li>The whole app wrapped in the theme provider.</li>
+      <li>The <code>theme-color</code> meta tag in the main layout now follows the theme (white in light, black in dark).</li>
+      <li><code>color-scheme: dark</code> under the dark attribute, plus the empty dark section in <code>tokens.scss</code> where phase 4 adds the dark values.</li>
+      <li>New ThemeToggle primitive from Figma node 93:54892, placed right of Connect Wallet in the header.</li>
+    </ul>
+
+    <h4>Files changed</h4>
+    <div class="tablecard">
+      <table>
+        <thead><tr><th>File</th><th>Change</th></tr></thead>
+        <tbody>
+          <tr><td><code>src/context/ThemeContext.tsx</code></td><td>New. Provider, <code>useTheme</code> hook, <code>isDarkModeEnabled</code> flag, storage key, theme colours and the init script.</td></tr>
+          <tr><td><code>src/design-system/primitives/toggles/theme-toggle/ThemeToggle.tsx</code></td><td>New. Switch button with sun and moon icons.</td></tr>
+          <tr><td><code>src/design-system/primitives/toggles/theme-toggle/ThemeToggle.module.scss</code></td><td>New. Figma sizes, shadows, knob position and icon colours keyed on the theme attribute.</td></tr>
+          <tr><td><code>src/design-system/primitives/toggles/theme-toggle/index.ts</code></td><td>New. Barrel export, same pattern as view toggle.</td></tr>
+          <tr><td><code>pages/_document.tsx</code></td><td>Adds the init script to the head when the flag is on.</td></tr>
+          <tr><td><code>pages/_app.tsx</code></td><td>Wraps everything in <code>ThemeProvider</code>.</td></tr>
+          <tr><td><code>src/design-system/layouts/main-layout/index.tsx</code></td><td><code>theme-color</code> meta reads from the theme.</td></tr>
+          <tr><td><code>src/design-system/layouts/header/index.tsx</code></td><td>Renders the toggle after the account slot when the flag is on.</td></tr>
+          <tr><td><code>src/design-system/styles/tokens.scss</code></td><td>New dark section with <code>color-scheme: dark</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4>Toggle states</h4>
+    <div class="preview">
+      <div><div class="pill l"><i></i></div><span>Light: knob over the sun</span></div>
+      <div><div class="pill d"><i></i></div><span>Dark: knob over the moon (Figma)</span></div>
+    </div>
+
+    <h4>Verified</h4>
+    <ul>
+      <li>Type check passes. Lint shows no errors and no new warnings (the 15 warnings in the header and main layout were there before).</li>
+      <li>Production build with the flag on succeeds.</li>
+      <li>The served home page contains the init script, the toggle (<code>role="switch"</code>) and the theme colour meta.</li>
+      <li>The compiled CSS contains every dark selector.</li>
+      <li>Headless Chrome screenshots of both toggle states. The dark state matches the Figma frame.</li>
+    </ul>
+
+    <h4>Not verified yet</h4>
+    <ul>
+      <li>Clicking the toggle and reloading in a real browser.</li>
+      <li>A build with the flag off. Everything new is guarded by the flag, so this path is low risk.</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">1</span><h3>Semantic tokens (light values only)</h3><span class="tag done">Done</span></div>
+    <p class="meta">9 October 2026 · branch <code>dark-mode</code> · commit <code>3e15b9f</code> “Add semantic theme role tokens with light values”</p>
+    <p>A layer of 27 role tokens that components will use instead of raw colours. Each role holds the colour the light site already uses most for that job, and nothing reads them yet, so the site looks identical.</p>
+
+    <h4>Work done</h4>
+    <ul>
+      <li>Counted the most used colours across <code>src/design-system</code> to find the real light value behind each role.</li>
+      <li>Added the roles at the end of <code>:root</code>, grouped as surfaces, text, borders, controls and brand, status, and data, each with a comment saying when to use it.</li>
+      <li>A note at the top of the block asks people to map a new colour to the nearest role before adding a new one.</li>
+    </ul>
+
+    <h4>Files changed</h4>
+    <div class="tablecard">
+      <table>
+        <thead><tr><th>File</th><th>Change</th></tr></thead>
+        <tbody>
+          <tr><td><code>src/design-system/styles/tokens.scss</code></td><td>46 lines added: the semantic roles block. See the <a href="#tokens">token reference</a>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4>Verified</h4>
+    <ul>
+      <li>The stylesheet compiles with Sass and outputs all 27 custom properties.</li>
+      <li>No component uses the new tokens, so there is no visual change.</li>
+    </ul>
+  </div>
+
+  <h2 id="decisions">Decisions</h2>
+  <div class="tablecard">
+    <table>
+      <thead><tr><th>Date</th><th>Decision</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td>9 Oct</td><td>One solid surface <code>#141415</code> for every card, table, row, panel, drawer section, input and the header in dark, on a pure black page. One extra shade <code>#2f2f2f</code> for hover and active. Nested cards get a white 10% border, not a second shade.</td><td>The designs use about seven different card backgrounds. One surface keeps dark mode calm and consistent and avoids dozens of tokens.</td></tr>
+        <tr><td>9 Oct</td><td>Work on its own branch <code>dark-mode</code>, one phase per commit.</td><td>Keeps dark mode out of normal feature PRs and each phase reviewable.</td></tr>
+        <tr><td>9 Oct</td><td>Start phases 1 to 3 before the designer session.</td><td>They cause no visual change, so the designer's answers only matter from phase 4.</td></tr>
+        <tr><td>9 Oct</td><td>27 roles, named <code>--color-bg-*</code>, <code>--color-text-*</code>, <code>--color-border-*</code>, <code>--color-control-*</code>, <code>--color-status-*</code>, <code>--color-data-*</code>, plus accent and extension badge.</td><td>Fits next to existing names in <code>tokens.scss</code> without collisions, and stays close to the 24 roles in the plan.</td></tr>
+        <tr><td>9 Oct</td><td>The theme lives in a <code>data-theme</code> attribute on <code>html</code>, set by an inline script before first paint.</td><td>Setting it from React would show the light page first and then flash to dark.</td></tr>
+        <tr><td>9 Oct</td><td>Everything is behind <code>NEXT_PUBLIC_DARK_MODE</code>. With it off, no script, no toggle, theme always light.</td><td>Lets us test on staging while production never sees a half finished theme.</td></tr>
+        <tr><td>9 Oct</td><td>Default theme is light. Only a saved choice switches to dark.</td><td>Whether to follow the OS setting is still an open team question.</td></tr>
+        <tr><td>9 Oct</td><td>The choice is saved in browser storage under the key <code>theme</code>.</td><td>Simple and per device. Saving on the account is still an open question.</td></tr>
+        <tr><td>9 Oct</td><td>Toggle light state mirrors the dark one: black pill, white knob over the sun.</td><td>Figma only has the dark state.</td></tr>
+        <tr><td>9 Oct</td><td>Sun and moon rebuilt from the Figma paths as inline <code>currentColor</code> SVGs, not image files.</td><td>One icon works in both themes, following the icon rules in the plan.</td></tr>
+        <tr><td>9 Oct</td><td>Toggle knob position and icon colours come from CSS on the theme attribute, not React state.</td><td>The knob is in the right place on first paint, even before React loads.</td></tr>
+        <tr><td>9 Oct</td><td>Address bar colour <code>#ffffff</code> in light (unchanged) and <code>#000000</code> in dark.</td><td>Matches each theme's page edge.</td></tr>
+        <tr><td>9 Oct</td><td>Near shades map to their role, even when light mode shifts slightly. Every shift is logged.</td><td>Chosen by the team: fewer tokens and a more consistent light mode over pixel identical light mode.</td></tr>
+        <tr><td>9 Oct</td><td>Brand fills, glows, shadows and decorative gradients stay as raw values or palette tokens.</td><td>They look the same in both themes; turning them into roles would only add tokens.</td></tr>
+        <tr><td>9 Oct</td><td>Colours with no fitting role are left raw and listed, not given new tokens.</td><td>Keeps the token list short; each gets decided with its dark value.</td></tr>
+        <tr><td>9 Oct</td><td>Disabled price input text keeps a gray close to the original (secondary role).</td><td>The disabled role would have been a visible change, not a near shade.</td></tr>
+        <tr><td>9 Oct</td><td>Single colour icons become inline components generated from the SVG files, with Figma's opacity kept and the colour set by the caller.</td><td>No path data retyped by hand; one icon works in both themes.</td></tr>
+        <tr><td>9 Oct</td><td>An icon used as a CSS background (breadcrumb slash) becomes a CSS mask filled with a role colour.</td><td>A background image can't take <code>currentColor</code>.</td></tr>
+        <tr><td>9 Oct</td><td>Phases 2 to 5 stay uncommitted until the go ahead.</td><td>Requested.</td></tr>
+        <tr><td>9 Oct</td><td>Only colours change in dark; component designs stay as in light unless explicitly asked.</td><td>Requested after the category tabs were restyled to Figma's dark design.</td></tr>
+        <tr><td>9 Oct</td><td>Home listings: one dark surface panel around tabs, heading, filters and table; black rows inside.</td><td>Requested.</td></tr>
+        <tr><td>9 Oct</td><td>Dark accent is <code>#6b7bff</code>, not Figma's <code>#2639ED</code>; brand fills keep <code>#2639ED</code>.</td><td>The brand blue is 2.5:1 as text on the dark surface; text needs 4.5:1.</td></tr>
+        <tr><td>9 Oct</td><td>Where Figma's dark hierarchy differs from light, a small <code>@include dark</code> override in the component, not a new token.</td><td>Keeps the token list at 27.</td></tr>
+        <tr><td>9 Oct</td><td>Sidebar uses the single surface like the header (Figma: black).</td><td>One surface for every panel, as decided.</td></tr>
+        <tr><td>9 Oct</td><td>White logo is the existing logo file with white text fills, not the Figma export.</td><td>Same geometry, so the header doesn't shift between themes.</td></tr>
+        <tr><td>9 Oct</td><td>Claude never starts, builds or stops servers; checks go through your dev server.</td><td>A build overwrote <code>.next</code> under the dev server once.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="open">Open items</h2>
+  <ol class="qs">
+    <li><b>Designer: dark accent and sidebar</b><span>Confirm the lighter accent <code>#6b7bff</code> and the sidebar on the single surface instead of black.</span></li>
+    <li><b>Commit phases 2 and 3</b><span>Both built and checked, held until the go ahead.</span></li>
+    <li><b>Colours with no role</b><span>The list in the phase 3 entry gets a dark value (or a decision to stay) in phase 4.</span></li>
+    <li><b>Dark tooltip</b><span>Stay a black bubble in dark mode, or invert to a light bubble?</span></li>
+    <li><b>Toggle light state</b><span>Confirm the mirrored design with the designer.</span></li>
+    <li><b>Toggle on tablet and mobile</b><span>It currently shows in the header at every width. Phase 0 decides its final place.</span></li>
+    <li><b>Default theme and where it is saved</b><span>Follow the OS or start light; browser storage or the user account. Needed before phase 12.</span></li>
+    <li><b>Phase 0 designer session</b><span>The 15 designer questions and 11 Figma issues in the plan. Blocks phase 4.</span></li>
+  </ol>
+
+  <h2 id="tokens">Token reference</h2>
+  <p class="muted">Light values from phase 1, dark values from phase 4 (pending designer approval).</p>
+  <div class="tablecard">
+    <table>
+      <thead><tr><th>Token</th><th>Light value</th><th>Dark value</th><th>Use for</th></tr></thead>
+      <tbody>
+        <tr><td colspan="4" class="grp">Surfaces</td></tr>
+        <tr><td><code>--color-bg-page</code></td><td><span class="sw"><span class="chip" style="background:#f9f9f9"></span><code>#f9f9f9</code></span></td><td><code>#000000</code></td><td>Page and drawer background</td></tr>
+        <tr><td><code>--color-bg-surface</code></td><td><span class="sw"><span class="chip" style="background:#fff"></span><code>#ffffff</code></span></td><td><code>#141415</code></td><td>Every card, table, row, panel, drawer section, input, header</td></tr>
+        <tr><td><code>--color-bg-surface-active</code></td><td><span class="sw"><span class="chip" style="background:#f5f5f5"></span><code>#f5f5f5</code></span></td><td><code>#2f2f2f</code></td><td>Hover, active, tiles inside a surface</td></tr>
+        <tr><td><code>--color-bg-option-selected</code></td><td>Gradient black to <code>#333</code></td><td>Same, white border</td><td>Selected option card, duration chip</td></tr>
+        <tr><td colspan="4" class="grp">Text</td></tr>
+        <tr><td><code>--color-text-primary</code></td><td><span class="sw"><span class="chip" style="background:#171429"></span><code>#171429</code></span></td><td>white 100%</td><td>Headings, values, body copy</td></tr>
+        <tr><td><code>--color-text-secondary</code></td><td><span class="sw"><span class="chip" style="background:#7e7a93"></span><code>#7e7a93</code></span></td><td>white 70%</td><td>Labels, supporting copy</td></tr>
+        <tr><td><code>--color-text-tertiary</code></td><td><span class="sw"><span class="chip" style="background:#aba7bc"></span><code>#aba7bc</code></span></td><td>white 50%</td><td>Hints, captions, placeholders</td></tr>
+        <tr><td><code>--color-text-disabled</code></td><td><span class="sw"><span class="chip" style="background:#b2b2b2"></span><code>#b2b2b2</code></span></td><td>white 25%</td><td>Disabled text</td></tr>
+        <tr><td><code>--color-text-mono-muted</code></td><td><span class="sw"><span class="chip" style="background:#a6a1bb"></span><code>#a6a1bb</code></span></td><td><code>#a6a1bb</code></td><td>Mono timestamps, addresses, table meta</td></tr>
+        <tr><td><code>--color-text-on-dark</code></td><td><span class="sw"><span class="chip" style="background:#fff"></span><code>#ffffff</code></span></td><td><code>#ffffff</code></td><td>Text on the selected option and dark fills</td></tr>
+        <tr><td colspan="4" class="grp">Borders</td></tr>
+        <tr><td><code>--color-border-subtle</code></td><td><span class="sw"><span class="chip" style="background:#eeedf3"></span><code>#eeedf3</code></span></td><td>white 10%</td><td>Dividers, card outlines, nested cards</td></tr>
+        <tr><td><code>--color-border-strong</code></td><td><span class="sw"><span class="chip" style="background:#e2e0ec"></span><code>#e2e0ec</code></span></td><td>white 30%</td><td>Inputs, option cards, toggles</td></tr>
+        <tr><td><code>--color-border-emphasis</code></td><td><span class="sw"><span class="chip" style="background:#afafaf"></span><code>#afafaf</code></span></td><td>white 57%</td><td>Note boxes, chain chips</td></tr>
+        <tr><td colspan="4" class="grp">Controls and brand</td></tr>
+        <tr><td><code>--color-control-selected-bg</code></td><td><span class="sw"><span class="chip" style="background:#2639ED"></span><code>#2639ED</code></span></td><td><code>#ffffff</code></td><td>Active tab, chip, segmented option</td></tr>
+        <tr><td><code>--color-control-selected-text</code></td><td><span class="sw"><span class="chip" style="background:#fff"></span><code>#ffffff</code></span></td><td><code>#000000</code></td><td>Text on the selected control</td></tr>
+        <tr><td><code>--color-accent</code></td><td><span class="sw"><span class="chip" style="background:#2639ED"></span><code>#2639ED</code></span></td><td><code>#6b7bff</code> (lighter, for contrast)</td><td>Links, accent text, focus</td></tr>
+        <tr><td><code>--color-badge-extension</code></td><td><span class="sw"><span class="chip" style="background:#fdc651"></span><code>#fdc651</code></span></td><td><code>#fdc651</code></td><td>Extension badge border</td></tr>
+        <tr><td colspan="4" class="grp">Status</td></tr>
+        <tr><td><code>--color-status-success</code></td><td><span class="sw"><span class="chip" style="background:#11d000"></span><code>#11d000</code></span></td><td><code>#27ff00</code></td><td>Sale amounts, success icons</td></tr>
+        <tr><td><code>--color-status-success-text</code></td><td><span class="sw"><span class="chip" style="background:#12a05c"></span><code>#12a05c</code></span></td><td><code>#1fff95</code></td><td>Success sentences and badges</td></tr>
+        <tr><td><code>--color-status-success-bg</code></td><td><span class="sw"><span class="chip" style="background:#e7f6ee"></span><code>#e7f6ee</code></span></td><td><code>#1fff95</code> at 13%</td><td>Success banners and badges</td></tr>
+        <tr><td><code>--color-status-error</code></td><td><span class="sw"><span class="chip" style="background:#ef4444"></span><code>#ef4444</code></span></td><td><code>#ef4444</code></td><td>Error icons, borders</td></tr>
+        <tr><td><code>--color-status-error-text</code></td><td><span class="sw"><span class="chip" style="background:#7a1f2c"></span><code>#7a1f2c</code></span></td><td><code>#f87171</code></td><td>Error banner text</td></tr>
+        <tr><td><code>--color-status-error-bg</code></td><td><span class="sw"><span class="chip" style="background:#fcedef"></span><code>#fcedef</code></span></td><td><code>#ef4444</code> at 13%</td><td>Error banners</td></tr>
+        <tr><td><code>--color-status-warning</code></td><td><span class="sw"><span class="chip" style="background:#976301"></span><code>#976301</code></span></td><td><code>#ffab0b</code></td><td>Warning text and icons</td></tr>
+        <tr><td><code>--color-status-warning-bg</code></td><td><span class="sw"><span class="chip" style="background:#fdf3e0"></span><code>#fdf3e0</code></span></td><td><code>#ffab0b</code> at 13%</td><td>Warning banners</td></tr>
+        <tr><td colspan="4" class="grp">Data</td></tr>
+        <tr><td><code>--color-data-primary</code></td><td><span class="sw"><span class="chip" style="background:#5b3df5"></span><code>#5b3df5</code></span></td><td><code>#5b3df5</code></td><td>Chart lines, bars, inline links</td></tr>
+        <tr><td><code>--color-data-secondary</code></td><td><span class="sw"><span class="chip" style="background:#dcd3fb"></span><code>#dcd3fb</code></span></td><td><code>#dcd3fb</code></td><td>Chart fills, second series</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="testing">How to test</h2>
+  <div class="card">
+    <ol>
+      <li>Add <code>NEXT_PUBLIC_DARK_MODE=true</code> to <code>.env</code> and restart <code>npm run dev</code> (port 3002). The flag is read at build time, so a restart is required.</li>
+      <li>The toggle appears right of Connect Wallet in the header.</li>
+      <li>Click it. In DevTools the <code>&lt;html&gt;</code> tag should flip between <code>data-theme="light"</code> and <code>data-theme="dark"</code>.</li>
+      <li>Reload while dark. The knob should already be on the moon with no flash.</li>
+      <li>Remove the flag and restart. The toggle disappears and the site is always light.</li>
+    </ol>
+    <p class="muted">Until phase 4, only the toggle, native scrollbars and form controls and the mobile address bar change. Page colours stay light.</p>
+  </div>
+
+  <footer>Started 9 October 2026. Last updated 9 October 2026 after phase 10. Updated after every phase.</footer>
+</div>
+<script>
+  document.getElementById('toggle').addEventListener('click', function () {
+    var root = document.documentElement;
+    var current = root.getAttribute('data-theme') ||
+      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('dmplan-theme', next); } catch (e) {}
+  });
+</script>
+</body>
+</html>

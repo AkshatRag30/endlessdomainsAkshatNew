@@ -1,7 +1,6 @@
 @import '@mpstyles/_mixins.scss';
 
-// Figma nodes 1:703 / 1:711. #e2e0ec border and the black→#333 selected
-// gradient are Figma-exact, no token match.
+// Figma nodes 1:703 / 1:711.
 
 .card {
   display: flex;
@@ -10,13 +9,13 @@
   width: 100%;
   min-height: 84px; // Figma grid row is 84.44px regardless of content
   padding: var(--space-3);
-  border: 1px solid #e2e0ec;
+  border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-sm);
-  background: var(--color-white-primary);
+  background: var(--color-bg-surface);
   text-align: left;
   cursor: pointer;
   font-family: var(--font-satoshi);
-  color: var(--color-black-primary);
+  color: var(--color-text-primary);
 
   &:focus-visible {
     @include focus-ring;
@@ -25,8 +24,8 @@
 
 .selected {
   border-color: transparent;
-  background: linear-gradient(180deg, var(--color-black-primary) 5.388%, #333 100%);
-  color: var(--color-white-primary);
+  background: var(--color-bg-option-selected);
+  color: var(--color-text-on-dark);
 }
 
 .disabled {
@@ -45,11 +44,11 @@
   flex-shrink: 0;
   width: 16px;
   height: 16px;
-  border: 1px solid #e2e0ec;
+  border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-full);
 
   .selected & {
-    border-color: var(--color-white-primary);
+    border-color: var(--color-text-on-dark);
 
     &::after {
       content: '';
@@ -59,7 +58,7 @@
       width: 8px;
       height: 8px;
       border-radius: var(--radius-full);
-      background: var(--color-white-primary);
+      background: var(--color-text-on-dark);
       transform: translate(-50%, -50%);
     }
   }

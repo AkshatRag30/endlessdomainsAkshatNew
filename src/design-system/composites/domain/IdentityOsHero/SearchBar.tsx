@@ -1,8 +1,9 @@
 import Image from 'next/image'
+import Link from 'next/link'
 import styles from './SearchBar.module.scss'
 import Input from '@/design-system/primitives/LandingInput'
 
-const DOMAIN_EXTENSIONS = ['.og', '.eth', '.sol', '.chain'] as const
+const DOMAIN_EXTENSIONS = ['.og', '.eth', '.sol', '.bnb', '.crypto', '.x'] as const
 
 const SearchBar = () => {
   return (
@@ -50,7 +51,14 @@ const SearchBar = () => {
               {domain}
             </span>
           ))}
-          <span role="listitem" className={styles.domainMore}>60+ TLDs</span>
+          <span role="listitem" className={styles.domainMoreItem}>
+            <Link href="/web3-domains" className={styles.domainMore} aria-label="See all 60+ TLDs and providers">
+              60+ TLDs
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M7 17L17 7M17 7H8M17 7V16" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </Link>
+          </span>
         </div>
       </div>
     </section>

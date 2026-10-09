@@ -10,11 +10,10 @@
   flex-direction: column;
   gap: var(--space-6);
   padding: var(--space-4);
-  background: var(--color-white-primary);
+  background: var(--color-bg-surface);
   @include stripe-bg;
   overflow: hidden;
-  border: 1px solid var(--color-blue-primary-alpha-07); // consistent with the alpha already used throughout this build, rather than BuilderSidebar's own alpha-20
-  border-radius: 8px;
+  border: 1px solid var(--color-border-subtle); // was the blue at 7%; the subtle border reads the same in light and becomes Figma's faint white edge in dark
 
   // Figma's drawer mockup (node 34:2884) is a different layout below
   // desktop, not a reflow of this one — MobileDrawerMenu replaces it there.
@@ -26,7 +25,7 @@
 .divider {
   height: 1px;
   margin: 0 var(--space-2-5);
-  background: var(--color-border-black-subtle);
+  background: var(--color-border-subtle);
 }
 
 .authAction {
@@ -39,11 +38,11 @@
   font-family: var(--font-satoshi);
   font-size: var(--text-small-13);
   font-weight: var(--font-weight-medium);
-  color: var(--color-blue-primary);
+  color: var(--color-accent);
   text-align: left;
   cursor: pointer;
 
   &:hover {
-    background: var(--color-blue-light);
+    background: var(--color-bg-surface-active);
   }
 }

@@ -1,9 +1,8 @@
 @import '@mpstyles/_mixins.scss';
 
-// Figma 5:3764 (desktop) / 5:4416 (mobile). Bar fills #ff718b / #7fe47e,
-// label #615e83, value #171429, deltas #ef4444 / #12a05c are Figma-exact
-// (the first three are the file's own "Red 400" / "Green 300" / "Text Gray"
-// styles). Bars are 60px tall, 8px apart (5px on mobile), 28px above the stats.
+// Figma 5:3764 (desktop) / 5:4416 (mobile). Bar fills #ff718b / #7fe47e
+// are Figma-exact (the file's own "Red 400" / "Green 300" styles). Bars are
+// 60px tall, 8px apart (5px on mobile), 28px above the stats.
 
 .grid {
   display: grid;
@@ -67,7 +66,7 @@
   font-family: var(--font-satoshi);
   font-size: 15px;
   line-height: 16.7px;
-  color: #615e83;
+  color: var(--color-text-secondary);
   white-space: nowrap;
 }
 
@@ -87,7 +86,7 @@
   font-weight: var(--font-weight-bold);
   line-height: 1.2;
   letter-spacing: -0.36px;
-  color: #171429;
+  color: var(--color-text-primary);
 }
 
 // 10px after the value (Figma), 12px of it from .valueRow's gap.

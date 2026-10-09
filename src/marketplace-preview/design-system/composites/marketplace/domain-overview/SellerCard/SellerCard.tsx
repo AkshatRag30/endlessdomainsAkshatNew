@@ -1,5 +1,5 @@
 import React from 'react'
-import Image from 'next/image'
+import { CalendarIcon } from '@/marketplace-preview/design-system/primitives/icons/overview-icons'
 import type { SellerSummary } from '@/marketplace-preview/types/marketplace'
 import GlassCard from '@/marketplace-preview/design-system/primitives/cards/glass-card'
 import KeyValueRows from '@/marketplace-preview/design-system/primitives/cards/key-value-rows'
@@ -29,9 +29,13 @@ export const SellerCard = ({ seller, expiresAt, onViewPortfolio }: SellerCardPro
           <span className={styles.avatar} aria-hidden="true" />
           <div className={styles.identityText}>
             <span className={styles.address}>{seller.displayAddress}</span>
-            <span className={styles.meta}>
-              Member since {formatMonthYear(seller.memberSince)} · {seller.activeListings} listings
-            </span>
+            {/* Both come from a real seller-stats endpoint this app doesn't have yet (pages/details/[orderId].tsx only knows the order's own `maker`) — dropped rather than fabricated. */}
+            {seller.memberSince && (
+              <span className={styles.meta}>
+                Member since {formatMonthYear(seller.memberSince)}
+                {seller.activeListings !== undefined && ` · ${seller.activeListings} listings`}
+              </span>
+            )}
           </div>
         </div>
 
@@ -39,12 +43,12 @@ export const SellerCard = ({ seller, expiresAt, onViewPortfolio }: SellerCardPro
           variant="boxed"
           className={styles.rows}
           rows={[
-            { label: 'Completed sales', value: seller.completedSales },
+            ...(seller.completedSales !== undefined ? [{ label: 'Completed sales', value: seller.completedSales }] : []),
             {
               label: 'Listing expires',
               value: expiresAt ? (
                 <span className={styles.expiry}>
-                  <Image src="/assets/img/domain-overview/calendar.svg" alt="" aria-hidden="true" width={10.2} height={11.6} className={styles.calendar} />
+                  <CalendarIcon width={10.2} height={11.6} className={styles.calendar} />
                   {formatDate(expiresAt)}
                 </span>
               ) : (
@@ -54,7 +58,7 @@ export const SellerCard = ({ seller, expiresAt, onViewPortfolio }: SellerCardPro
           ]}
         />
 
-        <PrimaryButton variant="charcoal" onClick={onViewPortfolio} className={styles.portfolio}>
+        <PrimaryButton size='sm' variant="charcoal" onClick={onViewPortfolio} className={styles.portfolio}>
           View Portfolio
         </PrimaryButton>
       </>

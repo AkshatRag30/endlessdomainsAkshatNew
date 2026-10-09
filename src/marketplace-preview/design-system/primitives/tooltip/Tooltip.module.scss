@@ -31,7 +31,7 @@
   padding: 6px 10px;
   border-radius: 6px;
   background: var(--color-black-primary);
-  color: var(--color-white-primary);
+  color: var(--color-text-on-dark);
   font-family: var(--font-satoshi);
   font-size: 12px;
   font-weight: var(--font-weight-medium);
@@ -103,8 +103,8 @@
 // own colors (e.g. Live Activity's bold domain name, colored price) read
 // exactly like they do in the row itself, just unclipped.
 .light .bubble {
-  background: var(--color-white-primary);
-  border: 1px solid var(--color-border-black-subtle);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
@@ -142,7 +142,7 @@
   // Plain-text (label) usage renders raw text with no span of its own to
   // carry a color, so it otherwise inherits the page's default text color
   // instead of showing up against this dark background.
-  color: var(--color-white-primary);
+  color: var(--color-text-on-dark);
   font-family: var(--font-satoshi);
   font-size: 12px;
   font-weight: var(--font-weight-medium);
@@ -157,8 +157,8 @@
 }
 
 .portalBubble.light {
-  background: var(--color-white-primary);
-  border: 1px solid var(--color-border-black-subtle);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 

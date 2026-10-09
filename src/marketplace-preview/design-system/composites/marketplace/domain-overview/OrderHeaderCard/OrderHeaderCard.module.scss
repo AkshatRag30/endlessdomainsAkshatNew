@@ -15,6 +15,7 @@
   min-height: 77px;
   padding: 11px 31px 11px 15px;
   border-color: rgba(55, 205, 0, 0.08);
+      margin: 0 35px;
 
   @include mobile {
     min-height: 94px;
@@ -34,10 +35,17 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 9px;
+  min-width: 0;
 }
 
 .title {
   margin: 0;
+  // order.id is a full 0x… hash — without this the long string just kept
+  // growing the row past the card's own width instead of yielding it,
+  // running straight under the Download/Share actions (flex items default
+  // to min-width: auto, which ignores overflow/text-overflow entirely).
+  flex: 1 1 auto;
+  min-width: 0;
   font-family: var(--font-satoshi);
   font-size: 23px;
   font-weight: var(--font-weight-medium);
@@ -52,6 +60,18 @@
     line-height: 20px;
     letter-spacing: -0.32px;
   }
+}
+
+// The Tooltip primitive's own wrapper span — `display: block` so it fills
+// .title's width (a bare <span> stays inline, which text-overflow ignores),
+// truncating with an ellipsis instead of wrapping/overflowing. `portal`
+// (passed on the Tooltip itself) is what keeps the hover bubble from being
+// clipped by this same overflow: hidden.
+.titleTooltip {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .meta {
@@ -90,6 +110,11 @@
   flex-shrink: 0;
   width: 17px;
   height: 17px;
+}
+
+// Calendar, clock and share glyphs draw in currentColor (see primitives/icons/overview-icons).
+.icon {
+  color: var(--color-text-primary);
 }
 
 // Figma 5:7475: the hands sit at 46.1% / 23.2% of the 17px face.

@@ -10,7 +10,7 @@
   display: grid;
   grid-template-columns: 212fr 321fr 212fr 210fr;
   gap: 25px;
-  margin-top: 22px;
+  margin: 20px 40px;
   padding: 0 4px;
 
   // Four across leaves each tile ~150px at the narrow end of tablet, too
@@ -37,6 +37,7 @@
 }
 
 .eyeIcon {
+  color: var(--color-text-primary);
   flex-shrink: 0;
 
   @include mobile {
@@ -74,6 +75,7 @@
 }
 
 .bookmarkIcon {
+  color: var(--color-text-primary);
   @include mobile {
     width: 7.5px;
     height: 8.7px;
@@ -96,6 +98,7 @@
 }
 
 .calendarIcon {
+  color: var(--color-text-primary);
   @include mobile {
     width: 10.4px;
     height: 11.9px;

@@ -42,12 +42,20 @@
   z-index: 20;
   margin: 0;
   padding: var(--space-1) 0;
-  list-style: none;
-  background: var(--color-white-primary);
-  border: 1px solid var(--color-border-black-subtle);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
   box-shadow: var(--shadow-panel);
   max-height: 240px;
   overflow-y: auto;
+}
+
+// .panel itself is a plain div now (it also hosts arbitrary custom content,
+// e.g. ListingFilterBar's price slider) — this resets the browser's default
+// <ul> margin/padding for the option-list case specifically.
+.optionList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 .option {
@@ -60,15 +68,15 @@
   cursor: pointer;
   font-family: var(--font-satoshi);
   font-size: var(--text-small-13);
-  color: var(--color-gray-darker);
+  color: var(--color-text-primary);
   white-space: nowrap;
 
   &:hover {
-    background: var(--color-gray-light-hover);
+    background: var(--color-bg-surface-active);
   }
 }
 
 .optionActive {
-  color: var(--color-blue-primary);
+  color: var(--color-accent);
   font-weight: var(--font-weight-medium);
 }

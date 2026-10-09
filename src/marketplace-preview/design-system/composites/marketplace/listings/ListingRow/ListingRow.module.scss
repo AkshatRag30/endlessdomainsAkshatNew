@@ -42,9 +42,14 @@
   // below keeps the content itself vertically centered now that the box
   // is full height.
   min-height: 56px;
-  background: var(--color-white-primary);
-  border: 1px solid var(--color-border-black-subtle);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
   border-radius: 3px;
+
+  // Figma dark (93:54008): rows are black inside the surface listings panel
+  @include dark {
+    background: var(--color-bg-page);
+  }
 
   @include mobile {
     display: none;
@@ -62,7 +67,7 @@
   min-height: 0;
 
   &:not(:first-child) {
-    border-left: 1px solid var(--color-border-black-subtle);
+    border-left: 1px solid var(--color-border-subtle);
   }
 }
 
@@ -116,7 +121,7 @@
 // used to live directly on .domainNameScroll below — same reasoning, just
 // one level further out.
 .domainNameTooltip {
-  flex: 1;
+  // flex: 1;
   min-width: 0;
 }
 
@@ -160,7 +165,7 @@
   text-decoration: none;
 
   &:hover .domainName {
-    color: var(--color-blue-primary);
+    color: var(--color-accent);
   }
 
   &:focus-visible {
@@ -175,7 +180,7 @@
   font-weight: var(--font-weight-bold);
   font-size: var(--text-small-15);
   line-height: 1.2; // unset, this inherited the app's global 1.5–1.6 body line-height, same bug fixed in PromotedDomainCard
-  color: var(--color-black-primary);
+  color: var(--color-text-primary);
   display: block; // unconditional now, see .domainNameScroll above — was mobile-only, which meant desktop had no real block box to truncate either
   overflow: hidden;
   text-overflow: ellipsis;
@@ -195,14 +200,32 @@
   font-weight: var(--font-weight-medium);
   font-size: var(--text-small-13);
   line-height: 1.2;
-  color: var(--color-black-primary);
+  color: var(--color-text-primary);
+}
+
+// Price cell: "USDT" plus its 12px logo, 4px apart, as one piece that
+// never breaks. It wraps as a whole under the amount when Price (the row's
+// narrowest column, 1fr of 7.9, see .row) can't fit the price on one line.
+// inline-flex keeps it on the amount's text baseline, and align-items
+// centres the logo on the "USDT" letters.
+.currency {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  white-space: nowrap;
+}
+
+.usdtIcon {
+  flex-shrink: 0;
+  width: 12px;
+  height: 12px;
 }
 
 .usd {
   font-family: var(--font-space-grotesk); // closest already-loaded face to Figma's JetBrains Mono
   font-size: var(--text-small-10);
   line-height: 1.2;
-  color: #a6a1bb; // design-specific: Figma-exact, no token match
+  color: var(--color-text-mono-muted);
 }
 
 // ── Action cell ──────────────────────────────────────────────────────────
@@ -227,7 +250,7 @@
 .favoriteIcon {
   width: 14px;
   height: 13px;
-  color: #a6a1bb; // design-specific: Figma-exact, matches the original favorite.svg's own stroke color
+  color: var(--color-text-mono-muted); // matches the original favorite.svg's own stroke color
 }
 
 .favoriteIconActive {
@@ -236,5 +259,6 @@
   // Was a filter approximating red on the same gray asset — react-icons
   // respects color/currentColor directly, so this just sets the color it
   // was always trying to fake.
-  color: var(--color-error);
+  color: var(--color-status-error);
+  fill: var(--color-status-error);
 }

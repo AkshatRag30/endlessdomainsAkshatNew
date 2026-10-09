@@ -10,11 +10,11 @@
 }
 
 .up {
-  color: var(--color-status-available);
+  color: var(--color-status-success);
 }
 
 .down {
-  color: var(--color-error);
+  color: var(--color-status-error);
 
   .arrow {
     // trend-down.svg's path is byte-for-byte identical to trend-up.svg's,
@@ -26,7 +26,7 @@
 }
 
 .neutral {
-  color: var(--color-gray-dark);
+  color: var(--color-text-secondary);
 
   .arrow {
     transform: rotate(90deg); // the fallback asset points up — rotate flat for 'neutral'

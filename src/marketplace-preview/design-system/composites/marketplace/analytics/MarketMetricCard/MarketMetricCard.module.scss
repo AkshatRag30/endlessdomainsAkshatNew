@@ -1,3 +1,5 @@
+@import '@mpstyles/_mixins.scss';
+
 // Figma node 1:1645 — one metric card.
 
 .card {
@@ -6,8 +8,8 @@
   justify-content: space-between;
   gap: var(--space-3);
   padding: var(--space-2) var(--space-2-5);
-  background: var(--color-white-primary);
-  border: 1px solid var(--color-blue-primary-alpha-07); // closest existing token to Figma's rgba(38,57,237,0.08)
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle); // was the blue at 7%
   border-radius: 8px;
 }
 
@@ -22,7 +24,11 @@
 .label {
   font-family: var(--font-satoshi);
   font-size: 10px;
-  color: #9291a5; // design-specific: Figma-exact
+  color: var(--color-text-secondary); // was #9291a5
+
+  @include dark {
+    color: var(--color-text-primary); // Figma dark (93:54511): labels are white
+  }
 }
 
 .valueRow {
@@ -36,14 +42,14 @@
   font-weight: var(--font-weight-medium);
   font-size: 1.2rem;
   letter-spacing: -0.02em;
-  color: #191627; // design-specific: Figma-exact
+  color: var(--color-text-primary); // was #191627
   white-space: nowrap;
 }
 
 .secondary {
   font-family: var(--font-satoshi);
   font-size: 9px;
-  color: #aba7bc; // design-specific: Figma-exact
+  color: var(--color-text-tertiary);
 }
 
 .chart {
@@ -60,5 +66,5 @@
   justify-content: space-between;
   font-family: var(--font-space-grotesk); // closest already-loaded face to Figma's Consolas
   font-size: 9px;
-  color: #aba7bc; // design-specific: Figma-exact
+  color: var(--color-text-tertiary);
 }

@@ -8,3 +8,11 @@
 .bars {
   margin: 30px 2px 0 0;
 }
+
+// Not in Figma — real orders have no views/watchers tracking yet (see the component's own comment).
+.empty {
+  margin: var(--space-4) 0 0;
+  font-family: var(--font-satoshi);
+  font-size: var(--text-nav);
+  color: #7e7a93;
+}

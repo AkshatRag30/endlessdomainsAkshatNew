@@ -10,8 +10,13 @@
   background: rgba(249, 249, 249, 0.2);
   @include stripe-bg;
   overflow: hidden;
-  border: 1px solid var(--color-blue-primary-alpha-07);
+  border: 1px solid var(--color-border-subtle); // was the blue at 7%
   border-radius: 4px;
+
+  // Figma dark (93:49561 right rail): the single surface panel
+  @include dark {
+    background-color: var(--color-bg-surface);
+  }
 }
 
 .heading {
@@ -19,15 +24,17 @@
   font-family: var(--font-satoshi);
   font-weight: var(--font-weight-medium);
   font-size: 13.6px; // Figma-exact
-  color: #454e43; // design-specific: Figma-exact, matches LiveActivityPanel's .heading
+  color: var(--color-text-primary);
   text-transform: capitalize;
 }
 
 .list {
   display: flex;
   flex-direction: column;
-  background: var(--color-white-primary);
+  background: var(--color-bg-surface);
   border-radius: 2px;
+  height: 214px;
+  overflow: auto;
 }
 
 .row {
@@ -40,7 +47,7 @@
   // every row, across all three right-rail panels that share this
   // primitive (Needs Attention, Getting the Most Views, Quick Actions).
   padding: var(--space-2) var(--space-2-5);
-  border-bottom: 1px solid #f0f1f3; // design-specific: Figma-exact
+  border-bottom: 1px solid var(--color-border-subtle);
 
   &:last-child {
     border-bottom: none;
@@ -53,7 +60,7 @@
 
   &:hover,
   &:focus-visible {
-    background: var(--color-gray-light);
+    background: var(--color-bg-surface-active);
   }
 
   &:focus-visible {
@@ -94,6 +101,11 @@
   background: linear-gradient(180deg, #000000, rgba(0, 0, 0, 0.47));
 }
 
+.avatarImage {
+  // An exported icon (iconImage); drawn at its own width and height props.
+  flex-shrink: 0;
+}
+
 .avatarIcon {
   width: 15px;
   height: 15px;
@@ -117,7 +129,7 @@
   font-family: var(--font-satoshi);
   font-weight: var(--font-weight-medium);
   font-size: 13px;
-  color: var(--color-blue-primary);
+  color: var(--color-accent);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -126,7 +138,7 @@
 .subtitle {
   font-family: var(--font-space-grotesk);
   font-size: 9px;
-  color: #5d5d5d; // design-specific: Figma-exact
+  color: var(--color-text-secondary);
 }
 
 // ── Trailing slot ────────────────────────────────────────────────────────
@@ -145,5 +157,33 @@
   text-align: center;
   font-family: var(--font-satoshi);
   font-size: var(--text-small-12);
-  color: var(--color-gray-primary);
+  color: var(--color-text-secondary);
+}
+
+// ── Optional slots (the watchlist rail, Figma 20:11882) ─────────────────
+
+// The title with an action beside it ("Needs A Look ... All"). The title
+// keeps its own bottom margin; the row just lines the two up.
+.headingRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+
+  .heading {
+    margin-bottom: var(--space-2);
+  }
+}
+
+// Figma 20:12061's intro: 12px secondary text, above the list.
+.description {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-12);
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+.footer {
+  margin-top: var(--space-3);
 }

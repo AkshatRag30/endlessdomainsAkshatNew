@@ -21,6 +21,7 @@ import { useMockWatchlist } from '@/marketplace-preview/data/marketplace/watchli
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import shellStyles from '@/marketplace-preview/design-system/composites/marketplace/shared/MarketplacePageShell/MarketplacePageShell.module.scss'
+import { ThemeProvider } from '@/marketplace-preview/context/ThemeContext'
 
 /**
  * Temporary preview route assembling everything built through Phase 8 —
@@ -55,6 +56,7 @@ export default function MarketplacePreview() {
   const filtered = filterListings(mockListings, debouncedSearch, filters)
 
   return (
+    <ThemeProvider>
     <div data-marketplace-preview>
       <Header onMenuClick={() => setMenuOpen((prev) => !prev)} menuOpen={menuOpen} previewMode />
       <LiveActivityTicker />
@@ -104,5 +106,6 @@ export default function MarketplacePreview() {
         />
       )}
     </div>
+    </ThemeProvider>
   )
 }

@@ -26,7 +26,8 @@
   padding: calc(var(--section-spacing) / 4) var(--space-5) calc(var(--section-spacing) / 2);
 
   // OwnershipComparison (the sticky/scrubbed desktop version) takes over from here up.
-  @include tablet-up {
+  // Matches the desktop version's 1179px hand-off.
+  @media (min-width: 1180px) {
     display: none;
   }
 }

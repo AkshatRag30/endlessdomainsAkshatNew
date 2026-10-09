@@ -17,7 +17,7 @@ export interface SparklineProps {
  * PVSparkline. Rendered client-side only — see index.ts, which dynamic-
  * imports this with ssr:false because recharts measures the DOM.
  */
-export const Sparkline = ({ data, color = 'var(--color-blue-primary)', height = 40, className = '', variant = 'area' }: SparklineProps) => {
+export const Sparkline = ({ data, color = 'var(--color-accent)', height = 40, className = '', variant = 'area' }: SparklineProps) => {
   const gradientId = `sparkline-${useId().replace(/:/g, '')}`
   const shellClass = [styles.wrap, className].filter(Boolean).join(' ')
 
@@ -42,6 +42,9 @@ export const Sparkline = ({ data, color = 'var(--color-blue-primary)', height = 
               stroke={color}
               strokeWidth={1.5}
               fill={`url(#${gradientId})`}
+              // null points (e.g. a bucket with no sales has no average)
+              // are bridged rather than dropped to 0 or breaking the line.
+              connectNulls
               isAnimationActive={false}
             />
           </AreaChart>

@@ -24,6 +24,7 @@ import type { MyDomainListing } from '@/marketplace-preview/types/my-domains'
 import { mockMyDomainsSummary, mockNeedsAttention, mockMostViewed } from '@/marketplace-preview/data/my-domains/domains'
 import { useMyDomainsFilters, filterMyDomains } from '@/marketplace-preview/hooks/my-domains/useMyDomainsFilters'
 import styles from './my-domains.module.scss'
+import { ThemeProvider } from '@/marketplace-preview/context/ThemeContext'
 
 interface ListingModalState {
   isOpen: boolean
@@ -90,6 +91,7 @@ export default function MyDomainsPreview() {
   }, [router, summary.domains])
 
   return (
+    <ThemeProvider>
     <div data-marketplace-preview>
       <Header onMenuClick={() => setMenuOpen((prev) => !prev)} menuOpen={menuOpen} previewMode />
       <MarketplacePageShell
@@ -137,5 +139,6 @@ export default function MyDomainsPreview() {
         />
       )}
     </div>
+    </ThemeProvider>
   )
 }

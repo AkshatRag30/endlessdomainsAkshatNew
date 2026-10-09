@@ -13,15 +13,15 @@ const BAR_HEIGHTS = [52, 62, 100, 76]
 // grounded in the real design rather than an invented shape.
 const LINE_VIEWBOX = { width: 564, height: 220 }
 const LINE_PATH = 'M 4 202 C 90 196, 170 190, 232 166 C 292 140, 352 122, 407 103 C 452 87, 500 48, 540 12'
-const LINE_POINTS: Array<{ x: number; y: number; label: string; value: string; side: 'above' | 'below'; align: 'center' | 'end' }> = [
+const LINE_POINTS: Array<{ x: number; y: number; label: string; value?: string; side: 'above' | 'below'; align: 'center' | 'end' }> = [
   // Right-aligned onto its own point (instead of centered) so its pill sits further left,
   // clear of the second point's callout right next to it — centered, the two pills
   // overlapped since the points themselves are close together near the chart's top-right.
-  { x: 407, y: 103, label: 'Web3 Identity', value: '+36$', side: 'above', align: 'end' },
+  { x: 407, y: 103, label: 'Web3 Identity', side: 'above', align: 'end' },
   // This point sits right at the top-right corner of the chart — a callout floating
   // above and centered on it would clip against both the top and right edges of the
   // card, so it drops below the point and right-aligns onto it instead.
-  { x: 540, y: 12, label: 'Web3 Identity', value: '+36$', side: 'below', align: 'end' },
+  { x: 540, y: 12, label: 'Web3 Identity', side: 'below', align: 'end' },
 ]
 
 function useHoverOrViewportActive() {
@@ -166,7 +166,7 @@ function GrowthLine({ active }: GrowthLineProps) {
           {point.side === 'above' && <span className={styles.lineCalloutLeader} />}
           <span className={styles.lineCalloutPill}>
             <span className={styles.lineCalloutLabel}>{point.label}</span>
-            <span className={styles.lineCalloutValue}>{point.value}</span>
+            {point.value && <span className={styles.lineCalloutValue}>{point.value}</span>}
           </span>
           {point.side === 'below' && <span className={styles.lineCalloutLeader} />}
         </div>

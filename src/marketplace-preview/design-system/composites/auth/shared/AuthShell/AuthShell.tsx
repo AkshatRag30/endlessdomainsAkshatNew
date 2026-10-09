@@ -6,6 +6,14 @@ export interface AuthShellProps {
   children: React.ReactNode
 }
 
+// ~5MB. Left as-is deliberately: the transparent 114px right apron
+// (AuthShell.module.scss's own $canvas-over-art comment) is load-bearing —
+// .artBackdrop (a second, blurred `fill` copy of this same image) shows
+// through it, which a JPEG re-export (no alpha channel) would flatten to
+// solid color and a naive resize doesn't reliably shrink either (tried:
+// sips's own PNG re-encode of a resized copy came out larger, not
+// smaller). Needs a real PNG-aware optimizer (pngquant/oxipng/squoosh),
+// not available in this environment, to fix without a visual regression.
 const ART_SRC = '/loginimage.png'
 const ART_SIZES = '(max-width: 1039px) 100vw, 50vw'
 

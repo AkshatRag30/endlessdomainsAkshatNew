@@ -15,9 +15,29 @@
   padding: var(--space-6) var(--space-4) var(--space-4);
   background: var(--color-gray-light-bg-85);
   @include stripe-bg;
-  border: 1px solid var(--color-blue-primary-alpha-07); // closest existing token to Figma's rgba(38,57,237,0.08)
+  border: 1px solid var(--color-border-subtle); // was the blue at 7%
   border-radius: 4px;
   overflow: hidden;
+
+  // Figma dark (93:53718): a panel darker than its cards (white 5% over the
+  // black page), fading to black at the left, right and bottom edges. The
+  // heading and glow sit above the fades, as in Figma.
+  @include dark {
+    background-color: rgba(255, 255, 255, 0.05); // design-specific: Figma-exact
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      // design-specific: Figma 93:53944 / 93:53947 / 93:53946 edge fades
+      background:
+        linear-gradient(to right, #000 0, #000 24px, rgba(0, 0, 0, 0) 118px),
+        linear-gradient(to left, #000 0, #000 24px, rgba(0, 0, 0, 0) 118px),
+        linear-gradient(to top, #000 0, rgba(0, 0, 0, 0) 33px);
+    }
+  }
 }
 
 .glow {
@@ -29,6 +49,24 @@
   height: 35px; // design-specific: Figma-exact
   object-fit: cover;
   pointer-events: none;
+
+  @include dark {
+    z-index: 2;
+  }
+}
+
+.glowLight {
+  @include dark {
+    display: none;
+  }
+}
+
+.glowDark {
+  display: none;
+
+  @include dark {
+    display: block;
+  }
 }
 
 .heading {
@@ -36,8 +74,13 @@
   font-family: var(--font-satoshi);
   font-size: 18px;
   font-weight: var(--font-weight-regular);
-  color: var(--color-black-primary);
+  color: var(--color-text-primary);
   text-transform: capitalize;
+
+  @include dark {
+    position: relative;
+    z-index: 2;
+  }
 }
 
 // ── Auto-sliding marquee ─────────────────────────────────────────────────

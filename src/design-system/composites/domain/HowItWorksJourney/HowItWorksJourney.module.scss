@@ -225,6 +225,9 @@
   gap: var(--space-14); // ≈162px Figma gap, nearest token
   padding: var(--space-13) var(--space-9);
 
+  // Figma's ~162px gutters leave the step title no room below ~1280px.
+  @include laptop { gap: var(--space-7); padding: var(--space-12) var(--space-7); }
+
   @include tablet-down {
     flex-direction: column;
     gap: var(--space-7);
@@ -311,6 +314,8 @@
     transition: none;
   }
 
+  @include laptop { gap: var(--space-7); }
+
   @include tablet-down {
     flex-direction: column;
     gap: var(--space-6);
@@ -327,6 +332,7 @@
   overflow: hidden;
   background: var(--color-white-dark); // #f0f0f0, neutral fallback surface while an image loads
 
+  @include laptop { flex-shrink: 1; width: 360px; min-width: 0; }
   @include tablet-down { width: 100%; }
 }
 
@@ -406,6 +412,7 @@
   -webkit-background-clip: text;
   color: transparent;
 
+  @include laptop { font-size: 36px; }
   @include tablet-down { font-size: var(--text-h3); }
 }
 

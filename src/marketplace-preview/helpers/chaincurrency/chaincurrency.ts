@@ -14,12 +14,14 @@
  *     as-is. Not wired into anything in this project yet; ported because
  *     it's part of the same helper module, available if a price-currency
  *     icon is ever needed (e.g. a payment/checkout flow).
+
  *   - USDT is the one exception: the listing flow (PriceInput's token chip,
  *     plus every USDT amount in ConfirmToSignStep/ListingSuccessStep/
  *     DomainInsightsCard) is the first real consumer, and it uses the
  *     project's own downloaded tether-usdt.svg
  *     (public/assets/img/my-domains/tether-usdt.svg) instead of the remote
  *     cryptologos.cc one every other symbol here still uses.
+
  */
 
 export type CurrencySymbol = keyof typeof CURRENCY_MAP

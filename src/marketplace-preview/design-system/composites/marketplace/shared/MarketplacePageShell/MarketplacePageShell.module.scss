@@ -5,7 +5,7 @@
   // Page backdrop behind the sidebar, hero banner, main listings/cards, and
   // right rail — none of those set their own opaque background over their
   // full bounds, so this is what actually shows through their gaps/padding.
-  background: var(--color-gray-page-bg);
+  background: var(--color-bg-page);
 
   // Clears MobileBottomNav's fixed bar so it never covers whatever ends up
   // last on the page (Promoted Domains after the mobile reorder below).
@@ -117,7 +117,7 @@
     bottom: 0;
     width: 280px;
     z-index: 40;
-    background: var(--color-white-primary);
+    background: var(--color-bg-surface);
     box-shadow: var(--shadow-panel);
     padding: var(--space-4);
     overflow-y: auto;
@@ -210,6 +210,16 @@
 
   @include mobile {
     order: 1;
+  }
+
+  // Figma dark (93:53951): category tabs, heading, filters and the table sit
+  // in one surface panel, with the listing rows black inside it (ListingRow).
+  // Light mode has no panel here.
+  @include dark {
+    padding: 14px; // design-specific: Figma-exact inset (14.45px)
+    background: var(--color-bg-surface);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 4px;
   }
 }
 

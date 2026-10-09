@@ -1,5 +1,5 @@
 import React from 'react'
-import Image from 'next/image'
+import { CalendarSmallIcon } from '@/marketplace-preview/design-system/primitives/icons/overview-icons'
 import type { OrderStatus, OrderTimelineEntry, OrderTimelineStep } from '@/marketplace-preview/types/marketplace'
 import GlassCard from '@/marketplace-preview/design-system/primitives/cards/glass-card'
 import TransactionChecklist from '@/marketplace-preview/design-system/primitives/progress/transaction-checklist'
@@ -36,7 +36,7 @@ export const OrderTimelineCard = ({ timeline, status }: OrderTimelineCardProps) 
         status: status === 'completed' || entry.at ? 'done' : 'pending',
         detail: entry.at ? (
           <>
-            <Image src="/assets/img/domain-overview/calendar-small.svg" alt="" aria-hidden="true" width={11.65} height={11.65} />
+            <CalendarSmallIcon width={11.65} height={11.65} className={styles.calendarIcon} />
             <time dateTime={entry.at}>
               {formatDate(entry.at)} at {formatTime(entry.at)}
             </time>

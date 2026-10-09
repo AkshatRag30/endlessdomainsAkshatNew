@@ -2,8 +2,8 @@ import React from 'react'
 import styles from './NoticeBanner.module.scss'
 
 export interface NoticeBannerProps {
-  /** 'error' = the red wrong-network banner (1:1297). 'warning' = the buying flow's amber insufficient-funds banner (1:1685). */
-  tone?: 'error' | 'warning'
+  /** 'error' = the red wrong-network banner (1:1297). 'warning' = the buying flow's amber insufficient-funds banner (1:1685). 'info' = the watchlist's lavender "Since you last looked" notice (watchlist 20:12143), announced politely as a status rather than an alert. */
+  tone?: 'error' | 'warning' | 'info'
   /** Caller-styled, so each flow keeps its own Figma icon and offset. */
   icon: React.ReactNode
   title: string
@@ -22,7 +22,7 @@ export interface NoticeBannerProps {
  * action button are passed in already styled.
  */
 export const NoticeBanner = ({ tone = 'error', icon, title, body, action, className = '' }: NoticeBannerProps) => (
-  <div className={[styles.banner, styles[tone], className].filter(Boolean).join(' ')} role="alert">
+  <div className={[styles.banner, styles[tone], className].filter(Boolean).join(' ')} role={tone === 'info' ? 'status' : 'alert'}>
     {icon}
     <div className={styles.text}>
       <p className={styles.title}>{title}</p>

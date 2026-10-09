@@ -1,14 +1,18 @@
 @import '@mpstyles/_mixins.scss';
 
-// Figma node 34:2800 — mobile-only. The Figma frame also shows the phone's
-// own home-indicator line beneath this bar — that's device chrome, not
-// real UI, skipped here the same way the status bar is skipped everywhere
-// else in this build.
+// Figma node 34:2800 — mobile only in the original frame, widened to every
+// width below desktop (tablet-down) once this moved into MainLayout: a
+// tablet visitor gets the same off-canvas drawer sidebar as mobile there
+// (see MainLayout.module.scss's own .sidebar), so it has no persistent nav
+// on screen either and benefits from the same fixed tab bar. The Figma frame
+// also shows the phone's own home-indicator line beneath this bar — that's
+// device chrome, not real UI, skipped here the same way the status bar is
+// skipped everywhere else in this build.
 
 .nav {
   display: none;
 
-  @include mobile {
+  @include tablet-down {
     display: flex;
     align-items: center;
     justify-content: space-around;
@@ -18,7 +22,7 @@
     bottom: 0;
     z-index: 50;
     padding: var(--space-3) var(--space-3) calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
-    background: var(--color-white-primary);
+    background: var(--color-bg-surface);
     box-shadow: var(--shadow-panel);
   }
 }
@@ -31,14 +35,26 @@
   gap: var(--space-1-5);
   flex: 1;
   text-decoration: none;
-  color: #a9a5bc; // design-specific: Figma-exact inactive label color
+  color: var(--color-text-tertiary); // was #a9a5bc, a near shade of the tertiary role
   font-family: var(--font-satoshi);
   font-size: var(--text-small-12);
 }
 
 .active {
-  color: var(--color-blue-primary);
+  color: var(--color-accent);
   font-weight: var(--font-weight-medium);
+
+  @include dark {
+    color: var(--color-text-primary);
+  }
+}
+
+// Sell — no real destination yet, rendered as a plain, non-Link span (see
+// the .tsx) instead of a live Link to '/'. Same dimming/cursor as the
+// header/sidebar's own placeholder rows.
+.itemDisabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 .indicator {

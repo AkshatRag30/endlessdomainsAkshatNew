@@ -1,5 +1,5 @@
 import React from 'react'
-import Image from 'next/image'
+import { InfoIcon } from '@/marketplace-preview/design-system/primitives/icons/overview-icons'
 import styles from './InfoNote.module.scss'
 
 export interface InfoNoteProps {
@@ -15,7 +15,7 @@ export interface InfoNoteProps {
  */
 export const InfoNote = ({ children, className = '' }: InfoNoteProps) => (
   <p className={[styles.note, className].filter(Boolean).join(' ')}>
-    <Image src="/assets/img/domain-overview/info.svg" alt="" aria-hidden="true" width={13.5} height={13.5} className={styles.icon} />
+    <InfoIcon width={13.5} height={13.5} className={styles.icon} />
     <span>{children}</span>
   </p>
 )

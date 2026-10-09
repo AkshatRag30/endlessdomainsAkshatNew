@@ -110,6 +110,9 @@
   max-width: var(--container-max-width);
   margin: 0 auto;
 
+  // 380px network + 480px panel + bridge + gaps overflow below ~1100px.
+  @include laptop { gap: var(--space-6); }
+
   @include tablet-down {
     flex-direction: column;
     gap: var(--space-7);
@@ -342,6 +345,8 @@
   min-width: 120px;
   max-width: 220px;
 
+  @include laptop { min-width: 72px; }
+
   @include tablet-down {
     flex-direction: column;
     max-width: none;
@@ -447,6 +452,7 @@
   width: 480px;
   flex-shrink: 0;
 
+  @include laptop { width: 400px; }
   @include tablet-down { width: 100%; max-width: 480px; }
 }
 

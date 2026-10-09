@@ -59,13 +59,13 @@
 // ── Variants ──────────────────────────────────────────────────────────────────
 
 .transparent {
-  background: var(--color-white-primary);
-  color: var(--color-black-primary);
-  border-color: var(--color-input-border);
+  background: var(--color-bg-surface);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-strong);
   box-shadow: none;
 
   &:hover:not(:disabled) {
-    background: var(--color-white-light-hover);
+    background: var(--color-bg-surface-active);
     opacity: 1;
   }
 }

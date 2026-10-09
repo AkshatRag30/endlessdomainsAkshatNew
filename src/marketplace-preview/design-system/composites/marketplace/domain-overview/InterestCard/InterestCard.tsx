@@ -5,19 +5,25 @@ import InterestBars from '@/marketplace-preview/design-system/primitives/charts/
 import styles from './InterestCard.module.scss'
 
 export interface InterestCardProps {
-  interest: DomainInterest
+  /** null = not tracked for this domain yet (pages/details/[orderId].tsx has no real views/watchers endpoint) — shown as "not tracked" rather than fabricated zeros. */
+  interest: DomainInterest | null
 }
 
 /** Figma node 5:3762: 7 day views against current watchers. */
 export const InterestCard = ({ interest }: InterestCardProps) => (
   <GlassCard title="Interest" titleId="domain-interest-title" className={styles.card}>
-    <InterestBars
-      className={styles.bars}
-      items={[
-        { label: 'Views, 7d', value: interest.views7d.value, changePct: interest.views7d.changePct },
-        { label: 'Watchers', value: interest.watchers.value, changePct: interest.watchers.changePct },
-      ]}
-    />
+    {interest ? (
+      <InterestBars
+        className={styles.bars}
+        items={[
+          { label: 'Views, 7d', value: interest.views7d.value, changePct: interest.views7d.changePct },
+          { label: 'Watchers', value: interest.watchers.value, changePct: interest.watchers.changePct },
+        ]}
+      />
+    ) : (
+      // Not in Figma — real orders have no views/watchers tracking yet.
+      <p className={styles.empty}>Not tracked for this listing yet.</p>
+    )}
   </GlassCard>
 )
 

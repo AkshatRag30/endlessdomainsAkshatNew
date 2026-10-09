@@ -414,7 +414,7 @@
     width: auto;
   }
 
-  span:not(.domainMore) {
+  span:not(.domainMoreItem) {
     border-radius: var(--radius-full);
     background: var(--color-white-primary);
     box-shadow: 0 1px 1px 0 rgb(0 0 0 / 16%) inset, 0 1px 2.2px 0 rgb(0 0 0 / 6%);
@@ -434,22 +434,93 @@
   }
 }
 
+.domainMoreItem {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+// Links to the full TLD/provider list. Same rotating conic border + soft glow as
+// .searchContainer, scaled down to pill size.
 .domainMore {
+  --border-angle: 0deg;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
   border-radius: var(--radius-full);
-  background: var(--color-blue-light);
-  box-shadow: 0 0 10px var(--color-blue-primary-alpha-13);
+  border: 2px solid transparent;
+  background: linear-gradient(var(--color-blue-light), var(--color-blue-light)) padding-box,
+  conic-gradient(from var(--border-angle),
+    var(--color-search-border-a) 0deg,
+    var(--color-search-border-b) 45deg,
+    var(--color-search-border-c) 90deg,
+    var(--color-search-border-d) 135deg,
+    var(--color-search-border-e) 180deg,
+    var(--color-search-border-f) 225deg,
+    var(--color-search-border-g) 270deg,
+    var(--color-search-border-h) 315deg,
+    var(--color-search-border-a) 360deg
+  ) border-box;
+  animation: borderAngleRotate 3s linear infinite;
   color: var(--color-blue-primary);
   text-align: center;
+  text-decoration: none;
   font-family: var(--font-space-grotesk);
   font-size: var(--text-small-12);
   font-style: normal;
   font-weight: var(--font-weight-semibold);
   text-transform: none;
   letter-spacing: 0.01em;
-  padding: var(--space-1-5) var(--space-4);
-  flex-shrink: 0;
+  padding: calc(var(--space-1-5) - 2px) var(--space-4);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: inherit;
+    background: conic-gradient(from var(--border-angle),
+        transparent 0deg,
+        var(--color-search-glow-a) 60deg,
+        var(--color-search-glow-b) 120deg,
+        var(--color-search-glow-c) 180deg,
+        var(--color-search-glow-d) 240deg,
+        var(--color-search-glow-a) 300deg,
+        transparent 360deg);
+    filter: blur(8px);
+    opacity: 0.6;
+    z-index: -1;
+    animation: borderAngleRotate 3s linear infinite;
+    pointer-events: none;
+  }
+
+  svg {
+    transition: transform 0.2s ease;
+  }
+
+  &:hover {
+    transform: scale(1.1);
+
+    svg {
+      transform: translate(1px, -1px);
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-blue-primary);
+    outline-offset: 3px;
+  }
 
   @include mobile-up {
-    padding: var(--space-1-5) var(--space-5);
+    padding: calc(var(--space-1-5) - 2px) var(--space-5);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+
+    &::before {
+      animation: none;
+    }
   }
 }

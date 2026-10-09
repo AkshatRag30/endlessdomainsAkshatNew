@@ -6,6 +6,60 @@
   gap: var(--space-2);
 }
 
+// Not in Figma — MyDomainsFilterBar's "Sync Now" (useSyncListingStatus) sets
+// isSyncing while POST /marketplacev2/orders/listing-status/sync is in
+// flight, since the table itself is what a sync actually changes.
+.syncOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  background: #fffffff1;
+
+  @include dark {
+    background: rgba(20, 20, 21, 0.94); // design-specific: the dark surface at the same 94%
+  }
+  border-radius: var(--radius-lg);
+}
+
+// Same ring + gradient circle + animated wave as WalletPendingStep's own
+// 'pending' status icon (its own WaveLoader, reused directly rather than
+// rebuilt — see that component's file comment for why the wave itself is
+// SMIL, not a CSS transform). Sized to that component's own 'md' default
+// (92px ring / 83px circle) since WaveLoader's SVG is a fixed 65px from
+// its own stylesheet either way — not adjustable from here.
+.syncWaveRing {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 92px;
+  height: 92px;
+  border-radius: var(--radius-full);
+  background: var(--color-blue-primary-alpha-18);
+}
+
+.syncWaveCircle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 83px;
+  height: 83px;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  background: linear-gradient(134.58deg, rgba(38, 57, 237, 0.7) 10.17%, #2639ed 59.57%, rgba(38, 57, 237, 0.5) 98.68%);
+}
+
+.syncText {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-normal);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
 .legend {
   display: flex;
   align-items: center;
@@ -32,7 +86,7 @@
 .legendLabel {
   font-family: var(--font-satoshi);
   font-size: var(--text-small-12);
-  color: var(--color-gray-dark);
+  color: var(--color-text-secondary);
   margin-right: var(--space-1);
 }
 
@@ -79,8 +133,8 @@
     grid-template-columns: minmax(320px, 2fr) 0.9fr minmax(120px, 0.8fr) minmax(96px, 0.9fr) 1.1fr minmax(134px, 1.4fr);
   }
 
-  background: var(--color-white-primary);
-  border: 1px solid var(--color-border-black-subtle);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
   border-radius: 3px;
 
   span {
@@ -88,7 +142,7 @@
     font-family: var(--font-satoshi);
     font-weight: var(--font-weight-medium);
     font-size: var(--text-small-13);
-    color: var(--color-black-alpha-55);
+    color: var(--color-text-secondary);
     // "EST. value" was the only label with a space in it, so it was the
     // only one ever narrow enough to wrap onto a second line — that grew
     // the header row taller than every other single-line label and left
@@ -111,7 +165,7 @@
     text-overflow: ellipsis;
 
     &:not(:first-child) {
-      border-left: 1px solid var(--color-border-black-subtle);
+      border-left: 1px solid var(--color-border-subtle);
     }
   }
 
@@ -131,7 +185,77 @@
   text-align: center;
   font-family: var(--font-satoshi);
   font-size: var(--text-small-13);
-  color: var(--color-gray-primary);
+  color: var(--color-text-secondary);
+}
+
+// ── Loading (not in Figma) — the initial fetch, before there's a real
+// `domains` array to check against the empty state at all. Row skeletons
+// reuse .header's own grid so nothing shifts once the real rows swap in;
+// card skeletons reuse .grid's.
+
+@keyframes myDomainsSkeletonPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.skeletonRow {
+  display: grid;
+  grid-template-columns: minmax(180px, 2fr) minmax(80px, 0.9fr) minmax(120px, 0.8fr) minmax(96px, 0.9fr) 1.1fr minmax(134px, 1.4fr);
+  min-height: 60px;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 3px;
+
+  @include dark {
+    background: var(--color-bg-page); // matches the black rows
+  }
+
+  @include wide {
+    grid-template-columns: minmax(290px, 2fr) minmax(80px, 0.9fr) minmax(120px, 0.8fr) minmax(96px, 0.9fr) 1.1fr minmax(134px, 1.4fr);
+  }
+}
+
+.skeletonCell {
+  display: flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  min-width: 0;
+
+  &:not(:first-child) {
+    border-left: 1px solid var(--color-border-subtle);
+  }
+}
+
+.skeletonBlock {
+  width: 100%;
+  max-width: 96px;
+  height: 12px;
+  border-radius: 4px;
+  background: var(--color-bg-surface-active);
+  animation: myDomainsSkeletonPulse 1.4s ease-in-out infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+.skeletonCard {
+  // Not a specific Figma measurement — MyDomainCard's own height is auto
+  // (content-driven, no fixed height in that file), so this is just a
+  // reasonable placeholder box rather than an exact match.
+  min-height: 220px;
+  border-radius: 8px;
+  background: var(--color-bg-surface-active);
+  animation: myDomainsSkeletonPulse 1.4s ease-in-out infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
 }
 
 .showMore {

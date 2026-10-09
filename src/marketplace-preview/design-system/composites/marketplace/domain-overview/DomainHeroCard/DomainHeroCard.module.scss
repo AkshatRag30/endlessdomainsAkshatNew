@@ -15,6 +15,7 @@
   // Figma centres a 558 + 188 + 253px row in the 1035px card, leaving ~18px
   // either side; the 188px gap becomes space-between so narrower widths shrink it.
   padding: 13px 18px;
+  margin: 20px 40px;
 
   @include mobile {
     flex-direction: column;
@@ -146,7 +147,8 @@
   font-family: var(--font-space-grotesk);
   font-size: 14.5px;
   color: #a6a1bb;
-  white-space: nowrap;
+  white-space: nowrap;    
+  letter-spacing: 2px;
 
   @include mobile {
     font-size: var(--text-small-12);
@@ -277,6 +279,7 @@
   width: 14px;
   height: 13px;
   color: var(--color-error);
+  fill: var(--color-error);
 }
 
 // Not in Figma (plan §7): replaces the price block when nothing is for sale.

@@ -45,8 +45,8 @@
   padding: 0;
   border: none;
   border-radius: var(--radius-sm);
-  background: var(--color-gray-light);
-  color: var(--color-black-primary); // FiX — was 2 hand-rotated CSS bars, matches their own black
+  background: var(--color-bg-surface-active);
+  color: var(--color-text-primary); // FiX
   cursor: pointer;
 }
 
@@ -58,8 +58,8 @@
   gap: var(--space-2);
   height: 40px;
   padding: 0 var(--space-3);
-  background: var(--color-white-primary);
-  border: 0.5px solid var(--color-border-black-subtle);
+  background: var(--color-bg-surface);
+  border: 0.5px solid var(--color-border-strong);
   border-radius: var(--radius-sm);
 }
 
@@ -76,13 +76,13 @@
   min-width: 0;
   font-family: var(--font-satoshi);
   font-size: var(--text-nav);
-  color: var(--color-black-alpha-55);
+  color: var(--color-text-tertiary);
   background: none;
   border: none;
   outline: none;
 
   &::placeholder {
-    color: var(--color-black-alpha-55);
+    color: var(--color-text-tertiary);
   }
 }
 
@@ -100,13 +100,13 @@
   min-width: 20px;
   height: 20px;
   padding: 0 var(--space-1);
-  background: var(--color-black-light);
-  border: 1px solid var(--color-white-primary);
+  background: var(--color-bg-surface-active);
+  border: 1px solid var(--color-border-subtle);
   border-radius: 4px;
   font-family: var(--font-satoshi);
   font-size: var(--text-small-12);
   font-weight: var(--font-weight-medium);
-  color: var(--color-gray-darkest);
+  color: var(--color-text-secondary);
 }
 
 // ── Sections (Navigation / Browse) ──────────────────────────────────────
@@ -124,12 +124,16 @@
   font-size: var(--text-nav);
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #4a4a4a; // design-specific: Figma-exact
+  color: var(--color-text-secondary);
+
+  @include dark {
+    color: var(--color-text-primary); // white section titles, same as the desktop sidebar
+  }
 }
 
 .divider {
   height: 1px;
-  background: var(--color-border-black-subtle);
+  background: var(--color-border-subtle);
 }
 
 // ── Navigation (mirrors Header's own nav exactly) ───────────────────────
@@ -149,24 +153,32 @@
   font-weight: var(--font-weight-regular);
   font-size: 17px;
   letter-spacing: -0.02em;
-  color: #666; // design-specific: Figma-exact
+  color: var(--color-text-secondary);
   text-decoration: none;
 }
 
 .navLinkActive {
   font-weight: var(--font-weight-medium);
-  color: var(--color-blue-primary);
+  color: var(--color-accent);
+
+  @include dark {
+    color: var(--color-text-primary); // white active link, same as the header nav
+  }
 }
 
 .navArrow {
   display: block;
   width: 7px;
   height: 7px;
-  color: var(--color-black-alpha-55); // nearest token to the original nav-arrow-inactive.svg's own 0.56 fill-opacity
+  color: var(--color-text-secondary); // the original nav-arrow-inactive.svg was black at 0.56
 }
 
 .navArrowActive {
-  color: var(--color-blue-primary); // matches the original nav-arrow-active.svg's own fill
+  color: var(--color-accent); // matches the original nav-arrow-active.svg's own fill
+
+  @include dark {
+    color: var(--color-text-primary);
+  }
 }
 
 // ── Browse ───────────────────────────────────────────────────────────────
@@ -195,10 +207,10 @@
 // now applies to whichever row previewSelectedBrowseId points at (see the
 // .tsx) rather than being stuck to Explore regardless of what's selected.
 .browseRowSelected {
-  background: #f4f4f6; // design-specific: Figma-exact
+  background: var(--color-bg-surface-active);
 
   .browseLabel {
-    color: var(--color-black-primary);
+    color: var(--color-text-primary);
     font-weight: var(--font-weight-medium);
   }
 }
@@ -210,13 +222,13 @@
   flex-shrink: 0;
   position: relative;
   z-index: 1;
-  color: #a6a1bb; // design-specific: Figma-exact, matches the original drawer-browse-icon.svg's own stroke
+  color: var(--color-text-mono-muted); // matches the original drawer-browse-icon.svg's own stroke
 }
 
 // Explore's own row uses FiTarget instead of the plain FiCheck every other
 // row gets — matches the original drawer-explore-icon.svg's own blue stroke.
 .browseIconAccent {
-  color: var(--color-blue-primary);
+  color: var(--color-accent);
 }
 
 .browseLabel {
@@ -225,7 +237,7 @@
   font-weight: var(--font-weight-regular);
   font-size: 17px;
   letter-spacing: -0.02em;
-  color: #666; // design-specific: Figma-exact
+  color: var(--color-text-secondary);
   position: relative;
   z-index: 1;
 }
@@ -271,7 +283,7 @@
   z-index: 1; // stays above the selected row's deco flourish, same reason as .browseIcon/.browseLabel
   font-family: var(--font-space-grotesk); // closest already-loaded face to Figma's JetBrains Mono
   font-size: var(--text-small-12);
-  color: #a6a1bb; // design-specific: Figma-exact
+  color: var(--color-text-mono-muted);
 }
 
 // ── Footer / auth action ────────────────────────────────────────────────
@@ -292,12 +304,12 @@
   align-items: center;
   justify-content: center;
   padding: var(--space-2) var(--space-6);
-  background: var(--color-white-primary);
-  border: 1px solid var(--color-border-black-subtle);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-full);
   cursor: pointer;
   font-family: var(--font-space-grotesk); // closest already-loaded face to Figma's Geist Mono
   font-size: var(--text-body-small);
-  color: var(--color-blue-primary);
+  color: var(--color-accent);
   text-decoration: none;
 }

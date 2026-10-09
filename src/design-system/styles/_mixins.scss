@@ -57,6 +57,15 @@ $breakpoint-wide: 1440px;
 }
 
 
+// Laptop (992px – 1279px) — small laptops and iPad Pro portrait (1024–1032px), where
+// tablet-down layouts have switched off but full desktop layouts don't fit yet.
+@mixin laptop {
+  @media (min-width: $breakpoint-tablet) and (max-width: 1279px) {
+    @content;
+  }
+}
+
+
 // Desktop
 @mixin desktop {
   @media (min-width: $breakpoint-desktop) {

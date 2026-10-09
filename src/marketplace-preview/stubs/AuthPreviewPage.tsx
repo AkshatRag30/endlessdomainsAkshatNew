@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import PrimaryButton from '@/marketplace-preview/design-system/primitives/buttons/primary-button'
+import { ThemeProvider } from '@/marketplace-preview/context/ThemeContext'
 import {
   AuthDivider,
   AuthEmailForm,
@@ -92,6 +93,7 @@ export const AuthPreviewPage = ({ mode }: { mode: 'login' | 'signup' }) => {
 
   return (
     // data-marketplace-preview: this project scopes the preview's tokens to that attribute.
+    <ThemeProvider>
     <div data-marketplace-preview>
       <AuthShell>
         <AuthHeader heading={copy.heading} subtext={copy.subtext} />
@@ -137,6 +139,7 @@ export const AuthPreviewPage = ({ mode }: { mode: 'login' | 'signup' }) => {
         <AuthFooterLink prompt={copy.footerPrompt} linkLabel={copy.footerLink} href={copy.footerHref} />
       </AuthShell>
     </div>
+    </ThemeProvider>
   )
 }
 
