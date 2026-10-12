@@ -286,7 +286,8 @@
     }
 
     @include desktop {
-      max-width: 1000px;
+      // The copy runs ~2040px on one line at 22px, so 1000px pushed it to 3 lines.
+      max-width: 1100px;
     }
   }
 }

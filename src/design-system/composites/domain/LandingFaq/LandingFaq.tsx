@@ -29,7 +29,7 @@ const FAQS: FaqsType[] = [
     position: 1,
     question: 'Is it really lifetime ownership? No renewals?',
     answer:
-      "It depends on the domain. Endless brings names from many providers into one place, so renewal rules vary. Some, like .og, .crypto, and .x, are yours with no renewals at all. Others, like .eth, .bnb, and .arb, need periodic renewal. Where a domain is permanent, there are no recurring fees and your ownership lives onchain for as long as the network does. Always check a domain's terms before minting.",
+      "It depends on the provider. Endless brings names from many providers into one place, so renewal rules vary. Providers like Unstoppable Domains, Freename, and Bonfida offer lifetime ownership with no renewals. Others, like ENS and SPACE ID, require periodic renewal. Where a domain is permanent, there are no recurring fees and your ownership lives onchain for as long as the network does. Always check a domain's terms before minting.",
   },
   {
     id: 'chains-supported',

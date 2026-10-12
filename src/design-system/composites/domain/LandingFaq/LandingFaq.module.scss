@@ -5,7 +5,9 @@
   background: var(--color-white-primary);
   position: relative;
   padding: var(--section-spacing, 80px) 0;
-  overflow: hidden;
+  // clip (not hidden) so .left's position: sticky still sticks to the viewport —
+  // overflow: hidden would make this section the sticky scroll container.
+  overflow: clip;
   border-top: 0.5px solid var(--color-border-black-subtle);
   border-bottom: 0.5px solid var(--color-border-black-subtle);
 }
@@ -42,6 +44,9 @@
   @include desktop {
     width: 450px;
     padding-top: var(--space-8);
+    // Stays in view while the taller accordion (after "View More") scrolls past.
+    position: sticky;
+    top: 100px;
   }
 }
 

@@ -11,7 +11,6 @@ const SCREEN_DURATION = 1200
 export function HowItWorksJourney() {
   const [activeJourneyIndex, setActiveJourneyIndex] = useState(0)
   const [activeScreenIndex, setActiveScreenIndex] = useState(0)
-  const [isPaused, setIsPaused] = useState(false)
 
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
 
@@ -24,13 +23,13 @@ export function HowItWorksJourney() {
   // Auto-advance through the active journey's screens — resets whenever the
   // journey itself changes, since screen count differs per journey (4 for
   // mint, 3 for the rest).
+  // Never pauses on hover/focus — it keeps cycling like a marquee.
   useEffect(() => {
-    if (isPaused) return
     const timer = setInterval(() => {
       setActiveScreenIndex(i => (i + 1) % journey.screens.length)
     }, SCREEN_DURATION)
     return () => clearInterval(timer)
-  }, [isPaused, journey.id, journey.screens.length])
+  }, [journey.id, journey.screens.length])
 
   const handleTabSelect = useCallback((index: number) => {
     setActiveJourneyIndex(index)
@@ -48,9 +47,6 @@ export function HowItWorksJourney() {
     },
     [activeJourneyIndex, handleTabSelect]
   )
-
-  const handlePause = useCallback(() => setIsPaused(true), [])
-  const handleResume = useCallback(() => setIsPaused(false), [])
 
   return (
     <section id="how-it-works" className={styles.section} aria-labelledby="how-it-works-journey-heading">
@@ -75,7 +71,7 @@ export function HowItWorksJourney() {
         </p>
       </div>
 
-      <div className={styles.tabBar} role="tablist" aria-label="Choose a journey" onMouseEnter={handlePause} onMouseLeave={handleResume}>
+      <div className={styles.tabBar} role="tablist" aria-label="Choose a journey">
         {JOURNEYS.map((j, index) => {
           const isActive = index === activeJourneyIndex
           return (
@@ -93,8 +89,6 @@ export function HowItWorksJourney() {
               className={`${styles.tab} ${isActive ? styles.tabActive : ''}`}
               onClick={() => handleTabSelect(index)}
               onKeyDown={handleTabKeyDown}
-              onFocus={handlePause}
-              onBlur={handleResume}
             >
               {j.tabLabel}
             </button>
@@ -108,8 +102,6 @@ export function HowItWorksJourney() {
           id={`journey-panel-${journey.id}`}
           role="tabpanel"
           aria-labelledby={`journey-tab-${journey.id}`}
-          onMouseEnter={handlePause}
-          onMouseLeave={handleResume}
         >
           <span className={styles.frameBg} aria-hidden="true">
             <Image src="/landing/how-it-works/journey-frame.svg" alt="" fill unoptimized className={styles.frameBgImg} />

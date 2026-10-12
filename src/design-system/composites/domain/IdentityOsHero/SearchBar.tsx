@@ -3,7 +3,10 @@ import Link from 'next/link'
 import styles from './SearchBar.module.scss'
 import Input from '@/design-system/primitives/LandingInput'
 
-const DOMAIN_EXTENSIONS = ['.og', '.eth', '.sol', '.bnb', '.crypto', '.x'] as const
+const DOMAIN_EXTENSIONS = [
+  '.og', '.eth', '.sol', '.bnb', '.crypto', '.x', '.arb', '.polygon', '.ton', '.tez',
+  '.bitcoin', '.nft', '.wallet', '.dao', '.blockchain', '.zil', '.stark', '.box', '.hodl', '.onchain',
+] as const
 
 const SearchBar = () => {
   return (
@@ -41,17 +44,22 @@ const SearchBar = () => {
         />
         <Input className={styles.wideSearch} />
 
-        <div
-          className={styles.domainList}
-          role="list"
-          aria-label="Popular domain extensions"
-        >
-          {DOMAIN_EXTENSIONS.map((domain) => (
-            <span key={domain} role="listitem">
-              {domain}
-            </span>
-          ))}
-          <span role="listitem" className={styles.domainMoreItem}>
+        <div className={styles.domainList}>
+          {/* Same footprint the static pills used; the list renders twice so the
+              translateX(-50%) loop is seamless — the copy is hidden from screen readers. */}
+          <div className={styles.marquee} role="list" aria-label="Popular domain extensions">
+            <div className={styles.marqueeTrack}>
+              {[...DOMAIN_EXTENSIONS, ...DOMAIN_EXTENSIONS].map((domain, index) => {
+                const isCopy = index >= DOMAIN_EXTENSIONS.length
+                return (
+                  <span key={`${domain}-${index}`} role={isCopy ? undefined : 'listitem'} aria-hidden={isCopy || undefined}>
+                    {domain}
+                  </span>
+                )
+              })}
+            </div>
+          </div>
+          <span className={styles.domainMoreItem}>
             <Link href="/web3-domains" className={styles.domainMore} aria-label="See all 60+ TLDs and providers">
               60+ TLDs
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
