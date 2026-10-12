@@ -24,7 +24,7 @@
   will-change: transform;
   // One set (25% of the 4-set track) per loop; duration tuned to the same ~85px/s
   // on-screen speed the icon-only version had.
-  animation: identity-os-providers-scroll 19.5s linear infinite;
+  animation: identity-os-providers-scroll 20s linear infinite;
 
   &:hover {
     animation-play-state: paused;
@@ -43,6 +43,17 @@
   gap: var(--space-2);
   flex-shrink: 0;
   margin: 0 var(--space-5);
+}
+
+.wordmark {
+  --logo-h: 30px;
+  display: block;
+  height: calc(var(--logo-h) * var(--logo-scale, 1));
+  width: auto;
+
+  @include tablet-down {
+    --logo-h: 24px;
+  }
 }
 
 .name {
