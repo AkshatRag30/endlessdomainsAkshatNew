@@ -24,7 +24,7 @@
   will-change: transform;
   // One set (25% of the 4-set track) per loop; duration tuned to the same ~85px/s
   // on-screen speed the icon-only version had.
-  animation: identity-os-providers-scroll 20s linear infinite;
+  animation: identity-os-providers-scroll 18.3s linear infinite;
 
   &:hover {
     animation-play-state: paused;

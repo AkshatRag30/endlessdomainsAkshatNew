@@ -1,6 +1,6 @@
 // Ported from the source project's src/helpers/chaincurrency/chaincurrency.tsx —
 // trimmed to just the provider list this marquee needs (that file's own CURRENCY_MAP
-// is unrelated to this section). All 11 icons already exist in this project's own
+// is unrelated to this section). All 10 icons already exist in this project's own
 // public/domain/ folder, so these reference that path directly rather than importing
 // them as bundled modules.
 export interface DomainProvider {
@@ -27,6 +27,5 @@ export const DOMAIN_PROVIDERS: DomainProvider[] = [
   { label: 'Aptos', image: '/domain/apt.svg', provider: 'Aptos', colorName: '#000', logo: '/new-assets/provider-logos/aptos.svg', logoAspect: 3.487, logoScale: 0.85 },
   { label: 'TON', image: '/domain/ton_symbol.png', provider: 'Ton', colorName: '#0098ea', logo: '/new-assets/provider-logos/ton.svg', logoAspect: 4.494, logoScale: 0.8 },
   { label: 'Box', image: '/domain/box_icon.png', provider: 'Box', colorName: '#000', logo: '/new-assets/provider-logos/box.svg', logoAspect: 2.529, logoScale: 0.85 },
-  { label: 'Starknet', image: '/domain/starknet_icon.png', provider: 'Starknet', colorName: '#19aa6e', logo: '/new-assets/provider-logos/starknet.svg', logoAspect: 4.219, logoScale: 1.0 },
   { label: 'Freename', image: '/domain/freename.svg', provider: 'Freename', colorName: '#4144c0', logo: '/new-assets/provider-logos/freename.svg', logoAspect: 8.915, logoScale: 0.72 },
 ]

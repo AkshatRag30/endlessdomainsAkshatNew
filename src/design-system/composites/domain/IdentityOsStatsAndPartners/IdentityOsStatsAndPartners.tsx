@@ -16,14 +16,13 @@ if (typeof window !== 'undefined') {
 // page-scoped copies in identity-os-logos/ with the white wordmarks recolored to black.
 const _PARTNER_LOGOS = [
   { src: '/new-assets/identity-os-logos/polygon.png', alt: 'polygon' },
-  { src: '/new-assets/partners/binance.svg', alt: 'BNB' },
   { src: '/new-assets/identity-os-logos/soneium.png', alt: 'soneium' },
-  { src: '/new-assets/identity-os-logos/hemi.png', alt: 'hemi' },
-  { src: '/new-assets/identity-os-logos/monad.png', alt: 'monad' },
+  { src: '/new-assets/identity-os-logos/hemi.svg', alt: 'hemi' },
+  { src: '/new-assets/identity-os-logos/monad.svg', alt: 'monad' },
   { src: '/new-assets/identity-os-logos/quote.png', alt: 'quote' },
   { src: '/new-assets/identity-os-logos/loyyal.png', alt: 'loyyal' },
   { src: '/new-assets/identity-os-logos/fluxor.svg', alt: 'fluxor' },
-  { src: '/new-assets/identity-os-logos/commudle.png', alt: 'commudle' },
+  { src: '/new-assets/identity-os-logos/commudle.svg', alt: 'commudle' },
 ]
 
 // gpay's original file (public/new-assets/feature-and-stats/gpay.svg) is shared with the
@@ -39,7 +38,7 @@ const _PAYMENT_LOGOS = [
   { src: '/new-assets/identity-os-logos/link.svg', alt: 'link' },
 ]
 
-// Partners: 9 logos × 3 = 27 cards — one set (~2250px) exceeds any viewport.
+// Partners: 8 logos × 3 = 24 cards — one set (~2000px) exceeds any viewport.
 // Payments: only 4 logos so needs 6× repetitions so one set (~800px × 2 = ~1600px) exceeds any viewport.
 const PARTNER_LOGOS = [..._PARTNER_LOGOS, ..._PARTNER_LOGOS, ..._PARTNER_LOGOS]
 const PAYMENT_LOGOS = [
