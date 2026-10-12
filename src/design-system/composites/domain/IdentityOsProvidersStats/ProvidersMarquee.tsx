@@ -4,9 +4,9 @@ import { DOMAIN_PROVIDERS } from './providersData'
 
 import styles from './ProvidersMarquee.module.scss'
 
-// The provider list is short (11 icons), so it's repeated 8x to build a track long
-// enough that the loop seam never sits inside the visible viewport.
-const REPEAT_COUNT = 8
+// Each provider shows its icon + name (a stand-in until designed logo+name artwork
+// exists), so one set is ~2000px — 4 repeats keep the loop seam off-screen everywhere.
+const REPEAT_COUNT = 4
 
 export function ProvidersMarquee() {
   return (
@@ -17,8 +17,9 @@ export function ProvidersMarquee() {
             DOMAIN_PROVIDERS.map(provider => (
               <li key={`${provider.provider}-${setIndex}`} className={styles.token} title={setIndex === 0 ? provider.label : undefined} aria-hidden={setIndex === 0 ? undefined : 'true'}>
                 <span className={styles.avatar} style={{ borderColor: `${provider.colorName}5c` }}>
-                  <Image src={provider.image} alt={setIndex === 0 ? provider.label : ''} width={40} height={40} className={styles.icon} />
+                  <Image src={provider.image} alt="" width={40} height={40} className={styles.icon} />
                 </span>
+                <span className={styles.name}>{provider.label}</span>
               </li>
             )),
           )}
