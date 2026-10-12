@@ -1,0 +1,912 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Landing Page Field Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f7f8fc; --surface:#ffffff; --surface-2:#f1f3fb; --text:#141726; --muted:#5b6175; --line:#e3e6f0;
+  --brand:#2639ed; --brand-soft:#e8eaff; --ok:#0f8a4b; --ok-soft:#e3f6ec; --warn:#a15c00; --warn-soft:#fff3df;
+  --bad:#c0262d; --bad-soft:#fde8e9; --code-bg:#0f1222; --code-text:#e6e8f5; --shadow:0 1px 2px rgba(20,23,38,.06),0 6px 24px rgba(20,23,38,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0c0e17; --surface:#141726; --surface-2:#1b1f33; --text:#e9ebf5; --muted:#a2a8bf; --line:#262b45;
+    --brand:#8c97ff; --brand-soft:#1e2350; --ok:#4fd18b; --ok-soft:#10301f; --warn:#f5b453; --warn-soft:#33240b;
+    --bad:#ff7a80; --bad-soft:#3a1316; --code-bg:#090b14; --code-text:#e6e8f5; --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0c0e17; --surface:#141726; --surface-2:#1b1f33; --text:#e9ebf5; --muted:#a2a8bf; --line:#262b45;
+  --brand:#8c97ff; --brand-soft:#1e2350; --ok:#4fd18b; --ok-soft:#10301f; --warn:#f5b453; --warn-soft:#33240b;
+  --bad:#ff7a80; --bad-soft:#3a1316; --code-bg:#090b14; --code-text:#e6e8f5; --shadow:none;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.65 Inter,system-ui,sans-serif}
+a{color:var(--brand)}
+code,pre{font-family:"JetBrains Mono",ui-monospace,monospace}
+code{font-size:.88em;background:var(--surface-2);padding:.1em .35em;border-radius:5px}
+pre{background:var(--code-bg);color:var(--code-text);padding:16px 18px;border-radius:12px;overflow:auto;font-size:13px;line-height:1.55;margin:14px 0}
+pre code{background:none;padding:0;font-size:inherit;color:inherit}
+.layout{display:grid;grid-template-columns:280px minmax(0,1fr);max-width:1320px;margin:0 auto}
+nav.toc{position:sticky;top:0;height:100vh;overflow:auto;padding:28px 18px 40px;border-right:1px solid var(--line)}
+nav.toc .brand{font-weight:700;font-size:15px;margin-bottom:4px}
+nav.toc .sub{color:var(--muted);font-size:12.5px;margin-bottom:18px}
+nav.toc h4{margin:18px 0 6px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+nav.toc a{display:block;padding:4px 8px;border-radius:7px;color:var(--text);text-decoration:none;font-size:13.5px}
+nav.toc a:hover{background:var(--surface-2)}
+main{padding:40px 48px 120px;min-width:0}
+header.hero{padding:8px 0 28px;border-bottom:1px solid var(--line);margin-bottom:32px}
+header.hero h1{font-size:36px;line-height:1.15;margin:0 0 10px;letter-spacing:-.02em}
+header.hero p{color:var(--muted);max-width:760px;margin:0}
+.themebtn{float:right;border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:999px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer}
+section.part{margin:56px 0}
+h2{font-size:26px;letter-spacing:-.01em;margin:0 0 6px;scroll-margin-top:20px}
+h3{font-size:19px;margin:30px 0 8px;scroll-margin-top:20px}
+h4{font-size:15px;margin:20px 0 6px}
+.lead{color:var(--muted);margin:0 0 20px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px 22px;box-shadow:var(--shadow);margin:16px 0}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.stat b{display:block;font-size:28px;letter-spacing:-.02em}
+.stat span{color:var(--muted);font-size:13.5px}
+.badge{display:inline-block;font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.b-ok{background:var(--ok-soft);color:var(--ok)}
+.b-warn{background:var(--warn-soft);color:var(--warn)}
+.b-bad{background:var(--bad-soft);color:var(--bad)}
+.b-info{background:var(--brand-soft);color:var(--brand)}
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface);margin:14px 0}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--surface-2);font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+tr:last-child td{border-bottom:none}
+.callout{border-left:4px solid var(--brand);background:var(--brand-soft);padding:12px 16px;border-radius:0 10px 10px 0;margin:16px 0}
+.callout.bad{border-color:var(--bad);background:var(--bad-soft)}
+.callout.warn{border-color:var(--warn);background:var(--warn-soft)}
+ol.steps{padding-left:22px}
+ol.steps>li{margin:6px 0}
+details{border:1px solid var(--line);border-radius:12px;background:var(--surface);margin:12px 0;overflow:hidden}
+details>summary{cursor:pointer;padding:14px 18px;font-weight:600;list-style:none;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+details>summary::-webkit-details-marker{display:none}
+details>summary::before{content:"▸";color:var(--muted);transition:transform .15s}
+details[open]>summary::before{transform:rotate(90deg)}
+details .body{padding:0 20px 18px}
+.tree{font-family:"JetBrains Mono",monospace;font-size:13px;line-height:1.7;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;overflow:auto;white-space:pre}
+.module{border:1px solid var(--line);border-radius:16px;background:var(--surface);padding:22px 24px;margin:22px 0;box-shadow:var(--shadow)}
+.module .num{font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--brand);text-transform:uppercase}
+.module h3{margin-top:4px}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 4px}
+.tag{font-size:12px;background:var(--surface-2);border:1px solid var(--line);padding:2px 8px;border-radius:999px;color:var(--muted)}
+.exercise{background:var(--surface-2);border-radius:10px;padding:12px 16px;margin-top:14px;font-size:14.5px}
+.exercise b{color:var(--brand)}
+.muted{color:var(--muted)}
+@media (max-width: 960px){
+  .layout{grid-template-columns:1fr}
+  nav.toc{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line);padding:20px 16px}
+  main{padding:28px 16px 80px}
+  header.hero h1{font-size:28px}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav class="toc" aria-label="Contents">
+  <div class="brand">Endless Landing Page</div>
+  <div class="sub">Audit, architecture and a build course</div>
+  <h4>Part 1 · Audit</h4>
+  <a href="#verdict">Overall verdict</a>
+  <a href="#blockers">Fix before launch</a>
+  <a href="#scorecard">Component scorecard</a>
+  <a href="#crosscutting">Cross cutting issues</a>
+  <a href="#tooling">Tooling and build health</a>
+  <h4>Part 2 · Architecture</h4>
+  <a href="#tree">How the page is linked</a>
+  <a href="#folders">Folder anatomy</a>
+  <a href="#styles">Styling system</a>
+  <a href="#data">Data flow</a>
+  <a href="#techniques">Animation techniques map</a>
+  <h4>Part 3 · Components</h4>
+  <a href="#components">Deep dives (all 17)</a>
+  <h4>Part 4 · The course</h4>
+  <a href="#course">How to use this course</a>
+  <a href="#m0">0 · Setup</a>
+  <a href="#m1">1 · Tokens and breakpoints</a>
+  <a href="#m2">2 · Static sections</a>
+  <a href="#m3">3 · CSS motion and marquees</a>
+  <a href="#m4">4 · Reveal on scroll</a>
+  <a href="#m5">5 · SVG drawing</a>
+  <a href="#m6">6 · State driven animation</a>
+  <a href="#m7">7 · The hero</a>
+  <a href="#m8">8 · Odometer counter</a>
+  <a href="#m9">9 · Scroll pinned stories</a>
+  <a href="#m10">10 · GSAP: ticker and accordion</a>
+  <a href="#m11">11 · Data: the blog slider</a>
+  <a href="#m12">12 · Wiring the page</a>
+  <a href="#m13">13 · Production polish</a>
+  <a href="#capstone">Capstone checklist</a>
+</nav>
+
+<main>
+<header class="hero">
+  <button class="themebtn" type="button" id="themeBtn">Toggle theme</button>
+  <h1>Endless Domains Landing Page Field Guide</h1>
+  <p>A code audit of every section on the new landing page, a map of how the pieces connect, and a beginner friendly course that rebuilds the whole page by hand, animations included. Every finding here was checked against the actual source in <code>webui/</code> on the <code>new-landing-page</code> branch (October 2026). Updated after the providers marquee switched to full logo + name artwork.</p>
+</header>
+
+<!-- ===================== PART 1 ===================== -->
+<section class="part" id="verdict">
+  <h2>Part 1 · Is it production grade?</h2>
+  <p class="lead">Short answer: the architecture is production grade, but the page is not launch ready until a handful of real bugs and broken links are fixed.</p>
+
+  <div class="grid">
+    <div class="stat"><b>17</b><span>sections and sub components reviewed (13 section folders, FAQ, page, layout, styles)</span></div>
+    <div class="stat"><b>0</b><span>TypeScript errors (<code>tsc --noEmit</code> across the whole project)</span></div>
+    <div class="stat"><b>36</b><span>ESLint problems in landing code, mostly auto fixable import sorting</span></div>
+    <div class="stat"><b>8</b><span>blocking issues to fix before launch (listed below)</span></div>
+  </div>
+
+  <div class="card">
+    <h4 style="margin-top:0">What is genuinely good</h4>
+    <ol>
+      <li>Clean structure: one folder per section, a barrel export, and a page that simply stacks sections in order. Easy to read, easy to reorder.</li>
+      <li>A real design system: CSS custom property tokens for colour, type and spacing, plus SCSS breakpoint mixins used consistently.</li>
+      <li>Strong TypeScript: strict mode, typed data files, and only three <code>any</code> casts in the whole landing folder.</li>
+      <li>Careful effect hygiene: almost every observer, timer, interval and animation frame has a matching cleanup.</li>
+      <li>Thoughtful accessibility in many places: screen reader only headline text, <code>aria-hidden</code> on decoration, a proper tabs pattern with arrow keys, an accessible custom scrollbar slider.</li>
+      <li>Well chosen techniques: transform only animations, SVG stroke drawing, pure progress functions for scroll stories, and a static page with incremental regeneration for the blog.</li>
+    </ol>
+    <h4>What holds it back</h4>
+    <ol>
+      <li>A few buttons do nothing, a texture file is missing, and new images are not committed to git.</li>
+      <li>Two features have real bugs (the counter under reduced motion, and a leak prone controller in the network diagram).</li>
+      <li>Reduced motion support is inconsistent, and several things move forever with no way to pause.</li>
+      <li>Desktop and mobile versions of two heavy sections are both mounted, and the hidden one keeps doing scroll work.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="part" id="blockers">
+  <h3>Fix before launch</h3>
+  <p class="lead">These are verified in code. Each one either breaks something a visitor will see, or is a correctness problem.</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>#</th><th>Issue</th><th>Where</th><th>Why it matters</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td><b>New images are not committed.</b> The three Marketplace screens, the seven new partner logos and the new provider logos are untracked, and the old screens show as deleted.</td><td><code>public/landing/how-it-works/marketplace/</code>, <code>public/new-assets/identity-os-logos/</code>, <code>public/new-assets/provider-logos/</code></td><td>A deploy from git would 404 those images.</td></tr>
+      <tr><td>2</td><td><b>Buttons that do nothing.</b> Two "Visit Website" buttons and "View The Data" have no click handler or link.</td><td><code>DomainGrowthComparison.tsx:227,259</code>, <code>DomainOnchainStats.tsx:223</code></td><td>Dead CTAs on a marketing page; keyboard users can focus them but nothing happens.</td></tr>
+      <tr><td>3</td><td><b>Missing texture.</b> The growth cards reference <code>/builder-profile/hero-noise-texture.png</code>, which does not exist in this project.</td><td><code>DomainGrowthComparison.module.scss:141,477</code></td><td>404 on every load; the grain effect is missing.</td></tr>
+      <tr><td>4</td><td><b>Counter goes blank under reduced motion.</b> With transitions off, <code>transitionend</code> never fires, so the reel position keeps growing and a digit renders empty after about 30 seconds.</td><td><code>DomainOnchainStats.tsx:35</code> and <code>.module.scss:587</code></td><td>Visible bug for users with reduced motion turned on.</td></tr>
+      <tr><td>5</td><td><b>"Live on chain" counter is not live data.</b> It starts at a hardcoded number and adds random increments.</td><td><code>DomainOnchainStats.tsx:7,134</code></td><td>Trust and accuracy: either wire it to a real source or change the label.</td></tr>
+      <tr><td>6</td><td><b>How It Works never stops.</b> Screens change every 1.2 seconds forever, with no pause control, and also under reduced motion.</td><td><code>HowItWorksJourney.tsx:9,27</code></td><td>WCAG 2.2.2 (Pause, Stop, Hide). You chose to remove hover pause, so add a visible pause button or slow it down.</td></tr>
+      <tr><td>7</td><td><b>Network diagram controller can leak.</b> Every re-measure rebuilds the scroll controller after an async import, and an earlier one can survive without cleanup.</td><td><code>OnchainIdentityNetwork.tsx:240,273–306</code></td><td>Listeners can keep running after navigating away.</td></tr>
+      <tr><td>8</td><td><b>Partner and payment marquees ignore reduced motion</b> and never re-measure on resize, so the loop can jump after rotating a tablet.</td><td><code>IdentityOsStatsAndPartners.tsx:65–127</code></td><td>Accessibility and a visible glitch.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="part" id="scorecard">
+  <h3>Component scorecard</h3>
+  <p class="lead"><span class="badge b-ok">Production ready</span> ship as is. <span class="badge b-warn">Minor fixes</span> small, low risk changes. <span class="badge b-bad">Needs work</span> has a bug, a dead control or a real accessibility gap.</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Component</th><th>Verdict</th><th>Top issue</th></tr></thead>
+    <tbody>
+      <tr><td>IdentityOsHero (shell)</td><td><span class="badge b-warn">Minor fixes</span></td><td>An <code>&lt;h4&gt;</code> tagline sits before the page's <code>&lt;h1&gt;</code>; should be a <code>&lt;p&gt;</code>.</td></tr>
+      <tr><td>TypeWord</td><td><span class="badge b-ok">Production ready</span></td><td>Reduced motion is read once, not live.</td></tr>
+      <tr><td>BoxLoader</td><td><span class="badge b-bad">Needs work</span></td><td>Schedules timers inside a state updater; keeps ticking while hidden on mobile; no reduced motion.</td></tr>
+      <tr><td>StripeAnimation</td><td><span class="badge b-warn">Minor fixes</span></td><td>References SVG filters that do not exist; SMIL rotation ignores reduced motion.</td></tr>
+      <tr><td>SearchBar</td><td><span class="badge b-warn">Minor fixes</span></td><td>About 270 lines of unused SCSS; three hero images all preloaded with high priority.</td></tr>
+      <tr><td>Input primitive</td><td><span class="badge b-bad">Needs work</span></td><td>Focus ring is white on white; input font below 16px makes iOS zoom; rotating border ignores reduced motion.</td></tr>
+      <tr><td>SeeHowItWorksButton</td><td><span class="badge b-warn">Minor fixes</span></td><td>319 KB texture PNG for a 194px button.</td></tr>
+      <tr><td>IdentityOsProvidersStats</td><td><span class="badge b-ok">Production ready</span></td><td>Heading says 10+ providers while the data lists 11.</td></tr>
+      <tr><td>ProvidersMarquee</td><td><span class="badge b-warn">Minor fixes</span></td><td>No reduced motion rule and no pause on focus. (The invalid <code>#000</code> + <code>5c</code> border now only affects the unused icon fallback.)</td></tr>
+      <tr><td>DomainIdentityOS</td><td><span class="badge b-ok">Production ready</span></td><td>Copy check on "Zero Platforms with Ownership".</td></tr>
+      <tr><td>OwnershipComparison (+ Mobile)</td><td><span class="badge b-warn">Minor fixes</span></td><td>Hidden desktop version still runs scroll work below 1180px; cards flash stacked before JS.</td></tr>
+      <tr><td>OnchainIdentityNetwork (+ Mobile)</td><td><span class="badge b-warn">Minor fixes</span></td><td>Controller rebuild race (blocker 7); desktop and mobile copy have drifted.</td></tr>
+      <tr><td>DomainOnchainStats</td><td><span class="badge b-bad">Needs work</span></td><td>Blockers 2, 4 and 5; bubbling <code>animationend</code> orphans timeouts.</td></tr>
+      <tr><td>DomainAdoptionGap</td><td><span class="badge b-warn">Minor fixes</span></td><td>Server HTML shows "0M total" and "0%" until it animates.</td></tr>
+      <tr><td>DomainGrowthComparison</td><td><span class="badge b-bad">Needs work</span></td><td>Dead CTAs, missing texture, charts only appear on mouse hover on desktop.</td></tr>
+      <tr><td>DomainLivingIdentity</td><td><span class="badge b-warn">Minor fixes</span></td><td>About 20 infinite CSS animations keep running off screen.</td></tr>
+      <tr><td>HowItWorksJourney</td><td><span class="badge b-bad">Needs work</span></td><td>Blocker 6; crossfade can get stuck mid exit; images unoptimized (about 2.4 MB total).</td></tr>
+      <tr><td>DomainRoadmap</td><td><span class="badge b-warn">Minor fixes</span></td><td><code>&lt;span&gt;</code> elements directly inside an <code>&lt;ol&gt;</code> (invalid HTML).</td></tr>
+      <tr><td>IdentityOsStatsAndPartners</td><td><span class="badge b-bad">Needs work</span></td><td>Blocker 8; duplicated logo copies are not hidden from screen readers.</td></tr>
+      <tr><td>DomainBlogTeaser</td><td><span class="badge b-warn">Minor fixes</span></td><td>Tooltip rendered twice in <code>BlogCard.tsx</code> (lines 45 and 114).</td></tr>
+      <tr><td>FAQ</td><td><span class="badge b-warn">Minor fixes</span></td><td>Closed answers are still read by screen readers (height 0, not hidden).</td></tr>
+      <tr><td>pages/index.tsx + layout</td><td><span class="badge b-warn">Minor fixes</span></td><td>Fonts loaded twice (once async, once render blocking); blog failure replaces a good page with an empty one.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="part" id="crosscutting">
+  <h3>Cross cutting issues</h3>
+  <details open><summary>Reduced motion is inconsistent <span class="badge b-warn">Medium</span></summary><div class="body">
+    <p>Handled well in TypeWord, the TLD marquee, Roadmap, AdoptionGap, LivingIdentity and the pinned stories. Missing in BoxLoader, StripeAnimation, the search border and placeholder typing, ProvidersMarquee, the partner and payment marquees, the FAQ accordion and the smooth scroll buttons. Fix once with a global rule plus a tiny hook:</p>
+<pre><code>// styles: one global safety net
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}
+// hooks/useReducedMotion.ts: live, not read once
+export function useReducedMotion() {
+  const [reduce, setReduce] = useState(false)
+  useEffect(() =&gt; {
+    const mq = matchMedia('(prefers-reduced-motion: reduce)')
+    const update = () =&gt; setReduce(mq.matches)
+    update(); mq.addEventListener('change', update)
+    return () =&gt; mq.removeEventListener('change', update)
+  }, [])
+  return reduce
+}</code></pre>
+  </div></details>
+  <details><summary>Both desktop and mobile versions are always mounted <span class="badge b-warn">Medium</span></summary><div class="body">
+    <p>OwnershipComparison and OnchainIdentityNetwork render a desktop and a mobile component side by side and hide one with CSS at 1180px. That doubles the HTML (duplicate headings), and the hidden desktop controller still listens to scroll on phones, running about 11 and 31 style writes per scroll event. Gate the controllers with <code>matchMedia('(min-width:1180px)')</code> or <code>gsap.matchMedia()</code>, and keep the CSS swap as the server rendered fallback.</p>
+  </div></details>
+  <details><summary>Content that is invisible without JavaScript <span class="badge b-warn">Medium</span></summary><div class="body">
+    <p>Roadmap cards, AdoptionGap text, OnchainStats titles and the network diagram all start at <code>opacity: 0</code> in CSS and only appear when JS sets a data attribute. If JS fails or loads slowly, the content is missing. Put the hidden start state behind a class that JS adds (for example <code>html.js .milestone{opacity:0}</code>) so the default is visible.</p>
+  </div></details>
+  <details><summary>Infinite motion with no pause <span class="badge b-warn">Medium</span></summary><div class="body">
+    <p>Four marquees, the How It Works carousel, the hero arcs and the box loaders all move for longer than five seconds. WCAG asks for a way to pause such motion. Options: pause on hover and focus, pause when off screen with an IntersectionObserver, and stop entirely under reduced motion.</p>
+  </div></details>
+  <details><summary>Performance budget <span class="badge b-info">Info</span></summary><div class="body">
+    <ol>
+      <li>Three hero background images all load with <code>priority</code> although CSS hides two of them at any given width.</li>
+      <li>Two centre logo SVGs are about 440 KB each (an embedded PNG plus filters) and are rotated during scroll.</li>
+      <li>How It Works screenshots total about 2.4 MB and are served <code>unoptimized</code>, so <code>sizes</code> has no effect.</li>
+      <li>Satoshi and Space Grotesk are loaded asynchronously in <code>_document</code> and then again as render blocking links in MainLayout.</li>
+      <li><code>IBM Plex Mono</code> is referenced in four stylesheets but never loaded.</li>
+    </ol>
+  </div></details>
+  <details><summary>Dead code worth deleting <span class="badge b-info">Info</span></summary><div class="body">
+    <ol>
+      <li><code>banner-faq/index.legacy.tsx</code> is not imported anywhere.</li>
+      <li>About 270 unused lines in <code>SearchBar.module.scss</code> (an old copy of the input styles).</li>
+      <li>The <code>(window as any).__lenis</code> branches: Lenis is not installed and nothing sets it.</li>
+      <li>Unused <code>gradientId</code>, <code>activePhase</code>, <code>dragging</code>, the missing <code>popRight</code> keyframe and empty SVG filter references.</li>
+    </ol>
+  </div></details>
+</section>
+
+<section class="part" id="tooling">
+  <h3>Tooling and build health</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Check</th><th>Result</th><th>Note</th></tr></thead>
+    <tbody>
+      <tr><td>TypeScript</td><td><span class="badge b-ok">0 errors</span></td><td>Strict mode is on.</td></tr>
+      <tr><td>ESLint (as configured)</td><td><span class="badge b-bad">Crashes</span></td><td><code>eslint-plugin-prettier</code> 4 calls <code>prettier.resolveConfig.sync</code>, which the installed Prettier no longer has. Upgrade the plugin to v5.</td></tr>
+      <tr><td>ESLint (prettier rule off)</td><td><span class="badge b-warn">36 problems</span></td><td>Mostly import sorting (run <code>eslint --fix</code>), plus 2 unused variables, 2 stray semicolons and 4 overlong lines.</td></tr>
+      <tr><td><code>next.config.js</code></td><td><span class="badge b-warn">Risky</span></td><td><code>reactStrictMode: false</code> hides effect cleanup bugs; <code>eslint.ignoreDuringBuilds: true</code> lets lint errors ship.</td></tr>
+      <tr><td>Git state</td><td><span class="badge b-bad">Uncommitted assets</span></td><td>See blocker 1.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ===================== PART 2 ===================== -->
+<section class="part" id="tree">
+  <h2>Part 2 · How the page is linked</h2>
+  <p class="lead">This is the full render tree, top to bottom, exactly as it runs today.</p>
+<div class="tree">pages/_document.tsx        &lt;html lang="en"&gt;, font preconnects, async font links
+└─ pages/_app.tsx           global CSS (bootstrap, toastify…, @newstyles/main.scss → tokens.scss :root)
+   │                        providers: GoogleOAuth → Wagmi → ReactQuery → Redux → Init → Solana wallet
+   └─ pages/index.tsx       Home({ blogPosts })  ← getStaticProps (Ghost CMS + views API, ISR 60s)
+      └─ div.pageWrapper    no overflow:hidden (sticky sections need that)
+         ├─ MainLayout      &lt;Head&gt; SEO + JSON-LD, scripts (GTM, Clarity, Freshworks), Header, Footer
+         │  └─ div.main     flex column of sections, in this order:
+         │     ├─ SubscribeModalTemplate         only when ?subscriber=new
+         │     ├─ IdentityOsHero                 h1, TypeWord, BoxLoader ×2, StripeAnimation, SearchBar, CTA
+         │     ├─ IdentityOsProvidersStats       ProvidersMarquee + 4 stats
+         │     ├─ DomainIdentityOS               "Why ownership matters" + 3 stats
+         │     ├─ OwnershipComparison            desktop, shown ≥1180px (400vh sticky story)
+         │     ├─ OwnershipComparisonMobile      shown &lt;1180px (static stack)
+         │     ├─ OnchainIdentityNetwork         desktop, shown ≥1180px (550vh sticky story)
+         │     ├─ OnchainIdentityNetworkMobile   shown &lt;1180px
+         │     ├─ DomainOnchainStats             odometer counter + data packets
+         │     ├─ DomainAdoptionGap              bar + count up
+         │     ├─ DomainGrowthComparison         bar chart vs drawn line
+         │     ├─ DomainLivingIdentity           orbit + activity feed
+         │     ├─ HowItWorksJourney              tabs + auto advancing screens (id="how-it-works")
+         │     ├─ DomainRoadmap                  zigzag timeline
+         │     ├─ IdentityOsStatsAndPartners     payment + partner marquees (GSAP ticker)
+         │     ├─ DomainBlogTeaser posts={…}     the only section that receives props
+         │     └─ FrequentlyAskedQuestions       sticky heading + GSAP accordion
+         └─ scroll to top button (outside MainLayout, appears after the hero)</div>
+  <div class="callout">The page itself is tiny: it imports 15 components from one barrel (<code>composites/landing-page/index.ts</code>) and stacks them. Each section is self contained, owns its data and styles, and takes no props, except the blog teaser.</div>
+</section>
+
+<section class="part" id="folders">
+  <h3>Folder anatomy (one section)</h3>
+<div class="tree">composites/landing-page/HowItWorksJourney/
+├─ index.ts                        export { HowItWorksJourney } + default
+├─ HowItWorksJourney.tsx           the section: state, tabs, layout
+├─ HowItWorksJourney.module.scss   scoped styles, imports ../../../styles/_mixins.scss
+├─ JourneyScreenVisual.tsx         small presentational child
+├─ journeyData.ts                  typed content (interfaces + array)
+└─ useCrossfade.ts                 a reusable hook for this section</div>
+  <p>Every section follows this recipe: a <b>section component</b>, an optional <b>data file</b>, optional <b>small children</b>, an optional <b>Animation.ts</b> holding pure maths (for the scroll stories), and a <b>CSS module</b>. That separation, data and maths outside the component, is the single best habit in this codebase.</p>
+</section>
+
+<section class="part" id="styles">
+  <h3>Styling system</h3>
+  <h4>Tokens (runtime CSS variables)</h4>
+  <p><code>src/design-system/styles/tokens.scss</code> defines everything on <code>:root</code>: colour scales and alpha ramps, text colours, font families, font sizes (<code>--text-h1</code> … <code>--text-small-12</code>), weights, line heights, the spacing scale <code>--space-1</code> (4px) to <code>--space-15</code> (160px), radii, header height and Figma shadows. Some tokens shrink in media queries, so headings resize without touching component code.</p>
+  <h4>Breakpoint mixins (compile time)</h4>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Mixin</th><th>Range</th><th>Typical use</th></tr></thead>
+    <tbody>
+      <tr><td><code>small-mobile</code></td><td>&lt; 500px</td><td>Phones: swap background art, 90vw widths</td></tr>
+      <tr><td><code>mobile</code> / <code>mobile-up</code></td><td>&lt; 768 / ≥ 768</td><td>Phone vs bigger</td></tr>
+      <tr><td><code>tablet</code></td><td>768 to 991</td><td>Tablet only tweaks</td></tr>
+      <tr><td><code>tablet-down</code> / <code>tablet-up</code></td><td>&lt; 992 / ≥ 992</td><td>The main stack vs row switch</td></tr>
+      <tr><td><code>laptop</code></td><td>992 to 1279</td><td>Small laptops and iPad Pro portrait</td></tr>
+      <tr><td><code>desktop</code> / <code>desktop-down</code></td><td>≥ 1025 / &lt; 1025</td><td>Full desktop layouts</td></tr>
+      <tr><td><code>wide</code></td><td>≥ 1440</td><td>Large screens</td></tr>
+    </tbody>
+  </table></div>
+  <p class="muted">Two small inconsistencies: token overrides use inclusive limits (768, 992) while mixins use 767 and 991, and <code>respond-to()</code> does not know about <code>laptop</code>.</p>
+</section>
+
+<section class="part" id="data">
+  <h3>Data flow</h3>
+  <ol class="steps">
+    <li>At build time (and every 60 seconds after, via ISR) <code>getStaticProps</code> asks Ghost for up to 5 featured posts, falling back to the newest 5.</li>
+    <li>It fetches view counts in one batch and maps posts to a small <code>BlogSummary</code> shape.</li>
+    <li>The page passes <code>blogPosts</code> to <code>DomainBlogTeaser</code>; if the list is empty the section returns <code>null</code> and disappears.</li>
+    <li>Everything else is static content inside each section's data file. There is no runtime API call for the landing content itself.</li>
+  </ol>
+  <div class="callout warn">On a failed revalidation the page returns <code>blogPosts: []</code>, which replaces a good cached page with one that has no blog section. Throwing instead keeps the previous good page.</div>
+</section>
+
+<section class="part" id="techniques">
+  <h3>Animation techniques map</h3>
+  <p class="lead">Only four sections use GSAP. Everything else is CSS plus a little React state. That is a good balance.</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Technique</th><th>Used in</th><th>Course module</th></tr></thead>
+    <tbody>
+      <tr><td>CSS <code>@keyframes</code> marquee (duplicate content, <code>translateX(-50%)</code>)</td><td>TLD pills, ProvidersMarquee</td><td><a href="#m3">3</a></td></tr>
+      <tr><td><code>@property</code> + <code>conic-gradient</code> animated border</td><td>Search box, 60+ TLDs pill</td><td><a href="#m3">3</a></td></tr>
+      <tr><td>IntersectionObserver sets a data attribute, CSS transitions do the rest</td><td>Roadmap, AdoptionGap, OnchainStats, LivingIdentity, GrowthComparison</td><td><a href="#m4">4</a></td></tr>
+      <tr><td>SVG stroke drawing (<code>stroke-dasharray</code> / <code>dashoffset</code>)</td><td>GrowthComparison line, network connectors</td><td><a href="#m5">5</a></td></tr>
+      <tr><td>Tick counter state + CSS variables + key remount</td><td>LivingIdentity orbit and feed</td><td><a href="#m6">6</a></td></tr>
+      <tr><td>Crossfade hook with exit / enter phases</td><td>HowItWorksJourney</td><td><a href="#m6">6</a></td></tr>
+      <tr><td>Async typing loop</td><td>TypeWord</td><td><a href="#m7">7</a></td></tr>
+      <tr><td>SVG SMIL rotation</td><td>StripeAnimation</td><td><a href="#m7">7</a></td></tr>
+      <tr><td>Odometer reels with <code>transitionend</code> snap back</td><td>DomainOnchainStats</td><td><a href="#m8">8</a></td></tr>
+      <tr><td>Sticky stage + scroll progress + pure functions + <code>gsap.set</code></td><td>OwnershipComparison, OnchainIdentityNetwork</td><td><a href="#m9">9</a></td></tr>
+      <tr><td><code>gsap.ticker</code> marquee with delta time</td><td>StatsAndPartners</td><td><a href="#m10">10</a></td></tr>
+      <tr><td>GSAP height tween accordion</td><td>FAQ</td><td><a href="#m10">10</a></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ===================== PART 3 ===================== -->
+<section class="part" id="components">
+  <h2>Part 3 · Component deep dives</h2>
+  <p class="lead">One card per component: what it does, how it is built, how it moves, and what to fix. Open any card.</p>
+
+  <details><summary>IdentityOsHero <span class="badge b-warn">Minor fixes</span></summary><div class="body">
+    <p><b>What:</b> the first screen. Eyebrow, the headline "Own your [word] forever.", a paragraph, then SearchBar and the "see how it works" button, over rotating arcs and two loading bar ornaments.</p>
+    <p><b>Built from:</b> <code>IdentityOsHero.tsx</code> (shell, no props, <code>HERO_WORDS</code> constant), <code>TypeWord</code>, <code>BoxLoader</code> ×2, <code>StripeAnimation</code>, <code>SearchBar</code>, <code>SeeHowItWorksButton</code>.</p>
+    <p><b>Nice detail:</b> the animated headline is <code>aria-hidden</code> and a hidden sentence "Own your reputation forever." is what screen readers hear. The first rendered word matches the server, so there is no hydration mismatch.</p>
+    <p><b>Fix:</b> change the <code>&lt;h4&gt;</code> tagline to a <code>&lt;p&gt;</code>; remove unused classes (<code>.txt_solid</code>, <code>.strokePath</code>, <code>.animationTrack</code>).</p>
+  </div></details>
+
+  <details><summary>TypeWord <span class="badge b-ok">Production ready</span></summary><div class="body">
+    <p><b>How it moves:</b> an async <code>while</code> loop inside <code>useEffect</code>. A promise wrapped <code>setTimeout</code> called <code>wait()</code> pauses between letters; the loop deletes with <code>slice</code>, moves to the next word, then types it. Cleanup flips a <code>cancelled</code> flag and clears the pending timer. Reduced motion swaps whole words instead.</p>
+  </div></details>
+
+  <details><summary>BoxLoader <span class="badge b-bad">Needs work</span></summary><div class="body">
+    <p><b>How it moves:</b> a chained <code>setTimeout</code> state machine fills ten skewed boxes one by one, pauses, then resets. Each box toggles an <code>.active</code> class.</p>
+    <p><b>Fix:</b> move the <code>setTimeout</code> out of the <code>setState</code> updater (updaters must be pure); do not mount it at all below 992px instead of hiding it; respect reduced motion; use camelCase SVG attributes (<code>strokeWidth</code>, <code>stopColor</code>); remove the unused <code>gradientId</code> and the missing <code>popRight</code> animation.</p>
+  </div></details>
+
+  <details><summary>StripeAnimation <span class="badge b-warn">Minor fixes</span></summary><div class="body">
+    <p><b>How it moves:</b> pure SVG, zero JS. Each "blade" is a circle whose <code>stroke-dasharray</code> shows a single 160 unit dash; a SMIL <code>&lt;animateTransform type="rotate"&gt;</code> spins its group around the circle centre every 5 seconds.</p>
+    <p><b>Fix:</b> <code>filter="url(#glow)"</code> points at filters that are not defined; SMIL cannot be stopped by a reduced motion media query (switch to a CSS rotation keyframe if you want that).</p>
+  </div></details>
+
+  <details><summary>SearchBar and the Input primitive <span class="badge b-warn">SearchBar: minor</span> <span class="badge b-bad">Input: needs work</span></summary><div class="body">
+    <p><b>How it moves:</b> the rainbow border animates a registered custom property <code>--border-angle</code> (via <code>@property</code>) inside a <code>conic-gradient</code> painted on <code>border-box</code> under a white <code>padding-box</code> layer, plus a blurred copy as glow. The TLD pills are a CSS marquee: the list is rendered twice and the track slides <code>translateX(-50%)</code> forever, with a <code>mask-image</code> fade on the edges, a hover pause and a reduced motion stop. The input's placeholder types itself with a timer driven effect.</p>
+    <p><b>Fix:</b> delete the ~270 unused lines in <code>SearchBar.module.scss</code>; load one background image per breakpoint instead of three priority images; give the input a visible focus style and at least 16px font on phones; respect reduced motion in the border and placeholder.</p>
+  </div></details>
+
+  <details><summary>SeeHowItWorksButton <span class="badge b-warn">Minor fixes</span></summary><div class="body">
+    <p>A real <code>&lt;button&gt;</code> that calls <code>scrollIntoView({behavior:'smooth'})</code> on <code>#how-it-works</code>. Styling uses layered box shadows (the last with spread and no blur draws a solid white ring) and a blended texture span.</p>
+    <p><b>Fix:</b> compress the 319 KB <code>button-texture.png</code>; add a <code>:focus-visible</code> style; use <code>behavior:'auto'</code> under reduced motion.</p>
+  </div></details>
+
+  <details><summary>IdentityOsProvidersStats + ProvidersMarquee <span class="badge b-ok">Section ready</span> <span class="badge b-warn">Marquee: minor</span></summary><div class="body">
+    <p><b>How it is built:</b> a chamfered frame drawn from seven 1px absolutely positioned spans (a diagonal is a bar of width <code>chamfer × √2</code> rotated 45°), driven by CSS variables that shrink on tablets. Stats switch from a row to a 2×2 grid. The marquee repeats the provider list four times and slides by <code>-25%</code> per loop over 18.3 seconds (about 85px per second).</p>
+    <p><b>Logos:</b> all 10 providers show full logo + name artwork from <code>public/new-assets/provider-logos/</code>. Each SVG had its built in padding trimmed by tightening its <code>viewBox</code>. In <code>providersData.ts</code> every provider carries a <code>logo</code> path, a <code>logoAspect</code> (width ÷ height, so next/image gets correct dimensions) and a <code>logoScale</code> optical correction, because a compact two line mark like Binance looks smaller than a bold one line wordmark like Aptos at the same height. CSS sets the height as <code>calc(var(--logo-h) * var(--logo-scale))</code> with <code>--logo-h</code> 30px on desktop and 24px on tablets and phones. A provider without a <code>logo</code> falls back to the old icon + name text.</p>
+    <p><b>Fix:</b> add a reduced motion rule and pause on focus; if the icon fallback is ever used again, normalise <code>#000</code> to <code>#000000</code> so the <code>5c</code> alpha suffix makes a valid colour.</p>
+  </div></details>
+
+  <details><summary>DomainIdentityOS <span class="badge b-ok">Production ready</span></summary><div class="body">
+    <p>Static section: bracketed eyebrow <code>&lt;p&gt;</code>, two tone <code>&lt;h2&gt;</code> with <code>background-clip: text</code>, a connector image and three stat columns with dot capped dividers made from <code>::before</code> / <code>::after</code>. On tablets it becomes a 2 column grid and the last stat spans both columns with <code>grid-column: 1 / -1</code> (selected with <code>:last-of-type</code> because a trailing span breaks <code>:last-child</code>).</p>
+  </div></details>
+
+  <details><summary>OwnershipComparison (+ Mobile) <span class="badge b-warn">Minor fixes</span></summary><div class="body">
+    <p><b>How it moves:</b> a 400vh section with a 100vh <code>position: sticky</code> stage. A hand written controller computes progress <code>(scrollY − sectionTop) / (sectionHeight − innerHeight)</code> on every scroll. Pure functions in <code>OwnershipComparisonAnimation.ts</code> turn progress into each card's opacity, scale and offset, written with <code>gsap.set</code>; <code>gsap.quickTo</code> pulses the core logo; the last 15% spins the logo down into the next section. A custom scrollbar is a keyboard accessible slider that scrolls the page. No ScrollTrigger is used.</p>
+    <p><b>Mobile:</b> a separate static stacked list that imports the same <code>STATES</code> data, so copy cannot drift.</p>
+    <p><b>Fix:</b> only start the controller at ≥1180px; re-measure after images and fonts load; give cards a centred, hidden default in CSS so they do not flash stacked before JS; delete the dead Lenis branches.</p>
+  </div></details>
+
+  <details><summary>OnchainIdentityNetwork (+ Mobile) <span class="badge b-warn">Minor fixes</span></summary><div class="body">
+    <p><b>How it moves:</b> a 550vh sticky stage. On mount it measures the real centres of the core and six nodes with <code>getBoundingClientRect</code>, builds SVG path strings (straight lines and cubic curves), and re-measures on resize, load and <code>document.fonts.ready</code>. Each node has a progress window: the connector draws (<code>strokeDashoffset</code> from length to 0), then the node pops in, then its text settles. Each path has its own <code>userSpaceOnUse</code> gradient so the fade runs from core to node on both sides.</p>
+    <p><b>Fix:</b> blocker 7 (compare path strings before <code>setPaths</code>, keep a cancelled flag around the async import, refresh lengths instead of rebuilding); align desktop and mobile copy; remove unused <code>activePhase</code>, <code>dragging</code> and status readout CSS.</p>
+  </div></details>
+
+  <details><summary>DomainOnchainStats <span class="badge b-bad">Needs work</span></summary><div class="body">
+    <p><b>How it moves:</b> no GSAP. An IntersectionObserver turns ticking on only while visible. A recursive <code>setTimeout</code> with random delays bumps the count. Each digit is an odometer reel: a 1em window over a strip of <code>0–9</code> written twice; the strip moves with <code>translateY</code> and a CSS transition, always rolling forward, then snaps back by 10 on <code>transitionend</code> with the transition switched off for one frame. Background "data packets" run CSS keyframes and reschedule on <code>animationend</code>.</p>
+    <p><b>Fix:</b> blockers 2, 4 and 5; in <code>DataSlot</code> ignore bubbled events with <code>if (e.target !== e.currentTarget) return</code>.</p>
+  </div></details>
+
+  <details><summary>DomainAdoptionGap <span class="badge b-warn">Minor fixes</span></summary><div class="body">
+    <p><b>How it moves:</b> an IntersectionObserver latches a <code>triggered</code> flag once; one effect then runs a small timeline of <code>setTimeout</code>s that flip data attributes: the text staggers in, the bar fill scales on X from the left, the numbers count up in steps, and a boundary pulse fires. Reduced motion jumps to the final state.</p>
+    <p><b>Fix:</b> render the final numbers on the server (today the HTML says "0M total" and "0%"); correct the stale comments about bar width and timing.</p>
+  </div></details>
+
+  <details><summary>DomainGrowthComparison <span class="badge b-bad">Needs work</span></summary><div class="body">
+    <p><b>How it moves:</b> bars grow with <code>scaleY</code> from the bottom with a staggered inline delay (and a reversed stagger on exit). The Web3 line is a cubic Bézier path whose length is measured with <code>getTotalLength()</code> and drawn by moving <code>stroke-dashoffset</code> to 0. On desktop with a mouse it activates on hover; on touch it activates once in view.</p>
+    <p><b>Fix:</b> blockers 2 and 3; also activate on keyboard focus or on scroll on desktop, otherwise many visitors see empty charts.</p>
+  </div></details>
+
+  <details><summary>DomainLivingIdentity <span class="badge b-warn">Minor fixes</span></summary><div class="body">
+    <p><b>How it moves:</b> one <code>tick</code> counter, advanced every 2 seconds only while visible, drives everything. The ring rotates by <code>tick × 45°</code> through a CSS variable with a transition; each node counter rotates so its label stays upright. Nodes also sway and breathe with their own keyframe durations so they stay out of phase. Flashes replay by changing a <code>key</code>, which remounts the element and restarts its keyframe. The activity feed places rows in slots from modular arithmetic.</p>
+    <p><b>Fix:</b> the row that wraps from top to bottom visibly slides down while fading (move it instantly instead); pause the ambient keyframes off screen.</p>
+  </div></details>
+
+  <details><summary>HowItWorksJourney <span class="badge b-bad">Needs work</span></summary><div class="body">
+    <p><b>How it moves:</b> five journeys as tabs (correct <code>role="tablist"</code>, roving <code>tabIndex</code>, arrow keys). A <code>setInterval</code> advances screens. <code>useCrossfade</code> keeps a displayed copy of the value and walks phases: <code>exit</code> (old content animates out), then after a short delay swap and <code>enter-start</code> (transition off, jump to the start offset), then a double <code>requestAnimationFrame</code> to <code>idle</code> (transition on, animate in). The DOM node is never remounted.</p>
+    <p><b>Fix:</b> blocker 6; in <code>useCrossfade</code>, reset to <code>idle</code> when the value returns to what is displayed; drop <code>aria-controls</code> on inactive tabs (their panels do not exist); optimise the screenshots.</p>
+  </div></details>
+
+  <details><summary>DomainRoadmap <span class="badge b-warn">Minor fixes</span></summary><div class="body">
+    <p><b>How it moves:</b> an IntersectionObserver sets <code>data-active</code> once; CSS fades each card in from above or below (zigzag) with <code>:nth-of-type</code> delays. Hovering a card sends a glowing dot up the nearest divider. Column width is <code>min(241px, (100% − gaps) / 5)</code> and the divider positions are computed from the same variable.</p>
+    <p><b>Fix:</b> move the divider <code>&lt;span&gt;</code>s out of the <code>&lt;ol&gt;</code>; give the horizontally scrolling mobile list a scroll affordance.</p>
+  </div></details>
+
+  <details><summary>IdentityOsStatsAndPartners <span class="badge b-bad">Needs work</span></summary><div class="body">
+    <p><b>How it moves:</b> each logo row is the set repeated (×3 partners, ×6 payments). A <code>gsap.ticker</code> callback moves <code>x</code> by <code>speed × deltaTime</code> (frame rate independent) and adds one set width back when it passes <code>−oneSet</code>, so the loop is seamless. Headers fade up with a one time ScrollTrigger inside <code>gsap.context</code>, reverted on unmount.</p>
+    <p><b>Fix:</b> blocker 8; mark repeated copies <code>aria-hidden</code>; pause when off screen; use an <code>&lt;a href="mailto:"&gt;</code> for "Partner With Us".</p>
+  </div></details>
+
+  <details><summary>DomainBlogTeaser <span class="badge b-warn">Minor fixes</span></summary><div class="body">
+    <p><b>How it works:</b> a horizontal <code>overflow-x: auto</code> row with scroll snap. A callback ref attaches a ResizeObserver; arrows and a progress bar are computed from <code>scrollLeft</code>, <code>scrollWidth</code> and <code>clientWidth</code>. Prev / next scroll by one card width. Cards show a cursor following tooltip using CSS variables.</p>
+    <p><b>Fix:</b> remove the duplicate tooltip span in <code>BlogCard.tsx</code>; guard posts without a feature image (empty <code>src</code>); format dates with a fixed time zone to avoid hydration mismatches.</p>
+  </div></details>
+
+  <details><summary>FrequentlyAskedQuestions <span class="badge b-warn">Minor fixes</span></summary><div class="body">
+    <p><b>How it moves:</b> each item tweens <code>height</code> to <code>'auto'</code> or 0 with GSAP plus an opacity fade; the caret rotates with CSS. The left column is <code>position: sticky</code> on desktop (the section uses <code>overflow: clip</code> so sticky keeps working).</p>
+    <p><b>Fix:</b> hide closed answers from assistive tech (<code>hidden</code> or <code>visibility: hidden</code> after closing); kill running tweens before starting new ones; respect reduced motion; add <code>aria-expanded</code> on View More; consider FAQPage structured data.</p>
+  </div></details>
+</section>
+
+<!-- ===================== PART 4 ===================== -->
+<section class="part" id="course">
+  <h2>Part 4 · Build it yourself: the course</h2>
+  <p class="lead">Thirteen modules that take a beginner from an empty Next.js app to this exact landing page. Each module teaches one idea, points at the real file to study, gives the core trick in a few lines, and ends with an exercise. Do them in order: every module reuses what came before.</p>
+  <div class="callout">
+    <b>How to study each module</b>
+    <ol style="margin:6px 0 0">
+      <li>Read the goal and the concepts.</li>
+      <li>Build the snippet in a scratch page first, not in the real section.</li>
+      <li>Open the real file and find the same idea there.</li>
+      <li>Do the exercise, which usually means fixing one of the audit findings above.</li>
+    </ol>
+  </div>
+</section>
+
+<div class="module" id="m0">
+  <div class="num">Module 0</div>
+  <h3>Setup and the mental model</h3>
+  <div class="tags"><span class="tag">Next.js pages router</span><span class="tag">TypeScript</span><span class="tag">CSS modules</span><span class="tag">SCSS</span></div>
+  <p><b>Goal:</b> understand how a page becomes HTML before you write any animation.</p>
+  <ol class="steps">
+    <li>Create an app with <code>npx create-next-app@14 --ts</code> and pick the <b>pages</b> router (this project uses <code>pages/</code>, not <code>app/</code>).</li>
+    <li>Install <code>sass</code> and <code>gsap</code>. Learn that every file in <code>pages/</code> becomes a route, and <code>pages/_app.tsx</code> wraps every page.</li>
+    <li>Learn the most important fact for animation work: <b>React renders on the server first</b>. Anything that reads <code>window</code>, <code>document</code>, sizes or the time must run inside <code>useEffect</code>.</li>
+    <li>Create the folder pattern from Part 2: <code>composites/landing-page/MySection/{index.ts, MySection.tsx, MySection.module.scss}</code>.</li>
+  </ol>
+<pre><code>// MySection.tsx
+import styles from './MySection.module.scss'
+export function MySection() {
+  return (
+    &lt;section className={styles.section} aria-labelledby="my-heading"&gt;
+      &lt;h2 id="my-heading"&gt;Hello&lt;/h2&gt;
+    &lt;/section&gt;
+  )
+}
+export default MySection</code></pre>
+  <div class="exercise"><b>Exercise:</b> build an empty page that renders three placeholder sections from a barrel <code>index.ts</code>, exactly like <code>pages/index.tsx</code> does.</div>
+</div>
+
+<div class="module" id="m1">
+  <div class="num">Module 1</div>
+  <h3>Design tokens and breakpoints</h3>
+  <div class="tags"><span class="tag">CSS custom properties</span><span class="tag">SCSS mixins</span><span class="tag">mobile first</span></div>
+  <p><b>Goal:</b> never hardcode a colour or size twice. Study <code>styles/tokens.scss</code> and <code>styles/_mixins.scss</code>.</p>
+<pre><code>// tokens.scss  (loaded once, globally)
+:root { --color-blue-primary: #2639ed; --space-4: 16px; --text-h1: 65px; }
+@media (max-width: 1200px) { :root { --text-h1: 55px; } }   /* token shrinks itself */
+
+// _mixins.scss  (imported into every module)
+@mixin tablet-down { @media (max-width: 991px) { @content; } }
+@mixin laptop { @media (min-width: 992px) and (max-width: 1279px) { @content; } }
+
+// usage
+.title { font-size: var(--text-h1); @include tablet-down { font-size: 30px; } }</code></pre>
+  <p><b>Why two systems?</b> Tokens are runtime variables, so they can change in a media query and every component follows. Mixins are compile time shortcuts so breakpoint numbers live in one place.</p>
+  <div class="exercise"><b>Exercise:</b> add <code>laptop</code> to the <code>respond-to()</code> mixin, and make the token media queries use the same 767 / 991 limits as the mixins.</div>
+</div>
+
+<div class="module" id="m2">
+  <div class="num">Module 2</div>
+  <h3>Static sections first: layout, gradient text and decorations</h3>
+  <div class="tags"><span class="tag">flex and grid</span><span class="tag">background-clip: text</span><span class="tag">pseudo elements</span><span class="tag">SCSS @extend</span></div>
+  <p><b>Goal:</b> build <code>DomainIdentityOS</code> and the stats part of <code>IdentityOsProvidersStats</code> with no JS at all. A good section looks finished before it moves.</p>
+  <ol class="steps">
+    <li>Semantic markup: <code>&lt;section aria-labelledby&gt;</code>, a <code>&lt;p&gt;</code> eyebrow, an <code>&lt;h2&gt;</code>, a list of stats.</li>
+    <li>Two tone heading: the accent line uses a gradient clipped to the text.</li>
+    <li>Corner brackets and dividers: empty spans with two borders, or <code>::before</code> / <code>::after</code> dots.</li>
+    <li>Responsive: row on desktop, 2 column grid on tablet with the last item spanning both columns.</li>
+  </ol>
+<pre><code>.accent { background: linear-gradient(147deg, #2639ed 70%, #8a95f5 96%);
+  -webkit-background-clip: text; background-clip: text; color: transparent; }
+%bracket { position: absolute; width: 9px; height: 9px; border: 0 solid currentColor; }
+.tl { @extend %bracket; top: 0; left: 0; border-width: 2px 0 0 2px; }
+.row { display: flex; @include tablet-down { display: grid; grid-template-columns: 1fr 1fr; } }
+.col:last-of-type { @include tablet-down { grid-column: 1 / -1; } }</code></pre>
+  <div class="exercise"><b>Exercise:</b> rebuild the chamfered frame from <code>IdentityOsProvidersStats</code>. Hint: a 45° diagonal across a chamfer of size <code>c</code> is a bar of width <code>c × 1.41421</code>.</div>
+</div>
+
+<div class="module" id="m3">
+  <div class="num">Module 3</div>
+  <h3>Pure CSS motion: marquees and the animated border</h3>
+  <div class="tags"><span class="tag">@keyframes</span><span class="tag">translateX(-50%)</span><span class="tag">mask-image</span><span class="tag">@property</span><span class="tag">conic-gradient</span></div>
+  <p><b>Goal:</b> the TLD pills, ProvidersMarquee and the rainbow search border. Study <code>SearchBar.tsx</code>, <code>SearchBar.module.scss</code> and <code>ProvidersMarquee.module.scss</code>.</p>
+  <h4>The seamless marquee</h4>
+  <ol class="steps">
+    <li>Render the list twice in one flex row with <code>width: max-content</code>.</li>
+    <li>Animate the row from <code>translateX(0)</code> to <code>translateX(-50%)</code>. At −50% the second copy sits exactly where the first started, so the reset is invisible.</li>
+    <li>Use <code>margin-right</code> on items, not <code>gap</code>, so both halves are identical widths.</li>
+    <li>Fade the edges with <code>mask-image</code>, pause on hover, stop under reduced motion, and mark the copy <code>aria-hidden</code>.</li>
+  </ol>
+<pre><code>.viewport { overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+.track { display: flex; width: max-content; animation: slide 40s linear infinite; }
+.track &gt; * { margin-right: 8px; }
+.viewport:hover .track { animation-play-state: paused; }
+@keyframes slide { to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) { .track { animation: none; } }</code></pre>
+  <h4>The rotating rainbow border</h4>
+<pre><code>@property --angle { syntax: '&lt;angle&gt;'; inherits: true; initial-value: 0deg; }
+.box { border: 3px solid transparent; border-radius: 16px;
+  background: linear-gradient(#fff, #fff) padding-box,
+              conic-gradient(from var(--angle), #2639ed, #9457f6, #2639ed) border-box;
+  animation: spin 3s linear infinite; }
+@keyframes spin { to { --angle: 360deg; } }</code></pre>
+  <p class="muted">Without <code>@property</code> the browser cannot interpolate a custom property, so the angle would jump instead of rotate.</p>
+  <h4>Logos of different shapes in one row</h4>
+  <p>Real brand logos come in every shape: Freename is about 9 times wider than tall, ENS about 2. Giving them all one <b>height</b> (never one width) keeps the row tidy, but bold one line wordmarks then look heavier than small two line marks. Fix it with an optical scale per logo, and trim any padding baked into the SVG first, otherwise a logo with lots of "clearspace" looks tiny.</p>
+<pre><code>// data: one entry per logo
+{ label: 'Binance', logo: '/provider-logos/binance.svg', logoAspect: 3.576, logoScale: 1.3 },
+{ label: 'Aptos',   logo: '/provider-logos/aptos.svg',   logoAspect: 3.487, logoScale: 0.85 },
+
+// component
+&lt;Image src={p.logo} alt={p.label} height={30} width={Math.round(30 * p.logoAspect)}
+  className={styles.wordmark} style={{ '--logo-scale': p.logoScale } as React.CSSProperties} /&gt;
+
+/* styles */
+.wordmark { --logo-h: 30px; height: calc(var(--logo-h) * var(--logo-scale, 1)); width: auto; }
+@media (max-width: 991px) { .wordmark { --logo-h: 24px; } }
+
+&lt;!-- trimming padding: shrink the viewBox to the drawn area --&gt;
+&lt;svg viewBox="0 0 1318 517"&gt;  →  &lt;svg viewBox="115.8 115.8 1086.5 285.1"&gt;</code></pre>
+  <p class="muted">When a loop's content gets wider, keep the speed constant by recomputing the duration: <code>duration = one set width ÷ pixels per second</code> (about 1554px ÷ 85px/s ≈ 18.3s here).</p>
+  <div class="exercise"><b>Exercise:</b> the providers marquee repeats 4 sets and slides <code>-25%</code>. Work out why, then add its missing reduced motion rule.</div>
+</div>
+
+<div class="module" id="m4">
+  <div class="num">Module 4</div>
+  <h3>Reveal on scroll with IntersectionObserver</h3>
+  <div class="tags"><span class="tag">IntersectionObserver</span><span class="tag">data attributes</span><span class="tag">transition-delay</span><span class="tag">effect cleanup</span></div>
+  <p><b>Goal:</b> the most reused pattern on the page. Study <code>DomainRoadmap.tsx</code>, then <code>DomainAdoptionGap.tsx</code> for a timed sequence.</p>
+  <ol class="steps">
+    <li>CSS defines a hidden start state and a visible state under <code>[data-active]</code>.</li>
+    <li>JS only flips one attribute when the element enters the viewport, then disconnects.</li>
+    <li>Stagger children with <code>transition-delay</code> (via <code>:nth-of-type</code> or an inline style).</li>
+  </ol>
+<pre><code>const ref = useRef&lt;HTMLOListElement&gt;(null)
+const [on, setOn] = useState(false)
+useEffect(() =&gt; {
+  const io = new IntersectionObserver(([e]) =&gt; {
+    if (e.isIntersecting) { setOn(true); io.disconnect() }
+  }, { threshold: 0.2 })
+  if (ref.current) io.observe(ref.current)
+  return () =&gt; io.disconnect()
+}, [])
+return &lt;ol ref={ref} data-active={on || undefined}&gt;…&lt;/ol&gt;
+
+/* CSS */
+li { opacity: 0; transform: translateY(-56px); transition: opacity .6s, transform .7s; }
+[data-active] li { opacity: 1; transform: none; }
+li:nth-of-type(2) { transition-delay: .15s; }</code></pre>
+  <div class="callout warn">Production lesson from the audit: if the hidden state is the default, the content is invisible when JS fails. Prefer <code>html.js li { opacity: 0 }</code>, adding the <code>js</code> class from a tiny inline script.</div>
+  <div class="exercise"><b>Exercise:</b> rebuild the AdoptionGap bar: a fill that grows with <code>transform: scaleX()</code> and <code>transform-origin: left</code>, and a number that counts up in steps. Then make the server render the final numbers instead of zeros.</div>
+</div>
+
+<div class="module" id="m5">
+  <div class="num">Module 5</div>
+  <h3>SVG drawing: lines that draw themselves</h3>
+  <div class="tags"><span class="tag">SVG paths M L C</span><span class="tag">getTotalLength</span><span class="tag">stroke-dasharray</span><span class="tag">stroke-dashoffset</span><span class="tag">scaleY</span></div>
+  <p><b>Goal:</b> the growth chart in <code>DomainGrowthComparison.tsx</code>. You will reuse the exact same trick in Module 9.</p>
+  <ol class="steps">
+    <li>Draw the curve as an SVG <code>&lt;path d="M … C …"&gt;</code> in a <code>viewBox</code>.</li>
+    <li>Measure its length in an effect with <code>getTotalLength()</code>.</li>
+    <li>Set the dash to the full length and offset it by the full length (invisible), then transition the offset to 0.</li>
+    <li>For bars, scale from the bottom: <code>transform-origin: bottom; transform: scaleY(0)</code> → <code>scaleY(1)</code>.</li>
+  </ol>
+<pre><code>const ref = useRef&lt;SVGPathElement&gt;(null)
+const [len, setLen] = useState(0)
+useLayoutEffect(() =&gt; { if (ref.current) setLen(ref.current.getTotalLength()) }, [])
+&lt;path ref={ref} d={D} fill="none" stroke="#fff"
+  style={{ strokeDasharray: len, strokeDashoffset: active ? 0 : len,
+           transition: 'stroke-dashoffset 1.1s ease' }} /&gt;</code></pre>
+  <div class="exercise"><b>Exercise:</b> make the charts also activate on keyboard focus and on scroll for desktop users who never hover, and wire the two "Visit Website" buttons to real links.</div>
+</div>
+
+<div class="module" id="m6">
+  <div class="num">Module 6</div>
+  <h3>State driven animation: one tick to rule them all</h3>
+  <div class="tags"><span class="tag">setInterval</span><span class="tag">CSS variables from React</span><span class="tag">key remount</span><span class="tag">requestAnimationFrame</span><span class="tag">ARIA tabs</span></div>
+  <p><b>Goal:</b> <code>DomainLivingIdentity</code> (orbit and feed) and <code>HowItWorksJourney</code> (tabs and crossfade).</p>
+  <h4>Part A: the orbit</h4>
+  <p>Keep one number, <code>tick</code>, and derive everything from it. Pass it to CSS as a variable and let CSS transitions do the motion.</p>
+<pre><code>const [tick, setTick] = useState(0)
+useEffect(() =&gt; { if (!visible) return
+  const id = setInterval(() =&gt; setTick(t =&gt; t + 1), 2000)
+  return () =&gt; clearInterval(id) }, [visible])
+
+&lt;div className="ring" style={{ '--ring': `${tick * 45}deg` } as React.CSSProperties}&gt;
+  {nodes.map(n =&gt; &lt;span key={n.id} className="node" style={{ '--base': `${n.angle}deg` } as React.CSSProperties}/&gt;)}
+&lt;/div&gt;
+/* .ring { transform: rotate(var(--ring)); transition: transform .7s }
+   .node { transform: rotate(calc(-1 * (var(--ring) + var(--base)))) }  keeps labels upright */</code></pre>
+  <p>To replay a one shot CSS animation, change its <code>key</code>: React remounts the element and the keyframe starts again.</p>
+  <h4>Part B: the crossfade hook</h4>
+<pre><code>function useCrossfade&lt;T&gt;(value: T, exitMs = 220) {
+  const [display, setDisplay] = useState(value)
+  const [phase, setPhase] = useState&lt;'idle' | 'exit' | 'enter-start'&gt;('idle')
+  useEffect(() =&gt; {
+    if (value === display) { setPhase('idle'); return }
+    setPhase('exit'); let r1 = 0, r2 = 0
+    const t = setTimeout(() =&gt; {
+      setDisplay(value); setPhase('enter-start')            // transition off, jump to start
+      r1 = requestAnimationFrame(() =&gt; { r2 = requestAnimationFrame(() =&gt; setPhase('idle')) })
+    }, exitMs)
+    return () =&gt; { clearTimeout(t); cancelAnimationFrame(r1); cancelAnimationFrame(r2) }
+  }, [value])
+  return { display, phase }
+}</code></pre>
+  <p class="muted">The double <code>requestAnimationFrame</code> guarantees the browser paints the start position before the transition is switched back on. The <code>setPhase('idle')</code> line in the early return is the fix for the stuck state found in the audit.</p>
+  <div class="exercise"><b>Exercise:</b> add a visible pause / play button to How It Works, stop the interval while the section is off screen and under reduced motion, and support Home / End keys on the tabs.</div>
+</div>
+
+<div class="module" id="m7">
+  <div class="num">Module 7</div>
+  <h3>The hero: typing headline, orbiting arcs and the search box</h3>
+  <div class="tags"><span class="tag">async loops</span><span class="tag">cancellation</span><span class="tag">sr-only text</span><span class="tag">SVG SMIL</span><span class="tag">next/image priority</span></div>
+  <p><b>Goal:</b> rebuild <code>IdentityOsHero</code> and its children. Study <code>TypeWord.tsx</code>, <code>StripeAnimation.tsx</code> and <code>SearchBar.tsx</code>.</p>
+  <h4>Typing headline</h4>
+<pre><code>useEffect(() =&gt; {
+  let cancelled = false
+  const wait = (ms: number) =&gt; new Promise&lt;void&gt;(r =&gt; { timer.current = setTimeout(r, ms) })
+  ;(async () =&gt; {
+    while (!cancelled) {
+      await wait(1400)
+      const word = words[index.current]
+      for (let i = word.length; i &gt;= 0 &amp;&amp; !cancelled; i--) { setText(word.slice(0, i)); await wait(45) }
+      index.current = (index.current + 1) % words.length
+      const next = words[index.current]
+      for (let i = 0; i &lt;= next.length &amp;&amp; !cancelled; i++) { setText(next.slice(0, i)); await wait(90) }
+    }
+  })()
+  return () =&gt; { cancelled = true; clearTimeout(timer.current) }
+}, [words])</code></pre>
+  <p>Accessibility: put <code>aria-hidden</code> on the animated headline and a visually hidden full sentence next to it, so screen readers get one stable line.</p>
+  <h4>Orbiting arcs with zero JS</h4>
+<pre><code>&lt;svg viewBox="0 200 1512 600" aria-hidden="true"&gt;
+  &lt;g&gt;
+    &lt;animateTransform attributeName="transform" type="rotate"
+      from={`0 ${cx} ${cy}`} to={`360 ${cx} ${cy}`} dur="5s" repeatCount="indefinite" /&gt;
+    &lt;circle cx={cx} cy={cy} r={R} fill="none" stroke="#9457f6" strokeWidth={6}
+      strokeLinecap="round" strokeDasharray={`160 ${2 * Math.PI * R - 160}`} /&gt;
+  &lt;/g&gt;
+&lt;/svg&gt;</code></pre>
+  <p class="muted">A dash of 160 followed by a gap of "the rest of the circumference" shows exactly one blade.</p>
+  <div class="exercise"><b>Exercise:</b> fix BoxLoader so the timer is scheduled outside the state updater and the component is not mounted below 992px; turn the hero tagline <code>&lt;h4&gt;</code> into a <code>&lt;p&gt;</code>.</div>
+</div>
+
+<div class="module" id="m8">
+  <div class="num">Module 8</div>
+  <h3>The odometer counter</h3>
+  <div class="tags"><span class="tag">refs for imperative DOM</span><span class="tag">transitionend</span><span class="tag">tabular numbers</span><span class="tag">recursive setTimeout</span></div>
+  <p><b>Goal:</b> rebuild <code>DomainOnchainStats</code>. Each digit is a reel: a 1em tall window over a strip <code>0123456789</code> written twice.</p>
+<pre><code>function Digit({ digit }: { digit: number }) {
+  const strip = useRef&lt;HTMLSpanElement&gt;(null)
+  const pos = useRef(digit)
+  useEffect(() =&gt; {
+    const el = strip.current!; const prev = pos.current % 10
+    if (digit === prev) return
+    pos.current += (digit - prev + 10) % 10                 // always roll forward
+    el.style.transform = `translateY(-${pos.current * 5}%)` // 20 cells → 5% each
+    if (pos.current &lt; 10) return
+    const snap = () =&gt; { el.style.transition = 'none'; pos.current -= 10
+      el.style.transform = `translateY(-${pos.current * 5}%)`
+      requestAnimationFrame(() =&gt; { el.style.transition = '' }) }
+    // the audit bug: with transitions disabled, transitionend never fires
+    if (getComputedStyle(el).transitionDuration === '0s') snap()
+    else el.addEventListener('transitionend', snap, { once: true })
+  }, [digit])
+  return &lt;span className="reel"&gt;&lt;span ref={strip}&gt;{'01234567890123456789'.split('').map((c, i) =&gt; &lt;span key={i}&gt;{c}&lt;/span&gt;)}&lt;/span&gt;&lt;/span&gt;
+}</code></pre>
+  <p>Use <code>font-variant-numeric: tabular-nums</code> so digits do not jiggle, give screen readers one hidden full number, and mark the reels <code>aria-hidden</code>.</p>
+  <div class="exercise"><b>Exercise:</b> apply the snap fix above to the real component, guard <code>onAnimationEnd</code> against bubbled events, and decide with the team whether the label should say "live".</div>
+</div>
+
+<div class="module" id="m9">
+  <div class="num">Module 9</div>
+  <h3>Scroll pinned stories (the hardest module)</h3>
+  <div class="tags"><span class="tag">position: sticky</span><span class="tag">scroll progress</span><span class="tag">lerp and clamp</span><span class="tag">pure functions</span><span class="tag">gsap.set / quickTo</span><span class="tag">ScrollTrigger</span></div>
+  <p><b>Goal:</b> rebuild <code>OwnershipComparison</code> and <code>OnchainIdentityNetwork</code>. Study the <code>*Animation.ts</code> files first: they are pure maths and easy to read.</p>
+  <ol class="steps">
+    <li><b>Static first:</b> build the layout with every card visible.</li>
+    <li><b>The stage:</b> outer section <code>height: 400vh</code>, inner <code>position: sticky; top: 0; height: 100vh</code>. No ancestor may have <code>overflow: hidden</code>, or sticky stops working (see the comment in <code>pages/index.module.scss</code>).</li>
+    <li><b>Progress:</b> turn scroll into a number from 0 to 1.</li>
+    <li><b>Pure function:</b> <code>(progress, index) → style</code>. Easy to test, fully reversible when scrolling up.</li>
+    <li><b>Apply:</b> in a passive scroll listener, write styles with <code>gsap.set</code>.</li>
+    <li><b>Fallback:</b> a separate static mobile component that reuses the same data array.</li>
+  </ol>
+<pre><code>const clamp = (v: number) =&gt; Math.min(1, Math.max(0, v))
+const lerp = (a: number, b: number, t: number) =&gt; a + (b - a) * t
+function progress(section: HTMLElement) {
+  const top = section.getBoundingClientRect().top + scrollY
+  return clamp((scrollY - top) / (section.offsetHeight - innerHeight))
+}
+function cardStyle(p: number, i: number, count = 4) {
+  const d = p * (count - 1) - i              // &lt;0 waiting, 0 active, &gt;0 leaving
+  if (Math.abs(d) &gt;= 1) return { opacity: 0, scale: 0.8 }
+  const t = 1 - Math.abs(d)
+  return { opacity: t, scale: lerp(0.75, 1, t) }
+}
+addEventListener('scroll', () =&gt; {
+  const p = progress(section)
+  cards.forEach((el, i) =&gt; gsap.set(el, cardStyle(p, i)))
+}, { passive: true })</code></pre>
+  <h4>The same thing with ScrollTrigger</h4>
+  <p>The project hand writes the controller. ScrollTrigger does the measuring, pinning, refresh after fonts and cleanup for you:</p>
+<pre><code>useLayoutEffect(() =&gt; {
+  const mm = gsap.matchMedia()
+  mm.add('(min-width: 1180px)', () =&gt; {            // only on desktop: fixes the hidden variant issue
+    gsap.timeline({ scrollTrigger: { trigger: section, start: 'top top', end: 'bottom bottom', scrub: true } })
+      .to(path, { strokeDashoffset: 0, ease: 'none' })
+      .from(node, { opacity: 0, scale: 0.6 }, '&lt;0.35')
+  })
+  return () =&gt; mm.revert()                          // kills triggers and tweens
+}, [])</code></pre>
+  <div class="exercise"><b>Exercise:</b> gate the existing controllers to ≥1180px, re-measure OwnershipComparison on <code>load</code> and <code>document.fonts.ready</code>, and fix the network controller rebuild race (compare path strings before <code>setPaths</code>, add a cancelled flag around <code>import('gsap')</code>).</div>
+</div>
+
+<div class="module" id="m10">
+  <div class="num">Module 10</div>
+  <h3>GSAP: the ticker marquee and the accordion</h3>
+  <div class="tags"><span class="tag">gsap.ticker</span><span class="tag">delta time</span><span class="tag">gsap.context</span><span class="tag">height: auto tweens</span></div>
+  <p><b>Goal:</b> <code>IdentityOsStatsAndPartners</code> and the FAQ.</p>
+  <h4>Ticker marquee (frame rate independent)</h4>
+<pre><code>useEffect(() =&gt; {
+  const el = row.current!; if (matchMedia('(prefers-reduced-motion: reduce)').matches) return
+  let oneSet = 0, x = 0, last = gsap.ticker.time
+  const measure = () =&gt; { const k = el.children; oneSet = k[k.length / REPS].getBoundingClientRect().left - k[0].getBoundingClientRect().left }
+  const tick = () =&gt; { const now = gsap.ticker.time; x -= SPEED * (now - last); last = now
+    if (x &lt;= -oneSet) x += oneSet; gsap.set(el, { x }) }
+  measure(); addEventListener('resize', measure); gsap.ticker.add(tick)
+  return () =&gt; { removeEventListener('resize', measure); gsap.ticker.remove(tick) }
+}, [])</code></pre>
+  <h4>Accordion with height: auto</h4>
+<pre><code>useEffect(() =&gt; {
+  const el = panel.current!; gsap.killTweensOf(el)
+  if (reduce) { gsap.set(el, { height: isOpen ? 'auto' : 0 }); return }
+  gsap.to(el, { height: isOpen ? 'auto' : 0, opacity: isOpen ? 1 : 0, duration: 0.35, ease: 'power2.out',
+    onComplete: () =&gt; { el.hidden = !isOpen } })     // closed answers leave the a11y tree
+}, [isOpen])</code></pre>
+  <div class="exercise"><b>Exercise:</b> the resize line above is the fix for blocker 8. Port it to the real file, and mark repeated logo copies <code>aria-hidden</code>.</div>
+</div>
+
+<div class="module" id="m11">
+  <div class="num">Module 11</div>
+  <h3>Data: getStaticProps and the blog slider</h3>
+  <div class="tags"><span class="tag">getStaticProps</span><span class="tag">ISR revalidate</span><span class="tag">scroll snap</span><span class="tag">ResizeObserver</span></div>
+  <p><b>Goal:</b> <code>pages/index.tsx</code> data loading and <code>DomainBlogTeaser</code>.</p>
+<pre><code>export const getStaticProps: GetStaticProps = async () =&gt; {
+  try {
+    const posts = await getFeaturedPosts()
+    return { props: { blogPosts: posts.map(toSummary) }, revalidate: 60 }
+  } catch (err) {
+    throw err   // during revalidation this keeps the last good page (better than returning [])
+  }
+}
+
+// slider
+const sync = () =&gt; { const el = row.current!; const max = el.scrollWidth - el.clientWidth
+  setProgress(max ? el.scrollLeft / max : 0) }
+const slide = (dir: 1 | -1) =&gt; row.current!.scrollBy({ left: dir * cardWidth, behavior: 'smooth' })
+/* .row { display: flex; overflow-x: auto; scroll-snap-type: x mandatory } */</code></pre>
+  <div class="exercise"><b>Exercise:</b> remove the duplicate tooltip in <code>BlogCard.tsx</code>, skip the image when a post has no feature image, and format dates with <code>timeZone: 'UTC'</code>.</div>
+</div>
+
+<div class="module" id="m12">
+  <div class="num">Module 12</div>
+  <h3>Wiring the whole page</h3>
+  <div class="tags"><span class="tag">barrel exports</span><span class="tag">MainLayout</span><span class="tag">SEO</span><span class="tag">fonts</span></div>
+  <ol class="steps">
+    <li>Export every section from <code>composites/landing-page/index.ts</code>.</li>
+    <li>In <code>pages/index.tsx</code>, wrap them in <code>MainLayout</code> with a <code>MetaData</code> object (title, description, canonical, og).</li>
+    <li>Keep the page wrapper free of <code>overflow: hidden</code> so sticky sections work.</li>
+    <li>Add the scroll to top button that appears after the hero (a passive scroll listener comparing <code>scrollY</code> with the hero height).</li>
+    <li>Load fonts once, asynchronously, in <code>_document.tsx</code>, and remove the duplicate render blocking links in MainLayout.</li>
+    <li>Exactly one <code>&lt;h1&gt;</code> (the hero), then <code>&lt;h2&gt;</code> per section, <code>&lt;h3&gt;</code> inside.</li>
+  </ol>
+  <div class="exercise"><b>Exercise:</b> add FAQPage structured data (JSON LD) built from the same FAQ array, so Google can show the questions in search results.</div>
+</div>
+
+<div class="module" id="m13">
+  <div class="num">Module 13</div>
+  <h3>Production polish</h3>
+  <div class="tags"><span class="tag">reduced motion</span><span class="tag">focus visible</span><span class="tag">image budgets</span><span class="tag">lint and strict mode</span></div>
+  <ol class="steps">
+    <li><b>Motion:</b> add the global reduced motion rule and <code>useReducedMotion</code> hook from Part 1; pause anything that moves for more than 5 seconds.</li>
+    <li><b>Focus:</b> every interactive element needs a visible <code>:focus-visible</code> style that contrasts with its background.</li>
+    <li><b>Images:</b> one hero image per breakpoint, compress large PNGs and SVGs with embedded bitmaps, let <code>next/image</code> optimise screenshots.</li>
+    <li><b>Do less off screen:</b> pause tickers, intervals and keyframes with an IntersectionObserver.</li>
+    <li><b>Tooling:</b> upgrade <code>eslint-plugin-prettier</code>, run <code>eslint --fix</code>, turn <code>reactStrictMode</code> on in development to surface effect bugs, stop ignoring lint during builds.</li>
+    <li><b>Ship safely:</b> commit every asset, run <code>next build</code> locally, and test on a real phone and a real iPad.</li>
+  </ol>
+</div>
+
+<section class="part" id="capstone">
+  <h2>Capstone checklist</h2>
+  <p class="lead">When every box is true, the page is production grade.</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Area</th><th>Done when</th></tr></thead>
+    <tbody>
+      <tr><td>Git</td><td>All images used by the page are committed; <code>git status</code> is clean before deploy.</td></tr>
+      <tr><td>Links</td><td>Every button and CTA goes somewhere real.</td></tr>
+      <tr><td>Assets</td><td>No 404s in the network tab (including the noise texture).</td></tr>
+      <tr><td>Accuracy</td><td>Every "live" number is live, or the label says it is illustrative.</td></tr>
+      <tr><td>Motion</td><td>Reduced motion stops all looping motion; long running motion can be paused.</td></tr>
+      <tr><td>No JS</td><td>With JavaScript disabled, every section's text is visible.</td></tr>
+      <tr><td>A11y</td><td>One h1, logical headings, visible focus, closed FAQ answers hidden, duplicates aria hidden.</td></tr>
+      <tr><td>Performance</td><td>Hidden variants do no scroll work; off screen loops pause; hero preloads one image.</td></tr>
+      <tr><td>Quality gates</td><td><code>tsc</code> clean, ESLint runs and passes, <code>next build</code> succeeds.</td></tr>
+    </tbody>
+  </table></div>
+  <p class="muted">Generated from a read only audit of the <code>new-landing-page</code> branch. Line numbers refer to the files as they were at the time of the audit.</p>
+</section>
+</main>
+</div>
+<script>
+(function(){
+  var root = document.documentElement, btn = document.getElementById('themeBtn'), key = 'lp-guide-theme';
+  try { var saved = localStorage.getItem(key); if (saved) root.setAttribute('data-theme', saved); } catch (e) {}
+  btn.addEventListener('click', function(){
+    var dark = root.getAttribute('data-theme') ? root.getAttribute('data-theme') === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+    var next = dark ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem(key, next); } catch (e) {}
+  });
+})();
+</script>
+</body>
+</html>
