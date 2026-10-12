@@ -22,7 +22,8 @@
   margin: 0;
   list-style: none;
   will-change: transform;
-  animation: identity-os-providers-scroll 7.5s linear infinite;
+  // 8.8s (was 7.5s) keeps the same on-screen speed now that each logo is wider.
+  animation: identity-os-providers-scroll 8.8s linear infinite;
 
   &:hover {
     animation-play-state: paused;
@@ -46,8 +47,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 31px;
-  height: 31px;
+  width: 40px;
+  height: 40px;
   border-radius: var(--radius-full);
   border: 1px solid var(--color-blue-primary-alpha-30);
   background: var(--color-white-primary);
@@ -55,13 +56,13 @@
   overflow: hidden;
 
   @include desktop {
-    width: 26px;
-    height: 26px;
+    width: 36px;
+    height: 36px;
   }
 
   @include tablet-down {
-    width: 26px;
-    height: 26px;
+    width: 36px;
+    height: 36px;
   }
 }
 

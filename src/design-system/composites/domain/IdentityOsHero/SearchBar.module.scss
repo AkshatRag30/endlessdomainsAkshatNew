@@ -448,7 +448,10 @@
   mask-image: linear-gradient(90deg, transparent 0, #000 8%, #000 92%, transparent 100%);
 
   @include tablet { width: 372px; }
-  @include mobile { width: 100%; }
+  // Matches the search box's own width above it (80% / 90% of the viewport) so the
+  // pills line up under its edges instead of running wider than it.
+  @include mobile { width: 80vw; }
+  @include small-mobile { width: 90vw; }
 }
 
 .marqueeTrack {
@@ -478,6 +481,12 @@
 .domainMoreItem {
   display: inline-flex;
   flex-shrink: 0;
+
+  // On phones the button always sits on its own centered row under the marquee.
+  @include mobile {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 // Links to the full TLD/provider list. Same rotating conic border + soft glow as

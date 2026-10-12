@@ -17,7 +17,7 @@ export function ProvidersMarquee() {
             DOMAIN_PROVIDERS.map(provider => (
               <li key={`${provider.provider}-${setIndex}`} className={styles.token} title={setIndex === 0 ? provider.label : undefined} aria-hidden={setIndex === 0 ? undefined : 'true'}>
                 <span className={styles.avatar} style={{ borderColor: `${provider.colorName}5c` }}>
-                  <Image src={provider.image} alt={setIndex === 0 ? provider.label : ''} width={26} height={26} className={styles.icon} />
+                  <Image src={provider.image} alt={setIndex === 0 ? provider.label : ''} width={40} height={40} className={styles.icon} />
                 </span>
               </li>
             )),
