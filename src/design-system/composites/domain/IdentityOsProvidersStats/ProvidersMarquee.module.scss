@@ -22,7 +22,9 @@
   margin: 0;
   list-style: none;
   will-change: transform;
-  animation: identity-os-providers-scroll 7.5s linear infinite;
+  // One set (25% of the 4-set track) per loop; duration tuned to the same ~85px/s
+  // on-screen speed the icon-only version had.
+  animation: identity-os-providers-scroll 18.3s linear infinite;
 
   &:hover {
     animation-play-state: paused;
@@ -31,23 +33,47 @@
 
 @keyframes identity-os-providers-scroll {
   0%   { transform: translateX(0); }
-  100% { transform: translateX(-12.5%); }
+  100% { transform: translateX(-25%); }
 }
 
 .token {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: var(--space-2);
   flex-shrink: 0;
-  margin: 0 var(--space-4);
+  margin: 0 var(--space-5);
+}
+
+.wordmark {
+  --logo-h: 30px;
+  display: block;
+  height: calc(var(--logo-h) * var(--logo-scale, 1));
+  width: auto;
+
+  @include tablet-down {
+    --logo-h: 24px;
+  }
+}
+
+.name {
+  font-family: var(--font-satoshi);
+  font-size: var(--text-small-15);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black-primary);
+  white-space: nowrap;
+
+  @include tablet-down {
+    font-size: var(--text-small-13);
+  }
 }
 
 .avatar {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 31px;
-  height: 31px;
+  width: 40px;
+  height: 40px;
   border-radius: var(--radius-full);
   border: 1px solid var(--color-blue-primary-alpha-30);
   background: var(--color-white-primary);
@@ -55,13 +81,13 @@
   overflow: hidden;
 
   @include desktop {
-    width: 26px;
-    height: 26px;
+    width: 36px;
+    height: 36px;
   }
 
   @include tablet-down {
-    width: 26px;
-    height: 26px;
+    width: 36px;
+    height: 36px;
   }
 }
 

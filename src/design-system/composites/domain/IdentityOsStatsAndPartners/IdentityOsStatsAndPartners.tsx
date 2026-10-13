@@ -11,20 +11,18 @@ if (typeof window !== 'undefined') {
 
 // ── Static data ───────────────────────────────────────────────────────────────
 
-// The four logos below have their wordmark baked into the SVG as fill="white" (or, for
-// fluxor, a near-white #FBFFFD) — correct on the old dark background, invisible on this
-// page's white one. Those exact files are still shared with the dark-themed homepage
-// StatsAndPartners and the payment-method UI, so they can't be recolored in place —
-// these point at page-scoped copies with the wordmark recolored to black instead.
+// Strategic partners only. Several original logo files are white-on-transparent for the
+// dark-themed homepage strip (and still shared with it), so this page points at
+// page-scoped copies in identity-os-logos/ with the white wordmarks recolored to black.
 const _PARTNER_LOGOS = [
-  { src: '/new-assets/partners/ethereum.svg', alt: 'Ethereum Name Service' },
-  { src: '/new-assets/partners/binance.svg', alt: 'Binance Smart Chain' },
-  { src: '/new-assets/identity-os-logos/solana.svg', alt: 'Solana' },
-  { src: '/new-assets/partners/spaceid.svg', alt: 'Space ID' },
-  { src: '/new-assets/identity-os-logos/bonfida.svg', alt: 'Bonfida' },
-  { src: '/new-assets/partners/unstoppable.svg', alt: 'Unstoppable Domains' },
-  { src: '/new-assets/identity-os-logos/tezos.svg', alt: 'Tezos Domains' },
+  { src: '/new-assets/identity-os-logos/polygon.png', alt: 'polygon' },
+  { src: '/new-assets/identity-os-logos/soneium.png', alt: 'soneium' },
+  { src: '/new-assets/identity-os-logos/hemi.svg', alt: 'hemi' },
+  { src: '/new-assets/identity-os-logos/monad.svg', alt: 'monad' },
+  { src: '/new-assets/identity-os-logos/quote.png', alt: 'quote' },
+  { src: '/new-assets/identity-os-logos/loyyal.png', alt: 'loyyal' },
   { src: '/new-assets/identity-os-logos/fluxor.svg', alt: 'fluxor' },
+  { src: '/new-assets/identity-os-logos/commudle.svg', alt: 'commudle' },
 ]
 
 // gpay's original file (public/new-assets/feature-and-stats/gpay.svg) is shared with the
@@ -40,7 +38,7 @@ const _PAYMENT_LOGOS = [
   { src: '/new-assets/identity-os-logos/link.svg', alt: 'link' },
 ]
 
-// Partners: 7 logos × 3 = 21 cards — one set (~1400px) exceeds any viewport.
+// Partners: 8 logos × 3 = 24 cards — one set (~2000px) exceeds any viewport.
 // Payments: only 4 logos so needs 6× repetitions so one set (~800px × 2 = ~1600px) exceeds any viewport.
 const PARTNER_LOGOS = [..._PARTNER_LOGOS, ..._PARTNER_LOGOS, ..._PARTNER_LOGOS]
 const PAYMENT_LOGOS = [

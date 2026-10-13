@@ -167,33 +167,9 @@
   opacity: 0.45;
   transition: opacity 0.5s ease;
 
-  // Phase 5 — a thin line draws in underneath, then a brief glow sweeps through it once.
-  &::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: -6px;
-    height: 1.5px;
-    width: 0;
-    background: var(--color-blue-primary-alpha-30);
-    transition: width 0.55s ease;
-  }
-
   &[data-reveal] {
     opacity: 1;
-
-    &::after {
-      width: 100%;
-      background: linear-gradient(90deg, var(--color-blue-primary-alpha-30) 0%, var(--color-blue-primary) 50%, var(--color-blue-primary-alpha-30) 100%);
-      background-size: 250% 100%;
-      animation: adoption-label-glow 1.1s ease 0.55s 1;
-    }
   }
-}
-
-@keyframes adoption-label-glow {
-  from { background-position: 120% 0; }
-  to { background-position: -20% 0; }
 }
 
 .labelTotal {

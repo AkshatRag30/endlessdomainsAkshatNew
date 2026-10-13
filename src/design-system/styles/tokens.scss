@@ -79,6 +79,7 @@
   --text-normal: 20px;
   --text-button: 18px;
   --text-body-small: 17px;
+  --text-heading-sm: 18px;
   --text-nav: 14px;
   --text-small-15: 15px;
   --text-small-13: 13px;
@@ -89,6 +90,7 @@
   // ── Font weights ──────────────────────────────────────────────────────────
   --font-weight-regular: 400;
   --font-weight-medium: 500;
+  --font-weight-semibold: 600;
   --font-weight-bold: 700;
 
   // ── Line heights ──────────────────────────────────────────────────────────
@@ -212,6 +214,7 @@
   --color-card-overlay-dark: #1a0533;
   --color-card-overlay-mid: rgba(13, 0, 32, 0.43);
   --color-black-alpha-60: rgba(0, 0, 0, 0.6);
+  --color-black-alpha-74: rgba(0, 0, 0, 0.74);
 
   // ── Black alpha ───────────────────────────────────────────────────────────────
   --color-black-alpha-55: rgba(0, 0, 0, 0.55);

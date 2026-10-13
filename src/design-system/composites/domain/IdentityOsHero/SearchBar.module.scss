@@ -434,9 +434,59 @@
   }
 }
 
+// ── TLD marquee — sits in exactly the area the 6 static pills used to take
+// (420px desktop, 372px tablet, a full row on phones with the button wrapping below).
+.marquee {
+  width: 420px;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  // Room for the pills' outer shadow, cancelled out so the row height stays 28px.
+  padding: 3px 0;
+  margin: -3px 0;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 8%, #000 92%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 8%, #000 92%, transparent 100%);
+
+  @include tablet { width: 372px; }
+  // Matches the search box's own width above it (80% / 90% of the viewport) so the
+  // pills line up under its edges instead of running wider than it.
+  @include mobile { width: 80vw; }
+  @include small-mobile { width: 90vw; }
+}
+
+.marqueeTrack {
+  display: flex;
+  width: max-content;
+  animation: tldMarquee 40s linear infinite;
+
+  // Spacing via margin (not gap) so both halves are identical widths and -50% loops exactly.
+  > span {
+    margin-right: var(--space-2);
+  }
+
+  .marquee:hover & {
+    animation-play-state: paused;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@keyframes tldMarquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
 .domainMoreItem {
   display: inline-flex;
   flex-shrink: 0;
+
+  // On phones the button always sits on its own centered row under the marquee.
+  @include mobile {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 // Links to the full TLD/provider list. Same rotating conic border + soft glow as
