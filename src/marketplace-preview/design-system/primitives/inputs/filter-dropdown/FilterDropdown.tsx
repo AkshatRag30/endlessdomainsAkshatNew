@@ -136,8 +136,10 @@ export const FilterDropdown = ({ label, value, options, onChange, className = ''
         coords &&
         typeof document !== 'undefined' &&
         createPortal(
+          // Preview: data-marketplace-preview brings the design tokens to this portaled panel (see Modal.tsx).
           <div
             ref={panelRef}
+            data-marketplace-preview=""
             className={styles.panel}
             role={children ? undefined : 'listbox'}
             style={{ top: coords.top, left: coords.left, minWidth: Math.max(140, coords.minWidth) }}

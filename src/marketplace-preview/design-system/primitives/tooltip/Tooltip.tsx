@@ -118,8 +118,10 @@ export const Tooltip = ({
       {children}
       {coords &&
         typeof document !== 'undefined' &&
+        // Preview: data-marketplace-preview brings the design tokens to this portaled bubble (see Modal.tsx).
         createPortal(
           <span
+            data-marketplace-preview=""
             className={[
               styles.portalBubble,
               variant === 'light' ? styles.light : '',
