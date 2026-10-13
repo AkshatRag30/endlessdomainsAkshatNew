@@ -1,13 +1,13 @@
 @import '@mpstyles/_mixins.scss';
 
-// Figma node 1:718. #e7f6ee / #0c7a46 callout colors match the listing
-// flow's green fee pill, Figma-exact, no token match.
+// Figma node 1:718. The callout uses the success roles, matching the
+// listing flow's green fee pill.
 
 .section {
   display: flex;
   flex-direction: column;
   padding: var(--space-4) 0;
-  border-bottom: 1px solid #eeedf3;
+  border-bottom: 1px solid var(--color-border-subtle);
 }
 
 // Figma draws this section's rows/balance/callout 480px wide inside the
@@ -29,7 +29,7 @@
   font-size: 14px;
   line-height: 15px;
   letter-spacing: -0.25px;
-  color: #7e7a93;
+  color: var(--color-text-secondary);
 }
 
 .rows {
@@ -51,11 +51,11 @@
   font-family: var(--font-satoshi);
   font-size: 12.5px;
   line-height: 18.75px;
-  color: #7e7a93;
+  color: var(--color-text-secondary);
 
   strong {
     font-weight: var(--font-weight-bold);
-    color: #171429;
+    color: var(--color-text-primary);
     white-space: nowrap;
   }
 }
@@ -67,14 +67,14 @@
   margin-top: var(--space-3);
   padding: 11px var(--space-3);
   border-radius: 11px;
-  background: #e7f6ee;
+  background: var(--color-status-success-bg);
 
   p {
     margin: 0;
     font-family: var(--font-satoshi);
     font-size: 12.5px;
     line-height: 18.75px;
-    color: #0c7a46;
+    color: var(--color-status-success-text);
   }
 }
 

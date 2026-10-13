@@ -1,7 +1,7 @@
 @import '@mpstyles/_mixins.scss';
 
-// Figma nodes 1:791 / 1:856. #5b3df5 (terms link) and #7e7a93 are
-// Figma-exact, no token match. The footer's own #f6f6f6 surface, top border
+// Figma nodes 1:791 / 1:856. The terms link and helper text use the data
+// purple and secondary text roles. The footer's own surface, top border
 // and upward shadow come from Modal's footer slot.
 
 .footer {
@@ -16,7 +16,7 @@
 
 .termsLink {
   font-weight: var(--font-weight-medium);
-  color: #5b3df5;
+  color: var(--color-data-primary);
   text-decoration: none;
 
   &:hover {
@@ -60,7 +60,7 @@
   font-family: var(--font-satoshi);
   font-size: var(--text-small-13);
   line-height: 17.25px;
-  color: #7e7a93;
+  color: var(--color-text-secondary);
   text-align: center;
 }
 
@@ -70,7 +70,7 @@
   cursor: pointer;
 
   &:hover {
-    color: var(--color-black-primary);
+    color: var(--color-text-primary);
   }
 
   &:focus-visible {

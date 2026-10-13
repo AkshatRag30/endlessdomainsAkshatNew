@@ -1,8 +1,9 @@
 @import '@mpstyles/_mixins.scss';
 
 // Figma node 5:3647 (desktop) / 5:4262 (mobile). The surface-active → surface
-// gradient and primary-text label/value use role tokens; the #f2f2f2 ring is
-// Figma-exact (box-shadow, left as is). Mobile scales the whole tile by
+// gradient and primary-text label/value use role tokens; the outer ring
+// (Figma #f2f2f2, drawn as a box-shadow) uses the subtle border role so it
+// becomes a faint edge in dark. Mobile scales the whole tile by
 // Figma's own ~0.786 factor rather than just reflowing it.
 
 .tile {
@@ -16,7 +17,7 @@
   border: 3px solid var(--color-bg-surface);
   border-radius: 10px;
   background: linear-gradient(180deg, var(--color-bg-surface-active) 0%, var(--color-bg-surface) 100%);
-  box-shadow: 0 0 0 4px #f2f2f2;
+  box-shadow: 0 0 0 4px var(--color-border-subtle);
 
   @include mobile {
     gap: 7px;
@@ -24,7 +25,7 @@
     padding: 4px 7px;
     border-width: 2.36px;
     border-radius: 7.86px;
-    box-shadow: 0 0 0 3.15px #f2f2f2;
+    box-shadow: 0 0 0 3.15px var(--color-border-subtle);
   }
 }
 

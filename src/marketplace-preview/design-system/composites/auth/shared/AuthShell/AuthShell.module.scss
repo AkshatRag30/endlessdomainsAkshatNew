@@ -15,7 +15,7 @@ $canvas-over-art: calc(2361 / 2247 * 100%); // 105.07%
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   min-height: 100vh;
-  background: var(--color-white-primary);
+  background: var(--color-bg-surface);
   // The Figma hairlines are drawn wider than the column (710 in a 660
   // column, 478 on a 390 screen), so they run off the edge rather than
   // widen the page. clip, not hidden: hidden would make the page its own
@@ -30,6 +30,11 @@ $canvas-over-art: calc(2361 / 2247 * 100%); // 105.07%
     // Stacked from the top: without this the rows stretch to fill 100vh
     // and the centred column opens a gap under the banner.
     align-content: start;
+  }
+
+  // Figma dark (93:38626): the form column sits on black
+  @include dark {
+    background: var(--color-bg-page);
   }
 }
 
@@ -97,6 +102,47 @@ $canvas-over-art: calc(2361 / 2247 * 100%); // 105.07%
 
 // The canvas is drawn from its left edge, so only its transparent strip
 // falls outside the frame.
+// Light and dark artwork both render; CSS on the theme attribute shows one,
+// so a saved dark choice never flashes the light art first.
+.forDark {
+  display: none;
+}
+
+@mixin show-dark-art {
+  @include dark {
+    &.forLight {
+      display: none;
+    }
+
+    &.forDark {
+      display: block;
+    }
+  }
+}
+
+.artCrop,
+.artImageDark {
+  @include show-dark-art;
+}
+
+// The blurred backdrop is desktop only (hidden from tablet down above), so
+// its dark swap is scoped the same way.
+.artBackdrop {
+  @include tablet-up {
+    @include show-dark-art;
+  }
+}
+
+// The dark artwork (Figma 93:38627) is a plain JPEG with no transparent
+// apron, so it fills the frame directly instead of going through .artCrop.
+.artImageDark {
+  object-fit: cover;
+
+  @include tablet-down {
+    object-position: 50% 23%;
+  }
+}
+
 .artCrop {
   position: absolute;
   top: 0;

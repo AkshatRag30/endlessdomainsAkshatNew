@@ -1,11 +1,14 @@
 import { useState } from 'react'
 import { useDebounces } from '@/utils/useDebounce'
 import type { MarketplaceListing } from '@/marketplace-preview/types/marketplace'
+import { matchesPriceBounds } from '@/marketplace-preview/helpers/marketplace/priceFilter'
 
 export interface ListingFilters {
   search: string
   extension: string
-  price: string
+  /** Price bounds as typed and validated by PriceFilterPanel, '' meaning no bound (see helpers/marketplace/priceFilter). */
+  minPrice: string
+  maxPrice: string
   length: string
   chain: string
   listed: string
@@ -14,7 +17,8 @@ export interface ListingFilters {
 export const DEFAULT_LISTING_FILTERS: ListingFilters = {
   search: '',
   extension: 'any',
-  price: 'any',
+  minPrice: '',
+  maxPrice: '',
   length: 'any',
   chain: 'any',
   listed: 'any',
@@ -45,19 +49,6 @@ const CHAIN_VALUE_TO_ID: Record<string, string> = {
 }
 
 const DAY_MS = 24 * 60 * 60 * 1000
-
-function matchesPrice(priceEth: number, bucket: string): boolean {
-  switch (bucket) {
-    case 'under-5':
-      return priceEth < 5
-    case '5-15':
-      return priceEth >= 5 && priceEth <= 15
-    case 'over-15':
-      return priceEth > 15
-    default:
-      return true
-  }
-}
 
 function matchesLength(domainName: string, bucket: string): boolean {
   const len = domainName.length
@@ -101,7 +92,7 @@ export function filterListings(listings: MarketplaceListing[], search: string, f
     if (term && !listing.domainName.toLowerCase().includes(term)) return false
     if (filters.extension !== 'any' && listing.extension !== filters.extension) return false
     if (filters.chain !== 'any' && listing.chain.id !== CHAIN_VALUE_TO_ID[filters.chain]) return false
-    if (!matchesPrice(listing.priceEth, filters.price)) return false
+    if (!matchesPriceBounds(listing.priceEth, filters.minPrice, filters.maxPrice)) return false
     if (!matchesLength(listing.domainName, filters.length)) return false
     if (!matchesListed(listing.listedAt, filters.listed)) return false
     return true

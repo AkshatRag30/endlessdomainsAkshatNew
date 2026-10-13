@@ -244,6 +244,20 @@
   color: var(--color-text-primary);
 }
 
+// "USDT" and its Tether icon stay together as one unit, same as ListingRow's.
+.currency {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  white-space: nowrap;
+}
+
+.usdtIcon {
+  flex-shrink: 0;
+  width: 12px;
+  height: 12px;
+}
+
 .usd {
   font-family: var(--font-space-grotesk);
   font-size: var(--text-small-10);

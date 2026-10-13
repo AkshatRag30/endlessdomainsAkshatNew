@@ -10,7 +10,7 @@
 .main {
   min-height: calc(100vh - 59px); // Header.module.scss's .bar height
   padding: 13px 29px var(--space-8);
-  background: var(--color-gray-page-bg);
+  background: var(--color-bg-page);
 
   @include tablet-down {
     padding: 13px var(--space-4) var(--space-8);

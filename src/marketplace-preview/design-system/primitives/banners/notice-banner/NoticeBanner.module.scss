@@ -1,6 +1,8 @@
+@import '@mpstyles/_mixins.scss';
+
 // Moved verbatim from ListingFormStep's .networkBanner (listing-flow Figma
 // 1:9355; buying-flow 1:1297 is the same component). Fill and text use the
-// status error roles; the #f3d3d9 border is Figma-exact with no role yet.
+// status error roles; the #f3d3d9 border is Figma-exact, red at 35% in dark.
 
 .banner {
   display: flex;
@@ -15,6 +17,10 @@
   border-color: #f3d3d9;
   background: var(--color-status-error-bg);
 
+  @include dark {
+    border-color: rgba(239, 68, 68, 0.35); // design-specific: the error red at 35%, a soft edge on dark
+  }
+
   .title {
     color: var(--color-status-error-text);
   }
@@ -25,12 +31,16 @@
 }
 
 // Figma 1:1685 (buying flow "no fund"). Fill and text use the status warning
-// roles; the #f0dfbe border is Figma-exact with no role yet.
+// roles; the #f0dfbe border is Figma-exact, amber at 35% in dark.
 // This variant also rounds its corners more (11px vs the red banner's 7px).
 .warning {
   border-color: #f0dfbe;
   border-radius: 11px;
   background: var(--color-status-warning-bg);
+
+  @include dark {
+    border-color: rgba(255, 171, 11, 0.35); // design-specific: the warning amber at 35%
+  }
 
   .title,
   .body {
@@ -39,7 +49,8 @@
 }
 
 // Watchlist 20:12143, "Since you last looked". #f1eefe / #dcd3fb / #5d6dff
-// are Figma-exact, no token match for this lavender. Roomier padding (13px
+// are Figma-exact in light; in dark the banner follows Figma 93:89796 (a deep
+// blue panel with a blue edge and white title). Roomier padding (13px
 // 15px) and a 6px radius; the action is centred on the whole banner rather
 // than top aligned with the title.
 .info {
@@ -55,6 +66,15 @@
 
   .body {
     color: var(--color-text-primary);
+  }
+
+  @include dark {
+    border-color: var(--color-blue-primary-alpha-50);
+    background: var(--color-blue-primary-alpha-13);
+
+    .title {
+      color: var(--color-text-primary);
+    }
   }
 }
 

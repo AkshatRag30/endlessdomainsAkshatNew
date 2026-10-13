@@ -22,9 +22,11 @@ export interface AuthHeaderProps {
 export const AuthHeader = ({ heading, subtext, gridPosition = 'behind' }: AuthHeaderProps) => (
   <div className={styles.header}>
     {/* Figma 16:522, already at its 45% opacity in the export. Desktop only: the mobile frame has no grid. */}
-    <Image src="/assets/img/auth/logo-grid.png" alt="" aria-hidden="true" width={379} height={268} className={gridPosition === 'raised' ? `${styles.grid} ${styles.gridRaised}` : styles.grid} />
+    <Image src="/assets/img/auth/logo-grid.png" alt="" aria-hidden="true" width={379} height={268} className={`${gridPosition === 'raised' ? `${styles.grid} ${styles.gridRaised}` : styles.grid} ${styles.forLight}`} />
+    <Image src="/assets/img/auth/logo-grid-dark.png" alt="" aria-hidden="true" width={379} height={268} className={`${gridPosition === 'raised' ? `${styles.grid} ${styles.gridRaised}` : styles.grid} ${styles.forDark}`} />
     <Link href="/" className={styles.logoLink} aria-label="Endless Domains home">
-      <Image src="/assets/img/auth/logo.svg" alt="Endless Domains" width={148} height={49} priority className={styles.logo} />
+      <Image src="/assets/img/auth/logo.svg" alt="Endless Domains" width={148} height={49} priority className={`${styles.logo} ${styles.forLight}`} />
+      <Image src="/assets/img/auth/logo-white.svg" alt="" aria-hidden="true" width={148} height={49} className={`${styles.logo} ${styles.forDark}`} />
     </Link>
     <div className={styles.text}>
       <h1 className={styles.heading}>{heading}</h1>

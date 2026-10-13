@@ -36,6 +36,10 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+
+  @include dark {
+    background: var(--color-bg-surface-active);
+  }
 }
 
 // ─── Body ─────────────────────────────────────────────────────────────────────
@@ -130,7 +134,18 @@
  background: repeating-linear-gradient(45deg, rgba(0, 255, 17, 0.20), rgba(0, 255, 17, 0.20) 6px, rgba(0, 255, 17, 0.323), rgba(0, 255, 17, 0.323) 7px);
 .title,svg,.message {
   color: #0f5e59;
-}}
+}
+
+  // The dark teal text can't be read once the translucent green sits on the
+  // dark surface; the success text role is the dark theme's readable green.
+  @include dark {
+    .title,
+    svg,
+    .message {
+      color: var(--color-status-success-text);
+    }
+  }
+}
 
 // ─── Info success variant ─────────────────────────────────────────────────────
 // design-specific: same green bg as success
@@ -140,7 +155,18 @@
  background: repeating-linear-gradient(45deg, rgba(0, 255, 17, 0.20), rgba(0, 255, 17, 0.20) 6px, rgba(0, 255, 17, 0.323), rgba(0, 255, 17, 0.323) 7px);
 .title,svg,.message {
   color: #0f5e59;
-}}
+}
+
+  // The dark teal text can't be read once the translucent green sits on the
+  // dark surface; the success text role is the dark theme's readable green.
+  @include dark {
+    .title,
+    svg,
+    .message {
+      color: var(--color-status-success-text);
+    }
+  }
+}
 
 // ─── Warning / bordered alert variant ────────────────────────────────────────
 // Figma "Bordered styles alert" example uses error/red styling
