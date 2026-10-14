@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Profile Data Guide</title>
+<script>
+  try {
+    var saved = localStorage.getItem('dmplan-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  } catch (e) {}
+</script>
+<style>
+  :root {
+    --bg: #f9f9f9; --surface: #ffffff; --surface-soft: #f3f4fe;
+    --text: #111111; --text-muted: #5b5b66; --border: #e6e6e6;
+    --accent: #2639ED; --accent-soft: #e9ebfd;
+    --wait: #9457f6; --wait-soft: #f4eefe;
+    --ok: #12805c; --ok-soft: #e4f5ee;
+    --warn: #b4540a; --warn-soft: #fdf1e4;
+    --bad: #c4314b; --bad-soft: #fdecef;
+    --code-bg: #f4f5f8;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+      --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+      --accent: #7f8cff; --accent-soft: #1d2150;
+      --wait: #b996fa; --wait-soft: #2c2142;
+      --ok: #4fd1a0; --ok-soft: #173229;
+      --warn: #f5a35c; --warn-soft: #3a2614;
+      --bad: #ff7d93; --bad-soft: #3a1c24;
+      --code-bg: #0b0b0c;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+    --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+    --accent: #7f8cff; --accent-soft: #1d2150;
+    --wait: #b996fa; --wait-soft: #2c2142;
+    --ok: #4fd1a0; --ok-soft: #173229;
+    --warn: #f5a35c; --warn-soft: #3a2614;
+    --bad: #ff7d93; --bad-soft: #3a1c24;
+    --code-bg: #0b0b0c;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: "Satoshi", system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.65; }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 48px 16px 80px; }
+  header.top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+  .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; }
+  h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.15; margin: 0 0 12px; }
+  .lede { color: var(--text-muted); margin: 0; max-width: 680px; }
+  .toggle { flex-shrink: 0; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 14px; cursor: pointer; }
+  .toggle:hover { border-color: var(--accent); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 32px; }
+  nav.toc a { font-size: 14px; text-decoration: none; color: var(--accent); background: var(--accent-soft); padding: 6px 12px; border-radius: 999px; }
+  h2 { font-size: 24px; margin: 56px 0 14px; display: flex; align-items: center; gap: 12px; }
+  h2 .step { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 15px; flex-shrink: 0; }
+  h3 { font-size: 18px; margin: 28px 0 8px; }
+  p { margin: 0 0 14px; }
+  .muted { color: var(--text-muted); }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px 24px; margin-bottom: 16px; }
+  .card p:last-child { margin-bottom: 0; }
+  ul, ol { padding-left: 22px; margin: 0 0 14px; }
+  li { margin-bottom: 8px; }
+  code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .86em; background: var(--surface-soft); border-radius: 6px; padding: 1px 6px; word-break: break-word; }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 0 0 16px; font-size: 13.5px; line-height: 1.55; }
+  pre code { background: none; padding: 0; font-size: inherit; word-break: normal; }
+  .file { font-size: 13px; color: var(--text-muted); margin: 0 0 6px; font-family: ui-monospace, Consolas, monospace; }
+  .callout { border-left: 4px solid var(--wait); background: var(--wait-soft); border-radius: 10px; padding: 14px 18px; margin: 0 0 16px; }
+  .callout p { margin: 0; }
+  .callout.ok { border-color: var(--ok); background: var(--ok-soft); }
+  .callout.warn { border-color: var(--warn); background: var(--warn-soft); }
+  .callout b.lbl { display: block; font-size: 13px; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+  .tablecard { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow-x: auto; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: 0; }
+  th { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+
+  /* The layer diagram: a vertical stack of boxes with arrows, pure HTML/CSS */
+  .flow { display: flex; flex-direction: column; align-items: stretch; gap: 0; margin: 8px 0 20px; }
+  .layer { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px; display: grid; grid-template-columns: 170px 1fr; gap: 12px; align-items: center; }
+  .layer .name { font-weight: 700; }
+  .layer .name small { display: block; font-weight: 400; font-size: 12px; color: var(--text-muted); font-family: ui-monospace, Consolas, monospace; overflow-wrap: anywhere; }
+  .layer .what { font-size: 15px; color: var(--text-muted); }
+  .layer.c1 { border-left: 5px solid var(--accent); }
+  .layer.c2 { border-left: 5px solid var(--wait); }
+  .layer.c3 { border-left: 5px solid var(--warn); }
+  .layer.c4 { border-left: 5px solid var(--ok); }
+  .arrow { text-align: center; color: var(--text-muted); font-size: 13px; padding: 4px 0; }
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .split .layer { grid-template-columns: 1fr; gap: 4px; }
+
+  .analogy { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 0 0 16px; }
+  .analogy div { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; font-size: 15px; }
+  .analogy b { display: block; color: var(--accent); }
+
+  ol.journey { counter-reset: j; list-style: none; padding: 0; }
+  ol.journey li { counter-increment: j; position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px 12px 54px; margin-bottom: 8px; }
+  ol.journey li::before { content: counter(j); position: absolute; left: 14px; top: 12px; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  footer { margin-top: 56px; font-size: 13px; color: var(--text-muted); }
+
+  @media (max-width: 700px) {
+    header.top { flex-direction: column; }
+    .layer { grid-template-columns: 1fr; gap: 4px; }
+    .split, .analogy { grid-template-columns: 1fr; }
+    .card { padding: 18px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">Marketplace V2 · Profile and Settings · Beginner guide</p>
+      <h1>How the Profile page gets its data</h1>
+      <p class="lede">A friendly, step by step walk through the mock data, the services, the api folder, the hooks, and how they all link up to the components on <code>/profile</code>. No prior knowledge of the code needed. Every example is copied from the real files on the <code>profile-settings</code> branch.</p>
+    </div>
+    <button class="toggle" id="toggle" type="button">Toggle theme</button>
+  </header>
+
+  <div class="callout warn"><p><b class="lbl">Being replaced on 15 October</b>This guide explains the data layer as it was built on 14 October, with its own <code>src/services/profile/</code> folder. That folder duplicates patterns the app already has, so it's being restructured to match My Domains and Watchlist: sample data in <code>src/data/profile/</code>, one hook per file on the shared <code>useMockQuery</code>, mappers in <code>src/helpers/profile/</code>, and no services folder. The plan is in <code>profile-settings-implementation-plan.md</code> §14.1. This guide will be rewritten after that. The ideas in it (types, hooks, mock versus real, the journey of one switch) still apply.</p></div>
+
+  <nav class="toc">
+    <a href="#why">Why any of this</a>
+    <a href="#picture">The big picture</a>
+    <a href="#words">Words you'll see</a>
+    <a href="#folders">Folder map</a>
+    <a href="#s1">1 · Types</a>
+    <a href="#s2">2 · Contract</a>
+    <a href="#s3">3 · Mock data</a>
+    <a href="#s4">4 · Real API</a>
+    <a href="#s5">5 · The switch</a>
+    <a href="#s6">6 · Hooks</a>
+    <a href="#s7">7 · Components</a>
+    <a href="#journey">A full journey</a>
+    <a href="#guard">The safety rule</a>
+    <a href="#recipes">Recipes</a>
+    <a href="#tradeoffs">Tradeoffs</a>
+    <a href="#faq">FAQ</a>
+  </nav>
+
+  <h2 id="why">Why any of this exists</h2>
+  <div class="card">
+    <p>The Figma design for the Profile page shows a lot of information: a username, a bio, active sessions, five notification switches, display preferences, account stats, and more. When the page was built, <b>the backend only had endpoints for a small part of that</b>: reading the profile, saving the name, email, phone and Telegram, changing the password and resending the verification email.</p>
+    <p>So there were two choices. We could wait for the backend, or build the whole page now with <b>pretend data</b> (called <b>mock data</b>) and plug in the real data later. You chose the second, with one important condition: <i>the pretend data must be easy to remove and replace.</i></p>
+    <p>Everything in this guide is the answer to that condition. The idea is simple: <b>the screens never know whether the data is real or pretend.</b> They ask for data through one door, and behind that door a single settings file decides where the data really comes from.</p>
+  </div>
+
+  <h2 id="picture">The big picture</h2>
+  <p>Think of the page like a restaurant.</p>
+  <div class="analogy">
+    <div><b>Component (the customer)</b>The thing you see on screen: a card, a switch, a form. It just wants food (data) and doesn't care how it's cooked.</div>
+    <div><b>Hook (the waiter)</b>Takes the order from the component, brings back the food, and says "still cooking" (loading) or "sorry, we're out" (error).</div>
+    <div><b>Service contract (the menu)</b>A fixed list of what you can order for each area, like "get notification settings" or "change password".</div>
+    <div><b>Mock and API (two kitchens)</b>The mock kitchen cooks with pretend ingredients. The API kitchen uses the real backend. Both cook exactly the dishes on the menu.</div>
+    <div><b>config.ts (the manager)</b>Decides, for each area, which kitchen cooks. Changing one word moves an area from the pretend kitchen to the real one.</div>
+    <div><b>Types (the recipe card)</b>Describes exactly what each dish looks like, so both kitchens serve the same plate.</div>
+  </div>
+
+  <p>Here is the same thing as layers, top to bottom. Data requests go down, data comes back up.</p>
+  <div class="flow">
+    <div class="layer c1"><div class="name">Components<small>composites/profile/…</small></div><div class="what">Cards, forms and tab panels. They call hooks and draw what they get back.</div></div>
+    <div class="arrow">↓ call a hook, like <code>useNotificationSettings()</code></div>
+    <div class="layer c2"><div class="name">Hooks<small>src/hooks/profile/</small></div><div class="what">Handle loading, errors, caching and saving. They only talk to <code>profileServices</code>.</div></div>
+    <div class="arrow">↓ call <code>profileServices.notifications.get()</code></div>
+    <div class="layer c3"><div class="name">Service registry<small>src/services/profile/index.ts</small></div><div class="what">Looks at <code>config.ts</code> and hands over either the mock or the api version of each area.</div></div>
+    <div class="arrow">↓ one or the other, per area</div>
+    <div class="split">
+      <div class="layer c4"><div class="name">Mock<small>services/profile/mock/</small></div><div class="what">Pretend data from the Figma frames, a short fake delay, saved in the browser.</div></div>
+      <div class="layer c4"><div class="name">API<small>services/profile/api/</small></div><div class="what">Calls the real backend through the existing RTK Query endpoints, then reshapes the answer.</div></div>
+    </div>
+  </div>
+  <div class="callout ok"><p><b class="lbl">The one sentence to remember</b>Components → hooks → <code>profileServices</code> → mock <i>or</i> api, chosen per area in <code>config.ts</code>.</p></div>
+
+  <h2 id="words">Words you'll see</h2>
+  <div class="tablecard"><table>
+    <thead><tr><th>Word</th><th>Plain meaning</th></tr></thead>
+    <tbody>
+      <tr><td><b>Component</b></td><td>A piece of the screen written in React, like a card or a button.</td></tr>
+      <tr><td><b>Hook</b></td><td>A React function whose name starts with <code>use</code>. It lets a component remember things (like "is it loading?") and react when they change.</td></tr>
+      <tr><td><b>Type / interface</b></td><td>A TypeScript description of what an object looks like. If code breaks the description, the editor shows a red error before you ever run it.</td></tr>
+      <tr><td><b>Area</b></td><td>One chunk of the page's data. There are eight: details, summary, security, sessions, wallets, notifications, preferences, account.</td></tr>
+      <tr><td><b>Service</b></td><td>An object with the functions for one area, for example <code>get()</code> and <code>update()</code>.</td></tr>
+      <tr><td><b>Contract</b></td><td>The interface a service must follow. Mock and api both follow the same contract, which is why they can be swapped.</td></tr>
+      <tr><td><b>Mock</b></td><td>Pretend data and pretend behaviour, used until the real backend is ready.</td></tr>
+      <tr><td><b>API</b></td><td>The real backend server. Here it means our code that calls it.</td></tr>
+      <tr><td><b>RTK Query</b></td><td>The library the app already uses to call the backend (<code>src/core/redux/</code>). We reuse it, we don't replace it.</td></tr>
+      <tr><td><b>Promise / async</b></td><td>A value that arrives later. Network calls take time, so every service function returns a Promise.</td></tr>
+      <tr><td><b>View model</b></td><td>The shape of data the page wants, which can be different from what the backend sends.</td></tr>
+      <tr><td><b>Cache</b></td><td>A small memory of data already loaded, so it doesn't have to be loaded again.</td></tr>
+      <tr><td><b>Optimistic update</b></td><td>Showing a change on screen straight away, before the server confirms it, and undoing it if the server says no.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="folders">Folder map</h2>
+  <pre><code>src/
+├── types/profile-settings/index.ts   ← Step 1: what the data looks like
+├── services/profile/
+│   ├── types.ts                      ← Step 2: the contract (menu) per area
+│   ├── mock/
+│   │   ├── fixtures.ts               ← Step 3: the pretend values
+│   │   ├── runtime.ts                ← Step 3: fake delay + browser storage
+│   │   └── index.ts                  ← Step 3: the pretend kitchen
+│   ├── api/
+│   │   ├── mapUser.ts                ← Step 4: reshape backend data
+│   │   └── index.ts                  ← Step 4: the real kitchen
+│   ├── config.ts                     ← Step 5: mock or api, per area
+│   └── index.ts                      ← Step 5: the registry (front door)
+├── hooks/profile/
+│   ├── useProfileResource.ts         ← Step 6: shared loading + cache
+│   ├── index.ts                      ← Step 6: one hook per area
+│   └── useProfileDraft.ts            ← Step 6: the Profile form's edits
+└── design-system/composites/profile/ ← Step 7: the screens that use hooks</code></pre>
+  <p class="muted">The steps below follow the order they were built in, from the bottom of the diagram up to the screen.</p>
+
+  <!-- STEP 1 -->
+  <h2 id="s1"><span class="step">1</span>Decide what the data looks like (types)</h2>
+  <p>Before writing any data, I wrote down <b>the shape the page needs</b>, by reading the Figma frames field by field. This is the "recipe card". It lives in <code>src/types/profile-settings/index.ts</code>.</p>
+  <p class="file">src/types/profile-settings/index.ts</p>
+  <pre><code>export interface NotificationSettings {
+  watchedDomainSold: boolean
+  watchlistPriceDrop: boolean
+  listingSold: boolean
+  expiringSoon: boolean
+  productNews: boolean
+  channels: { email: boolean; telegram: boolean }
+}
+
+// The eight areas of the page
+export type ProfileArea = 'details' | 'summary' | 'security' | 'sessions'
+  | 'wallets' | 'notifications' | 'preferences' | 'account'</code></pre>
+  <p>Why start here? Because both kitchens (mock and api) must serve <b>exactly this shape</b>. The backend might send something different (for example one phone string like <code>"+911111111111"</code>), but the page always gets the tidy version (<code>{ countryCode: 'IN', number: '1111111111' }</code>). The api folder does that tidying in step 4.</p>
+  <div class="callout"><p><b class="lbl">Small detail</b>The folder is called <code>profile-settings</code> and not <code>profile</code> because a file <code>src/types/Profile.ts</code> already exists, and Windows treats <code>profile</code> and <code>Profile</code> as the same name.</p></div>
+
+  <!-- STEP 2 -->
+  <h2 id="s2"><span class="step">2</span>Write the contract for each area (the menu)</h2>
+  <p>Next, for each area, I listed <b>what the page can ask for</b>. This is an interface in <code>src/services/profile/types.ts</code>. It doesn't contain any data or logic. It's only a promise: "whoever cooks for this area will provide these functions".</p>
+  <p class="file">src/services/profile/types.ts</p>
+  <pre><code>export interface NotificationsService {
+  get(): Promise&lt;NotificationSettings&gt;
+  update(patch: Partial&lt;NotificationSettings&gt;): Promise&lt;NotificationSettings&gt;
+}
+
+export interface WalletsService {
+  list(): Promise&lt;ConnectedWallet[]&gt;
+  disconnect(walletId: string): Promise&lt;void&gt;
+  setPrimary(walletId: string): Promise&lt;void&gt;
+  getSettings(): Promise&lt;WalletSettings&gt;
+  updateSettings(patch: Partial&lt;WalletSettings&gt;): Promise&lt;WalletSettings&gt;
+}
+
+// All eight together
+export interface ProfileServices {
+  details: ProfileDetailsService
+  summary: AccountSummaryService
+  security: SecurityService
+  sessions: SessionsService
+  wallets: WalletsService
+  notifications: NotificationsService
+  preferences: PreferencesService
+  account: AccountService
+}</code></pre>
+  <p>Three things to notice:</p>
+  <ul>
+    <li><b>Every function returns a Promise</b>, even in the mock. Real network calls take time, so the pretend version behaves the same way. That means nothing has to change when we switch to real data.</li>
+    <li><code>Partial&lt;…&gt;</code> means "some of these fields". So <code>update({ productNews: false })</code> changes only that one switch.</li>
+    <li>The same file defines <code>ProfileServiceError</code>, the one error type both kitchens throw. Because every error looks the same, every card can show errors the same way.</li>
+  </ul>
+  <pre><code>export class ProfileServiceError extends Error {
+  constructor(message: string, public readonly status?: number) {
+    super(message)
+    this.name = 'ProfileServiceError'
+  }
+}</code></pre>
+
+  <!-- STEP 3 -->
+  <h2 id="s3"><span class="step">3</span>Build the mock data (the pretend kitchen)</h2>
+  <p>The mock folder has three files, each with one job.</p>
+
+  <h3>3a. <code>fixtures.ts</code>: the pretend values</h3>
+  <p>I copied the sample values shown in the Figma frames (John Doe, johndoe, Bangalore, 28 domains, and so on) and typed them with the step 1 types. If I made a typo in a field name, TypeScript would complain straight away.</p>
+  <p class="file">src/services/profile/mock/fixtures.ts</p>
+  <pre><code>export const mockProfileDetails: ProfileDetails = {
+  fullName: 'John Doe',
+  username: 'johndoe',
+  email: 'john.doe@example.com',
+  isEmailVerified: true,
+  phone: { countryCode: 'IN', number: '1111111111' },
+  telegram: '',
+  bio: 'Web3 enthusiast · Domain investor · Building the future one domain at a time.',
+  location: 'Bangalore, India',
+  website: 'https://johndoe.com',
+  avatarUrl: null,
+}
+
+export const mockAccountSummary: AccountSummary = {
+  memberSince: '2024-05-01T00:00:00.000Z',
+  domainsOwned: 28,
+  listed: 9,
+  volumeSold: { amount: 4250, token: 'USDT' },
+  completedSales: 31,
+}</code></pre>
+
+  <h3>3b. <code>runtime.ts</code>: make it feel like a real server</h3>
+  <p>A pretend kitchen that answers instantly would hide bugs, because a real server takes time and remembers what you saved. So this file adds two behaviours:</p>
+  <ul>
+    <li><b>A fake delay of 300ms</b>, so loading skeletons actually appear and get tested.</li>
+    <li><b>Memory across reloads</b>, using the browser's <code>localStorage</code> under keys like <code>mock:profile:notifications</code>. If you turn a switch off and reload, it stays off, just like it would with a real server.</li>
+  </ul>
+  <p class="file">src/services/profile/mock/runtime.ts</p>
+  <pre><code>const MOCK_DELAY_MS = 300
+
+// Wait 300ms, then give back the value (like a network round trip)
+export const mockDelay = &lt;T&gt;(value: T, ms = MOCK_DELAY_MS): Promise&lt;T&gt; =&gt;
+  new Promise((resolve) =&gt; setTimeout(() =&gt; resolve(value), ms))
+
+// Read saved pretend data, or fall back to the fixture
+export function readMock&lt;T&gt;(area: string, fallback: T): T {
+  try {
+    const raw = localStorage.getItem(`mock:profile:${area}`)
+    return raw ? { ...fallback, ...JSON.parse(raw) } : fallback
+  } catch {
+    return fallback   // storage blocked (private mode): just use the fixture
+  }
+}
+
+// Save pretend data so it survives a reload
+export function writeMock&lt;T&gt;(area: string, value: T): T { … }</code></pre>
+  <div class="callout"><p><b class="lbl">Tip</b>To reset all the pretend data, open the browser DevTools → Application → Local Storage, and delete the keys that start with <code>mock:profile:</code>.</p></div>
+
+  <h3>3c. <code>mock/index.ts</code>: the pretend kitchen itself</h3>
+  <p>This file follows the contract from step 2 for all eight areas, using the fixtures and the runtime helpers. Because it's typed as <code>ProfileServices</code>, TypeScript refuses to compile if any function on the menu is missing.</p>
+  <p class="file">src/services/profile/mock/index.ts</p>
+  <pre><code>export const mockServices: ProfileServices = {
+  notifications: {
+    get: () =&gt; mockDelay(readMock('notifications', mockNotificationSettings)),
+    update: (patch) =&gt;
+      mockDelay(writeMock('notifications', {
+        ...readMock('notifications', mockNotificationSettings),
+        ...patch,                       // only the changed switches
+      })),
+  },
+
+  wallets: {
+    disconnect: async (walletId) =&gt; {
+      const wallets = readMockList('wallets', mockWallets)
+      // Behaves like a real server rule: you can't remove your last wallet
+      if (wallets.length &lt;= 1) throw new ProfileServiceError('You need at least one connected wallet.', 400)
+      writeMock('wallets', wallets.filter((w) =&gt; w.id !== walletId))
+      return mockDelay(undefined)
+    },
+    …
+  },
+  …
+}</code></pre>
+  <p>I also made the mock act like the real backend in a few places, so the error states could be tried without a backend:</p>
+  <ul>
+    <li>Typing <code>wrong-password</code> as the current password gives "Your current password is incorrect."</li>
+    <li>Changing the email turns <code>isEmailVerified</code> off, because a new address needs verifying again.</li>
+    <li>Deleting the account only works if you type the right username.</li>
+    <li>You can't disconnect the last wallet.</li>
+  </ul>
+
+  <!-- STEP 4 -->
+  <h2 id="s4"><span class="step">4</span>Build the real API side (the real kitchen)</h2>
+  <p>The api folder follows the <b>same contract</b>, but gets its data from the real backend. It doesn't call the server in a new way: it <b>reuses the RTK Query endpoints the app already has</b> in <code>src/core/redux/userProfile.ts</code>. I only added two small endpoints there that were missing: <code>resendVerificationEmail</code> and <code>changePassword</code>.</p>
+
+  <h3>4a. Calling the existing RTK Query endpoints from outside React</h3>
+  <p>RTK Query endpoints are usually used inside components as hooks. The service layer isn't a component, so it dispatches the endpoint on the app's store directly. It still goes through the same cache as the rest of the app.</p>
+  <p class="file">src/services/profile/api/index.ts</p>
+  <pre><code>async function fetchProfile(forceRefetch = false) {
+  const request = store.dispatch(
+    ProfileApi.endpoints.getUserProfile.initiate(undefined, { forceRefetch })
+  )
+  try {
+    const response = await request.unwrap()   // wait for the answer
+    return response.result                      // the backend User object
+  } catch (error) {
+    throw toServiceError(error, 'Could not load your profile.')
+  } finally {
+    request.unsubscribe()                       // tidy up
+  }
+}</code></pre>
+
+  <h3>4b. Reshaping backend data: <code>mapUser.ts</code></h3>
+  <p>The backend's <code>User</code> doesn't look like our page's types. For example, it stores the phone as one string and has no username yet. <code>mapUser.ts</code> converts it into the step 1 shape. Fields the backend doesn't have yet come back empty.</p>
+  <p class="file">src/services/profile/api/mapUser.ts</p>
+  <pre><code>export function mapUserToDetails(user: User): ProfileDetails {
+  return {
+    fullName: user.name ?? '',
+    username: '',                       // backend doesn't have it yet
+    email: user.email,
+    isEmailVerified: user.isEmailVerified,
+    // "+911111111111"  →  { countryCode: 'IN', number: '1111111111' }
+    phone: user.phoneNumber ? parsePhoneString(user.phoneNumber, COUNTRIES, DEFAULT_COUNTRY_CODE) : null,
+    telegram: user.telegram ?? '',
+    bio: '', location: '', website: '', avatarUrl: null,
+  }
+}</code></pre>
+
+  <h3>4c. Friendly errors: <code>toServiceError</code></h3>
+  <p>The server sometimes answers with technical words like "Unauthorized". This function turns them into sentences a person understands, wrapped in the same <code>ProfileServiceError</code> the mock uses.</p>
+  <div class="tablecard"><table>
+    <thead><tr><th>Server says</th><th>Person sees</th></tr></thead>
+    <tbody>
+      <tr><td>401 Unauthorized</td><td>Your session has expired. Sign in again to continue.</td></tr>
+      <tr><td>500 and above</td><td>The server didn't respond. Please try again in a moment.</td></tr>
+      <tr><td>No connection (FETCH_ERROR)</td><td>You seem to be offline. Check your connection and try again.</td></tr>
+      <tr><td>401 on change password</td><td>Your current password is incorrect.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>4d. Only the areas that really exist</h3>
+  <p>The api folder only implements the three areas the backend can support today. Where an endpoint is missing, it says so honestly instead of pretending.</p>
+  <pre><code>export const apiServices = {
+  details,     // GET profile, save name/email/phone/telegram, resend verification
+  security,    // sign in methods from GET, change password
+  wallets,     // list from GET; disconnect etc. say "not available yet"
+} satisfies Partial&lt;ProfileServices&gt;</code></pre>
+
+  <!-- STEP 5 -->
+  <h2 id="s5"><span class="step">5</span>The switch and the front door</h2>
+  <h3>5a. <code>config.ts</code>: one line per area</h3>
+  <p>This is the only file you edit to move an area from pretend to real data.</p>
+  <p class="file">src/services/profile/config.ts</p>
+  <pre><code>export const PROFILE_SOURCES: ProfileSourceConfig = {
+  details: 'mock',        // waits for backend item 1 (username, bio, …)
+  summary: 'mock',        // item 2
+  security: 'mock',       // item 3
+  sessions: 'mock',       // item 4
+  wallets: 'mock',        // item 5
+  notifications: 'mock',  // item 6
+  preferences: 'mock',    // item 7
+  account: 'mock',        // item 8
+}</code></pre>
+  <div class="callout ok"><p><b class="lbl">Built in safety</b>The type <code>ProfileSourceConfig</code> only allows <code>'api'</code> for areas that <code>api/index.ts</code> actually implements. If you write <code>notifications: 'api'</code> today, the editor shows a red error, because there's no real notifications code yet. You can't accidentally point the page at something that doesn't exist.</p></div>
+  <p>How that trick works, in plain words: <code>keyof typeof apiServices</code> means "the names of the areas in the api folder" (details, security, wallets). The config type says "an area may be <code>'api'</code> only if its name is in that list".</p>
+  <pre><code>type ApiReady = keyof typeof apiServices            // 'details' | 'security' | 'wallets'
+export type ProfileSource&lt;A extends ProfileArea&gt; =
+  'mock' | (A extends ApiReady ? 'api' : never)     // 'api' only when ready</code></pre>
+
+  <h3>5b. <code>services/profile/index.ts</code>: the front door</h3>
+  <p>This file reads the config and builds one object, <code>profileServices</code>, picking the mock or api version of each area. <b>This is the only thing the rest of the app imports.</b></p>
+  <p class="file">src/services/profile/index.ts</p>
+  <pre><code>function pick&lt;A extends ProfileArea&gt;(area: A): ProfileServices[A] {
+  if (PROFILE_SOURCES[area] === 'api') return apiServices[area]
+  return mockServices[area]
+}
+
+export const profileServices: ProfileServices = {
+  details: pick('details'),
+  summary: pick('summary'),
+  …
+  account: pick('account'),
+}
+
+// True while an area is still pretend; shows the "Sample data" chip
+export const isMockArea = (area: ProfileArea) =&gt; PROFILE_SOURCES[area] === 'mock'</code></pre>
+
+  <!-- STEP 6 -->
+  <h2 id="s6"><span class="step">6</span>The hooks (the waiters)</h2>
+  <p>Components could call <code>profileServices</code> directly, but then every component would have to handle loading, errors, saving and caching itself. Hooks do that once, for everyone.</p>
+
+  <h3>6a. <code>useProfileResource</code>: the shared loader</h3>
+  <p>One general hook that knows how to load anything. You give it a name (the cache key) and a function that loads the data. It gives back everything a screen needs.</p>
+  <p class="file">src/hooks/profile/useProfileResource.ts</p>
+  <pre><code>const resource = useProfileResource('notifications', () =&gt; profileServices.notifications.get())
+
+resource.data       // the settings, or undefined while loading
+resource.isLoading  // true the first time → show a skeleton
+resource.isError    // true if it failed → show an error banner
+resource.error      // the friendly message
+resource.reload()   // the Retry button calls this
+resource.replace(x) // put new data in after a save</code></pre>
+  <p>Two extra things happen inside it:</p>
+  <ul>
+    <li><b>A cache.</b> Loaded data is kept in memory under its key. When you switch from Notifications to Security and back, the data is shown immediately instead of loading again.</li>
+    <li><b>Listeners.</b> If two parts of the page use the same key, they stay in sync. Example: the Wallets tab badge (the "3" on the tab) and the wallet list both use <code>'wallets'</code>. Disconnect a wallet and the badge updates to 2 by itself.</li>
+  </ul>
+  <p>Next to it, <code>useProfileAction</code> wraps a save so the screen knows when it's busy (to show "Saving…" or disable a button).</p>
+  <pre><code>const { run: save, isSaving } = useProfileAction(async (patch) =&gt; { … })</code></pre>
+
+  <h3>6b. One hook per area: <code>hooks/profile/index.ts</code></h3>
+  <p>Each area gets a small, easy to read hook built from the two pieces above. Components use these, never the services.</p>
+  <p class="file">src/hooks/profile/index.ts</p>
+  <pre><code>export function useNotificationSettings() {
+  // 1. load the data
+  const resource = useProfileResource('notifications', () =&gt; profileServices.notifications.get())
+
+  // 2. a way to save changes
+  const { run: update, isSaving } = useProfileAction(async (patch) =&gt; {
+    const next = await profileServices.notifications.update(patch)
+    resource.replace(next)          // keep the cache up to date
+    return next
+  })
+
+  // 3. hand it all to the component, plus "is this pretend?"
+  return { ...resource, update, isSaving, isSample: isMockArea('notifications') }
+}</code></pre>
+  <p>The full list: <code>useProfileDetails</code>, <code>useResendVerification</code>, <code>useAccountSummary</code>, <code>useSignInMethods</code>, <code>useChangePassword</code>, <code>useActiveSessions</code>, <code>useConnectedWallets</code>, <code>useWalletSettings</code>, <code>useNotificationSettings</code>, <code>useProfilePreferences</code>, <code>useYourData</code>, <code>useWalletCount</code>.</p>
+
+  <h3>6c. <code>useProfileDraft</code>: the Profile form's edits</h3>
+  <p>The Profile form is special: you type in several fields, then press Save. This hook keeps a <b>draft</b> (your unsaved copy) next to the <b>saved</b> version from <code>useProfileDetails</code>.</p>
+  <ul>
+    <li>It compares draft and saved to know if anything changed (<code>isDirty</code>), which enables the Save button and powers the "Discard unsaved changes?" prompt.</li>
+    <li>It checks each field with the rules in <code>src/helpers/profileValidation.ts</code>, showing errors when you leave a field or press Save.</li>
+    <li>On Save it sends <b>only the changed fields</b> through <code>useProfileDetails().save</code>, so through the same service layer as everything else.</li>
+  </ul>
+
+  <!-- STEP 7 -->
+  <h2 id="s7"><span class="step">7</span>The components (the customers)</h2>
+  <p>Each tab has a "panel" component that uses the hooks and decides what to draw. Here's the Notifications tab, simplified. It shows the three states every card has: loading, error, and ready.</p>
+  <p class="file">composites/profile/notifications/NotificationsTabPanel/NotificationsTabPanel.tsx</p>
+  <pre><code>const notifications = useNotificationSettings()
+const [local, setLocal] = useState(notifications.data)
+
+// When the switch is flipped: show it now, save, undo if saving fails
+const handleToggle = async (key, value) =&gt; {
+  const previous = local
+  setLocal({ ...local, [key]: value })          // 1. update the screen at once
+  try {
+    await notifications.update({ [key]: value }) // 2. save
+  } catch (error) {
+    setLocal(previous)                           // 3. failed? put it back
+    ToastMessage(TOAST_TYPE.ERROR, "Couldn't save that alert", error.message)
+  }
+}
+
+if (notifications.isLoading) return &lt;SettingsCardSkeleton rows={4} /&gt;
+if (notifications.isError)   return &lt;NoticeBanner … action={&lt;Retry onClick={notifications.reload} /&gt;} /&gt;
+return &lt;NotificationSwitches settings={local} onToggle={handleToggle} isSample={notifications.isSample} /&gt;</code></pre>
+  <p>Notice that this component has <b>no idea</b> whether the data is pretend or real. It never imports anything from <code>mock/</code> or <code>api/</code>. That's the whole point.</p>
+  <p>The small visual pieces (<code>NotificationSwitches</code>, <code>SettingsRow</code>, <code>Switch</code>) don't load data at all. They just receive values and callbacks as props. Only the panels talk to hooks.</p>
+
+  <h2 id="journey">A full journey: flipping one switch</h2>
+  <p>Let's follow what happens when you turn off "Product news" on the Notifications tab, with notifications on <code>'mock'</code>.</p>
+  <ol class="journey">
+    <li>You open <code>/profile?tab=notifications</code>. The page renders <code>NotificationsTabPanel</code>.</li>
+    <li>The panel calls <code>useNotificationSettings()</code>.</li>
+    <li>That hook calls <code>useProfileResource('notifications', …)</code>. Nothing is in the cache yet, so <code>isLoading</code> is true and you see a skeleton.</li>
+    <li>The loader calls <code>profileServices.notifications.get()</code>.</li>
+    <li>The registry built <code>profileServices.notifications</code> from <code>config.ts</code>, which says <code>'mock'</code>, so this is <code>mockServices.notifications.get()</code>.</li>
+    <li>The mock reads <code>localStorage</code> (or the fixture), waits 300ms, and gives back the settings.</li>
+    <li>The hook stores them in the cache, <code>isLoading</code> becomes false, and the five switches appear.</li>
+    <li>You flip Product news. The panel shows it off straight away (optimistic) and calls <code>notifications.update({ productNews: false })</code>.</li>
+    <li>That goes down the same path to <code>mockServices.notifications.update</code>, which saves to <code>localStorage</code> and returns the new settings after 300ms.</li>
+    <li>The hook calls <code>resource.replace(next)</code>, so the cache and anything listening to <code>'notifications'</code> now hold the new value.</li>
+    <li>If step 9 had failed, the panel would put the switch back and show an error toast.</li>
+  </ol>
+  <div class="callout ok"><p><b class="lbl">With real data</b>Once the backend ships notifications and someone writes the api version, step 5 picks the api version instead, and steps 6 and 9 talk to the server. Every other step stays exactly the same.</p></div>
+
+  <h2 id="guard">The safety rule that keeps mock data contained</h2>
+  <p>If a component imported the pretend data directly, deleting <code>mock/</code> later would break it. To stop that from ever happening, I added a rule to <code>eslint.config.mjs</code>: importing anything from <code>services/profile/mock</code> <b>outside</b> <code>src/services/profile</code> is a lint error.</p>
+  <pre><code>// eslint.config.mjs
+"no-restricted-imports": ["error", {
+  patterns: [{
+    group: ["@/services/profile/mock", "**/services/profile/mock", …],
+    message: "Read profile data through the hooks in src/hooks/profile, not the mock implementations.",
+  }],
+}]</code></pre>
+  <p>So the only file that knows the mock exists is <code>services/profile/index.ts</code>.</p>
+
+  <h2 id="recipes">Recipes</h2>
+  <h3>Recipe A: the backend shipped notifications. How do I switch to real data?</h3>
+  <ol>
+    <li>Add the endpoints to RTK Query in <code>src/core/redux/</code> (and the URL to <code>src/constants/Api.ts</code>), the same way the rest of the app does.</li>
+    <li>In <code>services/profile/api/index.ts</code>, write a <code>notifications</code> object with <code>get</code> and <code>update</code> that call those endpoints. If the backend's shape is different, add a small mapper like <code>mapUser.ts</code>.</li>
+    <li>Add <code>notifications</code> to the <code>apiServices</code> list at the bottom of that file.</li>
+    <li>In <code>config.ts</code>, change <code>notifications: 'mock'</code> to <code>notifications: 'api'</code>. (Before step 3, this line would show a red error.)</li>
+    <li>Done. The "Sample data" chip disappears from that card by itself. No hook or component changes.</li>
+  </ol>
+  <h3>Recipe B: the areas that already have real code</h3>
+  <p>Details, security and wallets already have api code. Switching them is just step 4 above. They stay on mock for now only because the backend is missing <i>some</i> of their fields (username, bio, sessions, disconnect Google, and so on); switching early would show those parts empty.</p>
+  <h3>Recipe C: every area is real. How do I delete the mock data?</h3>
+  <ol>
+    <li>Make sure every line in <code>config.ts</code> says <code>'api'</code>.</li>
+    <li>Delete the folder <code>src/services/profile/mock/</code>.</li>
+    <li>In <code>services/profile/index.ts</code>, remove the <code>mockServices</code> import and the mock branch in <code>pick</code>.</li>
+    <li>Run the type check. It points at anything left over (for example the "Sample data" chip prop, which can then go too).</li>
+  </ol>
+  <h3>Recipe D: I want to see the error states while on mock</h3>
+  <ul>
+    <li>Change password: type <code>wrong-password</code> as the current password.</li>
+    <li>Wallets: disconnect wallets until only one is left, then try again.</li>
+    <li>Delete account: type a username that doesn't match.</li>
+    <li>A loading error for a whole card: temporarily set details, security or wallets to <code>'api'</code> while not logged in with a real account. Remember to set it back.</li>
+  </ul>
+
+  <h2 id="tradeoffs">Why this design, and what it costs</h2>
+  <div class="card">
+    <p><b>What we gain</b></p>
+    <ul>
+      <li>The whole page could be built and tested before the backend was ready.</li>
+      <li>Moving an area to real data is a one line change, and the type system stops mistakes.</li>
+      <li>Removing the pretend data later is deleting one folder.</li>
+      <li>Loading, errors and saving behave the same way on every card, because they're written once in the hooks.</li>
+      <li>The page always gets tidy data, whatever shape the backend sends.</li>
+    </ul>
+    <p><b>What it costs</b></p>
+    <ul>
+      <li><code>src/services/</code> is a new top level folder, and this pattern is only used by the Profile page so far. Other pages call RTK Query hooks directly.</li>
+      <li>There are more files than calling RTK Query from components would need.</li>
+      <li>If you prefer, it could live under <code>src/core/</code> next to the redux code instead. The design would be the same, only the location would change.</li>
+    </ul>
+  </div>
+
+  <h2 id="faq">FAQ</h2>
+  <div class="card">
+    <h3>Does this replace RTK Query?</h3>
+    <p>No. The api folder calls the existing RTK Query endpoints and shares their cache. It just adds reshaping and friendly errors on top.</p>
+    <h3>Will real users ever see John Doe?</h3>
+    <p>Only on cards whose area is still on mock, and those cards show a "Sample data" chip. When an area is switched to api, its pretend data is no longer used anywhere.</p>
+    <h3>Why does the mock wait 300ms?</h3>
+    <p>So the loading skeletons appear and get tested. Without a delay, bugs in loading states would stay hidden until the real backend arrived.</p>
+    <h3>Where is the theme (light/dark) saved?</h3>
+    <p>Not in this layer. The theme lives on the device through <code>src/context/ThemeContext.tsx</code>, the same as the header toggle. Saving it to the account waits for the backend.</p>
+    <h3>Why are some hooks shared between tabs?</h3>
+    <p>Because some data belongs to one area but shows in several places. Telegram is part of profile details, so the Notifications tab uses <code>useProfileDetails</code> to show and disconnect it. Thanks to the cache, both tabs always agree.</p>
+    <h3>Where's the full list of files?</h3>
+    <p>In <code>dev-docs/profile-settings-progress.html</code>, along with the phase history.</p>
+  </div>
+
+  <footer>Written 14 October 2026 for the <code>profile-settings</code> branch. Local only, like the rest of <code>dev-docs</code>.</footer>
+</div>
+<script>
+  document.getElementById('toggle').addEventListener('click', function () {
+    var root = document.documentElement;
+    var current = root.getAttribute('data-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('dmplan-theme', next); } catch (e) {}
+  });
+</script>
+</body>
+</html>

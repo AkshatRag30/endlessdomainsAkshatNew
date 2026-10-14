@@ -4,6 +4,8 @@ Figma: file `hq6HmB04UFUlFiJp9f9eGv` (marketplace akshat), section **"my profile
 Branch: cut `profile-settings` from `marketplace-v2` (after `dark-mode` is merged, or from `dark-mode` if it isn't yet, because the page must be dark ready from day one).
 Written 14 Oct 2026. Code comments cite this file as "profile plan §N.N".
 
+> **Continuing work? Start at §14**: where we stopped on 14 Oct and the next steps. First job on 15 Oct is §14.1, restructuring the data layer to match My Domains and Watchlist. Until it's done, §6.3, §6.4 and §8.3 describe the old service layer.
+
 ---
 
 ## 1. Context
@@ -728,3 +730,149 @@ from §8.2 it waits for. Don't commit.
 9. **Figma quirks (§2.9):** confirm with the designer, especially the Wallets frame copy.
 10. **Delete account:** soft delete with a grace period, or immediate? What happens to active listings (cancel on chain, or leave the orders)?
 11. **Notifications:** do email alerts already exist on the backend for any of the five events?
+
+---
+
+## 14. Where we stopped (14 Oct, end of day) and what's next
+
+**Status:** phases 1 to 9 are built and checked on branch `profile-settings`. **Nothing is committed.** Phase 0 (the backend and designer message) hasn't been done. Every area in `src/services/profile/config.ts` is still `'mock'`. The dev server on port 3002 stopped with the session; start it again before checking the page. Full file by file record: `dev-docs/profile-settings-progress.html`. Beginner explanation of the data layer: `dev-docs/profile-data-layer-guide.html`.
+
+### 14.1 Decided: restructure the data layer to match My Domains and Watchlist (run on 15 Oct)
+
+**How we got here (14 Oct).** The user asked why a new `src/services/` folder exists when the repo already has `src/core/services/`, then asked to check how My Domains and Watchlist are integrated and make this page match: "no extra duplicate folders, optimized". The first idea, moving the folder into `src/core/services/profile/`, is **dropped**. Comparing the pages showed the whole service layer is a pattern no other page uses. It should have been checked before phase 1; that was a miss.
+
+**Decided (user, 14 Oct):** do the restructure tomorrow. **Keep every area on sample data** for now; switching areas to the real API is a separate later step.
+
+#### How the other pages are built (checked 14 Oct)
+
+| Concern | My Domains / Watchlist / domain overview | Profile page today (duplicates) |
+|---|---|---|
+| Real backend calls | Hooks call RTK Query hooks from `src/core/redux/*` directly (`useMyDomainsData` → `useGetMyDomainsOrdersQuery`) | A separate layer `src/services/profile/` (types, config, registry, `api/`, `mock/`) between hooks and Redux |
+| Sample data | `src/data/<page>/` (`data/my-domains/domains.ts`, `data/marketplace/overview.ts`); shared, mutable mock state as a small store with `useSyncExternalStore` (`data/marketplace/watchlist.ts`, `useMockWatchlist`) | `src/services/profile/mock/` with `localStorage` persistence |
+| Loading for sample data | The shared `useMockQuery` + `QueryResult` in `src/hooks/marketplace/domain-overview/queryResult.ts` (already reused by watchlist hooks) | My own `useProfileResource` / `useProfileAction` with a module cache |
+| Going real | Replace the hook's mock body with the RTK query + a mapper, callers unchanged ("going real is a query plus a mapper here") | Flip a line in `config.ts` |
+| Hooks | One file per hook (`hooks/my-domains/useMyDomainsData.ts`, `hooks/marketplace/watchlist/useWatchlistItems.ts`), no barrel | Twelve hooks in one `hooks/profile/index.ts` barrel |
+| Mappers | `src/helpers/marketplace/watchlist.ts` or inside the hook | `src/services/profile/api/mapUser.ts` |
+| Error text | `getUserFriendlyToastMessage(error, fallback)` from `src/helpers/error-messages` | My own `toServiceError`, `ProfileServiceError`, `messageOf` |
+| Mock flag | `isMock` on the hook result (watchlist) | `isSample` |
+| Lint guard | none | `no-restricted-imports` rule for the mock folder |
+
+#### Target layout
+
+```
+src/
+├── data/profile/
+│   ├── fixtures.ts        ← from services/profile/mock/fixtures.ts (same values)
+│   └── store.ts           ← shared mock state + update functions, useSyncExternalStore,
+│                            modelled on data/marketplace/watchlist.ts (replaces mock/index.ts + runtime.ts)
+├── helpers/profile/
+│   ├── mapUser.ts         ← from services/profile/api/mapUser.ts (kept for going real)
+│   └── validation.ts      ← from helpers/profileValidation.ts
+├── hooks/profile/         ← one file per hook, no index.ts
+│   ├── useProfileDetails.ts      (data + save + resend verification)
+│   ├── useProfileDraft.ts        (unchanged logic, new imports)
+│   ├── useAccountSummary.ts
+│   ├── useSignInMethods.ts       (+ disconnect Google)
+│   ├── useChangePassword.ts
+│   ├── useActiveSessions.ts      (+ sign out, sign out others)
+│   ├── useConnectedWallets.ts    (+ disconnect, set primary, useWalletCount)
+│   ├── useWalletSettings.ts
+│   ├── useNotificationSettings.ts
+│   ├── useProfilePreferences.ts
+│   └── useYourData.ts
+└── types/profile-settings/index.ts   ← stays (a src/types/profile folder would clash with
+                                        src/types/Profile.ts in imports on Windows)
+```
+
+`src/helpers/phone.ts`, `passwordStrength.ts`, `displayFormat.ts` and `src/data/countries.ts` stay where they are: primitives use them and they aren't profile specific.
+
+#### Hook shape (every data hook)
+
+* Returns `QueryResult<T>` from `hooks/marketplace/domain-overview/queryResult.ts` (`data`, `isLoading`, `isError`, `refetch`), plus `isMock: true` and its actions (`save`, `update`, `disconnect`…) with an `isSaving` flag, like `useWatchlistItems` returns `remove` / `restore` / `pendingId`.
+* Mock body: `useMockQuery` for the first load (gives the loading state and skeletons), then the live value from the `data/profile/store.ts` snapshot via `useSyncExternalStore`, so two components on the same area agree (the Wallets tab badge and the wallet list). Mock actions update the store after a short delay and throw a plain `Error` for the test cases (`wrong-password`, last wallet, wrong username).
+* A comment at the top of each hook names the real body, for example: `Real: useGetUserProfileQuery() mapped through mapUserToDetails; save via useSetProfileMutation (PUT /users: name, phoneNumber, email, telegram); resend via useResendVerificationEmailMutation. Waits for §8.2 item 1.`
+* Mock state resets on a hard reload, like the watchlist preview (the `localStorage` persistence is dropped, matching the other pages).
+
+#### Steps
+
+1. Create `src/data/profile/fixtures.ts` and `store.ts` from the mock folder.
+2. Create `src/helpers/profile/mapUser.ts` and `validation.ts` (move, update imports in `ProfileInformationForm`, `ProfileTabPanel`, `useProfileDraft`, `pages/profile/index.tsx`).
+3. Split the hooks into one file each with the shape above; delete `hooks/profile/index.ts` and `useProfileResource.ts`.
+4. Update the users of each hook (all inside `composites/profile`, checked 14 Oct):
+
+   | Hook | Used by |
+   |---|---|
+   | `useProfileDetails` | NotificationsTabPanel, ProfileRail |
+   | `useResendVerification` (fold into `useProfileDetails`) | ProfileTabPanel |
+   | `useAccountSummary` | ProfileTabPanel, ProfileRail |
+   | `useSignInMethods`, `useChangePassword`, `useActiveSessions` | SecurityTabPanel |
+   | `useConnectedWallets`, `useWalletSettings` | WalletsTabPanel |
+   | `useWalletCount` | `pages/profile/index.tsx` |
+   | `useNotificationSettings` | NotificationsTabPanel |
+   | `useProfilePreferences` | PreferencesTabPanel |
+   | `useYourData` | ProfileRail |
+   | `useProfileDraft` | ProfileTabPanel |
+
+   Renames in those files: `reload` → `refetch`, `isSample` → `isMock`, `messageOf(error, …)` → `getUserFriendlyToastMessage(error, …)`. `QueryResult` has no `error` string, so error banners use their fixed fallback sentence ("Please try again.").
+5. Delete `src/services/` entirely (the folder is new on this branch, so the top level `src/services/` disappears). Remove the `no-restricted-imports` block from `eslint.config.mjs` (no other page has one; `eslint.config.mjs` then matches `main` again).
+6. Remove now unused types: `ProfileArea` in `types/profile-settings` if nothing else uses it.
+7. Update comments that mention `src/services/profile` (`pages/profile/index.tsx`, `types/profile-settings/index.ts`, `ProfileTabPanel.tsx`, `SampleDataChip.tsx`).
+8. Verify: `npx tsc --noEmit`, lint on changed files, `scsscheck.js` not needed (no styles change), grep that `services/profile`, `useProfileResource` and `isSample` are gone, then on the dev server click through all five tabs in light and dark: skeletons, every save, the `wrong-password` error, disconnect down to the last wallet (badge follows), delete account username check, Telegram set up and disconnect, unsaved changes guard.
+9. Docs: rewrite `dev-docs/profile-data-layer-guide.html` for the new structure (it describes the old service layer), update the file tables in `profile-settings-progress.html` (new and removed files), §6.3, §6.4 and §8.3 of this plan, and the memory note.
+
+Net effect expected: about 10 fewer files, no new top level folder, `eslint.config.mjs` back to unchanged, the page built the same way as its siblings. Behaviour on screen identical, except sample edits no longer survive a hard reload.
+
+**Ready prompt:**
+
+```
+Restructure the profile page's data layer as described in
+dev-docs/profile-settings-implementation-plan.md §14.1, to match how
+My Domains and Watchlist are built: sample data in src/data/profile/,
+one hook per file in src/hooks/profile/ on QueryResult and useMockQuery,
+mappers and validation in src/helpers/profile/, errors through
+getUserFriendlyToastMessage, delete src/services/ and useProfileResource,
+remove the profile lint rule. Keep every area on sample data. Then run
+the checks in step 8 and update the docs in step 9. Don't commit.
+```
+
+### 14.2 Why the page uses Redux (asked 14 Oct, recorded for reference)
+
+Redux wasn't added by this work. The app already had it, and the profile endpoints were already written there, so they were reused.
+
+* `src/core/redux/api.ts` sets up `myApi`, the app's RTK Query instance (RTK Query is the data fetching part of Redux Toolkit). It already attaches the login token from the cookie to every request, so the profile page didn't need its own auth handling.
+* `src/core/redux/userProfile.ts` already had `getUserProfile` (the GET that reads the user) and `setProfile` (the PUT that saves it): the two calls the page needs most.
+* It's the main way this app talks to the backend: 39 files import from `core/redux`, against 11 that use the older axios helpers in `core/services/api.service.ts`.
+
+Reusing it bought three things:
+
+1. **No duplicate profile request.** Other parts of the app (the wallet connect flow, the domain page) already load the user through `getUserProfile`; the profile page shares the same cached answer instead of asking the server again.
+2. **Everyone stays up to date after a save.** `setProfile` marks the cached profile as out of date (the `profile` tag), so every screen showing the user reloads it by itself. A separate axios call would leave those screens showing the old name until a page reload.
+3. **Consistency.** New endpoints live in the same place and style as the rest of the app.
+
+Only two endpoints were added to Redux, next to the existing ones: `resendVerificationEmail` (POST `/auth/verification-email`, body `{ email }`) and `changePassword` (PUT `/auth/change-password`, body `{ oldPassword, newPassword }`).
+
+The page's own state lives in React hooks, not the Redux store: loading, the per area cache, the form draft and the sample data. That's why the service layer sits on top: RTK Query only covers endpoints that exist, while the page also needs sample data for the missing ones and a way to swap between the two (§6.4).
+
+### 14.3 Going real after the restructure (replaces the 14 Oct answer about the service layer)
+
+The earlier answer here ("only `mock/` is deleted, the service folder stays") is **superseded by §14.1**: the service folder goes away tomorrow. After the restructure, an area goes real the same way as on My Domains and Watchlist:
+
+1. Make sure the RTK Query endpoint exists in `src/core/redux/` (for profile details, change password and resend verification it already does: `useGetUserProfileQuery`, `useSetProfileMutation`, `useChangePasswordMutation`, `useResendVerificationEmailMutation`).
+2. In that area's hook, replace the mock body with the RTK query, mapped through `src/helpers/profile/mapUser.ts`; the hook keeps the same return shape, so components don't change. Set `isMock` to false.
+3. Show errors with `getUserFriendlyToastMessage`; change password still turns a 401 into "Your current password is incorrect." inside its hook.
+4. When no hook uses `src/data/profile/` any more, delete that folder and the `SampleDataChip` primitive.
+
+Real calls share the app wide RTK cache, so the profile page and the rest of the app (header, wallet connect) stay in sync after a save (§14.2).
+
+### 14.4 Docs written on 14 Oct (local only, never commit `dev-docs`)
+
+* `dev-docs/profile-settings-progress.html`: rewritten in full. Every phase, all 123 new files by folder, all 20 changed files with what changed, why and the effect on other pages, things removed along the way, decisions, Figma quirks, backend findings, the sample data table, verification. A broken leftover script at the top was removed and the theme toggle fixed. Not checked at phone width in a real browser (the headless screenshot at 390 looked cut off on the right; probably headless Chrome's minimum window width, not confirmed).
+* `dev-docs/profile-data-layer-guide.html`: new. Beginner friendly explanation of types, contracts, mock data, the api folder, the switch, the hooks and the components, with real code snippets, a full journey of one switch flip, and recipes for switching an area to real data and deleting the mock data. Not checked at phone width either.
+
+### 14.5 Next steps, in order
+
+1. **Run §14.1** (restructure to match My Domains and Watchlist, all areas on sample data). Use its ready prompt. Start the dev server first.
+2. **Look at the page yourself** on the dev server: `/profile`, all five tabs, light and dark, phone and desktop.
+3. **Commit when ready** (only when asked): the 123 new files and 20 changed files on `profile-settings`, without `dev-docs`. Shared files changed: `CLAUDE.md`, `MarketplacePageShell`, `FilterDropdown`, `DefaultButton`, `InfoListCard`, `SegmentedToggle`, `ThemeContext`, navigation. A production build hasn't been run; the team should run one in CI.
+4. **Phase 0:** send the backend team the §8.2 list (also in the progress file's sample data table) and the designer the §2.9 quirks, the missing flags and the missing tablet frames.
+5. **Update §13:** Q3 is answered by the phase 5 backend check (PUT `/users` accepts name, phoneNumber, email and telegram); mark it.
