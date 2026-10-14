@@ -1,6 +1,6 @@
 // Figma node 1:1111 (the "Purchase submitted" Transaction / Network card).
-// Same blue→#333 card as the checklist above it; #7e7a93 helper color is
-// Figma-exact, no token match.
+// Same blue→#333 card as the checklist above it; the helper uses the
+// secondary text role.
 
 .submitted {
   display: flex;
@@ -52,6 +52,6 @@
   font-family: var(--font-satoshi);
   font-size: 13.5px;
   line-height: 20.25px;
-  color: #7e7a93;
+  color: var(--color-text-secondary);
   text-align: center;
 }

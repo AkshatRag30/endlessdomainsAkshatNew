@@ -32,6 +32,15 @@
   backdrop-filter: blur(21.4px);
   -webkit-backdrop-filter: blur(21.4px);
   box-shadow: 0 2.9px 9.7px rgba(18, 14, 31, 0.05), inset 0 0.97px 0 rgba(255, 255, 255, 0.9);
+
+  // Figma dark (receipt 93:98455): the white frost would show as a grey
+  // panel on black, so the glass becomes the single dark surface with a
+  // subtle border, its white top highlight dropped like ListingCategoryTabs'.
+  @include dark {
+    border-color: var(--color-border-subtle);
+    background: var(--color-bg-surface);
+    box-shadow: 0 2.9px 9.7px rgba(18, 14, 31, 0.05);
+  }
 }
 
 .title {

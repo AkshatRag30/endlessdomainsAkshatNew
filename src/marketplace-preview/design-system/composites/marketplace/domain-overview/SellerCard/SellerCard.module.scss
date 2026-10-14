@@ -3,8 +3,8 @@
 
 // Figma 5:3889 (desktop) / 5:4380 (mobile). The 36px seller row sits 9px
 // under the title, the rows' well 16px under that, and the button 9px under
-// the well (15px under the last row), indented 8.6px. #171429 / #7e7a93 text
-// and the peach gradient are Figma-exact.
+// the well (15px under the last row), indented 8.6px. Text uses the text
+// roles; the peach avatar gradient is Figma-exact.
 
 .card {
   min-width: 0;
@@ -37,14 +37,14 @@
 .address {
   font-size: 14px;
   line-height: 18.75px;
-  color: #171429;
+  color: var(--color-text-primary);
 }
 
 .meta {
   overflow: hidden;
   font-size: var(--text-small-12);
   line-height: 17.25px;
-  color: #7e7a93;
+  color: var(--color-text-secondary);
   text-overflow: ellipsis;
 }
 
@@ -82,5 +82,5 @@
   margin: var(--space-4) 0 0;
   font-family: var(--font-satoshi);
   font-size: var(--text-nav);
-  color: #7e7a93;
+  color: var(--color-text-secondary);
 }

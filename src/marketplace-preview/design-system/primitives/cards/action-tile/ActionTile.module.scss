@@ -15,11 +15,20 @@
   border: 3px solid var(--color-bg-surface);
   border-radius: 10px;
   background: linear-gradient(180deg, var(--color-bg-surface-active) 0%, var(--color-bg-surface) 100%);
-  box-shadow: 0 0 0 1px #f2f2f2;
+  box-shadow: 0 0 0 1px var(--color-border-subtle); // was #f2f2f2
   color: inherit;
   font: inherit;
   text-align: left;
   text-decoration: none;
+
+  // Figma dark (93:98976): black → #161616 with a 3px #3a3a3a border and no
+  // outer ring. Figma-exact, darker than the surface on purpose so the tiles
+  // read as buttons inside the card.
+  @include dark {
+    border-color: #3a3a3a; // design-specific: Figma-exact dark tile border
+    background: linear-gradient(180deg, #000000 0%, #161616 100%); // design-specific: Figma-exact dark tile fill
+    box-shadow: none;
+  }
 }
 
 // Not in Figma: tiles that go somewhere get a hover and focus state.
@@ -33,6 +42,14 @@
 
   &:focus-visible {
     @include focus-ring;
+  }
+
+  // The tile's dark rule removes its ring and outranks the hover above, so
+  // the hover ring is repeated here.
+  @include dark {
+    &:hover {
+      box-shadow: 0 0 0 1px var(--color-blue-primary-alpha-30);
+    }
   }
 }
 
@@ -56,6 +73,19 @@
     0 0 0 1.2px var(--color-white-primary),
     inset 0 0.24px 4.3px 0.48px #d2eaff,
     inset 0 0.24px 0.96px 0.48px #d2eaff;
+
+  // Figma dark draws the same glow in white instead of light blue.
+  @include dark {
+    box-shadow:
+      0 10px 25.6px rgba(255, 255, 255, 0.34),
+      0 5.9px 7.7px rgba(255, 255, 255, 0.19),
+      0 2.5px 3.2px rgba(0, 0, 0, 0.22),
+      0 0.9px 1.2px rgba(0, 0, 0, 0.15),
+      0 0 0 0.96px #e0e9f2,
+      0 0 0 1.2px var(--color-white-primary),
+      inset 0 0.24px 4.3px 0.48px #d2eaff,
+      inset 0 0.24px 0.96px 0.48px var(--color-white-primary);
+  }
 
   &::before {
     content: '';
@@ -85,6 +115,18 @@
       inset 0 0.3px 5.5px 0.61px #d2eaff,
       inset 0 0.3px 1.22px 0.61px #d2eaff;
 
+    @include dark {
+      box-shadow:
+        0 12.8px 32.7px rgba(255, 255, 255, 0.34),
+        0 7.5px 9.8px rgba(255, 255, 255, 0.19),
+        0 3.1px 4.1px rgba(0, 0, 0, 0.22),
+        0 1.1px 1.5px rgba(0, 0, 0, 0.15),
+        0 0 0 1.22px #e0e9f2,
+        0 0 0 1.53px var(--color-white-primary),
+        inset 0 0.3px 5.5px 0.61px #d2eaff,
+        inset 0 0.3px 1.22px 0.61px var(--color-white-primary);
+    }
+
     &::before {
       background-size: 93.8px 93.8px;
     }
@@ -103,10 +145,20 @@
   font-weight: var(--font-weight-medium);
   line-height: 19.5px;
   color: var(--color-accent);
+
+  // Figma dark (receipt 93:98455) draws the tile titles white.
+  @include dark {
+    color: var(--color-text-primary);
+  }
 }
 
 .subtitle {
   font-size: var(--text-small-12);
   line-height: 17.25px;
   color: var(--color-text-secondary);
+
+  // Figma dark: white 57%; the tertiary role (50%) is the nearest.
+  @include dark {
+    color: var(--color-text-tertiary);
+  }
 }

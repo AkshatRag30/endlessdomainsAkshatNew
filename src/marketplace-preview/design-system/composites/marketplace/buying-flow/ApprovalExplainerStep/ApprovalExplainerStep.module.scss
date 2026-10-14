@@ -1,8 +1,8 @@
 @import '@mpstyles/_mixins.scss';
 
-// Figma node 1:812. Amber tile/fee rows (#fdf3e0 / #7a5a12), text colors
-// (#171429, #7e7a93) and the blue→#333 card are Figma-exact, matching the
-// listing flow's OneTimeApprovalStep palette, no token match.
+// Figma node 1:812. Amber tile/fee rows and text use the warning and text
+// roles, matching the listing flow's OneTimeApprovalStep; the blue→#333 card
+// is a brand fill and stays as designed.
 
 .wrap {
   display: flex;
@@ -23,7 +23,7 @@
   width: 58px;
   height: 58px;
   border-radius: 17px;
-  background: #fdf3e0;
+  background: var(--color-status-warning-bg);
 }
 
 .heading {
@@ -33,7 +33,7 @@
   font-size: 19px;
   line-height: 22.8px;
   letter-spacing: -0.38px;
-  color: #171429;
+  color: var(--color-text-primary);
 }
 
 .subtext {
@@ -41,7 +41,7 @@
   font-family: var(--font-satoshi);
   font-size: 13.5px;
   line-height: 1.2;
-  color: #7e7a93;
+  color: var(--color-text-secondary);
 }
 
 .infoCard {
@@ -89,11 +89,11 @@
   margin-top: var(--space-2-5);
   padding: var(--space-2-5) var(--space-3);
   border-radius: 10px;
-  background: #fdf3e0;
+  background: var(--color-status-warning-bg);
   font-family: var(--font-satoshi);
   font-size: 12.5px;
   line-height: 18.75px;
-  color: #7a5a12;
+  color: var(--color-status-warning);
 
   strong {
     font-weight: var(--font-weight-bold);

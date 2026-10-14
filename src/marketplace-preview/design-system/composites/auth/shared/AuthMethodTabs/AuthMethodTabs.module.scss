@@ -1,11 +1,11 @@
 @import '@mpstyles/_mixins.scss';
 
 // Figma 16:1009 (desktop, 696 × 111) and 16:424 (mobile, 432.6 × 69, the
-// same drawing at 0.62 scale). Hairlines and fills below are Figma-exact:
-// #dad8d8 rules, #e8e8e8 track, #f4f4f4 → #fefefe active tab, #808080
-// inactive label; none has a token.
+// same drawing at 0.62 scale). Rules, band, track and inactive label use
+// the border, surface and text roles; the #f4f4f4 → #fefefe active tab is
+// Figma-exact and stays light in dark too, as in Figma 93:38626.
 
-$rule: 0.3px solid #dad8d8;
+$rule: 0.3px solid var(--color-border-subtle);
 
 // 52px under the header (32px on mobile, 16:418).
 .frame {
@@ -95,7 +95,7 @@ $rule: 0.3px solid #dad8d8;
   width: 592px;
   height: 82px;
   transform: translateX(-50%);
-  background: linear-gradient(180deg, var(--color-white-primary) 0%, #f6f6f6 50%, var(--color-white-primary) 100%);
+  background: linear-gradient(180deg, var(--color-bg-surface) 0%, var(--color-bg-surface-active) 50%, var(--color-bg-surface) 100%);
 
   @include mobile {
     top: 7.46px;
@@ -111,7 +111,7 @@ $rule: 0.3px solid #dad8d8;
   width: 434px;
   height: 52px;
   padding: 3px 4px;
-  background: #e8e8e8;
+  background: var(--color-bg-surface-active);
 
   @include mobile {
     width: 320px;
@@ -133,7 +133,7 @@ $rule: 0.3px solid #dad8d8;
   font-weight: var(--font-weight-regular);
   line-height: 1.2;
   letter-spacing: -1.12px;
-  color: #808080;
+  color: var(--color-text-secondary);
   cursor: pointer;
 
   &:focus-visible {

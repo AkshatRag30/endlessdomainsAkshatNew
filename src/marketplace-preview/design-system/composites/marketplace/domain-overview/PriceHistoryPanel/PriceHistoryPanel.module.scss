@@ -40,7 +40,8 @@
 // ── Stats ────────────────────────────────────────────────────────────────
 // Desktop (5:4854): 120×50 chips, #eceefd fill, #d4dafa border, a #f8f9ff
 // then #bdc8ff double ring, 14px apart. Mobile (5:5550): plain text in
-// three 83px columns, 17.6px apart both ways. Colours are Figma-exact.
+// three 83px columns, 17.6px apart both ways. Colours are Figma-exact in
+// light; in dark the chips sit on the surface with role colours for the rings.
 
 .stats {
   display: flex;
@@ -69,6 +70,15 @@
   background: #eceefd;
   box-shadow: 0 0 0 3px #f8f9ff, 0 0 0 4px #bdc8ff;
 
+  // desktop chips only; mobile drops the chip entirely (see below)
+  @include mobile-up {
+    @include dark {
+      border-color: var(--color-border-strong);
+      background: var(--color-bg-surface-active);
+      box-shadow: 0 0 0 3px var(--color-bg-surface), 0 0 0 4px var(--color-border-subtle);
+    }
+  }
+
   @include mobile {
     gap: 3.9px;
     width: auto;
@@ -91,7 +101,7 @@
   font-size: 13px;
   font-weight: var(--font-weight-regular); // the app's global reset bolds <dt>
   line-height: 16.7px;
-  color: rgba(0, 0, 0, 0.62);
+  color: var(--color-text-secondary);
 
   @include mobile {
     font-size: 12.7px;
@@ -117,7 +127,7 @@
   font-weight: var(--font-weight-bold);
   line-height: 1.2;
   letter-spacing: -0.36px;
-  color: var(--color-black-primary);
+  color: var(--color-text-primary);
 
   @include mobile {
     font-size: 14.7px;
@@ -151,7 +161,7 @@
   height: 250px;
   margin-top: var(--space-5);
   border-radius: 6px;
-  background: var(--color-gray-light);
+  background: var(--color-bg-surface-active);
 
   @include mobile {
     height: 340px;
@@ -162,7 +172,7 @@
   margin: var(--space-6) 0 var(--space-4);
   font-family: var(--font-satoshi);
   font-size: var(--text-nav);
-  color: #7e7a93;
+  color: var(--color-text-secondary);
   text-align: center;
 }
 
@@ -171,7 +181,7 @@
   border: none;
   background: none;
   font: inherit;
-  color: var(--color-blue-primary);
+  color: var(--color-accent);
   cursor: pointer;
   text-decoration: underline;
 

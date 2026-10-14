@@ -22,6 +22,13 @@
   transform: translateX(-50%);
   pointer-events: none;
 
+  // Below desktop the artwork is stacked right above the panel, so the
+  // raised grid (an opaque image) would cover the bottom of the art; it
+  // sits behind the logo instead, as on login.
+  @include tablet-down {
+    top: -13px;
+  }
+
   @include mobile {
     display: none;
   }
@@ -74,7 +81,7 @@
   font-size: 33px;
   font-weight: var(--font-weight-medium);
   line-height: normal;
-  color: var(--color-black-primary);
+  color: var(--color-text-primary);
 
   @include mobile {
     font-size: 22px;
@@ -89,11 +96,11 @@
   font-family: var(--font-space-grotesk);
   font-size: 17px;
   line-height: normal;
-  color: #525252; // Figma-exact; no gray token matches.
+  color: var(--color-text-secondary); // was #525252
 
   strong {
     font-weight: var(--font-weight-medium);
-    color: var(--color-black-primary);
+    color: var(--color-text-primary);
     text-decoration: underline;
     overflow-wrap: anywhere; // long email addresses
   }
@@ -115,5 +122,35 @@
   @include mobile {
     width: 316.5px;
     margin-top: 32px;
+  }
+}
+
+// Light and dark versions of the grid and logo both render; CSS on the theme
+// attribute shows one (logo-grid-dark.png is Figma 93:38630, logo-white.svg
+// is logo.svg with its black text fills turned white).
+.forDark {
+  display: none;
+}
+
+.forLight,
+.forDark {
+  @include dark {
+    &.forLight {
+      display: none;
+    }
+
+    &.forDark {
+      display: block;
+    }
+  }
+}
+
+// The grid is hidden on mobile (see .grid); keep the dark copy hidden too,
+// since the swap above outranks that rule.
+.grid.forDark {
+  @include mobile {
+    @include dark {
+      display: none;
+    }
   }
 }

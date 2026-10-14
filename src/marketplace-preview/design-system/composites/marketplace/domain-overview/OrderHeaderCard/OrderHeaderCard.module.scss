@@ -2,8 +2,8 @@
 @import '../domainOverview';
 
 // Figma 5:7454 (1156×77). The hero's noise surface with a faint green
-// border (rgba(55,205,0,0.08)); 15px inset; #1f1f21 23px title with -0.46px
-// tracking, rgba(0,0,0,0.74) meta — all Figma-exact. Actions sit ~31px from
+// border (rgba(55,205,0,0.08)); 15px inset; 23px primary text title with
+// -0.46px tracking and primary text meta. Actions sit ~31px from
 // the right edge.
 
 .card {
@@ -14,7 +14,7 @@
   gap: var(--space-6);
   min-height: 77px;
   padding: 11px 31px 11px 15px;
-  border-color: rgba(55, 205, 0, 0.08);
+  border-color: rgba(55, 205, 0, 0.08); // faint green edge, kept in both themes
       margin: 0 35px;
 
   @include mobile {
@@ -51,7 +51,7 @@
   font-weight: var(--font-weight-medium);
   line-height: 27.6px;
   letter-spacing: -0.46px;
-  color: #1f1f21;
+  color: var(--color-text-primary);
 
   // Figma 5:7981 sets the title ~16px on mobile, small enough for the chip
   // to stay on the same line at 390px.
@@ -81,7 +81,7 @@
   font-family: var(--font-satoshi);
   font-size: 13px;
   line-height: 19.5px;
-  color: rgba(0, 0, 0, 0.74);
+  color: var(--color-text-primary);
 }
 
 .metaItem {
@@ -159,11 +159,11 @@
   font-size: 13px;
   font-weight: var(--font-weight-semibold);
   line-height: 19.5px;
-  color: #171429;
+  color: var(--color-text-primary);
   cursor: pointer;
 
   &:hover {
-    color: var(--color-blue-primary);
+    color: var(--color-accent);
   }
 
   &:focus-visible {

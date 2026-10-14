@@ -1,8 +1,7 @@
 @import '@mpstyles/_mixins.scss';
 
-// Figma node 1:7791. Colors below (#171429, #7e7a93, the blue gradient
-// card, the green fee pill) are Figma-exact, matching OneTimeApprovalStep's
-// palette, no token match for this exact hue.
+// Figma node 1:7791. Text and the green fee pill use the text and status
+// roles, matching OneTimeApprovalStep; the blue gradient card is a brand fill.
 
 .wrap {
   display: flex;
@@ -30,6 +29,11 @@
   background: linear-gradient(180deg, #27ff00 0%, rgba(39, 255, 0, 0.47) 100%);
   color: var(--color-white-primary);
   box-shadow: 0 0 0 6px var(--color-white-primary), 0 20px 51px rgba(87, 177, 255, 0.34);
+
+  // the 6px ring takes the drawer colour instead of glowing white on dark
+  @include dark {
+    box-shadow: 0 0 0 6px var(--color-bg-surface), 0 20px 51px rgba(87, 177, 255, 0.34);
+  }
 }
 
 .heading {
@@ -38,7 +42,7 @@
   font-weight: var(--font-weight-medium);
   font-size: 19px;
   letter-spacing: -0.38px;
-  color: #171429;
+  color: var(--color-text-primary);
 }
 
 .subtext {
@@ -47,7 +51,7 @@
   font-family: var(--font-satoshi);
   font-size: 14px;
   line-height: 1.45;
-  color: #7e7a93;
+  color: var(--color-text-secondary);
 }
 
 .summaryCard {
@@ -98,8 +102,8 @@
   width: 100%;
   padding: var(--space-2-5) var(--space-3);
   border-radius: var(--radius-sm);
-  background: #e7f6ee;
-  color: #0c7a46;
+  background: var(--color-status-success-bg);
+  color: var(--color-status-success-text);
   font-family: var(--font-space-grotesk);
   font-size: 12.5px;
 
@@ -127,9 +131,9 @@
   cursor: pointer;
   font-family: var(--font-satoshi);
   font-size: 11.5px;
-  color: #7e7a93;
+  color: var(--color-text-secondary);
 
   &:hover {
-    color: var(--color-black-primary);
+    color: var(--color-text-primary);
   }
 }

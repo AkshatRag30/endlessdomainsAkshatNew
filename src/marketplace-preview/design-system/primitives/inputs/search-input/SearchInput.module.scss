@@ -23,6 +23,20 @@
   @include mobile {
     max-width: none;
   }
+
+  // Figma dark (93:53958): #19191a with the node's own noise tile blended
+  // in at 40% plus-lighter, baked into one opaque tile (drawn at 2x so the
+  // grain survives on retina), and a white 37% hairline instead of the
+  // light drop shadow. The hairline is an inset shadow so the 33px height
+  // doesn't change; focus is repeated because this outranks it.
+  @include dark {
+    background: #19191a url('/assets/img/marketplace/search-noise-dark.png') top left / 143px 143px repeat; // design-specific: Figma-exact search field fill
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.37); // design-specific: Figma-exact 37% hairline, between the strong and emphasis borders
+
+    &:focus-within {
+      box-shadow: inset 0 0 0 1px var(--color-accent);
+    }
+  }
 }
 
 .input {
@@ -39,6 +53,11 @@
 
   &::placeholder {
     color: var(--color-text-tertiary);
+
+    // Figma dark draws it at white 63%; the secondary role (70%) is nearest.
+    @include dark {
+      color: var(--color-text-secondary);
+    }
   }
 }
 
@@ -64,6 +83,11 @@
   height: 27px;
   background: var(--color-border-subtle);
   flex-shrink: 0;
+
+  // Figma dark: rgba(237, 237, 238, 0.33), the strong border role.
+  @include dark {
+    background: var(--color-border-strong);
+  }
 }
 
 .submit {

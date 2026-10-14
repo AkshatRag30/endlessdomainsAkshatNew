@@ -16,6 +16,8 @@ export interface AuthShellProps {
 // not available in this environment, to fix without a visual regression.
 const ART_SRC = '/loginimage.png'
 const ART_SIZES = '(max-width: 1039px) 100vw, 50vw'
+// Dark artwork from Figma 93:38627 (a JPEG, so no transparent apron).
+const ART_DARK_SRC = '/loginimage-dark.jpg'
 
 /**
  * Login / sign up page frame (Figma 16:511 desktop, 16:416 mobile): the
@@ -29,11 +31,13 @@ export const AuthShell = ({ children }: AuthShellProps) => (
           leaves of its half, so a screen wider or taller than the art's
           proportions shows soft colour instead of white bands. Same src and
           sizes as the artwork, so the browser fetches it once. */}
-      <Image src={ART_SRC} alt="" fill sizes={ART_SIZES} className={styles.artBackdrop} />
+      <Image src={ART_SRC} alt="" fill sizes={ART_SIZES} className={`${styles.artBackdrop} ${styles.forLight}`} />
+      <Image src={ART_DARK_SRC} alt="" fill sizes={ART_SIZES} className={`${styles.artBackdrop} ${styles.forDark}`} />
       <span className={styles.artFrame}>
-        <span className={styles.artCrop}>
+        <span className={`${styles.artCrop} ${styles.forLight}`}>
           <Image src={ART_SRC} alt="" fill priority sizes={ART_SIZES} className={styles.artImage} />
         </span>
+        <Image src={ART_DARK_SRC} alt="" fill sizes={ART_SIZES} className={`${styles.artImageDark} ${styles.forDark}`} />
       </span>
     </div>
     <main className={styles.column}>

@@ -1,3 +1,5 @@
+@import '@mpstyles/_mixins.scss';
+
 // Themed, fast-appearing replacement for the native title="" tooltip.
 // Native browser tooltips are unstyled OS chrome and take ~500ms-1s to
 // appear (varies by browser/OS, not controllable) — this one is themed to
@@ -50,6 +52,13 @@
   // Hiding: fades out over 120ms, then (only once invisible) drops out
   // of the layout — so un-hovering doesn't just cut it off mid-fade.
   transition: opacity 0.12s ease, transform 0.12s ease, visibility 0s linear 0.12s;
+
+  // Black would disappear on the black page and barely show on the dark
+  // surface, so in dark the bubble is the active surface with a hairline.
+  @include dark {
+    background: var(--color-bg-surface-active);
+    border: 1px solid var(--color-border-subtle);
+  }
 }
 
 .wrap[data-tooltip]:hover::after {
@@ -90,6 +99,13 @@
   transform: translateX(-50%) translateY(4px);
   pointer-events: none;
   transition: opacity 0.12s ease, transform 0.12s ease, visibility 0s linear 0.12s;
+
+  // Black would disappear on the black page and barely show on the dark
+  // surface, so in dark the bubble is the active surface with a hairline.
+  @include dark {
+    background: var(--color-bg-surface-active);
+    border: 1px solid var(--color-border-subtle);
+  }
 }
 
 .wrap:hover .bubble {
@@ -106,6 +122,11 @@
   background: var(--color-bg-surface);
   border: 1px solid var(--color-border-subtle);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+  // Outranks the dark rule on .bubble, so the card stays the surface its rows use.
+  @include dark {
+    background: var(--color-bg-surface);
+  }
 }
 
 // ── Downward-opening variant ──────────────────────────────────────────────
@@ -154,12 +175,23 @@
   // applied after the animation ends, instead of the property reverting to
   // its un-animated default — see the --tt-tx comment in Tooltip.tsx.
   animation: tooltip-portal-in 0.12s ease forwards;
+
+  // Black would disappear on the black page and barely show on the dark
+  // surface, so in dark the bubble is the active surface with a hairline.
+  @include dark {
+    background: var(--color-bg-surface-active);
+    border: 1px solid var(--color-border-subtle);
+  }
 }
 
 .portalBubble.light {
   background: var(--color-bg-surface);
   border: 1px solid var(--color-border-subtle);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+  @include dark {
+    background: var(--color-bg-surface);
+  }
 }
 
 // Domain-name-only portal tooltips (label, not content) — same wrapping

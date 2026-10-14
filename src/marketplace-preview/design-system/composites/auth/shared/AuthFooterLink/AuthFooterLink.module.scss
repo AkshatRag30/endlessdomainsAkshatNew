@@ -6,12 +6,12 @@
   font-size: var(--text-nav); // 14px
   font-weight: var(--font-weight-medium);
   text-align: center;
-  color: var(--color-black-primary);
+  color: var(--color-text-primary);
 }
 
 // Bootstrap underlines every link; Figma 16:1076 doesn't.
 .link {
-  color: var(--color-blue-primary);
+  color: var(--color-accent);
   text-decoration: none;
   text-transform: capitalize;
 

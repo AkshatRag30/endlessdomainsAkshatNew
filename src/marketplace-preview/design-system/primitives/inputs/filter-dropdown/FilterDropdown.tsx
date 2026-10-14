@@ -15,12 +15,14 @@ export interface FilterDropdownProps {
   onChange?: (value: string) => void
   className?: string
   /**
-   * Custom panel content (e.g. a range slider) in place of the default
-   * option list — when set, options/onChange aren't used to render the
-   * panel at all; the caller owns its own value/onChange via closure
-   * (ListingFilterBar's Price control does this for its slider).
+   * Custom panel content in place of the default option list — when set,
+   * options/onChange aren't used to render the panel at all; the caller
+   * owns its own value/onChange via closure. Pass a function to get a
+   * `close` callback, for content that closes itself (ListingFilterBar's
+   * price panel closes on Apply). The content mounts each time the panel
+   * opens, so its own state starts fresh.
    */
-  children?: React.ReactNode
+  children?: React.ReactNode | ((close: () => void) => React.ReactNode)
 }
 
 /**
@@ -134,13 +136,15 @@ export const FilterDropdown = ({ label, value, options, onChange, className = ''
         coords &&
         typeof document !== 'undefined' &&
         createPortal(
+          // Preview: data-marketplace-preview brings the design tokens to this portaled panel (see Modal.tsx).
           <div
             ref={panelRef}
+            data-marketplace-preview=""
             className={styles.panel}
             role={children ? undefined : 'listbox'}
             style={{ top: coords.top, left: coords.left, minWidth: Math.max(140, coords.minWidth) }}
           >
-            {children ?? (
+            {(typeof children === 'function' ? children(() => setOpen(false)) : children) ?? (
               <ul className={styles.optionList}>
                 {options?.map((option) => (
                   <li key={option.value}>

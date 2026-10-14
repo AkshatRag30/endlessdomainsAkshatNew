@@ -1,7 +1,7 @@
 @import '@mpstyles/_mixins.scss';
 
-// Figma 25:16733. Values without a token are Figma-exact: the #ded2d9
-// field border and #868686 placeholder.
+// Figma 25:16733. The field border and placeholder use the strong border
+// and tertiary text roles (#ded2d9 and #868686 in Figma).
 
 // 52px under the header, as on the login page (32px on mobile).
 .form {
@@ -32,7 +32,7 @@
   font-size: var(--text-nav); // 14px
   font-weight: var(--font-weight-medium);
   line-height: normal;
-  color: var(--color-black-primary);
+  color: var(--color-text-primary);
 }
 
 // 13px / 10px padding around 14px text, no radius.
@@ -40,30 +40,30 @@
   width: 100%;
   margin: 0;
   padding: 13px 10px;
-  border: 1px solid #ded2d9;
+  border: 1px solid var(--color-border-strong);
   border-radius: 0;
-  background: var(--color-white-primary);
+  background: var(--color-bg-surface);
   font-family: var(--font-space-grotesk);
   font-size: var(--text-nav);
   line-height: normal;
-  color: var(--color-black-primary);
+  color: var(--color-text-primary);
   outline: none;
   transition: border-color 150ms ease;
 
   &::placeholder {
-    color: #868686;
+    color: var(--color-text-tertiary);
   }
 
   &:focus-visible {
-    border-color: var(--color-blue-primary);
+    border-color: var(--color-accent);
   }
 }
 
 .inputError {
-  border-color: var(--color-error);
+  border-color: var(--color-status-error);
 
   &:focus-visible {
-    border-color: var(--color-error);
+    border-color: var(--color-status-error);
   }
 }
 
@@ -71,5 +71,5 @@
   margin-top: var(--space-1);
   font-family: var(--font-satoshi);
   font-size: 13px;
-  color: var(--color-error);
+  color: var(--color-status-error);
 }

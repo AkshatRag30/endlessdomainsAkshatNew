@@ -2,7 +2,7 @@
 
 .shell {
   position: relative;
-  background: var(--color-gray-page-bg);
+  background: var(--color-bg-page);
 }
 
 .body {
@@ -39,7 +39,7 @@
     bottom: 0;
     width: 280px;
     z-index: 40;
-    background: var(--color-white-primary);
+    background: var(--color-bg-surface);
     box-shadow: var(--shadow-panel);
     padding: var(--space-4);
     overflow-y: auto;

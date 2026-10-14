@@ -73,8 +73,11 @@ export const Modal = ({ isOpen, onClose, title, dismissible = true, footer, chil
 
   if (!mounted || typeof document === 'undefined') return null
 
+  // Preview: portaled to document.body, outside the page's <div data-marketplace-preview>,
+  // where this copy's design tokens live; the attribute brings the tokens (and their
+  // dark values) along, otherwise var(--color-bg-surface) etc. resolve to nothing.
   return createPortal(
-    <div className={styles.root}>
+    <div className={styles.root} data-marketplace-preview="">
       <div
         className={[styles.backdrop, entered ? styles.backdropVisible : ''].filter(Boolean).join(' ')}
         onClick={dismissible ? onClose : undefined}

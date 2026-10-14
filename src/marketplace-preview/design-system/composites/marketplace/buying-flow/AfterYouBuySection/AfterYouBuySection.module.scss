@@ -1,4 +1,4 @@
-// Figma node 1:770. #aba7bc note color is Figma-exact, no token match.
+// Figma node 1:770. The note uses the tertiary text role (#aba7bc in light).
 
 .section {
   display: flex;
@@ -13,7 +13,7 @@
   font-size: 14px;
   line-height: 15px;
   letter-spacing: -0.25px;
-  color: #7e7a93;
+  color: var(--color-text-secondary);
 }
 
 .rows {
@@ -26,5 +26,5 @@
   font-family: var(--font-satoshi);
   font-size: 14px;
   line-height: 17.25px;
-  color: #aba7bc;
+  color: var(--color-text-tertiary);
 }

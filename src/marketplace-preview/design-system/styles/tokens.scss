@@ -429,15 +429,18 @@
   --color-status-warning-bg: rgba(255, 171, 11, 0.13);
 
   // ── Data ──────────────────────────────────────────────────────────────────────
-  --color-data-primary: #5b3df5;
+  --color-data-primary: #8b7bff; // design-specific: not in Figma; #5b3df5 is only 3.0:1 as text on the dark surface (receipt tx id, terms link, insights header), this is 5.6:1
   --color-data-secondary: #dcd3fb;
 }
 
 // The legacy global stylesheets paint body white; below a short page that
-// shows as a white band under the dark shell. Light mode is left as it was.
-// Preview: the dark page colour behind the preview pages (tokens live on the wrapper, not body)
+// shows as a white band under the dark shell. Bootstrap also sets body text
+// to #212529, which any page without its own colours (redirect, older
+// screens) would inherit as dark grey on black. Light mode is left as it was.
+// Preview: the dark page behind the preview pages (tokens live on the wrapper, not body)
 :root[data-theme='dark'] body:has([data-marketplace-preview]) {
   background-color: #000000;
+  color: #ffffff;
 }
  
  

@@ -1,8 +1,8 @@
 @import '@mpstyles/_mixins.scss';
 
-// Figma node 1:934 ("Bought"). Text colors (#171429, #7e7a93) and the
-// blue→#333 summary card are Figma-exact, same palette as the listing
-// flow's ListingSuccessStep, no token match.
+// Figma node 1:934 ("Bought"). Text uses the text roles; the blue→#333
+// summary card is a brand fill, same palette as the listing flow's
+// ListingSuccessStep.
 
 .wrap {
   display: flex;
@@ -35,7 +35,7 @@
   font-size: 19px;
   line-height: 22.8px;
   letter-spacing: -0.38px;
-  color: #171429;
+  color: var(--color-text-primary);
 }
 
 .subtext {
@@ -44,7 +44,7 @@
   font-family: var(--font-satoshi);
   font-size: 13.5px;
   line-height: 1.2;
-  color: #7e7a93;
+  color: var(--color-text-secondary);
 }
 
 .summaryCard {
@@ -105,7 +105,7 @@
   font-family: var(--font-satoshi);
   font-size: 13.5px;
   line-height: 1.2;
-  color: #7e7a93;
+  color: var(--color-text-secondary);
 }
 
 .footer {
@@ -129,7 +129,7 @@
   font-weight: var(--font-weight-medium);
   font-size: var(--text-small-13);
   line-height: 17.25px;
-  color: var(--color-black-primary);
+  color: var(--color-text-primary);
 
   &:hover {
     text-decoration: underline;

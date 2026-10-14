@@ -2,9 +2,10 @@
 
 // Figma 16:1043 (desktop) / 16:459 (mobile, 0.687 scale). Values without a
 // token are Figma-exact: the rgba(209, 213, 236, 0.82) frame, #f3f3fe
-// face, #282828 label, #dad8d8 hairlines.
+// face, #282828 label. These stay light in dark mode (Figma 93:38626 keeps
+// the provider buttons white); only the hairlines use the border role.
 
-$rule: 0.3px solid #dad8d8;
+$rule: 0.3px solid var(--color-border-subtle);
 
 // A 58px row with a hairline above and below, running the width of the
 // column (Figma draws them 696px, past the 660px column).

@@ -43,7 +43,7 @@
 .label {
   font-family: var(--font-space-grotesk);
   font-size: var(--text-small-13);
-  color: var(--color-gray-primary);
+  color: var(--color-text-secondary);
   white-space: nowrap;
 }
 
@@ -54,7 +54,7 @@
   font-family: var(--font-satoshi);
   font-weight: var(--font-weight-bold);
   font-size: 17px;
-  color: #171429;
+  color: var(--color-text-primary);
   white-space: nowrap;
 }
 
@@ -66,7 +66,7 @@
   font-weight: var(--font-weight-bold);
   font-size: 17px;
   letter-spacing: -0.4px;
-  color: #171429;
+  color: var(--color-text-primary);
   white-space: nowrap;
 }
 
@@ -96,7 +96,7 @@
   padding-bottom: 3px;
   font-family: var(--font-space-grotesk);
   font-size: 14px;
-  color: var(--color-gray-medium);
+  color: var(--color-text-tertiary);
 
   @include mobile {
     display: none;
@@ -110,7 +110,7 @@
   margin: 0;
   font-family: var(--font-space-grotesk);
   font-size: var(--text-small-12);
-  color: var(--color-gray-primary);
+  color: var(--color-text-secondary);
 
   svg {
     flex-shrink: 0;
