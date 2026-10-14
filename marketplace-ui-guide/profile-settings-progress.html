@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Profile Settings Progress</title>
+<script>
+  try {
+    var saved = localStorage.getItem('dmplan-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  } catch (e) {}
+</script>
+<style>
+  :root {
+    --bg: #f9f9f9; --surface: #ffffff; --surface-soft: #f3f4fe;
+    --text: #111111; --text-muted: #5b5b66; --border: #e6e6e6;
+    --accent: #2639ED; --accent-soft: #e9ebfd;
+    --wait: #9457f6; --wait-soft: #f4eefe;
+    --ok: #12805c; --ok-soft: #e4f5ee;
+    --warn: #b4540a; --warn-soft: #fdf1e4;
+    --bad: #c4314b; --bad-soft: #fdecef;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+      --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+      --accent: #7f8cff; --accent-soft: #1d2150;
+      --wait: #b996fa; --wait-soft: #2c2142;
+      --ok: #4fd1a0; --ok-soft: #173229;
+      --warn: #f5a35c; --warn-soft: #3a2614;
+      --bad: #ff7d93; --bad-soft: #3a1c24;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+    --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+    --accent: #7f8cff; --accent-soft: #1d2150;
+    --wait: #b996fa; --wait-soft: #2c2142;
+    --ok: #4fd1a0; --ok-soft: #173229;
+    --warn: #f5a35c; --warn-soft: #3a2614;
+    --bad: #ff7d93; --bad-soft: #3a1c24;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: "Satoshi", system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.6; }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 48px 16px 80px; }
+  header.top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+  .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; }
+  h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.15; margin: 0 0 12px; }
+  .lede { color: var(--text-muted); margin: 0; max-width: 680px; }
+  .lede a { color: var(--accent); }
+  .toggle { flex-shrink: 0; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 14px; cursor: pointer; }
+  .toggle:hover { border-color: var(--accent); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 32px; }
+  nav.toc a { font-size: 14px; text-decoration: none; color: var(--accent); background: var(--accent-soft); padding: 6px 12px; border-radius: 999px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 0 0 16px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+  .stat b { display: block; font-size: 26px; line-height: 1.2; }
+  .stat span { font-size: 13px; color: var(--text-muted); }
+  h2 { font-size: 22px; margin: 52px 0 16px; }
+  h3 { font-size: 18px; margin: 0; }
+  h4 { font-size: 15px; margin: 22px 0 8px; color: var(--accent); }
+  p { margin: 0 0 12px; }
+  .muted { color: var(--text-muted); font-size: 15px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
+  .card p:last-child { margin-bottom: 0; }
+  .card ul, .card ol { margin: 8px 0 0; padding-left: 20px; }
+  .card li { margin-bottom: 6px; }
+  code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .86em; background: var(--surface-soft); border-radius: 6px; padding: 1px 6px; word-break: break-word; }
+  .findings { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .finding { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+  .finding h3 { font-size: 16px; margin-bottom: 6px; }
+  .finding p { font-size: 15px; margin: 0; color: var(--text-muted); }
+  .tablecard { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow-x: auto; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: 0; }
+  th { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+  td.grp { font-weight: 600; color: var(--accent); background: var(--surface-soft); font-size: 13px; }
+  .sw { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .chip { width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(128,128,128,.45); flex-shrink: 0; }
+  .callout { border-left: 4px solid var(--wait); background: var(--wait-soft); border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; }
+  .callout p { margin: 0; }
+  .callout.ok { border-color: var(--ok); background: var(--ok-soft); }
+  .callout.warn { border-color: var(--warn); background: var(--warn-soft); }
+  .issue { display: grid; grid-template-columns: 28px 1fr; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--bad); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+  .issue .n { font-weight: 700; color: var(--bad); }
+  .issue p { margin: 0; font-size: 15px; }
+  .issue .where { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+  .phase { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px 24px; margin-bottom: 14px; }
+  .phase-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  .num { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 15px; flex-shrink: 0; }
+  .tag { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+  .tag.now { background: var(--ok-soft); color: var(--ok); }
+  .tag.wait { background: var(--wait-soft); color: var(--wait); }
+  .tag.size { background: var(--surface-soft); color: var(--text-muted); }
+  .tag.new { background: var(--warn-soft); color: var(--warn); }
+  .rows { display: grid; grid-template-columns: 130px 1fr; gap: 6px 16px; font-size: 15px; }
+  .rows dt { color: var(--text-muted); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; padding-top: 2px; }
+  .rows dd { margin: 0; }
+  ol.qs { counter-reset: q; list-style: none; padding: 0; margin: 0; }
+  ol.qs li { counter-increment: q; position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px 14px 56px; margin-bottom: 10px; }
+  ol.qs li::before { content: counter(q); position: absolute; left: 16px; top: 14px; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  ol.qs.team li::before { background: var(--wait-soft); color: var(--wait); }
+  ol.qs b { display: block; margin-bottom: 2px; }
+  ol.qs span { color: var(--text-muted); font-size: 15px; }
+  footer { margin-top: 56px; font-size: 13px; color: var(--text-muted); }
+  @media (max-width: 700px) {
+    header.top { flex-direction: column; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .findings { grid-template-columns: 1fr; }
+    .card, .phase { padding: 18px; }
+    .rows { grid-template-columns: 1fr; }
+    .rows dt { padding-top: 8px; }
+    ol.qs li { padding-left: 50px; }
+  }
+</style>
+<style>
+  .tag.done { background: var(--ok-soft); color: var(--ok); }
+  .tag.review { background: var(--warn-soft); color: var(--warn); }
+  .tag.todo { background: var(--surface-soft); color: var(--text-muted); }
+  .meta { font-size: 14px; color: var(--text-muted); margin: 0 0 14px; }
+  .phase h4:first-of-type { margin-top: 14px; }
+  .phase ul { margin: 6px 0 0; padding-left: 20px; font-size: 15px; }
+  .phase li { margin-bottom: 6px; }
+  .preview { display: flex; gap: 12px; flex-wrap: wrap; margin: 8px 0 4px; }
+  .pill { position: relative; width: 108px; height: 44px; border-radius: 999px; border: 2.5px solid; }
+  .pill i { position: absolute; top: 3.5px; width: 32.5px; height: 32.5px; border-radius: 50%; border: 1.4px solid; }
+  .pill.l { background: #000; border-color: #000; } .pill.l i { left: 5px; background: #fff; border-color: #000; }
+  .pill.d { background: #fff; border-color: #fff; box-shadow: 0 0 0 1px var(--border); } .pill.d i { left: 63.5px; background: #000; border-color: #fff; }
+  .preview span { font-size: 13px; color: var(--text-muted); display: block; margin-top: 4px; }
+</style>
+<style>
+  .tag.done { background: var(--ok-soft); color: var(--ok); }
+  .tag.review { background: var(--warn-soft); color: var(--warn); }
+  .tag.todo { background: var(--surface-soft); color: var(--text-muted); }
+  .meta { font-size: 14px; color: var(--text-muted); margin: 0 0 14px; }
+  .phase h4:first-of-type { margin-top: 14px; }
+  .phase ul, .card ul { margin: 6px 0 0; padding-left: 20px; font-size: 15px; }
+  .phase li { margin-bottom: 6px; }
+  td code { white-space: normal; }
+  td.ph { white-space: nowrap; color: var(--text-muted); font-size: 13px; }
+  .folder { font-size: 15px; margin: 26px 0 8px; color: var(--text); }
+  .folder code { font-size: .92em; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">Marketplace V2 · Profile and Settings · Progress log</p>
+      <h1>Profile and Settings: everything built on this branch</h1>
+      <p class="lede">A full record of the <code>profile-settings</code> branch: what every phase built, every new file and what it does, every existing file that changed and why, the decisions taken with the user, the Figma quirks, the backend findings, and what was and wasn't verified. Plan: <code>dev-docs/profile-settings-implementation-plan.md</code>. Branch cut from <code>dark-mode</code> on 14 October 2026. Nothing on it is committed yet.</p>
+    </div>
+    <button class="toggle" id="toggle" type="button">Toggle theme</button>
+  </header>
+
+  <nav class="toc">
+    <a href="#glance">At a glance</a>
+    <a href="#status">Status by phase</a>
+    <a href="#how">How the page works</a>
+    <a href="#new">New files</a>
+    <a href="#changed">Changed files</a>
+    <a href="#removed">Removed along the way</a>
+    <a href="#log">Phase log</a>
+    <a href="#decisions">Decisions</a>
+    <a href="#figma">Figma quirks</a>
+    <a href="#backend">Backend findings</a>
+    <a href="#mock">Sample data areas</a>
+    <a href="#verify">Verification</a>
+    <a href="#outside">Outside the repo</a>
+    <a href="#commit">Before committing</a>
+  </nav>
+
+  <h2 id="glance">At a glance</h2>
+  <div class="stats">
+    <div class="stat"><b>9 of 10</b><span>phases done (1 to 9); phase 0 not started</span></div>
+    <div class="stat"><b>123</b><span>new files (about 6,100 lines of TS, TSX and SCSS)</span></div>
+    <div class="stat"><b>20</b><span>existing files changed (+496 / −43 lines)</span></div>
+    <div class="stat"><b>8 / 8</b><span>data areas still on sample data</span></div>
+  </div>
+  <div class="callout ok"><p>The page lives at <code>/profile</code> with five tabs in <code>?tab=</code> (profile, security, wallets, notifications, preferences) and a right rail (Account, Your Data). Every tab matches its Figma frames in light and dark, at phone, tablet and desktop widths. All data flows through one service layer, so each area moves from sample data to the real API by changing one line in <code>src/services/profile/config.ts</code>.</p></div>
+  <div class="callout warn"><p>Nothing is committed. <code>dev-docs</code> is local only and must never be committed. Shared files (page shell, dropdown, buttons, info cards, segmented toggle, theme context, CLAUDE.md) were changed additively; the existing pages were rechecked and behave as before.</p></div>
+
+  <h2 id="status">Status by phase</h2>
+  <div class="tablecard"><table>
+    <thead><tr><th>Phase</th><th>What</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td>0</td><td>Message to the backend team and the designer (open questions, plan §13)</td><td><span class="tag todo">Not started</span></td></tr>
+      <tr><td>1</td><td>Foundations: route, navigation, page shell placement, header, tabs, rail slot, types, service layer, hooks, lint guard</td><td><span class="tag review">Built and checked, not committed</span></td></tr>
+      <tr><td>2</td><td>Form primitives: text, password, phone, switch, settings row, avatar upload, plus additive extensions to existing primitives</td><td><span class="tag review">Built and checked, not committed</span></td></tr>
+      <tr><td>3</td><td>Profile tab: information form, public preview, save, discard, unsaved changes guard</td><td><span class="tag review">Built and checked, not committed</span></td></tr>
+      <tr><td>4</td><td>Right rail: Account summary, Your Data (export, delete)</td><td><span class="tag review">Built and checked, not committed</span></td></tr>
+      <tr><td>5</td><td>Security tab: sign in methods, change password, active sessions</td><td><span class="tag review">Built and checked, not committed</span></td></tr>
+      <tr><td>6</td><td>Wallets tab: connected wallets, settlement network, wallet badge</td><td><span class="tag review">Built and checked, not committed</span></td></tr>
+      <tr><td>7</td><td>Notifications tab: five alert switches, channels</td><td><span class="tag review">Built and checked, not committed</span></td></tr>
+      <tr><td>8</td><td>Preferences tab and the device theme (System / Light / Dark)</td><td><span class="tag review">Built and checked, not committed</span></td></tr>
+      <tr><td>9</td><td>Final QA: 40 screenshot matrix, errors, keyboard, nav, code rules, fixes</td><td><span class="tag review">Done, not committed</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="how">How the page works</h2>
+  <div class="card">
+    <h4>Route and layout</h4>
+    <p><code>pages/profile/index.tsx</code> renders inside <code>MainLayout</code> (site header, sidebar, mobile bottom nav) and <code>MarketplacePageShell</code>. The hero slot holds the title card (<code>ProfileSettingsHeader</code>) and the tab row (<code>ProfileTabs</code>); the main slot holds the active tab panel; the rail slot holds <code>ProfileRail</code>. The tab lives in <code>?tab=</code>, is validated against <code>PROFILE_TABS</code>, and changes through a shallow <code>router.replace</code>, so switching tabs adds no history entries and never refetches the page. No <code>tab</code> means Profile. Signed out visitors are sent to <code>/login</code> by the existing global ProtectedRoute, since <code>/profile</code> isn't public.</p>
+    <h4>Data flow</h4>
+    <p>Component → hook in <code>src/hooks/profile</code> → <code>profileServices</code> in <code>src/services/profile</code> → mock or api implementation, chosen per area in <code>config.ts</code>. Components never import mock data; an ESLint rule blocks it outside the service folder. Every service throws one error type (<code>ProfileServiceError</code>), so every card shows errors the same way.</p>
+    <h4>Loading, saving and errors</h4>
+    <ul>
+      <li><code>useProfileResource</code> keeps each area in a small module cache, so switching tabs doesn't flash skeletons again. Since phase 6 the cache also notifies every mounted hook on the same key (the Wallets tab badge follows the list).</li>
+      <li>While loading, each card shows <code>SettingsCardSkeleton</code>. If a load fails, only that card shows a <code>NoticeBanner</code> with Retry; the rest of the page keeps working.</li>
+      <li>Switches and selects save optimistically: the change shows at once, and if the save fails it rolls back with an error toast.</li>
+      <li>Anything destructive (disconnect, sign out, delete account, discard edits) asks first in <code>ConfirmDrawer</code>, which sits on the existing right side <code>Modal</code> drawer.</li>
+      <li>Cards on sample data show a "Sample data" chip, driven by <code>isMockArea</code>.</li>
+    </ul>
+    <h4>Unsaved changes guard (Profile tab)</h4>
+    <p>The Profile form reports whether it has unsaved edits. Switching tabs with edits opens a "Discard unsaved changes?" drawer; leaving for another page asks through the browser confirm (Next's router can't wait for a modal); closing or reloading the tab triggers the browser's own <code>beforeunload</code> prompt.</p>
+    <h4>Removing the sample data later</h4>
+    <p>Set every area in <code>config.ts</code> to <code>'api'</code>, delete <code>src/services/profile/mock/</code>, then drop the mock import and branch in <code>src/services/profile/index.ts</code>. The type check lists anything left over. An area can't be set to <code>'api'</code> before <code>api/index.ts</code> has an implementation for it; that's a type error.</p>
+  </div>
+
+  <h2 id="new">New files (123)</h2>
+  <p class="muted">Every file below is new on this branch (untracked in git). The phase column says when it was created; later phases that changed it are listed after a slash.</p>
+
+  <h3 class="folder"><code>pages/profile/</code></h3>
+  <div class="tablecard"><table><thead><tr><th>File</th><th>What it does</th><th>Phase</th></tr></thead><tbody>
+    <tr><td><code>index.tsx</code></td><td>The route. Reads and validates <code>?tab=</code>; builds the hero (header + tabs with the wallet count badge); renders the active panel inside a real <code>role="tabpanel"</code> linked to its tab by id; wires the unsaved changes guard (ConfirmDrawer on tab switch, <code>routeChangeStart</code> confirm, <code>beforeunload</code>); passes <code>focusField</code> so Notifications' Telegram "Set up" opens the Profile tab with the Telegram field focused; uses <code>mobileRailPlacement="after-main-tablet"</code>. Page title "Profile and Settings" and description.</td><td class="ph">1 / 3 to 8</td></tr>
+    <tr><td><code>profile.module.scss</code></td><td>Hero gap 17px, panel gap 23px (Figma 128:14900), focus ring on the panel.</td><td class="ph">1</td></tr>
+  </tbody></table></div>
+
+  <h3 class="folder"><code>public/assets/img/</code></h3>
+  <div class="tablecard"><table><thead><tr><th>File</th><th>What it is</th><th>Phase</th></tr></thead><tbody>
+    <tr><td><code>flags/in.svg</code></td><td>India flag from Figma 128:15024 (1.4 KB). The only flag so far; other countries show their ISO code in the flag slot.</td><td class="ph">2</td></tr>
+    <tr><td><code>profile/verified-badge.svg</code></td><td>The blue verified tick next to the name in the public preview (Figma 128:15091).</td><td class="ph">3</td></tr>
+    <tr><td><code>profile/method-email.png</code>, <code>method-google.png</code>, <code>method-wallet.png</code></td><td>The 3D sign in method icons. Figma exports them at 2000px (up to 650 KB); resized with sharp to 3x of their drawn size (5 to 8 KB each). Checked for baked in backgrounds: transparent, so one file serves both themes.</td><td class="ph">5</td></tr>
+  </tbody></table></div>
+
+  <h3 class="folder"><code>src/types/profile-settings/</code> and <code>src/data/</code></h3>
+  <div class="tablecard"><table><thead><tr><th>File</th><th>What it does</th><th>Phase</th></tr></thead><tbody>
+    <tr><td><code>types/profile-settings/index.ts</code></td><td>The page's view model (plan §6.1): <code>ProfileTab</code>, <code>PROFILE_TABS</code>, <code>ProfileArea</code>, <code>ProfileDetails</code>, <code>AccountSummary</code>, <code>SignInMethod</code>, <code>ActiveSession</code>, <code>ConnectedWallet</code>, <code>WalletSettings</code>, <code>NotificationSettings</code>, <code>DisplayPreferences</code>, <code>PrivacyPreferences</code>, <code>ProfilePreferences</code>. Named <code>profile-settings</code> because <code>src/types/profile</code> would clash with the existing <code>src/types/Profile.ts</code> on Windows (case insensitive paths).</td><td class="ph">1</td></tr>
+    <tr><td><code>data/countries.ts</code></td><td>16 countries with code, name, dial code and expected number length; <code>DEFAULT_COUNTRY_CODE</code> (IN); <code>findCountry</code> with a safe fallback for unknown codes.</td><td class="ph">2</td></tr>
+  </tbody></table></div>
+
+  <h3 class="folder"><code>src/services/profile/</code> (the service layer)</h3>
+  <div class="tablecard"><table><thead><tr><th>File</th><th>What it does</th><th>Phase</th></tr></thead><tbody>
+    <tr><td><code>types.ts</code></td><td>One interface per area: <code>ProfileDetailsService</code>, <code>AccountSummaryService</code>, <code>SecurityService</code>, <code>SessionsService</code>, <code>WalletsService</code>, <code>NotificationsService</code>, <code>PreferencesService</code>, <code>AccountService</code>, collected in <code>ProfileServices</code>. A compile time check that every <code>ProfileArea</code> has exactly one service. <code>ProfileServiceError</code> (message + optional HTTP status).</td><td class="ph">1</td></tr>
+    <tr><td><code>config.ts</code></td><td>The one switch: <code>PROFILE_SOURCES</code>, each area <code>'mock'</code> or <code>'api'</code>, with a comment naming the §8.2 item it waits for. The <code>ProfileSource</code> type only allows <code>'api'</code> for areas that <code>api/index.ts</code> implements.</td><td class="ph">1 / 3, 5, 6, 9</td></tr>
+    <tr><td><code>index.ts</code></td><td>The registry: <code>profileServices</code> picks mock or api per area; <code>isMockArea</code> drives the Sample data chip. The removal steps are written at the top.</td><td class="ph">1</td></tr>
+    <tr><td><code>api/index.ts</code></td><td>Real implementations through the existing RTK Query endpoints (dispatched from outside React, same cache). <b>details:</b> GET; update via PUT <code>/users</code> with name, email, phoneNumber, telegram, then a fresh GET; resend verification with <code>{ email }</code>. <b>security:</b> sign in methods from the GET; change password via PUT <code>/auth/change-password</code>, a 401 shown as "Your current password is incorrect."; disconnect Google says not available yet. <b>wallets:</b> list from the GET; disconnect, primary and settings say not available yet. <code>toServiceError</code> turns raw HTTP replies into sentences (401 session expired, 5xx server didn't respond, FETCH_ERROR offline).</td><td class="ph">1 / 3, 5, 6, 9</td></tr>
+    <tr><td><code>api/mapUser.ts</code></td><td>Maps the backend <code>User</code> to the view model: <code>mapUserToDetails</code> (splits the phone string into country and number, maps telegram), <code>mapUserToSignInMethods</code> (email, Google, wallet flags), <code>mapUserToWallets</code> (the <code>walletAddress[]</code> list).</td><td class="ph">1 / 3, 5, 6</td></tr>
+    <tr><td><code>mock/fixtures.ts</code></td><td>The sample data for all eight areas (details, summary, sign in methods, sessions, wallets, wallet settings, notifications, preferences).</td><td class="ph">1</td></tr>
+    <tr><td><code>mock/runtime.ts</code></td><td>Makes mocks feel like a server: 300ms delay (<code>mockDelay</code>), persistence in <code>localStorage</code> under <code>mock:profile:&lt;area&gt;</code> (<code>readMock</code>, <code>writeMock</code>, <code>readMockList</code>), safe when storage is blocked.</td><td class="ph">1</td></tr>
+    <tr><td><code>mock/index.ts</code></td><td><code>mockServices</code> for every area, with server shaped errors (the test password <code>wrong-password</code> is rejected as incorrect, the last wallet can't be disconnected, a mismatched username can't delete the account). Changing the email clears Verified, as the real flow does.</td><td class="ph">1 / 3, 5, 6</td></tr>
+  </tbody></table></div>
+
+  <h3 class="folder"><code>src/hooks/profile/</code></h3>
+  <div class="tablecard"><table><thead><tr><th>File</th><th>What it does</th><th>Phase</th></tr></thead><tbody>
+    <tr><td><code>useProfileResource.ts</code></td><td><code>useProfileResource(key, load)</code>: data, isLoading, isError, error, reload, replace, on a module cache. Phase 6 added listeners so every hook on a key gets new values. <code>useProfileAction</code>: wraps a call with an <code>isSaving</code> flag and rethrows so callers show their own toast.</td><td class="ph">1 / 6</td></tr>
+    <tr><td><code>index.ts</code></td><td>One hook per area: <code>useProfileDetails</code>, <code>useResendVerification</code>, <code>useAccountSummary</code>, <code>useSignInMethods</code>, <code>useChangePassword</code>, <code>useActiveSessions</code>, <code>useConnectedWallets</code>, <code>useWalletSettings</code>, <code>useNotificationSettings</code>, <code>useProfilePreferences</code>, <code>useYourData</code>, <code>useWalletCount</code>; each returns <code>isSample</code>. (Phase 1's <code>useSampleArea</code> was removed in phase 8.)</td><td class="ph">1 / 3 to 8</td></tr>
+    <tr><td><code>useProfileDraft.ts</code></td><td>The Profile form's draft: field errors on blur and on submit, dirty tracking, the changed fields diff, save through <code>useProfileDetails</code>, reset on discard.</td><td class="ph">3</td></tr>
+  </tbody></table></div>
+
+  <h3 class="folder"><code>src/helpers/</code> (pure functions, tested with node)</h3>
+  <div class="tablecard"><table><thead><tr><th>File</th><th>What it does</th><th>Phase</th></tr></thead><tbody>
+    <tr><td><code>passwordStrength.ts</code></td><td><code>PASSWORD_POLICY</code> is the backend's own regex (8+ characters with upper, lower, number and symbol); <code>PASSWORD_POLICY_TEXT</code>; <code>getPasswordStrength</code> returns Very weak / Weak / Medium / Strong (a password meeting the policy but under 12 characters is Medium).</td><td class="ph">2 / 5</td></tr>
+    <tr><td><code>phone.ts</code></td><td><code>normalizePhoneDigits</code> (strips spaces, a pasted dial code and a trunk 0), <code>validatePhoneNumber</code> (length per country), <code>formatPhoneDigits</code>, <code>parsePhoneString</code> (backend string → country + number), <code>toPhoneString</code>.</td><td class="ph">2 / 3</td></tr>
+    <tr><td><code>profileValidation.ts</code></td><td><code>PROFILE_LIMITS</code>, <code>validateProfileField</code>, <code>validateProfile</code>, <code>PROFILE_FIELDS</code>, <code>profileChanges</code> (only the changed fields are sent), <code>normalizeTelegram</code>, <code>validatePasswordChange</code> (current, new, confirm).</td><td class="ph">3 / 5</td></tr>
+    <tr><td><code>displayFormat.ts</code></td><td><code>formatDisplayDate</code>, <code>formatDisplayTime</code>, <code>DATE_FORMATS</code>, <code>TIME_FORMAT_LABELS</code> for the Preferences date and time formats. Not adopted by other pages yet.</td><td class="ph">8</td></tr>
+  </tbody></table></div>
+
+  <h3 class="folder"><code>src/design-system/primitives/</code> (new primitives)</h3>
+  <div class="tablecard"><table><thead><tr><th>Folder and files</th><th>What it does</th><th>Phase</th></tr></thead><tbody>
+    <tr><td><code>inputs/text-field/</code>: <code>FieldShell.tsx</code>, <code>TextField.tsx</code>, <code>TextField.module.scss</code>, <code>index.ts</code></td><td><code>FieldShell</code>: label, " · optional", helper or error text, counter, and the <code>aria-describedby</code> ids (<code>fieldDescribedBy</code>, <code>fieldHelperId</code>, <code>fieldErrorId</code>). <code>TextField</code>: input or <code>multiline</code> textarea (stops typing past the max, live counter), leading icon, trailing slot, error, <code>invalid</code> (red border without duplicate error text), disabled, read only. Dark: Figma's white 5% lift and 5px radius.</td><td class="ph">2</td></tr>
+    <tr><td><code>inputs/password-field/</code>: <code>PasswordField.tsx</code>, <code>PasswordStrength.tsx</code>, <code>PasswordField.module.scss</code>, <code>index.ts</code></td><td><code>PasswordField</code> is TextField plus the show/hide eye (reused from <code>AuthTextField</code>). <code>PasswordStrength</code>: four bars lit by level (<code>data-level</code>), a polite live label for screen readers.</td><td class="ph">2</td></tr>
+    <tr><td><code>inputs/phone-field/</code>: <code>PhoneField.tsx</code>, <code>PhoneField.module.scss</code>, <code>index.ts</code></td><td>Country select (FilterDropdown field variant, flag or ISO code, dial code) next to the number (TextField). Normalises paste, checks length on blur.</td><td class="ph">2</td></tr>
+    <tr><td><code>toggles/switch/</code>: <code>Switch.tsx</code>, <code>Switch.module.scss</code>, <code>index.ts</code></td><td><code>role="switch"</code> button with <code>aria-checked</code>, 50x28, Figma blue <code>#2563eb</code> when on, tertiary text role when off; labelled by its row.</td><td class="ph">2</td></tr>
+    <tr><td><code>cards/settings-row/</code>: <code>SettingsRow.tsx</code>, <code>SettingsRow.module.scss</code>, <code>index.ts</code></td><td>The 70px bevelled settings row: title, description, and a <code>control</code> render prop that receives <code>{ labelId, descriptionId }</code> so the control is named by the row. <code>wideControl</code> (selects go full width under the text on mobile); <code>stacked</code> (control on its own line, phase 5).</td><td class="ph">2 / 5</td></tr>
+    <tr><td><code>avatars/avatar-upload/</code>: <code>AvatarUpload.tsx</code>, <code>AvatarUpload.module.scss</code>, <code>index.ts</code></td><td>92px avatar with the camera badge, Upload and Remove buttons, PNG/JPG up to 2 MB (<code>checkAvatarFile</code>, <code>AVATAR_MAX_BYTES</code>, <code>AVATAR_TYPES</code>), local preview (object URL revoked), initials fallback (<code>getInitials</code>). <code>ProfileAvatar</code> split out in phase 3 so the preview card reuses it.</td><td class="ph">2 / 3</td></tr>
+    <tr><td><code>badges/sample-data-chip/</code>: <code>SampleDataChip.tsx</code>, <code>.module.scss</code>, <code>index.ts</code></td><td>The small "Sample data" chip on cards whose area is still mock.</td><td class="ph">1</td></tr>
+    <tr><td><code>icons/profile-icons/</code>: <code>ProfileIcons.tsx</code>, <code>index.ts</code></td><td>The five tab icons from Figma as <code>currentColor</code> components (ProfileTabIcon, SecurityTabIcon, WalletsTabIcon, NotificationsTabIcon, PreferencesTabIcon), so they follow the text colour in both themes.</td><td class="ph">1</td></tr>
+  </tbody></table></div>
+
+  <h3 class="folder"><code>src/design-system/composites/profile/</code></h3>
+  <p class="muted">Each component folder has the component, its <code>.module.scss</code> (where it has styles) and an <code>index.ts</code>. <code>composites/profile/index.ts</code> is the curated barrel exporting all of them.</p>
+  <div class="tablecard"><table><thead><tr><th>Component</th><th>What it does</th><th>Phase</th></tr></thead><tbody>
+    <tr><td class="grp" colspan="3">shared/</td></tr>
+    <tr><td><code>ProfileSettingsHeader</code></td><td>The title card ("Profile and Settings" and subtitle) on the domain pages' <code>noise-surface</code>, green edge in light, white hairline in dark.</td><td class="ph">1</td></tr>
+    <tr><td><code>ProfileTabs</code></td><td>A real tablist (<code>profileTabId</code>, <code>profilePanelId</code>) with arrow, Home and End keys; the selected pill uses the control selected roles (blue in light, white in dark); wallet count badge; sideways scroll on mobile with the active tab kept in view through a ResizeObserver.</td><td class="ph">1 / 6, 7, 8</td></tr>
+    <tr><td><code>SettingsCard</code></td><td>The section card: title, subtitle, action slot, Sample data chip, optional divider; <code>ariaLabel</code> and <code>cardBare</code> for untitled cards; header wraps on mobile.</td><td class="ph">1 / 6, 7</td></tr>
+    <tr><td><code>SettingsCardSkeleton</code></td><td>Loading placeholder with a set number of rows, reused by every tab.</td><td class="ph">3</td></tr>
+    <tr><td><code>ConfirmDrawer</code></td><td>The shared confirm step on the right side <code>Modal</code>: title, body, confirm and cancel labels, an error tone for destructive actions, a busy state and <code>confirmDisabled</code> (the Delete account card uses it for the typed username check).</td><td class="ph">5</td></tr>
+    <tr><td><code>NoteBox</code></td><td>The tinted note box (no KYC note, EVM note).</td><td class="ph">6</td></tr>
+    <tr><td><code>SuccessChip</code></td><td>The green status chip: Active, Connected, Primary.</td><td class="ph">7</td></tr>
+    <tr><td class="grp" colspan="3">profile/</td></tr>
+    <tr><td><code>ProfileInformationForm</code></td><td>Photo, then fields two per row (one on mobile): full name, username (with the portfolio link and copy, <code>portfolioPath</code>), email (Verified or Resend verification, and a note when changed), phone, Telegram, bio with counter, location and website with icons. <code>profileFieldId</code> gives stable ids for focusing.</td><td class="ph">3</td></tr>
+    <tr><td><code>PublicPreviewCard</code></td><td>Live preview of the unsaved draft: avatar or initials, name, verified badge, @username, bio, summary stats.</td><td class="ph">3</td></tr>
+    <tr><td><code>ProfileTabPanel</code></td><td>The Profile tab container: skeletons, error banner with Retry, Save changes (disabled until something changes, "Saving…"), Discard changes, toasts, focus on the first invalid field, <code>onDirtyChange</code>, and <code>focusField</code> / <code>onFocused</code> for the Telegram jump.</td><td class="ph">3 / 7</td></tr>
+    <tr><td class="grp" colspan="3">rail/</td></tr>
+    <tr><td><code>AccountSummaryCard</code></td><td>Account on <code>InfoListCard</code>: member since, domains owned and volume sold (each with View portfolio → My Domains), completed sales, reputation note; scroll fade on the list.</td><td class="ph">4</td></tr>
+    <tr><td><code>YourDataCard</code></td><td>Export my data and Delete account (red) rows with chevrons and a note; delete confirms by typing the username.</td><td class="ph">4</td></tr>
+    <tr><td><code>ProfileRail</code></td><td>Rail container: loads summary, details and account actions, shows toasts, logs out after a real delete; side by side at tablet, hidden on mobile.</td><td class="ph">4</td></tr>
+    <tr><td class="grp" colspan="3">security/</td></tr>
+    <tr><td><code>SignInMethodsCard</code></td><td>Email, Google and Wallet method cards with Active/Connected chips and the 3D icons, Disconnect for Google, Manage for the wallet, the no KYC note. <code>shortWalletAddress</code>; one line details with an ellipsis.</td><td class="ph">5 / 9</td></tr>
+    <tr><td><code>ChangePasswordForm</code></td><td>Current, new (with strength meter) and confirm; errors on blur and submit; a 401 under Current password; a note instead of the form for accounts with no password. <code>CHANGE_PASSWORD_CARD_ID</code> for scroll and focus.</td><td class="ph">5</td></tr>
+    <tr><td><code>ActiveSessionsList</code></td><td>Session rows with a device tile (current device in purple), "Active now" or relative time (<code>formatLastActive</code>), Sign Out per other session, Sign Out Everywhere Else.</td><td class="ph">5</td></tr>
+    <tr><td><code>SecurityTabPanel</code></td><td>Container: skeleton and error per card, toasts, the confirm drawers (disconnect Google, sign out), Manage → Wallets tab via <code>onNavigateTab</code>.</td><td class="ph">5</td></tr>
+    <tr><td class="grp" colspan="3">wallets/</td></tr>
+    <tr><td><code>ConnectedWalletsCard</code></td><td>Wallet cards: network label (<code>walletNetworkLabel</code>), Primary chip, short address with copy, Disconnect; the EVM note; Add Another Wallet disabled with "Coming soon".</td><td class="ph">6 / 9</td></tr>
+    <tr><td><code>DefaultNetworkCard</code></td><td>Settlement network select (FilterDropdown field with chain logos, <code>SETTLEMENT_CHAINS</code> from <code>src/data/marketplace/domains</code>) and the "Hide domains from other wallets" switch.</td><td class="ph">6</td></tr>
+    <tr><td><code>WalletsTabPanel</code></td><td>Container: skeleton and error per card, optimistic settings with rollback, disconnect confirm with the last wallet guard, copy toast.</td><td class="ph">6</td></tr>
+    <tr><td class="grp" colspan="3">notifications/</td></tr>
+    <tr><td><code>NotificationSwitches</code></td><td>The five alerts (<code>NOTIFICATION_ALERTS</code>) as SettingsRow + Switch; untitled card named "Alerts" for screen readers.</td><td class="ph">7</td></tr>
+    <tr><td><code>NotificationChannels</code></td><td>Email with the Primary chip; Telegram "Not connected" + Set up, or @handle + Disconnect.</td><td class="ph">7</td></tr>
+    <tr><td><code>NotificationsTabPanel</code></td><td>Optimistic switches with rollback and toast; Telegram disconnect confirm (saved through the details service); Set up hands off to the Profile tab.</td><td class="ph">7</td></tr>
+    <tr><td class="grp" colspan="3">preferences/</td></tr>
+    <tr><td><code>DisplayPreferencesCard</code></td><td>Theme pill (System / Light / Dark, hidden when dark mode is off), currency, language, date format and time format selects.</td><td class="ph">8</td></tr>
+    <tr><td><code>PrivacyPreferencesCard</code></td><td>Public portfolio and Show my sales history switches.</td><td class="ph">8</td></tr>
+    <tr><td><code>PreferencesTabPanel</code></td><td>Container: theme through <code>useTheme().setPreference</code> (per device), everything else saved optimistically with rollback through <code>useProfilePreferences</code>.</td><td class="ph">8</td></tr>
+  </tbody></table></div>
+
+  <h2 id="changed">Changed existing files (20)</h2>
+  <p class="muted">Every change to a shared file is additive: new optional props, variants or values. Existing callers get the old behaviour by default.</p>
+  <div class="tablecard"><table><thead><tr><th>File</th><th>What changed and why</th><th>Effect elsewhere</th><th>Phase</th></tr></thead><tbody>
+    <tr><td class="grp" colspan="4">Navigation and layout</td></tr>
+    <tr><td><code>src/helpers/marketplace/routes.ts</code></td><td>Added <code>PROFILE_HREF = '/profile'</code> and <code>profileHref(tab?)</code>, so no component builds the URL by hand.</td><td>None</td><td class="ph">1</td></tr>
+    <tr><td><code>src/data/marketplace/navigation.ts</code></td><td>The two greyed out Account placeholders (Profile, Settings) became one live "My Profile" item linking to <code>/profile</code> with <code>requiresAuth</code>; the unused <code>FiSettings</code> import removed.</td><td>Sidebar and mobile drawer on every page show My Profile</td><td class="ph">1</td></tr>
+    <tr><td><code>composites/marketplace/shared/MobileBottomNav/MobileBottomNav.tsx</code></td><td>Account tab links to <code>/profile</code> and is no longer a placeholder.</td><td>Bottom nav on every page</td><td class="ph">1</td></tr>
+    <tr><td><code>src/design-system/layouts/main-layout/index.tsx</code></td><td><code>'/profile': 'account'</code> added to the route → bottom nav map, so Account highlights on the page; comment updated.</td><td>None</td><td class="ph">1</td></tr>
+    <tr><td><code>composites/marketplace/shared/MarketplacePageShell/MarketplacePageShell.module.scss</code></td><td>New <code>data-mobile-rail='after-main-tablet'</code> grid areas: hero / main / rail from tablet down, so the rail never sits between the tabs and their panel.</td><td>None (new value only)</td><td class="ph">1</td></tr>
+    <tr><td><code>composites/marketplace/shared/MarketplacePageShell/MarketplacePageShell.tsx</code></td><td>Phase 1: <code>mobileRailPlacement</code> accepts <code>'after-main-tablet'</code>. Phase 9: the rail is rendered after main in the DOM for the after main placements, so keyboard Tab reaches the page content before the rail. Grid areas keep the visual layout identical.</td><td>Watchlist (after main) now tabs into its content first; rechecked at 1440 and 390, looks the same. Marketplace (before main) unchanged.</td><td class="ph">1 / 9</td></tr>
+    <tr><td class="grp" colspan="4">Primitives (additive extensions, reused instead of rebuilt)</td></tr>
+    <tr><td><code>primitives/inputs/filter-dropdown/FilterDropdown.tsx</code> and <code>.module.scss</code></td><td>New <code>variant="field"</code> (45px bordered form select, leading icon, red border via <code>data-invalid</code>), option <code>icon</code>s, <code>id</code>, <code>ariaLabel</code>, <code>ariaDescribedBy</code>, <code>disabled</code>, <code>label</code> as nodes. Keyboard for all variants: Escape closes and returns focus, arrows / Home / End move through options; the field variant moves focus into the list on open. <code>aria-haspopup</code> on the trigger. Dark styles in dark blocks.</td><td>Filter pills look the same; they gain Escape and arrow keys. Checked on the home page.</td><td class="ph">2</td></tr>
+    <tr><td><code>primitives/buttons/default-buttons/DefaultButtons.tsx</code> and <code>.module.scss</code></td><td>New <code>size="lg"</code>: 35.5px, 11px padding, 8px radius, 13px bold (Figma 128:14981, Upload / Remove).</td><td>None</td><td class="ph">2</td></tr>
+    <tr><td><code>primitives/cards/info-list-card/InfoListCard.tsx</code> and <code>.module.scss</code></td><td>Row <code>tone: 'danger'</code> (red gradient avatar, red title <code>#dc2626</code> for contrast, error role in dark) and <code>fitContent</code> (list sized to its rows instead of 214px).</td><td>None (My Domains and Watchlist rails don't pass them)</td><td class="ph">4</td></tr>
+    <tr><td><code>primitives/toggles/segmented-toggle/SegmentedToggle.tsx</code> and <code>.module.scss</code></td><td>New <code>variant="pill"</code> (Figma 128:17043 theme picker) and group <code>ariaLabel</code> / <code>ariaLabelledBy</code>.</td><td>None</td><td class="ph">8</td></tr>
+    <tr><td class="grp" colspan="4">Theme</td></tr>
+    <tr><td><code>src/context/ThemeContext.tsx</code></td><td>New <code>ThemePreference</code> (<code>'system' | 'light' | 'dark'</code>) and <code>preference</code> / <code>setPreference</code> beside the resolved <code>theme</code>. The inline init script now follows <code>prefers-color-scheme</code> when nothing or <code>system</code> is saved (first visit = device theme). While System is chosen a <code>matchMedia</code> listener follows live OS changes. <code>setTheme</code> and <code>toggleTheme</code> (header toggle) still work and save a fixed choice.</td><td>Site wide: a first visit with a dark OS now opens dark (was always light). Existing consumers unchanged.</td><td class="ph">8</td></tr>
+    <tr><td class="grp" colspan="4">API and types</td></tr>
+    <tr><td><code>src/constants/Api.ts</code></td><td>Added <code>ChangePasswordApi</code> and <code>ResendVerificationEmailApi</code> from existing <code>API_ENDPOINT</code> values.</td><td>None</td><td class="ph">3 / 5</td></tr>
+    <tr><td><code>src/core/redux/userProfile.ts</code></td><td>New mutations <code>resendVerificationEmail</code> (POST <code>{ email }</code>) and <code>changePassword</code> (PUT <code>{ oldPassword, newPassword }</code>) and their hooks.</td><td>None</td><td class="ph">3 / 5</td></tr>
+    <tr><td><code>src/types/Profile.ts</code></td><td>Optional <code>telegram</code> on the backend <code>User</code> type (the backend's UpdateUserDto accepts it).</td><td>None</td><td class="ph">5</td></tr>
+    <tr><td class="grp" colspan="4">Tooling and docs</td></tr>
+    <tr><td><code>eslint.config.mjs</code></td><td><code>no-restricted-imports</code> error on <code>services/profile/mock</code> anywhere outside <code>src/services/profile</code>, so sample data can be deleted in one go later.</td><td>None</td><td class="ph">1</td></tr>
+    <tr><td><code>CLAUDE.md</code> §7 "How it works"</td><td>Describes the new default (device theme), the <code>preference</code> values, the live OS following, and the Preferences tab as a second place to choose.</td><td>Docs only</td><td class="ph">8</td></tr>
+  </tbody></table></div>
+
+  <h2 id="removed">Removed along the way</h2>
+  <div class="card"><ul>
+    <li><code>composites/profile/PrimitivesPreview.tsx</code>: a temporary preview for the phase 2 screenshots, deleted at the end of phase 2 (the user reviews primitives in the real tabs).</li>
+    <li>The phase 1 placeholder section cards in <code>pages/profile/index.tsx</code> and the rail placeholders: replaced tab by tab in phases 3 to 8.</li>
+    <li><code>useSampleArea</code> in <code>src/hooks/profile</code>: only the placeholders used it; removed in phase 8.</li>
+    <li>A planned <code>SelectField</code> and <code>TextArea</code> were never built: the user asked to reuse existing primitives, so selects use FilterDropdown's field variant and the textarea is TextField <code>multiline</code>.</li>
+  </ul></div>
+
+  <h2 id="log">Phase log</h2>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">0</span><h3>Backend and designer message</h3><span class="tag todo">Not started</span></div>
+    <p>The plan's phase 0 is a message to the backend team (the §8.2 endpoint list) and to the designer (missing flags, tablet frames, Figma quirks). It hasn't been sent. The sample data table below and the Figma quirks list are ready to use for it.</p>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">1</span><h3>Foundations</h3><span class="tag review">Built and checked, not committed</span></div>
+    <p class="meta">14 October 2026</p>
+    <h4>Built</h4><ul>
+      <li>The <code>/profile</code> route with the five tabs in <code>?tab=</code>, each showing its Figma sections as placeholder cards.</li>
+      <li>Navigation: one "My Profile" item in the sidebar and drawer, bottom nav Account linked and highlighted, <code>PROFILE_HREF</code> and <code>profileHref()</code>.</li>
+      <li>Shell: the new <code>after-main-tablet</code> rail placement.</li>
+      <li>Header card, tab row with icons and wallet badge, settings card, Sample data chip.</li>
+      <li>View model types, the whole service layer (types, config, registry, mock with delay and persistence, api with the real GET switched off), the hooks and the shared loader.</li>
+      <li>The ESLint rule that keeps mock imports inside the service layer.</li>
+    </ul>
+    <h4>Decisions</h4><ul>
+      <li>The header reuses <code>noise-surface</code> (as OrderHeaderCard), green edge in light, white hairline in dark.</li>
+      <li>Inactive tab labels use the tertiary text role (Figma 36%; the role is 50% in dark).</li>
+      <li>Tablet puts the rail under the content (Figma has no tablet frame).</li>
+    </ul>
+    <h4>Verified</h4><ul>
+      <li>Type check and lint clean; stylesheets compile; the lint rule fires on a test import of mock data.</li>
+      <li>Screenshots: desktop 1512 light and dark, tablet 834 light and 1024 dark, mobile 390 dark, against the Figma frames.</li>
+      <li>Keyboard: Right arrow, End and Home move focus, the selected tab, the panel and <code>?tab=</code>.</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">2</span><h3>Form primitives</h3><span class="tag review">Built and checked, not committed</span></div>
+    <p class="meta">14 October 2026 · user asked mid phase: "can't we use the already present primitives?"</p>
+    <h4>Built</h4><ul>
+      <li>New: TextField + FieldShell, PasswordField + PasswordStrength, PhoneField, Switch, SettingsRow, AvatarUpload.</li>
+      <li>Extended instead of rebuilt: FilterDropdown <code>variant="field"</code> and keyboard support; DefaultButton <code>size="lg"</code>; the eye toggle from AuthTextField; textarea folded into TextField.</li>
+      <li>Helpers: <code>passwordStrength.ts</code>, <code>phone.ts</code>; data: <code>countries.ts</code>; asset: the India flag.</li>
+    </ul>
+    <h4>Decisions</h4><ul>
+      <li>Helper text uses the secondary role, not Figma's 39% (fails 4.5:1); labels use primary.</li>
+      <li>Dark inputs: Figma's white 5% lift and 5px radius in dark blocks; light keeps 3px.</li>
+      <li>Phone boxes are 45px like the other fields (Figma draws 40px beside a 45px field).</li>
+      <li>Only India has a flag; other countries show their ISO code until the designer sends flags.</li>
+      <li>The strength meter lights as many bars as the level; weak levels use Figma's <code>#ff1744</code>.</li>
+      <li>Switch off track uses the tertiary text role (Figma draws no off state).</li>
+      <li>PhoneField passes <code>invalid</code> to its number box instead of a blank error, which had duplicated ids.</li>
+    </ul>
+    <h4>Verified</h4><ul>
+      <li>Node tests: password cases, phone normalise / validate / format, unknown country fallback (a pasted dial code bug found and fixed).</li>
+      <li>Screenshots desktop light and dark, mobile 390 dark, against Figma 128:14986 / 128:18540, 128:15676 / 128:19236, 128:17050 / 128:20633, 128:17118 / 128:20701, 128:14970 / 128:18524.</li>
+      <li>Keyboard: select opens on the selected option, arrows, pick, focus back; Escape closes; switch toggles and is named by its row; eye toggles type and label.</li>
+      <li>The home page filter pills look and behave as before.</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">3</span><h3>Profile tab</h3><span class="tag review">Built and checked, not committed</span></div>
+    <p class="meta">14 October 2026</p>
+    <h4>Built</h4><ul>
+      <li>ProfileInformationForm, PublicPreviewCard (live draft preview), ProfileTabPanel (skeleton, error, save, discard, toasts, first invalid field focus), SettingsCardSkeleton.</li>
+      <li><code>useProfileDraft</code>, <code>profileValidation.ts</code>, phone parse and format.</li>
+      <li>The <code>resendVerificationEmail</code> mutation; real <code>details.update</code> and <code>resendVerification</code> (area stays on mock).</li>
+      <li>The page's unsaved changes guard; the verified badge asset; <code>ProfileAvatar</code> split out.</li>
+    </ul>
+    <h4>Decisions</h4><ul>
+      <li>The photo is part of the draft and saves with Save changes; there's no upload endpoint yet.</li>
+      <li>Changing the email shows a note that a new verification link will be sent, and hides Verified until then.</li>
+      <li>Save changes is PrimaryButton <code>sm</code> (44px, nearest to Figma's 40px).</li>
+      <li>Username availability needs the backend; only the format is checked.</li>
+    </ul>
+    <h4>Verified</h4><ul>
+      <li>Node tests for every field, the changes diff and phone parsing (IN, AE, US, no plus).</li>
+      <li>Screenshots desktop light and dark, mobile 390 light, against 128:14900 / 128:18454.</li>
+      <li>Save disabled until an edit; preview follows typing; username lowercases; submit with an error focuses the field; email change flow; save persists (mock); a dirty tab switch opens the drawer and Discard switches.</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">4</span><h3>Right rail</h3><span class="tag review">Built and checked, not committed</span></div>
+    <p class="meta">14 October 2026 · user chose the scroll fade for the faded Completed sales row</p>
+    <h4>Built</h4><ul>
+      <li>AccountSummaryCard, YourDataCard (type the username to delete), ProfileRail; InfoListCard <code>tone: 'danger'</code> and <code>fitContent</code>.</li>
+    </ul>
+    <h4>Decisions</h4><ul>
+      <li>The faded row is a scroll fade, as on the Watchlist Overview: the list scrolls in 196px and the last visible row fades.</li>
+      <li>Volume sold shows the real amount and token (Figma repeats "28").</li>
+      <li>Delete on sample data says it was simulated and keeps the session; on the real API it logs out.</li>
+      <li>Red text is <code>#dc2626</code> in light (Figma's <code>#ef4444</code> is 3.8:1 on white).</li>
+      <li>Dark keeps InfoListCard's existing dark look shared with My Domains and Watchlist.</li>
+    </ul>
+    <h4>Verified</h4><ul>
+      <li>Screenshots desktop light and dark, tablet 834 side by side.</li>
+      <li>Enter on Export shows the email toast; Delete stays disabled until the username matches, then closes with the simulated toast; View portfolio goes to My Domains.</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">5</span><h3>Security tab</h3><span class="tag review">Built and checked, not committed</span></div>
+    <p class="meta">14 October 2026 · user chose the backend password rule</p>
+    <h4>Built</h4><ul>
+      <li>SignInMethodsCard, ChangePasswordForm, ActiveSessionsList, SecurityTabPanel, ConfirmDrawer (now also used by the discard prompt and Delete account), SettingsRow <code>stacked</code>.</li>
+      <li><code>changePassword</code> mutation, real <code>security</code> service, <code>telegram</code> on the User type and mapper, the 3D method icons.</li>
+      <li>Fixed phase 3's resend to send <code>{ email }</code>, and the api save to send all four accepted fields.</li>
+    </ul>
+    <h4>Decisions</h4><ul>
+      <li>Password rule follows the backend (8+ with upper, lower, number, symbol), not Figma's "10 characters with a number or symbol".</li>
+      <li>The meter sits under New password (Figma draws it under the third field); third label reads "Confirm new password".</li>
+      <li>Session tiles show a desktop or phone icon (Figma's "@" and "G" are placeholders); the current device is purple.</li>
+      <li>Disconnecting Google when it's the only method explains why instead of disconnecting.</li>
+    </ul>
+    <h4>Verified</h4><ul>
+      <li>Node: password policy and change password rules.</li>
+      <li>Screenshots desktop light and dark, mobile 390 dark, against 128:15429 / 128:18991.</li>
+      <li>Change Password scrolls and focuses; empty submit shows three errors; wrong password shows the 401 message; success clears and toasts; Disconnect removes Google; Sign Out removes a session; Manage goes to the Wallets tab.</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">6</span><h3>Wallets tab</h3><span class="tag review">Built and checked, not committed</span></div>
+    <p class="meta">14 October 2026 · user chose "show it, mark coming soon" for Add Another Wallet</p>
+    <h4>Built</h4><ul>
+      <li>ConnectedWalletsCard, DefaultNetworkCard, WalletsTabPanel, NoteBox; real <code>wallets.list</code>.</li>
+      <li>The resource cache now publishes to every listener, so the Wallets badge follows the list.</li>
+      <li>Fixes: the badge on the active dark (white) tab was invisible; card headers with an action now wrap on mobile.</li>
+    </ul>
+    <h4>Decisions</h4><ul>
+      <li>Add Another Wallet is disabled with "Coming soon" until the backend supports several wallets. No wallet signing on this page.</li>
+      <li>Wallet titles read "EVM wallet" / "Solana wallet" from the network.</li>
+    </ul>
+    <h4>Verified</h4><ul>
+      <li>Screenshots desktop light and dark, mobile 390 light and dark.</li>
+      <li>Badge shows 3; Add disabled; network select saves; switch flips; two disconnects take the badge to 1; the last wallet is refused.</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">7</span><h3>Notifications tab</h3><span class="tag review">Built and checked, not committed</span></div>
+    <p class="meta">14 October 2026</p>
+    <h4>Built</h4><ul>
+      <li>NotificationSwitches, NotificationChannels, NotificationsTabPanel, SuccessChip (now shared by Security and Wallets too).</li>
+      <li>SettingsCard <code>ariaLabel</code> and <code>cardBare</code> for the untitled switches card (removed an empty band above it).</li>
+      <li>Telegram Set up opens the Profile tab with the Telegram field focused (<code>focusField</code>).</li>
+      <li>The tab row scrolls the active tab into view on mobile.</li>
+    </ul>
+    <h4>Decisions</h4><ul>
+      <li>Figma's green Primary button is a status, so it's the Primary chip.</li>
+      <li>No notification endpoint exists; the tab stays on sample data.</li>
+    </ul>
+    <h4>Verified</h4><ul>
+      <li>Real CDP key events: Space and Enter toggle a focused switch; each switch has its row's title as name and description as description.</li>
+      <li>Screenshots desktop light and dark, mobile 390 light and dark.</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">8</span><h3>Preferences tab and the device theme</h3><span class="tag review">Built and checked, not committed</span></div>
+    <p class="meta">14 October 2026</p>
+    <h4>Built</h4><ul>
+      <li>ThemeContext with <code>preference</code>, device theme on first visit, live OS following.</li>
+      <li>SegmentedToggle <code>pill</code>; DisplayPreferencesCard, PrivacyPreferencesCard, PreferencesTabPanel; <code>displayFormat.ts</code>.</li>
+      <li>Every tab real now; placeholders and <code>useSampleArea</code> removed.</li>
+      <li>ProfileTabs reveals the active tab whenever the row resizes (fonts, badge), so it's never cut off on mobile.</li>
+      <li>CLAUDE.md §7, <code>dev-docs/darkmodeprogress.html</code> and <code>darkmodecourse.html</code> updated for the new default.</li>
+    </ul>
+    <h4>Decisions</h4><ul>
+      <li>The theme stays per device (localStorage); syncing it to the account waits for §8.2 item 7.</li>
+      <li>The Theme row hides when <code>NEXT_PUBLIC_DARK_MODE</code> is off.</li>
+      <li>Currency (USD) and Language (English) have one option each for now.</li>
+    </ul>
+    <h4>Verified</h4><ul>
+      <li>Theme test with an emulated OS scheme: every combination of saved choice and OS setting opens in the right theme on the first frame, with no flash.</li>
+      <li>System follows a live OS switch; Light stops following; the header toggle saves Dark; System resumes following.</li>
+      <li>Node tests for date and time formats; screenshots desktop and mobile in both themes.</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">9</span><h3>Final QA</h3><span class="tag review">Done, not committed</span></div>
+    <p class="meta">14 October 2026</p>
+    <h4>Checked</h4><ul>
+      <li><b>Screenshot matrix:</b> 5 tabs × light and dark × 390, 834, 1024, 1440 (40 full page captures, reviewed as contact sheets). 1024 uses the tablet layout by design.</li>
+      <li><b>Code rules:</b> no <code>!important</code>, inline styles only for runtime positions, no native img or a, no fragments in maps. Raw colours only where marked design specific.</li>
+      <li><b>Errors:</b> with details, security and wallets temporarily on <code>'api'</code> (the test login gets 401s), each card showed its own banner with Retry. Config restored to all <code>'mock'</code> and confirmed.</li>
+      <li><b>Loading:</b> skeletons render (seen in the DOM); the 300ms mock window is too short to screenshot.</li>
+      <li><b>Keyboard:</b> real Tab presses through the Profile form, every stop has a visible focus ring.</li>
+      <li><b>Nav:</b> sidebar, drawer and bottom nav highlight My Profile on every tab.</li>
+      <li>Type check clean; lint 0 errors (warnings only in older untouched files); 34 stylesheets compile; all helper tests pass.</li>
+    </ul>
+    <h4>Fixed</h4><ul>
+      <li>Tab order: main now comes before the rail in the DOM for the after main placements (shell change above).</li>
+      <li>Raw "Unauthorized" errors became plain sentences (<code>toServiceError</code>).</li>
+      <li>Wallet and email lines stay on one line with an ellipsis at 1440 (they broke in two).</li>
+      <li>Two plain whites moved to <code>--color-text-on-dark</code>; the switch knob shadow annotated as design specific.</li>
+      <li>A stale phase 2 password test trimmed after the policy change.</li>
+    </ul>
+  </div>
+
+  <h2 id="decisions">Decisions taken with the user</h2>
+  <div class="tablecard"><table><thead><tr><th>When</th><th>Question</th><th>Answer</th></tr></thead><tbody>
+    <tr><td>Planning</td><td>Route and data</td><td><code>/profile</code>; sample data for now behind a service layer that's easy to remove</td></tr>
+    <tr><td>Planning</td><td>First visit theme</td><td>Follow the device (System is the default)</td></tr>
+    <tr><td>Phase 2</td><td>Build new primitives or reuse?</td><td>Reuse and extend the existing ones additively first</td></tr>
+    <tr><td>Phase 2</td><td>Keep the primitives preview?</td><td>No; the user checks in the real page</td></tr>
+    <tr><td>Phase 4</td><td>The faded Completed sales row</td><td>Scroll fade</td></tr>
+    <tr><td>Phase 5</td><td>Password rule</td><td>Backend rule: 8+ with upper, lower, number and symbol</td></tr>
+    <tr><td>Phase 6</td><td>Add Another Wallet</td><td>Show it disabled with "Coming soon"</td></tr>
+  </tbody></table></div>
+
+  <h2 id="figma">Figma quirks handled</h2>
+  <div class="card"><ul>
+    <li>The Website label reads "Websiter" in Figma; the code says Website.</li>
+    <li>The preview card copies the camera badge from the form; left out of the preview.</li>
+    <li>The preview's "4.25 ETH" and the rail's repeated "28" are placeholders; real values and token are shown.</li>
+    <li>The third password label and the meter's position (see phase 5).</li>
+    <li>The Wallets frame repeats the Security tab's Email/Google cards and Change Password card (plan §2.9.1); not copied.</li>
+    <li>The Notifications subtitle was copied from another card (plan §2.9.2); it reads "Where your alerts reach you."</li>
+    <li>Session tile letters, the green Primary button, the 40px phone box, the all red strength meter, the 39% helper text: see the phase decisions.</li>
+    <li>No tablet frames exist; tablet layout follows the shell (rail under the content).</li>
+  </ul></div>
+
+  <h2 id="backend">Backend findings</h2>
+  <p class="muted">Read only from <code>D:\Akshat Endless\backend\backend\src\components</code>.</p>
+  <div class="card"><ul>
+    <li><code>GET /users/user-multiple-wallet</code> is the only profile read: name, email, phone, verification, Google and wallet flags, <code>walletAddress[]</code>.</li>
+    <li><code>PUT /users</code> accepts name, phoneNumber, email and telegram. Username, bio, location, website and avatar don't exist yet.</li>
+    <li><code>PUT /auth/change-password</code> (not POST), body <code>{ oldPassword, newPassword }</code>; a wrong old password is 401 INVALID_ATTEMPT. Password policy: 8+ with upper, lower, number and symbol.</li>
+    <li><code>POST /auth/verification-email</code> needs <code>{ email }</code> in the body.</li>
+    <li>The marketplace wallet flow (<code>/web3-auth/login/:address</code> then <code>/authenticate</code>) is a sign in that can switch or create accounts; <code>/web3-auth/generate-nonce</code> + <code>/verify</code> links a wallet but replaces the single EVM wallet. Hence Add Another Wallet is disabled.</li>
+    <li>No endpoints for sessions, notifications, preferences, stats, export or delete.</li>
+  </ul></div>
+
+  <h2 id="mock">Still on sample data (<code>src/services/profile/config.ts</code>)</h2>
+  <div class="tablecard"><table><thead><tr><th>Area</th><th>Waits for (plan §8.2)</th><th>Real code already written</th></tr></thead><tbody>
+    <tr><td>details</td><td>1: username, bio, location, website, avatar upload</td><td>GET; save of name, email, phone, telegram (PUT /users); resend verification</td></tr>
+    <tr><td>summary</td><td>2: member since, domains, listed, volume, sales</td><td>none</td></tr>
+    <tr><td>security</td><td>3: disconnect Google, set a password</td><td>sign in methods from GET; change password</td></tr>
+    <tr><td>sessions</td><td>4: list, sign out one, sign out others</td><td>none</td></tr>
+    <tr><td>wallets</td><td>5: several wallets, disconnect, primary, settlement network, hide others</td><td>list from GET</td></tr>
+    <tr><td>notifications</td><td>6: the five alerts and channels</td><td>none</td></tr>
+    <tr><td>preferences</td><td>7: currency, language, formats, privacy (theme stays per device)</td><td>none</td></tr>
+    <tr><td>account</td><td>8: export, delete</td><td>none</td></tr>
+  </tbody></table></div>
+
+  <h2 id="verify">Verification summary</h2>
+  <div class="findings">
+    <div class="finding"><h3>Verified</h3><p>Type check clean, lint 0 errors, 34 stylesheets compile, every helper test passes. 40 screenshot matrix in both themes. Per card errors with Retry. Keyboard and focus rings. Nav highlights. No theme flash in any combination. Existing pages (home filters, Watchlist, My Domains rail) unchanged.</p></div>
+    <div class="finding"><h3>Not verified</h3><p>A real login against real endpoints (all areas on mock). A real screen reader (names checked in the DOM). <code>NEXT_PUBLIC_DARK_MODE</code> off. A real photo upload through the file picker. No production build was run (dev server on 3002 only, by rule).</p></div>
+  </div>
+  <div class="card">
+    <h4>How it was tested</h4>
+    <p>All checks ran through the dev server on port 3002 with headless Chrome over CDP and a local test login cookie. The scripts live in the session scratchpad, not in the repo: <code>shotauth.js</code> (screenshots), <code>shotkeys.js</code> (real key events), <code>themetest.js</code> (theme and OS scheme), <code>matrix.js</code> and <code>montage.js</code> (the 40 shot matrix and contact sheets), <code>tabtest.js</code>, <code>skeltest.js</code>, <code>scsscheck.js</code> (compiles every stylesheet), and node tests under <code>helpers/</code> run with <code>--experimental-strip-types</code>.</p>
+    <p>Known existing behaviour, not changed: the site nav has no <code>aria-current</code> on any page.</p>
+  </div>
+
+  <h2 id="outside">Changed outside the repo (local only)</h2>
+  <div class="card"><ul>
+    <li><code>dev-docs/profile-settings-implementation-plan.md</code>: the plan with per phase prompts.</li>
+    <li><code>dev-docs/profile-settings-progress.html</code>: this file.</li>
+    <li><code>dev-docs/darkmodeprogress.html</code>, <code>dev-docs/darkmodecourse.html</code>: the new default theme.</li>
+    <li>Claude memory: profile settings plan and status, reuse existing primitives, backend source location, dark mode initiative.</li>
+  </ul></div>
+
+  <h2 id="commit">Before committing</h2>
+  <div class="callout warn"><p>Commit only when asked. Leave <code>dev-docs</code> out (it's untracked on purpose). The commit would hold the 123 new files and the 20 changed files above, including shared ones (<code>CLAUDE.md</code>, page shell, FilterDropdown, DefaultButton, InfoListCard, SegmentedToggle, ThemeContext, navigation). A production build hasn't been run; the team should run one in CI or on their side.</p></div>
+
+  <footer>Started 14 October 2026 · rewritten in full after phase 9 · branch <code>profile-settings</code>.</footer>
+</div>
+<script>
+  document.getElementById('toggle').addEventListener('click', function () {
+    var root = document.documentElement;
+    var current = root.getAttribute('data-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('dmplan-theme', next); } catch (e) {}
+  });
+</script>
+</body>
+</html>

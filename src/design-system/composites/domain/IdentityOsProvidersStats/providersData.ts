@@ -22,7 +22,7 @@ export const DOMAIN_PROVIDERS: DomainProvider[] = [
   { label: 'Ethereum Name Service', image: '/domain/ethereum.svg', provider: 'ENS', colorName: '#60aaf5', logo: '/new-assets/provider-logos/ens.svg', logoAspect: 2.222, logoScale: 1.15 },
   { label: 'Arbitrum', image: '/domain/arb.svg', provider: 'Arbitrum', colorName: '#1a71b1', logo: '/new-assets/provider-logos/arbitrum.svg', logoAspect: 3.811, logoScale: 1.15 },
   { label: 'Binance', image: '/domain/bnb.svg', provider: 'BinanceSmartChain', colorName: '#ffc300', logo: '/new-assets/provider-logos/binance.svg', logoAspect: 3.576, logoScale: 1.3 },
-  { label: 'Bonfida', image: '/domain/bonnfida.svg', provider: 'Bonfida', colorName: '#000', logo: '/new-assets/provider-logos/bonfida.svg', logoAspect: 3.331, logoScale: 1.1 },
+  { label: 'SNS (Solana Name Service)', image: '/domain/bonnfida.svg', provider: 'SNS', colorName: '#000', logo: '/new-assets/provider-logos/sns.svg', logoAspect: 2.761, logoScale: 1.15 },
   { label: 'Tezos', image: '/domain/tezos.svg', provider: 'Tezos', colorName: '#14216a', logo: '/new-assets/provider-logos/tezos.svg', logoAspect: 2.809, logoScale: 1.0 },
   { label: 'Aptos', image: '/domain/apt.svg', provider: 'Aptos', colorName: '#000', logo: '/new-assets/provider-logos/aptos.svg', logoAspect: 3.487, logoScale: 0.85 },
   { label: 'TON', image: '/domain/ton_symbol.png', provider: 'Ton', colorName: '#0098ea', logo: '/new-assets/provider-logos/ton.svg', logoAspect: 4.494, logoScale: 0.8 },

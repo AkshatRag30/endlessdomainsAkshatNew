@@ -13,15 +13,13 @@ const BAR_HEIGHTS = [52, 62, 100, 76]
 // grounded in the real design rather than an invented shape.
 const LINE_VIEWBOX = { width: 564, height: 220 }
 const LINE_PATH = 'M 4 202 C 90 196, 170 190, 232 166 C 292 140, 352 122, 407 103 C 452 87, 500 48, 540 12'
-const LINE_POINTS: Array<{ x: number; y: number; label: string; value?: string; side: 'above' | 'below'; align: 'center' | 'end' }> = [
-  // Right-aligned onto its own point (instead of centered) so its pill sits further left,
-  // clear of the second point's callout right next to it — centered, the two pills
-  // overlapped since the points themselves are close together near the chart's top-right.
-  { x: 407, y: 103, label: 'Web3 Identity', side: 'above', align: 'end' },
+// `revealDelay` (ms) is added to the base point/callout delays so each point pops in
+// once the drawn line has reached it, independent of its position in this array.
+const LINE_POINTS: Array<{ x: number; y: number; label: string; value?: string; side: 'above' | 'below'; align: 'center' | 'end'; revealDelay: number }> = [
   // This point sits right at the top-right corner of the chart — a callout floating
   // above and centered on it would clip against both the top and right edges of the
   // card, so it drops below the point and right-aligns onto it instead.
-  { x: 540, y: 12, label: 'Web3 Identity', side: 'below', align: 'end' },
+  { x: 540, y: 12, label: 'Web3 Identity', side: 'below', align: 'end', revealDelay: 250 },
 ]
 
 function useHoverOrViewportActive() {
@@ -145,7 +143,7 @@ function GrowthLine({ active }: GrowthLineProps) {
             cy={point.y}
             r={4}
             fill="var(--color-white-primary)"
-            style={{ transitionDelay: active ? `${450 + i * 250}ms` : '0ms' }}
+            style={{ transitionDelay: active ? `${450 + point.revealDelay}ms` : '0ms' }}
           />
         ))}
       </svg>
@@ -160,7 +158,7 @@ function GrowthLine({ active }: GrowthLineProps) {
           style={{
             left: `${(point.x / LINE_VIEWBOX.width) * 100}%`,
             top: `${(point.y / LINE_VIEWBOX.height) * 100}%`,
-            transitionDelay: active ? `${600 + i * 250}ms` : '0ms',
+            transitionDelay: active ? `${600 + point.revealDelay}ms` : '0ms',
           }}
         >
           {point.side === 'above' && <span className={styles.lineCalloutLeader} />}
