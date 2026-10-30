@@ -1,0 +1,1167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Login From Zero</title>
+<style>
+:root{
+  --bg:#fbfaf7;--surface:#ffffff;--surface2:#f3f1ec;--text:#1f2328;--muted:#5d6470;--border:#e2ded5;
+  --accent:#2f5bd3;--accent-soft:#e8eefc;--good:#1f7a4d;--good-soft:#e5f4ec;--warn:#9a5b00;--warn-soft:#fdf1dc;
+  --bad:#b42318;--bad-soft:#fdeceb;--code-bg:#f5f3ee;--code-text:#24292f;--kw:#8a3ffc;--str:#0a7c45;--com:#7b8290;--dec:#c2410c;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121417;--surface:#1a1d21;--surface2:#22262b;--text:#e6e8eb;--muted:#a0a7b1;--border:#2f343a;
+    --accent:#7aa2ff;--accent-soft:#1d2a4a;--good:#5cc98f;--good-soft:#16301f;--warn:#f0b65a;--warn-soft:#3a2a10;
+    --bad:#ff8a80;--bad-soft:#3a1715;--code-bg:#16191d;--code-text:#e1e4e8;--kw:#c4a1ff;--str:#7ee2a8;--com:#8b949e;--dec:#ffab70;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121417;--surface:#1a1d21;--surface2:#22262b;--text:#e6e8eb;--muted:#a0a7b1;--border:#2f343a;
+  --accent:#7aa2ff;--accent-soft:#1d2a4a;--good:#5cc98f;--good-soft:#16301f;--warn:#f0b65a;--warn-soft:#3a2a10;
+  --bad:#ff8a80;--bad-soft:#3a1715;--code-bg:#16191d;--code-text:#e1e4e8;--kw:#c4a1ff;--str:#7ee2a8;--com:#8b949e;--dec:#ffab70;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.layout{display:grid;grid-template-columns:270px minmax(0,1fr);max-width:1240px;margin:0 auto}
+nav.toc{position:sticky;top:0;height:100vh;overflow-y:auto;padding:28px 18px;border-right:1px solid var(--border);font-size:14px}
+nav.toc h2{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+nav.toc a{display:block;color:var(--muted);text-decoration:none;padding:4px 8px;border-radius:6px}
+nav.toc a:hover{background:var(--surface2);color:var(--text)}
+nav.toc .sub{padding-left:20px;font-size:13px}
+main{padding:40px 48px 120px;min-width:0}
+h1{font-size:2.2rem;line-height:1.2;margin:0 0 8px}
+h2{font-size:1.6rem;margin:64px 0 12px;padding-top:12px;border-top:1px solid var(--border)}
+h3{font-size:1.2rem;margin:36px 0 8px}
+h4{font-size:1.02rem;margin:24px 0 6px}
+p{margin:0 0 14px}
+.lede{font-size:1.1rem;color:var(--muted);max-width:760px}
+a{color:var(--accent)}
+code{font-family:"Cascadia Code",Consolas,"SFMono-Regular",monospace;font-size:.88em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+pre{background:var(--code-bg);color:var(--code-text);border:1px solid var(--border);border-radius:10px;padding:16px 18px;overflow-x:auto;font-size:13.5px;line-height:1.6;margin:10px 0 16px}
+pre code{background:none;padding:0;font-size:inherit}
+.path{display:block;font-size:12px;color:var(--muted);margin:18px 0 -4px;font-family:Consolas,monospace}
+.k{color:var(--kw)}.s{color:var(--str)}.c{color:var(--com);font-style:italic}.d{color:var(--dec)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin:16px 0}
+.note,.warn,.good,.bad{border-radius:10px;padding:14px 18px;margin:16px 0;border-left:4px solid}
+.note{background:var(--accent-soft);border-color:var(--accent)}
+.warn{background:var(--warn-soft);border-color:var(--warn)}
+.good{background:var(--good-soft);border-color:var(--good)}
+.bad{background:var(--bad-soft);border-color:var(--bad)}
+.note b:first-child,.warn b:first-child,.good b:first-child,.bad b:first-child{display:block;margin-bottom:4px}
+table{width:100%;border-collapse:collapse;margin:10px 0 20px;font-size:14.5px}
+th,td{text-align:left;vertical-align:top;padding:9px 12px;border-bottom:1px solid var(--border)}
+th{background:var(--surface2);font-weight:600}
+td:first-child{white-space:nowrap}
+td:first-child code{white-space:nowrap}
+.tablewrap{overflow-x:auto}
+.flow{display:flex;flex-direction:column;gap:0;margin:20px 0}
+.flow .box{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px}
+.flow .box b{color:var(--accent)}
+.flow .arrow{text-align:center;color:var(--muted);font-size:18px;line-height:28px}
+.layers{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}
+.layers div{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;font-size:14px}
+.layers div b{display:block;color:var(--accent);margin-bottom:4px}
+.glossary dt{font-weight:700;margin-top:16px;font-family:Consolas,monospace;color:var(--accent)}
+.glossary dd{margin:4px 0 0 0}
+.step{counter-increment:step}
+.badge{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);margin-right:6px;vertical-align:middle}
+.check li{margin:6px 0}
+footer{color:var(--muted);font-size:13px;margin-top:80px;border-top:1px solid var(--border);padding-top:16px}
+.themebtn{position:fixed;top:14px;right:14px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px;z-index:5}
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr}
+  nav.toc{position:static;height:auto;border-right:none;border-bottom:1px solid var(--border);padding:16px}
+  main{padding:24px 16px 80px}
+  .layers{grid-template-columns:1fr 1fr}
+  h1{font-size:1.7rem}
+}
+</style>
+</head>
+<body>
+<button class="themebtn" id="themebtn" type="button">Toggle theme</button>
+<div class="layout">
+<nav class="toc">
+  <h2>Contents</h2>
+  <a href="#start">0. How to use this guide</a>
+  <a href="#picture">1. The big picture</a>
+  <a href="#words">2. Every word you need</a>
+  <a class="sub" href="#w-web">Web words</a>
+  <a class="sub" href="#w-ts">TypeScript words</a>
+  <a class="sub" href="#w-nest">NestJS words</a>
+  <a class="sub" href="#w-db">Database words</a>
+  <a class="sub" href="#w-sec">Security words</a>
+  <a href="#files">3. The files involved</a>
+  <a href="#journey">4. The journey, line by line</a>
+  <a class="sub" href="#j0">Step 0 Frontend sends it</a>
+  <a class="sub" href="#j1">Step 1 main.ts</a>
+  <a class="sub" href="#j2">Step 2 Routing</a>
+  <a class="sub" href="#j3">Step 3 DTO validation</a>
+  <a class="sub" href="#j4">Step 4 Controller</a>
+  <a class="sub" href="#j5">Step 5 Service</a>
+  <a class="sub" href="#j6">Step 6 Repository</a>
+  <a class="sub" href="#j7">Step 7 Entity and table</a>
+  <a class="sub" href="#j8">Step 8 Tokens</a>
+  <a class="sub" href="#j9">Step 9 Response</a>
+  <a href="#wiring">5. How the pieces get wired</a>
+  <a href="#after">6. After login: guards and refresh</a>
+  <a href="#build">7. Build it yourself from zero</a>
+  <a href="#quirks">8. Quirks in the real code</a>
+  <a href="#practice">9. Practice and self test</a>
+</nav>
+<main>
+
+<h1>Login, from absolute zero</h1>
+<p class="lede">A complete walkthrough of how <code>POST /api/v1/auth/login</code> works in the Endless Domains backend. Every keyword is explained, every line is annotated, and at the end you build the same thing yourself, file by file.</p>
+
+<!-- ============================================================ -->
+<h2 id="start">0. How to use this guide</h2>
+<p>Do not try to read this in one sitting. Read section 1 to get the shape of the whole thing, then keep section 2 open as a dictionary whenever a word confuses you. Section 4 is the main event: open each real file in VS Code next to this page and follow along line by line. Section 7 is where the learning actually locks in, because you will type the whole thing yourself in a fresh project.</p>
+<p>All real file paths are relative to <code>D:\Akshat Endless\backend\backend\</code>. When you see a code block with a grey path above it, that is the real file it was copied from. Some long files are trimmed, and trimmed parts are marked with <code>// ...</code>.</p>
+<div class="note"><b>You already know more than you think</b>As a frontend developer you have already called this endpoint with <code>fetch</code> or <code>axios</code>, stored a token, and sent it in a header. This guide is simply the other side of that same conversation.</div>
+
+<!-- ============================================================ -->
+<h2 id="picture">1. The big picture</h2>
+<p>Think of the backend as a hotel reception desk. A guest walks up and hands over an ID card (email and password). The receptionist looks the guest up in the register (the database). If the guest exists, is not banned, has confirmed their booking (verified email), and the ID matches, the receptionist hands over two keycards. One opens the room but stops working after a short time (the <b>access token</b>). The other is only for going back to reception to get a fresh room card (the <b>refresh token</b>). From that point on, the guest never shows their ID again; they just tap the room card.</p>
+
+<h3>The four layers</h3>
+<p>Almost every feature in this backend, login included, is split into the same four layers. Each layer has exactly one job, and each one only talks to the layer directly beneath it.</p>
+<div class="layers">
+  <div><b>Controller</b>Receives the HTTP request, hands the body to the service, wraps the answer. No thinking.</div>
+  <div><b>Service</b>All the business rules: is the user blocked, is the password right, make tokens.</div>
+  <div><b>Repository</b>The only place that talks to the database. Runs queries, returns rows.</div>
+  <div><b>Entity</b>A TypeScript class that describes one database table and its columns.</div>
+</div>
+
+<h3>The full journey in one picture</h3>
+<div class="flow">
+  <div class="box"><b>Browser</b> sends <code>POST /api/v1/auth/login</code> with email, password, source</div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>main.ts setup</b> CORS check, JSON body parsing, security headers, global validation pipe</div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>LogInDto</b> rules check the body. Bad body means a 400 error and the journey ends here.</div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>AuthController.login()</b> passes the DTO to the service</div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>AuthService.login()</b> normalize email, find user, check deleted, blocked, verified, compare password, create tokens, save hashed refresh token, fire background events</div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>UserService and UserRepo</b> run the actual SQL against <code>tbl_user</code> in PostgreSQL</div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>Response</b> <code>{ message: "Login Success", result: { user, accessToken, refreshToken } }</code> goes back with status 201</div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="words">2. Every word you need</h2>
+<p>This is the dictionary. Skim it once now, then come back whenever a word in section 4 feels fuzzy.</p>
+
+<h3 id="w-web">Web words</h3>
+<dl class="glossary">
+<dt>Server</dt><dd>A program that runs forever, waits for requests, and answers them. Our server is a Node.js program started by <code>npm run start:dev</code>. It listens on a port (a numbered door on the machine, for example 3001).</dd>
+<dt>HTTP request</dt><dd>A message from a client to a server. It has a <b>method</b> (GET, POST, PUT, DELETE), a <b>URL</b> (which resource), <b>headers</b> (extra info like <code>Authorization</code> or <code>Content-Type</code>), and optionally a <b>body</b> (the data, usually JSON).</dd>
+<dt>HTTP response</dt><dd>The server's answer. It has a <b>status code</b> (a number saying how it went), headers, and a body.</dd>
+<dt>Status codes</dt><dd><code>200</code> OK. <code>201</code> Created (NestJS uses this by default for every POST, which is why login returns 201). <code>400</code> Bad Request, the client sent something invalid. <code>401</code> Unauthorized, you are not who you claim, or not logged in. <code>403</code> Forbidden, you are known but not allowed. <code>404</code> Not Found. <code>500</code> Internal Server Error, the server itself crashed.</dd>
+<dt>Endpoint / route</dt><dd>One method plus one URL that the server knows how to handle, for example <code>POST /api/v1/auth/login</code>. GET <code>/api/v1/auth/login</code> would be a different endpoint (and does not exist).</dd>
+<dt>JSON</dt><dd>JavaScript Object Notation. Text that looks like a JS object: <code>{"email":"a@b.com"}</code>. The request body arrives as plain text and has to be <b>parsed</b> into a real object.</dd>
+<dt>Middleware</dt><dd>A function that runs on every request before your route code. It can inspect, modify, or reject the request. CORS, body parsing, and Helmet are all middleware.</dd>
+<dt>CORS</dt><dd>Cross Origin Resource Sharing. Browsers block a page on <code>siteA.com</code> from reading responses from <code>siteB.com</code> unless siteB explicitly allows siteA. Our backend keeps a list of allowed frontend origins.</dd>
+<dt>Header <code>Authorization: Bearer &lt;token&gt;</code></dt><dd>The standard way to send a token. "Bearer" means "whoever bears (carries) this token is allowed in".</dd>
+<dt>Express</dt><dd>The low level Node.js web framework that NestJS runs on top of. NestJS adds structure; Express does the actual HTTP handling underneath.</dd>
+</dl>
+
+<h3 id="w-ts">TypeScript words</h3>
+<dl class="glossary">
+<dt>class</dt><dd>A blueprint for objects. <code>class LogInDto { email: string }</code> describes the shape of a login body.</dd>
+<dt>interface</dt><dd>A type only description, a contract. It disappears when TypeScript compiles to JavaScript, so it cannot be used at runtime. That detail matters later (section 5).</dd>
+<dt>public / private / readonly</dt><dd><code>public</code> means anyone can access it. <code>private</code> means only code inside the class can. <code>readonly</code> means it can be set once and never reassigned.</dd>
+<dt>constructor</dt><dd>The special method that runs when an object is created. In NestJS, constructor parameters are how a class asks for its dependencies.</dd>
+<dt>async / await / Promise</dt><dd>Anything slow (database, network, hashing) returns a <b>Promise</b>, a placeholder for a value that arrives later. <code>await</code> pauses this function until the value arrives, without freezing the whole server. A function using <code>await</code> must be marked <code>async</code>, and it automatically returns a Promise. <code>Promise&lt;Response&gt;</code> means "a Promise that will eventually hold a Response".</dd>
+<dt>Promise.all([a, b])</dt><dd>Start both slow things at once and wait until both are done. Faster than awaiting one after the other.</dd>
+<dt>Generic <code>&lt;T&gt;</code></dt><dd>A type parameter. <code>BaseAbstractRepository&lt;User&gt;</code> means "the base repository, but working with User objects". Same idea as <code>useState&lt;string&gt;()</code> in React.</dd>
+<dt>Decorator <code>@Something()</code></dt><dd>A function that attaches extra information (metadata) to a class, method, property, or parameter. Decorators do not run your logic; they label things so a framework can find them later. <code>@Post('login')</code> labels a method as "handler for POST login". This is the single most important idea in NestJS.</dd>
+<dt>enum</dt><dd>A fixed named set of values. <code>AuthSuccessMessage.LOG_IN_SUCCESS</code> is just the string <code>'Login Success'</code> with a safe name.</dd>
+<dt>throw</dt><dd>Stop the current function immediately and send an error up to whoever called it. If nobody catches it, NestJS does, and turns it into an HTTP error response.</dd>
+<dt>Spread <code>...</code></dt><dd><code>{ ...payload, refreshToken }</code> copies every property of <code>payload</code> into a new object and adds <code>refreshToken</code>.</dd>
+</dl>
+
+<h3 id="w-nest">NestJS words</h3>
+<dl class="glossary">
+<dt>Module <code>@Module()</code></dt><dd>A box that groups related code. It declares its <b>controllers</b>, its <b>providers</b> (services, repos, strategies), what it <b>imports</b> from other modules, and what it <b>exports</b> for other modules to use. <code>AuthModule</code> is the box for everything auth.</dd>
+<dt>Controller <code>@Controller('auth')</code></dt><dd>A class whose methods handle HTTP routes. The string is the URL prefix for every route in it.</dd>
+<dt>Route decorators <code>@Get @Post @Put @Delete</code></dt><dd>Mark a method as the handler for that HTTP method on that path.</dd>
+<dt>Parameter decorators <code>@Body() @Query() @Param() @Req()</code></dt><dd>Tell NestJS what to pass into a parameter: the JSON body, the <code>?a=b</code> query string, a <code>:id</code> URL piece, or the whole raw request.</dd>
+<dt>Provider / <code>@Injectable()</code></dt><dd>Any class that NestJS can create and hand to other classes. Services, repositories, strategies are providers. <code>@Injectable()</code> marks a class as something NestJS is allowed to construct.</dd>
+<dt>Dependency Injection (DI)</dt><dd>Instead of a class doing <code>new UserService()</code> itself, it lists what it needs in its constructor and NestJS supplies it. NestJS creates one shared instance (a singleton) of each provider and reuses it everywhere. Benefits: classes stay loosely connected, and in tests you can swap in fakes.</dd>
+<dt>Injection token <code>@Inject('AuthServiceInterface')</code></dt><dd>The name a provider is registered under. This codebase registers services under string names (tokens) instead of using the class directly. The module says "the token <code>'AuthServiceInterface'</code> should be filled with the class <code>AuthService</code>".</dd>
+<dt>Pipe</dt><dd>Code that runs on incoming parameters before the handler, to <b>validate</b> or <b>transform</b> them. <code>ValidationPipe</code> checks DTOs.</dd>
+<dt>Guard <code>@UseGuards()</code></dt><dd>Code that decides "is this request allowed to reach the handler at all?" Returns yes or no. Used for authentication.</dd>
+<dt>Exception classes</dt><dd><code>BadRequestException</code> (400), <code>UnauthorizedException</code> (401), <code>ForbiddenException</code> (403), <code>NotFoundException</code> (404), <code>InternalServerErrorException</code> (500). Throw one and NestJS sends that status with your message.</dd>
+<dt>DTO (Data Transfer Object)</dt><dd>A class that describes the shape of data coming in or going out. With class validator decorators on it, it doubles as validation rules.</dd>
+<dt>ConfigService</dt><dd>A NestJS service for reading configuration values such as secrets. <code>this.configService.get('JWT_ACCESS_TOKEN_SECRET')</code>.</dd>
+<dt>EventEmitter2 / <code>@OnEvent()</code></dt><dd>A publish and subscribe system. <code>emit('name', data)</code> announces something happened. Any method decorated with <code>@OnEvent('name')</code> runs in response. The emitter does not wait for the listeners.</dd>
+<dt>Passport / Strategy</dt><dd>Passport is a popular Node library for authentication. A <b>strategy</b> is one way of authenticating (JWT, Google, and so on). NestJS wraps it with <code>PassportStrategy</code> and <code>AuthGuard</code>.</dd>
+</dl>
+
+<h3 id="w-db">Database words</h3>
+<dl class="glossary">
+<dt>PostgreSQL</dt><dd>The database. Data lives in <b>tables</b> (like spreadsheets): <b>columns</b> are fields, <b>rows</b> are records. Users live in <code>tbl_user</code>.</dd>
+<dt>SQL</dt><dd>The language for talking to the database: <code>SELECT * FROM tbl_user WHERE email = 'x' LIMIT 1</code>.</dd>
+<dt>ORM / TypeORM</dt><dd>Object Relational Mapper. Lets you work with TypeScript objects and it writes the SQL for you. <code>repo.findOne({ where: { email } })</code> becomes the SELECT above.</dd>
+<dt>Entity <code>@Entity()</code></dt><dd>A class that maps to a table. Each <code>@Column()</code> property is a column.</dd>
+<dt>Repository (TypeORM)</dt><dd>An object TypeORM gives you for one entity, with methods like <code>find</code>, <code>findOne</code>, <code>save</code>, <code>update</code>, <code>delete</code>.</dd>
+<dt>Repository (this codebase)</dt><dd>A wrapper class like <code>UserRepo</code> that holds the TypeORM repository and adds named query methods like <code>findByEmail</code>. Two different things share the word, which confuses everyone at first.</dd>
+<dt>UUID</dt><dd>A long random id like <code>3f2b...9c1e</code>. Every row's <code>id</code> here is a UUID, not 1, 2, 3.</dd>
+<dt>Index</dt><dd>A lookup structure that makes searching a column fast, like a book index. <code>tbl_user</code> has an index on <code>email</code> so login lookups stay quick.</dd>
+<dt>Unique constraint</dt><dd>The database refuses two rows with the same value in that column. Email is unique, so duplicate signups fail at the database level.</dd>
+</dl>
+
+<h3 id="w-sec">Security words</h3>
+<dl class="glossary">
+<dt>Hashing</dt><dd>A one way scramble. <code>hash("mypassword123")</code> gives <code>$2b$10$Xk9...</code>. You cannot turn the hash back into the password. To check a password, you hash the attempt the same way and compare.</dd>
+<dt>Salt</dt><dd>Random data mixed in before hashing, so two users with the same password get different hashes. bcrypt stores the salt inside the hash string, so you never handle it yourself.</dd>
+<dt>bcrypt</dt><dd>A deliberately slow password hashing algorithm. Slow is good: it makes guessing millions of passwords expensive for an attacker. The <code>10</code> in <code>bcrypt.hash(pw, 10)</code> is the "cost" (2 to the power 10 rounds).</dd>
+<dt>argon2</dt><dd>A newer, stronger hashing algorithm. This codebase uses it for hashing refresh tokens.</dd>
+<dt>JWT (JSON Web Token)</dt><dd>A string in three parts separated by dots: <code>header.payload.signature</code>. The header and payload are just base64 encoded JSON, readable by anyone (paste one into jwt.io). The signature is computed from the header, payload, and a secret key. If anyone edits the payload, the signature no longer matches and the server rejects it.</dd>
+<dt>Payload / claims</dt><dd>The data inside the JWT. Here it is <code>{ userId, iat, exp }</code>: who the user is, issued at, expires at.</dd>
+<dt>Secret</dt><dd>The key used to sign and verify JWTs. If it leaks, anyone can forge tokens. Stored in AWS Secrets Manager, never in code.</dd>
+<dt>Access token</dt><dd>Short lived JWT sent with every protected request.</dd>
+<dt>Refresh token</dt><dd>Longer lived JWT used only to get a new access token. Its hash is stored in the database so the server can revoke it.</dd>
+<dt>Stateless authentication</dt><dd>The server does not need to look anything up to trust an access token; the signature proves it. That is why JWTs are fast, and also why you cannot easily "cancel" one before it expires.</dd>
+</dl>
+
+<!-- ============================================================ -->
+<h2 id="files">3. The files involved</h2>
+<p>These are all the files login touches. Open them in VS Code as you go through section 4.</p>
+<div class="tablewrap"><table>
+<tr><th>File</th><th>Layer</th><th>What it does for login</th></tr>
+<tr><td><code>src/main.ts</code></td><td>Bootstrap</td><td>Starts the server, sets <code>/api/v1</code> prefix, CORS, body parser, validation pipe.</td></tr>
+<tr><td><code>src/app.module.ts</code></td><td>Root module</td><td>Imports <code>AuthModule</code> and sets up the database connection.</td></tr>
+<tr><td><code>src/components/auth/auth.module.ts</code></td><td>Module</td><td>Registers the controller, the service under its token, and the JWT strategies.</td></tr>
+<tr><td><code>src/components/auth/auth.controller.ts</code></td><td>Controller</td><td>The <code>login</code> route handler.</td></tr>
+<tr><td><code>src/components/auth/dto/login.dto.ts</code></td><td>DTO</td><td>Validation rules for the request body.</td></tr>
+<tr><td><code>src/components/auth/auth.service.ts</code></td><td>Service</td><td>All login logic plus <code>verifyPassword</code> and <code>getTokens</code>.</td></tr>
+<tr><td><code>src/components/auth/dto/return-login.dto.ts</code></td><td>DTO</td><td>Shape of what login returns.</td></tr>
+<tr><td><code>src/components/auth/interface/jwt-payload.interface.ts</code></td><td>Type</td><td>Shape of the data inside the JWT.</td></tr>
+<tr><td><code>src/components/user/user.service.ts</code></td><td>Service</td><td><code>getByEmail</code>, <code>getPasswordByUserId</code>, <code>setCurrentRefreshToken</code>, <code>updateTheUserSource</code>.</td></tr>
+<tr><td><code>src/components/user/user.repo.ts</code></td><td>Repository</td><td><code>findByEmail</code>, the actual query.</td></tr>
+<tr><td><code>src/repositories/base/base.abstract.repository.ts</code></td><td>Repository</td><td>Shared <code>findOneById</code>, <code>save</code>, <code>update</code>.</td></tr>
+<tr><td><code>src/components/user/entity/user.entity.ts</code></td><td>Entity</td><td>Describes <code>tbl_user</code>.</td></tr>
+<tr><td><code>src/@core/common/entity/base.entity.ts</code></td><td>Entity</td><td>Shared <code>id</code>, dates, <code>isDeleted</code>.</td></tr>
+<tr><td><code>src/@core/utils/email-normalizer.util.ts</code></td><td>Utility</td><td><code>normalizeEmail()</code>.</td></tr>
+<tr><td><code>src/@core/utils/helper.ts</code></td><td>Utility</td><td><code>hashData</code> and <code>verifyHash</code> (argon2).</td></tr>
+<tr><td><code>src/@core/common/dto/response.dto.ts</code></td><td>DTO</td><td>The <code>Response</code> wrapper class.</td></tr>
+<tr><td><code>src/components/auth/strategies/*.ts</code></td><td>Strategy</td><td>How tokens are checked on later requests.</td></tr>
+</table></div>
+
+<!-- ============================================================ -->
+<h2 id="journey">4. The journey, line by line</h2>
+
+<h3 id="j0">Step 0: The frontend sends the request</h3>
+<p>Somewhere in the frontend, a login form does something like this:</p>
+<pre><code><span class="k">const</span> res = <span class="k">await</span> axios.post(<span class="s">`${API}/api/v1/auth/login`</span>, {
+  email: <span class="s">'Akshat.Rag@gmail.com'</span>,
+  password: <span class="s">'mypassword123'</span>,
+  source: <span class="s">'marketplace'</span>,
+});</code></pre>
+<p>What actually travels over the network is plain text:</p>
+<pre><code>POST /api/v1/auth/login HTTP/1.1
+Host: api.endlessdomains.io
+Origin: https://marketplace.endlessdomains.io
+Content-Type: application/json
+
+{"email":"Akshat.Rag@gmail.com","password":"mypassword123","source":"marketplace"}</code></pre>
+<p>Every line matters. <code>POST</code> is the method. <code>/api/v1/auth/login</code> is the path. <code>Origin</code> is the website the browser is on, which CORS checks. <code>Content-Type: application/json</code> tells the server how to parse the body. The final line is the body.</p>
+
+<h3 id="j1">Step 1: main.ts prepares every request</h3>
+<p><code>main.ts</code> is the first file that runs when the server starts. It builds the app and attaches the middleware every request will pass through.</p>
+<span class="path">src/main.ts (trimmed)</span>
+<pre><code><span class="k">const</span> app = <span class="k">await</span> NestFactory.create(AppModule);       <span class="c">// build the whole app from the root module</span>
+app.enableCors({ origin: (origin, callback) =&gt; { <span class="c">/* allow list check */</span> }, credentials: <span class="k">true</span> });
+app.setGlobalPrefix(<span class="s">'api/v1'</span>);                             <span class="c">// every route now starts with /api/v1</span>
+app.use(bodyParser.json({ limit: <span class="s">'50mb'</span> }));                <span class="c">// turn JSON text into req.body object</span>
+app.useGlobalPipes(<span class="k">new</span> ValidationPipe({ whitelist: <span class="k">true</span>, transform: <span class="k">true</span> }));
+app.use(helmet());                                           <span class="c">// add security headers to every response</span>
+app.use(cookieParser());
+<span class="c">// ...</span>
+<span class="k">await</span> app.listen(PORT);                                      <span class="c">// open the door and start waiting</span></code></pre>
+<div class="tablewrap"><table>
+<tr><th>Piece</th><th>Meaning</th></tr>
+<tr><td><code>NestFactory.create(AppModule)</code></td><td>Read <code>AppModule</code>, follow all its imports (including <code>AuthModule</code>), create every provider, register every controller route.</td></tr>
+<tr><td><code>enableCors</code></td><td>If the <code>Origin</code> header is not on the allow list, reject. That is why calling the API from a random site fails in the browser.</td></tr>
+<tr><td><code>setGlobalPrefix('api/v1')</code></td><td>Prepends <code>/api/v1</code> to every route. The <code>v1</code> lets the team release a <code>v2</code> later without breaking old clients.</td></tr>
+<tr><td><code>bodyParser.json</code></td><td>Without this, <code>req.body</code> would be undefined. It reads the raw text and runs <code>JSON.parse</code> on it.</td></tr>
+<tr><td><code>whitelist: true</code></td><td>Remove any body property that the DTO does not declare. A sneaky <code>"isAdmin": true</code> is dropped silently.</td></tr>
+<tr><td><code>transform: true</code></td><td>Turn the plain body object into a real instance of the DTO class, and convert types where possible (string <code>"5"</code> to number <code>5</code> for query params).</td></tr>
+<tr><td><code>helmet()</code></td><td>Adds headers that make browsers stricter, protecting against some common attacks.</td></tr>
+<tr><td><code>listen(PORT)</code></td><td>The server is now running and waiting for requests.</td></tr>
+</table></div>
+
+<h3 id="j2">Step 2: NestJS finds the right method</h3>
+<p>When the server started, NestJS scanned every controller and built a routing table from the decorators. For login it combined three pieces of text:</p>
+<div class="card"><code>'api/v1'</code> (global prefix) + <code>'auth'</code> (from <code>@Controller('auth')</code>) + <code>'login'</code> (from <code>@Post('login')</code>) = <b>POST /api/v1/auth/login</b> &#8594; <code>AuthController.login()</code></div>
+<p>So when our request arrives, NestJS looks up the table, finds a match, and knows exactly which method to call.</p>
+
+<h3 id="j3">Step 3: The DTO validates the body</h3>
+<span class="path">src/components/auth/dto/login.dto.ts</span>
+<pre><code><span class="k">import</span> { ApiProperty } <span class="k">from</span> <span class="s">'@nestjs/swagger'</span>;
+<span class="k">import</span> { IsEmail, IsString, IsNotEmpty, MinLength } <span class="k">from</span> <span class="s">'class-validator'</span>;
+
+<span class="k">export class</span> LogInDto {
+    <span class="d">@ApiProperty</span>({ description: <span class="s">"user's email"</span>, example: <span class="s">'zxczxc@zxc.zxc'</span> })
+    <span class="d">@IsEmail</span>()
+    <span class="d">@IsNotEmpty</span>()
+    email: string;
+
+    <span class="d">@ApiProperty</span>({ description: <span class="s">"user's password"</span>, example: <span class="s">'can be anything'</span>, minimum: 8 })
+    <span class="d">@IsString</span>()
+    <span class="d">@IsNotEmpty</span>()
+    <span class="d">@MinLength</span>(8)
+    password: string;
+
+    <span class="d">@IsString</span>()
+    <span class="d">@IsNotEmpty</span>()
+    source: string;
+}
+
+<span class="k">export default</span> LogInDto;</code></pre>
+<div class="tablewrap"><table>
+<tr><th>Word</th><th>Meaning</th></tr>
+<tr><td><code>import { ... } from 'class-validator'</code></td><td>Bring in ready made validation decorators from the class validator library.</td></tr>
+<tr><td><code>export class LogInDto</code></td><td>Define a class and make it importable from other files. "Dto" in the name is just a convention.</td></tr>
+<tr><td><code>@ApiProperty(...)</code></td><td>Only for Swagger documentation (an auto generated API page). It does not validate anything. Swagger is turned off in this project, so these are effectively notes.</td></tr>
+<tr><td><code>@IsEmail()</code></td><td>The value must look like an email address.</td></tr>
+<tr><td><code>@IsNotEmpty()</code></td><td>The value cannot be empty string, null, or undefined.</td></tr>
+<tr><td><code>@IsString()</code></td><td>The value must be a string, not a number or object.</td></tr>
+<tr><td><code>@MinLength(8)</code></td><td>At least 8 characters.</td></tr>
+<tr><td><code>email: string;</code></td><td>Declares the property and its TypeScript type. With <code>whitelist: true</code>, only declared properties survive.</td></tr>
+<tr><td><code>export default LogInDto</code></td><td>Lets other files write <code>import LogInDto from './dto/login.dto'</code> without curly braces.</td></tr>
+</table></div>
+<p>If someone sends <code>{"email":"notanemail","password":"123"}</code>, the ValidationPipe stops the request and NestJS replies automatically:</p>
+<pre><code>{
+  <span class="s">"statusCode"</span>: 400,
+  <span class="s">"message"</span>: [<span class="s">"email must be an email"</span>, <span class="s">"password must be longer than or equal to 8 characters"</span>, <span class="s">"source should not be empty"</span>, <span class="s">"source must be a string"</span>],
+  <span class="s">"error"</span>: <span class="s">"Bad Request"</span>
+}</code></pre>
+<div class="good"><b>Key takeaway</b>You never write <code>if (!body.email) throw ...</code> by hand in NestJS. Put the rules on the DTO and the pipe enforces them before your code runs.</div>
+
+<h3 id="j4">Step 4: The controller hands off</h3>
+<span class="path">src/components/auth/auth.controller.ts (login part)</span>
+<pre><code><span class="d">@ApiTags</span>(<span class="s">'auth'</span>)
+<span class="d">@Controller</span>(<span class="s">'auth'</span>)
+<span class="k">export class</span> AuthController {
+    <span class="k">constructor</span>(
+        <span class="d">@Inject</span>(<span class="s">'AuthServiceInterface'</span>)
+        <span class="k">private readonly</span> authService: AuthServiceInterface
+    ) { }
+
+    <span class="d">@Post</span>(<span class="s">'login'</span>)
+    <span class="k">public async</span> login(<span class="d">@Body</span>() loginUserDto: LogInDto): Promise&lt;Response&gt; {
+        <span class="k">return new</span> Response(AuthSuccessMessage.LOG_IN_SUCCESS, <span class="k">await this</span>.authService.login(loginUserDto));
+    }
+}</code></pre>
+<p>Let us take apart the method signature word by word, because you will write this shape hundreds of times.</p>
+<div class="tablewrap"><table>
+<tr><th>Word</th><th>Meaning</th></tr>
+<tr><td><code>@ApiTags('auth')</code></td><td>Swagger grouping label. Documentation only.</td></tr>
+<tr><td><code>@Controller('auth')</code></td><td>This class handles routes starting with <code>/auth</code>.</td></tr>
+<tr><td><code>constructor(</code></td><td>"To build me, NestJS, you must give me the following things."</td></tr>
+<tr><td><code>@Inject('AuthServiceInterface')</code></td><td>"Specifically, give me whatever is registered under the name <code>'AuthServiceInterface'</code>." That is <code>AuthService</code> (see section 5).</td></tr>
+<tr><td><code>private readonly authService</code></td><td>TypeScript shortcut: this creates a property <code>this.authService</code> automatically, private and never reassigned.</td></tr>
+<tr><td><code>: AuthServiceInterface</code></td><td>The type. It tells your editor which methods exist so you get autocomplete.</td></tr>
+<tr><td><code>@Post('login')</code></td><td>This method handles POST to <code>/auth/login</code>.</td></tr>
+<tr><td><code>public async login(</code></td><td>A public method that does slow work, so it returns a Promise.</td></tr>
+<tr><td><code>@Body() loginUserDto: LogInDto</code></td><td>Take the parsed and validated JSON body, as a <code>LogInDto</code> instance, and call it <code>loginUserDto</code>.</td></tr>
+<tr><td><code>: Promise&lt;Response&gt;</code></td><td>This method eventually returns a <code>Response</code> object.</td></tr>
+<tr><td><code>await this.authService.login(loginUserDto)</code></td><td>Call the service and wait for its answer. If the service throws, this line throws too, and NestJS turns it into an error response.</td></tr>
+<tr><td><code>new Response(message, result)</code></td><td>Wrap the result in the standard shape used by every endpoint.</td></tr>
+<tr><td><code>AuthSuccessMessage.LOG_IN_SUCCESS</code></td><td>The string <code>'Login Success'</code> from the enum in <code>auth/enum/auth-success-message.enum.ts</code>.</td></tr>
+</table></div>
+<div class="note"><b>Why so thin?</b>If the controller held logic, you could not reuse that logic from another place (a cron job, an event handler, a different route). Keeping logic in the service means anything can call it.</div>
+
+<h3 id="j5">Step 5: The service does the real work</h3>
+<p>This is the heart of login. Here is the whole method, then we take it apart in pieces.</p>
+<span class="path">src/components/auth/auth.service.ts (lines 93 to 139)</span>
+<pre><code><span class="k">async</span> login(logInDto: LogInDto): Promise&lt;ReturnLoginDto&gt; {
+    <span class="k">const</span> logger = <span class="k">new</span> Logger(AuthService.name + <span class="s">'-login'</span>);
+    <span class="k">const</span> normalizedEmail = normalizeEmail(logInDto.email);
+    <span class="k">const</span> user = <span class="k">await this</span>.userService.getByEmail(normalizedEmail);
+    <span class="k">if</span> (!user) {
+        logger.error(UserErrorMessage.USER_DOES_NOT_EXIST + <span class="s">'-'</span> + logInDto.email);
+        <span class="k">throw new</span> UnauthorizedException(UserErrorMessage.INVALID_ATTEMPT);
+    }
+    <span class="k">if</span> (user.isDeleted) {
+        <span class="k">throw new</span> UnauthorizedException(<span class="s">'Your account has been deleted. Please contact support for assistance.'</span>);
+    }
+    <span class="k">if</span> (user.isBlocked) {
+        <span class="k">throw new</span> UnauthorizedException(<span class="s">'Your account has been blocked. Please contact support for assistance.'</span>);
+    }
+    <span class="k">const</span> passwordFromDB = <span class="k">await this</span>.userService.getPasswordByUserId(user.id);
+    <span class="k">if</span> (!passwordFromDB) {
+        logger.error(UserErrorMessage.USER_DOES_NOT_EXIST + <span class="s">'-'</span> + logInDto.email);
+        <span class="k">throw new</span> ForbiddenException(UserErrorMessage.INVALID_ATTEMPT);
+    }
+    <span class="k">if</span> (!user.isEmailVerified) {
+        logger.error(UserErrorMessage.EMAIL_NOT_VERIFIED_YET + <span class="s">'-'</span> + logInDto.email);
+        <span class="k">throw new</span> BadRequestException(UserErrorMessage.EMAIL_NOT_VERIFIED_YET);
+    }
+    <span class="k">await this</span>.userService.updateTheUserSource(user.id, logInDto.source);
+    <span class="k">await this</span>.verifyPassword(logInDto.password, passwordFromDB);
+    <span class="k">const</span> returnLoginDto = <span class="k">new</span> ReturnLoginDto();
+    returnLoginDto.user = user;
+    <span class="k">const</span> tokens = <span class="k">await this</span>.getTokens(user.id);
+    returnLoginDto.accessToken = tokens.accessToken;
+    <span class="k">await this</span>.userService.setCurrentRefreshToken(tokens.refreshToken, user.id);
+    returnLoginDto.refreshToken = tokens.refreshToken;
+    <span class="k">this</span>.eventEmitter.emit(<span class="s">`userlogin.UpdateDomainDetailTable`</span>, <span class="k">new</span> UpdateDomainDetailTableAfterLoginEvent(user.id));
+    <span class="k">this</span>.eventEmitter.emit(<span class="s">'reputation.login'</span>, { userId: user.id });
+    <span class="k">return</span> returnLoginDto;
+}</code></pre>
+
+<h4><span class="badge">5a</span>The service's constructor</h4>
+<p>Before <code>login</code> can use <code>this.userService</code> or <code>this.jwtService</code>, those have to be injected. The constructor of <code>AuthService</code> asks for them:</p>
+<pre><code><span class="d">@Injectable</span>()
+<span class="k">export class</span> AuthService <span class="k">implements</span> AuthServiceInterface {
+    <span class="k">private readonly</span> JWT_ACCESS_TOKEN_SECRET: string;
+    <span class="c">// ... more secret fields</span>
+    <span class="k">constructor</span>(
+        <span class="d">@Inject</span>(<span class="s">'UserServiceInterface'</span>) <span class="k">private readonly</span> userService: UserServiceInterface,
+        <span class="k">private</span> jwtService: JwtService,
+        <span class="k">private</span> eventEmitter: EventEmitter2,
+        <span class="k">private readonly</span> configService: ConfigService,
+        <span class="c">// ... plus email, moralis, alchemy services used by other methods</span>
+    ) {
+        <span class="k">this</span>.JWT_ACCESS_TOKEN_SECRET = <span class="k">this</span>.configService.get&lt;string&gt;(<span class="s">'JWT_ACCESS_TOKEN_SECRET'</span>);
+        <span class="k">this</span>.JWT_ACCESS_TOKEN_EXPIRATION = <span class="k">this</span>.configService.get&lt;string&gt;(<span class="s">'JWT_ACCESS_TOKEN_EXPIRATION'</span>);
+        <span class="c">// ... refresh secret and expiration the same way</span>
+    }</code></pre>
+<p><code>@Injectable()</code> lets NestJS construct this class. <code>implements AuthServiceInterface</code> is a promise to TypeScript that this class has every method the interface lists; if one is missing, compilation fails. Notice <code>JwtService</code> and <code>EventEmitter2</code> are injected <b>without</b> <code>@Inject('...')</code>. That is because they are real classes, so NestJS can use the class itself as the token. Only the project's own interface based services need string tokens. The secrets are read once at startup and kept in private fields.</p>
+
+<h4><span class="badge">5b</span>The logger</h4>
+<pre><code><span class="k">const</span> logger = <span class="k">new</span> Logger(AuthService.name + <span class="s">'-login'</span>);</code></pre>
+<p><code>Logger</code> is NestJS's built in logger. <code>AuthService.name</code> is the string <code>"AuthService"</code>, so log lines are tagged <code>[AuthService-login]</code>. This makes it easy to find where a log line came from.</p>
+
+<h4><span class="badge">5c</span>Normalizing the email</h4>
+<pre><code><span class="k">const</span> normalizedEmail = normalizeEmail(logInDto.email);</code></pre>
+<span class="path">src/@core/utils/email-normalizer.util.ts</span>
+<pre><code><span class="k">export function</span> normalizeEmail(email: string): string {
+    <span class="k">if</span> (!email) <span class="k">return</span> <span class="s">''</span>;
+    <span class="k">const</span> trimEmail = email.trim().toLowerCase();
+    <span class="k">const</span> emailParts = trimEmail.split(<span class="s">'@'</span>);
+    <span class="k">if</span> (emailParts.length !== 2) <span class="k">return</span> trimEmail;
+    <span class="k">let</span> [localPart, domain] = emailParts;
+    <span class="k">if</span> (domain === <span class="s">'gmail.com'</span> || domain === <span class="s">'googlemail.com'</span>) {
+        localPart = localPart.replace(<span class="s">/\./g</span>, <span class="s">''</span>);         <span class="c">// remove all dots</span>
+        <span class="k">const</span> plusIndex = localPart.indexOf(<span class="s">'+'</span>);
+        <span class="k">if</span> (plusIndex &gt; -1) localPart = localPart.substring(0, plusIndex);  <span class="c">// cut "+anything"</span>
+        domain = <span class="s">'gmail.com'</span>;
+    }
+    <span class="k">return</span> <span class="s">`${localPart}@${domain}`</span>;
+}</code></pre>
+<p>Gmail delivers <code>Akshat.Rag+promo@gmail.com</code> and <code>akshatrag@gmail.com</code> to the same inbox. Without normalization, one person could create many accounts (handy for abusing coupons or affiliate rewards). So <code>" Akshat.Rag+promo@Gmail.com "</code> becomes <code>"akshatrag@gmail.com"</code>, exactly matching what was stored at registration. This is a <b>pure function</b>: same input, same output, no database, no side effects. Those are the easiest kind of code to test.</p>
+
+<h4><span class="badge">5d</span>Finding the user</h4>
+<pre><code><span class="k">const</span> user = <span class="k">await this</span>.userService.getByEmail(normalizedEmail);</code></pre>
+<span class="path">src/components/user/user.service.ts (line 153)</span>
+<pre><code><span class="k">async</span> getByEmail(email: string): Promise&lt;ReturnUserDto&gt; {
+    <span class="k">const</span> user = <span class="k">await this</span>.userRepo.findByEmail(email);
+    <span class="k">if</span> (user) {
+        <span class="k">return await this</span>.toReturnUserDto(user);
+    }
+    <span class="k">throw new</span> UnauthorizedException(UserErrorMessage.INVALID_ATTEMPT);
+}</code></pre>
+<p>Notice AuthService does not talk to the database. It asks the <b>user</b> service, because users belong to the user module. Each module owns its own data. The user service then asks its repository (step 6), and if a row comes back, converts it with <code>toReturnUserDto</code>, a function that copies safe fields (id, email, name, flags) into a new object and deliberately <b>leaves out</b> <code>password</code> and <code>currentHashedRefreshToken</code>. If no row comes back, it throws a 401 with the message <code>'Invalid User Name or Password'</code>.</p>
+
+<h4><span class="badge">5e</span>Checking the account state</h4>
+<pre><code><span class="k">if</span> (user.isDeleted) <span class="k">throw new</span> UnauthorizedException(<span class="s">'Your account has been deleted...'</span>);
+<span class="k">if</span> (user.isBlocked) <span class="k">throw new</span> UnauthorizedException(<span class="s">'Your account has been blocked...'</span>);</code></pre>
+<p>These are <b>guard clauses</b>: check for a bad condition early and exit immediately. This keeps the happy path flat instead of nested in many <code>if/else</code> blocks. <code>isDeleted</code> comes from the shared base entity (soft delete: the row stays but is marked deleted). <code>isBlocked</code> is set by admins.</p>
+
+<h4><span class="badge">5f</span>Fetching the password hash separately</h4>
+<pre><code><span class="k">const</span> passwordFromDB = <span class="k">await this</span>.userService.getPasswordByUserId(user.id);</code></pre>
+<span class="path">src/components/user/user.service.ts (line 195)</span>
+<pre><code><span class="k">async</span> getPasswordByUserId(userId: string): Promise&lt;string&gt; {
+    <span class="k">return await</span> (<span class="k">await this</span>.userRepo.findOneById(userId)).password;
+}</code></pre>
+<p>Since the safe user object has no password, the service fetches the full row again by id and returns only the password hash. Two queries instead of one, but the hash never ends up in an object that might be sent to the browser. If the hash is missing (a user who signed up with Google or a wallet has no password), login refuses with 403.</p>
+
+<h4><span class="badge">5g</span>Email must be verified</h4>
+<pre><code><span class="k">if</span> (!user.isEmailVerified) <span class="k">throw new</span> BadRequestException(UserErrorMessage.EMAIL_NOT_VERIFIED_YET);</code></pre>
+<p>After registering, users get an email with a link. Clicking it sets <code>isEmailVerified = true</code>. Until then, login returns 400 with <code>'Email Not Verified Yet'</code>, and the frontend can show a "resend verification" button.</p>
+
+<h4><span class="badge">5h</span>Recording which site they came from</h4>
+<pre><code><span class="k">await this</span>.userService.updateTheUserSource(user.id, logInDto.source);</code></pre>
+<span class="path">src/components/user/user.service.ts (line 394)</span>
+<pre><code><span class="k">async</span> updateTheUserSource(userId: string, source: string): Promise&lt;<span class="k">void</span>&gt; {
+    <span class="k">const</span> user = <span class="k">await this</span>.userRepo.findOneById(userId);
+    <span class="k">if</span> (!user) <span class="k">throw new</span> NotFoundException(UserErrorMessage.USER_DOES_NOT_EXIST);
+    <span class="k">if</span> (source === <span class="s">'main_site'</span>) user.isMainSiteUser = <span class="k">true</span>;
+    <span class="k">if</span> (source === <span class="s">'marketplace'</span>) user.isMarketplceUser = <span class="k">true</span>;
+    <span class="k">await this</span>.userRepo.save(user);
+}</code></pre>
+<p>The same accounts work on the main site and the marketplace. This flips a flag so the team knows which product each user has used. <code>save(user)</code> writes the changed row back to the database (an <code>UPDATE</code>). Note this runs <b>before</b> the password check; see section 8.</p>
+
+<h4><span class="badge">5i</span>Checking the password</h4>
+<pre><code><span class="k">await this</span>.verifyPassword(logInDto.password, passwordFromDB);</code></pre>
+<span class="path">src/components/auth/auth.service.ts (line 282)</span>
+<pre><code><span class="k">private async</span> verifyPassword(plainTextPassword: string, hashedPassword: string): Promise&lt;<span class="k">void</span>&gt; {
+    <span class="k">const</span> isPasswordMatching = <span class="k">await</span> bcrypt.compare(plainTextPassword, hashedPassword);
+    <span class="k">if</span> (!isPasswordMatching) {
+        <span class="k">throw new</span> UnauthorizedException(UserErrorMessage.INVALID_ATTEMPT);
+    }
+}</code></pre>
+<p>The database holds something like <code>$2b$10$N9qo8uLOickgx2ZMRZoMye...</code>, never the real password. That string contains the algorithm (<code>2b</code>), the cost (<code>10</code>), the salt, and the hash. <code>bcrypt.compare</code> pulls the salt out, hashes the typed password with it, and checks if the results are identical. It returns <code>true</code> or <code>false</code>; it never "decrypts" anything.</p>
+<p>The error message is <code>'Invalid User Name or Password'</code> on purpose. If it said "wrong password", an attacker would learn that the email exists, which helps them target accounts. That idea is called avoiding <b>user enumeration</b>.</p>
+<p><code>private</code> means only code inside AuthService can call this. It is a helper, not part of the public API of the service.</p>
+
+<h3 id="j6">Step 6: The repository runs the query</h3>
+<p>We skipped this inside step 5d. Here is what <code>userRepo.findByEmail</code> actually does.</p>
+<span class="path">src/components/user/user.repo.ts</span>
+<pre><code><span class="d">@Injectable</span>()
+<span class="k">export class</span> UserRepo <span class="k">extends</span> BaseAbstractRepository&lt;User&gt; <span class="k">implements</span> UserRepoInterface {
+    <span class="k">constructor</span>(
+        <span class="d">@InjectRepository</span>(User)
+        <span class="k">private readonly</span> userRepository: Repository&lt;User&gt;
+    ) {
+        <span class="k">super</span>(userRepository);
+    }
+
+    <span class="k">async</span> findByEmail(email: string): Promise&lt;User&gt; {
+        <span class="k">const</span> normalized = normalizeEmail(email);
+        <span class="k">return await this</span>.userRepository.findOne({
+            where: { email: normalized }
+        });
+    }
+}</code></pre>
+<div class="tablewrap"><table>
+<tr><th>Word</th><th>Meaning</th></tr>
+<tr><td><code>extends BaseAbstractRepository&lt;User&gt;</code></td><td>Inherit the shared methods <code>save</code>, <code>update</code>, <code>findOneById</code>, <code>findAll</code>, <code>remove</code>, all typed for User.</td></tr>
+<tr><td><code>implements UserRepoInterface</code></td><td>Promise to have every method the interface lists.</td></tr>
+<tr><td><code>@InjectRepository(User)</code></td><td>Ask the <code>@nestjs/typeorm</code> package for TypeORM's built in repository for the User entity. This works because <code>user.module.ts</code> has <code>TypeOrmModule.forFeature([User, ...])</code> in its imports.</td></tr>
+<tr><td><code>Repository&lt;User&gt;</code></td><td>TypeORM's class with <code>find</code>, <code>findOne</code>, <code>save</code>, <code>createQueryBuilder</code> and so on.</td></tr>
+<tr><td><code>super(userRepository)</code></td><td>Call the parent class constructor, giving the base class its own copy so its shared methods work.</td></tr>
+<tr><td><code>findOne({ where: { email: normalized } })</code></td><td>TypeORM builds and runs roughly <code>SELECT * FROM tbl_user WHERE email = $1 LIMIT 1</code>, then turns the row into a <code>User</code> object. Returns <code>null</code> if nothing matches.</td></tr>
+</table></div>
+<span class="path">src/repositories/base/base.abstract.repository.ts</span>
+<pre><code><span class="k">export class</span> BaseAbstractRepository&lt;T&gt; <span class="k">implements</span> BaseInterfaceRepository&lt;T&gt; {
+    <span class="k">private</span> entity: Repository&lt;T&gt;;
+    <span class="k">protected constructor</span>(entity: Repository&lt;T&gt;) { <span class="k">this</span>.entity = entity; }
+
+    <span class="k">public async</span> save(data: T | any): Promise&lt;T&gt; { <span class="k">return await this</span>.entity.save(data); }
+    <span class="k">public async</span> update(id: string, data: any): Promise&lt;UpdateResult&gt; { <span class="k">return await this</span>.entity.update(id, data); }
+    <span class="k">public async</span> findOneById(id: string): Promise&lt;T&gt; { <span class="k">return await this</span>.entity.findOne({ where: { id } <span class="k">as</span> any }); }
+    <span class="k">public async</span> findAll(): Promise&lt;T[]&gt; { <span class="k">return await this</span>.entity.find(); }
+    <span class="k">public async</span> remove(id: string): Promise&lt;DeleteResult&gt; { <span class="k">return await this</span>.entity.delete(id); }
+}</code></pre>
+<p>This is why <code>userRepo.findOneById(...)</code> works even though <code>user.repo.ts</code> never defines it. Write the boring five methods once, and every repo in the project inherits them. The <code>&lt;T&gt;</code> is a placeholder; <code>UserRepo</code> fills it with <code>User</code>, a cart repo would fill it with <code>CartEntity</code>.</p>
+
+<h3 id="j7">Step 7: The entity is the table</h3>
+<span class="path">src/components/user/entity/user.entity.ts (trimmed)</span>
+<pre><code><span class="d">@Entity</span>({ name: <span class="s">'tbl_user'</span> })
+<span class="d">@Index</span>(<span class="s">'idx_user_email'</span>, [<span class="s">'email'</span>])
+<span class="k">export class</span> User <span class="k">extends</span> BaseEntity {
+    <span class="d">@Column</span>({ unique: <span class="k">true</span>, nullable: <span class="k">true</span> })
+    <span class="k">public</span> email: string;
+
+    <span class="d">@Column</span>({ nullable: <span class="k">true</span> })
+    <span class="d">@Exclude</span>()
+    <span class="k">public</span> password?: string;
+
+    <span class="d">@Column</span>({ nullable: <span class="k">true</span> })
+    <span class="d">@Exclude</span>()
+    <span class="k">public</span> currentHashedRefreshToken?: string;
+
+    <span class="d">@Column</span>({ <span class="k">default</span>: <span class="k">false</span> }) <span class="k">public</span> isEmailVerified: boolean;
+    <span class="d">@Column</span>({ <span class="k">default</span>: <span class="k">false</span> }) <span class="k">public</span> isBlocked: boolean;
+    <span class="c">// ... name, phone, username, bio, wallets, affiliate relations</span>
+}</code></pre>
+<span class="path">src/@core/common/entity/base.entity.ts</span>
+<pre><code><span class="k">export abstract class</span> BaseEntity {
+    <span class="d">@PrimaryGeneratedColumn</span>(<span class="s">'uuid'</span>) id: string;
+    <span class="d">@CreateDateColumn</span>({ type: <span class="s">'timestamptz'</span> }) createdDateTime: Date;
+    <span class="d">@Column</span>({ type: <span class="s">'boolean'</span>, <span class="k">default</span>: <span class="k">false</span> }) isDeleted: boolean;
+    <span class="d">@UpdateDateColumn</span>({ type: <span class="s">'timestamptz'</span> }) lastChangedDateTime: Date;
+}</code></pre>
+<div class="tablewrap"><table>
+<tr><th>Decorator</th><th>Meaning</th></tr>
+<tr><td><code>@Entity({ name: 'tbl_user' })</code></td><td>This class is the table <code>tbl_user</code>.</td></tr>
+<tr><td><code>@Index('idx_user_email', ['email'])</code></td><td>Create a fast lookup on email. Without it, every login would scan the entire table.</td></tr>
+<tr><td><code>@Column({ unique: true })</code></td><td>A column, and no two rows may share the value.</td></tr>
+<tr><td><code>nullable: true</code></td><td>The column may be empty (NULL).</td></tr>
+<tr><td><code>default: false</code></td><td>If not given, the database fills in <code>false</code>.</td></tr>
+<tr><td><code>@Exclude()</code></td><td>A class transformer hint: "never include this when turning the object into JSON". A second layer of protection for password and refresh hash.</td></tr>
+<tr><td><code>?</code> after a name</td><td>TypeScript optional property, may be undefined.</td></tr>
+<tr><td><code>abstract class BaseEntity</code></td><td>Cannot be used directly, only inherited. Every entity extending it automatically gets <code>id</code>, timestamps, and <code>isDeleted</code>.</td></tr>
+<tr><td><code>@PrimaryGeneratedColumn('uuid')</code></td><td>The unique id, generated as a UUID automatically on insert.</td></tr>
+<tr><td><code>@CreateDateColumn / @UpdateDateColumn</code></td><td>Filled automatically on insert and on every update.</td></tr>
+</table></div>
+
+<h3 id="j8">Step 8: Creating and saving the tokens</h3>
+<span class="path">src/components/auth/auth.service.ts (line 289)</span>
+<pre><code><span class="k">async</span> getTokens(userId: string, verifiedWalletInfo?: VerifiedWalletInfo): Promise&lt;TokenResponseDto&gt; {
+    <span class="k">const</span> jwtPayload: JwtPayload = {
+        userId: userId,
+        ...(verifiedWalletInfo &amp;&amp; {
+            walletAddress: verifiedWalletInfo.walletAddress,
+            walletVerifiedAt: verifiedWalletInfo.walletVerifiedAt
+        })
+    };
+
+    <span class="k">const</span> [accessToken, refreshToken] = <span class="k">await</span> Promise.all([
+        <span class="k">this</span>.jwtService.signAsync(jwtPayload, {
+            secret: <span class="k">this</span>.JWT_ACCESS_TOKEN_SECRET,
+            expiresIn: <span class="k">this</span>.JWT_ACCESS_TOKEN_EXPIRATION
+        }),
+        <span class="k">this</span>.jwtService.signAsync(jwtPayload, {
+            secret: <span class="k">this</span>.JWT_REFRESH_TOKEN_SECRET,
+            expiresIn: <span class="k">this</span>.JWT_REFRESH_TOKEN_EXPIRATION
+        })
+    ]);
+    <span class="k">const</span> tokenResponseDto = <span class="k">new</span> TokenResponseDto();
+    tokenResponseDto.accessToken = accessToken;
+    tokenResponseDto.refreshToken = refreshToken;
+    <span class="k">return</span> tokenResponseDto;
+}</code></pre>
+<div class="tablewrap"><table>
+<tr><th>Piece</th><th>Meaning</th></tr>
+<tr><td><code>verifiedWalletInfo?</code></td><td>Optional. During email login it is not passed, so the payload is just <code>{ userId }</code>. Wallet login uses it.</td></tr>
+<tr><td><code>...(cond &amp;&amp; { ... })</code></td><td>A trick to conditionally add properties. If <code>cond</code> is falsy, spreading <code>undefined</code> adds nothing.</td></tr>
+<tr><td><code>jwtService.signAsync(payload, options)</code></td><td>From <code>@nestjs/jwt</code>. Builds the header and payload, signs them with the secret, returns <code>xxx.yyy.zzz</code>. It also adds <code>iat</code> and <code>exp</code> automatically.</td></tr>
+<tr><td><code>secret</code></td><td>Different secrets for access and refresh, so one can never be used as the other.</td></tr>
+<tr><td><code>expiresIn</code></td><td>For example <code>'15m'</code> or <code>'7d'</code>. Real values live in AWS Secrets Manager.</td></tr>
+<tr><td><code>const [a, b] = await Promise.all([...])</code></td><td>Sign both at once and destructure the two results into variables.</td></tr>
+</table></div>
+<p>A decoded access token payload looks like this. Anyone can read it, so never put anything secret inside:</p>
+<pre><code>{ <span class="s">"userId"</span>: <span class="s">"3f2b6c1a-...-9c1e"</span>, <span class="s">"iat"</span>: 1761800000, <span class="s">"exp"</span>: 1761800900 }</code></pre>
+
+<h4>Saving the refresh token</h4>
+<pre><code><span class="k">await this</span>.userService.setCurrentRefreshToken(tokens.refreshToken, user.id);</code></pre>
+<span class="path">src/components/user/user.service.ts</span>
+<pre><code><span class="k">async</span> setCurrentRefreshToken(refreshToken: string, id: string): Promise&lt;<span class="k">void</span>&gt; {
+    <span class="k">const</span> hashedRefreshToken = <span class="k">await</span> hashData(refreshToken);   <span class="c">// argon2.hash(refreshToken)</span>
+    <span class="k">await this</span>.userRepo.update(id, { currentHashedRefreshToken: hashedRefreshToken, lastActiveAt: <span class="k">new</span> Date() });
+}</code></pre>
+<p>The refresh token is hashed with argon2 before storing, for the same reason passwords are hashed: if the database leaks, the attacker cannot use what they find. Only one hash is stored per user, so logging in on a second device replaces it, and the first device's refresh token stops working.</p>
+
+<h4>Background events</h4>
+<pre><code><span class="k">this</span>.eventEmitter.emit(<span class="s">`userlogin.UpdateDomainDetailTable`</span>, <span class="k">new</span> UpdateDomainDetailTableAfterLoginEvent(user.id));
+<span class="k">this</span>.eventEmitter.emit(<span class="s">'reputation.login'</span>, { userId: user.id });</code></pre>
+<p>Two announcements, and login does not wait for either. The first is caught at <code>auth.service.ts</code> line 342 by a method decorated with <code>@OnEvent('userlogin.UpdateDomainDetailTable', { async: true })</code>. It loads the user's wallet addresses and asks Alchemy which domain NFTs (Unstoppable, ENS, Freename and others) those wallets own, then updates the domain details table. Blockchain calls can take seconds, so doing it in the background keeps login fast. The second is caught by the reputation service, which may recalculate a reputation score.</p>
+
+<h3 id="j9">Step 9: The response goes back</h3>
+<span class="path">src/components/auth/dto/return-login.dto.ts</span>
+<pre><code><span class="k">export class</span> ReturnLoginDto {
+    user: ReturnUserDto;
+    accessToken: string;
+    refreshToken: string;
+    expiresIn: Date;
+}</code></pre>
+<span class="path">src/@core/common/dto/response.dto.ts</span>
+<pre><code><span class="k">export class</span> Response {
+    success: boolean;
+    statusCode: number;
+    message: string[] | string;
+    result: any;
+    <span class="k">constructor</span>(message: string[] | string, result?: any) {
+        <span class="k">this</span>.message = message;
+        <span class="k">this</span>.result = result;
+    }
+}</code></pre>
+<p>The controller builds <code>new Response('Login Success', returnLoginDto)</code>. NestJS sees an object returned from a handler, runs <code>JSON.stringify</code> on it, sets status 201 (default for POST), and sends:</p>
+<pre><code>{
+  <span class="s">"message"</span>: <span class="s">"Login Success"</span>,
+  <span class="s">"result"</span>: {
+    <span class="s">"user"</span>: { <span class="s">"id"</span>: <span class="s">"..."</span>, <span class="s">"email"</span>: <span class="s">"akshatrag@gmail.com"</span>, <span class="s">"isEmailVerified"</span>: <span class="k">true</span>, <span class="c">... no password ...</span> },
+    <span class="s">"accessToken"</span>: <span class="s">"eyJhbGciOiJIUzI1NiIs..."</span>,
+    <span class="s">"refreshToken"</span>: <span class="s">"eyJhbGciOiJIUzI1NiIs..."</span>
+  }
+}</code></pre>
+<p><code>success</code> and <code>statusCode</code> do not appear because nothing ever sets them, and <code>JSON.stringify</code> drops undefined properties. <code>expiresIn</code> is also never set, so it is missing too.</p>
+<p>If anything threw along the way, NestJS's built in exception handler produced an error response instead, for example:</p>
+<pre><code>{ <span class="s">"statusCode"</span>: 401, <span class="s">"message"</span>: <span class="s">"Invalid User Name or Password"</span>, <span class="s">"error"</span>: <span class="s">"Unauthorized"</span> }</code></pre>
+
+<!-- ============================================================ -->
+<h2 id="wiring">5. How the pieces get wired together</h2>
+<p>The most magical feeling part of NestJS is that nobody writes <code>new AuthService(...)</code>. Here is exactly how it happens.</p>
+<span class="path">src/components/auth/auth.module.ts (trimmed)</span>
+<pre><code><span class="d">@Module</span>({
+    imports: [JwtModule.register({}), ConfigModule, UserModule, EventEmitterModule.forRoot(), <span class="c">/* ... */</span>],
+    providers: [
+        { provide: <span class="s">'AuthServiceInterface'</span>, useClass: AuthService },
+        AccessTokenStrategy,
+        RefreshTokenStrategy
+    ],
+    controllers: [AuthController],
+    exports: [
+        { provide: <span class="s">'AuthServiceInterface'</span>, useClass: AuthService }
+    ]
+})
+<span class="k">export class</span> AuthModule { }</code></pre>
+<div class="tablewrap"><table>
+<tr><th>Key</th><th>Meaning</th></tr>
+<tr><td><code>imports</code></td><td>Other modules whose exported providers this module wants. Importing <code>UserModule</code> is why <code>AuthService</code> can inject <code>'UserServiceInterface'</code>. <code>JwtModule</code> provides <code>JwtService</code>.</td></tr>
+<tr><td><code>providers</code></td><td>Things this module can create. <code>{ provide: 'AuthServiceInterface', useClass: AuthService }</code> means "when someone asks for the token <code>'AuthServiceInterface'</code>, build an <code>AuthService</code>". Listing a bare class like <code>AccessTokenStrategy</code> is shorthand for <code>{ provide: AccessTokenStrategy, useClass: AccessTokenStrategy }</code>.</td></tr>
+<tr><td><code>controllers</code></td><td>Controllers to scan for routes.</td></tr>
+<tr><td><code>exports</code></td><td>Providers other modules may use if they import <code>AuthModule</code>.</td></tr>
+</table></div>
+<h3>Why string tokens like 'AuthServiceInterface'?</h3>
+<p>The controller wants to depend on the <b>interface</b>, not the concrete class, so the class could be swapped (for example, a fake in tests). But TypeScript interfaces vanish at runtime, so NestJS cannot use an interface as a key. The workaround is a string name. The interface gives you types in the editor, and the string gives NestJS a runtime key. That is the whole reason this pattern exists.</p>
+<h3>The order NestJS builds things</h3>
+<div class="flow">
+  <div class="box"><b>1.</b> <code>AppModule</code> imports <code>TypeOrmModule.forRootAsync</code> (database connection) and <code>AuthModule</code>.</div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>2.</b> <code>AuthModule</code> imports <code>UserModule</code>, which has <code>TypeOrmModule.forFeature([User])</code>, giving a TypeORM <code>Repository&lt;User&gt;</code>.</div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>3.</b> NestJS builds <code>UserRepo</code> (needs <code>Repository&lt;User&gt;</code>), then <code>UserService</code> (needs <code>'UserRepoInterface'</code>).</div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>4.</b> Builds <code>AuthService</code> (needs <code>'UserServiceInterface'</code>, <code>JwtService</code>, <code>ConfigService</code>, ...).</div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>5.</b> Builds <code>AuthController</code> (needs <code>'AuthServiceInterface'</code>) and registers its routes.</div>
+</div>
+<div class="warn"><b>The error you will definitely see</b><code>Nest can't resolve dependencies of the AuthService (?, JwtService, ...)</code>. The <code>?</code> marks the missing one. It almost always means the module that provides it is not in <code>imports</code>, or the provider is not in that module's <code>exports</code>, or the token string has a typo.</div>
+
+<!-- ============================================================ -->
+<h2 id="after">6. After login: guards and refresh</h2>
+<h3>Using the access token</h3>
+<p>The frontend stores the tokens and sends <code>Authorization: Bearer &lt;accessToken&gt;</code> with protected requests. Protected routes look like this:</p>
+<pre><code><span class="d">@UseGuards</span>(AccessTokenGuard)
+<span class="d">@Get</span>(<span class="s">'logout'</span>)
+<span class="k">async</span> logout(<span class="d">@Req</span>() req: Request) {
+    <span class="k">const</span> userId = req.user[<span class="s">'userId'</span>];
+    <span class="c">// ...</span>
+}</code></pre>
+<span class="path">src/@core/common/guards/access-token.guard.ts</span>
+<pre><code><span class="d">@Injectable</span>()
+<span class="k">export class</span> AccessTokenGuard <span class="k">extends</span> AuthGuard(<span class="s">'jwt'</span>) {}</code></pre>
+<span class="path">src/components/auth/strategies/access-token.strategy.ts</span>
+<pre><code><span class="d">@Injectable</span>()
+<span class="k">export class</span> AccessTokenStrategy <span class="k">extends</span> PassportStrategy(Strategy, <span class="s">'jwt'</span>) {
+    <span class="k">constructor</span>() {
+        <span class="k">super</span>({
+            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+            secretOrKey: process.env.JWT_ACCESS_TOKEN_SECRET
+        });
+    }
+    validate(payload: JwtPayload): JwtPayload {
+        <span class="k">return</span> payload;
+    }
+}</code></pre>
+<p>The guard's name <code>'jwt'</code> links it to the strategy with the same name. When the request arrives, the strategy pulls the token from the Authorization header, verifies the signature with the access secret and checks <code>exp</code>. If anything fails, the response is 401 and the handler never runs. If it passes, <code>validate</code> runs, and whatever it returns is placed on <code>req.user</code>. That is how every protected handler knows who is calling, with zero database lookups.</p>
+
+<h3>Refreshing</h3>
+<p>When the access token expires, the frontend calls <code>GET /api/v1/auth/refresh-token</code> with the <b>refresh</b> token in the header. That route uses <code>RefreshTokenGuard</code> and the <code>'jwt-refresh'</code> strategy, which verifies with the refresh secret and also attaches the raw token to <code>req.user</code>. Then:</p>
+<span class="path">src/components/auth/auth.service.ts</span>
+<pre><code><span class="k">async</span> refreshTokens(userId: string, refreshToken: string, ...): Promise&lt;TokenResponseDto&gt; {
+    <span class="k">const</span> refreshTokenFromDB = <span class="k">await this</span>.userService.getHashedRefreshTokenByUserId(userId);
+    <span class="k">if</span> (!refreshTokenFromDB) <span class="k">throw new</span> UnauthorizedException(<span class="s">'Access Denied'</span>);
+    <span class="k">const</span> refreshTokenMatches = <span class="k">await</span> verifyHash(refreshTokenFromDB, refreshToken);
+    <span class="k">if</span> (!refreshTokenMatches) <span class="k">throw new</span> UnauthorizedException(<span class="s">'Access Denied'</span>);
+    <span class="k">const</span> tokens = <span class="k">await this</span>.getTokens(userId, verifiedWalletInfo);
+    <span class="k">await this</span>.userService.setCurrentRefreshToken(tokens.refreshToken, userId);
+    <span class="k">return new</span> TokenResponseDto(tokens.accessToken, tokens.refreshToken);
+}</code></pre>
+<p>A valid signature is not enough here; the token must also match the hash stored in the database. That is what makes logout work: logout sets the stored hash to null, so the old refresh token is dead even though its signature is still valid. Each refresh issues a new pair and stores the new hash, which is called <b>token rotation</b>.</p>
+
+<!-- ============================================================ -->
+<h2 id="build">7. Build it yourself from zero</h2>
+<p>This is where understanding becomes skill. Make a brand new practice project <b>outside</b> the company repo and build a simplified version of exactly this login. Same layers, same ideas, fewer features. Type everything by hand; do not copy and paste. Typing forces you to notice every word.</p>
+
+<h3><span class="badge">1</span>Create the project</h3>
+<pre><code>npm i -g @nestjs/cli
+nest new login-practice
+cd login-practice
+npm i @nestjs/typeorm typeorm pg @nestjs/config @nestjs/jwt @nestjs/passport passport passport-jwt bcrypt class-validator class-transformer
+npm i -D @types/passport-jwt @types/bcrypt</code></pre>
+<p>What each package is for: <code>@nestjs/typeorm typeorm pg</code> are the ORM and the PostgreSQL driver. <code>@nestjs/config</code> reads a <code>.env</code> file. <code>@nestjs/jwt</code> signs tokens. <code>@nestjs/passport passport passport-jwt</code> check tokens on protected routes. <code>bcrypt</code> hashes passwords. <code>class-validator class-transformer</code> power DTO validation. The <code>@types/...</code> packages give TypeScript type information for plain JS libraries.</p>
+
+<h3><span class="badge">2</span>Get a database</h3>
+<p>Easiest is Docker:</p>
+<pre><code>docker run --name pg-practice -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=practice -p 5432:5432 -d postgres:16</code></pre>
+<p>Then create <code>.env</code> in the project root:</p>
+<pre><code>DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_NAME=practice
+JWT_ACCESS_SECRET=change_me_access
+JWT_ACCESS_EXPIRES=15m
+JWT_REFRESH_SECRET=change_me_refresh
+JWT_REFRESH_EXPIRES=7d</code></pre>
+<p>The real project gets these from AWS Secrets Manager. For practice, <code>.env</code> is fine. Add <code>.env</code> to <code>.gitignore</code> so secrets never get committed.</p>
+
+<h3><span class="badge">3</span>Generate the skeleton</h3>
+<pre><code>nest g module users
+nest g service users --no-spec
+nest g module auth
+nest g controller auth --no-spec
+nest g service auth --no-spec</code></pre>
+<p>The CLI creates the files and adds the modules to <code>AppModule</code> for you. Look at what it generated before moving on.</p>
+
+<h3><span class="badge">4</span>Root module: config and database</h3>
+<span class="path">src/app.module.ts</span>
+<pre><code><span class="k">import</span> { Module } <span class="k">from</span> <span class="s">'@nestjs/common'</span>;
+<span class="k">import</span> { ConfigModule, ConfigService } <span class="k">from</span> <span class="s">'@nestjs/config'</span>;
+<span class="k">import</span> { TypeOrmModule } <span class="k">from</span> <span class="s">'@nestjs/typeorm'</span>;
+<span class="k">import</span> { UsersModule } <span class="k">from</span> <span class="s">'./users/users.module'</span>;
+<span class="k">import</span> { AuthModule } <span class="k">from</span> <span class="s">'./auth/auth.module'</span>;
+
+<span class="d">@Module</span>({
+  imports: [
+    ConfigModule.forRoot({ isGlobal: <span class="k">true</span> }),         <span class="c">// load .env, available everywhere</span>
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) =&gt; ({
+        type: <span class="s">'postgres'</span>,
+        host: config.get(<span class="s">'DB_HOST'</span>),
+        port: Number(config.get(<span class="s">'DB_PORT'</span>)),
+        username: config.get(<span class="s">'DB_USER'</span>),
+        password: config.get(<span class="s">'DB_PASSWORD'</span>),
+        database: config.get(<span class="s">'DB_NAME'</span>),
+        autoLoadEntities: <span class="k">true</span>,
+        synchronize: <span class="k">true</span>,                               <span class="c">// practice only! creates tables from entities</span>
+      }),
+    }),
+    UsersModule,
+    AuthModule,
+  ],
+})
+<span class="k">export class</span> AppModule {}</code></pre>
+<div class="warn"><b>About synchronize: true</b>It automatically alters tables to match your entities. Great for practice, dangerous in production because it can drop columns with data. The real project uses migrations instead (<code>src/one-time-migration/</code>).</div>
+
+<h3><span class="badge">5</span>The entity</h3>
+<span class="path">src/users/user.entity.ts</span>
+<pre><code><span class="k">import</span> { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } <span class="k">from</span> <span class="s">'typeorm'</span>;
+
+<span class="d">@Entity</span>({ name: <span class="s">'tbl_user'</span> })
+<span class="k">export class</span> User {
+  <span class="d">@PrimaryGeneratedColumn</span>(<span class="s">'uuid'</span>) id: string;
+  <span class="d">@Column</span>({ unique: <span class="k">true</span> }) email: string;
+  <span class="d">@Column</span>({ nullable: <span class="k">true</span> }) password: string;
+  <span class="d">@Column</span>({ nullable: <span class="k">true</span> }) currentHashedRefreshToken: string;
+  <span class="d">@Column</span>({ <span class="k">default</span>: <span class="k">false</span> }) isEmailVerified: boolean;
+  <span class="d">@Column</span>({ <span class="k">default</span>: <span class="k">false</span> }) isBlocked: boolean;
+  <span class="d">@Column</span>({ <span class="k">default</span>: <span class="k">false</span> }) isDeleted: boolean;
+  <span class="d">@CreateDateColumn</span>() createdDateTime: Date;
+}</code></pre>
+
+<h3><span class="badge">6</span>The repository</h3>
+<p>To stay close to the real project, write a small repo class. (Many NestJS projects skip this and use TypeORM's repository straight in the service. Both are fine; this codebase chose the extra layer.)</p>
+<span class="path">src/users/users.repo.ts</span>
+<pre><code><span class="k">import</span> { Injectable } <span class="k">from</span> <span class="s">'@nestjs/common'</span>;
+<span class="k">import</span> { InjectRepository } <span class="k">from</span> <span class="s">'@nestjs/typeorm'</span>;
+<span class="k">import</span> { Repository } <span class="k">from</span> <span class="s">'typeorm'</span>;
+<span class="k">import</span> { User } <span class="k">from</span> <span class="s">'./user.entity'</span>;
+
+<span class="d">@Injectable</span>()
+<span class="k">export class</span> UsersRepo {
+  <span class="k">constructor</span>(<span class="d">@InjectRepository</span>(User) <span class="k">private readonly</span> repo: Repository&lt;User&gt;) {}
+
+  findByEmail(email: string): Promise&lt;User | <span class="k">null</span>&gt; {
+    <span class="k">return this</span>.repo.findOne({ where: { email } });
+  }
+  findById(id: string): Promise&lt;User | <span class="k">null</span>&gt; {
+    <span class="k">return this</span>.repo.findOne({ where: { id } });
+  }
+  save(user: Partial&lt;User&gt;): Promise&lt;User&gt; {
+    <span class="k">return this</span>.repo.save(user);
+  }
+  update(id: string, data: Partial&lt;User&gt;) {
+    <span class="k">return this</span>.repo.update(id, data);
+  }
+}</code></pre>
+<p><code>Partial&lt;User&gt;</code> means "a User where every field is optional", useful when you only update a few fields.</p>
+
+<h3><span class="badge">7</span>The users service and module</h3>
+<span class="path">src/users/users.service.ts</span>
+<pre><code><span class="k">import</span> { Injectable } <span class="k">from</span> <span class="s">'@nestjs/common'</span>;
+<span class="k">import</span> * <span class="k">as</span> bcrypt <span class="k">from</span> <span class="s">'bcrypt'</span>;
+<span class="k">import</span> { UsersRepo } <span class="k">from</span> <span class="s">'./users.repo'</span>;
+<span class="k">import</span> { User } <span class="k">from</span> <span class="s">'./user.entity'</span>;
+
+<span class="d">@Injectable</span>()
+<span class="k">export class</span> UsersService {
+  <span class="k">constructor</span>(<span class="k">private readonly</span> usersRepo: UsersRepo) {}
+
+  findByEmail(email: string) { <span class="k">return this</span>.usersRepo.findByEmail(email); }
+  findById(id: string) { <span class="k">return this</span>.usersRepo.findById(id); }
+
+  <span class="k">async</span> create(email: string, password: string): Promise&lt;User&gt; {
+    <span class="k">const</span> hashed = <span class="k">await</span> bcrypt.hash(password, 10);
+    <span class="k">return this</span>.usersRepo.save({ email, password: hashed, isEmailVerified: <span class="k">true</span> }); <span class="c">// auto verified for practice</span>
+  }
+
+  <span class="k">async</span> setRefreshToken(userId: string, refreshToken: string | <span class="k">null</span>) {
+    <span class="k">const</span> hashed = refreshToken ? <span class="k">await</span> bcrypt.hash(refreshToken, 10) : <span class="k">null</span>;
+    <span class="k">await this</span>.usersRepo.update(userId, { currentHashedRefreshToken: hashed });
+  }
+}</code></pre>
+<p>The real project uses argon2 for refresh tokens. bcrypt is used here to keep installs simple; the idea is identical. One catch: bcrypt only looks at the first 72 bytes of its input, and JWTs are longer, so for production prefer argon2 or a SHA256 of the token. A good thing to ask about in code review.</p>
+<span class="path">src/users/users.module.ts</span>
+<pre><code><span class="k">import</span> { Module } <span class="k">from</span> <span class="s">'@nestjs/common'</span>;
+<span class="k">import</span> { TypeOrmModule } <span class="k">from</span> <span class="s">'@nestjs/typeorm'</span>;
+<span class="k">import</span> { User } <span class="k">from</span> <span class="s">'./user.entity'</span>;
+<span class="k">import</span> { UsersRepo } <span class="k">from</span> <span class="s">'./users.repo'</span>;
+<span class="k">import</span> { UsersService } <span class="k">from</span> <span class="s">'./users.service'</span>;
+
+<span class="d">@Module</span>({
+  imports: [TypeOrmModule.forFeature([User])],   <span class="c">// makes Repository&lt;User&gt; injectable here</span>
+  providers: [UsersRepo, UsersService],
+  exports: [UsersService],                       <span class="c">// AuthModule needs this</span>
+})
+<span class="k">export class</span> UsersModule {}</code></pre>
+
+<h3><span class="badge">8</span>The DTOs</h3>
+<span class="path">src/auth/dto/login.dto.ts</span>
+<pre><code><span class="k">import</span> { IsEmail, IsNotEmpty, IsString, MinLength } <span class="k">from</span> <span class="s">'class-validator'</span>;
+
+<span class="k">export class</span> LoginDto {
+  <span class="d">@IsEmail</span>() <span class="d">@IsNotEmpty</span>()
+  email: string;
+
+  <span class="d">@IsString</span>() <span class="d">@MinLength</span>(8)
+  password: string;
+}</code></pre>
+<p>Make a <code>RegisterDto</code> with the same two fields so you can create test users.</p>
+
+<h3><span class="badge">9</span>The auth service</h3>
+<span class="path">src/auth/auth.service.ts</span>
+<pre><code><span class="k">import</span> { BadRequestException, Injectable, UnauthorizedException } <span class="k">from</span> <span class="s">'@nestjs/common'</span>;
+<span class="k">import</span> { ConfigService } <span class="k">from</span> <span class="s">'@nestjs/config'</span>;
+<span class="k">import</span> { JwtService } <span class="k">from</span> <span class="s">'@nestjs/jwt'</span>;
+<span class="k">import</span> * <span class="k">as</span> bcrypt <span class="k">from</span> <span class="s">'bcrypt'</span>;
+<span class="k">import</span> { UsersService } <span class="k">from</span> <span class="s">'../users/users.service'</span>;
+<span class="k">import</span> { LoginDto } <span class="k">from</span> <span class="s">'./dto/login.dto'</span>;
+
+<span class="d">@Injectable</span>()
+<span class="k">export class</span> AuthService {
+  <span class="k">constructor</span>(
+    <span class="k">private readonly</span> usersService: UsersService,
+    <span class="k">private readonly</span> jwtService: JwtService,
+    <span class="k">private readonly</span> config: ConfigService,
+  ) {}
+
+  <span class="k">async</span> register(email: string, password: string) {
+    <span class="k">const</span> existing = <span class="k">await this</span>.usersService.findByEmail(email.trim().toLowerCase());
+    <span class="k">if</span> (existing) <span class="k">throw new</span> BadRequestException(<span class="s">'User already exists'</span>);
+    <span class="k">const</span> user = <span class="k">await this</span>.usersService.create(email.trim().toLowerCase(), password);
+    <span class="k">return</span> { id: user.id, email: user.email };
+  }
+
+  <span class="k">async</span> login(dto: LoginDto) {
+    <span class="c">// 1. normalize</span>
+    <span class="k">const</span> email = dto.email.trim().toLowerCase();
+
+    <span class="c">// 2. find user, same vague message for every failure</span>
+    <span class="k">const</span> user = <span class="k">await this</span>.usersService.findByEmail(email);
+    <span class="k">if</span> (!user || !user.password) <span class="k">throw new</span> UnauthorizedException(<span class="s">'Invalid email or password'</span>);
+
+    <span class="c">// 3. compare password FIRST, before revealing anything about the account</span>
+    <span class="k">const</span> ok = <span class="k">await</span> bcrypt.compare(dto.password, user.password);
+    <span class="k">if</span> (!ok) <span class="k">throw new</span> UnauthorizedException(<span class="s">'Invalid email or password'</span>);
+
+    <span class="c">// 4. account state</span>
+    <span class="k">if</span> (user.isDeleted) <span class="k">throw new</span> UnauthorizedException(<span class="s">'Account deleted'</span>);
+    <span class="k">if</span> (user.isBlocked) <span class="k">throw new</span> UnauthorizedException(<span class="s">'Account blocked'</span>);
+    <span class="k">if</span> (!user.isEmailVerified) <span class="k">throw new</span> BadRequestException(<span class="s">'Email not verified'</span>);
+
+    <span class="c">// 5. tokens</span>
+    <span class="k">const</span> tokens = <span class="k">await this</span>.getTokens(user.id);
+    <span class="k">await this</span>.usersService.setRefreshToken(user.id, tokens.refreshToken);
+
+    <span class="c">// 6. return safe data only</span>
+    <span class="k">return</span> { user: { id: user.id, email: user.email }, ...tokens };
+  }
+
+  <span class="k">async</span> logout(userId: string) {
+    <span class="k">await this</span>.usersService.setRefreshToken(userId, <span class="k">null</span>);
+  }
+
+  <span class="k">private async</span> getTokens(userId: string) {
+    <span class="k">const</span> payload = { userId };
+    <span class="k">const</span> [accessToken, refreshToken] = <span class="k">await</span> Promise.all([
+      <span class="k">this</span>.jwtService.signAsync(payload, {
+        secret: <span class="k">this</span>.config.get(<span class="s">'JWT_ACCESS_SECRET'</span>),
+        expiresIn: <span class="k">this</span>.config.get(<span class="s">'JWT_ACCESS_EXPIRES'</span>),
+      }),
+      <span class="k">this</span>.jwtService.signAsync(payload, {
+        secret: <span class="k">this</span>.config.get(<span class="s">'JWT_REFRESH_SECRET'</span>),
+        expiresIn: <span class="k">this</span>.config.get(<span class="s">'JWT_REFRESH_EXPIRES'</span>),
+      }),
+    ]);
+    <span class="k">return</span> { accessToken, refreshToken };
+  }
+}</code></pre>
+<p>Compare this with the real one. The structure is the same. The differences are deliberate improvements: the password is checked <b>before</b> revealing whether the account is blocked or unverified (so a stranger cannot learn account state without knowing the password), and nothing is written to the database until the password is correct.</p>
+
+<h3><span class="badge">10</span>The strategy and guard</h3>
+<span class="path">src/auth/access-token.strategy.ts</span>
+<pre><code><span class="k">import</span> { Injectable } <span class="k">from</span> <span class="s">'@nestjs/common'</span>;
+<span class="k">import</span> { ConfigService } <span class="k">from</span> <span class="s">'@nestjs/config'</span>;
+<span class="k">import</span> { PassportStrategy } <span class="k">from</span> <span class="s">'@nestjs/passport'</span>;
+<span class="k">import</span> { ExtractJwt, Strategy } <span class="k">from</span> <span class="s">'passport-jwt'</span>;
+
+<span class="d">@Injectable</span>()
+<span class="k">export class</span> AccessTokenStrategy <span class="k">extends</span> PassportStrategy(Strategy, <span class="s">'jwt'</span>) {
+  <span class="k">constructor</span>(config: ConfigService) {
+    <span class="k">super</span>({
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      secretOrKey: config.get(<span class="s">'JWT_ACCESS_SECRET'</span>),
+    });
+  }
+  validate(payload: { userId: string }) {
+    <span class="k">return</span> payload;                    <span class="c">// becomes req.user</span>
+  }
+}</code></pre>
+<span class="path">src/auth/access-token.guard.ts</span>
+<pre><code><span class="k">import</span> { Injectable } <span class="k">from</span> <span class="s">'@nestjs/common'</span>;
+<span class="k">import</span> { AuthGuard } <span class="k">from</span> <span class="s">'@nestjs/passport'</span>;
+
+<span class="d">@Injectable</span>()
+<span class="k">export class</span> AccessTokenGuard <span class="k">extends</span> AuthGuard(<span class="s">'jwt'</span>) {}</code></pre>
+
+<h3><span class="badge">11</span>The controller and module</h3>
+<span class="path">src/auth/auth.controller.ts</span>
+<pre><code><span class="k">import</span> { Body, Controller, Get, Post, Req, UseGuards } <span class="k">from</span> <span class="s">'@nestjs/common'</span>;
+<span class="k">import</span> { AuthService } <span class="k">from</span> <span class="s">'./auth.service'</span>;
+<span class="k">import</span> { LoginDto } <span class="k">from</span> <span class="s">'./dto/login.dto'</span>;
+<span class="k">import</span> { AccessTokenGuard } <span class="k">from</span> <span class="s">'./access-token.guard'</span>;
+
+<span class="d">@Controller</span>(<span class="s">'auth'</span>)
+<span class="k">export class</span> AuthController {
+  <span class="k">constructor</span>(<span class="k">private readonly</span> authService: AuthService) {}
+
+  <span class="d">@Post</span>(<span class="s">'register'</span>)
+  <span class="k">async</span> register(<span class="d">@Body</span>() dto: LoginDto) {
+    <span class="k">return</span> { message: <span class="s">'Registered'</span>, result: <span class="k">await this</span>.authService.register(dto.email, dto.password) };
+  }
+
+  <span class="d">@Post</span>(<span class="s">'login'</span>)
+  <span class="k">async</span> login(<span class="d">@Body</span>() dto: LoginDto) {
+    <span class="k">return</span> { message: <span class="s">'Login Success'</span>, result: <span class="k">await this</span>.authService.login(dto) };
+  }
+
+  <span class="d">@UseGuards</span>(AccessTokenGuard)
+  <span class="d">@Get</span>(<span class="s">'me'</span>)
+  me(<span class="d">@Req</span>() req) {
+    <span class="k">return</span> { message: <span class="s">'You are logged in'</span>, result: req.user };
+  }
+
+  <span class="d">@UseGuards</span>(AccessTokenGuard)
+  <span class="d">@Get</span>(<span class="s">'logout'</span>)
+  <span class="k">async</span> logout(<span class="d">@Req</span>() req) {
+    <span class="k">await this</span>.authService.logout(req.user.userId);
+    <span class="k">return</span> { message: <span class="s">'Logout Success'</span> };
+  }
+}</code></pre>
+<span class="path">src/auth/auth.module.ts</span>
+<pre><code><span class="k">import</span> { Module } <span class="k">from</span> <span class="s">'@nestjs/common'</span>;
+<span class="k">import</span> { JwtModule } <span class="k">from</span> <span class="s">'@nestjs/jwt'</span>;
+<span class="k">import</span> { PassportModule } <span class="k">from</span> <span class="s">'@nestjs/passport'</span>;
+<span class="k">import</span> { UsersModule } <span class="k">from</span> <span class="s">'../users/users.module'</span>;
+<span class="k">import</span> { AuthController } <span class="k">from</span> <span class="s">'./auth.controller'</span>;
+<span class="k">import</span> { AuthService } <span class="k">from</span> <span class="s">'./auth.service'</span>;
+<span class="k">import</span> { AccessTokenStrategy } <span class="k">from</span> <span class="s">'./access-token.strategy'</span>;
+
+<span class="d">@Module</span>({
+  imports: [UsersModule, PassportModule, JwtModule.register({})],
+  controllers: [AuthController],
+  providers: [AuthService, AccessTokenStrategy],
+})
+<span class="k">export class</span> AuthModule {}</code></pre>
+
+<h3><span class="badge">12</span>main.ts</h3>
+<span class="path">src/main.ts</span>
+<pre><code><span class="k">import</span> { NestFactory } <span class="k">from</span> <span class="s">'@nestjs/core'</span>;
+<span class="k">import</span> { ValidationPipe } <span class="k">from</span> <span class="s">'@nestjs/common'</span>;
+<span class="k">import</span> { AppModule } <span class="k">from</span> <span class="s">'./app.module'</span>;
+
+<span class="k">async function</span> bootstrap() {
+  <span class="k">const</span> app = <span class="k">await</span> NestFactory.create(AppModule);
+  app.setGlobalPrefix(<span class="s">'api/v1'</span>);
+  app.enableCors({ origin: [<span class="s">'http://localhost:3000'</span>], credentials: <span class="k">true</span> });
+  app.useGlobalPipes(<span class="k">new</span> ValidationPipe({ whitelist: <span class="k">true</span>, transform: <span class="k">true</span> }));
+  <span class="k">await</span> app.listen(3001);
+}
+bootstrap();</code></pre>
+
+<h3><span class="badge">13</span>Run it and poke it</h3>
+<pre><code>npm run start:dev</code></pre>
+<p>Then in another terminal (Git Bash), or with Postman or Thunder Client in VS Code:</p>
+<pre><code><span class="c"># register</span>
+curl -X POST http://localhost:3001/api/v1/auth/register -H "Content-Type: application/json" -d '{"email":"me@test.com","password":"password123"}'
+
+<span class="c"># login: copy the accessToken from the response</span>
+curl -X POST http://localhost:3001/api/v1/auth/login -H "Content-Type: application/json" -d '{"email":"me@test.com","password":"password123"}'
+
+<span class="c"># protected route</span>
+curl http://localhost:3001/api/v1/auth/me -H "Authorization: Bearer PASTE_ACCESS_TOKEN"
+
+<span class="c"># try breaking things</span>
+curl -X POST http://localhost:3001/api/v1/auth/login -H "Content-Type: application/json" -d '{"email":"bad","password":"1"}'
+curl http://localhost:3001/api/v1/auth/me</code></pre>
+<p>Open the database (pgAdmin, DBeaver, or the VS Code PostgreSQL extension) and look at <code>tbl_user</code>. See the bcrypt hash in the password column and the refresh hash after login. Then log out and watch the refresh hash become NULL. Seeing the data change is when it really clicks.</p>
+
+<h3><span class="badge">14</span>Level ups, one at a time</h3>
+<p>Once the basics run, add these one by one. Each maps to something in the real codebase:</p>
+<div class="tablewrap"><table>
+<tr><th>Add this</th><th>Teaches you</th><th>Real code to compare</th></tr>
+<tr><td>Refresh endpoint with a second strategy named <code>'jwt-refresh'</code></td><td>Multiple Passport strategies, token rotation</td><td><code>auth/strategies/refresh-token.strategy.ts</code></td></tr>
+<tr><td>Gmail email normalization</td><td>Pure utility functions</td><td><code>@core/utils/email-normalizer.util.ts</code></td></tr>
+<tr><td>A <code>Response</code> wrapper class</td><td>Consistent response shape</td><td><code>@core/common/dto/response.dto.ts</code></td></tr>
+<tr><td>Error message enums</td><td>Avoiding magic strings</td><td><code>auth/enum/*.enum.ts</code></td></tr>
+<tr><td>Interface plus string token injection</td><td>Coding against interfaces</td><td><code>auth/auth.module.ts</code></td></tr>
+<tr><td>A <code>BaseAbstractRepository&lt;T&gt;</code></td><td>Generics and inheritance</td><td><code>repositories/base/</code></td></tr>
+<tr><td>Emit a <code>user.login</code> event and log it in a listener</td><td>Event driven background work</td><td><code>@OnEvent</code> in <code>auth.service.ts</code></td></tr>
+<tr><td>A unit test for <code>login</code> with a fake UsersService</td><td>Why DI matters</td><td><code>auth/auth.service.spec.ts</code></td></tr>
+</table></div>
+
+<!-- ============================================================ -->
+<h2 id="quirks">8. Quirks in the real code</h2>
+<p>Reading real code means noticing what is a little off. None of these are emergencies, but spotting them is a sign you understand the flow. Discuss them with the team before changing anything.</p>
+<div class="bad"><b>The <code>if (!user)</code> check never runs</b><code>userService.getByEmail</code> already throws when no user is found, so the <code>if (!user)</code> block right after it in <code>login</code> is unreachable.</div>
+<div class="bad"><b>The source flag is written before the password check</b><code>updateTheUserSource</code> runs before <code>verifyPassword</code>, so a failed login with the wrong password still writes to the user row.</div>
+<div class="warn"><b>Account state is revealed before the password check</b>Anyone who knows an email can learn whether that account is deleted, blocked, or unverified, without knowing the password, because those checks come first and have distinct messages.</div>
+<div class="warn"><b>Three queries for one user</b><code>getByEmail</code>, <code>getPasswordByUserId</code>, and <code>updateTheUserSource</code> each fetch the same row. One query could do it.</div>
+<div class="warn"><b>One refresh token per user</b>Logging in on a new device invalidates the old device's refresh token. This may be intended, but be aware of it when debugging "I got logged out" reports.</div>
+<div class="note"><b>success and statusCode are never set</b>The <code>Response</code> class declares them, but nothing assigns them, so they never appear in JSON. The project's CLAUDE.md says an interceptor fills them; there is none. On the frontend, rely on the HTTP status code.</div>
+<div class="note"><b>expiresIn is declared but never filled</b><code>ReturnLoginDto.expiresIn</code> exists but login never sets it. The frontend can decode <code>exp</code> from the access token instead.</div>
+
+<!-- ============================================================ -->
+<h2 id="practice">9. Practice and self test</h2>
+<p>Try to answer each of these out loud without looking. If you cannot, the section in brackets has the answer.</p>
+<ol class="check">
+<li>Where does <code>/api/v1</code> come from? <i>(Step 1)</i></li>
+<li>What happens if the login body has an extra field <code>role: "admin"</code>? <i>(Step 1, whitelist)</i></li>
+<li>Why does the controller never contain <code>if</code> statements? <i>(Step 4)</i></li>
+<li>Why is <code>'AuthServiceInterface'</code> a string and not just the interface? <i>(Section 5)</i></li>
+<li>What is the difference between <code>Repository&lt;User&gt;</code> and <code>UserRepo</code>? <i>(Step 6)</i></li>
+<li>Why can't the server "decrypt" the password to check it? <i>(Step 5i)</i></li>
+<li>What three parts make up a JWT, and which part can anyone read? <i>(Glossary, Step 8)</i></li>
+<li>Why do access and refresh tokens use different secrets? <i>(Step 8)</i></li>
+<li>Why is the refresh token hashed in the database, while the access token is not stored at all? <i>(Step 8 and section 6, Refreshing)</i></li>
+<li>How does a protected route know which user is calling? <i>(Section 6)</i></li>
+<li>Why does login not wait for the domain NFT sync? <i>(Step 8, events)</i></li>
+<li>What does "Nest can't resolve dependencies" usually mean? <i>(Section 5)</i></li>
+</ol>
+<h3>Next reads in the real code</h3>
+<p>Once you can answer all of these, read <code>register</code> (right below <code>login</code> in <code>auth.service.ts</code>), then <code>refreshTokens</code> and <code>logout</code>, then <code>web3-auth</code> to see a completely different way of logging in (signing a message with a wallet). Each one reuses the exact building blocks you now understand.</p>
+
+<footer>Written against the uat branch of the Endless Domains backend (commit 543b2937). File paths are relative to <code>D:\Akshat Endless\backend\backend\</code>. Line numbers may drift as the code changes.</footer>
+</main>
+</div>
+<script>
+(function(){
+  var btn=document.getElementById('themebtn');
+  var root=document.documentElement;
+  try{var saved=localStorage.getItem('login-guide-theme');if(saved)root.setAttribute('data-theme',saved);}catch(e){}
+  btn.addEventListener('click',function(){
+    var cur=root.getAttribute('data-theme');
+    if(!cur){cur=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+    var next=cur==='dark'?'light':'dark';
+    root.setAttribute('data-theme',next);
+    try{localStorage.setItem('login-guide-theme',next);}catch(e){}
+  });
+})();
+</script>
+</body>
+</html>
