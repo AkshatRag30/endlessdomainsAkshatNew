@@ -1,0 +1,914 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CRUD From Zero</title>
+<style>
+:root{
+  --bg:#fbfaf7;--surface:#ffffff;--surface2:#f3f1ec;--text:#1f2328;--muted:#5d6470;--border:#e2ded5;
+  --accent:#2f5bd3;--accent-soft:#e8eefc;--good:#1f7a4d;--good-soft:#e5f4ec;--warn:#9a5b00;--warn-soft:#fdf1dc;
+  --bad:#b42318;--bad-soft:#fdeceb;--code-bg:#f5f3ee;--code-text:#24292f;--kw:#8a3ffc;--str:#0a7c45;--com:#7b8290;--dec:#c2410c;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121417;--surface:#1a1d21;--surface2:#22262b;--text:#e6e8eb;--muted:#a0a7b1;--border:#2f343a;
+    --accent:#7aa2ff;--accent-soft:#1d2a4a;--good:#5cc98f;--good-soft:#16301f;--warn:#f0b65a;--warn-soft:#3a2a10;
+    --bad:#ff8a80;--bad-soft:#3a1715;--code-bg:#16191d;--code-text:#e1e4e8;--kw:#c4a1ff;--str:#7ee2a8;--com:#8b949e;--dec:#ffab70;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121417;--surface:#1a1d21;--surface2:#22262b;--text:#e6e8eb;--muted:#a0a7b1;--border:#2f343a;
+  --accent:#7aa2ff;--accent-soft:#1d2a4a;--good:#5cc98f;--good-soft:#16301f;--warn:#f0b65a;--warn-soft:#3a2a10;
+  --bad:#ff8a80;--bad-soft:#3a1715;--code-bg:#16191d;--code-text:#e1e4e8;--kw:#c4a1ff;--str:#7ee2a8;--com:#8b949e;--dec:#ffab70;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.layout{display:grid;grid-template-columns:270px minmax(0,1fr);max-width:1240px;margin:0 auto}
+nav.toc{position:sticky;top:0;height:100vh;overflow-y:auto;padding:28px 18px;border-right:1px solid var(--border);font-size:14px}
+nav.toc h2{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+nav.toc a{display:block;color:var(--muted);text-decoration:none;padding:4px 8px;border-radius:6px}
+nav.toc a:hover{background:var(--surface2);color:var(--text)}
+nav.toc .sub{padding-left:20px;font-size:13px}
+main{padding:40px 48px 120px;min-width:0}
+h1{font-size:2.2rem;line-height:1.2;margin:0 0 8px}
+h2{font-size:1.6rem;margin:64px 0 12px;padding-top:12px;border-top:1px solid var(--border)}
+h3{font-size:1.2rem;margin:36px 0 8px}
+h4{font-size:1.02rem;margin:24px 0 6px}
+p{margin:0 0 14px}
+.lede{font-size:1.1rem;color:var(--muted);max-width:760px}
+a{color:var(--accent)}
+code{font-family:"Cascadia Code",Consolas,"SFMono-Regular",monospace;font-size:.88em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+pre{background:var(--code-bg);color:var(--code-text);border:1px solid var(--border);border-radius:10px;padding:16px 18px;overflow-x:auto;font-size:13.5px;line-height:1.6;margin:10px 0 16px}
+pre code{background:none;padding:0;font-size:inherit}
+.path{display:block;font-size:12px;color:var(--muted);margin:18px 0 -4px;font-family:Consolas,monospace}
+.k{color:var(--kw)}.s{color:var(--str)}.c{color:var(--com);font-style:italic}.d{color:var(--dec)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin:16px 0}
+.note,.warn,.good,.bad{border-radius:10px;padding:14px 18px;margin:16px 0;border-left:4px solid}
+.note{background:var(--accent-soft);border-color:var(--accent)}
+.warn{background:var(--warn-soft);border-color:var(--warn)}
+.good{background:var(--good-soft);border-color:var(--good)}
+.bad{background:var(--bad-soft);border-color:var(--bad)}
+.note b:first-child,.warn b:first-child,.good b:first-child,.bad b:first-child{display:block;margin-bottom:4px}
+table{width:100%;border-collapse:collapse;margin:10px 0 20px;font-size:14.5px}
+th,td{text-align:left;vertical-align:top;padding:9px 12px;border-bottom:1px solid var(--border)}
+th{background:var(--surface2);font-weight:600}
+td:first-child{white-space:nowrap}
+.tablewrap{overflow-x:auto}
+.flow{display:flex;flex-direction:column;margin:20px 0}
+.flow .box{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px}
+.flow .box b{color:var(--accent)}
+.flow .arrow{text-align:center;color:var(--muted);font-size:18px;line-height:28px}
+.glossary dt{font-weight:700;margin-top:16px;font-family:Consolas,monospace;color:var(--accent)}
+.glossary dd{margin:4px 0 0 0}
+.badge{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);margin-right:6px;vertical-align:middle}
+.verb{display:inline-block;font-family:Consolas,monospace;font-size:12px;font-weight:700;padding:2px 8px;border-radius:6px;color:#fff}
+.v-post{background:#1f7a4d}.v-get{background:#2f5bd3}.v-patch{background:#9a5b00}.v-delete{background:#b42318}
+.check li{margin:6px 0}
+footer{color:var(--muted);font-size:13px;margin-top:80px;border-top:1px solid var(--border);padding-top:16px}
+.themebtn{position:fixed;top:14px;right:14px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px;z-index:5}
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr}
+  nav.toc{position:static;height:auto;border-right:none;border-bottom:1px solid var(--border);padding:16px}
+  main{padding:24px 16px 80px}
+  h1{font-size:1.7rem}
+}
+</style>
+</head>
+<body>
+<button class="themebtn" id="themebtn" type="button">Toggle theme</button>
+<div class="layout">
+<nav class="toc">
+  <h2>Contents</h2>
+  <a href="#start">0. Before you start</a>
+  <a href="#what">1. What CRUD really means</a>
+  <a href="#words">2. New words for this guide</a>
+  <a href="#real">3. A real CRUD module: favorites</a>
+  <a href="#design">4. Design before code</a>
+  <a href="#build">5. Build it step by step</a>
+  <a class="sub" href="#b1">5.1 Folder and module</a>
+  <a class="sub" href="#b2">5.2 Entity and relation</a>
+  <a class="sub" href="#b3">5.3 DTOs</a>
+  <a class="sub" href="#b4">5.4 Repository</a>
+  <a class="sub" href="#b5">5.5 Service</a>
+  <a class="sub" href="#b6">5.6 Controller</a>
+  <a class="sub" href="#b7">5.7 Wire it up</a>
+  <a href="#ops">6. Each operation, deep dive</a>
+  <a class="sub" href="#op-c">Create</a>
+  <a class="sub" href="#op-r">Read list and pagination</a>
+  <a class="sub" href="#op-r1">Read one</a>
+  <a class="sub" href="#op-u">Update</a>
+  <a class="sub" href="#op-d">Delete</a>
+  <a href="#security">7. Ownership and security</a>
+  <a href="#errors">8. Errors and status codes</a>
+  <a href="#test">9. Try it with curl</a>
+  <a href="#unit">10. Your first unit test</a>
+  <a href="#mistakes">11. Common beginner mistakes</a>
+  <a href="#levelup">12. Level ups and self test</a>
+</nav>
+<main>
+
+<h1>CRUD, from absolute zero</h1>
+<p class="lede">The sequel to <code>LOGIN-FROM-ZERO.html</code>. You now have users who can log in. Next you'll let them create, read, update and delete their own data. This is the work you'll do most often as a backend engineer.</p>
+
+<!-- ============================================================ -->
+<h2 id="start">0. Before you start</h2>
+<p>This guide builds on the <code>login-practice</code> project from section 7 of the login guide. You need it running, with register, login and the <code>/auth/me</code> route working, before you continue. If <code>/auth/me</code> returns your user id when you send a Bearer token, you're ready.</p>
+<p>We'll build a <b>domain listings</b> feature, a tiny version of the Endless Domains marketplace. A logged in user can list a domain for sale with a price, see everyone's listings, edit their own, and remove their own. It is small enough to finish in an evening and realistic enough that every concept you'll meet at work shows up.</p>
+<div class="note"><b>Same rule as before</b>Type everything by hand in your practice project. Keep the real backend repo open only for reading and comparing.</div>
+
+<!-- ============================================================ -->
+<h2 id="what">1. What CRUD really means</h2>
+<p>CRUD stands for <b>Create, Read, Update, Delete</b>, the four things you can do with stored data. Almost every feature in the Endless Domains backend is CRUD in a costume. The cart lets you add, view and remove items. Favorites lets you add, view and remove domains. Listings, coupons, watchlist and affiliate keys all follow the same pattern. Once you can build one cleanly, you can build all of them.</p>
+<p>In a REST API, each CRUD operation maps to an HTTP method and a URL pattern. Learn this table by heart; the whole industry uses it.</p>
+<div class="tablewrap"><table>
+<tr><th>Operation</th><th>HTTP</th><th>URL</th><th>SQL underneath</th><th>Success status</th></tr>
+<tr><td>Create</td><td><span class="verb v-post">POST</span></td><td><code>/listings</code></td><td><code>INSERT</code></td><td>201 Created</td></tr>
+<tr><td>Read many</td><td><span class="verb v-get">GET</span></td><td><code>/listings?page=1&amp;limit=10</code></td><td><code>SELECT ... LIMIT OFFSET</code></td><td>200 OK</td></tr>
+<tr><td>Read one</td><td><span class="verb v-get">GET</span></td><td><code>/listings/:id</code></td><td><code>SELECT ... WHERE id =</code></td><td>200 OK</td></tr>
+<tr><td>Update</td><td><span class="verb v-patch">PATCH</span></td><td><code>/listings/:id</code></td><td><code>UPDATE ... WHERE id =</code></td><td>200 OK</td></tr>
+<tr><td>Delete</td><td><span class="verb v-delete">DELETE</span></td><td><code>/listings/:id</code></td><td><code>DELETE</code> or soft delete <code>UPDATE</code></td><td>200 OK (or 204 No Content)</td></tr>
+</table></div>
+<p>Notice that the URL names the <b>thing</b> (a plural noun, <code>listings</code>), and the HTTP method says what to <b>do</b> with it. You don't write <code>/createListing</code> or <code>/deleteListing</code>. Some older routes in this backend break that rule, and that's fine to notice, but new code should follow it.</p>
+
+<h3>PUT versus PATCH</h3>
+<p><code>PUT</code> means "replace the whole thing with what I send". If you leave out a field, it should be cleared. <code>PATCH</code> means "change only the fields I send". Frontends almost always want PATCH, because an edit form usually changes one or two fields. We'll use PATCH.</p>
+
+<!-- ============================================================ -->
+<h2 id="words">2. New words for this guide</h2>
+<p>The login guide's dictionary still applies. These are the new terms you'll meet here.</p>
+<dl class="glossary">
+<dt>Resource</dt><dd>The "thing" an endpoint is about. Here, a listing. Each resource gets a URL.</dd>
+<dt>Path parameter <code>:id</code></dt><dd>A variable piece of the URL. In <code>/listings/7f3a...</code>, the id is the path parameter. Read it with <code>@Param('id')</code>.</dd>
+<dt>Query parameter <code>?page=2</code></dt><dd>Optional settings after the <code>?</code>, used for filtering, sorting and paging. Read them with <code>@Query()</code>. They always arrive as <b>strings</b>, which matters a lot (see <a href="#op-r">pagination</a>).</dd>
+<dt>Pagination</dt><dd>Returning a large list in small pages instead of all at once. <code>limit</code> is how many per page. <code>skip</code> (or offset) is how many rows to skip, which equals <code>(page - 1) * limit</code>.</dd>
+<dt>Relation</dt><dd>A link between two tables. Each listing belongs to one user, and one user has many listings. In the database this is a <b>foreign key</b> column, <code>ownerId</code>, that holds a user's id.</dd>
+<dt>Foreign key</dt><dd>A column whose value must exist as an id in another table. The database refuses a listing whose <code>ownerId</code> points to a user who doesn't exist.</dd>
+<dt><code>@ManyToOne</code> / <code>@OneToMany</code></dt><dd>TypeORM decorators that describe a relation. "Many listings to one user."</dd>
+<dt>Soft delete</dt><dd>Instead of removing a row, set <code>isDeleted = true</code> (or a <code>deletedAt</code> date) and hide it from queries. The data can be recovered and history stays intact. This backend's <code>BaseEntity</code> has <code>isDeleted</code> for exactly this.</dd>
+<dt>Hard delete</dt><dd>Actually remove the row with <code>DELETE</code>. Gone for good.</dd>
+<dt>Ownership / authorization</dt><dd><b>Authentication</b> asks "who are you?" and login answers it. <b>Authorization</b> asks "are you allowed to do this?" For example, may this user edit this particular listing? This guide is mostly about authorization.</dd>
+<dt><code>ParseUUIDPipe</code></dt><dd>A built in NestJS pipe that rejects a path parameter that isn't a valid UUID, before your code runs.</dd>
+<dt><code>PartialType</code></dt><dd>A helper that takes a DTO and makes every field optional. That's perfect for an update DTO built from the create DTO.</dd>
+<dt><code>@Type(() =&gt; Number)</code></dt><dd>A class transformer decorator that converts a value to a number before validation. Needed for query params, because they arrive as strings.</dd>
+<dt><code>findAndCount</code></dt><dd>A TypeORM method that returns <code>[rows, totalCount]</code> in one call. It's what pagination needs.</dd>
+<dt>Idempotent</dt><dd>Doing it twice has the same effect as doing it once. GET, PUT and DELETE should be idempotent; POST usually is not, because two POSTs create two rows.</dd>
+<dt>Unit test / mock</dt><dd>A test of one class in isolation. Its dependencies are replaced with <b>mocks</b>, fake objects that you control.</dd>
+</dl>
+
+<!-- ============================================================ -->
+<h2 id="real">3. A real CRUD module: favorites</h2>
+<p>Before building, look at how the real backend does it. The favorites module is the smallest complete example: <code>src/components/domain/domain-favorite/</code>. It lets a logged in user favorite domains, list their favorites, and remove them.</p>
+<div class="tablewrap"><table>
+<tr><th>File</th><th>Role</th></tr>
+<tr><td><code>enity/domain-favorite-entity.entity.ts</code></td><td>The table <code>tbl_fav_domain</code> (the folder name typo "enity" is real)</td></tr>
+<tr><td><code>dto/create-fav-domain.dto.ts</code></td><td>Body rules for adding a favorite</td></tr>
+<tr><td><code>dto/bulk-delete-fav-domain.dto.ts</code></td><td>Body rules for deleting several at once</td></tr>
+<tr><td><code>interface/*.interface.ts</code></td><td>Contracts for the service and repo</td></tr>
+<tr><td><code>domain-favorite-repo.service.ts</code></td><td>The repository (queries)</td></tr>
+<tr><td><code>domain-favorite-data-mutation.ts</code></td><td>Turns a DTO into an entity</td></tr>
+<tr><td><code>domain-favorite.service.ts</code></td><td>Business logic</td></tr>
+<tr><td><code>domain-favorite.controller.ts</code></td><td>Routes</td></tr>
+<tr><td><code>domain-favorite.module.ts</code></td><td>Wiring</td></tr>
+<tr><td><code>enum/DomainFavSuccessMessage.enum.ts</code></td><td>Response messages</td></tr>
+</table></div>
+
+<h3>The entity</h3>
+<span class="path">src/components/domain/domain-favorite/enity/domain-favorite-entity.entity.ts</span>
+<pre><code><span class="d">@Entity</span>({ name: <span class="s">'tbl_fav_domain'</span> })
+<span class="k">export class</span> DomainFavoriteEntity <span class="k">extends</span> BaseEntity {
+    <span class="d">@Column</span>({ nullable: <span class="k">false</span> }) domain_name: string;
+    <span class="d">@Column</span>({ nullable: <span class="k">false</span> }) domain_provider: string;
+    <span class="d">@Column</span>({ nullable: <span class="k">false</span> }) user_id: string;
+    <span class="d">@Column</span>({ unique: <span class="k">true</span>, nullable: <span class="k">false</span> }) fav_unique_identifier: string;
+}</code></pre>
+<p><code>user_id</code> is a plain string column, not a real relation. It works, but the database won't stop a favorite from pointing at a user who doesn't exist. <code>fav_unique_identifier</code> is <code>domainName~provider~userId</code> glued together with a unique constraint, a trick that stops the same user favoriting the same domain twice.</p>
+
+<h3>The controller</h3>
+<span class="path">src/components/domain/domain-favorite/domain-favorite.controller.ts (trimmed)</span>
+<pre><code><span class="d">@Controller</span>(<span class="s">'domain/favorite'</span>)
+<span class="k">export class</span> DomainFavoriteController {
+    <span class="k">constructor</span>(
+        <span class="d">@Inject</span>(<span class="s">'DomainFavoriteServiceInterface'</span>)
+        <span class="k">private readonly</span> domainFavoriteService: DomainFavoriteServiceInterface
+    ) {}
+
+    <span class="d">@Post</span>()
+    <span class="d">@HttpCode</span>(HttpStatus.OK)
+    <span class="d">@UseGuards</span>(AccessTokenGuard)
+    <span class="k">public async</span> addFavDomain(<span class="d">@Body</span>() createFavDomain: CreateFavoriteDomainDto, <span class="d">@Req</span>() req: Request): Promise&lt;Response&gt; {
+        <span class="k">const</span> userId = req.user[<span class="s">'userId'</span>];
+        <span class="k">return new</span> Response(DomainFavSuccessMessage.FAVORITE_DOMAIN_ADD_SUCCESSFUL,
+            <span class="k">await this</span>.domainFavoriteService.createFavoriteDomain(createFavDomain, userId));
+    }
+
+    <span class="d">@Delete</span>(<span class="s">':favDomainId'</span>)
+    <span class="d">@UseGuards</span>(AccessTokenGuard)
+    <span class="k">public async</span> deleteFromFavDomain(<span class="d">@Param</span>(<span class="s">'favDomainId'</span>) favDomainId: string, <span class="d">@Req</span>() req: Request) { <span class="c">/* ... */</span> }
+
+    <span class="d">@Get</span>()
+    <span class="d">@UseGuards</span>(AccessTokenGuard)
+    <span class="k">public async</span> getFavDomainByUser(<span class="d">@Req</span>() req: Request) { <span class="c">/* ... */</span> }
+}</code></pre>
+<p>Three ideas to notice. First, <code>@HttpCode(HttpStatus.OK)</code> overrides the default 201 for POST with 200. Second, every route reads <code>req.user['userId']</code>, which the access token guard put there, so the user id <b>always comes from the token, never from the body</b>. Third, <code>@Param('favDomainId')</code> pulls the id out of the URL.</p>
+
+<h3>The repository</h3>
+<span class="path">src/components/domain/domain-favorite/domain-favorite-repo.service.ts (trimmed)</span>
+<pre><code><span class="k">async</span> findAllFavoriteDomainByUserId(userId: string): Promise&lt;DomainFavoriteEntity[]&gt; {
+    <span class="k">try</span> {
+        <span class="k">return this</span>.favDomainRepo.find({ where: { user_id: userId } });
+    } <span class="k">catch</span> (e) {
+        <span class="k">this</span>.customLoggerService.error(<span class="s">'error===&gt;'</span>, e);
+        <span class="k">throw new</span> InternalServerErrorException(<span class="s">'Something went wrong'</span>);
+    }
+}
+
+<span class="k">async</span> addIfNotExistsByUserId(favDomain: DomainFavoriteEntity): Promise&lt;<span class="k">void</span>&gt; {
+    <span class="k">await this</span>.favDomainRepo.createQueryBuilder().insert().values(favDomain).orIgnore().execute();
+}
+
+<span class="k">async</span> removeFavDomainByUserIdAndFavDomainId(userId: string, favDomainId: string[]): Promise&lt;<span class="k">void</span>&gt; {
+    <span class="k">await this</span>.favDomainRepo.createQueryBuilder().delete()
+        .where(<span class="s">'user_id = :userId'</span>, { userId: userId })
+        .andWhere(<span class="s">'id in (:...id)'</span>, { id: favDomainId })
+        .execute();
+}</code></pre>
+<p><code>.orIgnore()</code> means "if this would break the unique constraint, quietly do nothing". That makes adding a favorite safe to repeat (idempotent). The delete is a good pattern: the <code>WHERE</code> includes <b>both</b> the item id and the user id, so a user can never delete someone else's favorite even if they guess its id. <code>:...id</code> expands an array into <code>IN ('a','b','c')</code>.</p>
+
+<h3>What favorites teaches, and what it skips</h3>
+<div class="good"><b>Good patterns to copy</b>The user id always comes from the token. The delete filters by owner. Adding a favorite twice is safe because of the unique key and <code>orIgnore</code>.</div>
+<div class="warn"><b>Things to do differently</b>There is no <b>Update</b>, so it's really CRD, not CRUD. The list has no pagination. Delete always says success, even when nothing matched. The <code>try</code> in <code>findAllFavoriteDomainByUserId</code> never catches anything, because <code>return this.favDomainRepo.find(...)</code> returns the promise without <code>await</code>; if the query fails, the rejection escapes the <code>try</code> before it can be caught (more in <a href="#mistakes">section 11</a>). <code>user_id</code> is not a real foreign key.</div>
+<p>Our listings feature will keep the good patterns and fix every item in that second box.</p>
+
+<!-- ============================================================ -->
+<h2 id="design">4. Design before code</h2>
+<p>Experienced engineers spend ten minutes on paper before touching code. Answer these four questions for every CRUD feature.</p>
+
+<h3>Question 1: What does the data look like?</h3>
+<div class="tablewrap"><table>
+<tr><th>Column</th><th>Type</th><th>Rules</th></tr>
+<tr><td><code>id</code></td><td>uuid</td><td>Generated</td></tr>
+<tr><td><code>domainName</code></td><td>varchar</td><td>Required, lowercase, like <code>coffee.eth</code></td></tr>
+<tr><td><code>price</code></td><td>numeric(12,2)</td><td>Required, above 0, in USD</td></tr>
+<tr><td><code>description</code></td><td>varchar(500)</td><td>Optional</td></tr>
+<tr><td><code>status</code></td><td>enum</td><td><code>active</code>, <code>paused</code> or <code>sold</code>. Default <code>active</code></td></tr>
+<tr><td><code>ownerId</code></td><td>uuid, foreign key to <code>tbl_user.id</code></td><td>Set from the token, never from the body</td></tr>
+<tr><td><code>isDeleted</code></td><td>boolean</td><td>Soft delete flag, default false</td></tr>
+<tr><td><code>createdAt</code>, <code>updatedAt</code></td><td>timestamptz</td><td>Automatic</td></tr>
+</table></div>
+<p>There's also one business rule: a domain can have only <b>one active listing at a time</b>.</p>
+
+<h3>Question 2: What endpoints, and who may call them?</h3>
+<div class="tablewrap"><table>
+<tr><th>Endpoint</th><th>Who</th><th>Purpose</th></tr>
+<tr><td><span class="verb v-post">POST</span> <code>/listings</code></td><td>Logged in</td><td>Create a listing owned by me</td></tr>
+<tr><td><span class="verb v-get">GET</span> <code>/listings</code></td><td>Anyone</td><td>Browse active listings with search, sort and pages</td></tr>
+<tr><td><span class="verb v-get">GET</span> <code>/listings/mine</code></td><td>Logged in</td><td>My listings in every status</td></tr>
+<tr><td><span class="verb v-get">GET</span> <code>/listings/:id</code></td><td>Anyone</td><td>One listing's details</td></tr>
+<tr><td><span class="verb v-patch">PATCH</span> <code>/listings/:id</code></td><td>Owner only</td><td>Change price, description or status</td></tr>
+<tr><td><span class="verb v-delete">DELETE</span> <code>/listings/:id</code></td><td>Owner only</td><td>Soft delete</td></tr>
+</table></div>
+
+<h3>Question 3: What can go wrong?</h3>
+<p>The body might be invalid (400). The user might not be logged in (401). The listing might not exist or might be deleted (404). The user might not own it (403). The domain might already have an active listing (409 Conflict). The id in the URL might not be a UUID (400). Writing these down now means you won't forget them later.</p>
+
+<h3>Question 4: What does each response look like?</h3>
+<p>Use the same envelope as the real backend, <code>{ message, result }</code>. Paginated lists put the items and the paging info inside <code>result</code>.</p>
+
+<!-- ============================================================ -->
+<h2 id="build">5. Build it step by step</h2>
+
+<h3 id="b1"><span class="badge">5.1</span>Folder and module</h3>
+<pre><code>cd login-practice
+npm i @nestjs/mapped-types
+nest g module listings
+nest g controller listings --no-spec
+nest g service listings
+</code></pre>
+<p><code>@nestjs/mapped-types</code> gives you <code>PartialType</code>. We keep the <code>.spec.ts</code> file for the service this time, because you'll write a test for it in section 10. Create the rest by hand until your folder looks like this:</p>
+<pre><code>src/listings/
+  dto/
+    create-listing.dto.ts
+    update-listing.dto.ts
+    list-listings-query.dto.ts
+  listing-status.enum.ts
+  listing.entity.ts
+  listings.repo.ts
+  listings.service.ts
+  listings.service.spec.ts
+  listings.controller.ts
+  listings.module.ts</code></pre>
+
+<h3 id="b2"><span class="badge">5.2</span>Entity and relation</h3>
+<span class="path">src/listings/listing-status.enum.ts</span>
+<pre><code><span class="k">export enum</span> ListingStatus {
+  ACTIVE = <span class="s">'active'</span>,
+  PAUSED = <span class="s">'paused'</span>,
+  SOLD = <span class="s">'sold'</span>,
+}</code></pre>
+<span class="path">src/listings/listing.entity.ts</span>
+<pre><code><span class="k">import</span> {
+  Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne,
+  PrimaryGeneratedColumn, UpdateDateColumn,
+} <span class="k">from</span> <span class="s">'typeorm'</span>;
+<span class="k">import</span> { User } <span class="k">from</span> <span class="s">'../users/user.entity'</span>;
+<span class="k">import</span> { ListingStatus } <span class="k">from</span> <span class="s">'./listing-status.enum'</span>;
+
+<span class="d">@Entity</span>({ name: <span class="s">'tbl_listing'</span> })
+<span class="d">@Index</span>([<span class="s">'status'</span>, <span class="s">'isDeleted'</span>])
+<span class="k">export class</span> Listing {
+  <span class="d">@PrimaryGeneratedColumn</span>(<span class="s">'uuid'</span>)
+  id: string;
+
+  <span class="d">@Column</span>()
+  domainName: string;
+
+  <span class="d">@Column</span>({ type: <span class="s">'numeric'</span>, precision: 12, scale: 2,
+    transformer: { to: (v: number) =&gt; v, from: (v: string) =&gt; Number(v) } })
+  price: number;
+
+  <span class="d">@Column</span>({ length: 500, nullable: <span class="k">true</span> })
+  description: string | <span class="k">null</span>;
+
+  <span class="d">@Column</span>({ type: <span class="s">'enum'</span>, enum: ListingStatus, <span class="k">default</span>: ListingStatus.ACTIVE })
+  status: ListingStatus;
+
+  <span class="d">@Column</span>()
+  ownerId: string;
+
+  <span class="d">@ManyToOne</span>(() =&gt; User, { onDelete: <span class="s">'CASCADE'</span> })
+  <span class="d">@JoinColumn</span>({ name: <span class="s">'ownerId'</span> })
+  owner: User;
+
+  <span class="d">@Column</span>({ <span class="k">default</span>: <span class="k">false</span> })
+  isDeleted: boolean;
+
+  <span class="d">@CreateDateColumn</span>({ type: <span class="s">'timestamptz'</span> })
+  createdAt: Date;
+
+  <span class="d">@UpdateDateColumn</span>({ type: <span class="s">'timestamptz'</span> })
+  updatedAt: Date;
+}</code></pre>
+<div class="tablewrap"><table>
+<tr><th>Piece</th><th>Meaning</th></tr>
+<tr><td><code>@Index(['status', 'isDeleted'])</code></td><td>The public list always filters on these two columns, so index them together.</td></tr>
+<tr><td><code>type: 'numeric', precision: 12, scale: 2</code></td><td>Exact decimal with up to 12 digits, 2 after the point. <b>Never store money as a float</b>; <code>0.1 + 0.2</code> is not <code>0.3</code> in floating point.</td></tr>
+<tr><td><code>transformer</code></td><td>PostgreSQL returns numeric columns as <b>strings</b> (<code>"25.00"</code>) so no precision is lost. This converts them back to a JS number on read. Fine for practice; real payment code often keeps them as strings or uses a decimal library.</td></tr>
+<tr><td><code>type: 'enum', enum: ListingStatus</code></td><td>The database itself refuses any status not in the list.</td></tr>
+<tr><td><code>@Column() ownerId</code></td><td>The plain foreign key column. Handy because you can filter on it without loading the user.</td></tr>
+<tr><td><code>@ManyToOne(() =&gt; User)</code></td><td>"Many listings belong to one user." Creates a real foreign key constraint. The arrow function avoids import order problems between files that reference each other.</td></tr>
+<tr><td><code>onDelete: 'CASCADE'</code></td><td>If the user row is hard deleted, the database deletes their listings too.</td></tr>
+<tr><td><code>@JoinColumn({ name: 'ownerId' })</code></td><td>"Use the <code>ownerId</code> column I already declared as the foreign key", instead of TypeORM inventing its own column.</td></tr>
+<tr><td><code>owner: User</code></td><td>Lets you load the user object with the listing when you ask for it (<code>relations: ['owner']</code>). It is not loaded by default.</td></tr>
+</table></div>
+<div class="note"><b>Compare with the real code</b>The favorites entity uses a plain <code>user_id</code> string without <code>@ManyToOne</code>. Ours gives you a real foreign key, so the database guards your data even if your code has a bug.</div>
+
+<h3 id="b3"><span class="badge">5.3</span>DTOs</h3>
+<p>You need three: one for the create body, one for the update body, and one for the list query string.</p>
+<span class="path">src/listings/dto/create-listing.dto.ts</span>
+<pre><code><span class="k">import</span> { Transform } <span class="k">from</span> <span class="s">'class-transformer'</span>;
+<span class="k">import</span> { IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, Matches, MaxLength } <span class="k">from</span> <span class="s">'class-validator'</span>;
+
+<span class="k">export class</span> CreateListingDto {
+  <span class="d">@Transform</span>(({ value }) =&gt; (<span class="k">typeof</span> value === <span class="s">'string'</span> ? value.trim().toLowerCase() : value))
+  <span class="d">@IsString</span>()
+  <span class="d">@IsNotEmpty</span>()
+  <span class="d">@Matches</span>(<span class="s">/^[a-z0-9-]+\.[a-z0-9]+$/</span>, { message: <span class="s">'domainName must look like name.tld'</span> })
+  domainName: string;
+
+  <span class="d">@IsNumber</span>({ maxDecimalPlaces: 2 })
+  <span class="d">@IsPositive</span>()
+  price: number;
+
+  <span class="d">@IsOptional</span>()
+  <span class="d">@IsString</span>()
+  <span class="d">@MaxLength</span>(500)
+  description?: string;
+}</code></pre>
+<div class="tablewrap"><table>
+<tr><th>Decorator</th><th>Meaning</th></tr>
+<tr><td><code>@Transform(...)</code></td><td>Clean the value <b>before</b> validation: trim spaces, lowercase. <code>"  Coffee.ETH "</code> becomes <code>"coffee.eth"</code>. Works because the global pipe has <code>transform: true</code>.</td></tr>
+<tr><td><code>@Matches(regex)</code></td><td>Must match the pattern: letters, digits or dashes, then a dot, then a TLD.</td></tr>
+<tr><td><code>@IsNumber({ maxDecimalPlaces: 2 })</code></td><td>A real JSON number, not the string <code>"25"</code>, with at most 2 decimals.</td></tr>
+<tr><td><code>@IsPositive()</code></td><td>Greater than zero.</td></tr>
+<tr><td><code>@IsOptional()</code></td><td>If the field is missing or null, skip the other checks for it.</td></tr>
+<tr><td><code>@MaxLength(500)</code></td><td>Matches the column length so the database never rejects it.</td></tr>
+</table></div>
+<p>Notice what is <b>not</b> in this DTO: <code>ownerId</code>, <code>status</code>, <code>id</code>, <code>isDeleted</code>. The client must never control those. Because of <code>whitelist: true</code>, if someone sends <code>"ownerId": "someone-else"</code>, it is stripped before your code sees it. This protection is called preventing <b>mass assignment</b>.</p>
+
+<span class="path">src/listings/dto/update-listing.dto.ts</span>
+<pre><code><span class="k">import</span> { PartialType } <span class="k">from</span> <span class="s">'@nestjs/mapped-types'</span>;
+<span class="k">import</span> { IsEnum, IsOptional } <span class="k">from</span> <span class="s">'class-validator'</span>;
+<span class="k">import</span> { CreateListingDto } <span class="k">from</span> <span class="s">'./create-listing.dto'</span>;
+<span class="k">import</span> { ListingStatus } <span class="k">from</span> <span class="s">'../listing-status.enum'</span>;
+
+<span class="k">export class</span> UpdateListingDto <span class="k">extends</span> PartialType(CreateListingDto) {
+  <span class="d">@IsOptional</span>()
+  <span class="d">@IsEnum</span>(ListingStatus)
+  status?: ListingStatus;
+}</code></pre>
+<p><code>PartialType(CreateListingDto)</code> copies every field <b>and its validation rules</b> from the create DTO and makes them all optional. So you can send only <code>{ "price": 30 }</code>, but if you send a price, it must still be a positive number. Then we add <code>status</code>, which you can change on update but not set on create. If you later add a field to <code>CreateListingDto</code>, the update DTO picks it up automatically.</p>
+
+<span class="path">src/listings/dto/list-listings-query.dto.ts</span>
+<pre><code><span class="k">import</span> { Type } <span class="k">from</span> <span class="s">'class-transformer'</span>;
+<span class="k">import</span> { IsIn, IsInt, IsOptional, IsString, Max, MaxLength, Min } <span class="k">from</span> <span class="s">'class-validator'</span>;
+
+<span class="k">export class</span> ListListingsQueryDto {
+  <span class="d">@IsOptional</span>() <span class="d">@Type</span>(() =&gt; Number) <span class="d">@IsInt</span>() <span class="d">@Min</span>(1)
+  page: number = 1;
+
+  <span class="d">@IsOptional</span>() <span class="d">@Type</span>(() =&gt; Number) <span class="d">@IsInt</span>() <span class="d">@Min</span>(1) <span class="d">@Max</span>(50)
+  limit: number = 10;
+
+  <span class="d">@IsOptional</span>() <span class="d">@IsString</span>() <span class="d">@MaxLength</span>(100)
+  search?: string;
+
+  <span class="d">@IsOptional</span>() <span class="d">@IsIn</span>([<span class="s">'newest'</span>, <span class="s">'price_asc'</span>, <span class="s">'price_desc'</span>])
+  sort: <span class="s">'newest'</span> | <span class="s">'price_asc'</span> | <span class="s">'price_desc'</span> = <span class="s">'newest'</span>;
+}</code></pre>
+<p>This one matters more than it looks. <code>?page=2</code> arrives as the <b>string</b> <code>"2"</code>. <code>@Type(() =&gt; Number)</code> turns it into the number <code>2</code> so that <code>@IsInt</code> passes and your math works. Without it, <code>(page - 1) * limit</code> would still work by accident in JS, but <code>page + 1</code> would give <code>"21"</code>. <code>= 1</code> and <code>= 10</code> are defaults when the parameter is missing. <code>@Max(50)</code> stops someone asking for a million rows at once and slowing your database down. <code>@IsIn</code> limits sort to known values, so nobody can inject an arbitrary column name.</p>
+
+<h3 id="b4"><span class="badge">5.4</span>Repository</h3>
+<span class="path">src/listings/listings.repo.ts</span>
+<pre><code><span class="k">import</span> { Injectable } <span class="k">from</span> <span class="s">'@nestjs/common'</span>;
+<span class="k">import</span> { InjectRepository } <span class="k">from</span> <span class="s">'@nestjs/typeorm'</span>;
+<span class="k">import</span> { Repository } <span class="k">from</span> <span class="s">'typeorm'</span>;
+<span class="k">import</span> { Listing } <span class="k">from</span> <span class="s">'./listing.entity'</span>;
+<span class="k">import</span> { ListingStatus } <span class="k">from</span> <span class="s">'./listing-status.enum'</span>;
+<span class="k">import</span> { ListListingsQueryDto } <span class="k">from</span> <span class="s">'./dto/list-listings-query.dto'</span>;
+
+<span class="d">@Injectable</span>()
+<span class="k">export class</span> ListingsRepo {
+  <span class="k">constructor</span>(<span class="d">@InjectRepository</span>(Listing) <span class="k">private readonly</span> repo: Repository&lt;Listing&gt;) {}
+
+  create(data: Partial&lt;Listing&gt;): Promise&lt;Listing&gt; {
+    <span class="k">return this</span>.repo.save(<span class="k">this</span>.repo.create(data));
+  }
+
+  findActiveById(id: string): Promise&lt;Listing | <span class="k">null</span>&gt; {
+    <span class="k">return this</span>.repo.findOne({ where: { id, isDeleted: <span class="k">false</span> } });
+  }
+
+  findActiveByDomain(domainName: string): Promise&lt;Listing | <span class="k">null</span>&gt; {
+    <span class="k">return this</span>.repo.findOne({ where: { domainName, status: ListingStatus.ACTIVE, isDeleted: <span class="k">false</span> } });
+  }
+
+  findMine(ownerId: string): Promise&lt;Listing[]&gt; {
+    <span class="k">return this</span>.repo.find({ where: { ownerId, isDeleted: <span class="k">false</span> }, order: { createdAt: <span class="s">'DESC'</span> } });
+  }
+
+  <span class="k">async</span> findPublicPage(q: ListListingsQueryDto): Promise&lt;[Listing[], number]&gt; {
+    <span class="k">const</span> qb = <span class="k">this</span>.repo.createQueryBuilder(<span class="s">'l'</span>)
+      .where(<span class="s">'l.isDeleted = false'</span>)
+      .andWhere(<span class="s">'l.status = :status'</span>, { status: ListingStatus.ACTIVE });
+
+    <span class="k">if</span> (q.search) {
+      qb.andWhere(<span class="s">'l.domainName ILIKE :search'</span>, { search: <span class="s">`%${q.search}%`</span> });
+    }
+
+    <span class="k">if</span> (q.sort === <span class="s">'price_asc'</span>) qb.orderBy(<span class="s">'l.price'</span>, <span class="s">'ASC'</span>);
+    <span class="k">else if</span> (q.sort === <span class="s">'price_desc'</span>) qb.orderBy(<span class="s">'l.price'</span>, <span class="s">'DESC'</span>);
+    <span class="k">else</span> qb.orderBy(<span class="s">'l.createdAt'</span>, <span class="s">'DESC'</span>);
+
+    <span class="k">return</span> qb.skip((q.page - 1) * q.limit).take(q.limit).getManyAndCount();
+  }
+
+  <span class="k">async</span> update(id: string, data: Partial&lt;Listing&gt;): Promise&lt;Listing&gt; {
+    <span class="k">await this</span>.repo.update({ id }, data);
+    <span class="k">return this</span>.repo.findOneOrFail({ where: { id } });
+  }
+
+  <span class="k">async</span> softDelete(id: string): Promise&lt;<span class="k">void</span>&gt; {
+    <span class="k">await this</span>.repo.update({ id }, { isDeleted: <span class="k">true</span> });
+  }
+}</code></pre>
+<div class="tablewrap"><table>
+<tr><th>Piece</th><th>Meaning</th></tr>
+<tr><td><code>this.repo.create(data)</code></td><td>Builds a <code>Listing</code> object in memory. It does <b>not</b> touch the database. The name is confusing; think of it as "new Listing with these fields".</td></tr>
+<tr><td><code>this.repo.save(entity)</code></td><td>Runs <code>INSERT</code> (or <code>UPDATE</code> if it has an existing id) and returns the row with its generated id and dates.</td></tr>
+<tr><td><code>isDeleted: false</code> everywhere</td><td>Soft delete only works if <b>every</b> read filters out deleted rows. Forgetting this once leaks "deleted" data. That's why it lives in the repo, written once per method.</td></tr>
+<tr><td><code>createQueryBuilder('l')</code></td><td>Start building SQL by hand, with <code>l</code> as a short alias for the listing table.</td></tr>
+<tr><td><code>:status</code>, <code>:search</code></td><td><b>Parameters.</b> TypeORM sends the values separately from the SQL text, so a search like <code>'; DROP TABLE</code> is treated as plain text, not code. Never glue user input into the SQL string yourself; that's how <b>SQL injection</b> happens.</td></tr>
+<tr><td><code>ILIKE '%coffee%'</code></td><td>Case insensitive "contains". <code>%</code> means "anything here".</td></tr>
+<tr><td><code>.skip(...).take(...)</code></td><td>OFFSET and LIMIT. Page 3 with limit 10 skips 20 rows and takes 10.</td></tr>
+<tr><td><code>getManyAndCount()</code></td><td>Runs two queries: the page of rows, and the total count ignoring skip and take. Returns <code>[rows, total]</code>.</td></tr>
+<tr><td><code>repo.update({ id }, data)</code></td><td>A direct <code>UPDATE ... SET ... WHERE id = ...</code>. It returns how many rows changed, not the row, so we fetch it again.</td></tr>
+<tr><td><code>findOneOrFail</code></td><td>Like <code>findOne</code> but throws if nothing is found.</td></tr>
+</table></div>
+<div class="note"><b>Compare with the real code</b>The real backend would make <code>ListingsRepo extends BaseAbstractRepository&lt;Listing&gt;</code> and register it under a string token like <code>'ListingRepoInterface'</code>. Once yours works, try converting it to that style as an exercise; you'll understand the real codebase much better afterwards.</div>
+
+<h3 id="b5"><span class="badge">5.5</span>Service</h3>
+<span class="path">src/listings/listings.service.ts</span>
+<pre><code><span class="k">import</span> { ConflictException, ForbiddenException, Injectable, NotFoundException } <span class="k">from</span> <span class="s">'@nestjs/common'</span>;
+<span class="k">import</span> { ListingsRepo } <span class="k">from</span> <span class="s">'./listings.repo'</span>;
+<span class="k">import</span> { Listing } <span class="k">from</span> <span class="s">'./listing.entity'</span>;
+<span class="k">import</span> { ListingStatus } <span class="k">from</span> <span class="s">'./listing-status.enum'</span>;
+<span class="k">import</span> { CreateListingDto } <span class="k">from</span> <span class="s">'./dto/create-listing.dto'</span>;
+<span class="k">import</span> { UpdateListingDto } <span class="k">from</span> <span class="s">'./dto/update-listing.dto'</span>;
+<span class="k">import</span> { ListListingsQueryDto } <span class="k">from</span> <span class="s">'./dto/list-listings-query.dto'</span>;
+
+<span class="d">@Injectable</span>()
+<span class="k">export class</span> ListingsService {
+  <span class="k">constructor</span>(<span class="k">private readonly</span> listingsRepo: ListingsRepo) {}
+
+  <span class="c">// CREATE</span>
+  <span class="k">async</span> create(dto: CreateListingDto, ownerId: string): Promise&lt;Listing&gt; {
+    <span class="k">const</span> existing = <span class="k">await this</span>.listingsRepo.findActiveByDomain(dto.domainName);
+    <span class="k">if</span> (existing) <span class="k">throw new</span> ConflictException(<span class="s">'This domain already has an active listing'</span>);
+    <span class="k">return this</span>.listingsRepo.create({ ...dto, ownerId });
+  }
+
+  <span class="c">// READ many (public)</span>
+  <span class="k">async</span> findPublic(q: ListListingsQueryDto) {
+    <span class="k">const</span> [items, total] = <span class="k">await this</span>.listingsRepo.findPublicPage(q);
+    <span class="k">const</span> lastPage = Math.max(1, Math.ceil(total / q.limit));
+    <span class="k">return</span> {
+      items,
+      paginationInfo: {
+        total,
+        page: q.page,
+        limit: q.limit,
+        lastPage,
+        nextPage: q.page &lt; lastPage ? q.page + 1 : <span class="k">null</span>,
+        prevPage: q.page &gt; 1 ? q.page - 1 : <span class="k">null</span>,
+      },
+    };
+  }
+
+  <span class="c">// READ many (mine)</span>
+  findMine(ownerId: string): Promise&lt;Listing[]&gt; {
+    <span class="k">return this</span>.listingsRepo.findMine(ownerId);
+  }
+
+  <span class="c">// READ one</span>
+  <span class="k">async</span> findOne(id: string): Promise&lt;Listing&gt; {
+    <span class="k">const</span> listing = <span class="k">await this</span>.listingsRepo.findActiveById(id);
+    <span class="k">if</span> (!listing) <span class="k">throw new</span> NotFoundException(<span class="s">'Listing not found'</span>);
+    <span class="k">return</span> listing;
+  }
+
+  <span class="c">// UPDATE</span>
+  <span class="k">async</span> update(id: string, dto: UpdateListingDto, userId: string): Promise&lt;Listing&gt; {
+    <span class="k">const</span> listing = <span class="k">await this</span>.findOwned(id, userId);
+
+    <span class="k">if</span> (listing.status === ListingStatus.SOLD) {
+      <span class="k">throw new</span> ConflictException(<span class="s">'A sold listing cannot be edited'</span>);
+    }
+    <span class="k">if</span> (dto.status === ListingStatus.ACTIVE &amp;&amp; listing.status !== ListingStatus.ACTIVE) {
+      <span class="k">const</span> other = <span class="k">await this</span>.listingsRepo.findActiveByDomain(listing.domainName);
+      <span class="k">if</span> (other &amp;&amp; other.id !== id) <span class="k">throw new</span> ConflictException(<span class="s">'Another active listing exists for this domain'</span>);
+    }
+    <span class="k">return this</span>.listingsRepo.update(id, dto);
+  }
+
+  <span class="c">// DELETE (soft)</span>
+  <span class="k">async</span> remove(id: string, userId: string): Promise&lt;<span class="k">void</span>&gt; {
+    <span class="k">await this</span>.findOwned(id, userId);
+    <span class="k">await this</span>.listingsRepo.softDelete(id);
+  }
+
+  <span class="c">// shared helper: exists AND belongs to this user</span>
+  <span class="k">private async</span> findOwned(id: string, userId: string): Promise&lt;Listing&gt; {
+    <span class="k">const</span> listing = <span class="k">await this</span>.findOne(id);
+    <span class="k">if</span> (listing.ownerId !== userId) <span class="k">throw new</span> ForbiddenException(<span class="s">'You do not own this listing'</span>);
+    <span class="k">return</span> listing;
+  }
+}</code></pre>
+<p>Read it as a list of business rules. Each rule is one guard clause that throws. The private <code>findOwned</code> helper is the heart of authorization: update and delete both go through it, so the ownership rule is written once and can't be forgotten on one path. <code>{ ...dto, ownerId }</code> copies the validated fields and adds the owner from the token, so the client never chooses the owner.</p>
+
+<h3 id="b6"><span class="badge">5.6</span>Controller</h3>
+<span class="path">src/listings/listings.controller.ts</span>
+<pre><code><span class="k">import</span> {
+  Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, Query, Req, UseGuards,
+} <span class="k">from</span> <span class="s">'@nestjs/common'</span>;
+<span class="k">import</span> { AccessTokenGuard } <span class="k">from</span> <span class="s">'../auth/access-token.guard'</span>;
+<span class="k">import</span> { ListingsService } <span class="k">from</span> <span class="s">'./listings.service'</span>;
+<span class="k">import</span> { CreateListingDto } <span class="k">from</span> <span class="s">'./dto/create-listing.dto'</span>;
+<span class="k">import</span> { UpdateListingDto } <span class="k">from</span> <span class="s">'./dto/update-listing.dto'</span>;
+<span class="k">import</span> { ListListingsQueryDto } <span class="k">from</span> <span class="s">'./dto/list-listings-query.dto'</span>;
+
+<span class="d">@Controller</span>(<span class="s">'listings'</span>)
+<span class="k">export class</span> ListingsController {
+  <span class="k">constructor</span>(<span class="k">private readonly</span> listingsService: ListingsService) {}
+
+  <span class="d">@UseGuards</span>(AccessTokenGuard)
+  <span class="d">@Post</span>()
+  <span class="k">async</span> create(<span class="d">@Body</span>() dto: CreateListingDto, <span class="d">@Req</span>() req) {
+    <span class="k">return</span> { message: <span class="s">'Listing created'</span>, result: <span class="k">await this</span>.listingsService.create(dto, req.user.userId) };
+  }
+
+  <span class="d">@Get</span>()
+  <span class="k">async</span> findPublic(<span class="d">@Query</span>() query: ListListingsQueryDto) {
+    <span class="k">return</span> { message: <span class="s">'Listings fetched'</span>, result: <span class="k">await this</span>.listingsService.findPublic(query) };
+  }
+
+  <span class="d">@UseGuards</span>(AccessTokenGuard)
+  <span class="d">@Get</span>(<span class="s">'mine'</span>)
+  <span class="k">async</span> findMine(<span class="d">@Req</span>() req) {
+    <span class="k">return</span> { message: <span class="s">'My listings fetched'</span>, result: <span class="k">await this</span>.listingsService.findMine(req.user.userId) };
+  }
+
+  <span class="d">@Get</span>(<span class="s">':id'</span>)
+  <span class="k">async</span> findOne(<span class="d">@Param</span>(<span class="s">'id'</span>, ParseUUIDPipe) id: string) {
+    <span class="k">return</span> { message: <span class="s">'Listing fetched'</span>, result: <span class="k">await this</span>.listingsService.findOne(id) };
+  }
+
+  <span class="d">@UseGuards</span>(AccessTokenGuard)
+  <span class="d">@Patch</span>(<span class="s">':id'</span>)
+  <span class="k">async</span> update(<span class="d">@Param</span>(<span class="s">'id'</span>, ParseUUIDPipe) id: string, <span class="d">@Body</span>() dto: UpdateListingDto, <span class="d">@Req</span>() req) {
+    <span class="k">return</span> { message: <span class="s">'Listing updated'</span>, result: <span class="k">await this</span>.listingsService.update(id, dto, req.user.userId) };
+  }
+
+  <span class="d">@UseGuards</span>(AccessTokenGuard)
+  <span class="d">@Delete</span>(<span class="s">':id'</span>)
+  <span class="k">async</span> remove(<span class="d">@Param</span>(<span class="s">'id'</span>, ParseUUIDPipe) id: string, <span class="d">@Req</span>() req) {
+    <span class="k">await this</span>.listingsService.remove(id, req.user.userId);
+    <span class="k">return</span> { message: <span class="s">'Listing deleted'</span>, result: <span class="k">null</span> };
+  }
+}</code></pre>
+<div class="warn"><b>Route order matters</b><code>@Get('mine')</code> must come <b>before</b> <code>@Get(':id')</code>. Routes are matched top to bottom, and <code>:id</code> matches any text, including the word "mine". If <code>:id</code> came first, <code>GET /listings/mine</code> would be treated as "find the listing with id mine". Here <code>ParseUUIDPipe</code> would then fail with a confusing 400 error.</div>
+<p>Notice that the guard is on each method rather than on the whole class, because two of the routes are public. If every route needed login, you could put <code>@UseGuards(AccessTokenGuard)</code> once above the class instead.</p>
+
+<h3 id="b7"><span class="badge">5.7</span>Wire it up</h3>
+<span class="path">src/listings/listings.module.ts</span>
+<pre><code><span class="k">import</span> { Module } <span class="k">from</span> <span class="s">'@nestjs/common'</span>;
+<span class="k">import</span> { TypeOrmModule } <span class="k">from</span> <span class="s">'@nestjs/typeorm'</span>;
+<span class="k">import</span> { Listing } <span class="k">from</span> <span class="s">'./listing.entity'</span>;
+<span class="k">import</span> { ListingsRepo } <span class="k">from</span> <span class="s">'./listings.repo'</span>;
+<span class="k">import</span> { ListingsService } <span class="k">from</span> <span class="s">'./listings.service'</span>;
+<span class="k">import</span> { ListingsController } <span class="k">from</span> <span class="s">'./listings.controller'</span>;
+
+<span class="d">@Module</span>({
+  imports: [TypeOrmModule.forFeature([Listing])],
+  providers: [ListingsRepo, ListingsService],
+  controllers: [ListingsController],
+})
+<span class="k">export class</span> ListingsModule {}</code></pre>
+<p>The CLI already added <code>ListingsModule</code> to <code>AppModule</code>'s imports. Because you set <code>autoLoadEntities: true</code> and <code>synchronize: true</code>, starting the app creates <code>tbl_listing</code> with its foreign key automatically. Run <code>npm run start:dev</code> and check the terminal; you should see the new routes logged as <code>Mapped {/api/v1/listings, POST} route</code> and so on.</p>
+<div class="note"><b>Why does the guard work here without importing AuthModule?</b><code>AccessTokenGuard</code> just calls Passport's <code>'jwt'</code> strategy, and that strategy was registered globally with Passport when <code>AuthModule</code> loaded. The guard itself has no dependencies to inject, so <code>ListingsModule</code> doesn't need to import anything for it.</div>
+
+<!-- ============================================================ -->
+<h2 id="ops">6. Each operation, deep dive</h2>
+<p>Now follow each request from start to finish, the same way the login guide did.</p>
+
+<h3 id="op-c"><span class="verb v-post">POST</span> Create</h3>
+<div class="flow">
+  <div class="box"><b>Request</b> <code>POST /api/v1/listings</code>, header <code>Authorization: Bearer ...</code>, body <code>{"domainName":" Coffee.ETH ","price":25,"ownerId":"hacker"}</code></div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>Guard</b> verifies the token and sets <code>req.user = { userId: "u1" }</code>. No token means 401.</div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>ValidationPipe</b> strips <code>ownerId</code> (not in the DTO), transforms the name to <code>coffee.eth</code>, checks the regex and the price.</div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>Service</b> checks for an existing active listing (409 if found), then saves <code>{ domainName, price, ownerId: "u1" }</code>.</div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>Database</b> <code>INSERT INTO tbl_listing (...) VALUES (...) RETURNING id, status, isDeleted, createdAt, updatedAt</code></div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>Response</b> 201 with the new listing, including its generated <code>id</code> and default <code>status: "active"</code>.</div>
+</div>
+<div class="warn"><b>The race condition</b>If two requests for <code>coffee.eth</code> arrive at the exact same millisecond, both can pass the "existing?" check before either inserts. The bulletproof fix is a <b>partial unique index</b> in the database: <code>CREATE UNIQUE INDEX ON tbl_listing ("domainName") WHERE status = 'active' AND "isDeleted" = false</code>. Then catch the PostgreSQL error code <code>23505</code> and turn it into a 409. The real backend uses this exact code: look for <code>PostgresErrorCode.UNIQUE_VIOLATION</code> in <code>auth.service.ts</code> <code>register</code>. Code checks give users friendly messages; database constraints give you real guarantees. Use both.</div>
+
+<h3 id="op-r"><span class="verb v-get">GET</span> Read list, with pagination</h3>
+<p>Request: <code>GET /api/v1/listings?page=2&amp;limit=5&amp;search=coffee&amp;sort=price_asc</code></p>
+<p>The ValidationPipe turns the query string into a <code>ListListingsQueryDto</code> with real numbers, and the repo builds this SQL:</p>
+<pre><code>SELECT * FROM tbl_listing l
+WHERE l."isDeleted" = false
+  AND l.status = 'active'
+  AND l."domainName" ILIKE '%coffee%'
+ORDER BY l.price ASC
+LIMIT 5 OFFSET 5;
+
+SELECT COUNT(*) FROM tbl_listing l WHERE <span class="c">-- same filters, no LIMIT/OFFSET</span></code></pre>
+<p>The response:</p>
+<pre><code>{
+  <span class="s">"message"</span>: <span class="s">"Listings fetched"</span>,
+  <span class="s">"result"</span>: {
+    <span class="s">"items"</span>: [ { <span class="s">"id"</span>: <span class="s">"..."</span>, <span class="s">"domainName"</span>: <span class="s">"coffeeshop.eth"</span>, <span class="s">"price"</span>: 12.5, ... } ],
+    <span class="s">"paginationInfo"</span>: { <span class="s">"total"</span>: 13, <span class="s">"page"</span>: 2, <span class="s">"limit"</span>: 5, <span class="s">"lastPage"</span>: 3, <span class="s">"nextPage"</span>: 3, <span class="s">"prevPage"</span>: 1 }
+  }
+}</code></pre>
+<p>The frontend uses <code>nextPage</code> and <code>prevPage</code> to enable the pager buttons, or <code>lastPage</code> to draw page numbers. The real backend does the same with its <code>paginateResponse(data, total, paginationRequest)</code> helper in <code>src/@core/utils/helper.ts</code>, and <code>getPaginationSkipByPageAndLimit(page, limit)</code> which is literally <code>(page - 1) * limit</code>. Open those two functions now; you'll recognize every line.</p>
+<div class="note"><b>Offset pagination's weakness</b>Skipping 100,000 rows still makes the database walk past them, and if new rows are inserted while someone pages, items can shift between pages. Big feeds use <b>cursor pagination</b> instead ("give me 10 after the item with this createdAt"). Offset is completely fine at this scale; just know the other exists.</div>
+
+<h3 id="op-r1"><span class="verb v-get">GET</span> Read one</h3>
+<p>Request: <code>GET /api/v1/listings/not-a-uuid</code> gives a 400 from <code>ParseUUIDPipe</code>, <b>before</b> the database is asked anything. Without the pipe, PostgreSQL itself would throw "invalid input syntax for type uuid", which NestJS would turn into a confusing 500. With a valid UUID that doesn't exist, or that is soft deleted, the service throws 404. Both cases look identical to the client, which is what you want: a deleted listing should simply not exist from the outside.</p>
+
+<h3 id="op-u"><span class="verb v-patch">PATCH</span> Update</h3>
+<p>Request: <code>PATCH /api/v1/listings/7f3a...</code> with body <code>{"price": 30}</code></p>
+<p>The order of checks inside <code>update</code> is deliberate:</p>
+<ol>
+<li><b>Does it exist?</b> If not, 404. (<code>findOne</code> inside <code>findOwned</code>.)</li>
+<li><b>Is it mine?</b> If not, 403. (<code>findOwned</code>.)</li>
+<li><b>Is the change allowed?</b> Sold listings are frozen, and reactivating must not create a second active listing. If not, 409.</li>
+<li><b>Apply it.</b> Only the fields present in the DTO are updated. <code>{"price": 30}</code> becomes <code>UPDATE tbl_listing SET price = 30, "updatedAt" = now() WHERE id = '7f3a...'</code>. The description and status are untouched.</li>
+</ol>
+<div class="warn"><b>The empty body</b>A body of <code>{}</code> passes validation (everything is optional) and leads to an update with nothing to set, which TypeORM rejects with an error. Easy fix as an exercise: in the service, if <code>Object.keys(dto).length === 0</code>, throw a <code>BadRequestException('Nothing to update')</code>.</div>
+
+<h3 id="op-d"><span class="verb v-delete">DELETE</span> Delete</h3>
+<p>Request: <code>DELETE /api/v1/listings/7f3a...</code></p>
+<p>Same first two checks as update (exists, mine), then <code>UPDATE tbl_listing SET "isDeleted" = true WHERE id = ...</code>. The row stays in the table but every read method filters it out. Calling DELETE again returns 404, because from the outside it no longer exists.</p>
+<div class="tablewrap"><table>
+<tr><th></th><th>Soft delete</th><th>Hard delete</th></tr>
+<tr><td>Recoverable</td><td>Yes, flip the flag back</td><td>No</td></tr>
+<tr><td>History and reports</td><td>Kept, so sales history still points to real rows</td><td>Lost, and foreign keys may break</td></tr>
+<tr><td>Risk</td><td>Forgetting <code>isDeleted: false</code> in one query leaks deleted data</td><td>Accidental permanent loss</td></tr>
+<tr><td>Privacy laws (user asks "erase me")</td><td>Not enough on its own</td><td>Required for personal data</td></tr>
+</table></div>
+<p>This backend uses soft delete by default via <code>BaseEntity.isDeleted</code>, but the favorites module uses a hard <code>DELETE</code>. Both are valid; pick deliberately.</p>
+
+<!-- ============================================================ -->
+<h2 id="security">7. Ownership and security</h2>
+<p>CRUD bugs are the most common security bugs in real APIs. They even have a name: <b>IDOR</b>, Insecure Direct Object Reference. It means "I changed the id in the URL and got someone else's data". These are the rules that prevent it.</p>
+<div class="good"><b>Rule 1: Identity comes from the token, never from the client</b>Use <code>req.user.userId</code>. Never accept <code>userId</code> or <code>ownerId</code> in a body, query or path for "my" resources. The real favorites controller follows this rule on every route.</div>
+<div class="good"><b>Rule 2: Check ownership on every write</b>Every update and delete must confirm the row belongs to the caller. Either load it and compare (our <code>findOwned</code>), or put the owner in the <code>WHERE</code> clause (the favorites delete does <code>WHERE user_id = :userId AND id IN (...)</code>). The second style is also safe against race conditions.</div>
+<div class="good"><b>Rule 3: Whitelist what the client may set</b>DTOs list exactly the allowed fields, and <code>whitelist: true</code> drops everything else. Never do <code>repo.save(req.body)</code>.</div>
+<div class="good"><b>Rule 4: Validate every input, including path and query</b><code>ParseUUIDPipe</code> for ids, a query DTO with <code>@Max</code> on <code>limit</code>, <code>@IsIn</code> for sort fields.</div>
+<div class="good"><b>Rule 5: Parameterize every query</b>Use <code>:name</code> placeholders in QueryBuilder. Never put user input directly into SQL text.</div>
+<div class="note"><b>403 or 404 for "not yours"?</b>We return 403, which is honest and easy to debug. Some teams return 404 instead so outsiders can't even confirm that an id exists. For private data, like a user's orders, 404 is the safer choice. For public data like listings, where anyone can already see the listing, 403 is fine.</div>
+
+<!-- ============================================================ -->
+<h2 id="errors">8. Errors and status codes</h2>
+<div class="tablewrap"><table>
+<tr><th>Situation</th><th>Status</th><th>Thrown by</th></tr>
+<tr><td>Body or query fails a DTO rule</td><td>400</td><td>ValidationPipe, automatically</td></tr>
+<tr><td>Id in URL is not a UUID</td><td>400</td><td><code>ParseUUIDPipe</code>, automatically</td></tr>
+<tr><td>No token, bad token, expired token</td><td>401</td><td><code>AccessTokenGuard</code>, automatically</td></tr>
+<tr><td>Not the owner</td><td>403</td><td><code>ForbiddenException</code> in service</td></tr>
+<tr><td>Not found or soft deleted</td><td>404</td><td><code>NotFoundException</code> in service</td></tr>
+<tr><td>Business rule conflict (duplicate active, sold)</td><td>409</td><td><code>ConflictException</code> in service</td></tr>
+<tr><td>Anything unexpected (DB down, bug)</td><td>500</td><td>NestJS default handler</td></tr>
+</table></div>
+<p>Four of these you get for free, without writing any code. That's the payoff of DTOs, pipes and guards. Your service only needs to throw for business rules.</p>
+
+<!-- ============================================================ -->
+<h2 id="test">9. Try it with curl</h2>
+<p>Use Git Bash, or Postman or Thunder Client. First log in as two different users and save their tokens, so you can test ownership.</p>
+<pre><code><span class="c"># two users</span>
+curl -s -X POST localhost:3001/api/v1/auth/register -H "Content-Type: application/json" -d '{"email":"a@test.com","password":"password123"}'
+curl -s -X POST localhost:3001/api/v1/auth/register -H "Content-Type: application/json" -d '{"email":"b@test.com","password":"password123"}'
+A=$(curl -s -X POST localhost:3001/api/v1/auth/login -H "Content-Type: application/json" -d '{"email":"a@test.com","password":"password123"}' | node -pe "JSON.parse(require('fs').readFileSync(0)).result.accessToken")
+B=$(curl -s -X POST localhost:3001/api/v1/auth/login -H "Content-Type: application/json" -d '{"email":"b@test.com","password":"password123"}' | node -pe "JSON.parse(require('fs').readFileSync(0)).result.accessToken")
+
+<span class="c"># CREATE as A (note the sneaky ownerId gets stripped)</span>
+curl -s -X POST localhost:3001/api/v1/listings -H "Authorization: Bearer $A" -H "Content-Type: application/json" \
+  -d '{"domainName":" Coffee.ETH ","price":25,"ownerId":"hacker"}'
+<span class="c"># copy the id from the response:</span>
+ID=paste-the-id-here
+
+<span class="c"># duplicate active listing, expect 409</span>
+curl -s -X POST localhost:3001/api/v1/listings -H "Authorization: Bearer $A" -H "Content-Type: application/json" -d '{"domainName":"coffee.eth","price":30}'
+
+<span class="c"># READ public list and one</span>
+curl -s "localhost:3001/api/v1/listings?page=1&amp;limit=5&amp;search=cof&amp;sort=price_desc"
+curl -s localhost:3001/api/v1/listings/$ID
+curl -s localhost:3001/api/v1/listings/not-a-uuid               <span class="c"># expect 400</span>
+
+<span class="c"># READ mine</span>
+curl -s localhost:3001/api/v1/listings/mine -H "Authorization: Bearer $A"
+
+<span class="c"># UPDATE as B, expect 403</span>
+curl -s -X PATCH localhost:3001/api/v1/listings/$ID -H "Authorization: Bearer $B" -H "Content-Type: application/json" -d '{"price":1}'
+<span class="c"># UPDATE as A, expect 200</span>
+curl -s -X PATCH localhost:3001/api/v1/listings/$ID -H "Authorization: Bearer $A" -H "Content-Type: application/json" -d '{"price":30,"status":"paused"}'
+
+<span class="c"># DELETE as A, then try to read it, expect 404</span>
+curl -s -X DELETE localhost:3001/api/v1/listings/$ID -H "Authorization: Bearer $A"
+curl -s localhost:3001/api/v1/listings/$ID</code></pre>
+<p>After each call, look at <code>tbl_listing</code> in your database tool. Watch <code>price</code>, <code>status</code> and <code>updatedAt</code> change, and see that the deleted row is still there with <code>isDeleted = true</code>.</p>
+
+<!-- ============================================================ -->
+<h2 id="unit">10. Your first unit test</h2>
+<p>The real backend has Jest set up and only a couple of spec files, so learning this puts you ahead. A unit test checks the service alone, with the repository replaced by a fake. This is where dependency injection pays off: you hand the service a fake repo instead of a real database.</p>
+<span class="path">src/listings/listings.service.spec.ts</span>
+<pre><code><span class="k">import</span> { Test } <span class="k">from</span> <span class="s">'@nestjs/testing'</span>;
+<span class="k">import</span> { ConflictException, ForbiddenException, NotFoundException } <span class="k">from</span> <span class="s">'@nestjs/common'</span>;
+<span class="k">import</span> { ListingsService } <span class="k">from</span> <span class="s">'./listings.service'</span>;
+<span class="k">import</span> { ListingsRepo } <span class="k">from</span> <span class="s">'./listings.repo'</span>;
+<span class="k">import</span> { ListingStatus } <span class="k">from</span> <span class="s">'./listing-status.enum'</span>;
+
+describe(<span class="s">'ListingsService'</span>, () =&gt; {
+  <span class="k">let</span> service: ListingsService;
+  <span class="k">const</span> repo = {
+    create: jest.fn(),
+    findActiveById: jest.fn(),
+    findActiveByDomain: jest.fn(),
+    update: jest.fn(),
+    softDelete: jest.fn(),
+  };
+
+  beforeEach(<span class="k">async</span> () =&gt; {
+    jest.resetAllMocks();
+    <span class="k">const</span> moduleRef = <span class="k">await</span> Test.createTestingModule({
+      providers: [ListingsService, { provide: ListingsRepo, useValue: repo }],
+    }).compile();
+    service = moduleRef.get(ListingsService);
+  });
+
+  it(<span class="s">'creates a listing owned by the caller'</span>, <span class="k">async</span> () =&gt; {
+    repo.findActiveByDomain.mockResolvedValue(<span class="k">null</span>);
+    repo.create.mockImplementation(<span class="k">async</span> (data) =&gt; ({ id: <span class="s">'l1'</span>, ...data }));
+
+    <span class="k">const</span> result = <span class="k">await</span> service.create({ domainName: <span class="s">'coffee.eth'</span>, price: 25 }, <span class="s">'u1'</span>);
+
+    expect(result.ownerId).toBe(<span class="s">'u1'</span>);
+    expect(repo.create).toHaveBeenCalledWith({ domainName: <span class="s">'coffee.eth'</span>, price: 25, ownerId: <span class="s">'u1'</span> });
+  });
+
+  it(<span class="s">'refuses a second active listing for the same domain'</span>, <span class="k">async</span> () =&gt; {
+    repo.findActiveByDomain.mockResolvedValue({ id: <span class="s">'other'</span> });
+    <span class="k">await</span> expect(service.create({ domainName: <span class="s">'coffee.eth'</span>, price: 25 }, <span class="s">'u1'</span>))
+      .rejects.toBeInstanceOf(ConflictException);
+  });
+
+  it(<span class="s">'returns 404 for a missing listing'</span>, <span class="k">async</span> () =&gt; {
+    repo.findActiveById.mockResolvedValue(<span class="k">null</span>);
+    <span class="k">await</span> expect(service.findOne(<span class="s">'x'</span>)).rejects.toBeInstanceOf(NotFoundException);
+  });
+
+  it(<span class="s">'blocks updates from someone who is not the owner'</span>, <span class="k">async</span> () =&gt; {
+    repo.findActiveById.mockResolvedValue({ id: <span class="s">'l1'</span>, ownerId: <span class="s">'u1'</span>, status: ListingStatus.ACTIVE });
+    <span class="k">await</span> expect(service.update(<span class="s">'l1'</span>, { price: 1 }, <span class="s">'intruder'</span>)).rejects.toBeInstanceOf(ForbiddenException);
+    expect(repo.update).not.toHaveBeenCalled();
+  });
+});</code></pre>
+<div class="tablewrap"><table>
+<tr><th>Piece</th><th>Meaning</th></tr>
+<tr><td><code>describe / it</code></td><td>A group of tests, and one test. The string reads like a sentence describing the behaviour.</td></tr>
+<tr><td><code>jest.fn()</code></td><td>A fake function that records how it was called and returns whatever you tell it to.</td></tr>
+<tr><td><code>{ provide: ListingsRepo, useValue: repo }</code></td><td>"When the service asks for <code>ListingsRepo</code>, give it this fake object." This is exactly the same mechanism as <code>useClass</code> in the real modules.</td></tr>
+<tr><td><code>mockResolvedValue(x)</code></td><td>Make the fake async function resolve to <code>x</code>.</td></tr>
+<tr><td><code>rejects.toBeInstanceOf(...)</code></td><td>Assert that the promise failed with that exception type.</td></tr>
+<tr><td><code>expect(repo.update).not.toHaveBeenCalled()</code></td><td>Prove that the intruder never reached the database write. This is the most important assertion in the file.</td></tr>
+</table></div>
+<pre><code>npm run test -- listings</code></pre>
+<p>All four should pass in under a second, with no database running. That speed is why unit tests are worth writing.</p>
+
+<!-- ============================================================ -->
+<h2 id="mistakes">11. Common beginner mistakes</h2>
+<div class="bad"><b>Returning a promise inside try without await</b>
+<pre><code><span class="k">try</span> { <span class="k">return this</span>.repo.find(...); } <span class="k">catch</span> (e) { <span class="c">/* never runs on DB errors */</span> }</code></pre>
+The function returns the pending promise, then leaves the <code>try</code> block. When the promise rejects later, the <code>catch</code> is no longer there to catch it. Write <code>return await this.repo.find(...)</code> inside try blocks. The real <code>findAllFavoriteDomainByUserId</code> has exactly this bug.</div>
+<div class="bad"><b>Taking the user id from the body</b><code>@Body() dto</code> with <code>dto.userId</code> lets anyone act as anyone. Always use <code>req.user.userId</code>.</div>
+<div class="bad"><b>Forgetting <code>isDeleted: false</code> in one query</b>Soft deleted rows reappear in one screen and nobody knows why. Keep every read in the repo, and filter there.</div>
+<div class="bad"><b>Putting <code>:id</code> routes above fixed routes</b><code>GET /listings/mine</code> gets swallowed by <code>GET /listings/:id</code>.</div>
+<div class="bad"><b>Query params treated as numbers without <code>@Type</code></b><code>page + 1</code> becomes <code>"21"</code>. Use <code>@Type(() =&gt; Number)</code> in the query DTO.</div>
+<div class="bad"><b>No upper limit on <code>limit</code></b><code>?limit=1000000</code> makes your database work hard and your response huge. Always cap it.</div>
+<div class="bad"><b>Money as float</b><code>@Column('float')</code> for prices leads to <code>19.999999</code>. Use <code>numeric</code>.</div>
+<div class="bad"><b>Business logic in the controller</b>The moment you write <code>if</code> in a controller, ask whether it belongs in the service.</div>
+<div class="bad"><b>Using <code>synchronize: true</code> outside practice</b>It can drop columns with real data. Production uses migrations.</div>
+
+<!-- ============================================================ -->
+<h2 id="levelup">12. Level ups and self test</h2>
+<h3>Level ups, in order</h3>
+<div class="tablewrap"><table>
+<tr><th>Add</th><th>What you learn</th><th>Where the real backend does it</th></tr>
+<tr><td>Partial unique index plus catching error <code>23505</code></td><td>Database constraints, race conditions</td><td><code>PostgresErrorCode.UNIQUE_VIOLATION</code> in <code>auth.service.ts</code></td></tr>
+<tr><td>Convert to interface tokens and <code>BaseAbstractRepository</code></td><td>The real project's structure</td><td><code>domain-favorite.module.ts</code></td></tr>
+<tr><td>Wrap responses in a <code>Response</code> class and messages enum</td><td>Consistency</td><td><code>DomainFavSuccessMessage.enum.ts</code></td></tr>
+<tr><td>Use <code>paginateResponse</code> style helper</td><td>Reusable utilities</td><td><code>src/@core/utils/helper.ts</code></td></tr>
+<tr><td>Bulk delete with <code>WHERE ownerId = :me AND id IN (:...ids)</code></td><td>Arrays in queries, owner in WHERE</td><td><code>removeFavDomainByUserIdAndFavDomainId</code></td></tr>
+<tr><td>Return the owner's name with each listing using <code>leftJoinAndSelect</code></td><td>Joins and choosing which fields to expose</td><td>Marketplace listing repos</td></tr>
+<tr><td>An admin only route to restore soft deleted listings</td><td>Role based guards</td><td><code>AdminTokenGuard</code>, <code>user-rbac</code></td></tr>
+<tr><td>Emit a <code>listing.created</code> event and log it</td><td>Event driven side effects</td><td><code>@OnEvent</code> handlers in <code>src/@core/utils/events/handlers/</code></td></tr>
+<tr><td>A transaction for "mark sold and record a sale" together</td><td>All or nothing writes</td><td>Search the repo for <code>transaction(</code></td></tr>
+<tr><td>Write a migration for <code>tbl_listing</code> and turn off synchronize</td><td>How production schemas change</td><td><code>src/one-time-migration/</code></td></tr>
+</table></div>
+
+<h3>Self test</h3>
+<p>Answer out loud without looking.</p>
+<ol class="check">
+<li>Which HTTP method and URL would you use to change only a listing's price? Why not PUT?</li>
+<li>Why is <code>ownerId</code> not in <code>CreateListingDto</code>, and what happens if the client sends it anyway?</li>
+<li>What does <code>PartialType</code> copy from the create DTO, and what does it change?</li>
+<li>Why do query DTOs need <code>@Type(() =&gt; Number)</code>?</li>
+<li>Write the skip formula for page 4 with limit 25. What number is it?</li>
+<li>Why must <code>@Get('mine')</code> be declared before <code>@Get(':id')</code>?</li>
+<li>What is IDOR, and which two lines of our code prevent it?</li>
+<li>What's the difference between <code>repo.create()</code> and <code>repo.save()</code>?</li>
+<li>Why can a code check like "does an active listing already exist" still let duplicates through, and what fixes it for real?</li>
+<li>In the unit test, how does the service receive a fake repository instead of the real one?</li>
+<li>Why does the <code>catch</code> in the real <code>findAllFavoriteDomainByUserId</code> never run?</li>
+<li>When would you choose a hard delete over a soft delete?</li>
+</ol>
+<h3>Then read the real thing</h3>
+<p>Once these feel easy, read the cart module (<code>src/components/cart/</code>). It's CRUD with extra rules (prices, coupons, providers). After that, read a marketplace listing module. You'll find you can follow them from controller to repository without getting lost, because they're built from exactly the pieces you just built.</p>
+
+<footer>Companion to LOGIN-FROM-ZERO.html. Real code references are from the uat branch of the Endless Domains backend (commit 543b2937), relative to <code>D:\Akshat Endless\backend\backend\</code>.</footer>
+</main>
+</div>
+<script>
+(function(){
+  var btn=document.getElementById('themebtn');
+  var root=document.documentElement;
+  try{var saved=localStorage.getItem('crud-guide-theme');if(saved)root.setAttribute('data-theme',saved);}catch(e){}
+  btn.addEventListener('click',function(){
+    var cur=root.getAttribute('data-theme');
+    if(!cur){cur=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+    var next=cur==='dark'?'light':'dark';
+    root.setAttribute('data-theme',next);
+    try{localStorage.setItem('crud-guide-theme',next);}catch(e){}
+  });
+})();
+</script>
+</body>
+</html>
