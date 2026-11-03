@@ -1,0 +1,1892 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Profile From Zero</title>
+<style>
+:root{
+  --bg:#fbfaf7;--surface:#ffffff;--surface2:#f3f1ec;--text:#1f2328;--muted:#5d6470;--border:#e2ded5;
+  --accent:#2f5bd3;--accent-soft:#e8eefc;--good:#1f7a4d;--good-soft:#e5f4ec;--warn:#9a5b00;--warn-soft:#fdf1dc;
+  --bad:#b42318;--bad-soft:#fdeceb;--code-bg:#f5f3ee;--code-text:#24292f;--kw:#8a3ffc;--str:#0a7c45;--com:#7b8290;--dec:#c2410c;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121417;--surface:#1a1d21;--surface2:#22262b;--text:#e6e8eb;--muted:#a0a7b1;--border:#2f343a;
+    --accent:#7aa2ff;--accent-soft:#1d2a4a;--good:#5cc98f;--good-soft:#16301f;--warn:#f0b65a;--warn-soft:#3a2a10;
+    --bad:#ff8a80;--bad-soft:#3a1715;--code-bg:#16191d;--code-text:#e1e4e8;--kw:#c4a1ff;--str:#7ee2a8;--com:#8b949e;--dec:#ffab70;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121417;--surface:#1a1d21;--surface2:#22262b;--text:#e6e8eb;--muted:#a0a7b1;--border:#2f343a;
+  --accent:#7aa2ff;--accent-soft:#1d2a4a;--good:#5cc98f;--good-soft:#16301f;--warn:#f0b65a;--warn-soft:#3a2a10;
+  --bad:#ff8a80;--bad-soft:#3a1715;--code-bg:#16191d;--code-text:#e1e4e8;--kw:#c4a1ff;--str:#7ee2a8;--com:#8b949e;--dec:#ffab70;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.layout{display:grid;grid-template-columns:270px minmax(0,1fr);max-width:1240px;margin:0 auto}
+nav.toc{position:sticky;top:0;height:100vh;overflow-y:auto;padding:28px 18px;border-right:1px solid var(--border);font-size:14px}
+nav.toc h2{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+nav.toc a{display:block;color:var(--muted);text-decoration:none;padding:4px 8px;border-radius:6px}
+nav.toc a:hover{background:var(--surface2);color:var(--text)}
+nav.toc .sub{padding-left:20px;font-size:13px}
+main{padding:40px 48px 120px;min-width:0}
+h1{font-size:2.2rem;line-height:1.2;margin:0 0 8px}
+h2{font-size:1.6rem;margin:64px 0 12px;padding-top:12px;border-top:1px solid var(--border)}
+h3{font-size:1.2rem;margin:36px 0 8px}
+h4{font-size:1.02rem;margin:24px 0 6px}
+p{margin:0 0 14px}
+.lede{font-size:1.1rem;color:var(--muted);max-width:760px}
+a{color:var(--accent)}
+code{font-family:"Cascadia Code",Consolas,"SFMono-Regular",monospace;font-size:.88em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+pre{background:var(--code-bg);color:var(--code-text);border:1px solid var(--border);border-radius:10px;padding:16px 18px;overflow-x:auto;font-size:13.5px;line-height:1.6;margin:10px 0 16px}
+pre code{background:none;padding:0;font-size:inherit}
+.path{display:block;font-size:12px;color:var(--muted);margin:18px 0 -4px;font-family:Consolas,monospace}
+.c{color:var(--com);font-style:italic}
+.note,.warn,.good,.bad{border-radius:10px;padding:14px 18px;margin:16px 0;border-left:4px solid}
+.note{background:var(--accent-soft);border-color:var(--accent)}
+.warn{background:var(--warn-soft);border-color:var(--warn)}
+.good{background:var(--good-soft);border-color:var(--good)}
+.bad{background:var(--bad-soft);border-color:var(--bad)}
+.note b:first-child,.warn b:first-child,.good b:first-child,.bad b:first-child{display:block;margin-bottom:4px}
+table{width:100%;border-collapse:collapse;margin:10px 0 20px;font-size:14.5px}
+th,td{text-align:left;vertical-align:top;padding:9px 12px;border-bottom:1px solid var(--border)}
+th{background:var(--surface2);font-weight:600}
+.tablewrap{overflow-x:auto}
+.flow{display:flex;flex-direction:column;gap:0;margin:20px 0}
+.flow .box{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px}
+.flow .box b{color:var(--accent)}
+.flow .arrow{text-align:center;color:var(--muted);font-size:18px;line-height:28px}
+.layers{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}
+.layers div{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;font-size:14px}
+.layers div b{display:block;color:var(--accent);margin-bottom:4px}
+.glossary dt{font-weight:700;margin-top:16px;font-family:Consolas,monospace;color:var(--accent)}
+.glossary dd{margin:4px 0 0 0}
+.badge{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);margin-right:6px;vertical-align:middle}
+.real{display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:999px;background:var(--good-soft);color:var(--good)}
+.sample{display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:999px;background:var(--warn-soft);color:var(--warn)}
+.off{display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:999px;background:var(--surface2);color:var(--muted)}
+.check li{margin:6px 0}
+footer{color:var(--muted);font-size:13px;margin-top:80px;border-top:1px solid var(--border);padding-top:16px}
+.themebtn{position:fixed;top:14px;right:14px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px;z-index:5}
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr}
+  nav.toc{position:static;height:auto;border-right:none;border-bottom:1px solid var(--border);padding:16px}
+  main{padding:24px 16px 80px}
+  .layers{grid-template-columns:1fr}
+  h1{font-size:1.7rem}
+}
+</style>
+</head>
+<body>
+<button class="themebtn" id="themebtn" type="button">Toggle theme</button>
+<div class="layout">
+<nav class="toc">
+  <h2>Contents</h2>
+  <a href="#start">0. How to use this guide</a>
+  <a href="#picture">1. The big picture</a>
+  <a href="#words">2. Words you need</a>
+  <a href="#files">3. Every file, mapped</a>
+  <a href="#types">4. The data types</a>
+  <a href="#backend">5. How it talks to the backend</a>
+  <a class="sub" href="#b-rtk">5.1 Door 1: RTK Query</a>
+  <a class="sub" href="#b-service">5.2 Door 2: the profile service</a>
+  <a class="sub" href="#b-legacy">5.3 Door 3: api.service</a>
+  <a class="sub" href="#b-table">5.4 Every endpoint</a>
+  <a href="#helpers-hooks">Interlude: helpers vs hooks</a>
+  <a class="sub" href="#hh-difference">The main difference</a>
+  <a class="sub" href="#hh-decide">How to decide</a>
+  <a class="sub" href="#hh-helpers">Every helper file</a>
+  <a class="sub" href="#hh-hooks">Every hook file</a>
+  <a href="#page">6. The page file, line by line</a>
+  <a href="#shared">7. Shared building blocks</a>
+  <a href="#tab-profile">8. Tab 1: Profile</a>
+  <a class="sub" href="#p-details">8.1 useProfileDetails</a>
+  <a class="sub" href="#p-map">8.2 The mapper</a>
+  <a class="sub" href="#p-draft">8.3 useProfileDraft</a>
+  <a class="sub" href="#p-validate">8.4 Validation</a>
+  <a class="sub" href="#p-panel">8.5 The panel and form</a>
+  <a class="sub" href="#p-journey">8.6 Journey: Save</a>
+  <a href="#tab-security">9. Tab 2: Security</a>
+  <a href="#tab-wallets">10. Tab 3: Wallets</a>
+  <a href="#tab-notifications">11. Tab 4: Notifications</a>
+  <a href="#tab-preferences">12. Tab 5: Preferences</a>
+  <a href="#rail">13. The right rail</a>
+  <a href="#mock">14. The sample data machinery</a>
+  <a href="#cross">15. Auth, mobile, toasts, a11y</a>
+  <a href="#status">16. Real or sample, today</a>
+  <a href="#quirks">17. Quirks in the real code</a>
+  <a href="#practice">18. Practice and self test</a>
+</nav>
+<main>
+
+<h1>Profile, from absolute zero</h1>
+<p class="lede">A complete walkthrough of the Profile and Settings page (<code>/profile</code>) from the frontend side: every file, every data type, every hook, every backend call, and how a click turns into a saved row. Written so a beginner can follow it and come out able to change any part of it.</p>
+
+<!-- ============================================================ -->
+<h2 id="start">0. How to use this guide</h2>
+<p>Read section 1 first; it is the map. Section 2 is a dictionary to keep open. Sections 3 to 5 are the foundations (files, types, backend calls). Then pick a tab (sections 8 to 12) and read it with the real files open in VS Code beside this page. Section 17 lists what is a little off in the code; section 18 tests you.</p>
+<p>All paths are relative to the marketplace frontend root, <code>endlessdomains-marketplace-frontend/</code>. Code was copied from the working tree on 3 Nov 2026 (branch <code>portfolio</code>). When a block is trimmed you will see <code>// ...</code>.</p>
+<div class="note"><b>Prerequisites</b>This guide assumes you know what a React component, props, <code>useState</code> and <code>useEffect</code> are. If any of those are fuzzy, read sections 5 and 6 of <code>FRONTEND-FROM-ZERO.html</code> (in <code>endlessdomainsAkshatNew</code>) first. Everything specific to Profile is explained here from zero.</div>
+<div class="warn"><b>Older Profile docs</b><code>dev-docs/profile/profile-page-walkthrough.html</code> and <code>profile-data-layer-guide.html</code> date from 26 Oct, before the backend dev's service file and the 27 to 29 Oct scope cuts. Where they disagree with this guide, this guide matches the code.</div>
+
+<!-- ============================================================ -->
+<h2 id="picture">1. The big picture</h2>
+<p>The page is one route, <code>/profile</code>, with five tabs chosen by the URL (<code>?tab=security</code> and so on) and a right rail:</p>
+<div class="tablewrap"><table>
+<tr><th>Area</th><th>What the user does there</th></tr>
+<tr><td>Profile tab</td><td>Edit name, username, email, phone, Telegram, bio, location, website; upload a photo; verify email; see a live public preview.</td></tr>
+<tr><td>Security tab</td><td>See how they sign in (email, Google, wallet); change password.</td></tr>
+<tr><td>Wallets tab</td><td>See linked wallets; link the missing EVM or Solana wallet; copy addresses.</td></tr>
+<tr><td>Notifications tab</td><td>Turn five email alerts on or off.</td></tr>
+<tr><td>Preferences tab</td><td>Pick System, Light or Dark theme.</td></tr>
+<tr><td>Right rail</td><td>Account summary (member since, domains, volume, sales); request a data export or account deletion.</td></tr>
+</table></div>
+
+<h3>The layers</h3>
+<p>Every piece of the page sits in exactly one layer, and data flows down through them in one direction. This is the single most important picture in the guide:</p>
+<div class="flow">
+  <div class="box"><b>Page</b> <code>pages/profile/index.tsx</code>: the route. Picks the tab, lays out the shell, guards unsaved edits.</div>
+  <div class="arrow">&#8595; renders</div>
+  <div class="box"><b>Composites</b> <code>src/design-system/composites/profile/</code>: tab panels and cards. Draw the UI, handle clicks.</div>
+  <div class="arrow">&#8595; call</div>
+  <div class="box"><b>Hooks</b> <code>src/hooks/profile/</code>: fetch, hold and save data. Hide where data comes from.</div>
+  <div class="arrow">&#8595; use</div>
+  <div class="box"><b>Helpers, types, data</b> <code>src/helpers/profile/</code> (pure functions), <code>src/types/</code> (shapes), <code>src/data/profile/</code> (sample data).</div>
+  <div class="arrow">&#8595; and call</div>
+  <div class="box"><b>Core</b> <code>src/core/redux/</code> and <code>src/core/services/</code>: the only code that sends HTTP requests.</div>
+  <div class="arrow">&#8595; HTTP</div>
+  <div class="box"><b>Backend</b> NestJS API at <code>process.env.BASE_URL</code> (users, auth, web3-auth, marketplacev2).</div>
+</div>
+<div class="note"><b>The hotel analogy, frontend edition</b>The page is the building, the composites are the rooms guests see, the hooks are the staff who fetch things, the helpers are the rule books staff consult, and core is the one phone line to head office (the backend). Guests never phone head office themselves.</div>
+<p>One honest caveat up front: in Profile, some composites call hooks themselves (for example <code>ProfileTabPanel</code> calls <code>useProfileDraft</code>). The project's newer rule says only the page should do that. It is a known, listed exception; section 17 explains it.</p>
+
+<!-- ============================================================ -->
+<h2 id="words">2. Words you need</h2>
+<dl class="glossary">
+<dt>view model</dt><dd>The shape the UI wants (for example <code>ProfileDetails</code> with <code>fullName</code>). It is deliberately different from the shape the backend sends (<code>Profile['result']</code> with <code>name</code>). A <b>mapper</b> converts one into the other.</dd>
+<dt>RTK Query</dt><dd>The data fetching part of Redux Toolkit. You describe an endpoint once (<code>getUserProfile</code>) and get a hook (<code>useGetUserProfileQuery()</code>) that fetches, caches and shares the result between every component that calls it.</dd>
+<dt>query vs mutation</dt><dd>A query reads (GET) and is cached. A mutation changes something (POST, PUT, PATCH, DELETE) and is not cached; its hook returns a trigger function: <code>const [setProfile] = useSetProfileMutation()</code>.</dd>
+<dt>.unwrap()</dt><dd>RTK mutation triggers return a special promise that never rejects. <code>.unwrap()</code> turns it into a normal promise that rejects on error, so <code>try/catch</code> works.</dd>
+<dt>cache tag</dt><dd>A label (like <code>'profile'</code>). A query that <i>provides</i> a tag is refetched automatically when a mutation <i>invalidates</i> it.</dd>
+<dt>QueryResult&lt;T&gt;</dt><dd>The project's small standard result shape: <code>{ data?, isLoading, isError, refetch }</code>. Every Profile hook returns it, real or sample, so components never care which.</dd>
+<dt>draft</dt><dd>An editable copy of saved data. You type into the draft; Save sends the differences; Discard copies the saved data back.</dd>
+<dt>dirty</dt><dd>"The draft differs from what is saved." Used to enable Save and to warn before leaving.</dd>
+<dt>optimistic update</dt><dd>Show the change immediately, save in the background, and roll back if the save fails. Used by the notification switches.</dd>
+<dt>debounce</dt><dd>Wait for a pause (400 ms) before acting, so typing a username fires one request, not one per key.</dd>
+<dt>type guard</dt><dd>A function whose return type is <code>value is X</code>; after it returns true, TypeScript treats the value as <code>X</code>.</dd>
+<dt>shallow routing</dt><dd><code>router.replace(url, undefined, { shallow: true })</code> changes the URL without re running the page's data fetching.</dd>
+<dt>render prop</dt><dd>Passing a function as a prop, which the child calls with some values. <code>SettingsRow</code>'s <code>control</code> can be a function that receives the ids to label a switch with.</dd>
+<dt>roving tabindex</dt><dd>Keyboard pattern for tabs: only the active tab has <code>tabIndex=0</code>; arrow keys move between tabs.</dd>
+<dt>barrel</dt><dd>An <code>index.ts</code> that re exports many components so you can import them from one path.</dd>
+<dt>useSyncExternalStore</dt><dd>A React hook to read a value stored outside React (a module variable) and re render when it changes. Powers the sample data store.</dd>
+<dt>nonce</dt><dd>A one time random string from the backend. The wallet signs it to prove ownership without a password.</dd>
+<dt>minor units</dt><dd>Money stored as an integer of the smallest unit. USDT has 6 decimals, so <code>4250000000</code> means 4,250 USDT.</dd>
+</dl>
+
+<!-- ============================================================ -->
+<h2 id="files">3. Every file, mapped</h2>
+<p>About 80 files, 5,100 lines (3,500 of TypeScript, the rest SCSS). Grouped by layer:</p>
+<div class="tablewrap"><table>
+<tr><th>File</th><th>Layer</th><th>Job</th></tr>
+<tr><td><code>pages/profile/index.tsx</code></td><td>Page</td><td>Route, tab state in the URL, unsaved changes guard, layout.</td></tr>
+<tr><td><code>pages/profile/profile.module.scss</code></td><td>Page</td><td>Gaps between hero parts and between cards.</td></tr>
+<tr><td><code>src/types/profile-settings/index.ts</code></td><td>Types</td><td>Every view model and the <code>PROFILE_TABS</code> list.</td></tr>
+<tr><td><code>src/types/Profile.ts</code></td><td>Types</td><td>The backend's user response shape.</td></tr>
+<tr><td><code>src/core/redux/api.ts</code></td><td>Core</td><td><code>myApi</code>: the single RTK Query API every feature adds endpoints to.</td></tr>
+<tr><td><code>src/core/redux/userProfile.ts</code></td><td>Core</td><td>Profile endpoints on <code>myApi</code>: get user, update user, resend verification, change password (plus older analytics and history ones).</td></tr>
+<tr><td><code>src/core/services/profile-settings.service.ts</code></td><td>Core</td><td>The backend dev's <code>fetch</code> wrapper: username check, avatar, notifications, logout others, summary, data requests.</td></tr>
+<tr><td><code>src/core/services/api.service.ts</code>, <code>wallet.service.ts</code></td><td>Core</td><td>Older generic helpers; used for wallet linking.</td></tr>
+<tr><td><code>src/core/enum/api-endpoint.enum.ts</code>, <code>src/constants/Api.ts</code></td><td>Core</td><td>Every path, and full URLs built from them.</td></tr>
+<tr><td><code>src/helpers/profile/mapUser.ts</code></td><td>Helper</td><td>Backend user to view models, and form back to the PUT body.</td></tr>
+<tr><td><code>src/helpers/profile/validation.ts</code></td><td>Helper</td><td>Field rules, the changed fields diff, password rules.</td></tr>
+<tr><td><code>src/helpers/profile/base58.ts</code>, <code>solana-signing.ts</code></td><td>Helper</td><td>Sign a message with a Solana wallet and encode it.</td></tr>
+<tr><td><code>src/helpers/phone.ts</code>, <code>passwordStrength.ts</code>, <code>error-messages/</code></td><td>Helper (shared)</td><td>Phone parsing, password policy, friendly error text.</td></tr>
+<tr><td><code>src/data/profile/fixtures.ts</code>, <code>store.ts</code></td><td>Data</td><td>Sample values, and a tiny live store for them.</td></tr>
+<tr><td><code>src/hooks/profile/*.ts</code> (15 files)</td><td>Hooks</td><td>One hook per area (details, draft, username, sign in methods, password, sessions, wallets, link wallet, wallet settings, notifications, preferences, summary, your data) plus two plumbing hooks.</td></tr>
+<tr><td><code>src/design-system/composites/profile/</code></td><td>Composites</td><td>Folders: <code>shared</code> (tabs, card, skeleton, drawer, chips), <code>profile</code>, <code>security</code>, <code>wallets</code>, <code>notifications</code>, <code>preferences</code>, <code>rail</code>; <code>index.ts</code> barrel.</td></tr>
+<tr><td><code>src/design-system/primitives/...</code></td><td>Primitives</td><td>Reused generic parts: <code>TextField</code>, <code>PhoneField</code>, <code>PasswordField</code>, <code>AvatarUpload</code>, <code>Switch</code>, <code>SegmentedToggle</code>, <code>SettingsRow</code>, <code>InfoListCard</code>, <code>Modal</code>, buttons, banners.</td></tr>
+<tr><td><code>src/context/ThemeContext.tsx</code>, <code>AuthContext.tsx</code></td><td>App wide</td><td>Theme choice; signed in state and <code>logout()</code>.</td></tr>
+</table></div>
+
+<!-- ============================================================ -->
+<h2 id="types">4. The data types</h2>
+<p>There are two families of types, and understanding why is the key to the whole data layer.</p>
+
+<h3>4.1 What the backend sends: <code>src/types/Profile.ts</code></h3>
+<span class="path">src/types/Profile.ts (trimmed)</span>
+<pre><code>type WalletAddress = {
+  id: string;
+  createdDateTime: string;
+  isDeleted: boolean;          // soft deleted wallets stay in the list
+  network: string;             // 'evm_network' or 'solana'
+  nonce: string;
+  userId: string;
+  walletAddress: string;
+  // ...
+};
+
+type User = {
+  id: string;
+  name: string | null;
+  email: string;
+  phoneNumber: string | null;  // one string, e.g. "+919876543210"
+  telegram?: string | null;
+  isEmailVerified: boolean;
+  isPhoneNumberVerified: boolean;
+  isRegisteredWithGoogle: boolean;
+  isRegisteredWithWallet: boolean;
+  sentEmailCount: number;      // how many verification emails went out
+  walletAddress: WalletAddress[];
+  username?: string | null;
+  bio?: string | null;
+  location?: string | null;
+  website?: string | null;
+  avatarUrl?: string | null;
+  createdDateTime?: string;
+};
+
+export interface Profile {
+  message: string;
+  result: User;                // every response is wrapped in { message, result }
+}</code></pre>
+<p>This mirrors <code>GET /users/user-multiple-wallet</code> exactly, warts and all: nullable fields, a phone as one string, an envelope around the user. <code>User</code> is not exported; code reaches it as <code>Profile['result']</code> (an <b>indexed access type</b>: "the type of the <code>result</code> property of <code>Profile</code>").</p>
+
+<h3>4.2 What the UI wants: <code>src/types/profile-settings/index.ts</code></h3>
+<span class="path">src/types/profile-settings/index.ts</span>
+<pre><code>export type ProfileTab = 'profile' | 'security' | 'wallets' | 'notifications' | 'preferences'
+export const PROFILE_TABS: readonly ProfileTab[] = ['profile', 'security', 'wallets', 'notifications', 'preferences']
+
+export interface ProfileDetails {
+  fullName: string
+  username: string
+  email: string
+  isEmailVerified: boolean
+  canChangeEmail: boolean       // computed, not stored anywhere
+  verificationSent: boolean     // computed from sentEmailCount
+  phone: { countryCode: string; number: string } | null
+  telegram: string              // '' = none
+  bio: string
+  location: string
+  website: string
+  avatarUrl: string | null
+}</code></pre>
+<div class="tablewrap"><table>
+<tr><th>Detail</th><th>Why it is like this</th></tr>
+<tr><td><code>ProfileTab</code> as a union of strings</td><td>TypeScript rejects a typo like <code>'secruity'</code> anywhere a tab is expected.</td></tr>
+<tr><td><code>PROFILE_TABS</code> as a <code>readonly</code> array</td><td>The same list at runtime (types vanish when compiled), used to validate <code>?tab=</code> and to render tabs in order. <code>readonly</code> stops anyone pushing into it.</td></tr>
+<tr><td>Strings are never <code>null</code></td><td><code>''</code> instead of <code>null</code> means inputs can bind directly (<code>value={draft.bio}</code>) with no null checks everywhere.</td></tr>
+<tr><td><code>canChangeEmail</code>, <code>verificationSent</code></td><td>Decisions computed once in the mapper, so components read a clear boolean instead of re deriving rules.</td></tr>
+<tr><td><code>phone</code> as an object</td><td>The form has a country picker and a number box; the backend's single string is split for it.</td></tr>
+</table></div>
+<p>The other view models in the same file:</p>
+<div class="tablewrap"><table>
+<tr><th>Type</th><th>Fields</th><th>Used by</th></tr>
+<tr><td><code>AccountSummary</code></td><td><code>memberSince</code> (ISO date), <code>domainsOwned</code>, <code>listed</code>, <code>volumeSold: { amount, token }</code>, <code>completedSales</code></td><td>Rail Account card, Public Preview</td></tr>
+<tr><td><code>SignInMethod</code></td><td>A <b>discriminated union</b>: <code>{ kind: 'email', email, active }</code> or <code>{ kind: 'google', email, connected }</code> or <code>{ kind: 'wallet', address, connected }</code></td><td>Security tab</td></tr>
+<tr><td><code>ConnectedWallet</code></td><td><code>id</code>, <code>address</code>, <code>network</code>, <code>primary</code></td><td>Wallets tab</td></tr>
+<tr><td><code>NotificationSettings</code></td><td>five booleans plus <code>channels: { email, telegram }</code></td><td>Notifications tab</td></tr>
+<tr><td><code>ActiveSession</code>, <code>WalletSettings</code>, <code>DisplayPreferences</code>, <code>PrivacyPreferences</code>, <code>ProfilePreferences</code></td><td>(see the file)</td><td>Areas that are currently hidden (sections 9, 10, 12)</td></tr>
+</table></div>
+<p><b>Discriminated union, explained.</b> Every member of <code>SignInMethod</code> has a <code>kind</code> field with a different literal value. When code checks <code>if (method.kind === 'wallet')</code>, TypeScript knows <code>method.address</code> exists inside that branch, and that <code>method.email</code> does not. It is how one list can hold three slightly different shapes safely.</p>
+<div class="good"><b>Why two families of types?</b>The backend shape changes when the backend changes; the UI shape changes when the design changes. Keeping them apart, with one mapper between them (<code>mapUser.ts</code>), means a backend rename touches one function instead of twenty components. It also lets sample data and real data share the UI type, so components cannot tell them apart.</div>
+
+<!-- ============================================================ -->
+<h2 id="backend">5. How it talks to the backend</h2>
+<p>Profile reaches the backend through <b>three different doors</b>. This is historical, not a design goal: the original endpoints went into RTK Query, the backend developer later added his own <code>fetch</code> wrapper for the new profile APIs, and wallet linking reused the old shared helpers. Knowing which door a call uses tells you how its errors, caching and auth behave.</p>
+
+<h3 id="b-rtk">5.1 Door 1: RTK Query (<code>myApi</code>)</h3>
+<span class="path">src/core/redux/api.ts</span>
+<pre><code>export const myApi = createApi({
+  reducerPath: 'myApi',
+  baseQuery: fetchBaseQuery({
+    baseUrl: baseUrl,
+    credentials: "include",
+    prepareHeaders: async (headers: any) =&gt; {
+      const token = getCookieValue(Cookie_Key.ACCESS_TOKEN)
+      if (!!token) {
+        headers.set('Authorization', `Bearer ${token}`);
+      }
+      return headers;
+    },
+  }),
+  tagTypes: ['faq', 'profile', 'domain', /* ... */],
+  endpoints: (builder: any) =&gt; ({}),
+});</code></pre>
+<div class="tablewrap"><table>
+<tr><th>Line</th><th>Meaning</th></tr>
+<tr><td><code>createApi({...})</code></td><td>Creates one API object for the whole app. Features add endpoints to it later with <code>injectEndpoints</code>.</td></tr>
+<tr><td><code>reducerPath: 'myApi'</code></td><td>Where its cache lives inside the Redux store (<code>state.myApi</code>).</td></tr>
+<tr><td><code>fetchBaseQuery</code></td><td>RTK's small wrapper around the browser's <code>fetch</code>. Every endpoint goes through it.</td></tr>
+<tr><td><code>baseUrl</code></td><td><code>process.env.BASE_URL</code>, e.g. the stage API. Prepended to relative URLs.</td></tr>
+<tr><td><code>credentials: "include"</code></td><td>Send cookies with cross site requests.</td></tr>
+<tr><td><code>prepareHeaders</code></td><td>Runs before every request: reads the <code>access_token</code> cookie (set at login) and adds <code>Authorization: Bearer ...</code>. This is how the backend knows which user is asking; no endpoint sends a user id.</td></tr>
+<tr><td><code>tagTypes</code></td><td>The list of cache labels any endpoint may use.</td></tr>
+<tr><td><code>endpoints: () =&gt; ({})</code></td><td>Empty on purpose; features inject theirs.</td></tr>
+</table></div>
+<p>Profile's endpoints, injected in <code>userProfile.ts</code>:</p>
+<span class="path">src/core/redux/userProfile.ts (the four Profile uses)</span>
+<pre><code>export const ProfileApi = myApi.injectEndpoints({
+  endpoints: (builder) =&gt; ({
+    getUserProfile: builder.query&lt;Profile, void&gt;({
+      query: () =&gt; ({ url: UserProfileApi, method: "GET" }),
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(setUserProfile(data));                       // also copy into a Redux slice
+          const evmWallet = data?.result?.walletAddress?.find((item) =&gt; item.network === "evm_network");
+          if (evmWallet) dispatch(setEvmWalletAddress(evmWallet.walletAddress));
+        } catch (error) {
+          console.error("Failed to fetch user profile:", error);
+        }
+      },
+    }),
+    setProfile: builder.mutation({
+      query: (post) =&gt; ({ url: UserProfileUpdateApi, method: "PUT", body: post }),
+      transformResponse: (response: Profile): Profile =&gt; response,
+      invalidatesTags: (_) =&gt; ["profile"],
+    }),
+    resendVerificationEmail: builder.mutation&lt;unknown, { email: string; source?: string }&gt;({
+      query: (body) =&gt; ({ url: ResendVerificationEmailApi, method: "POST", body }),
+    }),
+    changePassword: builder.mutation&lt;unknown, { oldPassword: string; newPassword: string }&gt;({
+      query: (body) =&gt; ({ url: ChangePasswordApi, method: "PUT", body }),
+    }),
+    // ... setAnalytics, getAnalytics, GetAnalyticsStats, GetUserHistory (other pages)
+  }),
+});
+export const { useGetUserProfileQuery, useSetProfileMutation, useResendVerificationEmailMutation, useChangePasswordMutation /* ... */ } = ProfileApi;</code></pre>
+<div class="tablewrap"><table>
+<tr><th>Piece</th><th>Meaning</th></tr>
+<tr><td><code>builder.query&lt;Profile, void&gt;</code></td><td>Generic arguments: the result type (<code>Profile</code>) and the argument type (<code>void</code>, none). So <code>useGetUserProfileQuery()</code> takes no argument and its <code>data</code> is a <code>Profile</code>.</td></tr>
+<tr><td><code>url: UserProfileApi</code></td><td>From <code>constants/Api.ts</code>: <code>baseUrl + '/users/user-multiple-wallet'</code>. It is already a full URL; <code>fetchBaseQuery</code> leaves absolute URLs alone, so <code>baseUrl</code> is not added twice.</td></tr>
+<tr><td><code>onQueryStarted</code></td><td>A side effect hook: when the request succeeds, copy the user into the older <code>userProfileSlice</code> Redux slice, and save the EVM wallet address separately. Older parts of the app read those slices.</td></tr>
+<tr><td><code>setProfile</code> <code>invalidatesTags: ["profile"]</code></td><td>Says "after this, anything providing the <code>profile</code> tag is stale". But <code>getUserProfile</code> provides <b>no</b> tag, so nothing refetches automatically. The hooks call <code>refetch()</code> by hand (section 8.1, and quirk in section 17).</td></tr>
+<tr><td><code>resendVerificationEmail</code></td><td><code>POST /auth/verification-email</code> with <code>{ email, source }</code>.</td></tr>
+<tr><td><code>changePassword</code></td><td><code>PUT /auth/change-password</code> with <code>{ oldPassword, newPassword }</code>.</td></tr>
+<tr><td>The <code>export const { use... } = ProfileApi</code> line</td><td>RTK generates a hook per endpoint, named <code>use</code> + Name + <code>Query</code>/<code>Mutation</code>. Destructuring pulls them out to export.</td></tr>
+</table></div>
+<div class="good"><b>The big win of Door 1: one request, many readers</b><code>useProfileDetails</code>, <code>useSignInMethods</code>, <code>useConnectedWallets</code> and <code>useWalletCount</code> all call <code>useGetUserProfileQuery()</code>. RTK sends <b>one</b> request and every caller reads the same cached answer. Refetch it once, and every tab and the wallet badge update together.</div>
+
+<h3 id="b-service">5.2 Door 2: the profile service (<code>fetch</code> wrapper)</h3>
+<p>The newer profile APIs (added on the backend on 26 Oct) are called through plain async functions in one file. Its heart is a private <code>request</code> function:</p>
+<span class="path">src/core/services/profile-settings.service.ts</span>
+<pre><code>interface Envelope&lt;T&gt; {
+  message?: string | string[]
+  result: T
+}
+
+async function request&lt;T&gt;(method: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE', path: string, options: { body?: unknown; form?: FormData } = {}): Promise&lt;T&gt; {
+  const token = getCookieValue(Cookie_Key.ACCESS_TOKEN)
+  const headers: Record&lt;string, string&gt; = {}
+  if (token) headers.Authorization = `Bearer ${token}`
+
+  let body: BodyInit | undefined
+  if (options.form) {
+    body = options.form
+  } else if (options.body !== undefined) {
+    headers['Content-Type'] = 'application/json'
+    body = JSON.stringify(options.body)
+  }
+
+  const response = await fetch(`${baseUrl}${path}`, { method, headers, body })
+  const text = await response.text()
+  const json = text ? JSON.parse(text) : undefined
+  if (!response.ok) {
+    const message = Array.isArray(json?.message) ? json.message.join(', ') : json?.message
+    throw Object.assign(new Error(message || `Request failed (${response.status})`), { statusCode: response.status, body: json })
+  }
+  return json as T
+}</code></pre>
+<div class="tablewrap"><table>
+<tr><th>Line</th><th>Meaning</th></tr>
+<tr><td><code>Envelope&lt;T&gt;</code></td><td>The backend wraps every answer as <code>{ message, result }</code>. A <b>generic</b> interface: <code>Envelope&lt;{ available: boolean }&gt;</code> means "an envelope whose <code>result</code> is <code>{ available: boolean }</code>".</td></tr>
+<tr><td><code>request&lt;T&gt;(method, path, options = {})</code></td><td>One function for every verb. <code>T</code> is what the caller expects back. The method is a union, so <code>'GTE'</code> would not compile.</td></tr>
+<tr><td><code>Record&lt;string, string&gt;</code></td><td>"An object with string keys and string values." Headers start empty.</td></tr>
+<tr><td>Bearer token</td><td>Same idea as Door 1: read the cookie, add the header.</td></tr>
+<tr><td><code>options.form</code> branch</td><td>For the avatar upload: a <code>FormData</code> body. No <code>Content-Type</code> is set on purpose; the browser adds <code>multipart/form-data</code> with the right boundary itself.</td></tr>
+<tr><td><code>options.body</code> branch</td><td>For JSON: set the header and stringify.</td></tr>
+<tr><td><code>response.text()</code> then <code>JSON.parse</code></td><td>Reading text first copes with empty bodies (a 204 has none), where <code>response.json()</code> would throw.</td></tr>
+<tr><td><code>if (!response.ok)</code></td><td><code>fetch</code> does <b>not</b> throw on 400 or 500; only on network failure. So the code checks <code>ok</code> (status 200 to 299) itself.</td></tr>
+<tr><td><code>Array.isArray(json?.message)</code></td><td>NestJS validation errors arrive as an array of messages; join them into one string.</td></tr>
+<tr><td><code>Object.assign(new Error(...), { statusCode, body })</code></td><td>Make a real <code>Error</code> (so <code>.message</code> works in toasts) and attach the status and raw body for callers that need them.</td></tr>
+</table></div>
+<p>The exported functions are all short wrappers. Two deserve a look:</p>
+<pre><code>export async function getAccountSummary(): Promise&lt;AccountSummary&gt; {
+  const response = await request&lt;Envelope&lt;{ memberSince: string | null; domainsOwned: number; listed: number; volumeSold: { amount: string; token: string }; completedSales: number }&gt;&gt;(
+    'GET', API_ENDPOINT.ACCOUNT_SUMMARY_API)
+  const summary = response.result
+  return {
+    memberSince: summary.memberSince ?? '',
+    domainsOwned: summary.domainsOwned,
+    listed: summary.listed,
+    volumeSold: { amount: Number(summary.volumeSold.amount) / 1_000_000, token: summary.volumeSold.token },
+    completedSales: summary.completedSales,
+  }
+}
+
+export async function signOutOtherSessions(): Promise&lt;void&gt; {
+  const response = await request&lt;Envelope&lt;{ accessToken: string; refreshToken: string }&gt;&gt;('POST', API_ENDPOINT.LOGOUT_OTHERS_API)
+  setCookieValue(Cookie_Key.ACCESS_TOKEN, response.result.accessToken)
+  setCookieValue(Cookie_Key.REFRESH_TOKEN, response.result.refreshToken)
+}</code></pre>
+<p><code>getAccountSummary</code> is a <b>mapper inside the service</b>: the volume arrives as a string of USDT minor units, so <code>Number(...) / 1_000_000</code> turns <code>"4250000000"</code> into <code>4250</code> (the underscores in <code>1_000_000</code> are just digit separators). A missing join date becomes <code>''</code>. <code>signOutOtherSessions</code> shows the backend's token rotation from the frontend side: it returns a brand new token pair, which replaces this browser's cookies so this device stays signed in while others are cut off.</p>
+<div class="warn"><b>What Door 2 does not have</b>No cache and no sharing: two components calling <code>getAccountSummary</code> would send two requests. <code>useAccountSummary</code> works around that with its own <code>inFlight</code> promise (section 13). No automatic token refresh either: if the access token has expired, these calls simply fail with 401.</div>
+
+<h3 id="b-legacy">5.3 Door 3: <code>api.service</code> and <code>wallet.service</code></h3>
+<p>Wallet linking uses the project's oldest helpers. <code>getApi(url, true)</code> and <code>postApi(url, body)</code> in <code>src/core/services/api.service.ts</code> are <code>fetch</code> wrappers that add the Bearer header and, on certain errors, run an <code>ErrorHandler</code> that may refresh the token and call themselves again. <code>wallet.service.ts</code> builds on them:</p>
+<span class="path">src/core/services/wallet.service.ts (trimmed)</span>
+<pre><code>export const buildWalletSignMessage = (nonce: string): string =&gt;
+  `Sign this message to verify wallet ownership on Endless Domains.\n\nNonce: ${nonce}`
+
+export const getNonce = async (getNoneApi: string, address) =&gt; {
+  const user = await apiService.getApi(`${url}`, true)
+  if (user.result.nonce === undefined) throw new Error('Nonce is undefined')
+  return user.result.nonce.toString()
+}
+
+export const connectWallet = async ({ postSignatureApi, address, signature, network, source }) =&gt; {
+  const formData = { walletAddress: address, signature, network, source }
+  return await apiService.postApi(postSignatureApi, formData)
+}</code></pre>
+<p>The signed message wraps the nonce in readable text because some wallets (Trust Wallet) would otherwise treat a bare hex nonce as raw bytes and sign something different from what the backend checks. Note <code>postApi</code> resolves even when the backend answers with an error body, which is why <code>useLinkWallet</code> inspects the response itself (section 10).</p>
+
+<h3 id="b-table">5.4 Every endpoint the page uses</h3>
+<div class="tablewrap"><table>
+<tr><th>Endpoint</th><th>Door</th><th>Function or hook</th><th>Used for</th></tr>
+<tr><td><code>GET /users/user-multiple-wallet</code></td><td>1</td><td><code>useGetUserProfileQuery</code></td><td>The whole user: details, sign in methods, wallets</td></tr>
+<tr><td><code>PUT /users</code></td><td>1</td><td><code>useSetProfileMutation</code></td><td>Save name, username, email, phone, Telegram, bio, location, website</td></tr>
+<tr><td><code>POST /auth/verification-email</code></td><td>1</td><td><code>useResendVerificationEmailMutation</code></td><td>Send or resend the email verification link</td></tr>
+<tr><td><code>PUT /auth/change-password</code></td><td>1</td><td><code>useChangePasswordMutation</code></td><td>Change password</td></tr>
+<tr><td><code>GET /users/username/availability?username=</code></td><td>2</td><td><code>checkUsernameAvailable</code></td><td>Live username check, and again before saving</td></tr>
+<tr><td><code>POST /users/avatar</code> / <code>DELETE /users/avatar</code></td><td>2</td><td><code>uploadProfileAvatar</code> / <code>removeProfileAvatar</code></td><td>Photo, PNG or JPEG up to 2 MB</td></tr>
+<tr><td><code>GET</code> / <code>PATCH /users/notifications</code></td><td>2</td><td><code>getNotificationSwitches</code> / <code>updateNotificationSwitches</code></td><td>The five alert switches</td></tr>
+<tr><td><code>GET /marketplacev2/orders/summary</code></td><td>2</td><td><code>getAccountSummary</code></td><td>Rail Account card and Public Preview figures</td></tr>
+<tr><td><code>GET</code> / <code>POST /users/requests</code></td><td>2</td><td><code>listDataRequests</code> / <code>createDataRequest</code></td><td>Export my data, request deletion</td></tr>
+<tr><td><code>POST /auth/logout/others</code></td><td>2</td><td><code>signOutOtherSessions</code></td><td>Only behind the hidden Active Sessions card</td></tr>
+<tr><td><code>GET /web3-auth/generate-nonce</code>, <code>POST /web3-auth/verify</code></td><td>3</td><td><code>getNonce</code>, <code>connectWallet</code></td><td>Link an EVM wallet</td></tr>
+<tr><td><code>GET /web3-auth/solana-generate-nonce</code>, <code>POST /web3-auth/solana-add-wallet</code></td><td>3</td><td><code>getApi</code>, <code>postApi</code></td><td>Link a Solana wallet</td></tr>
+</table></div>
+<p>Paths live in <code>src/core/enum/api-endpoint.enum.ts</code> (for example <code>USER_PROFILE_API = '/users/user-multiple-wallet'</code>). Door 1 uses full URLs built in <code>src/constants/Api.ts</code>; Doors 2 and 3 add <code>baseUrl</code> themselves.</p>
+
+<!-- ============================================================ -->
+<h2 id="helpers-hooks">Interlude: helpers vs hooks</h2>
+<p>Before the tabs, the one distinction that makes the rest of this guide easy: what is a <b>helper</b>, what is a <b>hook</b>, and how do you know which one you are writing? Profile has 4 helper files and 15 hook files (16 hooks: <code>useConnectedWallets.ts</code> also exports <code>useWalletCount</code>), and every one of them is discussed below.</p>
+
+<h3 id="hh-difference">The main difference, in one sentence each</h3>
+<div class="layers" style="grid-template-columns:1fr 1fr">
+  <div><b>Helper</b>A plain function. Give it input, it gives back output, the same output every time for the same input. It has no memory, does not know React exists, and never talks to the network. It is a <b>calculator</b>.</div>
+  <div><b>Hook</b>A function whose name starts with <code>use</code> and that runs <i>inside a React component while it renders</i>. It can remember things between renders (state), run code after render (effects), call other hooks, and fetch data. Its answer can change over time, and when it does, the component re renders. It is a <b>staff member with a notebook and a phone</b>.</div>
+</div>
+<p>The same job is usually split between them. Here is the Profile tab's details, side by side:</p>
+<pre><code><span class="c">// HELPER: src/helpers/profile/mapUser.ts. Pure: object in, object out.</span>
+export function mapUserToDetails(user: User): ProfileDetails {
+  return { fullName: user.name ?? '', email: user.email ?? '', /* ... */ }
+}
+
+<span class="c">// HOOK: src/hooks/profile/useProfileDetails.ts. Fetches, remembers, re renders, and USES the helper.</span>
+export function useProfileDetails() {
+  const query = useGetUserProfileQuery()                 // another hook: fetch + cache
+  const user = query.data?.result
+  const data = useMemo(() =&gt; (user ? mapUserToDetails(user) : undefined), [user])   // helper called inside
+  // ... save, upload, resend
+  return { data, isLoading: query.isLoading, /* ... */ }
+}</code></pre>
+<p>The hook does everything that involves <b>time</b> (waiting for the network, remembering, updating the screen). The helper does everything that is just <b>logic</b> (renaming fields, applying rules). That division is the whole idea.</p>
+
+<h3 id="hh-table">Side by side</h3>
+<div class="tablewrap"><table>
+<tr><th></th><th>Helper</th><th>Hook</th></tr>
+<tr><td>Where it lives</td><td><code>src/helpers/</code></td><td><code>src/hooks/</code> (also React's own: <code>useState</code>, <code>useEffect</code>...)</td></tr>
+<tr><td>Name</td><td>Any verb: <code>mapUserToDetails</code>, <code>validateProfile</code>, <code>base58Encode</code></td><td>Must start with <code>use</code>: <code>useProfileDraft</code>. React and the linter rely on this.</td></tr>
+<tr><td>Can use <code>useState</code>, <code>useEffect</code>, other hooks</td><td><b>No</b></td><td>Yes, that is the point</td></tr>
+<tr><td>Can fetch from the backend</td><td><b>No</b> (project rule, <code>CLAUDE.md</code> §8)</td><td>Yes, through <code>src/core</code></td></tr>
+<tr><td>Remembers between calls</td><td>No: same input, same output</td><td>Yes: state lives as long as the component</td></tr>
+<tr><td>Who may call it</td><td>Anyone: hooks, components, other helpers, tests, Node scripts, the server</td><td>Only React components and other hooks, and only at the top level of them</td></tr>
+<tr><td>Result</td><td>A value, right now</td><td>A value <i>for this render</i>, plus the promise to re render when it changes</td></tr>
+<tr><td>How to test</td><td>Call it with plain data and check the result (even with plain <code>node</code>)</td><td>Render it inside a component (React Testing Library), usually mocking the network</td></tr>
+<tr><td>May import</td><td>Only <code>types</code>, constants from <code>data</code>, other helpers</td><td><code>core</code>, <code>helpers</code>, <code>data</code>, <code>types</code>, other hooks</td></tr>
+</table></div>
+
+<h3 id="hh-rules">The rules of hooks, and why helpers do not have them</h3>
+<p>React tracks a component's hooks by their <b>order</b>: the first <code>useState</code> call is slot 1, the second is slot 2, on every render. So hooks have two rules: call them only at the top level of a component or another hook (never inside an <code>if</code>, a loop, or a callback), and only from React functions. Break the order and React hands slot 2's state to the wrong variable.</p>
+<pre><code><span class="c">// WRONG: the hook runs on some renders and not others, so every hook after it shifts slot</span>
+if (activeTab === 'wallets') {
+  const wallets = useConnectedWallets()
+}
+
+<span class="c">// RIGHT: call it every render, decide what to show afterwards</span>
+const wallets = useConnectedWallets()
+if (activeTab === 'wallets') { /* use wallets.data */ }</code></pre>
+<p>Helpers have no such rules because React does not track them: call <code>validateProfile(draft)</code> inside an <code>if</code>, a loop, an event handler, anywhere.</p>
+
+<h3 id="hh-decide">How to decide which one you are writing</h3>
+<p>Ask one question: <b>does this code need React state, an effect, another hook, or the network?</b></p>
+<div class="tablewrap"><table>
+<tr><th>Answer</th><th>Write a</th><th>Profile example</th></tr>
+<tr><td>No, it only turns data into other data or checks a rule</td><td>Helper</td><td><code>validateProfileField</code>, <code>missingWalletNetworks</code>, <code>profileChanges</code></td></tr>
+<tr><td>Yes, it must wait, remember or fetch</td><td>Hook</td><td><code>useUsernameAvailability</code> (waits 400 ms, remembers status, calls the backend)</td></tr>
+<tr><td>Both</td><td>A hook that <b>calls</b> helpers</td><td><code>useProfileDraft</code> keeps state and calls <code>validateProfile</code> and <code>profileChanges</code></td></tr>
+</table></div>
+<div class="good"><b>Why push as much as possible into helpers?</b>Helpers are the easiest code in the project to read, reuse and test. The Profile validation rules were checked with plain <code>node</code>, without a browser or a backend. Every line you move from a hook into a helper becomes testable in milliseconds. Keep hooks thin: wiring and timing only.</div>
+
+<h3 id="hh-helpers">Every Profile helper file, in detail</h3>
+
+<h4><span class="badge">1</span><code>src/helpers/profile/mapUser.ts</code>: translating between backend and UI</h4>
+<div class="tablewrap"><table>
+<tr><th>Export</th><th>Input → output</th><th>What it decides</th></tr>
+<tr><td><code>mapUserToDetails(user)</code></td><td>backend <code>User</code> → <code>ProfileDetails</code></td><td>Nulls become <code>''</code>; <code>canChangeEmail</code> (not Google, not verified); <code>verificationSent</code> (<code>sentEmailCount &gt; 0</code>); phone string split into country and number.</td></tr>
+<tr><td><code>toUpdateUserBody(saved, next)</code></td><td>two <code>ProfileDetails</code> → <code>PUT /users</code> body</td><td>Field renames (<code>fullName</code> → <code>name</code>); phone joined back to <code>"+91..."</code>; email only when it really changed (the 29 Oct unverify bug).</td></tr>
+<tr><td><code>mapUserToSignInMethods(user)</code></td><td><code>User</code> → <code>SignInMethod[]</code></td><td>Which of email, Google, wallet this account uses.</td></tr>
+<tr><td><code>mapUserToWallets(user)</code></td><td><code>User</code> → <code>ConnectedWallet[]</code></td><td>Drops deleted wallets, lowercases networks, marks the first EVM wallet primary.</td></tr>
+<tr><td><code>missingWalletNetworks(wallets)</code></td><td><code>ConnectedWallet[]</code> → <code>('evm' | 'solana')[]</code></td><td>Which Add buttons to show (one EVM and one Solana per account).</td></tr>
+<tr><td><code>EVM_WALLET_NETWORK</code>, <code>SOLANA_WALLET_NETWORK</code></td><td>constants</td><td>The backend's network names, typed once.</td></tr>
+</table></div>
+<p>Its only imports are types, the static <code>COUNTRIES</code> list from <code>src/data/countries</code>, and the phone helpers: exactly what the layering rule allows. If the backend renames <code>name</code> to <code>fullName</code> tomorrow, this file is the <b>only</b> one that changes. Covered line by line in sections 8.2, 9.1 and 10.1.</p>
+
+<h4><span class="badge">2</span><code>src/helpers/profile/validation.ts</code>: every rule the forms enforce</h4>
+<div class="tablewrap"><table>
+<tr><th>Export</th><th>Kind</th><th>Job</th></tr>
+<tr><td><code>PROFILE_LIMITS</code></td><td>constant</td><td>Max lengths and ranges (name 60, username 3 to 30, Telegram 5 to 32, bio 160, location 80, website 200). Also used by the inputs' <code>maxLength</code>, so the limit and the check never disagree.</td></tr>
+<tr><td><code>ProfileField</code>, <code>ProfileErrors</code></td><td>types</td><td>The eight field names; an object of messages keyed by them.</td></tr>
+<tr><td><code>TELEGRAM_RE</code>, <code>normalizeTelegram</code></td><td>regex, function</td><td>The main site's Telegram rule; strip a leading <code>@</code>.</td></tr>
+<tr><td><code>validateProfileField(field, draft)</code></td><td>function</td><td>One field's message, or <code>undefined</code> when valid. A <code>switch</code> with one case per field.</td></tr>
+<tr><td><code>PROFILE_FIELDS</code>, <code>validateProfile(draft)</code></td><td>constant, function</td><td>Run every field, collect the messages.</td></tr>
+<tr><td><code>profileChanges(saved, draft)</code></td><td>function</td><td>Which fields differ after cleaning (trim, drop <code>@</code>, empty phone to <code>null</code>). Drives Save and the dirty guard.</td></tr>
+<tr><td><code>PasswordChangeDraft</code> + <code>validatePasswordChange</code></td><td>type, function</td><td>The three password fields' rules, using the shared <code>PASSWORD_POLICY</code>.</td></tr>
+</table></div>
+<p>Notice what is <b>not</b> here: "username is taken". That needs the network and waiting, so it lives in a hook (<code>useUsernameAvailability</code>), and <code>useProfileDraft</code> merges the two kinds of error. A perfect illustration of the split. Covered line by line in sections 8.4 and 9.3.</p>
+
+<h4><span class="badge">3</span><code>src/helpers/profile/base58.ts</code>: turning bytes into text</h4>
+<span class="path">src/helpers/profile/base58.ts</span>
+<pre><code>const BASE58_ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
+
+export function base58Encode(input: Uint8Array): string {
+  let zeros = 0
+  while (zeros &lt; input.length &amp;&amp; input[zeros] === 0) zeros++
+
+  const digits: number[] = []            // the number in base 58, least significant digit first
+  for (const byte of input) {
+    let carry = byte
+    for (let j = 0; j &lt; digits.length; j++) {
+      carry += digits[j] &lt;&lt; 8             // shift everything so far up by one byte (× 256) and add the new byte
+      digits[j] = carry % 58               // keep what fits in this base 58 digit
+      carry = (carry / 58) | 0             // carry the rest to the next digit (| 0 = whole number)
+    }
+    while (carry &gt; 0) {                  // the number grew: add new digits at the top
+      digits.push(carry % 58)
+      carry = (carry / 58) | 0
+    }
+  }
+
+  let out = '1'.repeat(zeros)            // each leading zero byte is written as '1'
+  for (let i = digits.length - 1; i &gt;= 0; i--) out += BASE58_ALPHABET[digits[i]]
+  return out
+}</code></pre>
+<p>A Solana signature is 64 raw bytes, and the backend wants it as text. Base58 is like writing a number in base 10, except with 58 symbols, chosen so that easily confused characters (<code>0</code>, <code>O</code>, <code>I</code>, <code>l</code>) never appear. The algorithm treats all the bytes as one huge number and converts it to base 58 with schoolbook long division, one byte at a time.</p>
+<p><b>Worked example</b>, bytes <code>[0, 0, 1]</code>:</p>
+<ol class="check">
+<li>Count leading zero bytes: <code>zeros = 2</code>.</li>
+<li>Byte <code>0</code>: <code>digits</code> is empty, <code>carry = 0</code>, nothing added. Same for the second <code>0</code>.</li>
+<li>Byte <code>1</code>: <code>carry = 1</code>; the inner loop does nothing (no digits yet); the <code>while</code> pushes <code>1 % 58 = 1</code>. Now <code>digits = [1]</code>.</li>
+<li>Output: <code>'11'</code> for the two zeros, then <code>BASE58_ALPHABET[1]</code> which is <code>'2'</code>. Result <code>"112"</code>.</li>
+</ol>
+<p><code>&lt;&lt; 8</code> is a bit shift, multiplying by 256 (one byte). <code>(x / 58) | 0</code> is a fast way to drop the decimals. It is written without <code>BigInt</code> because the project's TypeScript target does not support it. A perfect helper: pure arithmetic, no imports at all.</p>
+
+<h4><span class="badge">4</span><code>src/helpers/profile/solana-signing.ts</code>: a helper that receives its dependency</h4>
+<pre><code>export interface SolanaSigner {
+  signMessage: (message: Uint8Array) =&gt; Promise&lt;Uint8Array | { signature: Uint8Array }&gt;
+}
+
+export async function signSolanaMessage(signer: SolanaSigner | undefined, message: string): Promise&lt;string&gt; {
+  if (!signer?.signMessage) throw new Error('This wallet does not support message signing')
+  const raw = await signer.signMessage(new TextEncoder().encode(message))
+  const bytes = raw instanceof Uint8Array ? raw : raw.signature
+  return base58Encode(bytes)
+}</code></pre>
+<p>This one is a borderline case worth understanding. It is <code>async</code> and it makes the user's wallet pop up, which is not "pure". It still counts as a helper because it does not <i>find</i> the wallet itself: the hook (<code>useLinkWallet</code>) gets the wallet provider from AppKit and <b>passes it in</b> as <code>signer</code>. This pattern is called <b>dependency injection</b>. The helper imports no wallet library and no React, and in a test you can pass a fake <code>signer</code> that returns fixed bytes. It also hides two wallet differences (some return bytes, some return <code>{ signature }</code>) behind one simple function.</p>
+
+<h4><span class="badge">+</span>Shared helpers Profile uses</h4>
+<div class="tablewrap"><table>
+<tr><th>File</th><th>Used for</th></tr>
+<tr><td><code>src/helpers/phone.ts</code></td><td><code>parsePhoneString</code>, <code>toPhoneString</code>, <code>validatePhoneNumber</code>: the phone field's split, join and rule.</td></tr>
+<tr><td><code>src/helpers/passwordStrength.ts</code></td><td><code>PASSWORD_POLICY</code> regex, its text, and the strength meter under New password.</td></tr>
+<tr><td><code>src/helpers/error-messages/</code></td><td><code>getUserFriendlyToastMessage(error, fallback)</code>: any error shape to a readable sentence.</td></tr>
+<tr><td><code>src/helpers/marketplace/routes.ts</code></td><td><code>PROFILE_HREF</code>, <code>PORTFOLIO_HREF</code>: route strings in one place.</td></tr>
+<tr><td><code>src/helpers/displayFormat.ts</code>, <code>chaincurrency</code></td><td>Date formats and the USD icon, for the (hidden) Display rows.</td></tr>
+</table></div>
+
+<h3 id="hh-hooks">Every Profile hook file, in detail</h3>
+<p>The 16 hooks in those 15 files fall into four kinds. Knowing the kind tells you what to expect inside.</p>
+<div class="tablewrap"><table>
+<tr><th>Kind</th><th>What it does</th><th>Typical return</th></tr>
+<tr><td><b>Data hook</b></td><td>Reads one area, from the backend or sample data</td><td><code>QueryResult</code>: <code>{ data, isLoading, isError, refetch }</code></td></tr>
+<tr><td><b>Action hook</b></td><td>Changes something on the backend</td><td>A function plus a busy flag: <code>{ changePassword, isSaving }</code></td></tr>
+<tr><td><b>Combined hook</b></td><td>A data hook plus its actions, or several hooks merged</td><td><code>QueryResult</code> plus actions</td></tr>
+<tr><td><b>Plumbing hook</b></td><td>Reusable machinery other hooks are built from</td><td>Whatever the pattern needs</td></tr>
+</table></div>
+<div class="tablewrap"><table>
+<tr><th>Hook file</th><th>Kind</th><th>Calls</th><th>Returns</th><th>Status</th></tr>
+<tr><td><code>useProfileDetails</code></td><td>Combined</td><td><code>useGetUserProfileQuery</code>, <code>useSetProfileMutation</code>, <code>useResendVerificationEmailMutation</code>, avatar and username services, <code>mapUser</code></td><td>details + <code>save</code>, <code>resendVerification</code>, <code>uploadAvatar</code>, <code>removeAvatar</code></td><td><span class="real">REAL</span></td></tr>
+<tr><td><code>useProfileDraft</code></td><td>Combined</td><td><code>useProfileDetails</code>, <code>useUsernameAvailability</code>, <code>validation</code> helpers</td><td>draft, errors, dirty, <code>setField</code>, <code>blur</code>, <code>submit</code>, <code>discard</code></td><td><span class="real">REAL</span></td></tr>
+<tr><td><code>useUsernameAvailability</code></td><td>Data</td><td><code>checkUsernameAvailable</code> after a 400 ms pause</td><td><code>'idle' | 'checking' | 'available' | 'taken'</code></td><td><span class="real">REAL</span></td></tr>
+<tr><td><code>useSignInMethods</code></td><td>Data</td><td><code>useGetUserProfileQuery</code>, <code>mapUserToSignInMethods</code></td><td><code>QueryResult&lt;SignInMethod[]&gt;</code></td><td><span class="real">REAL</span></td></tr>
+<tr><td><code>useChangePassword</code></td><td>Action</td><td><code>useChangePasswordMutation</code></td><td><code>{ changePassword, isSaving }</code></td><td><span class="real">REAL</span></td></tr>
+<tr><td><code>useConnectedWallets</code> (+ <code>useWalletCount</code>)</td><td>Data</td><td><code>useGetUserProfileQuery</code>, <code>mapUserToWallets</code>, <code>missingWalletNetworks</code></td><td>wallets, <code>missing</code>, <code>userId</code>; the count or <code>null</code></td><td><span class="real">REAL</span></td></tr>
+<tr><td><code>useLinkWallet</code></td><td>Action</td><td>AppKit, wagmi, <code>wallet.service</code>, <code>api.service</code>, <code>solana-signing</code></td><td><code>{ link, pending, isLinking }</code></td><td><span class="real">REAL</span></td></tr>
+<tr><td><code>useNotificationSettings</code></td><td>Combined</td><td><code>getNotificationSwitches</code>, <code>updateNotificationSwitches</code></td><td>settings + <code>update</code>, <code>isSaving</code></td><td><span class="real">REAL</span></td></tr>
+<tr><td><code>useAccountSummary</code></td><td>Data</td><td><code>getAccountSummary</code> (shared <code>inFlight</code> promise)</td><td><code>QueryResult&lt;AccountSummary&gt;</code></td><td><span class="real">REAL</span></td></tr>
+<tr><td><code>useYourData</code></td><td>Action</td><td><code>listDataRequests</code>, <code>createDataRequest</code></td><td><code>requestExport</code>, <code>deleteAccount</code>, statuses, busy flags</td><td><span class="real">REAL</span></td></tr>
+<tr><td><code>useActiveSessions</code></td><td>Combined</td><td><code>useProfileMockArea('sessions')</code>, <code>signOutOtherSessions</code></td><td>sessions + <code>signOut</code>, <code>signOutOthers</code></td><td><span class="off">HIDDEN</span></td></tr>
+<tr><td><code>useWalletSettings</code></td><td>Combined</td><td><code>useProfileMockArea('walletSettings')</code></td><td>settings + <code>update</code></td><td><span class="off">HIDDEN</span></td></tr>
+<tr><td><code>useProfilePreferences</code></td><td>Combined</td><td><code>useProfileMockArea('preferences')</code></td><td>preferences + <code>update</code></td><td><span class="off">HIDDEN</span></td></tr>
+<tr><td><code>useProfileAction</code></td><td>Plumbing</td><td><code>useState</code>, <code>useRef</code>, <code>useCallback</code></td><td><code>{ run, isSaving }</code> around any async function</td><td>used by 8 hooks</td></tr>
+<tr><td><code>useProfileMockArea</code></td><td>Plumbing</td><td><code>useProfileMock</code> (store), <code>useMockQuery</code></td><td><code>QueryResult</code> of one sample area, live</td><td>used by 3 hooks</td></tr>
+</table></div>
+<p>(Besides these, the page uses hooks from outside the folder: <code>useIsMobile</code>, a <b>display hook</b> that only watches the window width; <code>useAuth</code> and <code>useTheme</code>, <b>context hooks</b> that read app wide state from a Provider; and Next's <code>useRouter</code>.)</p>
+
+<h4>Patterns to recognise inside the hooks</h4>
+<div class="tablewrap"><table>
+<tr><th>Pattern</th><th>Where</th><th>What it solves</th></tr>
+<tr><td>Map the cached response with <code>useMemo</code> and a helper</td><td><code>useProfileDetails</code>, <code>useSignInMethods</code>, <code>useConnectedWallets</code></td><td>One request, many views of it; a stable object so effects downstream do not re run.</td></tr>
+<tr><td>Hand written query (state + effect + <code>reloads</code> counter + <code>cancelled</code> flag)</td><td><code>useNotificationSettings</code>, <code>useAccountSummary</code></td><td>Door 2 has no RTK hooks, so loading, error and refetch are rebuilt by hand.</td></tr>
+<tr><td>Debounce with a timer cleared in the cleanup</td><td><code>useUsernameAvailability</code></td><td>One request per pause in typing.</td></tr>
+<tr><td>Latest value in a ref</td><td><code>useProfileAction</code>, <code>useLinkWallet</code></td><td>Stable functions that never call stale values.</td></tr>
+<tr><td>Event driven effect with a "started" guard</td><td><code>useLinkWallet</code></td><td>Start work when an outside system (the wallet) reports a state, exactly once.</td></tr>
+<tr><td>Module level shared state in a hook file</td><td><code>useAccountSummary</code> (<code>inFlight</code>), <code>useLinkWallet</code> (<code>solanaAdapter</code>)</td><td>Share one request or one object across every component using the hook.</td></tr>
+<tr><td>Same return shape for real and sample</td><td>every data hook</td><td>Components never know, and switching to the real API changes only the hook.</td></tr>
+</table></div>
+<div class="warn"><b>Two mistakes to avoid</b><b>1.</b> Putting a <code>fetch</code> or a service call in a helper "because it is just a function". It then needs state for loading and errors, and the layering rule forbids it: that code belongs in a hook (or in <code>core</code>, called from a hook). <b>2.</b> Writing a hook for pure logic, like <code>useFormattedDate(date)</code> with no state inside. That forces callers to obey the rules of hooks for no reason; make it a helper and call it anywhere.</div>
+<div class="good"><b>Check yourself</b>Without looking: is "username is taken" a helper or a hook, and why? Why is <code>signSolanaMessage</code> allowed in <code>helpers/</code> even though it is async? Which hooks would you have to rewrite to move notifications into RTK Query, and which helpers would not change at all?</div>
+
+<!-- ============================================================ -->
+<h2 id="page">6. The page file, line by line</h2>
+<p><code>pages/profile/index.tsx</code> (179 lines) is the route. Because it lives in <code>pages/</code>, Next.js serves it at <code>/profile</code> automatically. It does four jobs: decide the active tab, lay out the page, render the right tab panel, and protect unsaved edits.</p>
+
+<h3>6.1 Imports and metadata (lines 1 to 19)</h3>
+<pre><code>import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/router'
+import MainLayout from '@/design-system/layouts/main-layout'
+import MarketplacePageShell from '@/design-system/composites/marketplace/shared/MarketplacePageShell'
+import { ConfirmDrawer, ProfileRail, ProfileRailAccount, ProfileSettingsHeader, ProfileTabPanel, SecurityTabPanel, WalletsTabPanel, NotificationsTabPanel, PreferencesTabPanel, ProfileTabs, profilePanelId, profileTabId } from '@/design-system/composites/profile'
+import { useWalletCount } from '@/hooks/profile/useConnectedWallets'
+import { useIsMobile } from '@/utils/UseIsMobile'
+import { PROFILE_TABS, type ProfileTab } from '@/types/profile-settings'
+import type { MetaData } from '@/core/model/meta-data.type'
+import { PROFILE_HREF } from '@/helpers/marketplace/routes'
+import type { ProfileField } from '@/helpers/profile/validation'
+import styles from './profile.module.scss'
+
+const meta: MetaData = {
+  title: 'Profile and Settings',
+  description: 'Your public profile, how you sign in, your wallets, notifications and preferences on Endless Domains.',
+}
+
+const isProfileTab = (value: unknown): value is ProfileTab =&gt;
+  typeof value === 'string' &amp;&amp; (PROFILE_TABS as readonly string[]).includes(value)</code></pre>
+<div class="tablewrap"><table>
+<tr><th>Line</th><th>Meaning</th></tr>
+<tr><td>React hooks import</td><td><code>useState</code> holds values that cause re renders; <code>useRef</code> holds values that do not; <code>useEffect</code> runs code after render; <code>useCallback</code> keeps a function's identity stable between renders.</td></tr>
+<tr><td><code>useRouter</code></td><td>Next.js router: read <code>router.query.tab</code>, change the URL, listen to navigation events.</td></tr>
+<tr><td>The long composites import</td><td>Everything comes from the barrel <code>composites/profile/index.ts</code>, so one line instead of twelve.</td></tr>
+<tr><td><code>type ProfileTab</code></td><td>The <code>type</code> keyword inside braces imports only the type; it disappears at compile time.</td></tr>
+<tr><td><code>meta</code></td><td>Handed to <code>MainLayout</code>, which writes <code>&lt;title&gt;</code> and the description meta tag.</td></tr>
+<tr><td><code>isProfileTab</code></td><td>A <b>type guard</b>. <code>router.query.tab</code> is typed <code>string | string[] | undefined</code> and could be anything a user typed. This checks it is a string and one of the five tabs. Because the return type is <code>value is ProfileTab</code>, TypeScript narrows the value after a true result. <code>PROFILE_TABS as readonly string[]</code> widens the array type so <code>.includes</code> accepts any string.</td></tr>
+</table></div>
+
+<h3>6.2 Which tab is active (lines 32 to 62)</h3>
+<pre><code>export default function ProfilePage() {
+  const router = useRouter()
+  const urlTab: ProfileTab = isProfileTab(router.query.tab) ? router.query.tab : 'profile'
+  const [requestedTab, setRequestedTab] = useState&lt;ProfileTab | null&gt;(null)
+  const activeTab = requestedTab ?? urlTab
+  const walletCount = useWalletCount()
+
+  useEffect(() =&gt; {
+    if (requestedTab &amp;&amp; urlTab === requestedTab) setRequestedTab(null)
+  }, [urlTab, requestedTab])
+
+  useEffect(() =&gt; {
+    const followUrl = (_url: string, { shallow }: { shallow: boolean }) =&gt; {
+      if (!shallow) setRequestedTab(null)
+    }
+    const onPopState = () =&gt; setRequestedTab(null)
+    router.events.on('routeChangeComplete', followUrl)
+    window.addEventListener('popstate', onPopState)
+    return () =&gt; {
+      router.events.off('routeChangeComplete', followUrl)
+      window.removeEventListener('popstate', onPopState)
+    }
+  }, [router])</code></pre>
+<p>The URL is the source of truth for the tab (so <code>/profile?tab=wallets</code> can be bookmarked and shared). Missing or invalid <code>?tab=</code> means Profile. But there is a subtlety the comments explain: Next.js updates the URL inside a React <b>transition</b>, which React may delay while other updates are busy, so a tab read only from the URL sometimes did not switch on click. The fix is a two source design:</p>
+<ol class="check">
+<li><code>requestedTab</code> holds the tab you just clicked, immediately.</li>
+<li><code>activeTab = requestedTab ?? urlTab</code>: the click wins until the URL catches up. <code>??</code> means "use the right side only if the left is <code>null</code> or <code>undefined</code>".</li>
+<li>The first effect clears <code>requestedTab</code> once the URL shows the same tab, so the URL leads again.</li>
+<li>The second effect clears it on a real (non shallow) navigation or on Back/Forward (<code>popstate</code>), so a link from the sidebar always wins over a click whose URL never landed.</li>
+<li>Both effects <b>return a cleanup</b> that removes the listeners. Without it, every re mount would add another listener and they would pile up.</li>
+</ol>
+<p><code>useWalletCount()</code> reads the cached user (Door 1) and returns the number of wallets for the Wallets tab badge, or <code>null</code> until loaded so no wrong number flashes.</p>
+
+<h3>6.3 Switching tabs, with the unsaved edits check (lines 64 to 99)</h3>
+<pre><code>  const [isDirty, setIsDirty] = useState(false)
+  const [pendingTab, setPendingTab] = useState&lt;ProfileTab | null&gt;(null)
+  const [focusField, setFocusField] = useState&lt;ProfileField | null&gt;(null)
+  const dirtyRef = useRef(false)
+  dirtyRef.current = isDirty
+
+  const goToTab = useCallback((tab: ProfileTab) =&gt; {
+    setRequestedTab(tab)
+    const query = { ...router.query }
+    if (tab === 'profile') delete query.tab
+    else query.tab = tab
+    router.replace({ pathname: router.pathname, query }, undefined, { shallow: true, scroll: false })
+  }, [router])
+
+  const setTab = useCallback((tab: ProfileTab) =&gt; {
+    if (tab !== activeTab &amp;&amp; activeTab === 'profile' &amp;&amp; dirtyRef.current) setPendingTab(tab)
+    else goToTab(tab)
+  }, [activeTab, goToTab])
+
+  const discardAndSwitch = () =&gt; {
+    if (!pendingTab) return
+    setIsDirty(false)
+    dirtyRef.current = false
+    goToTab(pendingTab)
+    setPendingTab(null)
+  }</code></pre>
+<div class="tablewrap"><table>
+<tr><th>Piece</th><th>Meaning</th></tr>
+<tr><td><code>isDirty</code></td><td>Set by the Profile tab (through <code>onDirtyChange</code>) whenever its draft differs from what is saved.</td></tr>
+<tr><td><code>dirtyRef</code></td><td>The same value in a ref. Event listeners created once (the <code>beforeunload</code> below) would otherwise see the stale <code>isDirty</code> from their first render, a classic <b>stale closure</b>. A ref is a box whose <code>.current</code> is always the latest value. Assigning it on every render (<code>dirtyRef.current = isDirty</code>) keeps it fresh.</td></tr>
+<tr><td><code>pendingTab</code></td><td>The tab the user wanted while having unsaved edits. Non null means "show the Discard drawer".</td></tr>
+<tr><td><code>focusField</code></td><td>Lets another tab ask the Profile tab to focus a field (designed for Notifications' Telegram "Set up", currently hidden).</td></tr>
+<tr><td><code>goToTab</code></td><td>Set the tab now, then copy the query, set or remove <code>tab</code> (Profile has no <code>?tab=</code>, keeping the URL clean), and <code>router.replace</code> with <code>shallow: true</code> (no data refetch) and <code>scroll: false</code> (stay where you are). <code>replace</code> instead of <code>push</code> means tab switches do not fill the Back button history.</td></tr>
+<tr><td><code>setTab</code></td><td>The guard: leaving Profile with unsaved edits opens the drawer instead of switching.</td></tr>
+<tr><td><code>discardAndSwitch</code></td><td>The drawer's confirm: clear dirty (both state and ref, so nothing re blocks), switch, close the drawer.</td></tr>
+</table></div>
+
+<h3>6.4 Leaving the page with unsaved edits (lines 101 to 122)</h3>
+<pre><code>  useEffect(() =&gt; {
+    const onBeforeUnload = (event: BeforeUnloadEvent) =&gt; {
+      if (!dirtyRef.current) return
+      event.preventDefault()
+      event.returnValue = ''
+    }
+    const onRouteChangeStart = (url: string) =&gt; {
+      if (!dirtyRef.current || url.split('?')[0] === PROFILE_HREF) return
+      if (window.confirm('You have unsaved changes on your profile. Leave without saving?')) return
+      router.events.emit('routeChangeError')
+      throw 'Route change aborted: unsaved profile changes'
+    }
+    window.addEventListener('beforeunload', onBeforeUnload)
+    router.events.on('routeChangeStart', onRouteChangeStart)
+    return () =&gt; { /* remove both */ }
+  }, [router])</code></pre>
+<p>Two kinds of leaving need two mechanisms. Closing the tab or reloading fires the browser's <code>beforeunload</code>; calling <code>preventDefault()</code> and setting <code>returnValue</code> makes the browser show its own "Leave site?" dialog (browsers ignore custom text there). Clicking a link to another page goes through Next's router, which fires <code>routeChangeStart</code>. Next has no official way to cancel a navigation, so the code uses the community workaround: emit <code>routeChangeError</code> and <b>throw</b>, which aborts it (Next logs it as cancelled). <code>url.split('?')[0] === PROFILE_HREF</code> lets tab changes on <code>/profile</code> itself through, because those are handled by the drawer above. A native <code>window.confirm</code> is used because the router cannot wait for an async modal.</p>
+
+<h3>6.5 Layout and the tab panel (lines 124 to 178)</h3>
+<pre><code>  const isMobile = useIsMobile(767)
+
+  const hero = (
+    &lt;div className={styles.hero}&gt;
+      &lt;ProfileSettingsHeader /&gt;
+      {isMobile &amp;&amp; &lt;ProfileRailAccount /&gt;}
+      &lt;ProfileTabs activeTab={activeTab} onChange={setTab} walletCount={walletCount} /&gt;
+    &lt;/div&gt;
+  )
+
+  return (
+    &lt;MainLayout metaInfo={meta}&gt;
+      &lt;MarketplacePageShell hero={hero} rightRail={&lt;ProfileRail showAccount={!isMobile} /&gt;} mobileRailPlacement="after-main-tablet"&gt;
+        &lt;div className={styles.panel} role="tabpanel" id={profilePanelId(activeTab)} aria-labelledby={profileTabId(activeTab)} tabIndex={0}&gt;
+          {activeTab === 'profile' ? (
+            &lt;ProfileTabPanel onDirtyChange={setIsDirty} focusField={focusField} onFocused={() =&gt; setFocusField(null)} /&gt;
+          ) : activeTab === 'security' ? (
+            &lt;SecurityTabPanel onNavigateTab={setTab} /&gt;
+          ) : activeTab === 'wallets' ? (
+            &lt;WalletsTabPanel /&gt;
+          ) : activeTab === 'notifications' ? (
+            &lt;NotificationsTabPanel onSetUpTelegram={() =&gt; { setFocusField('telegram'); setTab('profile') }} /&gt;
+          ) : (
+            &lt;PreferencesTabPanel /&gt;
+          )}
+        &lt;/div&gt;
+      &lt;/MarketplacePageShell&gt;
+
+      &lt;ConfirmDrawer isOpen={pendingTab !== null} title="Discard unsaved changes?" confirmLabel="Discard changes"
+        cancelLabel="Keep editing" onConfirm={discardAndSwitch} onCancel={() =&gt; setPendingTab(null)}&gt;
+        Your profile edits haven&amp;apos;t been saved. Switching tabs will lose them.
+      &lt;/ConfirmDrawer&gt;
+    &lt;/MainLayout&gt;
+  )
+}</code></pre>
+<div class="tablewrap"><table>
+<tr><th>Piece</th><th>Meaning</th></tr>
+<tr><td><code>MainLayout</code></td><td>The site shell: header, sidebar, bottom nav, footer stripe, page title.</td></tr>
+<tr><td><code>MarketplacePageShell</code></td><td>The shared three column grid (sidebar, main, rail). <code>hero</code> goes on top of the main column; children below; <code>rightRail</code> on the right. Below desktop it stacks; <code>"after-main-tablet"</code> puts the rail after the tab content on smaller screens.</td></tr>
+<tr><td><code>useIsMobile(767)</code></td><td>True when the window is 767px or narrower. On mobile the Account card moves to the top (into <code>hero</code>) and the rail is told not to repeat it (<code>showAccount={!isMobile}</code>). It starts <code>false</code> and resolves after the first render, so the first paint is the desktop arrangement.</td></tr>
+<tr><td><code>role="tabpanel"</code>, <code>id</code>, <code>aria-labelledby</code></td><td>Accessibility wiring: screen readers announce this region as the panel of the active tab. <code>profilePanelId('security')</code> is <code>'profile-panel-security'</code>; the matching tab button has <code>aria-controls</code> pointing here.</td></tr>
+<tr><td>The chained <code>? :</code></td><td>Only one panel is mounted at a time. Switching tabs <b>unmounts</b> the old panel, which is why the Profile tab clears the dirty flag in a cleanup (section 8.5).</td></tr>
+<tr><td><code>&amp;apos;</code></td><td>An HTML entity for <code>'</code>; React's lint rule forbids a raw apostrophe in JSX text.</td></tr>
+</table></div>
+
+<!-- ============================================================ -->
+<h2 id="shared">7. Shared building blocks</h2>
+
+<h3>7.1 <code>ProfileTabs</code>: an accessible tab row</h3>
+<span class="path">src/design-system/composites/profile/shared/ProfileTabs/ProfileTabs.tsx (key parts)</span>
+<pre><code>const PROFILE_TAB_ITEMS: readonly PillTab&lt;ProfileTab&gt;[] = PROFILE_TABS.map((id) =&gt; ({
+  id,
+  ...{
+    profile: { label: 'Profile', Icon: ProfileTabIcon },
+    security: { label: 'Security', Icon: SecurityTabIcon },
+    wallets: { label: 'Wallets', Icon: WalletsTabIcon },
+    notifications: { label: 'Notifications', Icon: NotificationsTabIcon },
+    preferences: { label: 'Preferences', Icon: PreferencesTabIcon },
+  }[id],
+}))
+
+export const ProfileTabs = &lt;T extends string = ProfileTab&gt;({ activeTab, onChange, walletCount = null, tabs = PROFILE_TAB_ITEMS as ..., /* ... */ }) =&gt; {
+  const refs = useRef&lt;Partial&lt;Record&lt;T, HTMLButtonElement | null&gt;&gt;&gt;({})
+  // ...
+  const handleKeyDown = (event: React.KeyboardEvent&lt;HTMLButtonElement&gt;) =&gt; {
+    const index = ids.indexOf(activeTab)
+    const last = ids.length - 1
+    const next =
+      event.key === 'ArrowRight' ? (index === last ? 0 : index + 1)
+      : event.key === 'ArrowLeft' ? (index === 0 ? last : index - 1)
+      : event.key === 'Home' ? 0
+      : event.key === 'End' ? last
+      : null
+    if (next === null) return
+    event.preventDefault()
+    focusTab(ids[next])
+  }
+  // ... renders &lt;button role="tab" aria-selected tabIndex={active ? 0 : -1} aria-controls=... &gt;</code></pre>
+<div class="tablewrap"><table>
+<tr><th>Idea</th><th>How it works</th></tr>
+<tr><td>Building the tab list</td><td>For each tab id, spread in its label and icon looked up from an object by id (<code>{...}[id]</code>). One source of order (<code>PROFILE_TABS</code>), one place for labels.</td></tr>
+<tr><td>Generic component <code>&lt;T extends string = ProfileTab&gt;</code></td><td>The same component also renders History's and Portfolio's tabs with their own ids. <code>T</code> defaults to <code>ProfileTab</code> when not given.</td></tr>
+<tr><td>Keyboard</td><td>Right and Left wrap around; Home and End jump. <code>preventDefault</code> stops the page from scrolling.</td></tr>
+<tr><td>Roving tabindex</td><td>Only the active tab has <code>tabIndex={0}</code>, so one Tab press enters the row and the next leaves it; arrows move inside.</td></tr>
+<tr><td><code>refs</code> object</td><td>Holds each button element so <code>focusTab</code> can move focus to it.</td></tr>
+<tr><td>Scroll reveal effect</td><td>On mobile the row scrolls sideways; an effect scrolls only the row (never the page) so the active tab is visible, and a <code>ResizeObserver</code> repeats it when fonts load or the badge appears and widths change.</td></tr>
+<tr><td>Badges</td><td>Wallets shows <code>walletCount</code> when not null; the optional <code>count</code> chip is for Portfolio.</td></tr>
+</table></div>
+
+<h3>7.2 <code>SettingsCard</code> and <code>SettingsRow</code></h3>
+<p>Every card on every tab is a <code>SettingsCard</code>: a <code>&lt;section&gt;</code> with an optional <code>&lt;h2&gt;</code> title, subtitle, an action on the right, the "Sample data" chip when <code>isSample</code>, and an optional divider. The heading id links to the section with <code>aria-labelledby</code>; a card without a title is named with <code>ariaLabel</code> instead.</p>
+<p>Rows inside cards are the primitive <code>SettingsRow</code>, whose <code>control</code> prop is a nice example of a <b>render prop</b>:</p>
+<span class="path">src/design-system/primitives/cards/settings-row/SettingsRow.tsx (key lines)</span>
+<pre><code>control?: React.ReactNode | ((ids: SettingsRowIds) =&gt; React.ReactNode)
+// ...
+const ids: SettingsRowIds = { labelId: `${id}-title`, descriptionId: description ? `${id}-description` : undefined }
+// ...
+{control &amp;&amp; &lt;div className={styles.control}&gt;{typeof control === 'function' ? control(ids) : control}&lt;/div&gt;}</code></pre>
+<p>The row creates ids for its own title and description. If you pass a function, it hands you those ids, so the switch inside can say <code>aria-labelledby={ids.labelId}</code>. A screen reader then reads "A domain I watch is sold, switch, on" instead of an unnamed switch. If you pass plain JSX, it just renders it.</p>
+
+<h3>7.3 The rest of <code>shared/</code></h3>
+<div class="tablewrap"><table>
+<tr><th>Component</th><th>What it is</th></tr>
+<tr><td><code>ProfileSettingsHeader</code></td><td>The title card: "Profile And Settings" and a subtitle, with default props.</td></tr>
+<tr><td><code>SettingsCardSkeleton</code></td><td>A grey placeholder card with <code>rows</code> bars, shown while a tab loads. <code>Array.from({ length: rows }, (_, index) =&gt; ...)</code> makes an array of that length to map over. <code>aria-hidden</code> keeps screen readers from reading empty shapes.</td></tr>
+<tr><td><code>ConfirmDrawer</code></td><td>The shared right side <code>Modal</code> drawer with Cancel and a confirm button (red when <code>confirmVariant="error"</code>). While <code>isBusy</code>, it cannot be dismissed. Plain string children are wrapped in a paragraph style.</td></tr>
+<tr><td><code>NoteBox</code></td><td><code>InfoNote</code> (icon + text) inside a tinted box.</td></tr>
+<tr><td><code>SuccessChip</code></td><td>The small green "Active", "Connected", "Primary" label.</td></tr>
+<tr><td><code>index.ts</code> barrel</td><td>Re exports the 28 public pieces of the folder.</td></tr>
+</table></div>
+
+<!-- ============================================================ -->
+<h2 id="tab-profile">8. Tab 1: Profile, end to end</h2>
+<p>The biggest tab. Four hooks and two helpers work together:</p>
+<div class="flow">
+  <div class="box"><b>ProfileTabPanel</b> (composite) calls <code>useProfileDraft()</code> and <code>useAccountSummary()</code></div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>useProfileDraft</b> keeps the editable copy, errors, dirty state; calls <code>useProfileDetails()</code> and <code>useUsernameAvailability()</code></div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>useProfileDetails</b> reads the user (Door 1), saves (Door 1), checks username and uploads the photo (Door 2)</div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>mapUser.ts</b> converts backend to view model and back; <b>validation.ts</b> holds every rule</div>
+</div>
+
+<h3 id="p-details">8.1 <code>useProfileDetails</code>: the source of the saved profile</h3>
+<span class="path">src/hooks/profile/useProfileDetails.ts</span>
+<pre><code>const isUsernameTaken = (error: unknown) =&gt; {
+  const { status, data } = (error ?? {}) as { status?: number; data?: { message?: string | string[] } }
+  const message = Array.isArray(data?.message) ? data?.message.join(' ') : data?.message
+  return status === 409 &amp;&amp; Boolean(message?.includes('USERNAME_TAKEN'))
+}
+
+const ACCOUNT_FIELDS: (keyof ProfileDetails)[] = ['fullName', 'email', 'phone', 'telegram', 'username', 'bio', 'location', 'website']
+
+export function useProfileDetails(): ProfileDetailsResult {
+  const query = useGetUserProfileQuery()
+  const [setProfile] = useSetProfileMutation()
+  const [sendVerification, { isLoading: isSending }] = useResendVerificationEmailMutation()
+  const { refetch } = query
+  const user = query.data?.result
+
+  const data = useMemo(() =&gt; (user ? mapUserToDetails(user) : undefined), [user])
+
+  const { run: save, isSaving } = useProfileAction(async (patch: Partial&lt;ProfileDetails&gt;) =&gt; {
+    if (!user) throw new Error('Your profile has not loaded yet.')
+    const saved = mapUserToDetails(user)
+    const accountChanged = ACCOUNT_FIELDS.some((field) =&gt; field in patch)
+
+    if (accountChanged &amp;&amp; patch.username &amp;&amp; patch.username !== saved.username) {
+      const available = await checkUsernameAvailable(patch.username)
+      if (!available) throw new Error('That username is already taken.')
+    }
+    if (accountChanged) {
+      try {
+        await setProfile(toUpdateUserBody(saved, { ...saved, ...patch })).unwrap()
+      } catch (error) {
+        if (isUsernameTaken(error)) throw new Error('That username is already taken.')
+        throw error
+      }
+    }
+    const fresh = accountChanged ? (await refetch().unwrap()).result : user
+    return mapUserToDetails(fresh)
+  })
+  // ... resendVerification, uploadAvatar, removeAvatar (below)
+}</code></pre>
+<div class="tablewrap"><table>
+<tr><th>Line</th><th>Meaning</th></tr>
+<tr><td><code>isUsernameTaken</code></td><td>RTK's <code>unwrap()</code> rejects with <code>{ status, data }</code>. <code>(error ?? {}) as {...}</code> protects against <code>null</code> and tells TypeScript what shape to expect. 409 Conflict with the backend's code <code>USERNAME_TAKEN</code> means someone took the name.</td></tr>
+<tr><td><code>ACCOUNT_FIELDS</code></td><td><code>(keyof ProfileDetails)[]</code>: an array of property names of <code>ProfileDetails</code>. These go through <code>PUT /users</code>; the photo does not.</td></tr>
+<tr><td><code>useGetUserProfileQuery()</code></td><td>The shared cached request (Door 1). <code>query.data?.result</code> is the backend <code>User</code>, or <code>undefined</code> while loading. <code>?.</code> stops at <code>undefined</code> instead of crashing.</td></tr>
+<tr><td><code>const [sendVerification, { isLoading: isSending }]</code></td><td>Mutation hooks return a pair: the trigger, and a status object. Destructuring renames <code>isLoading</code> to <code>isSending</code>.</td></tr>
+<tr><td><code>useMemo(() =&gt; mapUserToDetails(user), [user])</code></td><td>Map only when <code>user</code> changes. Without <code>useMemo</code> a new object every render would look like "changed" to effects downstream.</td></tr>
+<tr><td><code>useProfileAction(async patch =&gt; ...)</code></td><td>Wraps the save with an <code>isSaving</code> flag (section 8.1.1).</td></tr>
+<tr><td><code>field in patch</code></td><td>The <code>in</code> operator: does the object have this key? Only call the backend when an account field actually changed.</td></tr>
+<tr><td>Username check first</td><td>Fail fast with a clear message before the PUT. The second check (409 from the PUT) catches the rare race where someone took it in between.</td></tr>
+<tr><td><code>toUpdateUserBody(saved, { ...saved, ...patch })</code></td><td>Merge the changes over the saved values (later spreads win), then build the backend body (section 8.2).</td></tr>
+<tr><td><code>(await refetch().unwrap()).result</code></td><td>Because <code>getUserProfile</code> has no cache tag, the save refreshes it by hand and waits for the new user, so the draft gets the values as the backend stored them. Every other screen reading the same query updates too.</td></tr>
+</table></div>
+<p>The other three actions:</p>
+<pre><code>  const resendVerification = useCallback(async (email?: string) =&gt; {
+    const to = email ?? user?.email
+    if (!to) throw new Error('Add an email address first.')
+    const response = (await sendVerification({ email: to, source: 'marketplace' }).unwrap()) as { message?: string } | undefined
+    refetch()
+    return response?.message
+  }, [user?.email, sendVerification, refetch])
+
+  const uploadAvatar = useCallback(async (file: File) =&gt; {
+    const url = await uploadProfileAvatar(file)
+    refetch()
+    return url
+  }, [refetch])
+
+  const removeAvatar = useCallback(async () =&gt; {
+    await removeProfileAvatar()
+    refetch()
+  }, [refetch])</code></pre>
+<p><code>email ?? user?.email</code>: after "Save &amp; verify", the caller passes the address it just saved, because <code>user</code> in this render still holds the old one. <code>source: 'marketplace'</code> tells the backend which site's link to put in the email. After each action, <code>refetch()</code> (not awaited) refreshes the cached user in the background, so <code>sentEmailCount</code> and <code>avatarUrl</code> update everywhere.</p>
+
+<h4>8.1.1 <code>useProfileAction</code>: a tiny reusable pattern</h4>
+<span class="path">src/hooks/profile/useProfileAction.ts</span>
+<pre><code>export function useProfileAction&lt;Args extends unknown[], R&gt;(action: (...args: Args) =&gt; Promise&lt;R&gt;) {
+  const [isSaving, setIsSaving] = useState(false)
+  const actionRef = useRef(action)
+  actionRef.current = action
+
+  const run = useCallback(async (...args: Args) =&gt; {
+    setIsSaving(true)
+    try {
+      return await actionRef.current(...args)
+    } finally {
+      setIsSaving(false)
+    }
+  }, [])
+
+  return { run, isSaving }
+}</code></pre>
+<p>Given any async function, it returns <code>run</code> (same arguments, same result) plus an <code>isSaving</code> flag. <code>finally</code> clears the flag whether it succeeded or threw; errors still reach the caller, who shows its own toast. The generics <code>Args extends unknown[]</code> and <code>R</code> make <code>run</code> keep the exact argument and return types of the function you passed. The <b>ref trick</b> makes <code>run</code> stable forever (empty dependency list) while always calling the latest <code>action</code>, which would otherwise capture stale values like an old <code>user</code>. Eight hooks reuse it.</p>
+
+<h3 id="p-map">8.2 The mapper: <code>mapUser.ts</code></h3>
+<span class="path">src/helpers/profile/mapUser.ts</span>
+<pre><code>type User = Profile['result']
+
+export function mapUserToDetails(user: User): ProfileDetails {
+  return {
+    fullName: user.name ?? '',
+    username: user.username ?? '',
+    email: user.email ?? '',
+    isEmailVerified: user.isEmailVerified,
+    canChangeEmail: !user.isRegisteredWithGoogle &amp;&amp; !(user.email &amp;&amp; user.isEmailVerified),
+    verificationSent: (user.sentEmailCount ?? 0) &gt; 0,
+    phone: user.phoneNumber ? parsePhoneString(user.phoneNumber, COUNTRIES, DEFAULT_COUNTRY_CODE) : null,
+    telegram: user.telegram ?? '',
+    bio: user.bio ?? '',
+    location: user.location ?? '',
+    website: user.website ?? '',
+    avatarUrl: user.avatarUrl ?? null,
+  }
+}
+
+export function toUpdateUserBody(saved: ProfileDetails, next: ProfileDetails): Record&lt;string, string&gt; {
+  const body: Record&lt;string, string&gt; = {
+    name: next.fullName,
+    phoneNumber: next.phone?.number ? toPhoneString(findCountry(next.phone.countryCode).dial, next.phone.number) : '',
+    telegram: next.telegram,
+    username: next.username,
+    bio: next.bio,
+    location: next.location,
+    website: next.website,
+  }
+  const emailChanged = next.email.trim().toLowerCase() !== saved.email.trim().toLowerCase()
+  if (next.email &amp;&amp; emailChanged) body.email = next.email
+  return body
+}</code></pre>
+<div class="tablewrap"><table>
+<tr><th>Rule</th><th>Why</th></tr>
+<tr><td><code>user.name ?? ''</code> (and the others)</td><td>Backend <code>null</code> becomes <code>''</code> for the form.</td></tr>
+<tr><td><code>canChangeEmail</code></td><td>The main site's rule: a Google account's email is managed by Google, and a verified email is locked. Otherwise (missing or unverified) it can be edited.</td></tr>
+<tr><td><code>verificationSent</code></td><td>If at least one email went out, the button says "Resend verification" instead of "Verify email".</td></tr>
+<tr><td><code>parsePhoneString</code></td><td>Splits <code>"+919876543210"</code> into <code>{ countryCode: 'IN', number: '9876543210' }</code>. It first asks the <code>libphonenumber</code> library (<code>parsePhoneNumberFromString</code>); if that fails it matches the longest dial code from the country list; anything without a leading <code>+</code> keeps the default country <code>'IN'</code>.</td></tr>
+<tr><td><code>toUpdateUserBody</code>: whole account each time</td><td>Like the main site, it sends every account field, not just the changed ones. Phone goes back as dial code + number, or <code>''</code> to clear it.</td></tr>
+<tr><td>Email only when changed</td><td>A real bug fixed on 29 Oct: the backend treats any email in the body as new and marks it unverified, so saving just a bio used to unverify a verified email. Comparing trimmed lowercase avoids "changes" that are only case or spaces. Empty email is never sent because the backend validates it with <code>IsEmail</code>.</td></tr>
+</table></div>
+<p>The same file also maps sign in methods and wallets (sections 9 and 10). Every function is <b>pure</b>: no network, no React, same input, same output, so it can be tested with plain Node.</p>
+
+<h3 id="p-draft">8.3 <code>useProfileDraft</code>: the editing brain</h3>
+<span class="path">src/hooks/profile/useProfileDraft.ts</span>
+<pre><code>export function useProfileDraft() {
+  const details = useProfileDetails()
+  const saved = details.data
+  const [draft, setDraft] = useState&lt;ProfileDetails | null&gt;(saved ?? null)
+  const [touched, setTouched] = useState&lt;Partial&lt;Record&lt;ProfileField, boolean&gt;&gt;&gt;({})
+  const [submitted, setSubmitted] = useState(false)
+
+  useEffect(() =&gt; {
+    if (saved &amp;&amp; !draft) setDraft(saved)
+  }, [saved, draft])
+
+  const usernameToCheck =
+    draft &amp;&amp; saved &amp;&amp; draft.username &amp;&amp; draft.username !== saved.username &amp;&amp; !validateProfileField('username', draft) ? draft.username : ''
+  const usernameStatus = useUsernameAvailability(usernameToCheck)
+
+  const allErrors = useMemo&lt;ProfileErrors&gt;(() =&gt; {
+    if (!draft) return {}
+    const found = validateProfile(draft)
+    if (usernameStatus === 'taken') found.username = USERNAME_TAKEN
+    return found
+  }, [draft, usernameStatus])
+
+  const errors = useMemo&lt;ProfileErrors&gt;(() =&gt; {
+    if (submitted) return allErrors
+    const shown: ProfileErrors = {}
+    for (const field of Object.keys(allErrors) as ProfileField[]) if (touched[field]) shown[field] = allErrors[field]
+    if (usernameStatus === 'taken') shown.username = USERNAME_TAKEN
+    return shown
+  }, [allErrors, submitted, touched, usernameStatus])
+
+  const changes = useMemo(() =&gt; (saved &amp;&amp; draft ? profileChanges(saved, draft) : {}), [saved, draft])
+  const isDirty = Object.keys(changes).length &gt; 0
+  // ... setField, blur, submit, discard, return
+}</code></pre>
+<p>Three pieces of state drive everything:</p>
+<div class="tablewrap"><table>
+<tr><th>State</th><th>Meaning</th></tr>
+<tr><td><code>draft</code></td><td>The editable copy. Filled once from <code>saved</code> by the effect. Later reloads of <code>saved</code> do <b>not</b> overwrite it (<code>!draft</code>), so a background refetch never wipes what you are typing.</td></tr>
+<tr><td><code>touched</code></td><td>Which fields you have left (blurred). Errors appear only after you leave a field, not while you type the first letter.</td></tr>
+<tr><td><code>submitted</code></td><td>After pressing Save once, every error shows.</td></tr>
+</table></div>
+<p>And everything else is <b>derived</b> with <code>useMemo</code> rather than stored, which avoids keeping copies in sync:</p>
+<ol class="check">
+<li><code>usernameToCheck</code>: ask the backend only about a username that changed and already passes the format rules (<code>!validateProfileField(...)</code> is true when there is no error). Otherwise pass <code>''</code> to keep the checker idle.</li>
+<li><code>allErrors</code>: every rule failure right now, plus "taken" from the backend.</li>
+<li><code>errors</code>: what to <i>show</i>: all of them after submit, otherwise only touched fields, except "taken" which shows while typing.</li>
+<li><code>changes</code>: only the fields that differ (section 8.4). <code>isDirty</code> is simply "there is at least one".</li>
+</ol>
+<pre><code>  const setField = useCallback(&lt;K extends keyof ProfileDetails&gt;(field: K, value: ProfileDetails[K]) =&gt; {
+    setDraft((current) =&gt; (current ? { ...current, [field]: value } : current))
+  }, [])
+
+  const blur = useCallback((field: ProfileField) =&gt; setTouched((current) =&gt; ({ ...current, [field]: true })), [])
+
+  const submit = useCallback(async () =&gt; {
+    if (!draft || !saved) return null
+    setSubmitted(true)
+    const firstInvalid = (Object.keys(allErrors) as ProfileField[])[0]
+    if (firstInvalid) return { invalidField: firstInvalid }
+    if (!isDirty) return null
+    const next = await details.save(changes)
+    setDraft(next)
+    setTouched({})
+    setSubmitted(false)
+    return { saved: next }
+  }, [draft, saved, allErrors, isDirty, details, changes])
+
+  const discard = useCallback(() =&gt; {
+    setDraft(saved ?? null)
+    setTouched({})
+    setSubmitted(false)
+  }, [saved])</code></pre>
+<div class="tablewrap"><table>
+<tr><th>Function</th><th>Explained</th></tr>
+<tr><td><code>setField&lt;K extends keyof ProfileDetails&gt;</code></td><td>A generic function: the type of <code>value</code> depends on <code>field</code>. <code>setField('phone', 'abc')</code> will not compile because <code>ProfileDetails['phone']</code> is an object. <code>[field]: value</code> is a <b>computed property name</b>. The updater form <code>setDraft(current =&gt; ...)</code> always starts from the latest draft.</td></tr>
+<tr><td><code>blur</code></td><td>Marks a field touched.</td></tr>
+<tr><td><code>submit</code></td><td>Returns one of three results, a small <b>union of objects</b>: <code>{ invalidField }</code> (focus it), <code>{ saved }</code> (success), or <code>null</code> (nothing to do). On success the draft becomes exactly what the backend stored, and touched and submitted reset.</td></tr>
+<tr><td><code>discard</code></td><td>Copy saved back over the draft.</td></tr>
+</table></div>
+<p>The hook returns all of this plus the pass throughs from <code>useProfileDetails</code> (<code>isSaving</code>, <code>resendVerification</code>, <code>uploadAvatar</code>...). Note <code>isLoading: details.isLoading &amp;&amp; !draft</code>: once a draft exists, a background reload never brings the skeleton back.</p>
+
+<h4>8.3.1 <code>useUsernameAvailability</code>: debounced live check</h4>
+<span class="path">src/hooks/profile/useUsernameAvailability.ts</span>
+<pre><code>export function useUsernameAvailability(username: string): UsernameAvailability {
+  const [state, setState] = useState&lt;{ username: string; status: UsernameAvailability }&gt;({ username: '', status: 'idle' })
+
+  useEffect(() =&gt; {
+    if (!username) return
+    let cancelled = false
+    setState({ username, status: 'checking' })
+    const timer = setTimeout(() =&gt; {
+      checkUsernameAvailable(username)
+        .then((available) =&gt; { if (!cancelled) setState({ username, status: available ? 'available' : 'taken' }) })
+        .catch((err) =&gt; { if (cancelled) return; console.error(...); setState({ username, status: 'idle' }) })
+    }, DEBOUNCE_MS)
+    return () =&gt; {
+      cancelled = true
+      clearTimeout(timer)
+    }
+  }, [username])
+
+  return username &amp;&amp; state.username === username ? state.status : 'idle'
+}</code></pre>
+<p>Each keystroke changes <code>username</code>, which re runs the effect. The cleanup of the previous run clears its timer, so only a 400 ms pause actually sends a request: that is the debounce. The <code>cancelled</code> flag stops a slow old answer from overwriting a newer one. Storing <code>username</code> next to <code>status</code> and comparing on return is a second guard: never report an older name's answer for the name being typed now. A failed check returns to <code>'idle'</code> rather than blocking you; Save checks again anyway.</p>
+
+<h3 id="p-validate">8.4 Validation: <code>validation.ts</code></h3>
+<span class="path">src/helpers/profile/validation.ts (key parts)</span>
+<pre><code>export const PROFILE_LIMITS = { fullName: 60, username: [3, 30] as const, telegram: [5, 32] as const, bio: 160, location: 80, website: 200 }
+
+export type ProfileField = 'fullName' | 'username' | 'email' | 'phone' | 'telegram' | 'bio' | 'location' | 'website'
+export type ProfileErrors = Partial&lt;Record&lt;ProfileField, string&gt;&gt;
+
+export const TELEGRAM_RE = /^(?=.{5,32}$)(?!.*__)(?!_)[A-Za-z0-9_]+(?&lt;!_)$/
+
+export function validateProfileField(field: ProfileField, draft: ProfileDetails): string | undefined {
+  switch (field) {
+    case 'username': {
+      const v = draft.username
+      const [min, max] = PROFILE_LIMITS.username
+      if (!v) return undefined
+      if (!/^[a-z0-9_]+$/.test(v)) return 'Use lowercase letters, numbers and underscores only.'
+      if (v.length &lt; min || v.length &gt; max) return `Use ${min} to ${max} characters.`
+      return undefined
+    }
+    case 'website': {
+      const v = draft.website.trim()
+      if (!v) return undefined
+      if (v.length &gt; PROFILE_LIMITS.website) return 'That link is too long.'
+      try {
+        const url = new URL(v)
+        if (url.protocol !== 'https:' || !url.hostname.includes('.')) return 'Use a full https:// link.'
+      } catch {
+        return 'Use a full https:// link.'
+      }
+      return undefined
+    }
+    // ... fullName, email, phone, telegram, bio, location
+  }
+}</code></pre>
+<div class="tablewrap"><table>
+<tr><th>Piece</th><th>Meaning</th></tr>
+<tr><td><code>as const</code></td><td>Makes <code>[3, 30]</code> a fixed pair (a readonly tuple) instead of <code>number[]</code>, so <code>const [min, max] = ...</code> is typed exactly.</td></tr>
+<tr><td><code>Partial&lt;Record&lt;ProfileField, string&gt;&gt;</code></td><td>An object that may have any of the field names as keys, each with a message. Empty object = no errors.</td></tr>
+<tr><td>Every field optional</td><td><code>if (!v) return undefined</code>: wallet only accounts start with no name or email, so empty is allowed; a filled value must be valid.</td></tr>
+<tr><td><code>switch</code> with block scoped <code>case { }</code></td><td>The braces let each case declare its own <code>const v</code>.</td></tr>
+<tr><td>Website via <code>new URL()</code></td><td>The browser's URL parser throws on garbage; the <code>catch</code> turns that into a message. Then require <code>https:</code> and a dot in the host.</td></tr>
+<tr><td>Telegram regex</td><td><code>(?=.{5,32}$)</code> length 5 to 32; <code>(?!.*__)</code> no double underscore; <code>(?!_)</code> not starting with _; <code>(?&lt;!_)$</code> not ending with _. Lookaheads and lookbehinds check without consuming characters.</td></tr>
+</table></div>
+<p>And the diff that decides what Save sends:</p>
+<pre><code>export function profileChanges(saved: ProfileDetails, draft: ProfileDetails): Partial&lt;ProfileDetails&gt; {
+  const clean: ProfileDetails = {
+    ...draft,
+    fullName: draft.fullName.trim(),
+    email: draft.email.trim(),
+    telegram: normalizeTelegram(draft.telegram),   // drops a leading @
+    location: draft.location.trim(),
+    website: draft.website.trim(),
+    phone: draft.phone &amp;&amp; draft.phone.number ? draft.phone : null,
+  }
+  const patch: Partial&lt;ProfileDetails&gt; = {}
+  for (const key of Object.keys(clean) as (keyof ProfileDetails)[]) {
+    if (JSON.stringify(clean[key]) !== JSON.stringify(saved[key])) (patch as Record&lt;string, unknown&gt;)[key] = clean[key]
+  }
+  return patch
+}</code></pre>
+<p>Clean the draft the way it will be saved (so typing a trailing space is not a "change"), then compare each field. <code>JSON.stringify</code> compares the phone <i>object</i> by value; comparing objects with <code>!==</code> would compare references and always say "different".</p>
+
+<h3 id="p-panel">8.5 The panel and the form</h3>
+<p><code>ProfileTabPanel</code> connects the hook to the UI and owns the handlers:</p>
+<span class="path">src/design-system/composites/profile/profile/ProfileTabPanel/ProfileTabPanel.tsx (structure)</span>
+<pre><code>export const ProfileTabPanel = ({ onDirtyChange, focusField, onFocused }) =&gt; {
+  const profile = useProfileDraft()
+  const summary = useAccountSummary()
+  const { draft, saved, isDirty, isSaving } = profile
+
+  useEffect(() =&gt; { onDirtyChange?.(isDirty) }, [isDirty, onDirtyChange])     // tell the page
+  // focusField effect: scroll to and focus a field once the draft exists
+  useEffect(() =&gt; () =&gt; onDirtyChange?.(false), [onDirtyChange])              // cleanup on unmount
+
+  if (profile.isLoading) return &lt;&gt;&lt;SettingsCardSkeleton rows={8} /&gt;&lt;SettingsCardSkeleton rows={2} /&gt;&lt;/&gt;
+  if (profile.isError || !draft || !saved) return &lt;NoticeBanner tone="error" ... action={&lt;Retry/&gt;} /&gt;
+
+  const handleSave = async (event: React.FormEvent) =&gt; { event.preventDefault(); /* submit, toast */ }
+  const handleAvatar = async (file: File | null) =&gt; { /* upload or remove now, toast */ }
+  const handleCopy = async () =&gt; { await navigator.clipboard.writeText(`https://${portfolioPath(draft.username)}`) }
+  const handleResend = async () =&gt; { /* save first if email changed, then send link */ }
+
+  return (
+    &lt;form className={styles.form} onSubmit={handleSave} noValidate&gt;
+      &lt;ProfileInformationForm draft={draft} savedEmail={saved.email} errors={profile.errors} onChange={profile.setField} ... /&gt;
+      &lt;PublicPreviewCard draft={draft} summary={summary.data} isSample={summary.isMock} /&gt;
+      &lt;PrimaryButton type="submit" disabled={!isDirty} loading={isSaving}&gt;{isSaving ? 'Saving…' : 'Save changes'}&lt;/PrimaryButton&gt;
+      {isDirty &amp;&amp; !isSaving &amp;&amp; &lt;button type="button" onClick={profile.discard}&gt;Discard changes&lt;/button&gt;}
+    &lt;/form&gt;
+  )
+}</code></pre>
+<div class="tablewrap"><table>
+<tr><th>Detail</th><th>Why</th></tr>
+<tr><td><code>onDirtyChange?.(isDirty)</code></td><td><code>?.()</code> calls the function only if it was passed. This is how the page learns about unsaved edits (section 6.3).</td></tr>
+<tr><td><code>useEffect(() =&gt; () =&gt; ..., [...])</code></td><td>An effect whose only job is its cleanup: when the panel unmounts (tab switched after Discard), tell the page it is no longer dirty.</td></tr>
+<tr><td>Early returns for loading and error</td><td>After them TypeScript knows <code>draft</code> and <code>saved</code> exist, so the JSX needs no <code>?.</code>.</td></tr>
+<tr><td><code>&lt;form noValidate onSubmit&gt;</code></td><td>A real form, so Enter submits; <code>noValidate</code> turns off the browser's own popups because the app shows its own errors. <code>event.preventDefault()</code> stops the browser reloading the page on submit.</td></tr>
+<tr><td>Photo saves immediately</td><td>The avatar has its own endpoint; it is not part of Save. After upload the URL is written into the draft with <code>setField('avatarUrl', url)</code>, because the draft never re syncs from <code>saved</code> on its own.</td></tr>
+<tr><td>"Save &amp; verify"</td><td>If the email was edited, <code>handleResend</code> saves the form first, then sends the link to the newly saved address.</td></tr>
+<tr><td><code>PublicPreviewCard draft={draft}</code></td><td>The preview reads the <i>draft</i>, so it updates as you type, before saving.</td></tr>
+</table></div>
+<p><code>ProfileInformationForm</code> is purely presentational: props in, callbacks out. Its most interesting logic is the email field, which has five possible states:</p>
+<div class="tablewrap"><table>
+<tr><th>Situation</th><th>Badge or button</th><th>Helper text</th></tr>
+<tr><td>Verified and unchanged</td><td>"Verified" with a tick</td><td>"A verified email can't be changed." (field disabled)</td></tr>
+<tr><td>Edited to a new address</td><td>"Save &amp; verify"</td><td>Explains it saves and sends a link</td></tr>
+<tr><td>Google account, email not verified</td><td>"Verify email" or "Resend verification" (field disabled)</td><td>"Managed by your Google account." (a verified Google email falls in the first row instead)</td></tr>
+<tr><td>Saved, unverified, link sent before</td><td>"Resend verification"</td><td>"Not verified yet. Check your inbox..."</td></tr>
+<tr><td>No email at all</td><td>none</td><td>"Add an email to get order receipts and alerts."</td></tr>
+</table></div>
+<p>Each field is a primitive (<code>TextField</code>, <code>PhoneField</code>, <code>AvatarUpload</code>) given an <code>id</code> from <code>profileFieldId(field)</code> (<code>'profile-email'</code>), so code can focus the first invalid field with <code>document.getElementById(...)</code>. Username lowercases as you type (<code>v.toLowerCase()</code>) and shows your future portfolio link with a copy button.</p>
+
+<h3 id="p-journey">8.6 Journey: you edit your bio and press Save</h3>
+<div class="flow">
+  <div class="box"><b>1.</b> You type in Bio. <code>TextField</code> calls <code>onChange('bio', value)</code> = <code>profile.setField</code>. The draft updates; the component re renders.</div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>2.</b> <code>profileChanges</code> now returns <code>{ bio }</code>, so <code>isDirty</code> is true: Save enables, "Discard changes" appears, the page's <code>isDirty</code> flips, Public Preview shows the new bio.</div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>3.</b> You click Save. The form's <code>onSubmit</code> runs <code>handleSave</code> → <code>profile.submit()</code>.</div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>4.</b> No errors, dirty, so <code>details.save({ bio })</code>. <code>bio</code> is an account field; username unchanged, so no availability call.</div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>5.</b> <code>toUpdateUserBody</code> builds <code>{ name, phoneNumber, telegram, username, bio, location, website }</code> (no email, unchanged). <code>setProfile(body).unwrap()</code> sends <code>PUT /users</code> with the Bearer token.</div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>6.</b> Then <code>refetch().unwrap()</code> sends <code>GET /users/user-multiple-wallet</code>; the cache updates for every reader.</div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>7.</b> The fresh user is mapped; the draft becomes it; <code>isDirty</code> is false again. <code>handleSave</code> shows "Your profile is saved."</div>
+</div>
+<p>If step 5 fails (say the backend is down), the error travels back up through <code>save</code> and <code>submit</code> to <code>handleSave</code>'s <code>catch</code>, which shows "Couldn't save your profile" with a friendly message from <code>getUserFriendlyToastMessage</code>. The draft keeps your typing.</p>
+
+<!-- ============================================================ -->
+<h2 id="tab-security">9. Tab 2: Security</h2>
+<p>Two cards: <b>How You Sign In</b> and <b>Change Password</b>. A third, Active Sessions, is built but commented out (not supported for now, decided 27 Oct).</p>
+
+<h3>9.1 Where the sign in methods come from</h3>
+<span class="path">src/hooks/profile/useSignInMethods.ts</span>
+<pre><code>export function useSignInMethods(): SignInMethodsResult {
+  const query = useGetUserProfileQuery()
+  const user = query.data?.result
+  const data = useMemo(() =&gt; (user ? mapUserToSignInMethods(user) : undefined), [user])
+  return { data, isLoading: query.isLoading, isError: query.isError, refetch: () =&gt; { query.refetch() } }
+}</code></pre>
+<p>No new request: it reads the same cached user as the Profile tab (Door 1) and maps it. The mapper:</p>
+<span class="path">src/helpers/profile/mapUser.ts</span>
+<pre><code>export function mapUserToSignInMethods(user: User): SignInMethod[] {
+  const methods: SignInMethod[] = []
+  if (user.email &amp;&amp; !user.isRegisteredWithGoogle) methods.push({ kind: 'email', email: user.email, active: true })
+  if (user.isRegisteredWithGoogle) methods.push({ kind: 'google', email: user.email, connected: true })
+  const wallet = user.walletAddress?.find((w) =&gt; !w.isDeleted)
+  if (user.isRegisteredWithWallet &amp;&amp; wallet) methods.push({ kind: 'wallet', address: wallet.walletAddress, connected: true })
+  return methods
+}</code></pre>
+<p>An email that is not a Google account means email and password sign in. A Google flag means Google. A wallet registration flag plus a non deleted wallet means wallet sign in. Note the product rule (27 Oct): Google and wallet accounts never get a password, so the Google card has no Disconnect button (it would lock the user out).</p>
+
+<h3>9.2 The panel</h3>
+<span class="path">src/design-system/composites/profile/security/SecurityTabPanel/SecurityTabPanel.tsx (active parts)</span>
+<pre><code>export const SecurityTabPanel = ({ onNavigateTab }: SecurityTabPanelProps) =&gt; {
+  const methods = useSignInMethods()
+  const password = useChangePassword()
+  const { logout } = useAuth()
+
+  const methodList = methods.data ?? []
+  const hasPassword = methodList.some((method) =&gt; method.kind === 'email')
+
+  const scrollToPassword = () =&gt; {
+    document.getElementById(CHANGE_PASSWORD_CARD_ID)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    window.setTimeout(() =&gt; document.getElementById('password-currentPassword')?.focus({ preventScroll: true }), 350)
+  }
+
+  const handleChangePassword = async (input: { currentPassword: string; newPassword: string }) =&gt; {
+    try {
+      await password.changePassword(input)
+      ToastMessage(TOAST_TYPE.SUCCESS, '', 'Your password is updated. Sign in again with your new password.')
+      logout()
+    } catch (error) {
+      const message = getUserFriendlyToastMessage(error, 'Could not change your password.')
+      if (!/current password/i.test(message)) ToastMessage(TOAST_TYPE.ERROR, "Couldn't update your password", message)
+      throw error
+    }
+  }
+  // renders: skeleton | error banner | &lt;SignInMethodsCard ... onManageWallet={() =&gt; onNavigateTab('wallets')} /&gt;
+  //          skeleton | &lt;ChangePasswordForm hasPassword={hasPassword} onSubmit={handleChangePassword} isSaving={password.isSaving} /&gt;
+}</code></pre>
+<div class="tablewrap"><table>
+<tr><th>Detail</th><th>Why</th></tr>
+<tr><td><code>hasPassword</code></td><td>Derived from the methods: only an email method has a password. Without one the form is replaced by a note.</td></tr>
+<tr><td><code>scrollToPassword</code></td><td>"Change Password" on the email card scrolls smoothly to the form, then (after the 350 ms scroll) focuses the first field with <code>preventScroll</code> so there is no second jump.</td></tr>
+<tr><td><code>logout()</code> after success</td><td>Like the main site: a new password signs you out everywhere, so you sign in again. <code>logout()</code> (from <code>AuthContext</code>) calls the backend logout, clears cookies, resets every RTK cache, and goes to <code>/login</code>.</td></tr>
+<tr><td><code>throw error</code> after toasting</td><td>Re throwing lets the form also react: a "current password" error is shown under that field instead of as a toast. A <b>regular expression with the <code>i</code> flag</b> matches case insensitively.</td></tr>
+<tr><td><code>onNavigateTab('wallets')</code></td><td>The wallet card's Manage button switches tab through the page's guarded <code>setTab</code>.</td></tr>
+</table></div>
+
+<h3>9.3 Changing the password</h3>
+<span class="path">src/hooks/profile/useChangePassword.ts</span>
+<pre><code>export function useChangePassword() {
+  const [changePasswordMutation, { isLoading: isSaving }] = useChangePasswordMutation()
+  const changePassword = useCallback(async ({ currentPassword, newPassword }) =&gt; {
+    try {
+      await changePasswordMutation({ oldPassword: currentPassword, newPassword }).unwrap()
+    } catch (error) {
+      if ((error as { status?: unknown })?.status === 401) throw new Error('Your current password is incorrect.')
+      throw new Error(getUserFriendlyToastMessage(error, 'Could not change your password.'))
+    }
+  }, [changePasswordMutation])
+  return { changePassword, isSaving }
+}</code></pre>
+<p>The hook translates the UI's names (<code>currentPassword</code>) into the backend's (<code>oldPassword</code>) and turns the backend's 401 into a sentence. Everything above it sees only a normal <code>Error</code> with a readable message.</p>
+<p><code>ChangePasswordForm</code> keeps its own small draft (current, new, confirm), the same touched and submitted pattern as the Profile tab, and validates with <code>validatePasswordChange</code>:</p>
+<pre><code>export function validatePasswordChange(draft: PasswordChangeDraft): PasswordChangeErrors {
+  const errors: PasswordChangeErrors = {}
+  if (!draft.currentPassword) errors.currentPassword = 'Enter your current password.'
+  else if (draft.currentPassword.length &lt; 8) errors.currentPassword = 'Your current password is at least 8 characters.'
+
+  if (!draft.newPassword) errors.newPassword = 'Enter a new password.'
+  else if (!PASSWORD_POLICY.test(draft.newPassword)) errors.newPassword = PASSWORD_POLICY_TEXT
+  else if (draft.newPassword === draft.currentPassword) errors.newPassword = 'Pick a password different from your current one.'
+
+  if (!draft.confirmPassword) errors.confirmPassword = 'Type the new password again.'
+  else if (draft.confirmPassword !== draft.newPassword) errors.confirmPassword = "The passwords don't match."
+  return errors
+}</code></pre>
+<p><code>PASSWORD_POLICY</code> (in <code>helpers/passwordStrength.ts</code>) is the backend's rule as a regex: at least 8 characters with a lowercase letter, an uppercase letter, a digit and a symbol, each checked by a lookahead <code>(?=.*[a-z])</code>. The form also keeps a <code>serverError</code> for the current password field: if the submit rejects with a message mentioning "current password", it shows there and focuses the field; typing in that field clears it. On success the form resets to empty (just before <code>logout</code> takes you away).</p>
+<div class="note"><b>Journey: change password</b>Type three fields → Update Password → form validates locally → <code>onSubmit</code> = <code>handleChangePassword</code> → <code>useChangePassword</code> → <code>PUT /auth/change-password</code>. Wrong current password: 401 → "Your current password is incorrect." under the field. Success: green toast, <code>logout()</code>, <code>/login</code>.</div>
+
+<!-- ============================================================ -->
+<h2 id="tab-wallets">10. Tab 3: Wallets</h2>
+<p>One card, <b>Connected Wallets</b>, with a list and the buttons to link the wallet the account is missing. The Default Network card is commented out (not supported, 27 Oct). The rule from the seniors (15 Oct): an account has at most <b>one EVM and one Solana</b> wallet.</p>
+
+<h3>10.1 The list and what is missing</h3>
+<span class="path">src/helpers/profile/mapUser.ts</span>
+<pre><code>export const EVM_WALLET_NETWORK = 'evm_network'
+export const SOLANA_WALLET_NETWORK = 'solana'
+
+export function mapUserToWallets(user: User): ConnectedWallet[] {
+  const live = (user.walletAddress ?? []).filter((w) =&gt; !w.isDeleted &amp;&amp; w.walletAddress)
+  return live.map((w, index) =&gt; ({
+    id: w.id,
+    address: w.walletAddress,
+    network: w.network.toLowerCase(),
+    primary: w.network.toLowerCase() === EVM_WALLET_NETWORK
+      ? live.findIndex((x) =&gt; x.network.toLowerCase() === EVM_WALLET_NETWORK) === index
+      : false,
+  }))
+}
+
+export function missingWalletNetworks(wallets: ConnectedWallet[]): ('evm' | 'solana')[] {
+  const missing: ('evm' | 'solana')[] = []
+  if (!wallets.some((w) =&gt; w.network === EVM_WALLET_NETWORK)) missing.push('evm')
+  if (!wallets.some((w) =&gt; w.network === SOLANA_WALLET_NETWORK)) missing.push('solana')
+  return missing
+}</code></pre>
+<p>Drop deleted or empty entries. The backend has no "primary" flag, so the <b>first EVM wallet</b> is marked primary (the one the rest of the app uses): for an EVM wallet, <code>findIndex</code> returns the position of the first EVM wallet, and only that one matches its own <code>index</code>. <code>missingWalletNetworks</code> decides which Add buttons appear: none, one ("Add Another Wallet"), or both. <code>useConnectedWallets</code> returns the list, <code>missing</code>, and the user's id, all from the same cached user (Door 1); <code>useWalletCount</code> is a one line wrapper for the tab badge.</p>
+
+<h3>10.2 <code>useLinkWallet</code>: proving you own a wallet</h3>
+<p>The hardest hook on the page, because it waits on a wallet app the user controls. The idea: the backend gives a <b>nonce</b>, the wallet <b>signs</b> it, the backend checks the signature matches the address. Nobody types a password and no funds move.</p>
+<span class="path">src/hooks/profile/useLinkWallet.ts (structure)</span>
+<pre><code>let solanaAdapter: SolanaAdapter | null = null
+
+const createProfileAppKit = () =&gt; {
+  solanaAdapter ??= new SolanaAdapter()
+  return createAppKit({
+    adapters: [wagmiAdapter, solanaAdapter],
+    networks: [mainnet, arbitrum, polygon, bsc, base, /* testnets */, solana],
+    projectId: projectId(),
+    features: { analytics: true },
+  })
+}
+
+const failed = (response) =&gt; !response || Boolean(response.error) || (typeof response.statusCode === 'number' &amp;&amp; response.statusCode &gt;= 400)
+
+export function useLinkWallet({ userId, onLinked, onError }: UseLinkWalletOptions) {
+  const [pending, setPending] = useState&lt;LinkableNetwork | null&gt;(null)
+  const [isLinking, setIsLinking] = useState(false)
+  const startedRef = useRef(false)
+  const callbacks = useRef({ onLinked, onError })
+  callbacks.current = { onLinked, onError }
+
+  const evm = useAccount()                                              // wagmi: EVM connection
+  const solanaAccount = useAppKitAccount({ namespace: 'solana' })       // AppKit: Solana connection
+  const { walletProvider: solanaProvider } = useAppKitProvider('solana') as unknown as { walletProvider?: SolanaSigner }
+  const { signMessageAsync } = useSignMessage()                         // wagmi: sign with EVM wallet
+  // ... two effects and link() below
+}</code></pre>
+<div class="tablewrap"><table>
+<tr><th>Piece</th><th>Meaning</th></tr>
+<tr><td>AppKit (Reown)</td><td>The "Connect wallet" modal library. Adapters plug in chain families: <code>wagmiAdapter</code> for EVM, <code>SolanaAdapter</code> for Solana.</td></tr>
+<tr><td><code>solanaAdapter ??= new SolanaAdapter()</code></td><td><b>Nullish assignment</b>: create it only if it is still <code>null</code>. One adapter for the page's lifetime, kept in a module variable.</td></tr>
+<tr><td><code>createProfileAppKit</code> on each click</td><td>Other screens may have created an EVM only AppKit; recreating it here guarantees the Solana adapter is included.</td></tr>
+<tr><td><code>failed(response)</code></td><td><code>postApi</code> (Door 3) resolves even on error bodies, so success has to be read off the response.</td></tr>
+<tr><td><code>pending</code></td><td>Which network the user asked to link. The effects below only act while it is set.</td></tr>
+<tr><td><code>startedRef</code></td><td>Guard so a link starts once even if effects re run while signing.</td></tr>
+<tr><td><code>callbacks</code> ref</td><td>The same latest callback trick as <code>useProfileAction</code>: effects call <code>callbacks.current.onLinked</code> without listing the callbacks as dependencies.</td></tr>
+<tr><td><code>as unknown as {...}</code></td><td>A double cast: the library's type does not expose <code>signMessage</code> the way the code needs, so it is told the shape explicitly. Use sparingly; it switches off checking.</td></tr>
+</table></div>
+<p>The flow is <b>event driven</b>: clicking Add only opens the modal. The actual work starts in an effect when the wallet reports it is connected.</p>
+<pre><code>  const link = (network: LinkableNetwork) =&gt; {
+    if (!userId) { callbacks.current.onError('Your profile has not loaded yet. Please try again.'); return }
+    const kit = createProfileAppKit()
+    startedRef.current = false
+    setPending(network)
+    const unsubscribe = kit.subscribeState((state) =&gt; {
+      if (state.open) return
+      unsubscribe()
+      window.setTimeout(() =&gt; { if (!startedRef.current) setPending(null) }, 500)
+    })
+    kit.open({ view: 'Connect', namespace: network === 'solana' ? 'solana' : 'eip155' })
+  }
+
+  // EVM: once AppKit has a connected address, sign the nonce and verify.
+  useEffect(() =&gt; {
+    if (pending !== 'evm' || !evm.isConnected || !evm.address || startedRef.current) return
+    startedRef.current = true
+    setIsLinking(true)
+    ;(async () =&gt; {
+      try {
+        const address = getAddress(evm.address as string)
+        const nonce = await getNonce(API_ENDPOINT.GET_NONCE_API, address)
+        const signature = await signMessageAsync({ message: buildWalletSignMessage(nonce) })
+        const response = await connectWallet({ postSignatureApi: API_ENDPOINT.VERIFY_WALLET_API, address, signature, network: EVM_NETWORK, source: 'marketplace' })
+        if (failed(response)) throw response
+        callbacks.current.onLinked('evm')
+      } catch (error) {
+        callbacks.current.onError(getUserFriendlyToastMessage(error, 'Could not link that wallet.'))
+      } finally {
+        finish()
+      }
+    })()
+  }, [pending, evm.isConnected, evm.address, signMessageAsync])</code></pre>
+<div class="flow">
+  <div class="box"><b>1.</b> Click "Add EVM Wallet" → <code>link('evm')</code>: <code>pending = 'evm'</code>, open the AppKit modal on the EVM (<code>eip155</code>) side, and watch for the modal closing.</div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>2.</b> User picks MetaMask and connects. wagmi's <code>useAccount()</code> now reports <code>isConnected</code> and an <code>address</code>; the component re renders; the effect's conditions pass.</div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>3.</b> <code>getAddress</code> (viem) normalises the address to its checksummed form. <code>GET /web3-auth/generate-nonce</code> returns a nonce for it.</div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>4.</b> <code>signMessageAsync</code> pops up the wallet: "Sign this message to verify wallet ownership... Nonce: ...". User approves; we get a signature.</div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>5.</b> <code>POST /web3-auth/verify</code> with address, signature, network, source. The backend recovers the signer from the signature and, if it matches, attaches the wallet to the signed in user (read from the Bearer token).</div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>6.</b> <code>onLinked('evm')</code>: <code>WalletsTabPanel</code> refetches the user (the new wallet appears, the badge goes up) and shows a toast. <code>finish()</code> resets the flags.</div>
+</div>
+<p>The <code>;(async () =&gt; { ... })()</code> shape is an <b>async IIFE</b> (immediately invoked function expression): effects cannot be <code>async</code> themselves, so the async work goes in a function that is defined and called at once. The leading <code>;</code> protects against the previous line being read as a function call.</p>
+<p>If the user closes the modal without connecting, the <code>subscribeState</code> listener fires; after 500 ms, if no link started, <code>pending</code> resets so the buttons stop spinning.</p>
+<p>The Solana effect is the same shape with Solana pieces: <code>GET /web3-auth/solana-generate-nonce</code>, then <code>signSolanaMessage(solanaProvider, ...)</code>, then <code>POST /web3-auth/solana-add-wallet</code> with <code>{ walletAddress, network: 'solana', signature }</code>.</p>
+
+<h3>10.3 Signing with Solana: <code>solana-signing.ts</code> and <code>base58.ts</code></h3>
+<span class="path">src/helpers/profile/solana-signing.ts</span>
+<pre><code>export interface SolanaSigner {
+  signMessage: (message: Uint8Array) =&gt; Promise&lt;Uint8Array | { signature: Uint8Array }&gt;
+}
+
+export async function signSolanaMessage(signer: SolanaSigner | undefined, message: string): Promise&lt;string&gt; {
+  if (!signer?.signMessage) throw new Error('This wallet does not support message signing')
+  const raw = await signer.signMessage(new TextEncoder().encode(message))
+  const bytes = raw instanceof Uint8Array ? raw : raw.signature
+  return base58Encode(bytes)
+}</code></pre>
+<p>Solana wallets sign <b>bytes</b>, not text, so <code>TextEncoder</code> turns the message into UTF 8 bytes (<code>Uint8Array</code>). Different wallets return either the raw bytes or an object with a <code>signature</code> field; the union return type and the <code>instanceof</code> check handle both. The backend expects the signature in <b>base58</b> (Bitcoin's alphabet without the confusable <code>0 O I l</code>), so <code>base58Encode</code> converts it: it treats the bytes as one big number and repeatedly divides by 58, keeping remainders as digits, and writes each leading zero byte as a <code>'1'</code>. It is written without <code>BigInt</code> because the project's TypeScript target does not allow it.</p>
+
+<h3>10.4 The card</h3>
+<p><code>ConnectedWalletsCard</code> renders one stacked <code>SettingsRow</code> per wallet: label from <code>walletNetworkLabel</code> (<code>'evm_network'</code> → "EVM wallet"), a Primary chip, the address shortened by <code>shortWalletAddress</code> (first 10 … last 10 characters, full address in the <code>title</code> tooltip), and a copy button. The header action depends on <code>missing</code>: nothing, one "Add Another Wallet" with a hint, or "Add EVM Wallet" and "Add Solana Wallet" side by side. While linking, all add buttons are disabled and the active one spins (<code>loading={adding === network}</code>). Disconnect is commented out: there is no unlink endpoint.</p>
+
+<!-- ============================================================ -->
+<h2 id="tab-notifications">11. Tab 4: Notifications</h2>
+<p>Five alert switches (real, Door 2) and a "Where To Send Them" card that shows the account email as the primary channel. The Telegram channel row is commented out (not supported, 27 Oct).</p>
+
+<h3>11.1 <code>useNotificationSettings</code>: a hand written query</h3>
+<span class="path">src/hooks/profile/useNotificationSettings.ts</span>
+<pre><code>const DEFAULT_CHANNELS: NotificationSettings['channels'] = { email: true, telegram: false }
+
+export function useNotificationSettings(): NotificationSettingsResult {
+  const [switches, setSwitches] = useState&lt;NotificationSwitches | undefined&gt;(undefined)
+  const [channels, setChannels] = useState(DEFAULT_CHANNELS)
+  const [isLoading, setLoading] = useState(true)
+  const [isError, setError] = useState(false)
+  const [reloads, setReloads] = useState(0)
+
+  useEffect(() =&gt; {
+    let cancelled = false
+    setLoading(true)
+    setError(false)
+    getNotificationSwitches()
+      .then((saved) =&gt; { if (!cancelled) setSwitches(saved) })
+      .catch((err) =&gt; { if (cancelled) return; console.error(...); setError(true) })
+      .finally(() =&gt; { if (!cancelled) setLoading(false) })
+    return () =&gt; { cancelled = true }
+  }, [reloads])
+
+  const refetch = useCallback(() =&gt; setReloads((count) =&gt; count + 1), [])
+
+  const { run: update, isSaving } = useProfileAction(async (patch: Partial&lt;NotificationSettings&gt;) =&gt; {
+    const { channels: nextChannels, ...switchPatch } = patch
+    if (nextChannels) setChannels((current) =&gt; ({ ...current, ...nextChannels }))
+    if (Object.keys(switchPatch).length &gt; 0) {
+      setSwitches(await updateNotificationSwitches(switchPatch))
+    }
+  })
+
+  const data = switches ? { ...switches, channels } : undefined
+  return { data, isLoading, isError, refetch, update, isSaving, isMock: false }
+}</code></pre>
+<p>Door 2 has no RTK hooks, so this hook rebuilds the <code>QueryResult</code> shape by hand. Study it; it is the plain React version of what RTK gives you for free:</p>
+<div class="tablewrap"><table>
+<tr><th>Piece</th><th>Meaning</th></tr>
+<tr><td>Four state variables</td><td>Data, loading, error, and a <code>reloads</code> counter.</td></tr>
+<tr><td>The effect depends on <code>[reloads]</code></td><td>Runs on mount, and again every time <code>refetch</code> bumps the counter. That is how "refetch" works without RTK.</td></tr>
+<tr><td><code>cancelled</code></td><td>If the component unmounts (tab switched) before the answer arrives, the cleanup sets it, so no state is set on an unmounted component.</td></tr>
+<tr><td><code>.then / .catch / .finally</code></td><td>Promise chain: success sets data; failure logs and flags error; either way stop loading.</td></tr>
+<tr><td><code>const { channels: nextChannels, ...switchPatch } = patch</code></td><td><b>Rest destructuring</b>: pull <code>channels</code> out (renamed), put every other key into <code>switchPatch</code>.</td></tr>
+<tr><td>Channels stay local</td><td>The backend has no column for channels yet, so they live in this hook's state only and reset on reload.</td></tr>
+<tr><td><code>PATCH</code> sends only what changed</td><td>The backend merges it and returns the full new set, which replaces <code>switches</code>.</td></tr>
+</table></div>
+
+<h3>11.2 Optimistic switches in the panel</h3>
+<span class="path">src/design-system/composites/profile/notifications/NotificationsTabPanel/NotificationsTabPanel.tsx</span>
+<pre><code>  const notifications = useNotificationSettings()
+  const details = useProfileDetails()
+  const [local, setLocal] = useState&lt;NotificationSettings | undefined&gt;(notifications.data)
+
+  useEffect(() =&gt; {
+    if (notifications.data) setLocal(notifications.data)
+  }, [notifications.data])
+
+  const handleToggle = async (key: NotificationAlert, value: boolean) =&gt; {
+    if (!local) return
+    const previous = local
+    setLocal({ ...local, [key]: value })          // 1. show it at once
+    try {
+      await notifications.update({ [key]: value }) // 2. save
+    } catch (error) {
+      setLocal(previous)                           // 3. failed: undo
+      ToastMessage(TOAST_TYPE.ERROR, "Couldn't save that alert", getUserFriendlyToastMessage(error, 'Please try again.'))
+    }
+  }</code></pre>
+<p>This is the <b>optimistic update</b> pattern in its clearest form: keep a local copy, flip it immediately so the switch feels instant, save, and restore the previous copy if the save fails. <code>NotificationAlert</code> is <code>Exclude&lt;keyof NotificationSettings, 'channels'&gt;</code>: all keys except <code>channels</code>, a <b>utility type</b> that removes members from a union.</p>
+<p><code>NotificationSwitches</code> renders <code>NOTIFICATION_ALERTS</code> (an array of key, title, description) as rows, each with a <code>Switch</code> labelled through the <code>SettingsRow</code> render prop (section 7.2). <code>NotificationChannels</code> shows the email from <code>useProfileDetails</code> with a "Primary" chip.</p>
+
+<!-- ============================================================ -->
+<h2 id="tab-preferences">12. Tab 5: Preferences</h2>
+<p>Since 29 Oct only the <b>Theme</b> row shows. Currency, language, date and time format and the Privacy card only ever saved to sample data, so they are commented out until the backend supports them.</p>
+<span class="path">src/design-system/composites/profile/preferences/PreferencesTabPanel/PreferencesTabPanel.tsx</span>
+<pre><code>export const PreferencesTabPanel = () =&gt; {
+  const { preference, setPreference } = useTheme()
+  return &lt;DisplayPreferencesCard theme={preference} onThemeChange={setPreference} showTheme={isDarkModeEnabled} themeOnly /&gt;
+}</code></pre>
+<p>No hook from <code>hooks/profile</code> at all: the theme lives on the device, in <code>ThemeContext</code>, shared with the header's toggle. <code>DisplayPreferencesCard</code> with <code>themeOnly</code> renders one <code>SettingsRow</code> with a <code>SegmentedToggle</code> (System, Light, Dark). If dark mode is switched off for the environment (<code>NEXT_PUBLIC_DARK_MODE=false</code>), it shows "Nothing to set yet" instead.</p>
+<h3>12.1 How the theme actually changes</h3>
+<span class="path">src/context/ThemeContext.tsx (key parts)</span>
+<pre><code>const apply = (theme: Theme) =&gt; document.documentElement.setAttribute('data-theme', theme)
+
+const setPreference = useCallback((next: ThemePreference) =&gt; {
+  if (!isDarkModeEnabled) return
+  const resolved = resolve(next)                 // 'system' becomes 'light' or 'dark' from the OS
+  apply(resolved)                                // &lt;html data-theme="dark"&gt;
+  try {
+    localStorage.setItem(THEME_STORAGE_KEY, next) // remember 'system', 'light' or 'dark'
+  } catch { /* private mode: lasts this page view */ }
+  setPreferenceState(next)
+  setThemeState(resolved)
+}, [])</code></pre>
+<p>Every colour in the app is a CSS variable whose dark value is defined under <code>:root[data-theme='dark']</code>, so setting one attribute on <code>&lt;html&gt;</code> recolours everything at once, no React re render of components needed. A tiny inline script in <code>pages/_document.tsx</code> (<code>themeInitScript</code>) applies the saved choice <b>before</b> the page paints, so there is no white flash on a dark device. While "System" is chosen, an effect listens to the OS (<code>matchMedia('(prefers-color-scheme: dark)')</code>) and follows it live.</p>
+
+<!-- ============================================================ -->
+<h2 id="rail">13. The right rail</h2>
+<p>Two cards: <b>Account</b> (summary figures) and <b>Your Data</b> (export, deletion). On mobile the Account card moves to the top of the page and the rail, placed after the tab content, shows only Your Data (section 6.5).</p>
+
+<h3>13.1 <code>ProfileRail</code> and <code>ProfileRailAccount</code></h3>
+<span class="path">src/design-system/composites/profile/rail/ProfileRail/ProfileRail.tsx</span>
+<pre><code>export const ProfileRailAccount = () =&gt; {
+  const summary = useAccountSummary()
+  return &lt;AccountSummaryCard summary={summary.data} isSample={summary.isMock} /&gt;
+}
+
+export const ProfileRail = ({ showAccount = true }: ProfileRailProps) =&gt; {
+  const details = useProfileDetails()
+  const data = useYourData()
+
+  const handleExport = async () =&gt; {
+    try {
+      await data.requestExport()
+      ToastMessage(TOAST_TYPE.SUCCESS, '', `Export request received. We will contact you${details.data?.email ? ` at ${details.data.email}` : ''}.`)
+    } catch (error) { /* error toast */ }
+  }
+
+  const handleDelete = async () =&gt; {
+    await data.deleteAccount()
+    ToastMessage(TOAST_TYPE.SUCCESS, '', 'Deletion request received. Our team will confirm it by email.')
+  }
+
+  return (
+    &lt;div className={styles.rail}&gt;
+      {showAccount &amp;&amp; &lt;ProfileRailAccount /&gt;}
+      &lt;YourDataCard username={details.data?.username || details.data?.email || ''} onExport={handleExport} onDelete={handleDelete} ... /&gt;
+    &lt;/div&gt;
+  )
+}</code></pre>
+<p>Splitting <code>ProfileRailAccount</code> out lets the page render the same card in two places (rail on desktop, hero on mobile) with only one mounted at a time. A nested template literal builds "We will contact you at you@x.com." only when an email exists. <code>handleDelete</code> has no <code>try/catch</code> on purpose: the error propagates to the confirm drawer, which shows it under the input.</p>
+
+<h3>13.2 <code>useAccountSummary</code>: sharing one request by hand</h3>
+<span class="path">src/hooks/profile/useAccountSummary.ts</span>
+<pre><code>let inFlight: Promise&lt;AccountSummary&gt; | null = null
+
+const loadSummary = (fresh: boolean): Promise&lt;AccountSummary&gt; =&gt; {
+  if (fresh || !inFlight) {
+    const request = getAccountSummary().finally(() =&gt; {
+      if (inFlight === request) inFlight = null
+    })
+    inFlight = request
+  }
+  return inFlight
+}
+
+export function useAccountSummary(options: { skip?: boolean } = {}) {
+  const { skip = false } = options
+  const [data, setData] = useState&lt;AccountSummary | undefined&gt;(undefined)
+  const [isLoading, setLoading] = useState(!skip)
+  // ... same effect pattern as useNotificationSettings, calling loadSummary(reloads &gt; 0)
+  return { data, isLoading, isError, refetch, isMock: false }
+}</code></pre>
+<p>The Public Preview (Profile tab) and the Account card both need the summary at the same moment. Door 2 has no cache, so this module level <code>inFlight</code> promise does the sharing: the first caller starts the request, the second gets the <b>same promise</b>. When it settles, <code>finally</code> clears it (only if it is still the current one), so the next visit fetches fresh. <code>refetch</code> passes <code>fresh = true</code> to force a new request. <code>skip</code> (added for Portfolio's public pages) keeps it idle and not loading.</p>
+<p><code>AccountSummaryCard</code> draws four rows on the shared <code>InfoListCard</code>: Member since (formatted "May 2024" with <code>toLocaleDateString</code>, or a dash when the backend has no date), Domains owned and Volume sold (each with a "View portfolio →" link), and Completed sales. Undefined summary means loading, and every value shows "—".</p>
+
+<h3>13.3 Your Data: export and deletion requests</h3>
+<span class="path">src/hooks/profile/useYourData.ts</span>
+<pre><code>export function useYourData() {
+  const [statuses, setStatuses] = useState&lt;Partial&lt;Record&lt;DataRequestType, DataRequestStatus&gt;&gt;&gt;({})
+
+  const loadStatuses = useCallback(async () =&gt; {
+    try {
+      const requests = await listDataRequests()
+      const next: Partial&lt;Record&lt;DataRequestType, DataRequestStatus&gt;&gt; = {}
+      for (const request of requests) {
+        const status: DataRequestStatus = request.status === 'open' ? 'open' : 'done'
+        if (next[request.type] !== 'open') next[request.type] = status
+      }
+      setStatuses(next)
+    } catch (err) { console.error(...) }
+  }, [])
+
+  useEffect(() =&gt; { void loadStatuses() }, [loadStatuses])
+
+  const { run: requestExport, isSaving: isExporting } = useProfileAction(async () =&gt; { await createDataRequest('export'); await loadStatuses() })
+  const { run: deleteAccount, isSaving: isDeleting } = useProfileAction(async () =&gt; { await createDataRequest('delete'); await loadStatuses() })
+  return { requestExport, isExporting, deleteAccount, isDeleting, exportStatus: statuses.export, deleteStatus: statuses.delete, isMock: false }
+}</code></pre>
+<p>Nothing is exported or deleted by the app; both are <b>requests</b> to the support team (<code>POST /users/requests</code>). The status loop keeps, per type, "open" if any request is open, otherwise "done". <code>void loadStatuses()</code> marks the promise as deliberately not awaited (effects cannot await). After creating a request it reloads statuses, so the card shows "Requested · our team will contact you".</p>
+<p><code>YourDataCard</code> guards deletion with a typed confirmation: the drawer's confirm button stays disabled until what you type exactly matches your username (or email when there is no username). Each opening starts empty, thanks to an effect that resets the input when <code>isConfirming</code> turns true.</p>
+
+<!-- ============================================================ -->
+<h2 id="mock">14. The sample data machinery</h2>
+<p>When the page was built, most areas had no backend. They read <b>sample data</b> through the same hook shape as real data, so a later switch to the real API changes only the hook. Today every visible area is real; the machinery still feeds the hidden areas (Active Sessions, Default Network, extra Display preferences, Privacy). It is worth understanding because Promotions and other new pages use the same idea.</p>
+
+<h3>14.1 The fixtures and the store</h3>
+<span class="path">src/data/profile/store.ts</span>
+<pre><code>let state: ProfileMockState = {
+  summary: mockAccountSummary,
+  sessions: mockSessions,
+  walletSettings: mockWalletSettings,
+  notifications: mockNotificationSettings,
+  preferences: mockPreferences,
+}
+
+const listeners = new Set&lt;() =&gt; void&gt;()
+
+const subscribe = (listener: () =&gt; void) =&gt; {
+  listeners.add(listener)
+  return () =&gt; { listeners.delete(listener) }
+}
+
+export const getProfileMock = &lt;K extends keyof ProfileMockState&gt;(key: K): ProfileMockState[K] =&gt; state[key]
+
+export function setProfileMock&lt;K extends keyof ProfileMockState&gt;(key: K, next: ProfileMockState[K]): ProfileMockState[K] {
+  state = { ...state, [key]: next }
+  listeners.forEach((listener) =&gt; listener())
+  return next
+}
+
+export function useProfileMock&lt;K extends keyof ProfileMockState&gt;(key: K): ProfileMockState[K] {
+  const read = () =&gt; state[key]
+  return useSyncExternalStore(subscribe, read, read)
+}
+
+export const mockSaveDelay = (ms = 350) =&gt; new Promise&lt;void&gt;((resolve) =&gt; setTimeout(resolve, ms))</code></pre>
+<p>This is a <b>tiny global store in 30 lines</b>, the same idea Redux is built on:</p>
+<ol class="check">
+<li><code>state</code> is a module variable: it lives as long as the page, so it survives tab switches; a reload resets it.</li>
+<li><code>setProfileMock</code> never mutates: it builds a <b>new</b> object and then notifies every listener. React compares snapshots by reference, so mutating in place would go unnoticed.</li>
+<li><code>useSyncExternalStore(subscribe, read, read)</code> is React's official way to read outside state: React calls <code>subscribe</code> with its own listener, and re renders the component whenever <code>read()</code> returns something new. The third argument is the value used during server rendering.</li>
+<li>The generic <code>&lt;K extends keyof ProfileMockState&gt;</code> ties the key to the value type: <code>setProfileMock('sessions', x)</code> requires <code>x</code> to be <code>ActiveSession[]</code>.</li>
+<li><code>mockSaveDelay</code> fakes network time so "Saving…" states are visible in review.</li>
+</ol>
+<p><code>fixtures.ts</code> holds the starting values (copied from the Figma frames), for example two sample sessions and default preferences.</p>
+
+<h3>14.2 <code>useMockQuery</code> and <code>useProfileMockArea</code></h3>
+<span class="path">src/hooks/marketplace/domain-overview/queryResult.ts</span>
+<pre><code>export interface QueryResult&lt;T&gt; {
+  data?: T
+  isLoading: boolean
+  isError: boolean
+  refetch: () =&gt; void
+}
+
+export function useMockQuery&lt;T&gt;(key: string | null, load: (key: string) =&gt; T | null, options: { skip?: boolean } = {}): QueryResult&lt;T&gt; {
+  // state { key, data, isLoading, isError } and a nonce for refetch
+  // effect: after 350 ms, setState({ key, data: load(key) ?? undefined, isLoading: false, isError: false })
+  // a thrown load() becomes isError
+  // if the key changed but the effect has not run yet, return no data (never the old key's)
+}</code></pre>
+<span class="path">src/hooks/profile/useProfileMockArea.ts</span>
+<pre><code>const loadArea = (key: string) =&gt; getProfileMock(key as keyof ProfileMockState)
+
+export function useProfileMockArea&lt;K extends keyof ProfileMockState&gt;(key: K): QueryResult&lt;ProfileMockState[K]&gt; {
+  const live = useProfileMock(key)
+  const query = useMockQuery(key, loadArea)
+  return { ...query, data: query.data === undefined ? undefined : live }
+}</code></pre>
+<p><code>useMockQuery</code> imitates an RTK query: a first load delay and the same <code>QueryResult</code> shape. <code>useProfileMockArea</code> combines it with the live store: wait for the fake first load (so skeletons show), then always return the <b>live</b> value, so a save in one component is seen by every other. <code>loadArea</code> is defined at module level on purpose: <code>useMockQuery</code> re runs when <code>load</code> changes identity, and an inline arrow would be a new function every render, looping forever on Loading (a lesson learned on Portfolio).</p>
+<p>The hidden area hooks are now three lines each, for example:</p>
+<pre><code>export function useWalletSettings() {
+  const area = useProfileMockArea('walletSettings')
+  const { run: update, isSaving } = useProfileAction(async (patch: Partial&lt;WalletSettings&gt;) =&gt; {
+    await mockSaveDelay()
+    return setProfileMock('walletSettings', { ...getProfileMock('walletSettings'), ...patch })
+  })
+  return { ...area, isMock: true, update, isSaving }
+}</code></pre>
+<p><code>isMock: true</code> is what makes <code>SettingsCard</code> show the yellow "Sample data" chip. To make such an area real: write the service or RTK endpoint, rewrite this one hook to call it with the same return shape, set <code>isMock: false</code>, and delete its entry from the store and fixtures. No component changes.</p>
+
+<!-- ============================================================ -->
+<h2 id="cross">15. Auth, mobile, toasts, accessibility</h2>
+<div class="tablewrap"><table>
+<tr><th>Concern</th><th>How Profile handles it</th></tr>
+<tr><td>Signed out visitors</td><td><code>/profile</code> is not in <code>PUBLIC_ROUTES</code> of <code>src/component/ProtectedRoute.tsx</code>, so the global guard sends signed out visitors to <code>/login</code> before the page renders its data.</td></tr>
+<tr><td>Who is the user?</td><td>Never sent explicitly. Every door adds <code>Authorization: Bearer &lt;access_token cookie&gt;</code> and the backend reads the user id from the token.</td></tr>
+<tr><td>Logging out</td><td><code>useAuth().logout()</code>: backend logout, both cookies cleared, <code>myApi.util.resetApiState()</code> wipes every cached query (so the next user never sees the previous user's data), then <code>/login</code>.</td></tr>
+<tr><td>Expired sessions</td><td>Door 1 and Door 2 do not refresh tokens; an expired access token makes calls fail and the tabs show their error banners with Retry. This is a known open item (no global 401 handling).</td></tr>
+<tr><td>Loading and errors</td><td>Each card loads and fails on its own: <code>SettingsCardSkeleton</code> while loading, <code>NoticeBanner</code> with Retry on error. One failing area never blanks the whole page.</td></tr>
+<tr><td>Feedback</td><td><code>ToastMessage(TOAST_TYPE.SUCCESS | ERROR, title, body)</code> after every action. Error text comes from <code>getUserFriendlyToastMessage(error, fallback)</code> in <code>helpers/error-messages</code>, which turns backend and network errors into readable sentences.</td></tr>
+<tr><td>Mobile</td><td><code>useIsMobile(767)</code> in the page moves the Account card to the top; the shell stacks columns; the tab row scrolls sideways; forms go one column (CSS).</td></tr>
+<tr><td>Dark mode</td><td>All colours come from role tokens (<code>--color-bg-surface</code>, <code>--color-text-secondary</code>...) whose dark values switch with <code>data-theme</code>. Images that differ are rendered twice and CSS shows one.</td></tr>
+<tr><td>Accessibility</td><td>Real tablist (arrows, Home, End, roving tabindex, <code>aria-controls</code>), <code>role="tabpanel"</code>, every switch named through <code>SettingsRow</code> ids, focus moved to the first invalid field on submit, forms with <code>noValidate</code> and visible error text, <code>aria-hidden</code> on decorative icons and skeletons.</td></tr>
+</table></div>
+
+<!-- ============================================================ -->
+<h2 id="status">16. Real or sample, today</h2>
+<div class="tablewrap"><table>
+<tr><th>Area</th><th>Status</th><th>Source</th></tr>
+<tr><td>Name, username, email, phone, Telegram, bio, location, website</td><td><span class="real">REAL</span></td><td>GET and PUT <code>/users</code> (Door 1)</td></tr>
+<tr><td>Username availability</td><td><span class="real">REAL</span></td><td><code>/users/username/availability</code> (Door 2)</td></tr>
+<tr><td>Photo</td><td><span class="real">REAL</span></td><td><code>/users/avatar</code> (Door 2)</td></tr>
+<tr><td>Email verification link</td><td><span class="real">REAL</span></td><td><code>/auth/verification-email</code> (Door 1)</td></tr>
+<tr><td>Public Preview figures, Account card</td><td><span class="real">REAL</span></td><td><code>/marketplacev2/orders/summary</code> (Door 2)</td></tr>
+<tr><td>How You Sign In</td><td><span class="real">REAL</span></td><td>flags on the user (Door 1)</td></tr>
+<tr><td>Change Password</td><td><span class="real">REAL</span></td><td><code>/auth/change-password</code> (Door 1)</td></tr>
+<tr><td>Active Sessions</td><td><span class="off">HIDDEN</span></td><td>list sample; "sign out others" real; commented out 27 Oct</td></tr>
+<tr><td>Connected wallets, linking</td><td><span class="real">REAL</span></td><td>user wallets (Door 1); web3-auth (Door 3)</td></tr>
+<tr><td>Default Network card</td><td><span class="off">HIDDEN</span></td><td>sample; commented out 27 Oct</td></tr>
+<tr><td>Five alert switches</td><td><span class="real">REAL</span></td><td><code>/users/notifications</code> (Door 2)</td></tr>
+<tr><td>Alert channels</td><td><span class="sample">LOCAL</span></td><td>hook state only; Telegram row hidden</td></tr>
+<tr><td>Theme</td><td><span class="real">DEVICE</span></td><td><code>localStorage</code> through ThemeContext</td></tr>
+<tr><td>Currency, language, date, time, privacy</td><td><span class="off">HIDDEN</span></td><td>sample; commented out 29 Oct</td></tr>
+<tr><td>Export my data, account deletion</td><td><span class="real">REAL</span></td><td><code>/users/requests</code> (Door 2)</td></tr>
+</table></div>
+
+<!-- ============================================================ -->
+<h2 id="quirks">17. Quirks in the real code</h2>
+<p>Spotting these is a sign you understand the page. None is urgent; talk to the team before changing them.</p>
+<div class="warn"><b>Three doors to the backend</b>RTK Query, the profile service's <code>fetch</code> wrapper, and the old <code>api.service</code>. Each handles errors, caching and auth slightly differently, which is why some hooks (<code>useAccountSummary</code>, <code>useNotificationSettings</code>) rebuild loading, error, refetch and request sharing by hand. Moving Door 2 into RTK endpoints in one file would remove that code. This is exactly the problem the "every API call from one place" rule in the Promotions plan prevents.</div>
+<div class="warn"><b>The <code>profile</code> tag does nothing</b><code>setProfile</code> invalidates <code>'profile'</code>, but <code>getUserProfile</code> does not provide it, so nothing refetches automatically. Every save, upload and resend calls <code>refetch()</code> by hand. Adding <code>providesTags: ['profile']</code> to <code>getUserProfile</code> would do it automatically (check other pages that use the tag first).</div>
+<div class="warn"><b>Composites calling data hooks</b><code>ProfileTabPanel</code>, <code>ProfileRail</code>, <code>SecurityTabPanel</code>, <code>WalletsTabPanel</code> and <code>NotificationsTabPanel</code> call data hooks themselves. The project rule (<code>CLAUDE.md</code> §8) says composites only draw and the page wires data; Profile is listed as a known violation in <code>dev-docs/layering/</code>.</div>
+<div class="note"><b>Stale comments</b><code>ProfileTabPanel</code>'s header says username, bio, location, website and the photo are sample data; <code>NotificationsTabPanel</code>'s says the switches are sample; <code>ProfileRail</code> says there is no username on the backend. All are real now. Comments drift; trust the code.</div>
+<div class="note"><b>Sample chips that never show</b>Panels pass <code>isSample={summary.isMock}</code> and similar, but the real hooks return <code>isMock: false</code> as a literal type, so those chips are permanently off. Harmless, ready for the day an area goes back to sample.</div>
+<div class="note"><b>Leftovers for hidden areas</b><code>useActiveSessions</code>, <code>useWalletSettings</code>, <code>useProfilePreferences</code>, the matching components, and the <code>summary</code> and <code>notifications</code> entries in the sample store are unused today. Kept deliberately to restore later, but they are dead code until then.</div>
+<div class="note"><b>Two copies of the user</b><code>getUserProfile</code>'s <code>onQueryStarted</code> also copies the user into the older <code>userProfileSlice</code> Redux slice for legacy screens. The RTK cache and the slice can briefly disagree.</div>
+<div class="note"><b>First paint on phones</b><code>useIsMobile</code> starts <code>false</code>, so a phone first renders the desktop arrangement (Account card in the rail), then swaps after the effect runs. Accepted project wide (<code>CLAUDE.md</code> §5).</div>
+<div class="note"><b>Cancelling navigation by throwing</b>The leave page guard throws inside <code>routeChangeStart</code>, a widely used but unofficial Next.js trick. Re test it after any Next.js upgrade.</div>
+<div class="note"><b>Small naming slip</b><code>YourDataCard</code>'s prop is <code>username</code>, but <code>ProfileRail</code> passes the email when there is no username. The confirm text says "Type ... to confirm" with whichever it got.</div>
+
+<!-- ============================================================ -->
+<h2 id="practice">18. Practice and self test</h2>
+<p>Answer out loud without looking; the section in brackets has the answer.</p>
+<ol class="check">
+<li>Why are there two families of types, and which function sits between them? <i>(4)</i></li>
+<li>Name the three doors to the backend and one endpoint that goes through each. <i>(5)</i></li>
+<li>How does the backend know which user is calling, when no request sends a user id? <i>(5.1, 15)</i></li>
+<li>Why can four different hooks call <code>useGetUserProfileQuery()</code> without four requests? <i>(5.1)</i></li>
+<li>Why does the page keep both <code>requestedTab</code> and <code>urlTab</code>? <i>(6.2)</i></li>
+<li>Why is <code>isDirty</code> also stored in a ref? <i>(6.3)</i></li>
+<li>What are the two ways of leaving the page with unsaved edits, and how is each caught? <i>(6.4)</i></li>
+<li>Why does a background refetch never overwrite what you are typing? <i>(8.3)</i></li>
+<li>Why is the email not always sent in <code>PUT /users</code>? <i>(8.2)</i></li>
+<li>How does the username check avoid one request per keystroke, and avoid showing an old answer? <i>(8.3.1)</i></li>
+<li>Why does <code>profileChanges</code> compare with <code>JSON.stringify</code>? <i>(8.4)</i></li>
+<li>What happens, step by step, after a successful password change? <i>(9.2)</i></li>
+<li>Why does linking a wallet start in an effect instead of in the click handler? <i>(10.2)</i></li>
+<li>Why must a Solana signature be base58 encoded, and why is the message turned into bytes first? <i>(10.3)</i></li>
+<li>What are the three steps of an optimistic update? <i>(11.2)</i></li>
+<li>How does setting one attribute recolour the whole page? <i>(12.1)</i></li>
+<li>How do two components share one summary request without RTK? <i>(13.2)</i></li>
+<li>To make Default Network real, which files change and which do not? <i>(14.2)</i></li>
+</ol>
+
+<h3>Exercises (in a branch, then throw it away)</h3>
+<ol class="check">
+<li><b>Trace a field.</b> Follow <code>isEmailVerified</code> from the backend JSON to the "Verified" tick: name every file and function it passes through.</li>
+<li><b>Add a rule.</b> Make Location reject digits only. Change only <code>validation.ts</code>; watch the error appear on blur and on submit without touching any component.</li>
+<li><b>Fix the tag.</b> Add <code>providesTags: ['profile']</code> to <code>getUserProfile</code>, remove one manual <code>refetch()</code>, and confirm the Profile tab still updates after Save.</li>
+<li><b>Move a call through Door 1.</b> Write <code>getNotificationSwitches</code> as an RTK query in a new file, rewrite <code>useNotificationSettings</code> to use it with the same return shape, and confirm <code>NotificationsTabPanel</code> needs no change.</li>
+<li><b>Break it on purpose.</b> In DevTools, block <code>/users/notifications</code>. Check that only the alerts card shows an error banner, and Retry recovers once unblocked.</li>
+</ol>
+<div class="good"><b>When you have really got it</b>You can open any new page in this repo and, before reading its code, predict which types, hooks, helpers and doors it uses, how its loading and error states work, and where a click ends up on the backend. Then read the code to check your guess.</div>
+
+<footer>Written 3 Nov 2026 against the marketplace frontend working tree (branch <code>portfolio</code>, based on 6cb6ac2), after reading every Profile file. Line numbers will drift as the code changes; the ideas will not. Companion guides: <code>FRONTEND-FROM-ZERO.html</code>, <code>LOGIN-FROM-ZERO.html</code> (backend side of sign in).</footer>
+</main>
+</div>
+<script>
+(function(){
+  var btn=document.getElementById('themebtn');
+  var root=document.documentElement;
+  try{var saved=localStorage.getItem('profile-guide-theme');if(saved)root.setAttribute('data-theme',saved);}catch(e){}
+  btn.addEventListener('click',function(){
+    var cur=root.getAttribute('data-theme');
+    if(!cur){cur=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+    var next=cur==='dark'?'light':'dark';
+    root.setAttribute('data-theme',next);
+    try{localStorage.setItem('profile-guide-theme',next);}catch(e){}
+  });
+})();
+</script>
+</body>
+</html>

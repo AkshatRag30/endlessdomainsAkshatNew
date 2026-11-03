@@ -101,6 +101,16 @@ footer{color:var(--muted);font-size:13px;margin-top:80px;border-top:1px solid va
   <a class="sub" href="#j3">Step 3 DTO validation</a>
   <a class="sub" href="#j4">Step 4 Controller</a>
   <a class="sub" href="#j5">Step 5 Service</a>
+  <a class="sub" href="#j5-what">&nbsp;&nbsp;5.0 What a service is</a>
+  <a class="sub" href="#j5-story">&nbsp;&nbsp;5.1 The story</a>
+  <a class="sub" href="#j5-top">&nbsp;&nbsp;5.2 Lines 1 to 92</a>
+  <a class="sub" href="#j5-ctor">&nbsp;&nbsp;5c Constructor</a>
+  <a class="sub" href="#j5-throw">&nbsp;&nbsp;5f Throw to HTTP error</a>
+  <a class="sub" href="#j5-find">&nbsp;&nbsp;5i Finding the user</a>
+  <a class="sub" href="#j5-verify">&nbsp;&nbsp;5o Password check</a>
+  <a class="sub" href="#j5-errors">&nbsp;&nbsp;5s Every failure</a>
+  <a class="sub" href="#j5-test">&nbsp;&nbsp;5u Testing it</a>
+  <a class="sub" href="#j5-rules">&nbsp;&nbsp;5v Service rules</a>
   <a class="sub" href="#j6">Step 6 Repository</a>
   <a class="sub" href="#j7">Step 7 Entity and table</a>
   <a class="sub" href="#j8">Step 8 Tokens</a>
@@ -110,6 +120,15 @@ footer{color:var(--muted);font-size:13px;margin-top:80px;border-top:1px solid va
   <a href="#build">7. Build it yourself from zero</a>
   <a href="#quirks">8. Quirks in the real code</a>
   <a href="#practice">9. Practice and self test</a>
+  <a href="#startproject">10. Start a backend from zero</a>
+  <a class="sub" href="#sp-mindset">10.1 Inside out</a>
+  <a class="sub" href="#sp-tree">10.2 Folder structure</a>
+  <a class="sub" href="#sp-foundation">10.3 Foundation</a>
+  <a class="sub" href="#sp-feature">10.4 One feature, in order</a>
+  <a class="sub" href="#sp-names">10.5 Naming</a>
+  <a class="sub" href="#sp-checklist">10.6 Production checklist</a>
+  <a class="sub" href="#sp-mistakes">10.7 Mistakes</a>
+  <a class="sub" href="#sp-start">10.8 Your first week</a>
 </nav>
 <main>
 
@@ -380,8 +399,21 @@ app.use(cookieParser());
 <div class="note"><b>Why so thin?</b>If the controller held logic, you could not reuse that logic from another place (a cron job, an event handler, a different route). Keeping logic in the service means anything can call it.</div>
 
 <h3 id="j5">Step 5: The service does the real work</h3>
-<p>This is the heart of login. Here is the whole method, then we take it apart in pieces.</p>
-<span class="path">src/components/auth/auth.service.ts (lines 93 to 139)</span>
+<p>This is the heart of login, and the part most people find confusing the first time. So we are going to go slowly. First you will learn what a service actually <i>is</i>. Then you will read the whole method once as a plain English story. Then we take every single line apart, including the small TypeScript details that are easy to skim past. By the end of this step you should be able to write a service like this yourself, and spot the problems in it.</p>
+
+<h4 id="j5-what"><span class="badge">5.0</span>What is a service, in plain words?</h4>
+<p>Think of a restaurant. The <b>controller</b> is the waiter: they take your order at the table, carry it to the kitchen, and bring the plate back. They do not cook. The <b>service</b> is the chef: it gets the order, decides what to do, follows the recipe, checks the ingredients, and refuses if something is wrong ("we are out of salmon"). The <b>repository</b> is the storeroom: the chef sends someone to fetch ingredients from it, but the chef never organizes the shelves.</p>
+<p>In code terms, a service is just a TypeScript class with methods. What makes it special in NestJS is three things:</p>
+<div class="tablewrap"><table>
+<tr><th>Property</th><th>What it means for you</th></tr>
+<tr><td>It is <b>injectable</b></td><td>You never write <code>new AuthService(...)</code>. NestJS builds it for you and hands it to whoever asks (the controller, another service). That is what <code>@Injectable()</code> allows.</td></tr>
+<tr><td>It is a <b>singleton</b></td><td>NestJS creates <b>one</b> <code>AuthService</code> when the app starts, and every request for every user shares that same object. This has a huge consequence: never store data about the current request on <code>this</code> (like <code>this.currentUser = user</code>), because two users logging in at the same moment would overwrite each other. Keep request data in local variables (<code>const</code>) inside the method.</td></tr>
+<tr><td>It knows <b>nothing about HTTP</b></td><td>A service never touches <code>req</code>, <code>res</code>, headers or status codes directly. It takes plain data in (a DTO, an id) and returns plain data out, or throws an error. That is why a cron job or an event listener can call the exact same method the controller calls.</td></tr>
+</table></div>
+<div class="note"><b>Frontend comparison</b>You already write this split in React. A component (like the controller) handles clicks and rendering, while a hook or a helper (like the service) holds the logic. If you have ever moved logic out of a component "so it can be reused and tested", you already understand why services exist.</div>
+
+<h4 id="j5-story"><span class="badge">5.1</span>The whole method, then the story</h4>
+<span class="path">src/components/auth/auth.service.ts (login method, around lines 93 to 139)</span>
 <pre><code><span class="k">async</span> login(logInDto: LogInDto): Promise&lt;ReturnLoginDto&gt; {
     <span class="k">const</span> logger = <span class="k">new</span> Logger(AuthService.name + <span class="s">'-login'</span>);
     <span class="k">const</span> normalizedEmail = normalizeEmail(logInDto.email);
@@ -390,9 +422,11 @@ app.use(cookieParser());
         logger.error(UserErrorMessage.USER_DOES_NOT_EXIST + <span class="s">'-'</span> + logInDto.email);
         <span class="k">throw new</span> UnauthorizedException(UserErrorMessage.INVALID_ATTEMPT);
     }
+    <span class="c">// Case 1: Check if user account is deleted</span>
     <span class="k">if</span> (user.isDeleted) {
         <span class="k">throw new</span> UnauthorizedException(<span class="s">'Your account has been deleted. Please contact support for assistance.'</span>);
     }
+    <span class="c">// Case 2: Check if user account is blocked</span>
     <span class="k">if</span> (user.isBlocked) {
         <span class="k">throw new</span> UnauthorizedException(<span class="s">'Your account has been blocked. Please contact support for assistance.'</span>);
     }
@@ -409,39 +443,229 @@ app.use(cookieParser());
     <span class="k">await this</span>.verifyPassword(logInDto.password, passwordFromDB);
     <span class="k">const</span> returnLoginDto = <span class="k">new</span> ReturnLoginDto();
     returnLoginDto.user = user;
+    <span class="c">// Access Token</span>
     <span class="k">const</span> tokens = <span class="k">await this</span>.getTokens(user.id);
     returnLoginDto.accessToken = tokens.accessToken;
+    <span class="c">// Refresh Token</span>
     <span class="k">await this</span>.userService.setCurrentRefreshToken(tokens.refreshToken, user.id);
     returnLoginDto.refreshToken = tokens.refreshToken;
     <span class="k">this</span>.eventEmitter.emit(<span class="s">`userlogin.UpdateDomainDetailTable`</span>, <span class="k">new</span> UpdateDomainDetailTableAfterLoginEvent(user.id));
     <span class="k">this</span>.eventEmitter.emit(<span class="s">'reputation.login'</span>, { userId: user.id });
     <span class="k">return</span> returnLoginDto;
 }</code></pre>
+<p>Before reading any line closely, read the method as a story. If you can tell this story out loud, you understand login:</p>
+<ol class="check">
+<li>Make a labelled notebook (the logger) so anything we write down is tagged "AuthService login".</li>
+<li>Clean up the email the person typed, so <code>" Akshat.Rag@Gmail.com "</code> and <code>"akshatrag@gmail.com"</code> count as the same person.</li>
+<li>Ask the user service: "who has this email?" If nobody does, stop with "Invalid User Name or Password".</li>
+<li>If that account was deleted, stop.</li>
+<li>If that account was blocked by an admin, stop.</li>
+<li>Fetch the account's password hash (kept separately, for safety). If there is none, this account signed up with Google or a wallet, so stop.</li>
+<li>If they never clicked the link in the verification email, stop.</li>
+<li>Note down which website they are logging in from (main site or marketplace).</li>
+<li>Check the typed password against the stored hash. Wrong? Stop.</li>
+<li>Everything passed. Make an empty answer object and put the safe user details in it.</li>
+<li>Create two tokens (access and refresh). Save a hashed copy of the refresh token on the user row. Put both tokens in the answer.</li>
+<li>Shout two announcements into the app ("this user just logged in") for background jobs to pick up, without waiting for them.</li>
+<li>Hand the answer back to the controller.</li>
+</ol>
+<p>Notice the shape: lots of "stop if bad" checks at the top, then the real work at the bottom. Every <code>throw</code> is a "stop". Here is the same flow as a picture, with every trip to the database marked:</p>
+<div class="flow">
+  <div class="box"><b>normalizeEmail</b> pure function, no database</div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>getByEmail</b> database: find user row, then find wallet row &nbsp;&#8594;&nbsp; <i>no row: 401</i></div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>isDeleted / isBlocked</b> just reading the object we already have &nbsp;&#8594;&nbsp; <i>401</i></div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>getPasswordByUserId</b> database: find user row again &nbsp;&#8594;&nbsp; <i>no hash: 403</i></div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>isEmailVerified</b> reading the object &nbsp;&#8594;&nbsp; <i>400</i></div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>updateTheUserSource</b> database: find user row again, then UPDATE it</div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>verifyPassword</b> bcrypt, CPU work, no database &nbsp;&#8594;&nbsp; <i>wrong: 401</i></div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>getTokens</b> sign two JWTs, no database</div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>setCurrentRefreshToken</b> argon2 hash, then database UPDATE</div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>emit, emit, return</b> fire and forget, then answer</div>
+</div>
 
-<h4><span class="badge">5a</span>The service's constructor</h4>
-<p>Before <code>login</code> can use <code>this.userService</code> or <code>this.jwtService</code>, those have to be injected. The constructor of <code>AuthService</code> asks for them:</p>
+<h4 id="j5-top"><span class="badge">5.2</span>Lines 1 to 92: everything before login, at a glance</h4>
+<p><code>login</code> starts at line 93 of <code>auth.service.ts</code>. The 92 lines above it do no work themselves: they only <b>set the service up</b>. When you open the file it looks like a wall of code, but it is just four blocks. Here is the map; parts 5a to 5c below then zoom into each block line by line.</p>
+<div class="tablewrap"><table>
+<tr><th>Lines</th><th>Block</th><th>In one sentence</th></tr>
+<tr><td>1 to 39</td><td>Imports</td><td>Bring in every name the file uses from other files and packages.</td></tr>
+<tr><td>40 to 41</td><td>Class line</td><td><code>@Injectable()</code> lets NestJS build it; <code>implements AuthServiceInterface</code> promises every method on the menu exists.</td></tr>
+<tr><td>44 to 53</td><td>Ten settings fields</td><td>Empty, private, read only boxes for secrets and URLs, filled once by the constructor.</td></tr>
+<tr><td>54 to 79</td><td>Constructor arguments</td><td>The shopping list: 13 things NestJS must hand the service.</td></tr>
+<tr><td>80 to 90</td><td>Constructor body</td><td>Read each setting from <code>ConfigService</code> once, at startup, into the fields.</td></tr>
+<tr><td>91 and 92</td><td><code>}</code> and a blank line</td><td>End of the constructor. <code>login</code> begins on line 93.</td></tr>
+</table></div>
+
+<p><b>The 39 import lines, grouped by purpose.</b> Nobody reads them one by one; read them as groups:</p>
+<div class="tablewrap"><table>
+<tr><th>Group</th><th>What gets imported</th><th>Used for</th></tr>
+<tr><td>NestJS core (line 2)</td><td><code>Injectable</code>, <code>Inject</code>, <code>Logger</code>, and the exceptions <code>BadRequestException</code>, <code>ForbiddenException</code>, <code>NotFoundException</code>, <code>UnauthorizedException</code>, <code>InternalServerErrorException</code></td><td>Making the class injectable, logging, and saying "no" with the right HTTP status.</td></tr>
+<tr><td>DTOs</td><td><code>LogInDto</code>, <code>ReturnLoginDto</code>, <code>RegisterUserDto</code>, <code>EmailVerificationDto</code>, <code>CreateUserDto</code>, <code>TokenResponseDto</code>, <code>ResetPasswordDto</code>, <code>ChangePasswordDto</code></td><td>The shapes of data in and out of each method. Login needs only the first two; the rest belong to register, reset password, change password and so on.</td></tr>
+<tr><td>Interfaces</td><td><code>AuthServiceInterface</code>, <code>UserServiceInterface</code>, <code>EmailVerificationServiceInterface</code>, Moralis, DomainDetail, and five Alchemy interfaces (Arb, UdBase, Ens, Ud, Freename)</td><td>Types for the services injected in the constructor.</td></tr>
+<tr><td>Message enums</td><td><code>UserErrorMessage</code>, <code>AuthErrorMessage</code>, <code>EmailVerificationErrorMessage</code>, <code>CommonErrorMessage</code>, <code>PostgresErrorCode</code></td><td>Fixed message strings so nothing is typed twice. <code>PostgresErrorCode</code> recognizes database errors such as "this email already exists" during register.</td></tr>
+<tr><td>Security</td><td><code>bcrypt</code>, <code>JwtService</code>, <code>verifyHash</code></td><td>Checking passwords, signing tokens, checking the stored refresh token hash.</td></tr>
+<tr><td>Events</td><td><code>EventEmitter2</code>, <code>OnEvent</code>, event name constants, event payload DTOs, <code>UpdateDomainDetailTableAfterLoginEvent</code></td><td>Background work after login, forgot password and reset password.</td></tr>
+<tr><td>Config and secrets</td><td><code>ConfigService</code>, <code>SecretsService</code></td><td>Reading settings like the JWT secrets.</td></tr>
+<tr><td>Misc</td><td><code>Response as ExpressResponse</code>, <code>DomainProvider</code>, <code>JwtPayload</code>, <code>VerifiedWalletInfo</code>, <code>normalizeEmail</code></td><td><code>as ExpressResponse</code> renames Express's <code>Response</code> so it does not clash with the project's own <code>Response</code> class; logout uses it to clear cookies.</td></tr>
+</table></div>
+<p>One detail worth spotting: line 4 is <code>import LogInDto from './dto/login.dto'</code> with <b>no</b> curly braces, because that file ends with <code>export default LogInDto;</code>.</p>
+
+<p><b>The ten fields (lines 44 to 53).</b> Each looks like <code>private readonly JWT_ACCESS_TOKEN_SECRET: string;</code>. They hold: the access token secret and expiry, the refresh token secret and expiry, the email verification token secret and expiry, the website URL and the marketplace URL, and two cookie names (<code>ACCESS_TOKEN</code>, <code>REFRESH_TOKEN</code>).</p>
+
+<p><b>The 13 constructor arguments (lines 54 to 79)</b> fall into two kinds:</p>
+<div class="tablewrap"><table>
+<tr><th>Kind</th><th>Which ones</th><th>Why</th></tr>
+<tr><td>With <code>@Inject('...')</code></td><td>userService, emailVerificationService, Moralis, DomainDetail, and the five Alchemy services</td><td>Their types are interfaces, which disappear when TypeScript compiles, so NestJS needs a string name to look them up.</td></tr>
+<tr><td>Without <code>@Inject</code></td><td><code>JwtService</code>, <code>EventEmitter2</code>, <code>ConfigService</code>, <code>SecretsService</code></td><td>Real classes still exist at runtime, so the class itself is the lookup key.</td></tr>
+</table></div>
+<p>Login uses only <b>four</b> of the 13: <code>userService</code>, <code>jwtService</code>, <code>eventEmitter</code> and <code>configService</code>. The Moralis and Alchemy services power the background job that finds which domain NFTs a user owns after login, and the rest serve register, email verification and password reset.</p>
+
+<p><b>The constructor body (lines 80 to 90)</b> is ten lines of the same pattern: <code>this.JWT_ACCESS_TOKEN_SECRET = this.configService.get&lt;string&gt;('JWT_ACCESS_TOKEN_SECRET');</code>. Each reads one setting once, at startup, into its field. <code>&lt;string&gt;</code> only tells TypeScript the type; it checks nothing, so a missing setting quietly becomes <code>undefined</code> and only shows up later when something uses it.</p>
+<div class="good"><b>How to read the top of any big service</b>Skim the imports by group, not line by line. Look at the constructor arguments: they tell you everything the class depends on. Then find which of them the method you care about actually uses. Usually it is a small fraction, like four out of thirteen here.</div>
+
+<h4 id="j5-imports"><span class="badge">5a</span>The top of the file: imports</h4>
+<p>Before the class even starts, the file imports about forty things. You do not need all of them for login, but you do need to understand the four different <i>kinds</i> of import line, because you will write all four yourself:</p>
+<span class="path">src/components/auth/auth.service.ts (top of file, a few lines)</span>
+<pre><code><span class="k">import</span> { BadRequestException, ForbiddenException, Inject, Injectable, Logger, UnauthorizedException } <span class="k">from</span> <span class="s">'@nestjs/common'</span>;
+<span class="k">import</span> LogInDto <span class="k">from</span> <span class="s">'./dto/login.dto'</span>;
+<span class="k">import</span> * <span class="k">as</span> bcrypt <span class="k">from</span> <span class="s">'bcrypt'</span>;
+<span class="k">import</span> { UserServiceInterface } <span class="k">from</span> <span class="s">'@components/user/interface/user.service.interface'</span>;
+<span class="k">import</span> { normalizeEmail } <span class="k">from</span> <span class="s">'src/@core/utils/email-normalizer.util'</span>;</code></pre>
+<div class="tablewrap"><table>
+<tr><th>Line</th><th>What kind of import</th><th>Explained</th></tr>
+<tr><td><code>import { A, B } from '@nestjs/common'</code></td><td>Named imports from a package</td><td>The package exports many things by name; the curly braces pick only the ones you need. <code>@nestjs/common</code> holds the everyday NestJS tools: decorators like <code>Injectable</code> and <code>Inject</code>, the <code>Logger</code>, and the HTTP exception classes.</td></tr>
+<tr><td><code>import LogInDto from './dto/login.dto'</code></td><td>Default import from your own file</td><td>No curly braces. It works because <code>login.dto.ts</code> ends with <code>export default LogInDto;</code>. A file can have only one default export. The <code>./</code> means "start from the folder this file is in".</td></tr>
+<tr><td><code>import * as bcrypt from 'bcrypt'</code></td><td>Namespace import</td><td>"Give me everything this library exports, bundled into one object called <code>bcrypt</code>." Then you call <code>bcrypt.compare(...)</code>, <code>bcrypt.hash(...)</code>. Common for older plain JavaScript libraries.</td></tr>
+<tr><td><code>from '@components/user/...'</code></td><td>Path alias</td><td><code>@components</code> is not a package on npm. It is a shortcut defined in <code>tsconfig.json</code> under <code>paths</code>, pointing at <code>src/components</code>. It saves you from writing <code>../../../user/...</code>. The <code>src/...</code> style in the last line works because <code>baseUrl</code> is the project root.</td></tr>
+</table></div>
+<div class="good"><b>Pro habit</b>When an import fails with "Cannot find module", check three things in order: the spelling and folder, whether the other file uses <code>export</code> or <code>export default</code> (and whether you used braces to match), and whether the alias exists in <code>tsconfig.json</code>.</div>
+
+<h4 id="j5-class"><span class="badge">5b</span>The class line and the interface it promises to follow</h4>
 <pre><code><span class="d">@Injectable</span>()
-<span class="k">export class</span> AuthService <span class="k">implements</span> AuthServiceInterface {
-    <span class="k">private readonly</span> JWT_ACCESS_TOKEN_SECRET: string;
-    <span class="c">// ... more secret fields</span>
+<span class="k">export class</span> AuthService <span class="k">implements</span> AuthServiceInterface {</code></pre>
+<div class="tablewrap"><table>
+<tr><th>Word</th><th>Meaning</th></tr>
+<tr><td><code>@Injectable()</code></td><td>A <b>decorator</b>: a function that runs on the class and attaches extra information to it. This one tells NestJS "you are allowed to create this class and fill in its constructor arguments for me." Without it, NestJS cannot read what the constructor needs, and you get the "can't resolve dependencies" error.</td></tr>
+<tr><td><code>export</code></td><td>Other files may import this class. The module file (<code>auth.module.ts</code>) needs to.</td></tr>
+<tr><td><code>class AuthService</code></td><td>A blueprint. NestJS will create exactly one object from it.</td></tr>
+<tr><td><code>implements AuthServiceInterface</code></td><td>A promise checked by TypeScript: "this class has every method listed in that interface, with the same parameter and return types." If you delete <code>login</code> or change its return type, the project stops compiling.</td></tr>
+</table></div>
+<p>Here is the start of the interface it promises to follow:</p>
+<span class="path">src/components/auth/interface/auth.service.interface.ts</span>
+<pre><code><span class="k">export interface</span> AuthServiceInterface {
+    login(logInDto: LogInDto): Promise&lt;ReturnLoginDto&gt;;
+    logout(userId: string, res: any): Promise&lt;<span class="k">void</span>&gt;;
+    register(registerUserDto: RegisterUserDto): Promise&lt;<span class="k">void</span>&gt;;
+    refreshTokens(userId: string, refreshToken: string, verifiedWalletInfo?: VerifiedWalletInfo): Promise&lt;TokenResponseDto&gt;;
+    getTokens(userId: string, verifiedWalletInfo?: VerifiedWalletInfo): Promise&lt;TokenResponseDto&gt;;
+    <span class="c">// ... forgotPassword, resetPassword, changePassword, logoutOthers</span>
+}</code></pre>
+<p>An interface is a <b>menu</b>: it lists what you can order, not how it is cooked. The controller only ever sees this menu (it injects <code>AuthServiceInterface</code>), so it cannot accidentally call a private helper like <code>verifyPassword</code>. Note that <code>verifyPassword</code> is <b>not</b> on the menu. That is exactly right: it is an internal step, not something other code should call.</p>
+
+<h4 id="j5-ctor"><span class="badge">5c</span>The fields and the constructor, line by line</h4>
+<pre><code>    <span class="k">private readonly</span> JWT_ACCESS_TOKEN_SECRET: string;
+    <span class="k">private readonly</span> JWT_ACCESS_TOKEN_EXPIRATION: string;
+    <span class="k">private readonly</span> JWT_REFRESH_TOKEN_SECRET: string;
+    <span class="k">private readonly</span> JWT_REFRESH_TOKEN_EXPIRATION: string;
+    <span class="c">// ... six more config fields used by other methods</span>
+
     <span class="k">constructor</span>(
-        <span class="d">@Inject</span>(<span class="s">'UserServiceInterface'</span>) <span class="k">private readonly</span> userService: UserServiceInterface,
+        <span class="d">@Inject</span>(<span class="s">'UserServiceInterface'</span>)
+        <span class="k">private readonly</span> userService: UserServiceInterface,
         <span class="k">private</span> jwtService: JwtService,
+        <span class="d">@Inject</span>(<span class="s">'EmailVerificationServiceInterface'</span>)
+        <span class="k">private readonly</span> emailVerificationService: EmailVerificationServiceInterface,
         <span class="k">private</span> eventEmitter: EventEmitter2,
+        <span class="c">// ... Moralis, DomainDetail and five Alchemy services, used by other methods</span>
         <span class="k">private readonly</span> configService: ConfigService,
-        <span class="c">// ... plus email, moralis, alchemy services used by other methods</span>
+        <span class="k">private readonly</span> secretsService: SecretsService
     ) {
         <span class="k">this</span>.JWT_ACCESS_TOKEN_SECRET = <span class="k">this</span>.configService.get&lt;string&gt;(<span class="s">'JWT_ACCESS_TOKEN_SECRET'</span>);
         <span class="k">this</span>.JWT_ACCESS_TOKEN_EXPIRATION = <span class="k">this</span>.configService.get&lt;string&gt;(<span class="s">'JWT_ACCESS_TOKEN_EXPIRATION'</span>);
-        <span class="c">// ... refresh secret and expiration the same way</span>
+        <span class="k">this</span>.JWT_REFRESH_TOKEN_SECRET = <span class="k">this</span>.configService.get&lt;string&gt;(<span class="s">'JWT_REFRESH_TOKEN_SECRET'</span>);
+        <span class="k">this</span>.JWT_REFRESH_TOKEN_EXPIRATION = <span class="k">this</span>.configService.get&lt;string&gt;(<span class="s">'JWT_REFRESH_TOKEN_EXPIRATION'</span>);
+        <span class="c">// ... the rest the same way</span>
     }</code></pre>
-<p><code>@Injectable()</code> lets NestJS construct this class. <code>implements AuthServiceInterface</code> is a promise to TypeScript that this class has every method the interface lists; if one is missing, compilation fails. Notice <code>JwtService</code> and <code>EventEmitter2</code> are injected <b>without</b> <code>@Inject('...')</code>. That is because they are real classes, so NestJS can use the class itself as the token. Only the project's own interface based services need string tokens. The secrets are read once at startup and kept in private fields.</p>
+<p><b>The fields first.</b> <code>private readonly JWT_ACCESS_TOKEN_SECRET: string;</code> declares a property on the class. <code>private</code> means only code inside <code>AuthService</code> can read it. <code>readonly</code> means after the constructor sets it, nothing may change it (TypeScript allows assignment only inside the constructor). <code>: string</code> is its type. The ALL_CAPS name is just a convention for "this is a constant setting".</p>
+<p><b>Now the constructor arguments.</b> The constructor is the "shopping list" the class hands to NestJS. Each argument is something the service needs to do its job:</p>
+<div class="tablewrap"><table>
+<tr><th>Argument</th><th>Why it has (or lacks) <code>@Inject</code></th><th>What login uses it for</th></tr>
+<tr><td><code>userService</code></td><td>The type is an <b>interface</b>, and interfaces vanish when TypeScript compiles to JavaScript. NestJS needs something real to look up at runtime, so you give it a string name. The module file maps that string to <code>UserService</code> (see section 5).</td><td>Every database question about users: find by email, get password hash, save source, save refresh token.</td></tr>
+<tr><td><code>jwtService</code></td><td>No <code>@Inject</code> needed. <code>JwtService</code> is a real class, and a class still exists at runtime, so NestJS can use the class itself as the lookup key.</td><td>Signing tokens (inside <code>getTokens</code>).</td></tr>
+<tr><td><code>eventEmitter</code></td><td>Real class, no <code>@Inject</code>.</td><td>The two background announcements at the end.</td></tr>
+<tr><td><code>configService</code></td><td>Real class, no <code>@Inject</code>.</td><td>Reading secrets and settings in the constructor body.</td></tr>
+<tr><td>The other eight</td><td>Mixed</td><td>Not used by login at all. They exist because one service class holds every auth method (register, wallet sync, password reset).</td></tr>
+</table></div>
+<p><b>The magic shortcut.</b> Writing <code>private readonly userService: UserServiceInterface</code> <i>inside the constructor brackets</i> is a TypeScript feature called a <b>parameter property</b>. It is shorthand for all of this:</p>
+<pre><code><span class="c">// what you write</span>
+<span class="k">constructor</span>(<span class="k">private readonly</span> userService: UserServiceInterface) {}
 
-<h4><span class="badge">5b</span>The logger</h4>
+<span class="c">// what it means</span>
+<span class="k">private readonly</span> userService: UserServiceInterface;
+<span class="k">constructor</span>(userService: UserServiceInterface) {
+    <span class="k">this</span>.userService = userService;
+}</code></pre>
+<p>That is why the login method can say <code>this.userService</code> even though you never see an assignment. Without the word <code>private</code> (or <code>public</code>, <code>protected</code>, <code>readonly</code>) in front, the argument would be an ordinary parameter, and <code>this.userService</code> would be undefined.</p>
+<p><b>The constructor body.</b> <code>this.configService.get&lt;string&gt;('JWT_ACCESS_TOKEN_SECRET')</code> reads one value from the environment (in production, from AWS Secrets Manager loaded at startup). The <code>&lt;string&gt;</code> is a <b>generic</b>: it tells TypeScript "treat the result as a string". It does not check or convert anything at runtime. If the variable is missing, you silently get <code>undefined</code>, and you find out only when the first login tries to sign a token. Reading everything once here, at startup, is cheaper than reading it on every request.</p>
+<div class="warn"><b>Pro point: fail at startup, not at the first login</b>A production grade app validates its environment when it boots (with a schema in <code>ConfigModule.forRoot({ validationSchema })</code>), so a missing secret crashes the deploy immediately instead of breaking login an hour later. Section 10 shows how.</div>
+
+<h4 id="j5-sig"><span class="badge">5d</span>The method signature</h4>
+<pre><code><span class="k">async</span> login(logInDto: LogInDto): Promise&lt;ReturnLoginDto&gt; {</code></pre>
+<div class="tablewrap"><table>
+<tr><th>Piece</th><th>Meaning</th></tr>
+<tr><td><code>async</code></td><td>This method will <code>await</code> slow things (database, hashing). An <code>async</code> function <b>always</b> returns a Promise, even if you write <code>return x</code>; JavaScript wraps <code>x</code> for you.</td></tr>
+<tr><td><code>login</code></td><td>The method name. No <code>public</code> keyword written, but class methods are public by default in TypeScript, so the controller can call it.</td></tr>
+<tr><td><code>logInDto: LogInDto</code></td><td>One parameter called <code>logInDto</code>, whose type is the <code>LogInDto</code> class. By the time we get here, the ValidationPipe (step 3) has already guaranteed it has a valid <code>email</code>, a <code>password</code> of 8 or more characters, and a non empty <code>source</code>. The service trusts that and does not check again.</td></tr>
+<tr><td><code>: Promise&lt;ReturnLoginDto&gt;</code></td><td>The return type: "a Promise that, when it finishes, gives a <code>ReturnLoginDto</code>." If it fails, it does not return; it throws.</td></tr>
+</table></div>
+
+<h4 id="j5-await"><span class="badge">5e</span>A short detour: what <code>await</code> really does</h4>
+<p>Almost every line in login has <code>await</code>, so you must be solid on it. A database query takes a few milliseconds. JavaScript does not freeze while waiting; it gives you a <b>Promise</b>, an IOU that says "the answer will arrive later". <code>await</code> pauses <i>this function only</i> until the IOU is paid, then gives you the real value. Meanwhile Node keeps serving other users' requests.</p>
+<pre><code><span class="c">// WITHOUT await: a classic beginner bug</span>
+<span class="k">const</span> user = <span class="k">this</span>.userService.getByEmail(email);   <span class="c">// user is a Promise, not a user!</span>
+<span class="k">if</span> (user.isBlocked) { ... }                        <span class="c">// always undefined, so the check silently never fires</span>
+
+<span class="c">// WITH await</span>
+<span class="k">const</span> user = <span class="k">await this</span>.userService.getByEmail(email); <span class="c">// user is the real ReturnUserDto</span></code></pre>
+<p>And if the awaited Promise <b>rejects</b> (the called function threw), <code>await</code> re throws that error right on this line. That is the key to how errors flow in this whole method, covered next.</p>
+
+<h4 id="j5-throw"><span class="badge">5f</span>How a <code>throw</code> turns into an HTTP error</h4>
+<p>You will see <code>throw new UnauthorizedException(...)</code> six times. Here is exactly what happens when one runs:</p>
+<div class="flow">
+  <div class="box"><b>1.</b> <code>throw</code> stops the service method instantly. No line after it runs.</div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>2.</b> The controller was doing <code>await this.authService.login(...)</code>. That await re throws, so the controller method stops too.</div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>3.</b> Nobody catches it, so it reaches NestJS's built in <b>exception filter</b>.</div>
+  <div class="arrow">&#8595;</div>
+  <div class="box"><b>4.</b> The filter sees an <code>HttpException</code> subclass, reads its status and message, and sends <code>{ "statusCode": 401, "message": "...", "error": "Unauthorized" }</code>.</div>
+</div>
+<p>So in a service, <b>throwing is how you answer "no"</b>. You never build an error response by hand. The exception classes used in login, and when to pick each one:</p>
+<div class="tablewrap"><table>
+<tr><th>Class</th><th>Status</th><th>Use it when</th><th>In login</th></tr>
+<tr><td><code>BadRequestException</code></td><td>400</td><td>The request is understood but cannot be done as asked.</td><td>Email not verified yet</td></tr>
+<tr><td><code>UnauthorizedException</code></td><td>401</td><td>"We do not know who you are" or the credentials are wrong.</td><td>No user, wrong password, deleted, blocked</td></tr>
+<tr><td><code>ForbiddenException</code></td><td>403</td><td>"We know who you are, but you may not do this."</td><td>Account has no password (Google or wallet signup)</td></tr>
+<tr><td><code>NotFoundException</code></td><td>404</td><td>The thing asked for does not exist.</td><td>Inside <code>updateTheUserSource</code></td></tr>
+</table></div>
+<div class="warn"><b>What if something throws that is not an HttpException?</b>For example a plain <code>TypeError: Cannot read properties of null</code>, or the database being down. The filter does not know what it means, so it sends a generic <code>500 Internal server error</code>. Unexpected bugs become 500s; deliberate "no" answers should always be HttpExceptions with the right status.</div>
+
+<h4 id="j5-logger"><span class="badge">5g</span>Line 1: the logger</h4>
 <pre><code><span class="k">const</span> logger = <span class="k">new</span> Logger(AuthService.name + <span class="s">'-login'</span>);</code></pre>
-<p><code>Logger</code> is NestJS's built in logger. <code>AuthService.name</code> is the string <code>"AuthService"</code>, so log lines are tagged <code>[AuthService-login]</code>. This makes it easy to find where a log line came from.</p>
+<p><code>Logger</code> is NestJS's built in logger (from <code>@nestjs/common</code>). The argument is a <b>context</b>, a label printed in front of every line it writes. <code>AuthService.name</code> is a built in JavaScript property: every class knows its own name as a string, so it is <code>"AuthService"</code>. Joined with <code>'-login'</code>, the label is <code>"AuthService-login"</code>, and a log line looks like:</p>
+<pre><code>[Nest] 4120  - 11/03/2026, 10:42:07 AM   ERROR [AuthService-login] User does not exist-someone@example.com</code></pre>
+<p>Why <code>AuthService.name</code> and not just the text <code>'AuthService'</code>? If someone renames the class, the label updates itself. It is made fresh inside the method (a <code>const</code>) instead of as a class field; both work. A common production style is one field per class: <code>private readonly logger = new Logger(AuthService.name);</code>.</p>
+<div class="note"><b>Pro point: what you log matters</b>These log lines include the email address. Emails are personal data, and logs are often kept for months and read by many people. Production teams usually log the user id or a masked email (<code>ak***@gmail.com</code>), and never log passwords or tokens, not even by accident inside an object.</div>
 
-<h4><span class="badge">5c</span>Normalizing the email</h4>
+<h4 id="j5-normalize"><span class="badge">5h</span>Line 2: normalizing the email</h4>
 <pre><code><span class="k">const</span> normalizedEmail = normalizeEmail(logInDto.email);</code></pre>
 <span class="path">src/@core/utils/email-normalizer.util.ts</span>
 <pre><code><span class="k">export function</span> normalizeEmail(email: string): string {
@@ -451,71 +675,297 @@ app.use(cookieParser());
     <span class="k">if</span> (emailParts.length !== 2) <span class="k">return</span> trimEmail;
     <span class="k">let</span> [localPart, domain] = emailParts;
     <span class="k">if</span> (domain === <span class="s">'gmail.com'</span> || domain === <span class="s">'googlemail.com'</span>) {
-        localPart = localPart.replace(<span class="s">/\./g</span>, <span class="s">''</span>);         <span class="c">// remove all dots</span>
+        localPart = localPart.replace(<span class="s">/\./g</span>, <span class="s">''</span>);
         <span class="k">const</span> plusIndex = localPart.indexOf(<span class="s">'+'</span>);
-        <span class="k">if</span> (plusIndex &gt; -1) localPart = localPart.substring(0, plusIndex);  <span class="c">// cut "+anything"</span>
+        <span class="k">if</span> (plusIndex &gt; -1) localPart = localPart.substring(0, plusIndex);
         domain = <span class="s">'gmail.com'</span>;
     }
     <span class="k">return</span> <span class="s">`${localPart}@${domain}`</span>;
 }</code></pre>
-<p>Gmail delivers <code>Akshat.Rag+promo@gmail.com</code> and <code>akshatrag@gmail.com</code> to the same inbox. Without normalization, one person could create many accounts (handy for abusing coupons or affiliate rewards). So <code>" Akshat.Rag+promo@Gmail.com "</code> becomes <code>"akshatrag@gmail.com"</code>, exactly matching what was stored at registration. This is a <b>pure function</b>: same input, same output, no database, no side effects. Those are the easiest kind of code to test.</p>
+<p>Follow one real input through it: <code>" Akshat.Rag+promo@GoogleMail.com "</code>.</p>
+<div class="tablewrap"><table>
+<tr><th>Line</th><th>What it does</th><th>Value after</th></tr>
+<tr><td><code>if (!email) return ''</code></td><td>Safety: empty or missing input returns an empty string instead of crashing on <code>.trim()</code>.</td><td>(skipped, we have input)</td></tr>
+<tr><td><code>email.trim().toLowerCase()</code></td><td>Remove spaces at both ends, then lowercase everything. Methods <b>chain</b>: each one returns a new string the next one works on.</td><td><code>"akshat.rag+promo@googlemail.com"</code></td></tr>
+<tr><td><code>.split('@')</code></td><td>Cut the string at every <code>@</code> into an array.</td><td><code>["akshat.rag+promo", "googlemail.com"]</code></td></tr>
+<tr><td><code>if (length !== 2) return trimEmail</code></td><td>Not exactly one <code>@</code>? It is weird; return it lowercased and do not touch it further.</td><td>(skipped, length is 2)</td></tr>
+<tr><td><code>let [localPart, domain] = emailParts</code></td><td><b>Array destructuring</b>: first item into <code>localPart</code>, second into <code>domain</code>. <code>let</code> (not <code>const</code>) because we change them below.</td><td><code>localPart = "akshat.rag+promo"</code>, <code>domain = "googlemail.com"</code></td></tr>
+<tr><td><code>if (domain === 'gmail.com' || ...)</code></td><td>The next rules are Gmail specific, because Gmail ignores dots and anything after <code>+</code>.</td><td>(enters the block)</td></tr>
+<tr><td><code>.replace(/\./g, '')</code></td><td>A regular expression: <code>\.</code> is a literal dot, <code>g</code> means every one. Replace each with nothing.</td><td><code>"akshatrag+promo"</code></td></tr>
+<tr><td><code>indexOf('+')</code></td><td>Position of the first <code>+</code>, or <code>-1</code> if none.</td><td><code>9</code></td></tr>
+<tr><td><code>substring(0, plusIndex)</code></td><td>Keep only the characters before the plus.</td><td><code>"akshatrag"</code></td></tr>
+<tr><td><code>domain = 'gmail.com'</code></td><td>googlemail.com and gmail.com are the same inbox.</td><td><code>"gmail.com"</code></td></tr>
+<tr><td><code>return `${localPart}@${domain}`</code></td><td>A <b>template string</b> (backticks): glue them back together.</td><td><code>"akshatrag@gmail.com"</code></td></tr>
+</table></div>
+<p>Why bother? Without it, one person could register <code>akshat.rag@gmail.com</code>, <code>akshatrag+1@gmail.com</code>, <code>akshatrag+2@gmail.com</code> and so on, all landing in one inbox, to farm signup rewards. And at login, the typed email must match what registration stored, which was normalized the same way. This is a <b>pure function</b>: same input, same output, no database, no side effects. Pure functions are the easiest code to test, which is why they live in <code>utils</code>, not in the service.</p>
 
-<h4><span class="badge">5d</span>Finding the user</h4>
+<h4 id="j5-find"><span class="badge">5i</span>Line 3: finding the user (and what really happens inside)</h4>
 <pre><code><span class="k">const</span> user = <span class="k">await this</span>.userService.getByEmail(normalizedEmail);</code></pre>
-<span class="path">src/components/user/user.service.ts (line 153)</span>
+<p>Read it right to left: call <code>getByEmail</code> on the user service with the cleaned email, wait for the answer, store it in a constant called <code>user</code>. Notice <code>AuthService</code> does not talk to the database itself. Users belong to the <b>user</b> module, so it asks the user service. Each module owns its own data, and other modules ask politely through the service. Here is what runs:</p>
+<span class="path">src/components/user/user.service.ts (around line 162)</span>
 <pre><code><span class="k">async</span> getByEmail(email: string): Promise&lt;ReturnUserDto&gt; {
-    <span class="k">const</span> user = <span class="k">await this</span>.userRepo.findByEmail(email);
+    <span class="k">const</span> user = <span class="k">await this</span>.userRepo.findByEmail(email);    <span class="c">// query 1: SELECT ... FROM tbl_user WHERE email = $1</span>
     <span class="k">if</span> (user) {
-        <span class="k">return await this</span>.toReturnUserDto(user);
+        <span class="k">return await this</span>.toReturnUserDto(user);             <span class="c">// convert (and query 2, see below)</span>
     }
     <span class="k">throw new</span> UnauthorizedException(UserErrorMessage.INVALID_ATTEMPT);
 }</code></pre>
-<p>Notice AuthService does not talk to the database. It asks the <b>user</b> service, because users belong to the user module. Each module owns its own data. The user service then asks its repository (step 6), and if a row comes back, converts it with <code>toReturnUserDto</code>, a function that copies safe fields (id, email, name, flags) into a new object and deliberately <b>leaves out</b> <code>password</code> and <code>currentHashedRefreshToken</code>. If no row comes back, it throws a 401 with the message <code>'Invalid User Name or Password'</code>.</p>
+<p>Two outcomes. Row found: convert it and return it. No row: throw a 401 with <code>'Invalid User Name or Password'</code> (the value of <code>UserErrorMessage.INVALID_ATTEMPT</code> in <code>user/enum/user-error-message.enum.ts</code>).</p>
+<p>The conversion is important. The row from the database is a <code>User</code> <b>entity</b>, which includes the password hash and the refresh token hash. You must never send those to a browser. So <code>toReturnUserDto</code> builds a brand new object and copies over only the safe fields:</p>
+<span class="path">src/components/user/user.service.ts (trimmed)</span>
+<pre><code><span class="k">private async</span> toReturnUserDto(user: User, network?: string): Promise&lt;ReturnUserDto&gt; {
+    <span class="k">const</span> returnUserDto = <span class="k">new</span> ReturnUserDto();
+    returnUserDto.id = user.id;
+    returnUserDto.name = user.name;
+    returnUserDto.email = user.email;
+    returnUserDto.isEmailVerified = user.isEmailVerified;
+    returnUserDto.isBlocked = user.isBlocked;
+    returnUserDto.isDeleted = user.isDeleted;
+    returnUserDto.username = user.username ?? <span class="k">null</span>;
+    <span class="c">// ... about 15 more safe fields. password and currentHashedRefreshToken are NOT copied.</span>
+    <span class="k">if</span> (network) { <span class="c">/* look up the wallet for that network */</span> }
+    <span class="k">else</span> {
+        <span class="k">const</span> walletAddressEntity = <span class="k">await this</span>.walletRepo.findById(user.id);  <span class="c">// query 2</span>
+        <span class="c">// ... copy walletAddress and network</span>
+    }
+    <span class="k">return</span> returnUserDto;
+}</code></pre>
+<div class="tablewrap"><table>
+<tr><th>Detail</th><th>Meaning</th></tr>
+<tr><td>This is called an <b>allow list</b></td><td>Copy only what is explicitly allowed. The opposite (copy everything, then delete the password) is fragile: the day someone adds a <code>twoFactorSecret</code> column, it leaks automatically. With an allow list, new columns stay hidden until someone decides to show them.</td></tr>
+<tr><td><code>user.username ?? null</code></td><td>The <b>nullish coalescing</b> operator: "use <code>user.username</code>, but if it is <code>null</code> or <code>undefined</code>, use <code>null</code>." So the JSON always has the key, with <code>null</code> rather than missing.</td></tr>
+<tr><td><code>network?: string</code></td><td>Optional parameter. Login does not pass it, so the <code>else</code> branch runs and fetches the user's wallet.</td></tr>
+<tr><td>Hidden cost</td><td>So "find the user" is actually <b>two</b> queries: the user row and the wallet row. Reading the helpers a method calls, not just its name, is a big part of becoming a strong backend developer.</td></tr>
+</table></div>
 
-<h4><span class="badge">5e</span>Checking the account state</h4>
-<pre><code><span class="k">if</span> (user.isDeleted) <span class="k">throw new</span> UnauthorizedException(<span class="s">'Your account has been deleted...'</span>);
-<span class="k">if</span> (user.isBlocked) <span class="k">throw new</span> UnauthorizedException(<span class="s">'Your account has been blocked...'</span>);</code></pre>
-<p>These are <b>guard clauses</b>: check for a bad condition early and exit immediately. This keeps the happy path flat instead of nested in many <code>if/else</code> blocks. <code>isDeleted</code> comes from the shared base entity (soft delete: the row stays but is marked deleted). <code>isBlocked</code> is set by admins.</p>
+<h4 id="j5-dead"><span class="badge">5j</span>Lines 4 to 7: the check that can never run</h4>
+<pre><code><span class="k">if</span> (!user) {
+    logger.error(UserErrorMessage.USER_DOES_NOT_EXIST + <span class="s">'-'</span> + logInDto.email);
+    <span class="k">throw new</span> UnauthorizedException(UserErrorMessage.INVALID_ATTEMPT);
+}</code></pre>
+<p>Read what it <i>tries</i> to do: "if no user came back, log 'User does not exist-the email' and refuse with a 401." <code>!user</code> is true when <code>user</code> is <code>null</code> or <code>undefined</code>. The <code>+</code> signs glue strings together.</p>
+<p>But look back at <code>getByEmail</code>: it never returns nothing. It either returns a user or <b>throws</b>. If it throws, the <code>await</code> line re throws and we never reach this <code>if</code>. So this block is <b>dead code</b>; it can never run, and that log line will never be written. It is harmless, but it is misleading: a reader assumes a missing user gets logged here, and it does not. Spotting this needs you to know two things at once: what <code>getByEmail</code> does inside, and how <code>await</code> handles a throw. That is the level you are aiming for.</p>
 
-<h4><span class="badge">5f</span>Fetching the password hash separately</h4>
-<pre><code><span class="k">const</span> passwordFromDB = <span class="k">await this</span>.userService.getPasswordByUserId(user.id);</code></pre>
-<span class="path">src/components/user/user.service.ts (line 195)</span>
+<h4 id="j5-state"><span class="badge">5k</span>Lines 8 to 15: checking the account state with guard clauses</h4>
+<pre><code><span class="k">if</span> (user.isDeleted) {
+    <span class="k">throw new</span> UnauthorizedException(<span class="s">'Your account has been deleted. Please contact support for assistance.'</span>);
+}
+<span class="k">if</span> (user.isBlocked) {
+    <span class="k">throw new</span> UnauthorizedException(<span class="s">'Your account has been blocked. Please contact support for assistance.'</span>);
+}</code></pre>
+<p><code>isDeleted</code> comes from the shared base entity every table extends. It is a <b>soft delete</b>: when a user deletes their account, the row is not removed (orders and history still point at it); it is just marked deleted. <code>isBlocked</code> is set by admins. These are plain property reads on the object we already have, so no database trip.</p>
+<p>This style is called <b>guard clauses</b>: check each bad case and leave immediately. Compare it with the nested style beginners often write:</p>
+<pre><code><span class="c">// Nested: the real work drifts further right with every check</span>
+<span class="k">if</span> (!user.isDeleted) {
+    <span class="k">if</span> (!user.isBlocked) {
+        <span class="k">if</span> (user.isEmailVerified) {
+            <span class="c">// ... actual login, four levels deep</span>
+        } <span class="k">else</span> { <span class="k">throw</span> ... }
+    } <span class="k">else</span> { <span class="k">throw</span> ... }
+} <span class="k">else</span> { <span class="k">throw</span> ... }
+
+<span class="c">// Guard clauses: every "no" at the top, the happy path stays flat</span>
+<span class="k">if</span> (user.isDeleted) <span class="k">throw</span> ...;
+<span class="k">if</span> (user.isBlocked) <span class="k">throw</span> ...;
+<span class="k">if</span> (!user.isEmailVerified) <span class="k">throw</span> ...;
+<span class="c">// ... actual login, no nesting</span></code></pre>
+<p>Notice these two messages are typed straight into the code as strings, while others use the <code>UserErrorMessage</code> enum. That inconsistency is common in real projects. In your own code, put every user facing message in an enum or constants file, so the same text is never typed twice and a change happens in one place.</p>
+
+<h4 id="j5-pass"><span class="badge">5l</span>Lines 16 to 20: fetching the password hash separately</h4>
+<pre><code><span class="k">const</span> passwordFromDB = <span class="k">await this</span>.userService.getPasswordByUserId(user.id);
+<span class="k">if</span> (!passwordFromDB) {
+    logger.error(UserErrorMessage.USER_DOES_NOT_EXIST + <span class="s">'-'</span> + logInDto.email);
+    <span class="k">throw new</span> ForbiddenException(UserErrorMessage.INVALID_ATTEMPT);
+}</code></pre>
+<p>Why fetch again? Because the <code>user</code> we hold is the <i>safe</i> version, with no password on it (step 5i). So we ask for the hash on its own:</p>
+<span class="path">src/components/user/user.service.ts (around line 204)</span>
 <pre><code><span class="k">async</span> getPasswordByUserId(userId: string): Promise&lt;string&gt; {
-    <span class="k">return await</span> (<span class="k">await this</span>.userRepo.findOneById(userId)).password;
+    <span class="k">return await</span> (
+        <span class="k">await this</span>.userRepo.findOneById(userId)
+    ).password;
 }</code></pre>
-<p>Since the safe user object has no password, the service fetches the full row again by id and returns only the password hash. Two queries instead of one, but the hash never ends up in an object that might be sent to the browser. If the hash is missing (a user who signed up with Google or a wallet has no password), login refuses with 403.</p>
+<p>That bracket shape confuses everyone at first. Read it from the inside out:</p>
+<ol class="check">
+<li><code>this.userRepo.findOneById(userId)</code> starts a query and gives back a Promise of the full <code>User</code> row (password included).</li>
+<li>The inner <code>await</code> waits for it. The brackets now hold the real <code>User</code> object.</li>
+<li><code>( ... ).password</code> reads the password property from that object.</li>
+<li>The outer <code>await</code> is pointless: <code>.password</code> is already a plain string, and awaiting a non Promise just returns it. Harmless, but you can delete it.</li>
+</ol>
+<p>Written the beginner friendly way, it is identical:</p>
+<pre><code><span class="k">const</span> fullUser = <span class="k">await this</span>.userRepo.findOneById(userId);
+<span class="k">return</span> fullUser.password;</code></pre>
+<div class="warn"><b>Hidden crash</b>If <code>findOneById</code> returned <code>null</code>, <code>null.password</code> would throw <code>TypeError: Cannot read properties of null</code>, and the user would get a 500. In login this cannot happen (we just found the user), but if another caller passes a wrong id, it will. Safer: <code>return fullUser?.password ?? null;</code> where <code>?.</code> (optional chaining) means "if the left side is null, stop and give undefined instead of crashing".</div>
+<p>If the hash is empty, this account was created with Google or with a wallet signature, so there is no password to compare. Login refuses with 403 and the same vague message. The design idea here: the password hash only ever lives in a short lived local variable, never in an object that could be returned to the browser.</p>
 
-<h4><span class="badge">5g</span>Email must be verified</h4>
-<pre><code><span class="k">if</span> (!user.isEmailVerified) <span class="k">throw new</span> BadRequestException(UserErrorMessage.EMAIL_NOT_VERIFIED_YET);</code></pre>
-<p>After registering, users get an email with a link. Clicking it sets <code>isEmailVerified = true</code>. Until then, login returns 400 with <code>'Email Not Verified Yet'</code>, and the frontend can show a "resend verification" button.</p>
+<h4 id="j5-verified"><span class="badge">5m</span>Lines 21 to 24: email must be verified</h4>
+<pre><code><span class="k">if</span> (!user.isEmailVerified) {
+    logger.error(UserErrorMessage.EMAIL_NOT_VERIFIED_YET + <span class="s">'-'</span> + logInDto.email);
+    <span class="k">throw new</span> BadRequestException(UserErrorMessage.EMAIL_NOT_VERIFIED_YET);
+}</code></pre>
+<p>After registering, the user gets an email with a link. Clicking it calls another endpoint that sets <code>isEmailVerified = true</code>. Until then, login answers 400 with <code>'Email Not Verified Yet'</code>. The message is specific on purpose here, so the frontend can show a "resend verification email" button. This is a product decision mixed with a security one; see section 8 for why its position before the password check leaks information.</p>
 
-<h4><span class="badge">5h</span>Recording which site they came from</h4>
+<h4 id="j5-source"><span class="badge">5n</span>Line 25: recording which site they came from</h4>
 <pre><code><span class="k">await this</span>.userService.updateTheUserSource(user.id, logInDto.source);</code></pre>
-<span class="path">src/components/user/user.service.ts (line 394)</span>
+<span class="path">src/components/user/user.service.ts (around line 394)</span>
 <pre><code><span class="k">async</span> updateTheUserSource(userId: string, source: string): Promise&lt;<span class="k">void</span>&gt; {
-    <span class="k">const</span> user = <span class="k">await this</span>.userRepo.findOneById(userId);
-    <span class="k">if</span> (!user) <span class="k">throw new</span> NotFoundException(UserErrorMessage.USER_DOES_NOT_EXIST);
-    <span class="k">if</span> (source === <span class="s">'main_site'</span>) user.isMainSiteUser = <span class="k">true</span>;
-    <span class="k">if</span> (source === <span class="s">'marketplace'</span>) user.isMarketplceUser = <span class="k">true</span>;
-    <span class="k">await this</span>.userRepo.save(user);
+    <span class="k">const</span> user = <span class="k">await this</span>.userRepo.findOneById(userId);     <span class="c">// SELECT the row again</span>
+    <span class="k">if</span> (!user) {
+        <span class="k">throw new</span> NotFoundException(UserErrorMessage.USER_DOES_NOT_EXIST);
+    }
+    <span class="k">if</span> (source === <span class="s">'main_site'</span>) {
+        user.isMainSiteUser = <span class="k">true</span>;
+    }
+    <span class="k">if</span> (source === <span class="s">'marketplace'</span>) {
+        user.isMarketplceUser = <span class="k">true</span>;                       <span class="c">// sic: the column really is spelled this way</span>
+    }
+    <span class="k">await this</span>.userRepo.save(user);                          <span class="c">// UPDATE the row</span>
 }</code></pre>
-<p>The same accounts work on the main site and the marketplace. This flips a flag so the team knows which product each user has used. <code>save(user)</code> writes the changed row back to the database (an <code>UPDATE</code>). Note this runs <b>before</b> the password check; see section 8.</p>
+<p>One account works on both the main site and the marketplace. The frontend sends <code>source</code> in the login body (step 3 made it required), and this flips a flag so the team knows which products each person uses.</p>
+<div class="tablewrap"><table>
+<tr><th>Detail</th><th>Meaning</th></tr>
+<tr><td><code>Promise&lt;void&gt;</code></td><td>It finishes but gives nothing back. You <code>await</code> it only to make sure it is done (or to let its error surface).</td></tr>
+<tr><td><code>===</code></td><td>Strict equality: same type and same value. Always use it over <code>==</code>.</td></tr>
+<tr><td>Any other <code>source</code> value</td><td>Neither <code>if</code> matches, nothing changes, but <code>save</code> still runs. A wasted write.</td></tr>
+<tr><td><code>save(user)</code> vs <code>update(id, data)</code></td><td><code>save</code> takes a whole entity: if it has an id that exists, TypeORM compares and updates the changed columns; if not, it inserts. <code>update</code> sends one <code>UPDATE ... SET</code> for just the fields you pass, without loading the row first. For "flip one flag", <code>update(userId, { isMarketplceUser: true })</code> is one query instead of two.</td></tr>
+</table></div>
+<p>Important: this line runs <b>before</b> the password is checked. So someone typing the wrong password still causes a database write. Ordering matters in a service; section 8 lists it.</p>
 
-<h4><span class="badge">5i</span>Checking the password</h4>
+<h4 id="j5-verify"><span class="badge">5o</span>Line 26: checking the password</h4>
 <pre><code><span class="k">await this</span>.verifyPassword(logInDto.password, passwordFromDB);</code></pre>
-<span class="path">src/components/auth/auth.service.ts (line 282)</span>
+<span class="path">src/components/auth/auth.service.ts (around line 282)</span>
 <pre><code><span class="k">private async</span> verifyPassword(plainTextPassword: string, hashedPassword: string): Promise&lt;<span class="k">void</span>&gt; {
     <span class="k">const</span> isPasswordMatching = <span class="k">await</span> bcrypt.compare(plainTextPassword, hashedPassword);
     <span class="k">if</span> (!isPasswordMatching) {
         <span class="k">throw new</span> UnauthorizedException(UserErrorMessage.INVALID_ATTEMPT);
     }
 }</code></pre>
-<p>The database holds something like <code>$2b$10$N9qo8uLOickgx2ZMRZoMye...</code>, never the real password. That string contains the algorithm (<code>2b</code>), the cost (<code>10</code>), the salt, and the hash. <code>bcrypt.compare</code> pulls the salt out, hashes the typed password with it, and checks if the results are identical. It returns <code>true</code> or <code>false</code>; it never "decrypts" anything.</p>
-<p>The error message is <code>'Invalid User Name or Password'</code> on purpose. If it said "wrong password", an attacker would learn that the email exists, which helps them target accounts. That idea is called avoiding <b>user enumeration</b>.</p>
-<p><code>private</code> means only code inside AuthService can call this. It is a helper, not part of the public API of the service.</p>
+<p>The database never stores the real password. It stores a bcrypt hash such as <code>$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy</code>. Take it apart:</p>
+<div class="tablewrap"><table>
+<tr><th>Part</th><th>Meaning</th></tr>
+<tr><td><code>$2b$</code></td><td>Which version of the bcrypt algorithm.</td></tr>
+<tr><td><code>10$</code></td><td>The <b>cost</b>: bcrypt repeats its work 2<sup>10</sup> = 1024 times. Slow on purpose, around 50 to 100 ms, which is nothing for one login but makes guessing billions of passwords impossibly slow.</td></tr>
+<tr><td>next 22 characters</td><td>The <b>salt</b>: random characters made at registration, different for every user. Two users with the password <code>password123</code> get completely different hashes, so an attacker cannot use one precomputed table for everybody.</td></tr>
+<tr><td>the rest</td><td>The actual hash result.</td></tr>
+</table></div>
+<p><code>bcrypt.compare(typed, stored)</code> reads the cost and salt out of the stored string, hashes the typed password the same way, and checks whether the results are identical. It returns <code>true</code> or <code>false</code>. Nothing is ever "decrypted"; a hash is a one way street.</p>
+<p>Three design choices worth copying:</p>
+<ol class="check">
+<li><b>It is <code>private</code>.</b> Only code inside <code>AuthService</code> can call it, and it is not on the interface menu. It is a step, not a feature.</li>
+<li><b>It throws instead of returning a boolean.</b> The caller cannot forget to check the result. With <code>const ok = await check(...)</code>, a tired developer might forget <code>if (!ok)</code>; with a throwing helper, a wrong password is impossible to ignore.</li>
+<li><b>The message is deliberately vague.</b> <code>'Invalid User Name or Password'</code> for both "no such email" and "wrong password". If it said "wrong password", an attacker would learn the email is registered. Hiding that is called preventing <b>user enumeration</b>.</li>
+</ol>
+
+<h4 id="j5-build"><span class="badge">5p</span>Lines 27 to 33: building the answer and the tokens</h4>
+<pre><code><span class="k">const</span> returnLoginDto = <span class="k">new</span> ReturnLoginDto();
+returnLoginDto.user = user;
+<span class="k">const</span> tokens = <span class="k">await this</span>.getTokens(user.id);
+returnLoginDto.accessToken = tokens.accessToken;
+<span class="k">await this</span>.userService.setCurrentRefreshToken(tokens.refreshToken, user.id);
+returnLoginDto.refreshToken = tokens.refreshToken;</code></pre>
+<div class="tablewrap"><table>
+<tr><th>Line</th><th>Meaning</th></tr>
+<tr><td><code>new ReturnLoginDto()</code></td><td>Create an empty answer object from the class in <code>auth/dto/return-login.dto.ts</code> (fields <code>user</code>, <code>accessToken</code>, <code>refreshToken</code>, <code>expiresIn</code>). Using a class instead of a loose <code>{ }</code> means TypeScript complains if you misspell a field, and every endpoint that logs in returns the same shape.</td></tr>
+<tr><td><code>returnLoginDto.user = user</code></td><td>The safe user from step 5i. No password, by construction.</td></tr>
+<tr><td><code>this.getTokens(user.id)</code></td><td>Signs the access token and refresh token in parallel. Fully explained in step 8. Returns an object with both.</td></tr>
+<tr><td><code>setCurrentRefreshToken(...)</code></td><td>Hashes the refresh token with <b>argon2</b> (<code>hashData</code> in <code>@core/utils/helper.ts</code> is just <code>argon2.hash(data)</code>) and writes the hash plus <code>lastActiveAt</code> with one <code>update</code>. Storing it is what makes logout and refresh checking possible (section 6).</td></tr>
+<tr><td>Order of the lines</td><td>The refresh token is saved <b>before</b> it is returned. If saving failed, the user would get a refresh token the server does not recognize; failing first is the safer order.</td></tr>
+</table></div>
+
+<h4 id="j5-events"><span class="badge">5q</span>Lines 34 and 35: announcing the login, without waiting</h4>
+<pre><code><span class="k">this</span>.eventEmitter.emit(<span class="s">`userlogin.UpdateDomainDetailTable`</span>, <span class="k">new</span> UpdateDomainDetailTableAfterLoginEvent(user.id));
+<span class="k">this</span>.eventEmitter.emit(<span class="s">'reputation.login'</span>, { userId: user.id });</code></pre>
+<p>Think of <code>emit</code> as shouting an announcement in an office: "User 3f2b just logged in!" Anyone who registered interest in that announcement (a <b>listener</b>) hears it and does their own job. The one who shouted does not wait to see what they do.</p>
+<div class="tablewrap"><table>
+<tr><th>Piece</th><th>Meaning</th></tr>
+<tr><td><code>emit(name, payload)</code></td><td>First argument is the event name, a string. Second is the data handed to listeners.</td></tr>
+<tr><td>Backticks around the first name</td><td>A template string with no <code>${}</code> inside, so it behaves exactly like normal quotes. Harmless inconsistency.</td></tr>
+<tr><td><code>new UpdateDomainDetailTableAfterLoginEvent(user.id)</code></td><td>A tiny class whose whole file is <code>constructor(public readonly userId: string) {}</code>. That is the parameter property trick from 5c again: it creates an object with one field, <code>userId</code>. A class gives the event a named type; the second emit uses a plain object, which works the same at runtime.</td></tr>
+<tr><td>No <code>await</code></td><td>Login does not wait. The listener is declared with <code>@OnEvent('userlogin.UpdateDomainDetailTable', { async: true })</code> (around line 342 of this file) and asks Alchemy which domain NFTs the user's wallets own. That can take seconds; the user should not stare at a spinner for it.</td></tr>
+</table></div>
+<div class="note"><b>The trade off</b>Fire and forget means if the background job fails, login still succeeds and nobody tells the user. For "nice to have" work (refresh a cache, recalculate a score) that is exactly right. For "must happen" work (charge a card, send a receipt), production systems use a durable queue (like BullMQ with Redis, or SQS) that retries, instead of an in memory event.</div>
+
+<h4 id="j5-return"><span class="badge">5r</span>Line 36: return</h4>
+<pre><code><span class="k">return</span> returnLoginDto;</code></pre>
+<p>Because the method is <code>async</code>, this actually resolves the Promise the controller is awaiting. The controller wraps it in <code>new Response('Login Success', ...)</code> (step 4) and NestJS turns it into JSON (step 9).</p>
+
+<h4 id="j5-errors"><span class="badge">5s</span>Every way login can fail, in one table</h4>
+<div class="tablewrap"><table>
+<tr><th>Situation</th><th>Where it stops</th><th>Status</th><th>Message</th></tr>
+<tr><td>No account with that email</td><td><code>getByEmail</code> throws</td><td>401</td><td>Invalid User Name or Password</td></tr>
+<tr><td>Account deleted</td><td><code>if (user.isDeleted)</code></td><td>401</td><td>Your account has been deleted...</td></tr>
+<tr><td>Account blocked</td><td><code>if (user.isBlocked)</code></td><td>401</td><td>Your account has been blocked...</td></tr>
+<tr><td>Google or wallet account, no password</td><td><code>if (!passwordFromDB)</code></td><td>403</td><td>Invalid User Name or Password</td></tr>
+<tr><td>Email not verified</td><td><code>if (!user.isEmailVerified)</code></td><td>400</td><td>Email Not Verified Yet</td></tr>
+<tr><td>Wrong password</td><td><code>verifyPassword</code> throws</td><td>401</td><td>Invalid User Name or Password</td></tr>
+<tr><td>Database down, secret missing, a bug</td><td>anywhere</td><td>500</td><td>Internal server error</td></tr>
+</table></div>
+
+<h4 id="j5-cost"><span class="badge">5t</span>Counting the cost: database trips per login</h4>
+<p>Strong backend developers read a method and count how many times it talks to the database, because each trip costs time and connection pool slots.</p>
+<div class="tablewrap"><table>
+<tr><th>Call</th><th>Queries</th></tr>
+<tr><td><code>getByEmail</code> (user row, then wallet row)</td><td>2</td></tr>
+<tr><td><code>getPasswordByUserId</code> (user row again)</td><td>1</td></tr>
+<tr><td><code>updateTheUserSource</code> (user row again, then save)</td><td>2</td></tr>
+<tr><td><code>setCurrentRefreshToken</code> (update)</td><td>1</td></tr>
+<tr><td><b>Total for one successful login</b></td><td><b>6</b>, three of them loading the same user row</td></tr>
+</table></div>
+<p>A tighter version would load the full row once in the auth service (or a dedicated repo method that selects the password), check everything on that one object, and finish with a single <code>update</code> that sets the source flag, the refresh hash and <code>lastActiveAt</code> together: about 3 queries. That is not urgent at today's traffic, but noticing it is exactly the kind of thing a senior reviewer points out.</p>
+
+<h4 id="j5-test"><span class="badge">5u</span>Proving it works: a unit test for the service</h4>
+<p>Here is the real payoff of injecting interfaces. In a test you can hand <code>AuthService</code> a <b>fake</b> user service, and test every rule without a database:</p>
+<span class="path">src/components/auth/auth.service.spec.ts (a sketch to write yourself)</span>
+<pre><code><span class="k">describe</span>(<span class="s">'AuthService.login'</span>, () =&gt; {
+  <span class="k">let</span> service: AuthService;
+  <span class="k">const</span> userService = {                                   <span class="c">// a fake with just the methods login uses</span>
+    getByEmail: jest.fn(),
+    getPasswordByUserId: jest.fn(),
+    updateTheUserSource: jest.fn(),
+    setCurrentRefreshToken: jest.fn(),
+  };
+
+  <span class="k">beforeEach</span>(<span class="k">async</span> () =&gt; {
+    <span class="k">const</span> moduleRef = <span class="k">await</span> Test.createTestingModule({
+      providers: [
+        AuthService,
+        { provide: <span class="s">'UserServiceInterface'</span>, useValue: userService },  <span class="c">// same string token, fake value</span>
+        { provide: JwtService, useValue: { signAsync: jest.fn().mockResolvedValue(<span class="s">'token'</span>) } },
+        { provide: EventEmitter2, useValue: { emit: jest.fn() } },
+        { provide: ConfigService, useValue: { get: jest.fn() } },
+        <span class="c">// ... the other constructor arguments as empty fakes</span>
+      ],
+    }).compile();
+    service = moduleRef.get(AuthService);
+  });
+
+  <span class="k">it</span>(<span class="s">'refuses a blocked user'</span>, <span class="k">async</span> () =&gt; {
+    userService.getByEmail.mockResolvedValue({ id: <span class="s">'u1'</span>, isBlocked: <span class="k">true</span> });
+    <span class="k">await</span> expect(service.login({ email: <span class="s">'a@b.com'</span>, password: <span class="s">'x'</span>.repeat(8), source: <span class="s">'marketplace'</span> }))
+      .rejects.toThrow(UnauthorizedException);
+    expect(userService.setCurrentRefreshToken).not.toHaveBeenCalled();
+  });
+});</code></pre>
+<p><code>jest.fn()</code> makes a fake function that records how it was called. <code>mockResolvedValue(x)</code> makes it return a Promise of <code>x</code>. <code>rejects.toThrow</code> checks the Promise failed with that error class. Write one test per row of the failure table in 5s, plus one happy path test, and you have covered every rule of login.</p>
+
+<h4 id="j5-rules"><span class="badge">5v</span>The rules for writing your own services</h4>
+<div class="tablewrap"><table>
+<tr><th>Rule</th><th>Why</th></tr>
+<tr><td>No <code>req</code>, <code>res</code>, headers or cookies in a service</td><td>Then a cron job, an event or a test can call it. HTTP is the controller's job.</td></tr>
+<tr><td>Say "no" by throwing the right HttpException</td><td>The status code is part of your API. 400, 401, 403, 404 and 409 each mean something specific to the frontend.</td></tr>
+<tr><td>Validate the shape in the DTO, the business rules in the service</td><td>"Is this an email?" belongs to the DTO. "Is this account blocked?" belongs to the service.</td></tr>
+<tr><td>Never return an entity; map to a response DTO with an allow list</td><td>Entities carry secrets and internal columns.</td></tr>
+<tr><td>Guard clauses first, happy path last</td><td>Flat code is readable code.</td></tr>
+<tr><td>Check the cheapest and most decisive thing first, and write nothing until all checks pass</td><td>Avoid side effects (like the source flag) on requests you are about to reject.</td></tr>
+<tr><td>Nothing request specific on <code>this</code></td><td>The service is a singleton shared by every request.</td></tr>
+<tr><td>Ask other modules through their service, not their repository</td><td>Each module owns its data and its rules.</td></tr>
+<tr><td>Several writes that must succeed together go in one transaction</td><td>Otherwise a crash halfway leaves half updated data. (TypeORM: <code>dataSource.transaction(async manager =&gt; { ... })</code>.)</td></tr>
+<tr><td>Slow, optional work goes to events; important work goes to a queue</td><td>Keep responses fast without losing work that matters.</td></tr>
+<tr><td>Log ids and outcomes, never passwords, tokens or full personal data</td><td>Logs are kept long and read widely.</td></tr>
+</table></div>
+<div class="good"><b>Check yourself on Step 5</b>Without looking: (1) why does the constructor use <code>@Inject('UserServiceInterface')</code> but not <code>@Inject</code> for <code>JwtService</code>? (2) Why can the <code>if (!user)</code> block never run? (3) What does <code>toReturnUserDto</code> protect against, and why is an allow list safer? (4) Why does <code>verifyPassword</code> throw instead of returning false? (5) How many database queries does one successful login make? If you can answer all five out loud, you understand this service better than most people who have worked on it.</div>
 
 <h3 id="j6">Step 6: The repository runs the query</h3>
-<p>We skipped this inside step 5d. Here is what <code>userRepo.findByEmail</code> actually does.</p>
+<p>We skipped this inside step 5i. Here is what <code>userRepo.findByEmail</code> actually does.</p>
 <span class="path">src/components/user/user.repo.ts</span>
 <pre><code><span class="d">@Injectable</span>()
 <span class="k">export class</span> UserRepo <span class="k">extends</span> BaseAbstractRepository&lt;User&gt; <span class="k">implements</span> UserRepoInterface {
@@ -1135,7 +1585,7 @@ curl http://localhost:3001/api/v1/auth/me</code></pre>
 <li>Why does the controller never contain <code>if</code> statements? <i>(Step 4)</i></li>
 <li>Why is <code>'AuthServiceInterface'</code> a string and not just the interface? <i>(Section 5)</i></li>
 <li>What is the difference between <code>Repository&lt;User&gt;</code> and <code>UserRepo</code>? <i>(Step 6)</i></li>
-<li>Why can't the server "decrypt" the password to check it? <i>(Step 5i)</i></li>
+<li>Why can't the server "decrypt" the password to check it? <i>(Step 5o)</i></li>
 <li>What three parts make up a JWT, and which part can anyone read? <i>(Glossary, Step 8)</i></li>
 <li>Why do access and refresh tokens use different secrets? <i>(Step 8)</i></li>
 <li>Why is the refresh token hashed in the database, while the access token is not stored at all? <i>(Step 8 and section 6, Refreshing)</i></li>
@@ -1146,7 +1596,451 @@ curl http://localhost:3001/api/v1/auth/me</code></pre>
 <h3>Next reads in the real code</h3>
 <p>Once you can answer all of these, read <code>register</code> (right below <code>login</code> in <code>auth.service.ts</code>), then <code>refreshTokens</code> and <code>logout</code>, then <code>web3-auth</code> to see a completely different way of logging in (signing a message with a wallet). Each one reuses the exact building blocks you now understand.</p>
 
-<footer>Written against the uat branch of the Endless Domains backend (commit 543b2937). File paths are relative to <code>D:\Akshat Endless\backend\backend\</code>. Line numbers may drift as the code changes.</footer>
+<!-- ============================================================ -->
+<h2 id="startproject">10. Starting a backend project from zero, production grade</h2>
+<p>Section 7 built one feature inside a quick practice project. This section answers the bigger question: when you sit down in front of an empty folder to build a <b>real</b> backend that will go to production, what do you do first, second and third? Which file comes before which, and why? What should the folders look like so the project still makes sense at fifty modules?</p>
+<p>The short answer: build the <b>foundation once</b> (config, database, shared building blocks), then build every feature <b>from the inside out</b>: data first, then rules, then the door to the outside world.</p>
+
+<h3 id="sp-mindset">10.1 The one idea behind the order: inside out</h3>
+<p>Remember the four layers from section 1. Each layer depends on the one below it. A controller cannot exist without a service to call; a service cannot do anything without a repository; a repository needs an entity to know the table. So you build in that same order, bottom up, and at every step the thing you just wrote can be compiled and tested before you build on top of it.</p>
+<div class="flow">
+  <div class="box"><b>Entity</b> what the data looks like (the table)</div>
+  <div class="arrow">&#8595; then</div>
+  <div class="box"><b>Migration</b> actually create that table in the database</div>
+  <div class="arrow">&#8595; then</div>
+  <div class="box"><b>Repository</b> how to read and write that data</div>
+  <div class="arrow">&#8595; then</div>
+  <div class="box"><b>DTOs</b> what comes in from the outside and what goes back out</div>
+  <div class="arrow">&#8595; then</div>
+  <div class="box"><b>Service</b> the business rules, using the repository and the DTOs</div>
+  <div class="arrow">&#8595; then</div>
+  <div class="box"><b>Controller</b> the HTTP door, calling the service</div>
+  <div class="arrow">&#8595; then</div>
+  <div class="box"><b>Module</b> wire it all together and register it in AppModule</div>
+  <div class="arrow">&#8595; then</div>
+  <div class="box"><b>Tests and docs</b> prove it and describe it</div>
+</div>
+<div class="note"><b>But first, on paper: the contract</b>Before the entity, spend ten minutes writing down the endpoints: method, path, request body, response body, and the errors. It is the same thing you do as a frontend developer when you agree an API with the backend team. The DTOs come straight out of this note. Building inside out is about the <i>code order</i>; designing outside in (from what the client needs) is about <i>deciding what to build</i>. Pros do both.</div>
+
+<h3 id="sp-tree">10.2 The folder structure</h3>
+<p>This is a production grade layout. It follows the same ideas as the Endless backend (<code>@core</code> for shared things, <code>components</code> for features, each feature with its own <code>dto</code>, <code>entity</code>, <code>enum</code>, <code>interface</code> folders), cleaned up a little:</p>
+<pre><code>my-backend/
+├── src/
+│   ├── main.ts                        <span class="c"># boots the app: prefix, pipes, CORS, helmet, swagger</span>
+│   ├── app.module.ts                  <span class="c"># root module: imports config, database, every feature module</span>
+│   │
+│   ├── config/                        <span class="c"># everything about environment variables</span>
+│   │   ├── env.validation.ts          <span class="c"># schema: the app refuses to start if a variable is missing</span>
+│   │   └── database.config.ts         <span class="c"># builds the TypeORM options from ConfigService</span>
+│   │
+│   ├── database/
+│   │   ├── data-source.ts             <span class="c"># used by the TypeORM CLI to run migrations</span>
+│   │   └── migrations/                <span class="c"># one timestamped file per schema change, never edited after merge</span>
+│   │
+│   ├── @core/                         <span class="c"># shared by every feature, knows nothing about any feature</span>
+│   │   ├── common/
+│   │   │   ├── entity/base.entity.ts  <span class="c"># id, createdAt, updatedAt, isDeleted</span>
+│   │   │   ├── repository/base.repository.ts
+│   │   │   ├── dto/response.dto.ts    <span class="c"># the standard { success, statusCode, message, result } shape</span>
+│   │   │   ├── dto/pagination.dto.ts  <span class="c"># page, limit, reused by every list endpoint</span>
+│   │   │   ├── filters/http-exception.filter.ts
+│   │   │   ├── interceptors/response.interceptor.ts
+│   │   │   ├── guards/access-token.guard.ts
+│   │   │   └── decorators/current-user.decorator.ts
+│   │   ├── enum/                      <span class="c"># app wide enums (roles, common error messages)</span>
+│   │   └── utils/                     <span class="c"># pure helpers: normalizeEmail, hashData, slugify</span>
+│   │
+│   └── components/                    <span class="c"># one folder per feature (a "module")</span>
+│       ├── user/
+│       │   ├── dto/
+│       │   │   ├── create-user.dto.ts
+│       │   │   ├── update-user.dto.ts
+│       │   │   └── return-user.dto.ts
+│       │   ├── entity/user.entity.ts
+│       │   ├── enum/user-error-message.enum.ts
+│       │   ├── interface/
+│       │   │   ├── user.repo.interface.ts
+│       │   │   └── user.service.interface.ts
+│       │   ├── user.repo.ts
+│       │   ├── user.service.ts
+│       │   ├── user.service.spec.ts   <span class="c"># unit tests sit next to the file they test</span>
+│       │   ├── user.controller.ts
+│       │   └── user.module.ts
+│       ├── auth/                      <span class="c"># same shape, plus strategies/</span>
+│       └── listing/                   <span class="c"># same shape</span>
+│
+├── test/                              <span class="c"># end to end tests that start the whole app</span>
+│   └── listing.e2e-spec.ts
+├── .env.example                       <span class="c"># every variable name with fake values, committed</span>
+├── .env                               <span class="c"># real local values, NEVER committed</span>
+├── Dockerfile
+├── docker-compose.yml                 <span class="c"># Postgres (and Redis) for local development</span>
+└── package.json</code></pre>
+<div class="tablewrap"><table>
+<tr><th>Folder</th><th>The rule that keeps it clean</th></tr>
+<tr><td><code>components/&lt;feature&gt;</code></td><td>Everything about one feature lives together. To delete a feature you delete one folder. Group by <b>feature</b>, never by kind (a top level <code>controllers/</code> folder with fifty files is a classic beginner layout that does not scale).</td></tr>
+<tr><td><code>@core</code></td><td>Shared code. It may never import from <code>components</code>. If <code>@core</code> needs to know about listings, the code is in the wrong place.</td></tr>
+<tr><td><code>config</code></td><td>The only place that knows variable names. Everything else asks <code>ConfigService</code>.</td></tr>
+<tr><td><code>database/migrations</code></td><td>The history of your schema. Production databases are only ever changed by running these.</td></tr>
+<tr><td><code>dto</code>, <code>entity</code>, <code>interface</code>, <code>enum</code> inside a feature</td><td>Same subfolders in every feature, so anyone can find anything without searching.</td></tr>
+</table></div>
+
+<h3 id="sp-foundation">10.3 Phase A: the foundation (do this once, in this order)</h3>
+
+<h4><span class="badge">A1</span>Create the project and switch on strict TypeScript</h4>
+<pre><code>nest new my-backend --strict
+cd my-backend
+npm i @nestjs/config joi dotenv @nestjs/typeorm typeorm pg class-validator class-transformer @nestjs/swagger helmet @nestjs/throttler @nestjs/terminus</code></pre>
+<p><code>--strict</code> turns on TypeScript's strict checks (for example, it forces you to handle <code>null</code>). It feels annoying for a week and then saves you from a whole category of production bugs, such as the <code>null.password</code> crash from step 5l. Then add path aliases in <code>tsconfig.json</code> so imports stay short:</p>
+<pre><code><span class="s">"baseUrl"</span>: <span class="s">"./"</span>,
+<span class="s">"paths"</span>: {
+  <span class="s">"@core/*"</span>: [<span class="s">"src/@core/*"</span>],
+  <span class="s">"@components/*"</span>: [<span class="s">"src/components/*"</span>]
+}</code></pre>
+
+<h4><span class="badge">A2</span>Config that refuses to start when something is missing</h4>
+<span class="path">src/config/env.validation.ts</span>
+<pre><code><span class="k">import</span> * <span class="k">as</span> Joi <span class="k">from</span> <span class="s">'joi'</span>;
+
+<span class="k">export const</span> envValidationSchema = Joi.object({
+  NODE_ENV: Joi.string().valid(<span class="s">'development'</span>, <span class="s">'test'</span>, <span class="s">'production'</span>).default(<span class="s">'development'</span>),
+  PORT: Joi.number().default(3001),
+  CORS_ORIGINS: Joi.string().required(),             <span class="c">// comma separated, e.g. http://localhost:3000</span>
+  DB_HOST: Joi.string().required(),
+  DB_PORT: Joi.number().default(5432),
+  DB_USER: Joi.string().required(),
+  DB_PASSWORD: Joi.string().required(),
+  DB_NAME: Joi.string().required(),
+  JWT_ACCESS_SECRET: Joi.string().min(32).required(),
+  JWT_ACCESS_EXPIRES: Joi.string().default(<span class="s">'15m'</span>),
+  JWT_REFRESH_SECRET: Joi.string().min(32).required(),
+  JWT_REFRESH_EXPIRES: Joi.string().default(<span class="s">'7d'</span>),
+});</code></pre>
+<p>Plugged in with <code>ConfigModule.forRoot({ isGlobal: true, validationSchema: envValidationSchema })</code> in <code>AppModule</code>. Now a missing <code>JWT_ACCESS_SECRET</code> crashes the app at boot with a clear message, instead of breaking the first login in production. Commit a <code>.env.example</code> with every name and fake values so a new developer knows what to fill in.</p>
+
+<h4><span class="badge">A3</span>Database with migrations, not synchronize</h4>
+<span class="path">src/database/data-source.ts</span>
+<pre><code><span class="k">import</span> <span class="s">'dotenv/config'</span>;
+<span class="k">import</span> { DataSource } <span class="k">from</span> <span class="s">'typeorm'</span>;
+
+<span class="k">export default new</span> DataSource({
+  type: <span class="s">'postgres'</span>,
+  host: process.env.DB_HOST,
+  port: Number(process.env.DB_PORT),
+  username: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  entities: [<span class="s">'src/**/*.entity.ts'</span>],
+  migrations: [<span class="s">'src/database/migrations/*.ts'</span>],
+  synchronize: <span class="k">false</span>,                     <span class="c">// never true outside a throwaway practice project</span>
+});</code></pre>
+<span class="path">package.json (scripts)</span>
+<pre><code><span class="s">"migration:generate"</span>: <span class="s">"typeorm-ts-node-commonjs migration:generate -d src/database/data-source.ts"</span>,
+<span class="s">"migration:run"</span>: <span class="s">"typeorm-ts-node-commonjs migration:run -d src/database/data-source.ts"</span>,
+<span class="s">"migration:revert"</span>: <span class="s">"typeorm-ts-node-commonjs migration:revert -d src/database/data-source.ts"</span></code></pre>
+<p>The app module uses <code>TypeOrmModule.forRootAsync</code> (as in section 7, step 4) with <code>synchronize: false</code> and <code>autoLoadEntities: true</code>. A migration is a small file with an <code>up</code> (apply the change) and a <code>down</code> (undo it). It is reviewed in the pull request like any code, so nobody changes the production schema by surprise.</p>
+
+<h4><span class="badge">A4</span>The shared building blocks in <code>@core</code></h4>
+<span class="path">src/@core/common/entity/base.entity.ts</span>
+<pre><code><span class="k">export abstract class</span> BaseEntity {
+  <span class="d">@PrimaryGeneratedColumn</span>(<span class="s">'uuid'</span>) id: string;
+  <span class="d">@CreateDateColumn</span>({ type: <span class="s">'timestamptz'</span> }) createdAt: Date;
+  <span class="d">@UpdateDateColumn</span>({ type: <span class="s">'timestamptz'</span> }) updatedAt: Date;
+  <span class="d">@Column</span>({ <span class="k">default</span>: <span class="k">false</span> }) isDeleted: boolean;
+}</code></pre>
+<span class="path">src/@core/common/interceptors/response.interceptor.ts</span>
+<pre><code><span class="c">// Wraps every successful answer in the same shape, so controllers just return data.</span>
+<span class="d">@Injectable</span>()
+<span class="k">export class</span> ResponseInterceptor <span class="k">implements</span> NestInterceptor {
+  intercept(context: ExecutionContext, next: CallHandler) {
+    <span class="k">const</span> statusCode = context.switchToHttp().getResponse().statusCode;
+    <span class="k">return</span> next.handle().pipe(
+      map((data) =&gt; ({ success: <span class="k">true</span>, statusCode, message: data?.message ?? <span class="s">'OK'</span>, result: data?.result ?? data })),
+    );
+  }
+}</code></pre>
+<span class="path">src/@core/common/filters/http-exception.filter.ts</span>
+<pre><code><span class="c">// Turns every error into the same shape, and logs real crashes.</span>
+<span class="d">@Catch</span>()
+<span class="k">export class</span> AllExceptionsFilter <span class="k">implements</span> ExceptionFilter {
+  <span class="k">private readonly</span> logger = <span class="k">new</span> Logger(AllExceptionsFilter.name);
+  catch(exception: unknown, host: ArgumentsHost) {
+    <span class="k">const</span> res = host.switchToHttp().getResponse();
+    <span class="k">const</span> isHttp = exception <span class="k">instanceof</span> HttpException;
+    <span class="k">const</span> statusCode = isHttp ? exception.getStatus() : 500;
+    <span class="k">if</span> (!isHttp) <span class="k">this</span>.logger.error(exception);                <span class="c">// a real bug: log the stack</span>
+    <span class="c">// getResponse() keeps ValidationPipe's array of messages; a crash never leaks internals</span>
+    <span class="k">const</span> message = isHttp ? (exception.getResponse() <span class="k">as</span> any).message ?? exception.message : <span class="s">'Internal server error'</span>;
+    res.status(statusCode).json({ success: <span class="k">false</span>, statusCode, message, result: <span class="k">null</span> });
+  }
+}</code></pre>
+<p>This is what the Endless <code>Response</code> class was missing (section 8: <code>success</code> and <code>statusCode</code> are never filled). With an interceptor and a filter, every endpoint returns the same shape automatically, success or failure. Also add a <code>BaseRepository&lt;T&gt;</code> (like step 6) and a <code>PaginationDto</code> that every list endpoint reuses:</p>
+<span class="path">src/@core/common/dto/pagination.dto.ts</span>
+<pre><code><span class="k">export class</span> PaginationDto {
+  <span class="d">@Type</span>(() =&gt; Number) <span class="d">@IsInt</span>() <span class="d">@Min</span>(1)
+  page: number = 1;
+
+  <span class="d">@Type</span>(() =&gt; Number) <span class="d">@IsInt</span>() <span class="d">@Min</span>(1) <span class="d">@Max</span>(100)        <span class="c">// a max limit, so nobody asks for a million rows</span>
+  limit: number = 20;
+}</code></pre>
+<p>Query strings always arrive as text (<code>"2"</code>, not <code>2</code>). <code>@Type(() =&gt; Number)</code> from <code>class-transformer</code> converts them before validation runs; without it, <code>@IsInt()</code> fails on every request.</p>
+
+<h4><span class="badge">A5</span>main.ts, production settings</h4>
+<span class="path">src/main.ts</span>
+<pre><code><span class="k">async function</span> bootstrap() {
+  <span class="k">const</span> app = <span class="k">await</span> NestFactory.create(AppModule);
+  <span class="k">const</span> config = app.get(ConfigService);
+
+  app.use(helmet());                                           <span class="c">// safe HTTP headers</span>
+  app.enableCors({ origin: config.get(<span class="s">'CORS_ORIGINS'</span>)?.split(<span class="s">','</span>), credentials: <span class="k">true</span> });
+  app.setGlobalPrefix(<span class="s">'api/v1'</span>);                                <span class="c">// version your API from day one</span>
+  app.useGlobalPipes(<span class="k">new</span> ValidationPipe({ whitelist: <span class="k">true</span>, forbidNonWhitelisted: <span class="k">true</span>, transform: <span class="k">true</span> }));
+  app.useGlobalInterceptors(<span class="k">new</span> ResponseInterceptor());
+  app.useGlobalFilters(<span class="k">new</span> AllExceptionsFilter());
+  app.enableShutdownHooks();                                   <span class="c">// close DB connections cleanly on deploy</span>
+
+  <span class="k">if</span> (config.get(<span class="s">'NODE_ENV'</span>) !== <span class="s">'production'</span>) {
+    <span class="k">const</span> doc = SwaggerModule.createDocument(app, <span class="k">new</span> DocumentBuilder().setTitle(<span class="s">'API'</span>).addBearerAuth().build());
+    SwaggerModule.setup(<span class="s">'docs'</span>, app, doc);                        <span class="c">// interactive docs at /docs</span>
+  }
+  <span class="k">await</span> app.listen(config.get(<span class="s">'PORT'</span>));
+}
+bootstrap();</code></pre>
+<p>Then add three small global modules in <code>AppModule</code>: <code>ThrottlerModule</code> (rate limiting, so nobody can try a million passwords on login), a <code>HealthModule</code> with <code>@nestjs/terminus</code> exposing <code>GET /health</code> that checks the database (load balancers and ECS use this to know your app is alive), and the auth module with a global guard if most routes are private.</p>
+<div class="good"><b>Checkpoint</b>At this point the app starts, connects to the database, validates its env, has <code>/health</code> and <code>/docs</code>, and has zero features. That is correct. Commit this as your first commit. Every feature from now on is built on a solid floor.</div>
+
+<h3 id="sp-feature">10.4 Phase B: one feature, step by step</h3>
+<p>Repeat this for every feature. We use a <b>listing</b> feature (a seller lists a domain for sale) as the example, because you know it from the frontend. Generate the files with the CLI first, then fill them in the order below:</p>
+<pre><code>nest g module components/listing
+nest g service components/listing --no-spec --flat
+nest g controller components/listing --no-spec --flat</code></pre>
+
+<div class="tablewrap"><table>
+<tr><th>Order</th><th>File</th><th>Why it comes here</th></tr>
+<tr><td>0</td><td>The contract (on paper)</td><td>Decides every field of the DTOs and every error.</td></tr>
+<tr><td>1</td><td><code>entity/listing.entity.ts</code></td><td>Everything else refers to this type.</td></tr>
+<tr><td>2</td><td>migration</td><td>The table must exist before anything can query it.</td></tr>
+<tr><td>3</td><td><code>enum/</code> files</td><td>Status values and error messages, used by entity, service and DTOs.</td></tr>
+<tr><td>4</td><td><code>interface/listing.repo.interface.ts</code> + <code>listing.repo.ts</code></td><td>The only place with queries. Needs the entity.</td></tr>
+<tr><td>5</td><td><code>dto/</code> (create, query, return)</td><td>The shapes the service accepts and returns.</td></tr>
+<tr><td>6</td><td><code>interface/listing.service.interface.ts</code> + <code>listing.service.ts</code></td><td>The rules. Needs the repo and the DTOs.</td></tr>
+<tr><td>7</td><td><code>listing.controller.ts</code></td><td>The door. Needs the service.</td></tr>
+<tr><td>8</td><td><code>listing.module.ts</code>, then import it in <code>AppModule</code></td><td>Wiring. Only now does NestJS know the feature exists.</td></tr>
+<tr><td>9</td><td><code>listing.service.spec.ts</code>, <code>test/listing.e2e-spec.ts</code></td><td>Prove each rule and each endpoint.</td></tr>
+</table></div>
+
+<h4><span class="badge">B0</span>The contract</h4>
+<pre><code>POST /api/v1/listings          (logged in)
+  body:   { domainName: "vision.eth", priceUsd: 2800 }
+  201:    { id, domainName, priceUsd, status: "ACTIVE", createdAt }
+  400:    validation failed     409: domain already listed     401: not logged in
+
+GET  /api/v1/listings?page=1&amp;limit=20&amp;status=ACTIVE   (public)
+  200:    { items: [...], total, page, limit }
+
+DELETE /api/v1/listings/:id    (logged in, owner only)
+  200:    { id, status: "CANCELLED" }
+  403:    not your listing     404: no such listing</code></pre>
+
+<h4><span class="badge">B1</span>Entity</h4>
+<span class="path">src/components/listing/entity/listing.entity.ts</span>
+<pre><code><span class="d">@Entity</span>({ name: <span class="s">'tbl_listing'</span> })
+<span class="d">@Index</span>([<span class="s">'status'</span>, <span class="s">'createdAt'</span>])                       <span class="c">// the list endpoint filters and sorts by these</span>
+<span class="k">export class</span> Listing <span class="k">extends</span> BaseEntity {
+  <span class="d">@Column</span>({ unique: <span class="k">true</span> }) domainName: string;
+  <span class="d">@Column</span>({ type: <span class="s">'numeric'</span>, precision: 18, scale: 2 }) priceUsd: string; <span class="c">// money is never a float</span>
+  <span class="d">@Column</span>({ type: <span class="s">'enum'</span>, <span class="k">enum</span>: ListingStatus, <span class="k">default</span>: ListingStatus.ACTIVE }) status: ListingStatus;
+  <span class="d">@ManyToOne</span>(() =&gt; User, { nullable: <span class="k">false</span> })
+  <span class="d">@JoinColumn</span>({ name: <span class="s">'sellerId'</span> })                       <span class="c">// the foreign key column</span>
+  seller: User;
+  <span class="d">@Column</span>() sellerId: string;                             <span class="c">// same column, readable without loading the user</span>
+}</code></pre>
+<p>Notice the production details: an index for the query you know you will run, money stored as <code>numeric</code> (floats turn 0.1 + 0.2 into 0.30000000000000004), and the status as an enum so the database rejects junk values.</p>
+
+<h4><span class="badge">B2</span>Migration</h4>
+<pre><code>npm run migration:generate -- src/database/migrations/CreateListing
+npm run migration:run</code></pre>
+<p>TypeORM compares your entities with the real database and writes the SQL for the difference. <b>Always open the generated file and read it</b> before running it. If it says <code>DROP COLUMN</code> and you did not expect that, stop.</p>
+
+<h4><span class="badge">B3 and B4</span>Enums and repository</h4>
+<span class="path">src/components/listing/enum/listing-status.enum.ts</span>
+<pre><code><span class="k">export enum</span> ListingStatus { ACTIVE = <span class="s">'ACTIVE'</span>, SOLD = <span class="s">'SOLD'</span>, CANCELLED = <span class="s">'CANCELLED'</span> }</code></pre>
+<span class="path">src/components/listing/listing.repo.ts</span>
+<pre><code><span class="d">@Injectable</span>()
+<span class="k">export class</span> ListingRepo <span class="k">extends</span> BaseRepository&lt;Listing&gt; <span class="k">implements</span> ListingRepoInterface {
+  <span class="k">constructor</span>(<span class="d">@InjectRepository</span>(Listing) <span class="k">private readonly</span> repo: Repository&lt;Listing&gt;) { <span class="k">super</span>(repo); }
+
+  findByDomain(domainName: string) {
+    <span class="k">return this</span>.repo.findOne({ where: { domainName, isDeleted: <span class="k">false</span> } });
+  }
+
+  findPage(status: ListingStatus, page: number, limit: number) {
+    <span class="k">return this</span>.repo.findAndCount({
+      where: { status, isDeleted: <span class="k">false</span> },
+      order: { createdAt: <span class="s">'DESC'</span> },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+  }
+}</code></pre>
+<p>Every query lives here and nowhere else. The service will say "give me page 2 of active listings"; it will never know whether that is SQL, a cache or a different database.</p>
+
+<h4><span class="badge">B5</span>DTOs: one for each direction</h4>
+<span class="path">src/components/listing/dto/create-listing.dto.ts</span>
+<pre><code><span class="k">export class</span> CreateListingDto {
+  <span class="d">@ApiProperty</span>({ example: <span class="s">'vision.eth'</span> })
+  <span class="d">@IsString</span>() <span class="d">@Matches</span>(<span class="s">/^[a-z0-9]+\.[a-z]+$/</span>)
+  domainName: string;
+
+  <span class="d">@ApiProperty</span>({ example: 2800 })
+  <span class="d">@IsNumber</span>({ maxDecimalPlaces: 2 }) <span class="d">@IsPositive</span>()
+  priceUsd: number;
+}</code></pre>
+<span class="path">src/components/listing/dto/query-listing.dto.ts</span>
+<pre><code><span class="k">export class</span> QueryListingDto <span class="k">extends</span> PaginationDto {     <span class="c">// page and limit come from @core</span>
+  <span class="d">@IsOptional</span>() <span class="d">@IsEnum</span>(ListingStatus)
+  status: ListingStatus = ListingStatus.ACTIVE;
+}</code></pre>
+<span class="path">src/components/listing/dto/return-listing.dto.ts</span>
+<pre><code><span class="k">export class</span> ReturnListingDto {
+  id: string; domainName: string; priceUsd: number; status: ListingStatus; createdAt: Date;
+
+  <span class="k">static</span> from(listing: Listing): ReturnListingDto {          <span class="c">// the allow list from step 5i, in one place</span>
+    <span class="k">return</span> { id: listing.id, domainName: listing.domainName, priceUsd: Number(listing.priceUsd),
+             status: listing.status, createdAt: listing.createdAt };
+  }
+}</code></pre>
+<p>Three DTOs, three jobs: <b>create</b> validates what a client sends, <b>query</b> validates the URL's <code>?page=...&amp;status=...</code> (the <code>@Type</code> on <code>PaginationDto</code> turns the strings into numbers, and the defaults apply because <code>transform: true</code> builds a real instance of the class), <b>return</b> decides exactly what leaves the server.</p>
+
+<h4><span class="badge">B6</span>Service: the rules</h4>
+<span class="path">src/components/listing/listing.service.ts</span>
+<pre><code><span class="d">@Injectable</span>()
+<span class="k">export class</span> ListingService <span class="k">implements</span> ListingServiceInterface {
+  <span class="k">private readonly</span> logger = <span class="k">new</span> Logger(ListingService.name);
+
+  <span class="k">constructor</span>(<span class="d">@Inject</span>(<span class="s">'ListingRepoInterface'</span>) <span class="k">private readonly</span> listingRepo: ListingRepoInterface) {}
+
+  <span class="k">async</span> create(sellerId: string, dto: CreateListingDto): Promise&lt;ReturnListingDto&gt; {
+    <span class="k">const</span> existing = <span class="k">await this</span>.listingRepo.findByDomain(dto.domainName);
+    <span class="k">if</span> (existing) <span class="k">throw new</span> ConflictException(ListingErrorMessage.ALREADY_LISTED);  <span class="c">// 409</span>
+
+    <span class="k">const</span> saved = <span class="k">await this</span>.listingRepo.save({ ...dto, priceUsd: String(dto.priceUsd), sellerId });
+    <span class="k">this</span>.logger.log(<span class="s">`listing ${saved.id} created by ${sellerId}`</span>);
+    <span class="k">return</span> ReturnListingDto.from(saved);
+  }
+
+  <span class="k">async</span> list(query: QueryListingDto) {
+    <span class="k">const</span> [rows, total] = <span class="k">await this</span>.listingRepo.findPage(query.status, query.page, query.limit);
+    <span class="k">return</span> { items: rows.map(ReturnListingDto.from), total, page: query.page, limit: query.limit };
+  }
+
+  <span class="k">async</span> cancel(sellerId: string, id: string): Promise&lt;ReturnListingDto&gt; {
+    <span class="k">const</span> listing = <span class="k">await this</span>.listingRepo.findOneById(id);
+    <span class="k">if</span> (!listing || listing.isDeleted) <span class="k">throw new</span> NotFoundException(ListingErrorMessage.NOT_FOUND);
+    <span class="k">if</span> (listing.sellerId !== sellerId) <span class="k">throw new</span> ForbiddenException(ListingErrorMessage.NOT_OWNER);
+    <span class="k">if</span> (listing.status !== ListingStatus.ACTIVE) <span class="k">throw new</span> BadRequestException(ListingErrorMessage.NOT_ACTIVE);
+
+    listing.status = ListingStatus.CANCELLED;
+    <span class="k">return</span> ReturnListingDto.from(<span class="k">await this</span>.listingRepo.save(listing));
+  }
+}</code></pre>
+<p>Everything from the step 5v rule table is here: guard clauses first, the right exception for each "no", nothing written until every check passes, entities mapped to a return DTO, no HTTP objects, a logger that logs ids and not personal data.</p>
+
+<h4><span class="badge">B7</span>Controller: the door</h4>
+<span class="path">src/components/listing/listing.controller.ts</span>
+<pre><code><span class="d">@ApiTags</span>(<span class="s">'listings'</span>)
+<span class="d">@Controller</span>(<span class="s">'listings'</span>)
+<span class="k">export class</span> ListingController {
+  <span class="k">constructor</span>(<span class="d">@Inject</span>(<span class="s">'ListingServiceInterface'</span>) <span class="k">private readonly</span> listingService: ListingServiceInterface) {}
+
+  <span class="d">@Post</span>()
+  <span class="d">@UseGuards</span>(AccessTokenGuard) <span class="d">@ApiBearerAuth</span>()
+  create(<span class="d">@CurrentUser</span>(<span class="s">'userId'</span>) userId: string, <span class="d">@Body</span>() dto: CreateListingDto) {
+    <span class="k">return this</span>.listingService.create(userId, dto);
+  }
+
+  <span class="d">@Get</span>()
+  list(<span class="d">@Query</span>() query: QueryListingDto) {
+    <span class="k">return this</span>.listingService.list(query);
+  }
+
+  <span class="d">@Delete</span>(<span class="s">':id'</span>)
+  <span class="d">@UseGuards</span>(AccessTokenGuard) <span class="d">@ApiBearerAuth</span>()
+  cancel(<span class="d">@CurrentUser</span>(<span class="s">'userId'</span>) userId: string, <span class="d">@Param</span>(<span class="s">'id'</span>, ParseUUIDPipe) id: string) {
+    <span class="k">return this</span>.listingService.cancel(userId, id);
+  }
+}</code></pre>
+<p>Each method is one line: read the inputs, call the service, return. <code>@CurrentUser('userId')</code> is a small custom decorator in <code>@core</code> that reads <code>req.user.userId</code>, so controllers never touch <code>req</code>. <code>ParseUUIDPipe</code> rejects <code>/listings/banana</code> with a 400 before your code runs. The interceptor from A4 wraps the result, so there is no <code>new Response(...)</code> anywhere.</p>
+
+<h4><span class="badge">B8</span>Module: wiring</h4>
+<span class="path">src/components/listing/listing.module.ts</span>
+<pre><code><span class="d">@Module</span>({
+  imports: [TypeOrmModule.forFeature([Listing])],
+  controllers: [ListingController],
+  providers: [
+    { provide: <span class="s">'ListingRepoInterface'</span>, useClass: ListingRepo },
+    { provide: <span class="s">'ListingServiceInterface'</span>, useClass: ListingService },
+  ],
+  exports: [<span class="s">'ListingServiceInterface'</span>],        <span class="c">// only if another module (orders) needs it</span>
+})
+<span class="k">export class</span> ListingModule {}</code></pre>
+<p>Then add <code>ListingModule</code> to <code>imports</code> in <code>AppModule</code> (the CLI usually does this for you). A tip for later: put the token strings in constants (<code>export const LISTING_SERVICE = 'ListingServiceInterface'</code>) so a typo becomes a compile error instead of a "can't resolve dependencies" error at startup.</p>
+
+<h4><span class="badge">B9</span>Tests</h4>
+<p>Unit test the service exactly like step 5u: fake the repo, one test per rule (already listed, not found, not owner, not active, happy path). Then one end to end test per endpoint in <code>test/</code> using <code>supertest</code> against a real test database, to prove the wiring, validation and guard all work together. Run both in CI on every pull request.</p>
+
+<h3 id="sp-names">10.5 Naming conventions</h3>
+<div class="tablewrap"><table>
+<tr><th>Thing</th><th>Convention</th><th>Example</th></tr>
+<tr><td>Files</td><td>lowercase words with dots for the role</td><td><code>listing.service.ts</code>, <code>create-listing.dto.ts</code></td></tr>
+<tr><td>Classes</td><td>PascalCase plus role</td><td><code>ListingService</code>, <code>CreateListingDto</code></td></tr>
+<tr><td>Tables</td><td>one consistent style for the whole project</td><td><code>tbl_listing</code> (Endless style) or <code>listings</code></td></tr>
+<tr><td>Routes</td><td>plural nouns, no verbs; the HTTP method is the verb</td><td><code>POST /listings</code>, not <code>POST /createListing</code></td></tr>
+<tr><td>DTOs</td><td>Action + Thing + Dto</td><td><code>CreateListingDto</code>, <code>UpdateListingDto</code>, <code>ReturnListingDto</code></td></tr>
+<tr><td>Enums</td><td>PascalCase name, UPPER_CASE values that equal their string</td><td><code>ListingStatus.ACTIVE = 'ACTIVE'</code></td></tr>
+<tr><td>Migrations</td><td>timestamp + what changed</td><td><code>1730600000000-CreateListing.ts</code></td></tr>
+</table></div>
+
+<h3 id="sp-checklist">10.6 Production checklist</h3>
+<p>Before you call a backend "production ready", every one of these should be true:</p>
+<div class="tablewrap"><table>
+<tr><th>Area</th><th>Check</th></tr>
+<tr><td>Config</td><td>Env validated at boot; <code>.env</code> ignored by git; real secrets in a secrets manager, not in the repo.</td></tr>
+<tr><td>Database</td><td><code>synchronize: false</code>; every change is a reviewed migration; indexes for every filter and sort you run; money as <code>numeric</code>; multi write operations in a transaction.</td></tr>
+<tr><td>Input</td><td>Global <code>ValidationPipe</code> with <code>whitelist</code> and <code>forbidNonWhitelisted</code>; ids parsed with pipes; list endpoints always paginated with a max <code>limit</code>.</td></tr>
+<tr><td>Output</td><td>Every response goes through a return DTO; one response shape for success and errors; 500s never leak stack traces.</td></tr>
+<tr><td>Security</td><td>helmet; CORS limited to your frontends; rate limiting (strict on login and signup); passwords with bcrypt or argon2; tokens short lived with refresh rotation; owner checks on every write.</td></tr>
+<tr><td>Observability</td><td>Logger with context; no secrets or personal data in logs; <code>/health</code> endpoint; errors reported to a tool (Sentry, CloudWatch alarms).</td></tr>
+<tr><td>Quality</td><td>Strict TypeScript; lint and tests run in CI; unit tests for services, e2e for endpoints.</td></tr>
+<tr><td>Delivery</td><td>Dockerfile; migrations run as a deploy step before the new code starts; graceful shutdown; API docs at <code>/docs</code> outside production.</td></tr>
+</table></div>
+
+<h3 id="sp-mistakes">10.7 Beginner mistakes and the pro version</h3>
+<div class="tablewrap"><table>
+<tr><th>Beginner does</th><th>Pro does instead</th></tr>
+<tr><td>Starts with the controller and puts logic in it</td><td>Starts with the entity; the controller is written last and stays one line per method.</td></tr>
+<tr><td><code>synchronize: true</code> "for now", forever</td><td>Migrations from the first table.</td></tr>
+<tr><td>Returns the entity straight from the service</td><td>Maps to a return DTO with an allow list.</td></tr>
+<tr><td>Uses the TypeORM repository directly in five services</td><td>One repo per entity, owned by its module; other modules call the service.</td></tr>
+<tr><td><code>if (!body.email)</code> checks in the service</td><td>Shape rules on the DTO, business rules in the service.</td></tr>
+<tr><td>Returns <code>{ error: 'not found' }</code> with status 200</td><td>Throws <code>NotFoundException</code>; the status code is part of the API.</td></tr>
+<tr><td>Forgets <code>await</code></td><td>Turns on the <code>@typescript-eslint/no-floating-promises</code> lint rule, which catches it.</td></tr>
+<tr><td>Stores money as <code>float</code></td><td><code>numeric</code> in the database, careful conversion at the edges.</td></tr>
+<tr><td>Builds ten features, then writes tests</td><td>Writes the service test right after the service, while the rules are fresh.</td></tr>
+<tr><td>Groups folders by kind (<code>controllers/</code>, <code>services/</code>)</td><td>Groups by feature (<code>components/listing/</code>).</td></tr>
+</table></div>
+
+<h3 id="sp-start">10.8 How to actually start, this week</h3>
+<ol class="check">
+<li><b>Day 1:</b> Phase A only. Project, strict mode, config validation, Postgres in Docker, data source, first empty migration run, <code>/health</code>. Commit.</li>
+<li><b>Day 2:</b> The <code>user</code> feature in the B0 to B9 order, without auth: create user and get user. Read every generated migration.</li>
+<li><b>Day 3:</b> Auth, rebuilt from section 7 but inside this structure: interfaces with string tokens, return DTOs, the interceptor and filter instead of a <code>Response</code> class. Write the 5u tests.</li>
+<li><b>Day 4:</b> One real feature of your own (like listings) entirely in the B order, with a contract written first.</li>
+<li><b>Day 5:</b> Go through the 10.6 checklist and fix every row that is not true yet. Then compare your project with the Endless backend folder by folder, and write down every difference and which one you think is better, and why.</li>
+</ol>
+<div class="good"><b>The real sign you have levelled up</b>You can open any module in the Endless backend, and before reading the code, predict which files it has, what order they were probably written in, where the business rules are, and how many queries an endpoint makes. Then you read the code to check your guess. When your guesses are mostly right, you are no longer a beginner.</div>
+
+<footer>Written against the uat branch of the Endless Domains backend (commit 543b2937). Step 5 was rewritten and checked again against uat commit 7fb3e55f on 3 Nov 2026; section 10 is general guidance, not a copy of that code. File paths are relative to <code>D:\Akshat Endless\backend\backend\</code>. Line numbers may drift as the code changes.</footer>
 </main>
 </div>
 <script>
