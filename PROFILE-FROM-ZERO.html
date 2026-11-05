@@ -553,7 +553,7 @@ if (activeTab === 'wallets') { /* use wallets.data */ }</code></pre>
 <tr><td><code>TELEGRAM_RE</code>, <code>normalizeTelegram</code></td><td>regex, function</td><td>The main site's Telegram rule; strip a leading <code>@</code>.</td></tr>
 <tr><td><code>validateProfileField(field, draft)</code></td><td>function</td><td>One field's message, or <code>undefined</code> when valid. A <code>switch</code> with one case per field.</td></tr>
 <tr><td><code>PROFILE_FIELDS</code>, <code>validateProfile(draft)</code></td><td>constant, function</td><td>Run every field, collect the messages.</td></tr>
-<tr><td><code>profileChanges(saved, draft)</code></td><td>function</td><td>Which fields differ after cleaning (trim, drop <code>@</code>, empty phone to <code>null</code>). Drives Save and the dirty guard.</td></tr>
+<tr><td><code>profileChanges(saved, draft)</code></td><td>function</td><td>Which editable fields differ once both sides are cleaned (trim, drop <code>@</code>, empty phone to <code>null</code>). Drives Save and the dirty guard.</td></tr>
 <tr><td><code>PasswordChangeDraft</code> + <code>validatePasswordChange</code></td><td>type, function</td><td>The three password fields' rules, using the shared <code>PASSWORD_POLICY</code>.</td></tr>
 </table></div>
 <p>Notice what is <b>not</b> here: "username is taken". That needs the network and waiting, so it lives in a hook (<code>useUsernameAvailability</code>), and <code>useProfileDraft</code> merges the two kinds of error. A perfect illustration of the split. Covered line by line in sections 8.4 and 9.3.</p>
@@ -1061,10 +1061,6 @@ export function toUpdateUserBody(saved: ProfileDetails, next: ProfileDetails): R
   const [touched, setTouched] = useState&lt;Partial&lt;Record&lt;ProfileField, boolean&gt;&gt;&gt;({})
   const [submitted, setSubmitted] = useState(false)
 
-  useEffect(() =&gt; {
-    if (saved &amp;&amp; !draft) setDraft(saved)
-  }, [saved, draft])
-
   const usernameToCheck =
     draft &amp;&amp; saved &amp;&amp; draft.username &amp;&amp; draft.username !== saved.username &amp;&amp; !validateProfileField('username', draft) ? draft.username : ''
   const usernameStatus = useUsernameAvailability(usernameToCheck)
@@ -1086,12 +1082,19 @@ export function toUpdateUserBody(saved: ProfileDetails, next: ProfileDetails): R
 
   const changes = useMemo(() =&gt; (saved &amp;&amp; draft ? profileChanges(saved, draft) : {}), [saved, draft])
   const isDirty = Object.keys(changes).length &gt; 0
+
+  const appliedSaved = useRef(saved)
+  useEffect(() =&gt; {
+    if (!saved || (draft &amp;&amp; saved === appliedSaved.current)) return
+    appliedSaved.current = saved
+    if (!draft || !isDirty) setDraft(saved)
+  }, [saved, draft, isDirty])
   // ... setField, blur, submit, discard, return
 }</code></pre>
 <p>Three pieces of state drive everything:</p>
 <div class="tablewrap"><table>
 <tr><th>State</th><th>Meaning</th></tr>
-<tr><td><code>draft</code></td><td>The editable copy. Filled once from <code>saved</code> by the effect. Later reloads of <code>saved</code> do <b>not</b> overwrite it (<code>!draft</code>), so a background refetch never wipes what you are typing.</td></tr>
+<tr><td><code>draft</code></td><td>The editable copy. The effect fills it from <code>saved</code> on the first load, and again whenever <code>saved</code> reloads <b>while nothing is edited</b> (verification sent, a new photo), so the copy never goes stale. If you have edits, a reload does not touch them. The <code>appliedSaved</code> ref makes the effect react only to a new <code>saved</code>, never to your typing: otherwise typing "John " (trailing space, which cleans to "John" and so counts as no change) would reset the field mid word. Fixed 3 Nov 2026; before that the copy was filled once and never refreshed.</td></tr>
 <tr><td><code>touched</code></td><td>Which fields you have left (blurred). Errors appear only after you leave a field, not while you type the first letter.</td></tr>
 <tr><td><code>submitted</code></td><td>After pressing Save once, every error shows.</td></tr>
 </table></div>
@@ -1203,23 +1206,28 @@ export function validateProfileField(field: ProfileField, draft: ProfileDetails)
 <tr><td>Telegram regex</td><td><code>(?=.{5,32}$)</code> length 5 to 32; <code>(?!.*__)</code> no double underscore; <code>(?!_)</code> not starting with _; <code>(?&lt;!_)$</code> not ending with _. Lookaheads and lookbehinds check without consuming characters.</td></tr>
 </table></div>
 <p>And the diff that decides what Save sends:</p>
-<pre><code>export function profileChanges(saved: ProfileDetails, draft: ProfileDetails): Partial&lt;ProfileDetails&gt; {
-  const clean: ProfileDetails = {
-    ...draft,
-    fullName: draft.fullName.trim(),
-    email: draft.email.trim(),
-    telegram: normalizeTelegram(draft.telegram),   // drops a leading @
-    location: draft.location.trim(),
-    website: draft.website.trim(),
-    phone: draft.phone &amp;&amp; draft.phone.number ? draft.phone : null,
-  }
+<pre><code>const cleanDetails = (details: ProfileDetails): ProfileDetails =&gt; ({
+  ...details,
+  fullName: details.fullName.trim(),
+  email: details.email.trim(),
+  telegram: normalizeTelegram(details.telegram),   // drops a leading @
+  location: details.location.trim(),
+  website: details.website.trim(),
+  phone: details.phone &amp;&amp; details.phone.number ? details.phone : null,
+})
+
+export function profileChanges(saved: ProfileDetails, draft: ProfileDetails): Partial&lt;ProfileDetails&gt; {
+  const before = cleanDetails(saved)
+  const after = cleanDetails(draft)
   const patch: Partial&lt;ProfileDetails&gt; = {}
-  for (const key of Object.keys(clean) as (keyof ProfileDetails)[]) {
-    if (JSON.stringify(clean[key]) !== JSON.stringify(saved[key])) (patch as Record&lt;string, unknown&gt;)[key] = clean[key]
+  for (const key of PROFILE_FIELDS) {
+    if (JSON.stringify(after[key]) !== JSON.stringify(before[key])) (patch as Record&lt;string, unknown&gt;)[key] = after[key]
   }
   return patch
 }</code></pre>
-<p>Clean the draft the way it will be saved (so typing a trailing space is not a "change"), then compare each field. <code>JSON.stringify</code> compares the phone <i>object</i> by value; comparing objects with <code>!==</code> would compare references and always say "different".</p>
+<p>Clean <b>both</b> sides the way they will be saved (so typing a trailing space is not a "change"), then compare only the eight editable fields in <code>PROFILE_FIELDS</code>. Read only fields like <code>isEmailVerified</code> or <code>avatarUrl</code> can never make the form look edited.</p>
+<div class="box"><b>Bug fixed 3 Nov 2026.</b> This used to clean only the draft and compare every field. The old main site saves an empty phone as just the dial code (<code>"+91"</code>) and Telegram with its <code>@</code>, so for those accounts the cleaned draft never matched the raw saved values. An untouched form counted as changed, and leaving the page always asked to save or discard. It never showed on localhost because the stage account had been saved through the new page, which stores clean values.</div>
+<p><code>JSON.stringify</code> compares the phone <i>object</i> by value; comparing objects with <code>!==</code> would compare references and always say "different".</p>
 
 <h3 id="p-panel">8.5 The panel and the form</h3>
 <p><code>ProfileTabPanel</code> connects the hook to the UI and owns the handlers:</p>

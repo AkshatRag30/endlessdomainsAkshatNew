@@ -1,0 +1,670 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trails spike explained</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* Same look as trails-checkout-explained.html: sticky contents rail, one reading column; each block pairs real code (with its line numbers) and plain words */
+:root {
+  --bg: #f6f6f9; --surface: #ffffff; --sunk: #eeedf4; --fg: #1b1a24; --muted: #5c5a6b; --line: #dddbe7;
+  --accent: #6a3fd6; --accent-soft: #ece6fb; --warn: #9a5b00; --warn-soft: #fff3df; --ok: #1d7a4c; --ok-soft: #e3f4ea;
+  --bad: #b3261e; --bad-soft: #fdeceb;
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f0e14; --surface: #18171f; --sunk: #211f2a; --fg: #ecebf2; --muted: #a3a1b3; --line: #2e2c3a;
+    --accent: #ac90ff; --accent-soft: #2a2240; --warn: #f0b45a; --warn-soft: #332611; --ok: #6fd39d; --ok-soft: #142a1e;
+    --bad: #ff8a80; --bad-soft: #351817; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f0e14; --surface: #18171f; --sunk: #211f2a; --fg: #ecebf2; --muted: #a3a1b3; --line: #2e2c3a;
+  --accent: #ac90ff; --accent-soft: #2a2240; --warn: #f0b45a; --warn-soft: #332611; --ok: #6fd39d; --ok-soft: #142a1e;
+  --bad: #ff8a80; --bad-soft: #351817; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0; background: var(--bg); color: var(--fg);
+  font-family: var(--font-body); font-size: 16px; line-height: 1.65;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 64px;
+}
+.wrap { max-width: 1120px; margin: 0 auto; display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 48px; }
+header.top { max-width: 1120px; margin: 0 auto; padding-block: 48px 32px; border-bottom: 1px solid var(--line); margin-bottom: 40px; }
+.eyebrow { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin: 0; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; line-height: 1.2; margin: 0; }
+h1 { font-size: clamp(32px, 5vw, 48px); margin-top: 8px; }
+.lede { font-size: 18px; color: var(--muted); max-width: 64ch; margin: 14px 0 0; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.chip { font-size: 13px; padding: 3px 10px; border-radius: 99px; background: var(--sunk); color: var(--muted); }
+nav.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 24px); align-self: start; font-size: 14px; max-height: calc(100vh - 48px); overflow-y: auto; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+nav.toc a { display: block; padding: 5px 10px; border-radius: 6px; color: var(--muted); text-decoration: none; }
+nav.toc a:hover, nav.toc a:focus-visible { background: var(--sunk); color: var(--fg); outline: none; }
+nav.toc .label { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; font-weight: 600; color: var(--muted); padding: 10px 10px 6px; }
+main { min-width: 0; display: flex; flex-direction: column; gap: 56px; }
+section { scroll-margin-top: 24px; display: flex; flex-direction: column; gap: 16px; }
+section > p, section > ul, section > ol { max-width: 70ch; margin: 0; }
+h2 { font-size: 28px; }
+h3 { font-size: 19px; margin-top: 8px; }
+.num { font-family: var(--font-mono); font-size: 13px; color: var(--accent); font-weight: 500; display: block; margin-bottom: 4px; }
+.level { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; padding: 2px 8px; border-radius: 99px; margin-left: 8px; vertical-align: middle; }
+.level.l0 { background: var(--ok-soft); color: var(--ok); }
+.level.l1 { background: var(--accent-soft); color: var(--accent); }
+.level.l2 { background: var(--warn-soft); color: var(--warn); }
+.oneline { background: var(--accent-soft); border-radius: 10px; padding: 14px 18px; max-width: 70ch; }
+.oneline b { display: block; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-bottom: 2px; }
+.callout { border-radius: 10px; padding: 14px 18px; max-width: 70ch; }
+.callout.warn { background: var(--warn-soft); }
+.callout.warn b:first-child { color: var(--warn); }
+.callout.ok { background: var(--ok-soft); }
+.callout.ok b:first-child { color: var(--ok); }
+code { font-family: var(--font-mono); font-size: .88em; background: var(--sunk); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+pre { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; overflow-x: auto; font-family: var(--font-mono); font-size: 13px; line-height: 1.6; }
+pre code { background: none; padding: 0; font-size: inherit; overflow-wrap: normal; }
+.ln { color: var(--muted); user-select: none; display: inline-block; min-width: 3ch; margin-right: 12px; text-align: right; }
+.cm { color: var(--muted); }
+.lines { display: flex; flex-direction: column; gap: 10px; max-width: 76ch; }
+.lines > div { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; }
+.lines .at { font-family: var(--font-mono); font-size: 13px; color: var(--accent); font-weight: 500; }
+.lines p { margin: 0; }
+.lines p + p { margin-top: 8px; }
+.tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; background: var(--sunk); }
+tr:last-child td { border-bottom: none; }
+.flow { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.step { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; position: relative; font-size: 14px; }
+.step strong { display: block; font-family: var(--font-display); font-size: 15px; margin-bottom: 2px; }
+.step .where { font-size: 12px; color: var(--accent); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+.step:not(:last-child)::after { content: "→"; position: absolute; right: -11px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 14px; }
+.bytes { display: flex; flex-wrap: wrap; gap: 6px; font-family: var(--font-mono); font-size: 12.5px; }
+.bytes span { padding: 6px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); overflow-wrap: anywhere; }
+.bytes .sel { background: var(--accent-soft); border-color: transparent; }
+.bytes .a1 { background: var(--ok-soft); border-color: transparent; }
+.bytes .a2 { background: var(--warn-soft); border-color: transparent; }
+details.quiz { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; max-width: 70ch; }
+details.quiz summary { cursor: pointer; font-weight: 600; }
+details.quiz p { margin: 8px 0 0; }
+@media (max-width: 860px) {
+  .wrap { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  nav.toc { position: static; max-height: none; border: 1px solid var(--line); border-radius: 10px; padding: 6px; background: var(--surface); }
+  nav.toc ol { display: grid; grid-template-columns: 1fr 1fr; }
+  .flow { grid-template-columns: minmax(0, 1fr); }
+  .step:not(:last-child)::after { content: "↓"; right: auto; left: 50%; top: auto; bottom: -15px; transform: translateX(-50%); }
+  .lines > div { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <p class="eyebrow">Trails checkout · phase 3 · learning guide</p>
+  <h1>trails-spike.tsx, line by line</h1>
+  <p class="lede">What the test page is for, then every line of <code>pages/trails-spike.tsx</code> in order, starting from the basics and ending with the tricky parts: how blockchain calls become bytes, how the Trails box is loaded, and how each check proves something.</p>
+  <div class="meta">
+    <span class="chip">268 lines</span>
+    <span class="chip">Local only, never committed</span>
+    <span class="chip">Written 5 Nov 2026</span>
+    <span class="chip"><span class="level l0" style="margin:0">Basic</span> <span class="level l1" style="margin:0">Middle</span> <span class="level l2" style="margin:0">Advanced</span></span>
+  </div>
+</header>
+
+<div class="wrap">
+<nav class="toc" aria-label="Contents">
+  <ol>
+    <li class="label">Start here</li>
+    <li><a href="#why">0. Why this page exists</a></li>
+    <li><a href="#basics">1. Words you need first</a></li>
+    <li class="label">The file, top to bottom</li>
+    <li><a href="#header">2. Lines 1 to 7: the note</a></li>
+    <li><a href="#imports">3. Lines 8 to 19: imports</a></li>
+    <li><a href="#fixture">4. Lines 21 to 42: the test order</a></li>
+    <li><a href="#expected">5. Lines 44 to 49: right answers</a></li>
+    <li><a href="#abi">6. Lines 51 to 59: the ABI</a></li>
+    <li><a href="#types">7. Lines 61 to 62: types</a></li>
+    <li><a href="#toviem">8. Lines 64 to 80: toViemParams</a></li>
+    <li><a href="#buildcalls">9. Lines 82 to 97: buildCalls</a></li>
+    <li><a href="#stringify">10. Line 99: stringify</a></li>
+    <li><a href="#proptypes">11. Lines 101 to 109: shapes</a></li>
+    <li><a href="#widget">12. Lines 111 to 147: the Trails box</a></li>
+    <li><a href="#state">13. Lines 149 to 160: page memory</a></li>
+    <li><a href="#selfcheck">14. Lines 162 to 177: self checks</a></li>
+    <li><a href="#onevent">15. Lines 179 to 195: onEvent</a></li>
+    <li><a href="#cors">16. Lines 197 to 211: check (d)</a></li>
+    <li><a href="#jsx">17. Lines 213 to 267: the screen</a></li>
+    <li class="label">Going deeper</li>
+    <li><a href="#bytesdeep">18. What calldata looks like</a></li>
+    <li><a href="#order">19. What happens when, in order</a></li>
+    <li><a href="#real">20. Spike vs the real build</a></li>
+    <li><a href="#quiz">21. Test yourself</a></li>
+  </ol>
+</nav>
+
+<main>
+
+<section id="why">
+  <div><span class="num">Section 0</span><h2>Why this page exists <span class="level l0">Basic</span></h2></div>
+  <div class="oneline"><b>In one line</b>A throwaway test page that proves the Trails payment box works inside our buy drawer before we spend days building the real screens around it.</div>
+  <p>Think of it like test fitting a new part in a machine before rebuilding the machine around it. Mohit's doc asked for four answers before anyone builds the real "pay with any token" feature:</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Check</th><th>The question</th><th>Where in the file</th><th>Result 5 Nov</th></tr></thead>
+    <tbody>
+      <tr><td>(a)</td><td>Will the Trails box accept our own two instructions and give a price?</td><td>Lines 113 to 147 (the box), 131 (<code>onQuote</code>)</td><td>Pass</td></tr>
+      <tr><td>(b)</td><td>Did Trails keep our instructions byte for byte, with the domain going to the buyer?</td><td>Lines 179 to 195</td><td>Pass</td></tr>
+      <tr><td>(c)</td><td>Does the box sit nicely in our drawer, light and dark, phone and desktop?</td><td>Lines 260 to 262 (our <code>Modal</code>)</td><td>Dark desktop OK, rest pending</td></tr>
+      <tr><td>(d)</td><td>Can the browser ask Trails "how is this payment doing?" directly?</td><td>Lines 197 to 211</td><td>Pass</td></tr>
+    </tbody>
+  </table></div>
+  <p>The page uses an old order from Mohit's experiments ("probe order 99"). It's already sold, so it can never be bought again. That makes it safe for getting a price, but it also means you must never press the final Pay button: the buying step would fail on chain and Trails would refund you minus fees.</p>
+  <h3>The flow the page tests</h3>
+  <div class="flow" role="list">
+    <div class="step" role="listitem"><span class="where">Our page</span><strong>Build 2 calls</strong>approve USDT, then buy the order for the buyer</div>
+    <div class="step" role="listitem"><span class="where">Our page</span><strong>Hand to Trails</strong>as <code>actions</code> on the Pay box</div>
+    <div class="step" role="listitem"><span class="where">Trails</span><strong>Quote</strong>"pay 2.94 POL and we'll do this"</div>
+    <div class="step" role="listitem"><span class="where">Our page</span><strong>Compare</strong>are our exact bytes inside the quote?</div>
+    <div class="step" role="listitem"><span class="where">Our page</span><strong>Stop</strong>never press Pay</div>
+  </div>
+</section>
+
+<section id="basics">
+  <div><span class="num">Section 1</span><h2>Words you need first <span class="level l0">Basic</span></h2></div>
+  <p>If these are already familiar, skip ahead. Everything later builds on them.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Word</th><th>What it means here</th></tr></thead>
+    <tbody>
+      <tr><td>Page file</td><td>Any file in <code>pages/</code> becomes a URL in Next.js. <code>pages/trails-spike.tsx</code> becomes <code>localhost:3002/trails-spike</code>. That's the only reason the page exists at that address.</td></tr>
+      <tr><td>Component</td><td>A function that returns what to draw (JSX, the HTML looking code). <code>TrailsSpikePage</code> is the page's component.</td></tr>
+      <tr><td>Props</td><td>Inputs passed into a component, like arguments to a function. <code>&lt;Modal isOpen={open}&gt;</code> passes <code>isOpen</code>.</td></tr>
+      <tr><td>State</td><td>Memory a component keeps between redraws, made with <code>useState</code>. Changing it redraws the screen.</td></tr>
+      <tr><td>Hook</td><td>A function whose name starts with <code>use</code> that plugs a component into something React manages: state (<code>useState</code>), remembered results (<code>useMemo</code>), the wallet (<code>useAccount</code>), the theme (<code>useTheme</code>).</td></tr>
+      <tr><td>Wallet / address</td><td>The buyer's MetaMask account. An address looks like <code>0x8FD5…e4D0</code>: 20 bytes written as 40 hex characters.</td></tr>
+      <tr><td>Hex</td><td>Base 16 numbers (0 to 9 then a to f). Blockchain data is written in hex with a <code>0x</code> in front. Two hex characters = one byte.</td></tr>
+      <tr><td>Smart contract</td><td>A program living on the blockchain at an address. We talk to two: USDT (the token) and Seaport (the marketplace contract that runs sales).</td></tr>
+      <tr><td>Calldata</td><td>The bytes you send to a contract to say "run this function with these inputs". Building calldata is most of this file.</td></tr>
+      <tr><td>Trails</td><td>An outside payment service: the buyer pays with any token on any chain, Trails turns it into USDT on Polygon and runs our calls for them.</td></tr>
+      <tr><td>Quote</td><td>Trails' price offer: "pay this much of your token and we'll deliver 0.25 USDT and run your calls."</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="header">
+  <div><span class="num">Section 2</span><h2>Lines 1 to 7: the note at the top <span class="level l0">Basic</span></h2></div>
+<pre><code><span class="ln">1</span><span class="cm">// Trails phase 3 widget spike. LOCAL ONLY: listed in .git/info/exclude, never</span>
+<span class="ln">2</span><span class="cm">// commit, delete when the spike is recorded (trails plan §4 phase 3).</span>
+<span class="ln">3</span><span class="cm">//</span>
+<span class="ln">4</span><span class="cm">// Renders the Trails Pay widget inside our drawer Modal with the doc's</span>
+<span class="ln">5</span><span class="cm">// fixture calls (probe order 99, already sold) and records checks (a) to (d).</span>
+<span class="ln">6</span><span class="cm">// Never press the final Pay/confirm in the widget: the order can't be filled</span>
+<span class="ln">7</span><span class="cm">// again, so the destination call would revert and Trails would refund minus fees.</span></code></pre>
+  <div class="lines">
+    <div><span class="at">1 to 2</span><p>A warning to anyone who opens the file. <code>.git/info/exclude</code> is a private ignore list that lives only in your copy of the repo (unlike <code>.gitignore</code>, it is never committed). Because the file is listed there, <code>git status</code> doesn't see it and it can't be committed by accident. A test page once reached prod, which is why the doc insists on this.</p></div>
+    <div><span class="at">4 to 5</span><p>What the file does, in one sentence. "Fixture" means fixed test data with known right answers.</p></div>
+    <div><span class="at">6 to 7</span><p>The one rule. "Revert" means the blockchain refuses the transaction and undoes it. Trails would then send the money back, but the bridging and gas fees are already spent.</p></div>
+  </div>
+</section>
+
+<section id="imports">
+  <div><span class="num">Section 3</span><h2>Lines 8 to 19: imports <span class="level l0">Basic</span></h2></div>
+  <div class="oneline"><b>In one line</b>Pulling in tools from React, Next, the wallet library, the blockchain library and our own design system.</div>
+<pre><code><span class="ln">8</span>import { useCallback, useMemo, useState } from 'react'
+<span class="ln">9</span>import dynamic from 'next/dynamic'
+<span class="ln">10</span>import { useAccount } from 'wagmi'
+<span class="ln">11</span>import { decodeFunctionData, encodeFunctionData, erc20Abi, keccak256, parseAbi, size, zeroHash, type Hex } from 'viem'
+<span class="ln">12</span>import MainLayout from '@/design-system/layouts/main-layout'
+<span class="ln">13</span>import Modal from '@/design-system/primitives/modal'
+<span class="ln">14</span>import PrimaryButton from '@/design-system/primitives/buttons/primary-button'
+<span class="ln">15</span>import { useTheme } from '@/context/ThemeContext'
+<span class="ln">16</span>import { DEFAULTS } from '@/lib/marketplace-order-client'
+<span class="ln">17</span>import { toOrderParameters } from '@/lib/seaport-order-builder-v5'
+<span class="ln">18</span>import { TRAILS_CONFIG } from '@/constants/trails'
+<span class="ln">19</span>import styles from './trails-spike.module.scss'</code></pre>
+  <div class="tbl"><table>
+    <thead><tr><th>Line</th><th>What comes in</th><th>Used for</th></tr></thead>
+    <tbody>
+      <tr><td>8</td><td><code>useState</code>, <code>useMemo</code>, <code>useCallback</code> from React</td><td>Page memory, remembered results, a stable function. Explained at section 13 to 15.</td></tr>
+      <tr><td>9</td><td><code>dynamic</code> from Next</td><td>Loading the Trails box only in the browser, in its own file. Section 12.</td></tr>
+      <tr><td>10</td><td><code>useAccount</code> from wagmi</td><td>wagmi is our wallet library. <code>useAccount</code> tells us the connected wallet's address.</td></tr>
+      <tr><td>11</td><td>Tools from viem</td><td>viem is the library that turns function calls into blockchain bytes and back. Each tool is used once: <code>encodeFunctionData</code> (call to bytes), <code>decodeFunctionData</code> (bytes to call), <code>erc20Abi</code> (the standard token's function list, which includes <code>approve</code>), <code>parseAbi</code> (turns readable function signatures into an ABI), <code>keccak256</code> (the blockchain's fingerprint function), <code>size</code> (byte length), <code>zeroHash</code> (32 zero bytes), and <code>Hex</code>, a TypeScript type meaning "a string starting with 0x". The word <code>type</code> before it means it's only for TypeScript and disappears from the real JavaScript.</td></tr>
+      <tr><td>12</td><td><code>MainLayout</code></td><td>Our normal page frame: header, sidebar, footer. Using it means the spike sits in the real site, so check (c) is honest.</td></tr>
+      <tr><td>13</td><td><code>Modal</code></td><td>Our right side drawer, the same one <code>BuyFlowModal</code> uses. The Trails box goes inside it.</td></tr>
+      <tr><td>14</td><td><code>PrimaryButton</code></td><td>Our standard button.</td></tr>
+      <tr><td>15</td><td><code>useTheme</code></td><td>Tells us if the site is in light or dark mode, so the Trails box can match.</td></tr>
+      <tr><td>16</td><td><code>DEFAULTS</code></td><td>Our existing constants: Polygon chain id 137, the Seaport address, the USDT address. Reusing them means the spike uses exactly the addresses the real site uses.</td></tr>
+      <tr><td>17</td><td><code>toOrderParameters</code></td><td>An existing helper that turns a stored order into the shape Seaport wants when buying. Section 9.</td></tr>
+      <tr><td>18</td><td><code>TRAILS_CONFIG</code></td><td>From phase 1: the API key, the on switch and the pilot list, read from <code>.env</code>.</td></tr>
+      <tr><td>19</td><td><code>styles</code></td><td>The page's small SCSS module (spacing, the red warning, the log box). Also excluded from git.</td></tr>
+    </tbody>
+  </table></div>
+  <p>The <code>@/</code> at the start of a path is a shortcut for <code>src/</code>, set in <code>tsconfig.json</code>.</p>
+</section>
+
+<section id="fixture">
+  <div><span class="num">Section 4</span><h2>Lines 21 to 42: the test order <span class="level l1">Middle</span></h2></div>
+  <div class="oneline"><b>In one line</b>A real, already sold order copied word for word from page 7 of Mohit's PDF, so our code can be compared with known right answers.</div>
+<pre><code><span class="ln">22</span>const FIXTURE = {
+<span class="ln">23</span>  orderHash: '0x0795f427…32e0',
+<span class="ln">24</span>  recipient: '0x8a5DF0C5bbC5cD0C4EbfA0C6F3D57117177Ac70b',
+<span class="ln">25</span>  signature: '0x8f74f1ef…7c1c',
+<span class="ln">26</span>  rawOrder: {
+<span class="ln">27</span>    offerer: '0x797e0862…16f4',
+<span class="ln">28</span>    zone: '0x0000…0000',
+<span class="ln">29</span>    offer: [{ itemType: 2, token: '0xa395…663C', identifierOrCriteria: '99', startAmount: '1', endAmount: '1' }],
+<span class="ln">30</span>    consideration: [
+<span class="ln">31</span>      { itemType: 1, token: '0xc213…8e8F', …, startAmount: '243750', …, recipient: '0x797e…16f4' },
+<span class="ln">32</span>      { itemType: 1, token: '0xc213…8e8F', …, startAmount: '6250',   …, recipient: '0x4779…6586' },
+<span class="ln">33</span>    ],
+<span class="ln">34</span>    orderType: 0,
+<span class="ln">35</span>    startTime: '1793703349',
+<span class="ln">36</span>    endTime: '1794308149',
+<span class="ln">37</span>    zoneHash: '0x0000…0000',
+<span class="ln">38</span>    salt: '2347558213…20811',
+<span class="ln">39</span>    conduitKey: '0x0000…0000',
+<span class="ln">40</span>    counter: '0',
+<span class="ln">41</span>  },
+<span class="ln">42</span>} as const</code></pre>
+  <p>A Seaport order is the seller's signed promise: "I give this, I want that, between these times." Field by field:</p>
+  <div class="lines">
+    <div><span class="at">23</span><p><b>orderHash</b>: the order's unique fingerprint. Not used in this file, kept because it's part of the doc's fixture.</p></div>
+    <div><span class="at">24</span><p><b>recipient</b>: the buyer from Mohit's original test. Only used for the encoding check (section 14), because the doc's expected bytes were made with this buyer.</p></div>
+    <div><span class="at">25</span><p><b>signature</b>: the seller's wallet signature over the order. Proves the seller agreed. 65 bytes.</p></div>
+    <div><span class="at">27</span><p><b>offerer</b>: the seller.</p></div>
+    <div><span class="at">28</span><p><b>zone</b>: an optional referee contract that can approve or block sales. All zeros means "no referee".</p></div>
+    <div><span class="at">29</span><p><b>offer</b>: what the seller gives. <code>itemType: 2</code> means an NFT (ERC721). The token is Mohit's test NFT contract (not our domain contract), and <code>99</code> is the NFT's number. Amount 1.</p></div>
+    <div><span class="at">30 to 33</span><p><b>consideration</b>: what the seller wants back, as a list. <code>itemType: 1</code> means an ERC20 token; the token address is USDT on Polygon. 243,750 goes to the seller and 6,250 to our fee wallet. USDT has 6 decimals, so these are 0.24375 and 0.00625 USDT, together 250,000 = 0.25 USDT. 6,250 is 2.5% of 250,000: our fee.</p></div>
+    <div><span class="at">34</span><p><b>orderType: 0</b>: "full open": the whole order must be bought at once, by anyone.</p></div>
+    <div><span class="at">35 to 36</span><p><b>startTime, endTime</b>: Unix time (seconds since 1 Jan 1970). The order is valid between them, about 7 days.</p></div>
+    <div><span class="at">37, 39</span><p><b>zoneHash, conduitKey</b>: extra settings for the referee and for a "conduit" (a helper that moves tokens). All zeros: not used.</p></div>
+    <div><span class="at">38</span><p><b>salt</b>: a huge random number that makes every order unique, even two otherwise identical ones.</p></div>
+    <div><span class="at">40</span><p><b>counter</b>: the seller's "cancel everything" counter at signing time. It is part of what was signed but is not sent when buying (section 9).</p></div>
+    <div><span class="at">42</span><p><b><code>as const</code></b>: tells TypeScript "this object never changes, and remember each value exactly". It also lets line 61 read the exact shape of the order.</p></div>
+  </div>
+  <div class="callout warn"><b>Why numbers are strings here.</b> JavaScript's normal numbers can't hold exact values above about 9 quadrillion. The salt has 77 digits. So the API (and the PDF) write big numbers as text, and we turn them into <code>BigInt</code> later (section 8).</div>
+</section>
+
+<section id="expected">
+  <div><span class="num">Section 5</span><h2>Lines 44 to 49: the right answers <span class="level l1">Middle</span></h2></div>
+<pre><code><span class="ln">44</span>const EXPECTED = {
+<span class="ln">45</span>  selector: '0xe7acab24',
+<span class="ln">46</span>  bytes: 1444,
+<span class="ln">47</span>  keccak: '0x81f1e320…7bd99',
+<span class="ln">48</span>  approve: '0x095ea7b3…0003d090',
+<span class="ln">49</span>}</code></pre>
+  <div class="lines">
+    <div><span class="at">45</span><p><b>selector</b>: the first 4 bytes of any calldata name the function. <code>0xe7acab24</code> means <code>fulfillAdvancedOrder</code>. If ours started differently we'd be calling the wrong function.</p></div>
+    <div><span class="at">46</span><p><b>bytes</b>: the total length of the buy calldata. If the struct shape were wrong (a missing field, wrong order), the length would differ.</p></div>
+    <div><span class="at">47</span><p><b>keccak</b>: a fingerprint of all 1,444 bytes. Change any single byte and the fingerprint is completely different. Matching it means every byte is right.</p></div>
+    <div><span class="at">48</span><p><b>approve</b>: the complete approve calldata, short enough to compare directly. Section 18 takes it apart byte by byte.</p></div>
+  </div>
+  <p>These came from the real transaction that bought order 99 on Polygon mainnet. They're the answer key.</p>
+</section>
+
+<section id="abi">
+  <div><span class="num">Section 6</span><h2>Lines 51 to 59: the ABI <span class="level l2">Advanced</span></h2></div>
+  <div class="oneline"><b>In one line</b>A description of Seaport's buy function and the data shapes it takes, so viem knows how to turn our JavaScript object into bytes.</div>
+<pre><code><span class="ln">52</span>const seaportFulfillAbi = parseAbi([
+<span class="ln">53</span>  'struct OfferItem { uint8 itemType; address token; uint256 identifierOrCriteria; uint256 startAmount; uint256 endAmount; }',
+<span class="ln">54</span>  'struct ConsiderationItem { … same five … ; address recipient; }',
+<span class="ln">55</span>  'struct OrderParameters { address offerer; address zone; OfferItem[] offer; ConsiderationItem[] consideration; … ; uint256 totalOriginalConsiderationItems; }',
+<span class="ln">56</span>  'struct AdvancedOrder { OrderParameters parameters; uint120 numerator; uint120 denominator; bytes signature; bytes extraData; }',
+<span class="ln">57</span>  'struct CriteriaResolver { uint256 orderIndex; uint8 side; uint256 index; uint256 identifier; bytes32[] criteriaProof; }',
+<span class="ln">58</span>  'function fulfillAdvancedOrder(AdvancedOrder advancedOrder, CriteriaResolver[] criteriaResolvers, bytes32 fulfillerConduitKey, address recipient) payable returns (bool fulfilled)',
+<span class="ln">59</span>])</code></pre>
+  <p><b>ABI</b> stands for Application Binary Interface: the contract's "menu", listing each function and the exact type of each input. It's needed because the blockchain only sees bytes; the ABI is the agreement about which bytes mean what.</p>
+  <div class="lines">
+    <div><span class="at">52</span><p><code>parseAbi</code> reads these human readable lines (Solidity style) and builds the ABI object viem needs. Mohit's probe used exactly these lines on mainnet, so we copy them word for word.</p></div>
+    <div><span class="at">53 to 57</span><p>A <b>struct</b> is a named group of fields, like a TypeScript interface. Types: <code>uint8</code>, <code>uint120</code>, <code>uint256</code> are whole numbers of 8, 120, 256 bits; <code>address</code> is 20 bytes; <code>bytes32</code> is exactly 32 bytes; <code>bytes</code> is any length; <code>[]</code> means a list.</p></div>
+    <div><span class="at">56</span><p><b>AdvancedOrder</b> wraps the order with <code>numerator/denominator</code> (what fraction to buy, we always use 1/1 = all of it), the seller's <code>signature</code>, and <code>extraData</code> (unused, empty).</p></div>
+    <div><span class="at">57</span><p><b>CriteriaResolver</b>: for "buy any NFT from a collection" style orders. We don't use it, so we pass an empty list.</p></div>
+    <div><span class="at">58</span><p>The function itself. Its last input, <code>address recipient</code>, is the whole reason we use this function: it says who gets the NFT.</p></div>
+  </div>
+  <div class="callout warn"><b>The rule this protects.</b> With Trails, the one paying Seaport is a Trails wallet, not the buyer. Seaport's simpler functions (<code>fulfillOrder</code>, <code>fulfillBasicOrder</code>) always give the NFT to whoever paid, so the domain would get stuck in the Trails wallet. Only <code>fulfillAdvancedOrder</code> lets us name the buyer as the recipient.</div>
+</section>
+
+<section id="types">
+  <div><span class="num">Section 7</span><h2>Lines 61 to 62: two type shortcuts <span class="level l1">Middle</span></h2></div>
+<pre><code><span class="ln">61</span>type RawOrder = typeof FIXTURE.rawOrder
+<span class="ln">62</span>type WireParams = ReturnType&lt;typeof toOrderParameters&gt;</code></pre>
+  <div class="lines">
+    <div><span class="at">61</span><p><code>typeof</code> here (in a type position) means "the TypeScript type of this value". So <code>RawOrder</code> is exactly the shape of our test order, without writing it out again.</p></div>
+    <div><span class="at">62</span><p><code>ReturnType&lt;…&gt;</code> means "whatever this function returns". <code>WireParams</code> is the shape <code>toOrderParameters</code> gives back. Types only help the editor and <code>tsc</code>; they vanish when the code runs.</p></div>
+  </div>
+</section>
+
+<section id="toviem">
+  <div><span class="num">Section 8</span><h2>Lines 64 to 80: toViemParams <span class="level l2">Advanced</span></h2></div>
+  <div class="oneline"><b>In one line</b>Turns every number stored as text into a real <code>BigInt</code>, because viem insists on <code>BigInt</code> for blockchain numbers.</div>
+<pre><code><span class="ln">65</span>const toViemParams = (p: WireParams) =&gt; {
+<span class="ln">66</span>  const w = p as unknown as Omit&lt;RawOrder, 'counter'&gt; &amp; { totalOriginalConsiderationItems: number }
+<span class="ln">67</span>  return {
+<span class="ln">68</span>    offerer: w.offerer as Hex,
+<span class="ln">70</span>    offer: w.offer.map((i) =&gt; ({ itemType: i.itemType, token: i.token as Hex, identifierOrCriteria: BigInt(i.identifierOrCriteria), … })),
+<span class="ln">71</span>    consideration: w.consideration.map((i) =&gt; ({ …, recipient: i.recipient as Hex })),
+<span class="ln">73</span>    startTime: BigInt(w.startTime),
+<span class="ln">76</span>    salt: BigInt(w.salt),
+<span class="ln">78</span>    totalOriginalConsiderationItems: BigInt(w.totalOriginalConsiderationItems),
+<span class="ln">79</span>  }
+<span class="ln">80</span>}</code></pre>
+  <div class="lines">
+    <div><span class="at">65</span><p>An arrow function that takes the "wire" order (the shape from <code>toOrderParameters</code>).</p></div>
+    <div><span class="at">66</span><p>The trickiest TypeScript line in the file. <code>toOrderParameters</code> was written for ethers (our older blockchain library), so its types talk about ethers' <code>BigNumber</code>. Our data is plain strings. <code>as unknown as X</code> is a double cast: "trust me, treat this as X". <code>Omit&lt;RawOrder, 'counter'&gt;</code> means "the order shape minus counter", and <code>&amp; { … }</code> adds the new field. It changes nothing at runtime; it only tells TypeScript what's really there.</p></div>
+    <div><span class="at">68</span><p><code>as Hex</code>: tells TypeScript this string is a <code>0x…</code> value, which viem's types require for addresses.</p></div>
+    <div><span class="at">70 to 71</span><p><code>.map(…)</code> makes a new list by converting each item. Each item keeps its fields, with the number fields wrapped in <code>BigInt(…)</code>.</p></div>
+    <div><span class="at">73 to 78</span><p>The same <code>BigInt</code> treatment for times, salt and the item count. <code>itemType</code> and <code>orderType</code> stay normal numbers because viem accepts small numbers for <code>uint8</code>.</p></div>
+  </div>
+  <p>Phase 4 moves this function into <code>src/helpers/trails/buildDestinationCalls.ts</code>, with a proper test. The spike has its own copy so it doesn't depend on unfinished work.</p>
+</section>
+
+<section id="buildcalls">
+  <div><span class="num">Section 9</span><h2>Lines 82 to 97: buildCalls, the heart of the file <span class="level l2">Advanced</span></h2></div>
+  <div class="oneline"><b>In one line</b>Builds the two instructions Trails will run on Polygon: "let Seaport take 0.25 USDT" and "buy order 99 for this buyer".</div>
+<pre><code><span class="ln">82</span>const buildCalls = (buyer: Hex) =&gt; {
+<span class="ln">83</span>  const rawOrder = FIXTURE.rawOrder
+<span class="ln">84</span>  const price = rawOrder.consideration.reduce((s, c) =&gt; s + BigInt(c.startAmount), BigInt(0))
+<span class="ln">85</span>  const approveData = encodeFunctionData({ abi: erc20Abi, functionName: 'approve', args: [DEFAULTS.seaportAddress as Hex, price] })
+<span class="ln">86</span>  const fulfillData = encodeFunctionData({
+<span class="ln">87</span>    abi: seaportFulfillAbi,
+<span class="ln">88</span>    functionName: 'fulfillAdvancedOrder',
+<span class="ln">89</span>    args: [
+<span class="ln">90</span>      { parameters: toViemParams(toOrderParameters(rawOrder as never)), numerator: BigInt(1), denominator: BigInt(1), signature: FIXTURE.signature, extraData: '0x' },
+<span class="ln">91</span>      [],
+<span class="ln">92</span>      zeroHash,
+<span class="ln">93</span>      buyer,
+<span class="ln">94</span>    ],
+<span class="ln">95</span>  })
+<span class="ln">96</span>  return { price, approveData, fulfillData }
+<span class="ln">97</span>}</code></pre>
+  <div class="lines">
+    <div><span class="at">82</span><p>Takes one input, the buyer's address, because that's the only thing that changes between buyers.</p></div>
+    <div><span class="at">84</span><p><b>The price.</b> <code>reduce</code> walks the list and keeps a running total: start at <code>BigInt(0)</code>, add each item's amount. 243,750 + 6,250 = 250,000. We add up the consideration instead of trusting a separate "price" field, so the amount always matches what Seaport will actually charge. (<code>BigInt(0)</code> is written instead of <code>0n</code> because the project's TypeScript target is older.)</p></div>
+    <div><span class="at">85</span><p><b>Call 1, approve.</b> Tokens can't be taken from a wallet without permission. <code>approve(spender, amount)</code> on the USDT contract says "Seaport may take up to 250,000 from me". "Me" will be the Trails wallet when this runs. <code>encodeFunctionData</code> turns this into bytes.</p></div>
+    <div><span class="at">86 to 95</span><p><b>Call 2, buy.</b> The four inputs of <code>fulfillAdvancedOrder</code>, in order:</p>
+      <p>1 (line 90): the <code>AdvancedOrder</code>. <code>toOrderParameters</code> drops <code>counter</code> and adds <code>totalOriginalConsiderationItems</code> (here 2), which is what Seaport wants when buying. Then <code>toViemParams</code> converts the numbers. <code>rawOrder as never</code> is a cast to satisfy the ethers typed helper; <code>never</code> fits any type. Then 1/1 (buy all), the seller's signature, and empty <code>extraData</code>.</p>
+      <p>2 (line 91): <code>[]</code>, no criteria resolvers.</p>
+      <p>3 (line 92): <code>zeroHash</code>, no conduit for the buyer side, tokens move through Seaport directly.</p>
+      <p>4 (line 93): <b><code>buyer</code>, the recipient.</b> The domain goes here.</p></div>
+    <div><span class="at">96</span><p>Returns all three so the page can show the price and hand both calldatas to Trails.</p></div>
+  </div>
+  <div class="callout ok"><b>Proven correct.</b> With Mohit's buyer, this produces exactly the doc's selector, 1,444 bytes and keccak. It was checked in Node and again in your browser (all four lines true).</div>
+</section>
+
+<section id="stringify">
+  <div><span class="num">Section 10</span><h2>Line 99: a safe stringify <span class="level l1">Middle</span></h2></div>
+<pre><code><span class="ln">99</span>const stringify = (v: unknown) =&gt; JSON.stringify(v, (_k, x) =&gt; (typeof x === 'bigint' ? x.toString() : x), 2)</code></pre>
+  <p><code>JSON.stringify</code> turns an object into text, but it crashes on <code>BigInt</code> values ("Do not know how to serialize a BigInt"). The second argument is a "replacer" that runs on every value: if it's a <code>BigInt</code>, turn it into a string, otherwise leave it. The <code>2</code> indents the output by two spaces so it's readable. <code>_k</code> is the key, unused, and the underscore says so on purpose.</p>
+</section>
+
+<section id="proptypes">
+  <div><span class="num">Section 11</span><h2>Lines 101 to 109: two shapes <span class="level l1">Middle</span></h2></div>
+<pre><code><span class="ln">101</span>type LogEntry = { at: string; name: string; data: unknown }
+<span class="ln">102</span>type SpikeWidgetProps = {
+<span class="ln">103</span>  buyer: Hex
+<span class="ln">104</span>  approveData: Hex
+<span class="ln">105</span>  fulfillData: Hex
+<span class="ln">106</span>  theme: 'light' | 'dark'
+<span class="ln">107</span>  renderInline: boolean
+<span class="ln">108</span>  onEvent: (name: string, data: unknown) =&gt; void
+<span class="ln">109</span>}</code></pre>
+  <div class="lines">
+    <div><span class="at">101</span><p>One row in the callback log: the time, the event name, and whatever data came with it. <code>unknown</code> means "could be anything, check before using", the safer cousin of <code>any</code>.</p></div>
+    <div><span class="at">102 to 109</span><p>The props the Trails box wrapper takes. <code>'light' | 'dark'</code> means "exactly one of these two strings". <code>onEvent</code> is a function prop: the box calls it to tell the page something happened, and <code>void</code> means it returns nothing.</p></div>
+  </div>
+</section>
+
+<section id="widget">
+  <div><span class="num">Section 12</span><h2>Lines 111 to 147: loading and setting up the Trails box <span class="level l2">Advanced</span></h2></div>
+  <div class="oneline"><b>In one line</b>Load Trails only in the browser and only when the drawer opens, then configure its Pay box with our two calls and listen to everything it reports.</div>
+<pre><code><span class="ln">113</span>const SpikeWidget = dynamic(
+<span class="ln">114</span>  () =&gt;
+<span class="ln">115</span>    Promise.all([import('0xtrails/widget'), import('0xtrails'), import('@0xtrails/adapter-wagmi')]).then(([widget, sdk, adapter]) =&gt; {
+<span class="ln">116</span>      const adapters = [adapter.wagmiAdapter()]
+<span class="ln">117</span>      const SpikeWidgetInner = ({ buyer, approveData, fulfillData, theme, renderInline, onEvent }: SpikeWidgetProps) =&gt; (
+<span class="ln">118</span>        &lt;widget.Pay
+<span class="ln">119</span>          apiKey={TRAILS_CONFIG.apiKey}
+<span class="ln">120</span>          adapters={adapters}
+<span class="ln">121</span>          renderInline={renderInline}
+<span class="ln">122</span>          theme={theme}
+<span class="ln">123</span>          to={{ recipient: buyer, chain: DEFAULTS.chainId, token: DEFAULTS.usdtAddress, amount: '0.25' }}
+<span class="ln">124</span>          actions={[sdk.custom({ to: DEFAULTS.usdtAddress as Hex, data: approveData }), sdk.custom({ to: DEFAULTS.seaportAddress as Hex, data: fulfillData })]}
+<span class="ln">125</span>          bridgeProvider="RELAY"
+<span class="ln">126</span>          bridgeProviderFallback={false}
+<span class="ln">127</span>          payMessage="Trails spike: fixture order 99 (do not confirm)"
+<span class="ln">128</span>          onOpen={() =&gt; onEvent('onOpen', null)}
+<span class="ln">…</span>          …one line per callback…
+<span class="ln">141</span>          onPaymentError={(d) =&gt; onEvent('onPaymentError', d)}
+<span class="ln">142</span>        /&gt;
+<span class="ln">143</span>      )
+<span class="ln">144</span>      return SpikeWidgetInner
+<span class="ln">145</span>    }),
+<span class="ln">146</span>  { ssr: false, loading: () =&gt; &lt;p&gt;Loading the Trails widget…&lt;/p&gt; }
+<span class="ln">147</span>)</code></pre>
+  <h3>Why <code>dynamic</code> (lines 113, 146)</h3>
+  <div class="lines">
+    <div><span class="at">146 ssr</span><p>Next.js first draws every page on the server, where there's no browser and no wallet. Trails touches browser only things, so <code>ssr: false</code> means "skip this on the server, draw it only in the browser".</p></div>
+    <div><span class="at">113 chunk</span><p><code>import(…)</code> with brackets is a <b>dynamic import</b>: the code is downloaded only when needed, as a separate file ("chunk"). Trails is large; the doc's definition of done says no page may get heavier, so it must never load until someone opens the Trails option.</p></div>
+    <div><span class="at">146 loading</span><p>What shows while the chunk downloads.</p></div>
+  </div>
+  <h3>Lines 115 to 116: three packages at once</h3>
+  <div class="lines">
+    <div><span class="at">115</span><p><code>Promise.all([...])</code> starts all three downloads together and waits until all are done. <code>.then(([widget, sdk, adapter]) =&gt; …)</code> receives them in the same order: the Pay box (<code>0xtrails/widget</code>), the main SDK with helpers like <code>custom</code> (<code>0xtrails</code>), and the wagmi adapter.</p></div>
+    <div><span class="at">116</span><p><b>The adapter.</b> Our site already has a wallet connection (wagmi, set up in <code>_app.tsx</code>). <code>wagmiAdapter()</code> with no options tells Trails "use the wallet connection already around you" instead of making its own. That's why, after you picked MetaMask in its list, it reused your connected wallet without asking MetaMask again. It's created once here, outside the component, so it stays the same object on every redraw.</p></div>
+  </div>
+  <h3>Lines 117 to 127: the Pay box settings</h3>
+  <div class="lines">
+    <div><span class="at">117</span><p>A small component made inside <code>.then</code>, so it can use the freshly loaded packages. The <code>{ buyer, … }</code> part unpacks the props.</p></div>
+    <div><span class="at">119</span><p><b>apiKey</b>: identifies us to Trails. Without it, no price.</p></div>
+    <div><span class="at">121</span><p><b>renderInline</b>: <code>true</code> draws the box right where it is, inside our drawer. <code>false</code> shows a button that opens Trails' own popup. The checkbox on the page flips this, for check (c).</p></div>
+    <div><span class="at">122</span><p><b>theme</b>: our light or dark, so the box matches the site.</p></div>
+    <div><span class="at">123</span><p><b>to</b>: where the money must end up: chain 137 (Polygon), the USDT token, 0.25. <code>recipient</code> here is only what the box shows; with <code>actions</code>, the real receiver is whatever the calls say (our buyer inside call 2).</p></div>
+    <div><span class="at">124</span><p><b>actions</b>: the two instructions Trails runs after the USDT arrives. <code>custom({ to, data })</code> wraps a raw call: <code>to</code> is the contract, <code>data</code> the bytes from <code>buildCalls</code>. Order matters: approve first, then buy. <b>This prop is check (a).</b></p></div>
+    <div><span class="at">125 to 126</span><p><b>bridgeProvider="RELAY"</b>, no fallback: use the bridge Mohit's probes used, and never silently switch to another one.</p></div>
+    <div><span class="at">127</span><p><b>payMessage</b>: the text shown at the top of the box. A reminder not to confirm.</p></div>
+  </div>
+  <h3>Lines 128 to 141: listening to every event</h3>
+  <p>Each <code>onSomething</code> is a callback: Trails calls it when that moment happens. Every one just forwards to <code>onEvent</code> with its name, so the page can log it. The useful ones for the real build:</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Callback</th><th>When it fires</th><th>Why we care later</th></tr></thead>
+    <tbody>
+      <tr><td><code>onQuote</code></td><td>A price arrives. Carries <code>intentId</code> and the full quote.</td><td>Save the <code>intentId</code> so we can track the payment after a reload (phase 9).</td></tr>
+      <tr><td><code>onSignRequest</code> / <code>onSign</code> / <code>onSignReject</code></td><td>The wallet is asked to sign / signs / the user cancels.</td><td><code>onSignReject</code> drives the "cancelled signature" screen.</td></tr>
+      <tr><td><code>onOriginConfirmation</code></td><td>The buyer's payment is confirmed on their chain.</td><td>Progress screen step 1.</td></tr>
+      <tr><td><code>onDestinationConfirmation</code></td><td>Our two calls ran on Polygon.</td><td>Progress screen step 2.</td></tr>
+      <tr><td><code>onPaymentSuccess</code> / <code>onPaymentError</code></td><td>The whole thing finished or failed.</td><td>Done or failure screens. Done still waits for our own sale receipt.</td></tr>
+      <tr><td><code>onOpen</code> / <code>onClose</code></td><td>Its own popup opens or closes.</td><td>That's the <code>onClose</code> in your first log.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="state">
+  <div><span class="num">Section 13</span><h2>Lines 149 to 160: the page and its memory <span class="level l1">Middle</span></h2></div>
+<pre><code><span class="ln">149</span>const TrailsSpikePage = () =&gt; {
+<span class="ln">150</span>  const { address } = useAccount()
+<span class="ln">151</span>  const { theme } = useTheme()
+<span class="ln">152</span>  const [open, setOpen] = useState(false)
+<span class="ln">153</span>  const [renderInline, setRenderInline] = useState(true)
+<span class="ln">154</span>  const [log, setLog] = useState&lt;LogEntry[]&gt;([])
+<span class="ln">155</span>  const [quoteCheck, setQuoteCheck] = useState&lt;string&gt;('No quote yet')
+<span class="ln">156</span>  const [intentId, setIntentId] = useState&lt;string | null&gt;(null)
+<span class="ln">157</span>  const [corsResult, setCorsResult] = useState&lt;string&gt;('Not run')
+<span class="ln">158</span>
+<span class="ln">159</span>  const buyer = (address ?? FIXTURE.recipient) as Hex
+<span class="ln">160</span>  const calls = useMemo(() =&gt; buildCalls(buyer), [buyer])</code></pre>
+  <div class="lines">
+    <div><span class="at">150</span><p>The connected wallet's address, or <code>undefined</code> if none. The <code>{ address }</code> picks one field out of what the hook returns.</p></div>
+    <div><span class="at">151</span><p>The current site theme.</p></div>
+    <div><span class="at">152 to 157</span><p>Six pieces of memory. <code>useState(start)</code> returns a pair: the current value and a function to change it. Calling the setter redraws the page. In order: is the drawer open, inline or popup mode, the event log list, the (b) result text, the last <code>intentId</code> seen, and the (d) result text. The <code>&lt;…&gt;</code> after <code>useState</code> tells TypeScript what kind of value it holds.</p></div>
+    <div><span class="at">159</span><p><code>??</code> means "use the left side, unless it's empty, then use the right". So the buyer is your wallet, or Mohit's buyer if no wallet is connected. That's why the page said "(connected wallet)".</p></div>
+    <div><span class="at">160</span><p><code>useMemo</code> remembers a result and only redoes the work when something in the list <code>[buyer]</code> changes. Encoding 1,444 bytes on every redraw would be wasteful, and keeping the same result also keeps the Trails box from thinking its inputs changed.</p></div>
+  </div>
+</section>
+
+<section id="selfcheck">
+  <div><span class="num">Section 14</span><h2>Lines 162 to 177: checking our own bytes <span class="level l2">Advanced</span></h2></div>
+<pre><code><span class="ln">163</span>const fixtureCheck = useMemo(() =&gt; {
+<span class="ln">164</span>  const f = buildCalls(FIXTURE.recipient as Hex)
+<span class="ln">165</span>  return {
+<span class="ln">166</span>    selector: f.fulfillData.slice(0, 10) === EXPECTED.selector,
+<span class="ln">167</span>    bytes: size(f.fulfillData) === EXPECTED.bytes,
+<span class="ln">168</span>    keccak: keccak256(f.fulfillData) === EXPECTED.keccak,
+<span class="ln">169</span>    approve: f.approveData.toLowerCase() === EXPECTED.approve.toLowerCase(),
+<span class="ln">170</span>    approveActual: f.approveData,
+<span class="ln">171</span>  }
+<span class="ln">172</span>}, [])
+<span class="ln">174</span>const decodedRecipient = useMemo(() =&gt; {
+<span class="ln">175</span>  const d = decodeFunctionData({ abi: seaportFulfillAbi, data: calls.fulfillData })
+<span class="ln">176</span>  return d.args[3]
+<span class="ln">177</span>}, [calls.fulfillData])</code></pre>
+  <div class="lines">
+    <div><span class="at">164</span><p>Builds the calls with <b>Mohit's</b> buyer, not yours, because the answer key was made with his. Same code, different buyer: if this matches, the code is right for any buyer.</p></div>
+    <div><span class="at">166</span><p><code>.slice(0, 10)</code> takes the first 10 characters: <code>0x</code> plus 8 hex characters = 4 bytes = the function selector.</p></div>
+    <div><span class="at">167</span><p><code>size</code> counts bytes (hex characters without <code>0x</code>, divided by 2).</p></div>
+    <div><span class="at">168</span><p>Compares fingerprints. The strongest of the four checks.</p></div>
+    <div><span class="at">169</span><p>Lowercases both sides first, because hex letters can be written as <code>A</code> or <code>a</code> and mean the same.</p></div>
+    <div><span class="at">172</span><p>The empty list <code>[]</code> means "work this out once and never again": the fixture never changes.</p></div>
+    <div><span class="at">174 to 177</span><p>The reverse direction: take <b>your</b> buy bytes, decode them back into inputs with the same ABI, and read input number 4 (<code>args[3]</code>, counting from 0), the recipient. This proves from the bytes themselves, not from our variables, that the domain goes to your wallet. That's the "Decoded fulfill recipient" line on the page.</p></div>
+  </div>
+</section>
+
+<section id="onevent">
+  <div><span class="num">Section 15</span><h2>Lines 179 to 195: onEvent and check (b) <span class="level l2">Advanced</span></h2></div>
+<pre><code><span class="ln">179</span>const onEvent = useCallback(
+<span class="ln">180</span>  (name: string, data: unknown) =&gt; {
+<span class="ln">181</span>    console.log('[trails-spike]', name, data)
+<span class="ln">182</span>    setLog((prev) =&gt; [...prev, { at: new Date().toLocaleTimeString(), name, data }])
+<span class="ln">183</span>    if (name !== 'onQuote' || !data || typeof data !== 'object') return
+<span class="ln">184</span>    const { intentId: id, quote } = data as { intentId: string | null; quote?: { destinationCalldata?: string; destinationAddress?: string } }
+<span class="ln">185</span>    if (id) setIntentId(id)
+<span class="ln">186</span>    const dest = (quote?.destinationCalldata ?? '').toLowerCase()
+<span class="ln">187</span>    const hasApprove = dest.includes(calls.approveData.slice(2).toLowerCase())
+<span class="ln">188</span>    const hasFulfill = dest.includes(calls.fulfillData.slice(2).toLowerCase())
+<span class="ln">189</span>    setQuoteCheck(`destinationAddress … ; contains our approve bytes: ${hasApprove}; … : ${hasFulfill}`)
+<span class="ln">193</span>  },
+<span class="ln">194</span>  [calls.approveData, calls.fulfillData, decodedRecipient]
+<span class="ln">195</span>)</code></pre>
+  <div class="lines">
+    <div><span class="at">179, 194</span><p><code>useCallback</code> is <code>useMemo</code> for functions: keep the same function object until something in the list changes. The Trails box receives this function; giving it a new one on every redraw could make it reset.</p></div>
+    <div><span class="at">181</span><p>Also prints to the browser console, with a tag you can filter on.</p></div>
+    <div><span class="at">182</span><p>Adds a row to the log. <code>prev =&gt; [...prev, row]</code> is the safe way to update a list: copy the old list (<code>...prev</code> spreads it out) and add one at the end. Never change the old list in place, or React may not notice.</p></div>
+    <div><span class="at">183</span><p>A guard: everything below only matters for <code>onQuote</code>. <code>||</code> means "or": stop if it's not a quote, or there's no data, or the data isn't an object.</p></div>
+    <div><span class="at">184</span><p>Pulls two fields out of the event. <code>intentId: id</code> renames it to <code>id</code> while unpacking. The cast describes only the fields we read.</p></div>
+    <div><span class="at">185</span><p>Saves the intent id so check (d) can ask about a real payment. (Your run had none, because no payment was signed.)</p></div>
+    <div><span class="at">186</span><p><code>?.</code> means "if <code>quote</code> is missing, don't crash, just give undefined". <code>destinationCalldata</code> is what Trails will actually run on Polygon.</p></div>
+    <div><span class="at">187 to 188</span><p><b>Check (b) itself.</b> Trails wraps our calls into one bigger bundle (1,860 bytes, sent to its helper contract <code>0x0000…cD74b</code>). If our exact bytes appear inside that bundle, unchanged, then Trails will run exactly what we built, including the recipient. <code>.slice(2)</code> drops the <code>0x</code> so we search for the bytes alone. Both were <b>true</b> in your run.</p></div>
+  </div>
+</section>
+
+<section id="cors">
+  <div><span class="num">Section 16</span><h2>Lines 197 to 211: check (d), can the browser ask Trails? <span class="level l2">Advanced</span></h2></div>
+<pre><code><span class="ln">199</span>const runCorsCheck = async () =&gt; {
+<span class="ln">200</span>  setCorsResult('Running…')
+<span class="ln">201</span>  try {
+<span class="ln">202</span>    const { TrailsApi } = await import('@0xtrails/api')
+<span class="ln">203</span>    const api = new TrailsApi(TRAILS_CONFIG.apiKey)
+<span class="ln">204</span>    const res = await api.getIntentReceipt({ intentId: intentId ?? '0x00…01' })
+<span class="ln">205</span>    setCorsResult(`OK, API answered: …`)
+<span class="ln">206</span>  } catch (err) {
+<span class="ln">207</span>    const e = err as { name?: string; message?: string; status?: number; code?: number }
+<span class="ln">208</span>    const blocked = err instanceof TypeError
+<span class="ln">209</span>    setCorsResult(`${blocked ? 'BLOCKED (likely CORS or network)' : 'Reached the API (CORS fine), it returned an error'}: …`)
+<span class="ln">210</span>  }
+<span class="ln">211</span>}</code></pre>
+  <p><b>CORS</b> (Cross Origin Resource Sharing) is a browser safety rule: a page on <code>localhost:3002</code> may only read answers from another website if that website says it allows it. If Trails didn't allow browsers, we'd need our backend to ask on our behalf.</p>
+  <div class="lines">
+    <div><span class="at">199</span><p><code>async</code> lets the function use <code>await</code>, which pauses until a slow thing (a download, a network call) finishes.</p></div>
+    <div><span class="at">202</span><p>Loads the Trails API client only when the button is pressed. It came installed with <code>0xtrails</code>.</p></div>
+    <div><span class="at">204</span><p>Asks for the receipt of a payment. With no real intent, it asks about a made up id ending in 1.</p></div>
+    <div><span class="at">201, 206</span><p><code>try { … } catch (err) { … }</code>: if anything in <code>try</code> fails, jump to <code>catch</code> instead of crashing.</p></div>
+    <div><span class="at">208</span><p><b>The clever part.</b> When the browser blocks a request for CORS, <code>fetch</code> throws a <code>TypeError</code> ("Failed to fetch"), and the page never sees any answer. Any other error means a reply did arrive. Your result, <code>NotFound 8000 400 Resource not found</code>, is Trails replying "no such payment", which is the correct answer for a made up id. So CORS is fine: <b>pass</b>.</p></div>
+  </div>
+</section>
+
+<section id="jsx">
+  <div><span class="num">Section 17</span><h2>Lines 213 to 267: what you see on screen <span class="level l0">Basic</span></h2></div>
+  <div class="lines">
+    <div><span class="at">214</span><p><code>MainLayout</code> wraps everything in the normal site frame. <code>metaInfo</code> gives the browser tab its title.</p></div>
+    <div><span class="at">217</span><p>The red warning line.</p></div>
+    <div><span class="at">219 to 225</span><p>A definition list (<code>dl</code>, <code>dt</code> = label, <code>dd</code> = value): key set and its length (never the key itself), the switch, the buyer, the price, and the decoded recipient. <code>{ … }</code> inside JSX runs JavaScript; <code>a ? b : c</code> means "if a then b else c".</p></div>
+    <div><span class="at">227 to 233</span><p>The four encoding results. <code>String(true)</code> prints the word "true".</p></div>
+    <div><span class="at">236 to 238</span><p>The renderInline checkbox. <code>checked</code> shows the current value; <code>onChange</code> stores the new one.</p></div>
+    <div><span class="at">239 to 240</span><p>The two buttons: open the drawer (sets <code>open</code> to true) and run check (d).</p></div>
+    <div><span class="at">243 to 246</span><p>Where the (b) and (d) results appear.</p></div>
+    <div><span class="at">248 to 257</span><p>The callback log. <code>log.map(…)</code> draws one row per event. <code>key</code> is React's way to tell rows apart. <code>&lt;details&gt;</code>/<code>&lt;summary&gt;</code> is a built in fold out: click the summary to see the data.</p></div>
+    <div><span class="at">260 to 262</span><p><b>Our drawer with the Trails box inside.</b> <code>isOpen</code> and <code>onClose</code> connect it to the <code>open</code> memory. This is what check (c) looks at.</p></div>
+    <div><span class="at">267</span><p><code>export default</code>: tells Next "this is the page for this file".</p></div>
+  </div>
+</section>
+
+<section id="bytesdeep">
+  <div><span class="num">Section 18</span><h2>What calldata really looks like <span class="level l2">Advanced</span></h2></div>
+  <div class="oneline"><b>In one line</b>A selector, then each input padded to 32 bytes, in order.</div>
+  <p>The approve calldata is short enough to read by hand. It's 68 bytes:</p>
+  <div class="bytes" aria-label="approve calldata split into parts">
+    <span class="sel">095ea7b3</span>
+    <span class="a1">0000000000000000000000000000000000000068f116a894984e2db1123eb395</span>
+    <span class="a2">000000000000000000000000000000000000000000000000000000000003d090</span>
+  </div>
+  <div class="lines">
+    <div><span class="at">4 bytes</span><p><b>Selector</b> <code>095ea7b3</code>: the first 4 bytes of the keccak fingerprint of the text <code>approve(address,uint256)</code>. Every contract that has an <code>approve</code> function with these inputs uses the same selector.</p></div>
+    <div><span class="at">32 bytes</span><p><b>Input 1, spender</b>: the Seaport address <code>0x0000000000000068F116…B395</code>, padded on the left with zeros to fill 32 bytes.</p></div>
+    <div><span class="at">32 bytes</span><p><b>Input 2, amount</b>: <code>3d090</code> in hex = 250,000 in decimal = 0.25 USDT. Also padded to 32 bytes.</p></div>
+  </div>
+  <p>The buy calldata follows the same rules, but its inputs contain lists and variable length bytes (the signature), so it's longer. Those parts are stored after the fixed part, with "offsets" saying where each one starts. That's how it reaches 1,444 bytes. You never write this by hand; that's viem's job. The fingerprint check is how we know viem and the ABI produced it right.</p>
+  <p>Trails' bundle (1,860 bytes) is another call to its own helper contract, with our two calls placed inside it as inputs. That's why a plain "contains" search could find our bytes inside it in check (b).</p>
+</section>
+
+<section id="order">
+  <div><span class="num">Section 19</span><h2>What happens when, in order <span class="level l1">Middle</span></h2></div>
+  <ol>
+    <li><b>Server:</b> Next draws the page frame. The Trails box is skipped (<code>ssr: false</code>).</li>
+    <li><b>Browser, first draw:</b> wallet and theme are read, <code>buildCalls</code> runs for your wallet, the fixture check and decode run once. The four "true" lines appear.</li>
+    <li><b>You click "Open drawer":</b> <code>open</code> becomes true, our <code>Modal</code> slides in. Inside, <code>SpikeWidget</code> starts downloading the three Trails packages, showing "Loading the Trails widget…".</li>
+    <li><b>Packages arrive:</b> the adapter links to our wallet connection, the Pay box draws with our settings.</li>
+    <li><b>You pick MetaMask and a token:</b> the box asks Trails for a price. Trails replies; the box calls <code>onQuote</code>.</li>
+    <li><b><code>onEvent</code> runs:</b> logs the event, saves the intent id, searches the quote for our bytes, writes the (b) line.</li>
+    <li><b>You stop</b> and close the drawer. Nothing was paid.</li>
+    <li><b>Check (d) button:</b> separate from all of the above; asks Trails' API directly.</li>
+  </ol>
+</section>
+
+<section id="real">
+  <div><span class="num">Section 20</span><h2>Spike vs the real build <span class="level l1">Middle</span></h2></div>
+  <p>The spike puts everything in one file to answer questions fast. The real feature splits it up by the layering rules (CLAUDE.md §8):</p>
+  <div class="tbl"><table>
+    <thead><tr><th>In the spike</th><th>In the real build</th><th>Phase</th></tr></thead>
+    <tbody>
+      <tr><td><code>FIXTURE</code>, <code>EXPECTED</code></td><td>Inside <code>buildDestinationCalls.test.ts</code> (Vitest) only</td><td>4</td></tr>
+      <tr><td>The ABI, <code>toViemParams</code>, <code>buildCalls</code></td><td><code>src/helpers/trails/buildDestinationCalls.ts</code>, pure, taking any real order</td><td>4</td></tr>
+      <tr><td>Nothing (spike uses a sold order)</td><td>Live checks before paying: still listed, seller still owns it, not expiring, not your own</td><td>5</td></tr>
+      <tr><td><code>SpikeWidget</code> with <code>dynamic</code></td><td><code>TrailsWidgetLoader</code> and <code>TrailsPayStep</code> under <code>buying-flow/trails/</code></td><td>7</td></tr>
+      <tr><td><code>onEvent</code> and the log</td><td><code>useTrailsCheckout</code> hook: progress, Done, refunds</td><td>8</td></tr>
+      <tr><td><code>runCorsCheck</code></td><td>Status polling with <code>getIntentReceipt</code>, plus resume after reload</td><td>8, 9</td></tr>
+      <tr><td>This page and its SCSS</td><td>Deleted when phase 3 is recorded</td><td>3</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="quiz">
+  <div><span class="num">Section 21</span><h2>Test yourself</h2></div>
+  <details class="quiz"><summary>Why can't we use Seaport's simpler fulfillOrder?</summary><p>It sends the domain to whoever pays Seaport, which with Trails is the Trails wallet. Only <code>fulfillAdvancedOrder</code> has a recipient input.</p></details>
+  <details class="quiz"><summary>Why is the encoding check built with Mohit's buyer instead of yours?</summary><p>The expected fingerprint was made with his buyer. Any other address changes the bytes, so only his can be compared with the answer key.</p></details>
+  <details class="quiz"><summary>What would "BLOCKED" in check (d) have meant?</summary><p>The browser threw a <code>TypeError</code>, so Trails' API doesn't allow requests from our site. We'd need the backend to ask Trails for status instead.</p></details>
+  <details class="quiz"><summary>Why does approve come before the buy call?</summary><p>Seaport pulls the USDT from the Trails wallet during the buy. Without the approval first, that pull is refused and the buy reverts.</p></details>
+  <details class="quiz"><summary>What does 3d090 mean?</summary><p>250,000 in hex, which is 0.25 USDT because USDT has 6 decimals.</p></details>
+  <details class="quiz"><summary>Why is the Trails box loaded with dynamic and ssr: false?</summary><p>It needs the browser (no server rendering), and it's big, so it goes in its own chunk that only downloads when the drawer opens. No other page gets heavier.</p></details>
+</section>
+
+</main>
+</div>
+</body>
+</html>
