@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Editing reels with Claude · a 4 week plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F2F3F7;--panel:#FFFFFF;--ink:#14151A;--muted:#5B5E6B;--line:#DCDEE6;
+  --violet:#6B3BFF;--violet-soft:rgba(107,59,255,.10);--amber:#FFB547;--amber-ink:#8A5300;--green:#1E9E5A;
+  --code:#16171D;--code-ink:#E9E8F2;--code-dim:#8C8BA0;
+  --display:'Bricolage Grotesque',ui-sans-serif,system-ui,sans-serif;
+  --sans:'Instrument Sans',ui-sans-serif,system-ui,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0F1015;--panel:#181A21;--ink:#ECECF3;--muted:#A3A5B3;--line:#2A2D38;
+  --violet:#9B7BFF;--violet-soft:rgba(155,123,255,.14);--amber:#FFC46B;--amber-ink:#FFC46B;--green:#4FD38A;
+  --code:#0A0B0F;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0F1015;--panel:#181A21;--ink:#ECECF3;--muted:#A3A5B3;--line:#2A2D38;--violet:#9B7BFF;--violet-soft:rgba(155,123,255,.14);--amber:#FFC46B;--amber-ink:#FFC46B;--green:#4FD38A;--code:#0A0B0F;color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16.5px/1.6 var(--sans);-webkit-font-smoothing:antialiased}
+a{color:var(--violet)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+code{font:400 .88em var(--mono);background:var(--violet-soft);padding:1px 6px;border-radius:4px}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--violet);outline-offset:2px}
+
+/* top bar: a playhead that tracks your progress */
+.bar{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.bar-in{display:flex;align-items:center;gap:18px;height:56px}
+.tc{font:600 14px var(--mono);letter-spacing:.5px;min-width:96px}
+.track{flex:1;height:10px;border-radius:5px;background:var(--line);position:relative;overflow:hidden}
+.track i{position:absolute;inset:0 auto 0 0;width:0;background:linear-gradient(90deg,var(--violet),#B392FF);border-radius:5px;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.track b{position:absolute;top:0;bottom:0;width:1px;background:color-mix(in srgb,var(--ink) 25%,transparent)}
+.bar nav{display:flex;gap:4px}
+.bar nav a{font:500 13px var(--sans);color:var(--muted);text-decoration:none;padding:6px 10px;border-radius:6px}
+.bar nav a:hover{background:var(--violet-soft);color:var(--violet)}
+
+/* hero */
+header.hero{padding:72px 0 40px}
+.hero h1{font:800 clamp(44px,7vw,84px)/.98 var(--display);letter-spacing:-.025em;margin:0;max-width:880px}
+.hero p.lede{font-size:19px;color:var(--muted);max-width:640px;margin:22px 0 0}
+.meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
+.meta span{font:500 13px var(--mono);border:1px solid var(--line);background:var(--panel);padding:6px 11px;border-radius:999px}
+
+section{padding:56px 0;border-top:1px solid var(--line)}
+h2{font:700 clamp(30px,4vw,44px)/1.05 var(--display);letter-spacing:-.02em;margin:0 0 10px}
+h3{font:700 21px/1.2 var(--display);margin:0 0 6px}
+.sub{color:var(--muted);max-width:680px;margin:0 0 30px}
+
+/* pipeline strip */
+.pipe{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px;margin-top:8px}
+.clip{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px 12px 14px;position:relative}
+.clip::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:8px 0 0 8px;background:var(--c,var(--violet))}
+.clip small{display:block;font:600 11px var(--mono);color:var(--muted)}
+.clip b{display:block;font:700 15px/1.25 var(--display);margin:4px 0}
+.clip span{display:block;font-size:13px;color:var(--muted);line-height:1.4}
+
+/* stack table */
+.tbl{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.tblwrap{overflow-x:auto}
+.tbl th,.tbl td{text-align:left;padding:13px 16px;border-bottom:1px solid var(--line);vertical-align:top;font-size:15px}
+.tbl th{font:600 12px var(--mono);color:var(--muted);background:color-mix(in srgb,var(--panel) 92%,var(--ink))}
+.tbl tr:last-child td{border-bottom:0}
+.tbl td:first-child{font-weight:600;white-space:nowrap}
+.free{color:var(--green);font-weight:600}
+
+/* spec + safe zones */
+.spec{display:grid;grid-template-columns:260px 1fr;gap:36px;align-items:start}
+.phone{width:100%;max-width:260px}
+.specs dl{display:grid;grid-template-columns:max-content 1fr;gap:10px 22px;margin:0}
+.specs dt{font:600 13px var(--mono);color:var(--muted);padding-top:2px}
+.specs dd{margin:0}
+
+/* weeks */
+.week{display:grid;grid-template-columns:200px 1fr;gap:32px;padding:44px 0;border-top:1px dashed var(--line)}
+.week:first-of-type{border-top:0;padding-top:8px}
+.wk-side{position:sticky;top:80px;align-self:start}
+.wk-num{font:800 72px/.9 var(--display);color:var(--violet);letter-spacing:-.04em}
+.wk-tc{font:600 13px var(--mono);color:var(--muted);margin-top:8px}
+.wk-goal{font-size:15px;color:var(--muted);margin-top:12px}
+.day{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px 22px;margin-bottom:14px}
+.day-h{display:flex;align-items:baseline;gap:12px;margin-bottom:10px}
+.day-h small{font:600 12px var(--mono);color:var(--violet);white-space:nowrap}
+.tasks{list-style:none;margin:0;padding:0}
+.tasks li{display:flex;gap:12px;align-items:flex-start;padding:7px 0}
+.tasks input{appearance:none;flex:none;width:20px;height:20px;margin-top:3px;border:1.5px solid color-mix(in srgb,var(--ink) 35%,transparent);border-radius:5px;display:grid;place-content:center;cursor:pointer;background:var(--panel)}
+.tasks input::after{content:"";width:10px;height:6px;border:2.5px solid #fff;border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px);opacity:0}
+.tasks input:checked{background:var(--violet);border-color:var(--violet)}
+.tasks input:checked::after{opacity:1}
+.tasks label{cursor:pointer}
+.tasks input:checked + label{color:var(--muted);text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--muted) 60%,transparent)}
+.done{margin-top:12px;padding:10px 14px;border-radius:8px;background:color-mix(in srgb,var(--green) 10%,transparent);font-size:14.5px}
+.done b{color:var(--green)}
+
+/* code + prompts */
+.code{position:relative;margin:12px 0;background:var(--code);color:var(--code-ink);border-radius:10px;overflow:hidden}
+.code header{display:flex;justify-content:space-between;align-items:center;padding:8px 12px 8px 16px;font:600 11.5px var(--mono);color:var(--code-dim);border-bottom:1px solid rgba(255,255,255,.07)}
+.code pre{margin:0;padding:14px 16px;overflow-x:auto;font:400 13.5px/1.6 var(--mono);white-space:pre}
+.code.prompt pre{white-space:pre-wrap}
+.code .cp{border:1px solid rgba(255,255,255,.18);background:transparent;color:var(--code-ink);font:600 11.5px var(--mono);padding:4px 10px;border-radius:6px}
+.code .cp:hover{background:rgba(255,255,255,.08)}
+.code.prompt header{color:#C9B6FF}
+
+.note{border-left:3px solid var(--amber);background:color-mix(in srgb,var(--amber) 12%,transparent);padding:12px 16px;border-radius:0 8px 8px 0;font-size:15px;margin:12px 0}
+.note b{color:var(--amber-ink)}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px 22px}
+.card p{margin:6px 0 0;color:var(--muted);font-size:15px}
+
+.cost{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.cost .card big{display:block;font:800 40px/1 var(--display);letter-spacing:-.02em;margin:6px 0 4px}
+
+footer{padding:48px 0 calc(64px + env(safe-area-inset-bottom,0px));color:var(--muted);font-size:14px;border-top:1px solid var(--line)}
+.reset{border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:8px 14px;border-radius:8px;font-size:14px}
+
+@media (max-width:860px){
+  .pipe{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .week{grid-template-columns:1fr;gap:16px}
+  .wk-side{position:static;display:flex;align-items:baseline;gap:16px;flex-wrap:wrap}
+  .wk-num{font-size:52px}
+  .spec{grid-template-columns:1fr}
+  .grid2,.cost{grid-template-columns:1fr}
+  .bar nav{display:none}
+}
+@media (max-width:520px){.pipe{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <div class="wrap bar-in">
+    <span class="tc" id="tc">00:00 / 30</span>
+    <div class="track" aria-label="Plan progress"><i id="fill"></i><b style="left:25%"></b><b style="left:50%"></b><b style="left:75%"></b></div>
+    <nav aria-label="Sections"><a href="#stack">Stack</a><a href="#w1">Week 1</a><a href="#w2">Week 2</a><a href="#w3">Week 3</a><a href="#w4">Week 4</a><a href="#daily">Daily loop</a></nav>
+  </div>
+</div>
+
+<header class="hero wrap">
+  <h1>Edit a reel a day with Claude, starting from zero</h1>
+  <p class="lede">A four week plan for a frontend developer who already speaks HTML, CSS and GSAP. By the end you'll have a reusable reel template and a pipeline that turns a raw talking head clip into a captioned, scored, ready to post Instagram reel in about 30 minutes.</p>
+  <div class="meta"><span>4 weeks</span><span>~1 hour a day</span><span>30 reels a month target</span><span>₹2,000/mo total</span></div>
+</header>
+
+<main>
+<section class="wrap" id="pipeline">
+  <h2>The pipeline you're building</h2>
+  <p class="sub">Every reel moves through the same eight clips. Weeks 1 to 3 teach each clip; week 4 makes it routine. Tick tasks as you go and the timeline at the top fills up (progress is saved in this browser).</p>
+  <div class="pipe">
+    <div class="clip" style="--c:#FFB547"><small>01</small><b>Film</b><span>Vertical, phone, good light</span></div>
+    <div class="clip" style="--c:#FFB547"><small>02</small><b>Trim</b><span>FFmpeg cuts dead air</span></div>
+    <div class="clip"><small>03</small><b>Transcribe</b><span>Whisper, word timings</span></div>
+    <div class="clip"><small>04</small><b>Plan</b><span>Claude picks hook, emphasis, B roll</span></div>
+    <div class="clip"><small>05</small><b>Compose</b><span>HyperFrames HTML + GSAP</span></div>
+    <div class="clip"><small>06</small><b>Render</b><span>Headless Chrome to MP4</span></div>
+    <div class="clip" style="--c:#1E9E5A"><small>07</small><b>Mix</b><span>Music, SFX, loudness</span></div>
+    <div class="clip" style="--c:#1E9E5A"><small>08</small><b>Ship</b><span>QA, export, post</span></div>
+  </div>
+</section>
+
+<section class="wrap" id="stack">
+  <h2>The stack</h2>
+  <p class="sub">Everything except Claude is free and runs on your laptop. HyperFrames is the main editor here because it's plain HTML with seekable GSAP, which you already know; Remotion is optional.</p>
+  <div class="tblwrap"><table class="tbl">
+    <thead><tr><th>TOOL</th><th>JOB IN YOUR PIPELINE</th><th>COST</th></tr></thead>
+    <tbody>
+      <tr><td>Claude Pro + Claude Code</td><td>Writes compositions, runs commands, debugs renders, plans each edit</td><td>₹2,000/mo</td></tr>
+      <tr><td>HyperFrames</td><td>HTML video compositions: subtitles, transitions, B roll cards, rendered to MP4</td><td class="free">Free · Apache 2.0</td></tr>
+      <tr><td>FFmpeg</td><td>Trim, crop to 9:16, mix audio, normalize loudness, final export</td><td class="free">Free</td></tr>
+      <tr><td>Whisper (local)</td><td>Transcript with word level timestamps for animated captions</td><td class="free">Free</td></tr>
+      <tr><td>Openverse</td><td>Creative Commons music and sound effects</td><td class="free">Free · check attribution</td></tr>
+      <tr><td>yt-dlp</td><td>Download your own published reels to study pacing and retention</td><td class="free">Free · own content only</td></tr>
+      <tr><td>Remotion</td><td>Optional React alternative to HyperFrames</td><td class="free">Free for teams of 3 or fewer</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="wrap" id="spec">
+  <h2>The reel spec, memorise it once</h2>
+  <p class="sub">Put these numbers in your CLAUDE.md (week 3) so Claude never has to guess them.</p>
+  <div class="spec">
+    <svg class="phone" viewBox="0 0 270 480" role="img" aria-label="Instagram reel safe zones: keep text out of the top 250, bottom 420 and right 120 pixels of a 1080 by 1920 frame">
+      <rect x="1" y="1" width="268" height="478" rx="22" fill="var(--panel)" stroke="var(--line)" stroke-width="2"/>
+      <rect x="1" y="1" width="268" height="62" rx="22" fill="var(--amber)" opacity=".28"/>
+      <rect x="1" y="374" width="268" height="105" fill="var(--amber)" opacity=".28"/>
+      <rect x="239" y="63" width="30" height="311" fill="var(--amber)" opacity=".28"/>
+      <rect x="22" y="80" width="204" height="276" rx="6" fill="none" stroke="var(--violet)" stroke-width="2" stroke-dasharray="6 5"/>
+      <g fill="var(--muted)" font-family="JetBrains Mono, monospace" font-size="11"><text x="135" y="38" text-anchor="middle">top 250 px</text><text x="128" y="428" text-anchor="middle">bottom 420 px</text><text x="254" y="222" text-anchor="middle" transform="rotate(90 254 222)">right 120 px</text></g>
+      <text x="124" y="222" text-anchor="middle" fill="var(--violet)" font-family="Instrument Sans, sans-serif" font-size="14" font-weight="600">captions live here</text>
+    </svg>
+    <div class="specs">
+      <dl>
+        <dt>Frame</dt><dd>1080 × 1920, 9:16 vertical</dd>
+        <dt>Frame rate</dt><dd>30 fps (shoot at 30 too, so nothing gets resampled)</dd>
+        <dt>Length</dt><dd>30 to 40 seconds; hook lands in the first 1.5 seconds</dd>
+        <dt>Video</dt><dd>H.264, yuv420p, around 8 Mbps, faststart</dd>
+        <dt>Audio</dt><dd>AAC 192 kbps, loudness around −14 LUFS, music sitting well under the voice</dd>
+        <dt>Captions</dt><dd>Inside the dashed box. Two to four words at a time, large, high contrast, the spoken word highlighted</dd>
+        <dt>Pacing</dt><dd>A visual change (cut, zoom, card, emphasis) every 2 to 4 seconds</dd>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<section class="wrap" id="plan">
+  <h2>Four weeks, day by day</h2>
+  <p class="sub">Each block is roughly an hour. Miss a day and just continue; the order matters more than the calendar.</p>
+
+  <!-- WEEK 1 -->
+  <div class="week" id="w1">
+    <div class="wk-side"><div class="wk-num">01</div><div class="wk-tc">DAYS 1 to 7</div><div class="wk-goal">Set up the machine and get comfortable cutting video from the terminal.</div></div>
+    <div>
+      <div class="day">
+        <div class="day-h"><small>DAY 1</small><h3>Install the toolkit</h3></div>
+        <ul class="tasks">
+          <li><input type="checkbox" id="t1"><label for="t1">Subscribe to Claude Pro (₹2,000/mo in India) and log in on claude.ai.</label></li>
+          <li><input type="checkbox" id="t2"><label for="t2">Install Claude Code, then run <code>claude</code> in a new folder called <code>reels</code> and log in.</label></li>
+          <li><input type="checkbox" id="t3"><label for="t3">Install Node.js 18 or newer, FFmpeg and Python 3.10 or newer. Check each with its <code>--version</code> flag.</label></li>
+        </ul>
+        <div class="code"><header><span>macOS / Linux / WSL</span><button class="cp">Copy</button></header><pre>curl -fsSL https://claude.ai/install.sh | bash
+brew install ffmpeg node python   # macOS; use your package manager on Linux</pre></div>
+        <div class="code"><header><span>Windows PowerShell</span><button class="cp">Copy</button></header><pre>irm https://claude.ai/install.ps1 | iex
+winget install Gyan.FFmpeg OpenJS.NodeJS.LTS Python.Python.3.12</pre></div>
+        <div class="done"><b>Done when</b> <code>claude</code>, <code>ffmpeg -version</code>, <code>node -v</code> and <code>python3 --version</code> all print a version.</div>
+      </div>
+
+      <div class="day">
+        <div class="day-h"><small>DAY 2</small><h3>Shoot a test clip properly</h3></div>
+        <ul class="tasks">
+          <li><input type="checkbox" id="t4"><label for="t4">Record a 40 second talking head on your phone: vertical, 1080p, 30 fps, window light in front of you, phone at eye level.</label></li>
+          <li><input type="checkbox" id="t5"><label for="t5">Use a cheap lapel mic or sit close to the phone in a quiet room. Bad audio kills retention faster than bad video.</label></li>
+          <li><input type="checkbox" id="t6"><label for="t6">Clap once on camera before you start talking. It gives you a sharp sync point later.</label></li>
+        </ul>
+        <div class="done"><b>Done when</b> you have <code>raw/day2.mp4</code> in your reels folder.</div>
+      </div>
+
+      <div class="day">
+        <div class="day-h"><small>DAY 3</small><h3>FFmpeg basics, with Claude driving</h3></div>
+        <p>Don't memorise FFmpeg. Ask Claude Code to do it, then read what it ran. You'll pick up the flags in a week.</p>
+        <div class="code prompt"><header><span>Prompt for Claude Code</span><button class="cp">Copy</button></header><pre>Inspect raw/day2.mp4 with ffprobe and tell me its resolution, fps, codec and duration. Then trim it to start 0.5s after the clap and end at the last spoken word, keeping it 1080x1920 at 30fps. Save to work/trimmed.mp4 and explain each flag you used in one line.</pre></div>
+        <div class="code"><header><span>What it should roughly run</span><button class="cp">Copy</button></header><pre>ffmpeg -ss 00:00:01.8 -to 00:00:39.5 -i raw/day2.mp4 \
+  -c:v libx264 -crf 18 -preset medium -c:a aac -b:a 192k work/trimmed.mp4</pre></div>
+        <ul class="tasks">
+          <li><input type="checkbox" id="t7"><label for="t7">Trim your clip with Claude Code and read every flag it explains.</label></li>
+          <li><input type="checkbox" id="t8"><label for="t8">Ask it to crop a horizontal clip to 9:16 too, so you know how for later.</label></li>
+        </ul>
+      </div>
+
+      <div class="day">
+        <div class="day-h"><small>DAY 4</small><h3>Transcribe with word timings</h3></div>
+        <div class="code"><header><span>Install and run Whisper locally</span><button class="cp">Copy</button></header><pre>pip install -U openai-whisper
+whisper work/trimmed.mp4 --model small --language en \
+  --word_timestamps True --output_format json --output_dir work</pre></div>
+        <ul class="tasks">
+          <li><input type="checkbox" id="t9"><label for="t9">Transcribe your clip and open the JSON. Find a single word and its start and end time.</label></li>
+          <li><input type="checkbox" id="t10"><label for="t10">Ask Claude Code to fix misheard tech terms (company names, "LLM", salaries) in the JSON while keeping every timestamp.</label></li>
+        </ul>
+        <div class="note"><b>Tip:</b> the <code>small</code> model is a good speed to accuracy balance on a laptop. If tech jargon keeps coming out wrong, try <code>medium</code>.</div>
+      </div>
+
+      <div class="day">
+        <div class="day-h"><small>DAYS 5 to 7</small><h3>Study three reels you admire</h3></div>
+        <ul class="tasks">
+          <li><input type="checkbox" id="t11"><label for="t11">Pick three reels in your niche that look the way you want yours to look. Screen record or screenshot them.</label></li>
+          <li><input type="checkbox" id="t12"><label for="t12">For each one, write down: hook line, caption style (font, size, colour, how words appear), how often the shot changes, what sounds play on transitions.</label></li>
+          <li><input type="checkbox" id="t13"><label for="t13">Paste the screenshots into Claude and ask it to turn your notes into a written style spec. Save it as <code>style.md</code>.</label></li>
+        </ul>
+        <div class="done"><b>Week 1 done when</b> you can trim and transcribe a clip without help and you have a <code>style.md</code> describing your target look.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WEEK 2 -->
+  <div class="week" id="w2">
+    <div class="wk-side"><div class="wk-num">02</div><div class="wk-tc">DAYS 8 to 14</div><div class="wk-goal">Render your first full reel: captions, transitions, sound.</div></div>
+    <div>
+      <div class="day">
+        <div class="day-h"><small>DAY 8</small><h3>Meet HyperFrames</h3></div>
+        <div class="code"><header><span>Start a project and give Claude the skills</span><button class="cp">Copy</button></header><pre>npx hyperframes init my-reel
+cd my-reel
+npx skills add heygen-com/hyperframes</pre></div>
+        <ul class="tasks">
+          <li><input type="checkbox" id="t14"><label for="t14">Init a project, open it in your editor and read the generated <code>index.html</code>. It's just HTML with timing attributes.</label></li>
+          <li><input type="checkbox" id="t15"><label for="t15">Ask Claude Code to explain how timing, tracks and GSAP timelines work in this project, then preview it in the browser.</label></li>
+          <li><input type="checkbox" id="t16"><label for="t16">Render the sample to MP4 once so you know the full loop works.</label></li>
+        </ul>
+        <div class="note"><b>Your edge:</b> this is HTML and GSAP, so everything you know about easing, stagger and timelines transfers directly. The one new rule is that every animation must be seekable: driven by the timeline, never by timers or scroll.</div>
+      </div>
+
+      <div class="day">
+        <div class="day-h"><small>DAYS 9 and 10</small><h3>Cinematic word by word captions</h3></div>
+        <div class="code prompt"><header><span>Prompt for Claude Code</span><button class="cp">Copy</button></header><pre>In this HyperFrames project, build a 1080x1920 composition that plays work/trimmed.mp4 full frame and shows captions from work/trimmed.json (Whisper word timestamps).
+Captions: groups of 2 to 4 words, centred at about 62% height, inside Instagram's safe zone (clear of top 250px, bottom 420px, right 120px). Each word fades and rises 12px as it is spoken; the word being spoken is highlighted in #6B3BFF. Font: bold display sans, 72px, white with a soft dark shadow. Follow style.md for anything I haven't specified. Use GSAP on the composition timeline so it is fully seekable.</pre></div>
+        <ul class="tasks">
+          <li><input type="checkbox" id="t17"><label for="t17">Get captions rendering in sync with your voice.</label></li>
+          <li><input type="checkbox" id="t18"><label for="t18">Scrub the preview frame by frame around fast words and fix any drift. Ask Claude to shift all captions by a few frames if they feel early or late.</label></li>
+        </ul>
+      </div>
+
+      <div class="day">
+        <div class="day-h"><small>DAYS 11 and 12</small><h3>Transitions and B roll cards</h3></div>
+        <ul class="tasks">
+          <li><input type="checkbox" id="t19"><label for="t19">Add punch in zooms (scale 1.0 to 1.08 over 0.3s) on key sentences, so the frame changes every few seconds even on a single shot.</label></li>
+          <li><input type="checkbox" id="t20"><label for="t20">Ask Claude to build one full screen card: a big stat that counts up ("2.4 lakh tech layoffs") or a mock job listing, cut in for 2 seconds.</label></li>
+          <li><input type="checkbox" id="t21"><label for="t21">Keep transitions subtle: 6 to 10 frame crossfades, short blur wipes, zoom through. Avoid stock flashy wipes.</label></li>
+        </ul>
+        <div class="note"><b>Accuracy:</b> any number you put on screen should come from a source you can name in the caption or comments. In a jobs market niche, one wrong stat costs more trust than ten good reels earn.</div>
+      </div>
+
+      <div class="day">
+        <div class="day-h"><small>DAYS 13 and 14</small><h3>Sound: music, SFX and loudness</h3></div>
+        <ul class="tasks">
+          <li><input type="checkbox" id="t22"><label for="t22">Find one music bed and 4 to 5 sound effects (whoosh, pop, click, riser tail) on Openverse. Save each file's license and attribution text in <code>sounds/credits.txt</code>.</label></li>
+          <li><input type="checkbox" id="t23"><label for="t23">Place SFX on the exact frames of your transitions inside the composition, then render.</label></li>
+          <li><input type="checkbox" id="t24"><label for="t24">Mix music under the voice with ducking and normalise loudness with the command below.</label></li>
+        </ul>
+        <div class="code"><header><span>Duck music under voice, then normalise</span><button class="cp">Copy</button></header><pre>ffmpeg -i out/reel.mp4 -i sounds/music.mp3 -filter_complex \
+"[0:a]asplit=2[v1][v2];[1:a]volume=0.30[m];\
+[m][v1]sidechaincompress=threshold=0.05:ratio=8:attack=20:release=300[d];\
+[v2][d]amix=inputs=2:duration=first:normalize=0,loudnorm=I=-14:TP=-1.5[a]" \
+-map 0:v -map "[a]" -c:v copy -c:a aac -b:a 192k out/reel-mixed.mp4</pre></div>
+        <div class="done"><b>Week 2 done when</b> you've posted (or at least privately exported) one complete reel: trimmed, captioned, with transitions, a card and sound.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WEEK 3 -->
+  <div class="week" id="w3">
+    <div class="wk-side"><div class="wk-num">03</div><div class="wk-tc">DAYS 15 to 21</div><div class="wk-goal">Turn that one reel into a template you reuse forever.</div></div>
+    <div>
+      <div class="day">
+        <div class="day-h"><small>DAYS 15 and 16</small><h3>Write your CLAUDE.md</h3></div>
+        <p>Claude Code reads <code>CLAUDE.md</code> at the start of every session in that folder. Put your rules there once and every reel follows them.</p>
+        <div class="code"><header><span>reels/CLAUDE.md, a starting point</span><button class="cp">Copy</button></header><pre># Reel editing rules
+Output: 1080x1920, 30fps, H.264 yuv420p ~8Mbps, AAC 192k, faststart, ~-14 LUFS.
+Safe zone: no text in top 250px, bottom 420px, right 120px.
+Captions: 2-4 words per group, display sans 72px bold, white, spoken word in #6B3BFF.
+Pacing: a visual change every 2-4s (punch in, card, cut). Hook visible by 1.5s.
+Transitions: subtle only. Crossfade 6-10 frames, zoom through, blur wipe.
+Stats on screen: only numbers I give you, always with the source in a small label.
+Sound: SFX on exact transition frames; music ducked under voice.
+Folders: raw/ (camera files), work/ (trims, transcripts), out/ (renders), sounds/.
+Template: compositions live in template/; copy, never edit, for each new reel.
+Always: preview before full render; tell me the render time.</pre></div>
+        <ul class="tasks">
+          <li><input type="checkbox" id="t25"><label for="t25">Create <code>CLAUDE.md</code> from this and your <code>style.md</code>, then adjust anything that doesn't match your taste.</label></li>
+        </ul>
+      </div>
+
+      <div class="day">
+        <div class="day-h"><small>DAYS 17 and 18</small><h3>Build the reusable template</h3></div>
+        <div class="code prompt"><header><span>Prompt for Claude Code</span><button class="cp">Copy</button></header><pre>Turn my week 2 reel into a reusable template in template/. It should take three inputs: a trimmed clip, its Whisper JSON, and a small edit.json where I list the hook text, which words to emphasise, and any cards (type, text, start time, duration, source). Include my intro hook style, caption system, punch in zooms, stat card, list card, end card with my handle, and SFX placement. Document edit.json's format in template/README.md.</pre></div>
+        <ul class="tasks">
+          <li><input type="checkbox" id="t26"><label for="t26">Build the template and render your week 2 reel again from it. It should look identical.</label></li>
+          <li><input type="checkbox" id="t27"><label for="t27">Add your brand: logo, colours and one display font file (put the font in the project, don't rely on system fonts).</label></li>
+        </ul>
+      </div>
+
+      <div class="day">
+        <div class="day-h"><small>DAYS 19 to 21</small><h3>One command pipeline</h3></div>
+        <div class="code prompt"><header><span>Prompt for Claude Code</span><button class="cp">Copy</button></header><pre>Write a script make-reel that takes raw/NAME.mp4 and does: detect the clap and trim, transcribe with Whisper (word timestamps), draft edit.json by reading the transcript (suggest the hook, 3-5 emphasis words and up to 2 cards, but leave every number blank for me to fill with a sourced figure), pause so I can review edit.json, then render with the template, mix music from sounds/, normalise loudness and save out/NAME-final.mp4. Print a QA summary at the end: duration, fps, resolution, loudness.</pre></div>
+        <ul class="tasks">
+          <li><input type="checkbox" id="t28"><label for="t28">Get the pipeline working end to end on a brand new clip.</label></li>
+          <li><input type="checkbox" id="t29"><label for="t29">Time yourself from raw clip to final file. Target: under 45 minutes including your review.</label></li>
+        </ul>
+        <div class="done"><b>Week 3 done when</b> one command plus a short review of <code>edit.json</code> produces a finished reel.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WEEK 4 -->
+  <div class="week" id="w4">
+    <div class="wk-side"><div class="wk-num">04</div><div class="wk-tc">DAYS 22 to 30</div><div class="wk-goal">Make 30 reels a month a routine, not a sprint.</div></div>
+    <div>
+      <div class="day">
+        <div class="day-h"><small>DAYS 22 and 23</small><h3>Plan a month of topics in one sitting</h3></div>
+        <div class="code prompt"><header><span>Prompt for Claude (chat)</span><button class="cp">Copy</button></header><pre>I make 30 to 40 second Instagram reels about the tech jobs market for students and early career developers in India. Give me 30 reel ideas across these pillars: hiring trends, skills to learn, interview prep, salary reality, myths. For each: a hook line under 10 words, the one takeaway, and what source I'd need to back any number. Flag any idea that depends on stats I must verify before filming.</pre></div>
+        <ul class="tasks">
+          <li><input type="checkbox" id="t30"><label for="t30">Pick 30 ideas, write a short script for each (about 90 words is ~35 seconds).</label></li>
+          <li><input type="checkbox" id="t31"><label for="t31">Collect sources for every number before you film.</label></li>
+        </ul>
+      </div>
+
+      <div class="day">
+        <div class="day-h"><small>DAYS 24 and 25</small><h3>Batch film</h3></div>
+        <ul class="tasks">
+          <li><input type="checkbox" id="t32"><label for="t32">Film 10 reels in one session with the same light, outfit changes between topics, a clap before each take.</label></li>
+          <li><input type="checkbox" id="t33"><label for="t33">Name files by date and topic (<code>raw/2026-12-01-ai-hiring.mp4</code>) so the pipeline output stays organised.</label></li>
+        </ul>
+      </div>
+
+      <div class="day">
+        <div class="day-h"><small>DAYS 26 to 28</small><h3>Batch edit and QA</h3></div>
+        <ul class="tasks">
+          <li><input type="checkbox" id="t34"><label for="t34">Run the pipeline on all 10 clips. Review each <code>edit.json</code> while the next one transcribes.</label></li>
+          <li><input type="checkbox" id="t35"><label for="t35">QA every export on your actual phone before posting: captions readable, nothing under the Instagram UI, audio clear at low volume.</label></li>
+          <li><input type="checkbox" id="t36"><label for="t36">Keep a <code>fixes.md</code> of anything you corrected by hand. Each week, ask Claude to fold those fixes into the template or CLAUDE.md.</label></li>
+        </ul>
+      </div>
+
+      <div class="day">
+        <div class="day-h"><small>DAYS 29 and 30</small><h3>Close the feedback loop</h3></div>
+        <ul class="tasks">
+          <li><input type="checkbox" id="t37"><label for="t37">After a week of posting, note each reel's views, average watch time and shares in a simple sheet.</label></li>
+          <li><input type="checkbox" id="t38"><label for="t38">Share the numbers with Claude and ask which hooks, lengths and card types correlate with longer watch time. Update the template accordingly.</label></li>
+          <li><input type="checkbox" id="t39"><label for="t39">Optional: download your own best reels with yt-dlp and ask Claude to break down their pacing second by second.</label></li>
+        </ul>
+        <div class="done"><b>Plan complete when</b> you can film 10 reels on a Sunday and have all 10 edited by Wednesday.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="wrap" id="daily">
+  <h2>Your daily loop after the plan</h2>
+  <p class="sub">About 30 minutes per reel once the template is mature.</p>
+  <div class="grid2">
+    <div class="card"><h3>5 min · Run the pipeline</h3><p><code>make-reel raw/today.mp4</code> trims, transcribes and drafts the edit while you make chai.</p></div>
+    <div class="card"><h3>10 min · Review edit.json</h3><p>Fix the hook wording, choose emphasis words, fill in sourced numbers for cards.</p></div>
+    <div class="card"><h3>10 min · Render and check</h3><p>Preview the tricky moments, render, watch once on your phone.</p></div>
+    <div class="card"><h3>5 min · Post</h3><p>Caption with sources and any Openverse attribution, then schedule.</p></div>
+  </div>
+</section>
+
+<section class="wrap" id="pitfalls">
+  <h2>Things that will trip you up</h2>
+  <div class="grid2">
+    <div class="card"><h3>Captions drift out of sync</h3><p>Usually a frame rate mismatch. Shoot at 30, render at 30, and never let the clip get resampled to 29.97 or 60 halfway through.</p></div>
+    <div class="card"><h3>Fonts change on render</h3><p>The renderer only sees fonts you ship in the project. Add the font files; don't rely on what's installed on your laptop.</p></div>
+    <div class="card"><h3>Animations jump when scrubbing</h3><p>Something is running on a timer or CSS transition. Everything must hang off the composition timeline.</p></div>
+    <div class="card"><h3>Music gets muted on Instagram</h3><p>Only use Creative Commons tracks whose license allows your use, and credit them. Trending songs are copyrighted unless you add them through Instagram's own music picker.</p></div>
+    <div class="card"><h3>Hitting Claude's usage limits</h3><p>Reuse the template instead of regenerating compositions, and batch edits in one session. If you still hit limits daily, consider Max (₹11,999/mo).</p></div>
+    <div class="card"><h3>License fine print</h3><p>Remotion is free only for individuals and teams of 3 or fewer. yt-dlp is for your own content; reusing other creators' videos can break platform rules.</p></div>
+  </div>
+</section>
+
+<section class="wrap" id="cost">
+  <h2>What it costs</h2>
+  <div class="cost">
+    <div class="card"><small style="font:600 12px var(--mono);color:var(--muted)">CLAUDE PRO</small><big>₹2,000</big><p>per month, the only paid piece</p></div>
+    <div class="card"><small style="font:600 12px var(--mono);color:var(--muted)">TOOLS</small><big>₹0</big><p>HyperFrames, FFmpeg, Whisper, Openverse, yt-dlp</p></div>
+    <div class="card"><small style="font:600 12px var(--mono);color:var(--muted)">PER REEL</small><big>~₹67</big><p>at 30 reels a month on Pro</p></div>
+  </div>
+  <p class="sub" style="margin-top:18px">Prices as of November 2026; check claude.com/pricing before subscribing. Official Claude Code docs: <a href="https://code.claude.com/docs/en/">code.claude.com/docs</a>.</p>
+</section>
+</main>
+
+<footer class="wrap">
+  <p>Progress is stored only in this browser. <button class="reset" id="reset">Reset progress</button></p>
+</footer>
+
+<script>
+(function(){
+  const KEY='reel-plan-v1';
+  const boxes=[...document.querySelectorAll('.tasks input[type=checkbox]')];
+  let state={};
+  try{state=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){state={}}
+  boxes.forEach(b=>{b.checked=!!state[b.id];b.addEventListener('change',()=>{state[b.id]=b.checked;save();paint()})});
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
+  function paint(){
+    const done=boxes.filter(b=>b.checked).length, pct=done/boxes.length;
+    document.getElementById('fill').style.width=(pct*100).toFixed(1)+'%';
+    const day=Math.round(pct*30);
+    document.getElementById('tc').textContent=String(day).padStart(2,'0')+':00 / 30';
+  }
+  document.getElementById('reset').addEventListener('click',()=>{state={};boxes.forEach(b=>b.checked=false);save();paint()});
+  document.querySelectorAll('.cp').forEach(btn=>btn.addEventListener('click',async()=>{
+    const txt=btn.closest('.code').querySelector('pre').innerText;
+    try{await navigator.clipboard.writeText(txt);btn.textContent='Copied'}catch(e){btn.textContent='Select & copy'}
+    setTimeout(()=>btn.textContent='Copy',1500);
+  }));
+  paint();
+})();
+</script>
+</body>
+</html>
