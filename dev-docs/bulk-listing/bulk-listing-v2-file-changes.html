@@ -1,0 +1,590 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bulk Listing File Changes</title>
+<script>
+  try {
+    var saved = localStorage.getItem('dmplan-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  } catch (e) {}
+</script>
+<style>
+  :root {
+    --bg: #f9f9f9; --surface: #ffffff; --surface-soft: #f3f4fe;
+    --text: #111111; --text-muted: #5b5b66; --border: #e6e6e6;
+    --accent: #2639ED; --accent-soft: #e9ebfd;
+    --wait: #9457f6; --wait-soft: #f4eefe;
+    --ok: #12805c; --ok-soft: #e4f5ee;
+    --warn: #b4540a; --warn-soft: #fdf1e4;
+    --bad: #c4314b; --bad-soft: #fdecef;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+      --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+      --accent: #7f8cff; --accent-soft: #1d2150;
+      --wait: #b996fa; --wait-soft: #2c2142;
+      --ok: #4fd1a0; --ok-soft: #173229;
+      --warn: #f5a35c; --warn-soft: #3a2614;
+      --bad: #ff7d93; --bad-soft: #3a1c24;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+    --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+    --accent: #7f8cff; --accent-soft: #1d2150;
+    --wait: #b996fa; --wait-soft: #2c2142;
+    --ok: #4fd1a0; --ok-soft: #173229;
+    --warn: #f5a35c; --warn-soft: #3a2614;
+    --bad: #ff7d93; --bad-soft: #3a1c24;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: "Satoshi", system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.6; }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 48px 16px 80px; }
+  header.top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+  .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; }
+  h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.15; margin: 0 0 12px; }
+  .lede { color: var(--text-muted); margin: 0; max-width: 680px; }
+  .lede a { color: var(--accent); }
+  .toggle { flex-shrink: 0; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 14px; cursor: pointer; }
+  .toggle:hover { border-color: var(--accent); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 32px; }
+  nav.toc a { font-size: 14px; text-decoration: none; color: var(--accent); background: var(--accent-soft); padding: 6px 12px; border-radius: 999px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 0 0 16px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+  .stat b { display: block; font-size: 26px; line-height: 1.2; }
+  .stat span { font-size: 13px; color: var(--text-muted); }
+  h2 { font-size: 22px; margin: 52px 0 16px; }
+  h3 { font-size: 18px; margin: 0; }
+  h4 { font-size: 15px; margin: 22px 0 8px; color: var(--accent); }
+  p { margin: 0 0 12px; }
+  .muted { color: var(--text-muted); font-size: 15px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
+  .card p:last-child { margin-bottom: 0; }
+  .card ul, .card ol { margin: 8px 0 0; padding-left: 20px; }
+  .card li { margin-bottom: 6px; }
+  code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .86em; background: var(--surface-soft); border-radius: 6px; padding: 1px 6px; word-break: break-word; }
+  .findings { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .finding { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+  .finding h3 { font-size: 16px; margin-bottom: 6px; }
+  .finding p { font-size: 15px; margin: 0; color: var(--text-muted); }
+  .tablecard { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow-x: auto; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: 0; }
+  th { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+  td.grp { font-weight: 600; color: var(--accent); background: var(--surface-soft); font-size: 13px; }
+  .sw { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .chip { width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(128,128,128,.45); flex-shrink: 0; }
+  .callout { border-left: 4px solid var(--wait); background: var(--wait-soft); border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; }
+  .callout p { margin: 0; }
+  .callout.ok { border-color: var(--ok); background: var(--ok-soft); }
+  .callout.warn { border-color: var(--warn); background: var(--warn-soft); }
+  .issue { display: grid; grid-template-columns: 28px 1fr; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--bad); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+  .issue .n { font-weight: 700; color: var(--bad); }
+  .issue p { margin: 0; font-size: 15px; }
+  .issue .where { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+  .phase { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px 24px; margin-bottom: 14px; }
+  .phase-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  .num { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 15px; flex-shrink: 0; }
+  .tag { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+  .tag.now { background: var(--ok-soft); color: var(--ok); }
+  .tag.wait { background: var(--wait-soft); color: var(--wait); }
+  .tag.size { background: var(--surface-soft); color: var(--text-muted); }
+  .tag.new { background: var(--warn-soft); color: var(--warn); }
+  .rows { display: grid; grid-template-columns: 130px 1fr; gap: 6px 16px; font-size: 15px; }
+  .rows dt { color: var(--text-muted); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; padding-top: 2px; }
+  .rows dd { margin: 0; }
+  ol.qs { counter-reset: q; list-style: none; padding: 0; margin: 0; }
+  ol.qs li { counter-increment: q; position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px 14px 56px; margin-bottom: 10px; }
+  ol.qs li::before { content: counter(q); position: absolute; left: 16px; top: 14px; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  ol.qs.team li::before { background: var(--wait-soft); color: var(--wait); }
+  ol.qs b { display: block; margin-bottom: 2px; }
+  ol.qs span { color: var(--text-muted); font-size: 15px; }
+  footer { margin-top: 56px; font-size: 13px; color: var(--text-muted); }
+  @media (max-width: 700px) {
+    header.top { flex-direction: column; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .findings { grid-template-columns: 1fr; }
+    .card, .phase { padding: 18px; }
+    .rows { grid-template-columns: 1fr; }
+    .rows dt { padding-top: 8px; }
+    ol.qs li { padding-left: 50px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">Bulk listing v2 · every file change</p>
+      <h1>Bulk listing v2: every file we changed, explained</h1>
+      <p class="lede">A running record, updated at the end of every phase until bulk listing v2 is finished. For each phase: which files changed, what each one does, and why, in plain words. Newest phase first. Status and test results live in <code>bulk-listing-progress.html</code>; this page is only about the files.</p>
+    </div>
+    <button class="toggle" id="toggle" type="button">Toggle theme</button>
+  </header>
+
+  <nav class="toc">
+    <a href="#summary">All files so far</a><a href="#prev">Review fixes</a><a href="#popt">Optimisations</a><a href="#psg">Safeguards</a><a href="#p7">Phase 7</a><a href="#p6">Phase 6</a><a href="#p5">Phase 5</a><a href="#p8b">Edit price</a><a href="#p8">Phase 8</a><a href="#p4">Phase 4</a><a href="#p3">Phase 3</a><a href="#p2">Phase 2</a><a href="#p1">Phase 1</a><a href="#p0">Phase 0</a><a href="#docs">Notes (dev-docs)</a>
+  </nav>
+
+  <h2 id="summary">All code files so far</h2>
+  <div class="tablecard"><table>
+    <tr><th>File</th><th>Kind</th><th>Phase</th><th>One line</th></tr>
+    <tr><td><code>src/types/my-domains/bulk.ts</code></td><td>Changed</td><td>2</td><td>Three new shapes: <code>Eip712Types</code>, <code>BulkOrderTree</code>, <code>DecodedBulkSignature</code></td></tr>
+    <tr><td><code>src/helpers/my-domains/bulkOrderTree.ts</code></td><td>New</td><td>2</td><td>The maths for "one signature for all names"</td></tr>
+    <tr><td><code>src/helpers/my-domains/bulkOrderTree.test.ts</code></td><td>New</td><td>2</td><td>28 automatic tests</td></tr>
+    <tr><td><code>src/helpers/my-domains/__fixtures__/bulkOrderTree.fixtures.json</code></td><td>New</td><td>2</td><td>The answer key made by Seaport.js</td></tr>
+    <tr><td><code>src/core/services/my-domains/bulkOrders.service.ts</code></td><td>New</td><td>3</td><td>Sends the batch to the backend</td></tr>
+    <tr><td><code>src/helpers/my-domains/bulkBatch.ts</code></td><td>New</td><td>3</td><td>The rules of one batch: sign once, check, post, read answers</td></tr>
+    <tr><td><code>src/helpers/my-domains/bulkBatch.test.ts</code></td><td>New</td><td>3</td><td>11 automatic tests</td></tr>
+    <tr><td><code>src/hooks/my-domains/useBulkListingActions.ts</code></td><td>Changed</td><td>3</td><td>Connects the wallet and the backend to the batch rules</td></tr>
+    <tr><td><code>BulkListingFlowModal.tsx</code></td><td>Changed</td><td>3</td><td>The drawer runs the one signature path</td></tr>
+    <tr><td><code>BulkListingSigningStep.tsx</code>, <code>index.ts</code></td><td>Changed</td><td>3</td><td>New progress and "post failed" screens</td></tr>
+    <tr><td><code>BulkListingFormStep.tsx</code></td><td>Changed</td><td>3</td><td>Wallet check notice, new note</td></tr>
+    <tr><td><code>src/lib/marketplace-order-client.ts</code></td><td>Changed</td><td>3</td><td>Two small additions</td></tr>
+    <tr><td><code>src/types/my-domains/bulk.ts</code></td><td>Changed</td><td>2, 3, 4</td><td>Shapes for the tree (2), the request and answer (3), two failure reasons (4)</td></tr>
+    <tr><td><code>bulkBatch.ts</code>, <code>bulkBatch.test.ts</code>, <code>useBulkListingActions.ts</code>, the drawer files</td><td>Changed</td><td>4</td><td>Fallback, smart wallet and network checks (see Phase 4)</td></tr>
+    <tr><td><code>src/core/services/my-domains/cancelOrders.service.ts</code></td><td>New</td><td>8</td><td>Backend calls for the on chain delist</td></tr>
+    <tr><td><code>src/helpers/my-domains/onChainCancel.ts</code> (+ <code>.test.ts</code>)</td><td>New</td><td>8</td><td>The cancel recipe, row label map, messages; 10 tests</td></tr>
+    <tr><td><code>useOnChainCancel.ts</code>, <code>usePendingCancels.ts</code></td><td>New</td><td>8</td><td>Wallet, Seaport cancel, row label refresh</td></tr>
+    <tr><td><code>bulk-listing/BulkDelistModal/</code>, <code>bulk-listing/PendingCancelChip/</code></td><td>New</td><td>8</td><td>Bulk delist drawer; Cancelling label</td></tr>
+    <tr><td><code>src/data/my-domains/pricing.ts</code>, <code>src/helpers/my-domains/bulkSigning.test.ts</code></td><td>New</td><td>Review</td><td><code>MAX_PRICE</code> moved to data; per name loop tests</td></tr>
+    <tr><td>The single and bulk drawers, <code>bulkSigning.ts</code>, <code>bulkBatch.ts</code>, <code>bulkListing.ts</code>, the bulk and cancel services and hooks, <code>FilterDropdown</code>, <code>types/my-domains/bulk.ts</code>, the drawer style files</td><td>Changed</td><td>Review</td><td>Code review fixes, steps 2, 3, 4, 6 (see Code review fixes)</td></tr>
+    <tr><td><code>useDelistListing.ts</code>, the My Domains page, rows, cards, table, select bar and button, bulk listing drawer, result screen and form, Quick Actions, small type and helper files, <code>seaport-order-builder-v5.ts</code></td><td>Changed</td><td>8</td><td>On chain delist everywhere (see Phase 8)</td></tr>
+  </table></div>
+
+  <h2 id="prev">Code review fixes · 24 Nov 2026 · steps 2, 3, 4, 6</h2>
+  <div class="callout ok"><p>From <code>bulk-list-code-review.html</code> §11. Committed in <code>8df9b76</code> (dark drawer colours), <code>0a070bd</code> (FilterDropdown Escape) and <code>a59939a</code> (with phase 7), pushed 24 Nov. Full detail: progress log, "v2 Code review fixes".</p></div>
+  <div class="phase">
+    <div class="phase-head"><span class="num">1</span><h3>New files</h3><span class="tag new">2 new</span></div>
+    <ul>
+      <li><b><code>src/data/my-domains/pricing.ts</code></b>: <code>MAX_PRICE</code>, moved out of the PriceInput primitive (step 6).</li>
+      <li><b><code>src/helpers/my-domains/bulkSigning.test.ts</code></b>: 3 tests for the per name loop (L4, L8).</li>
+    </ul>
+  </div>
+  <div class="phase">
+    <div class="phase-head"><span class="num">2</span><h3>Single listing drawer</h3><span class="tag size">Changed</span></div>
+    <ul>
+      <li><b><code>listing-flow/listingOrder.ts</code></b>: <code>onPublishing</code> callback, <code>LOGIN_EXPIRED_TEXT</code> and the 401 check (steps 2 and 3).</li>
+      <li><b><code>listing-flow/useListingFlowActions.ts</code></b>: phase <code>'publishing'</code>.</li>
+      <li><b><code>listing-flow/ListingFlowModal/ListingFlowModal.tsx</code></b>: "Publishing your listing" screen without Cancel, L12 button fix, login expired message.</li>
+    </ul>
+  </div>
+  <div class="phase">
+    <div class="phase-head"><span class="num">3</span><h3>Bulk listing rules and wiring</h3><span class="tag size">Changed</span></div>
+    <ul>
+      <li><b><code>helpers/my-domains/bulkSigning.ts</code></b>: per name publishing phase, stop after repeated wallet errors, login expired stops the loop, progress counts only signable names.</li>
+      <li><b><code>helpers/my-domains/bulkBatch.ts</code></b> (+ test): "No longer active", "Signed with a different wallet", only <code>listed</code> counts as live.</li>
+      <li><b><code>helpers/my-domains/bulkListing.ts</code></b>: <code>setBulkMode</code> keeps the same price, <code>typedPriceCount</code>; <code>MAX_PRICE</code> import from data.</li>
+      <li><b><code>core/services/my-domains/bulkOrders.service.ts</code></b>: checks the answer has its result list.</li>
+      <li><b><code>hooks/my-domains/useBulkListingActions.ts</code></b>: <code>'batch-refused'</code> and <code>'login-expired'</code>, 45 s time limit, offerer check before re-proof, address re-read before signing.</li>
+      <li><b><code>hooks/my-domains/useBulkListingDraft.ts</code></b>: <code>typedPrices</code>.</li>
+      <li><b><code>hooks/my-domains/useNftApprovals.ts</code></b>: one approval in flight per contract; <code>walletAddress</code> exported.</li>
+    </ul>
+  </div>
+  <div class="phase">
+    <div class="phase-head"><span class="num">4</span><h3>Bulk drawer screens</h3><span class="tag size">Changed</span></div>
+    <ul>
+      <li><b><code>BulkListingFlowModal.tsx</code></b>: listable counts and totals, refused batch message, retry run id and Cancel, discard question on the approval step, "Use one price for every name?", Cancel hidden while a name is posting.</li>
+      <li><b><code>BulkListingFormStep.tsx</code></b>: <code>listCount</code>. <b><code>BulkListingSigningStep.tsx</code></b>: <code>done</code>. <b><code>BulkListingSuccessStep.tsx</code></b>: titles follow the result, the waiting line.</li>
+    </ul>
+  </div>
+  <div class="phase">
+    <div class="phase-head"><span class="num">5</span><h3>Delist, page, primitives, types</h3><span class="tag size">Changed</span></div>
+    <ul>
+      <li><b><code>core/services/my-domains/cancelOrders.service.ts</code></b>, <b><code>helpers/my-domains/onChainCancel.ts</code></b> (+ test): orders already sold, expired or cancelled are reported before the wallet opens; 401 reads login expired.</li>
+      <li><b><code>hooks/my-domains/usePendingCancels.ts</code></b>: polls only for pending cancels, stops when the proof isn't fresh. <b><code>useOnChainCancel.ts</code></b>: the new reasons.</li>
+      <li><b><code>pages/seller-hub/my-domains/index.tsx</code></b>: ignores an Escape already handled.</li>
+      <li><b><code>primitives/inputs/filter-dropdown/FilterDropdown.tsx</code></b>: Escape closes an open dropdown wherever focus is (all filter dropdowns).</li>
+      <li><b><code>primitives/inputs/price-input/PriceInput.tsx</code></b>: re-exports <code>MAX_PRICE</code> from data.</li>
+      <li><b><code>types/my-domains/bulk.ts</code></b>: the shared phase types moved in; reasons <code>'batch-refused'</code>, <code>'login-expired'</code>, <code>'already-gone'</code>.</li>
+    </ul>
+  </div>
+  <div class="phase">
+    <div class="phase-head"><span class="num">6</span><h3>Dark drawer text colours</h3><span class="tag size">Styles only</span></div>
+    <ul>
+      <li><code>ListingFormStep</code>, <code>FeeBreakdownRow</code>, <code>DomainInsightsCard</code>, <code>WhatYouPaySection</code>, <code>AfterYouBuySection</code>, <code>BulkListingFormStep</code>, <code>SegmentedToggle</code>, <code>KeyValueRows</code>, <code>Modal</code> (<code>.module.scss</code>): dark blocks making text and prices white. No border changes.</li>
+    </ul>
+  </div>
+
+  <h2 id="popt">Optimisations · 24 Nov 2026</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">1</span><h3>Files</h3><span class="tag size">5 changed</span></div>
+    <ul>
+      <li><b><code>hooks/my-domains/useBulkListingActions.ts</code></b>: <code>readChainExpiries</code> reads the whole batch in one Multicall3 call.</li>
+      <li><b><code>BulkListingFlowModal</code></b>: reuses an expiry read under a minute old at List.</li>
+      <li><b><code>helpers/my-domains/onChainCancel.ts</code></b>: <code>settledSentCancels</code>.</li>
+      <li><b><code>hooks/my-domains/usePendingCancels.ts</code></b>, <b><code>pages/seller-hub/my-domains/index.tsx</code></b>: live listings passed in; a changed row stops the polling.</li>
+      <li><b><code>helpers/my-domains/cancelSafeguards.test.ts</code></b>: 1 new test.</li>
+    </ul>
+  </div>
+
+  <h2 id="psg">Cancel safeguards · 24 Nov 2026 <span class="tag size">Removed the same day, pending Mohit sir</span></h2>
+  <div class="callout warn"><p>Removed after the code review: <code>sentCancels.store.ts</code> and <code>cancelSafeguards.test.ts</code> deleted; <code>usePendingCancels</code>, <code>useOnChainCancel</code>, <code>onChainCancel.ts</code>, <code>MyDomainsTable</code>, <code>MyDomainRow</code>, <code>MyDomainCard</code> back to their committed versions; the safeguard parts of <code>types/my-domains/bulk.ts</code> and the My Domains page taken out. Kept: the clearer toast in <code>onChainCancel.ts</code> (+1 test in <code>onChainCancel.test.ts</code>). The list below is what was built.</p></div>
+  <div class="callout ok"><p>After the stage outage. Simplest version: <code>phase-explained/bulk-listing-v2-safeguards-explained.html</code>.</p></div>
+  <div class="phase">
+    <div class="phase-head"><span class="num">1</span><h3>Files</h3><span class="tag size">2 new, 7 changed</span></div>
+    <ul>
+      <li><b><code>core/services/my-domains/sentCancels.store.ts</code></b> <span class="tag size">New</span>: the browser memory of sent cancels.</li>
+      <li><b><code>helpers/my-domains/cancelSafeguards.test.ts</code></b> <span class="tag size">New</span>: 6 tests.</li>
+      <li><b><code>helpers/my-domains/onChainCancel.ts</code></b>: <code>liveSentCancels</code>, <code>unsentHashes</code>, <code>unrecordedByTx</code>, the two new texts.</li>
+      <li><b><code>hooks/my-domains/useOnChainCancel.ts</code></b>: skip, save, <code>retryUnrecorded</code>.</li>
+      <li><b><code>hooks/my-domains/usePendingCancels.ts</code></b>: <code>sentHashes</code>, the retry tick.</li>
+      <li><b><code>types/my-domains/bulk.ts</code></b>: <code>SentCancel</code>, <code>PendingCancel.local</code>, reason <code>'already-sent'</code>.</li>
+      <li><b><code>MyDomainsTable</code>, <code>MyDomainRow</code>, <code>MyDomainCard</code>, <code>pages/seller-hub/my-domains/index.tsx</code></b>: the Cancelling label and no Edit price on those rows.</li>
+    </ul>
+  </div>
+
+  <h2 id="p7">Phase 7 · 24 Nov 2026 · Product rules</h2>
+  <div class="callout ok"><p>Mohit sir's F9 (decisions 2 and 8), V10 (expiry on chain) and W2 (<code>?bulk=1</code>). One new test file; small changes elsewhere. Simplest version: <code>phase-explained/bulk-listing-v2-phase7-explained.html</code>.</p></div>
+  <div class="phase">
+    <div class="phase-head"><span class="num">1</span><h3>Rules</h3><span class="tag size">Changed</span></div>
+    <ul>
+      <li><b><code>helpers/my-domains/bulkListing.ts</code></b>: 7 day margin, 14 day minimum, <code>'expiring-soon'</code> reason; new <code>bulkBatchChain</code>, <code>bulkReasonInBatch</code>, <code>withChainExpiry</code>, <code>bulkSkipped</code>.</li>
+      <li><b><code>helpers/my-domains/bulkSigning.ts</code></b>: the skipped reason reads "Expires within 14 days".</li>
+      <li><b><code>types/my-domains/bulk.ts</code></b>: reasons <code>'expiring-soon'</code> and <code>'pick-chain'</code>.</li>
+      <li><b><code>helpers/my-domains/bulkPhase7.test.ts</code></b> <span class="tag size">New</span>: 7 tests. <code>bulkPhase5.test.ts</code>: two tests moved to 20 days left.</li>
+    </ul>
+  </div>
+  <div class="phase">
+    <div class="phase-head"><span class="num">2</span><h3>Wiring and screens</h3><span class="tag size">Changed</span></div>
+    <ul>
+      <li><b><code>hooks/my-domains/useBulkListingActions.ts</code></b>: <code>readChainExpiries</code> (UD <code>expiryOf</code>).</li>
+      <li><b><code>BulkListingFlowModal</code></b>: chain expiry on open and at signing, skipped names left out of the price check and the List count.</li>
+      <li><b><code>BulkListingFormStep</code></b> (+ scss): "7 days before", the Skipped line.</li>
+      <li><b><code>BulkSelectButton</code></b>, <b><code>BulkSelectBanner</code></b>: the two new tooltips, the pick a chain banner.</li>
+      <li><b><code>pages/seller-hub/my-domains/index.tsx</code></b>: chain filter set and restored in select mode, the chain rule for Select, <code>?bulk=1</code>.</li>
+      <li><b><code>primitives/modal/Modal.module.scss</code></b>: dark drawer footer on the body colour (all drawers).</li>
+    </ul>
+  </div>
+
+  <h2 id="p6">Phase 6 · 23 Nov 2026 · Approvals per contract</h2>
+  <div class="callout ok"><p>Mohit sir's F5. Four new files and a test; small changes to the approval screen and both drawers. The wrong network fix was tested on uat with MetaMask. Simplest version: <code>phase-explained/bulk-listing-v2-phase6-explained.html</code>.</p></div>
+  <div class="phase">
+    <div class="phase-head"><span class="num">1</span><h3>New files</h3><span class="tag size">New</span></div>
+    <ul>
+      <li><b><code>types/my-domains/approvals.ts</code></b>: the approval types (exported from the types index).</li>
+      <li><b><code>constants/nftContracts.ts</code></b>: the table of listable contracts (one row today; multi chain adds more).</li>
+      <li><b><code>helpers/my-domains/nftApprovals.ts</code></b>: grouping, missing, fee text, cancel toast. Pure.</li>
+      <li><b><code>helpers/my-domains/nftApprovals.test.ts</code></b>: 8 tests.</li>
+      <li><b><code>hooks/my-domains/useNftApprovals.ts</code></b>: reads approvals on each contract's own chain, estimates the fee, sends the approvals.</li>
+    </ul>
+  </div>
+  <div class="phase">
+    <div class="phase-head"><span class="num">2</span><h3>Changed</h3><span class="tag size">Changed</span></div>
+    <ul>
+      <li><b><code>OneTimeApprovalStep</code></b> (+ scss, index): the "Approval needed" rows, the note for several, the real fee, "Approve N in wallet".</li>
+      <li><b><code>BulkListingFlowModal</code></b>: approvals from the new hook, one transaction per missing contract, "Confirm approval 1 of 2", the part D toast.</li>
+      <li><b><code>ListingFlowModal</code></b>: the real fee on the single approval screen.</li>
+    </ul>
+  </div>
+
+  <h2 id="p5">Phase 5 · 23 Nov 2026 · Drawer fixes</h2>
+  <div class="callout ok"><p>F4, F6 items 1 to 3 and the F8 design issues. One new file (a test); everything else is small changes. The bulk drawer was tested on uat with MetaMask. Simplest version: <code>phase-explained/bulk-listing-v2-phase5-explained.html</code>.</p></div>
+  <div class="phase">
+    <div class="phase-head"><span class="num">1</span><h3>Rules (helpers, pure)</h3><span class="tag size">Changed</span></div>
+    <ul>
+      <li><b><code>helpers/my-domains/bulkListing.ts</code></b>: the percentage helpers removed (<code>parsePercent</code>, <code>percentPrice</code>, <code>bulkEstimate</code>, <code>BULK_DEFAULT_PERCENT</code>, the 1 to 500 limits); new <code>signedEndTime</code>, <code>bulkCutShort</code>, <code>bulkSignableCount</code>, <code>signedExpiries</code>; <code>bulkExpiry</code> now uses block time minus 5 minutes.</li>
+      <li><b><code>helpers/my-domains/bulkBatch.ts</code></b>: <code>isCancelled</code> checked before signing and before posting; each listed name gets its signed <code>endTime</code>.</li>
+      <li><b><code>helpers/my-domains/bulkSigning.ts</code></b>: <code>isCancelled</code>, <code>onRecorded</code>, <code>CANCELLED_BEFORE_SIGNING</code>; <code>onRejected</code> now receives the real remaining count; listed names get <code>endTime</code>.</li>
+      <li><b><code>helpers/token-format/tokenFormat.ts</code></b>: <code>feePercentLabel(feeBps)</code>.</li>
+      <li><b><code>helpers/my-domains/bulkPhase5.test.ts</code></b> <span class="tag size">New</span>: 11 tests. <code>bulkBatch.test.ts</code>: the estimate field removed from its sample item.</li>
+    </ul>
+  </div>
+  <div class="phase">
+    <div class="phase-head"><span class="num">2</span><h3>Types and hooks</h3><span class="tag size">Changed</span></div>
+    <ul>
+      <li><b><code>types/my-domains/bulk.ts</code></b>: <code>BulkPricingMode</code> is <code>'same' | 'each'</code>; <code>estimateUsd</code>, <code>percent</code> and <code>'bad-percent'</code> removed; <code>BulkListingResult.endTime</code> added.</li>
+      <li><b><code>hooks/my-domains/useBulkListingDraft.ts</code></b>: no percent or <code>hasEstimates</code>.</li>
+      <li><b><code>hooks/my-domains/useBulkListingActions.ts</code></b>: <code>readChainNow</code>; <code>isCancelled</code> and <code>onRecorded</code> passed through; the per name <code>beforePost</code> drops a late signature.</li>
+    </ul>
+  </div>
+  <div class="phase">
+    <div class="phase-head"><span class="num">3</span><h3>What you see (composites, one primitive)</h3><span class="tag size">Changed</span></div>
+    <ul>
+      <li><b><code>BulkPricingOptions</code></b> (+ scss): two cards. <b><code>BulkNamesList</code></b> (+ scss): no estimate text.</li>
+      <li><b><code>BulkListingFormStep</code></b>: <code>nowMs</code> prop, the signed date, named cut short names, the fee label, auction text.</li>
+      <li><b><code>BulkListingSuccessStep</code></b>: <code>endsSooner</code> rows. <b><code>KeyValueRows</code></b> (primitive): optional <code>id</code> for rows sharing a label.</li>
+      <li><b><code>BulkListingFlowModal</code></b>: reads block time on open, the Cancel buttons and run numbers, signed dates on the result, the real remaining count.</li>
+      <li><b><code>ListingFlowModal</code></b>: Cancel on the approval, wallet check and signing screens. <b><code>listingOrder.ts</code></b>: <code>FlowCancelledError</code>, treated as a quiet cancel.</li>
+      <li><b><code>OneTimeApprovalStep</code></b>, <b><code>ListingFormStep</code></b>, <b><code>ConfirmToSignStep</code></b>, <b><code>FeeBreakdownRow</code></b>: approval wording, auction text, fee label.</li>
+    </ul>
+  </div>
+
+  <h2 id="p8b">Phase 8, part 2 · 23 Nov 2026 · Edit price (option B)</h2>
+  <div class="callout ok"><p>Free price cuts. No new files; small additions to the cancel helper, service and hook, the listing drawer pieces, and the rows. Tested on uat with MetaMask. Simplest version: <code>phase-explained/bulk-listing-v2-edit-price-explained.html</code>.</p></div>
+  <div class="phase">
+    <div class="phase-head"><span class="num">1</span><h3>The rule and the backend call</h3><span class="tag size">Changed</span></div>
+    <ul>
+      <li><b><code>comparePrice</code></b> (<code>onChainCancel.ts</code>, + 2 tests): is the new price lower, the same, or higher than the live one, in exact USDT units.</li>
+      <li><b><code>hideListingOffChain</code></b> (<code>cancelOrders.service.ts</code>) and <b><code>hideOffChain</code></b> (<code>useOnChainCancel.ts</code>): hide the old listing for free, for a price cut only.</li>
+      <li><b><code>beforePost</code></b> (<code>listingOrder.ts</code>, <code>useListingFlowActions.ts</code>): a step that runs after the new price is signed and before it's posted, so the old listing is only hidden once you've really signed.</li>
+    </ul>
+  </div>
+  <div class="phase">
+    <div class="phase-head"><span class="num">2</span><h3>What you see</h3><span class="tag size">Changed</span></div>
+    <ul>
+      <li><b>Rows and cards:</b> "Edit price" on listed names instead of "Delist".</li>
+      <li><b>Listing drawer (edit mode):</b> the free note, the same or higher price messages, the red "Remove this listing" box with Delist, "Sign new price", the edit texts on the confirm and success screens.</li>
+      <li><b>Notes fixed:</b> the normal listing form ("…Delisting later costs a small network fee; lowering the price is free.") and the single success screen ("You can delist it any time…").</li>
+    </ul>
+  </div>
+
+  <h2 id="p8">Phase 8 · 23 Nov 2026 · on chain delist, single and bulk (F7)</h2>
+  <div class="callout"><p>7 new files and 19 changed. Not committed and not tested by hand yet. Simplest version: <code>phase-explained/bulk-listing-v2-phase8-explained.html</code>. Every message drawn: <code>wording/phase8-wording.html</code>. Full detail: <code>bulk-listing-progress.html</code>, v2 Phase 8.</p></div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">1</span><h3><code>src/core/services/my-domains/cancelOrders.service.ts</code></h3><span class="tag new">New · 49 lines</span></div>
+    <p>Four backend calls: get a listing's exact signed order; tell the backend "these are cancelled, here's the transaction"; read which hashes a "can't cancel" (409) answer named; read the recent cancels for the row labels.</p>
+  </div>
+  <div class="phase">
+    <div class="phase-head"><span class="num">2</span><h3><code>src/helpers/my-domains/onChainCancel.ts</code> (+ <code>.test.ts</code>, 10 tests)</h3><span class="tag new">New · the rules</span></div>
+    <ol class="qs">
+      <li><b>runOnChainCancel</b><span>Fetch every signed order, make sure each is the right one and yours, send one cancel transaction, then tell the backend; if some were already sold or cancelled, tell it about the rest with the same transaction.</span></li>
+      <li><b>pendingCancelsByToken</b><span>Which of your names are still "Cancelling" or "Cancel not confirmed".</span></li>
+      <li><b>cancelOutcomeText</b><span>The approved message for each result.</span></li>
+    </ol>
+  </div>
+  <div class="phase">
+    <div class="phase-head"><span class="num">3</span><h3>Hooks: <code>useOnChainCancel.ts</code>, <code>usePendingCancels.ts</code> (new), <code>useDelistListing.ts</code> (rewritten)</h3><span class="tag new">Glue</span></div>
+    <dl class="rows">
+      <dt>useOnChainCancel</dt><dd>Checks Polygon and the wallet proof, sends Seaport <code>cancel</code> from your wallet, then refreshes the page's data.</dd>
+      <dt>usePendingCancels</dt><dd>Reads the "Cancelling" states for the rows; checks again every 20 seconds while any are waiting.</dd>
+      <dt>useDelistListing</dt><dd>The single Delist button, now on chain; same shape for the pages that use it.</dd>
+    </dl>
+  </div>
+  <div class="phase">
+    <div class="phase-head"><span class="num">4</span><h3>New screens: <code>BulkDelistModal</code>, <code>PendingCancelChip</code></h3><span class="tag new">On screen</span></div>
+    <ul>
+      <li><b>BulkDelistModal:</b> "Delist N listings" with the names, then Preparing / Confirm in your wallet / Saving, then "N listings cancelled" or "Nothing was cancelled".</li>
+      <li><b>PendingCancelChip:</b> the "Cancelling" or "Cancel not confirmed" label on a row or card.</li>
+    </ul>
+  </div>
+  <div class="phase">
+    <div class="phase-head"><span class="num">5</span><h3>Changed screens and page</h3><span class="tag size">On screen</span></div>
+    <ul>
+      <li><b>My Domains page:</b> delist select mode, the Bulk delist Quick Action, the delist drawer, and the row labels.</li>
+      <li><b>Rows and cards:</b> the label, and Cancel again when not confirmed. <b>Table:</b> passes the label and the delist select reason.</li>
+      <li><b>Select bar:</b> delist texts and "Delist N". <b>Select button:</b> "Not for sale, so there's nothing to delist".</li>
+      <li><b>Bulk listing drawer and result screen:</b> the "Cancel older listings" box; the two "cancelling is free" notes fixed.</li>
+      <li><b>Quick Actions:</b> "Bulk delist · Cancel many listings in one transaction".</li>
+    </ul>
+  </div>
+  <div class="phase">
+    <div class="phase-head"><span class="num">6</span><h3>Small</h3><span class="tag size">Changed</span></div>
+    <p>Seaport <code>cancel</code> added to the shared Seaport function list (additive only); <code>delistIneligibleReason</code> in <code>bulkListing.ts</code>; <code>useBulkSelection</code> takes an eligibility rule; new shapes in <code>types/my-domains/bulk.ts</code> and the <code>bulk-delist</code> action type; the drawer exported from the my-domains barrel.</p>
+  </div>
+
+  <h2 id="p4">Phase 4 · 20 Nov 2026 · fallback, smart wallets, network check (F3, F9)</h2>
+  <div class="callout"><p>Three safety nets around the one signature flow. 8 files changed, nothing new created. Not committed and not tested by hand yet; Phantom, Rabby and Coinbase marked not tested. Simplest version: <code>phase-explained/bulk-listing-v2-phase4-explained.html</code>. Full detail: <code>bulk-listing-progress.html</code>, v2 Phase 4.</p></div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">1</span><h3><code>src/helpers/my-domains/bulkBatch.ts</code></h3><span class="tag size">Changed · +23 lines</span></div>
+    <ol class="qs">
+      <li><b>isSmartContractCode(code)</b><span>Looks at an account's code on the blockchain. No code means a normal wallet. Code means a smart contract wallet, unless it starts with <code>0xef0100</code>, which is a normal wallet using a newer feature (EIP 7702) that still signs like any wallet.</span></li>
+      <li><b>offersPerNameFallback(outcome, lastPhase)</b><span>Decides when to offer "Sign each name separately": only if nothing was signed, the wallet really was asked, and it failed or produced a signature that doesn't check out. Not after a cancel, the wrong wallet, the wrong network or a smart wallet.</span></li>
+    </ol>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">2</span><h3><code>src/helpers/my-domains/bulkBatch.test.ts</code></h3><span class="tag size">Changed · 4 new tests (15 in this file)</span></div>
+    <p>The fallback is offered when the wallet errors or signs wrongly; not offered after a cancel, before signing, for the wrong network, a smart wallet, or after posting; and smart wallet detection works, including the EIP 7702 case.</p>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">3</span><h3><code>src/hooks/my-domains/useBulkListingActions.ts</code></h3><span class="tag size">Changed · +36 / −2 lines</span></div>
+    <dl class="rows">
+      <dt>BulkPrecheckError</dt><dd>An error meaning "a check before signing failed": wrong network, or smart wallet.</dd>
+      <dt>isSmartWalletAddress</dt><dd>Reads the account's code on Polygon and asks <code>isSmartContractCode</code>.</dd>
+      <dt>prepare</dt><dd>Now checks, before anything else, that the wallet is on Polygon and isn't a smart wallet.</dd>
+      <dt>isSmartWallet</dt><dd>For the form's notice when the drawer opens.</dd>
+    </dl>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">4</span><h3>The drawer: <code>BulkListingFlowModal</code>, <code>BulkListingSigningStep</code> (+ <code>index.ts</code>), <code>BulkListingFormStep</code></h3><span class="tag size">Changed · on screen</span></div>
+    <ul>
+      <li><b>New screen</b> "Your wallet couldn't sign them all at once", with Sign each name separately and Back to the form.</li>
+      <li><b>The October per name flow is back</b>, but only behind that button: "Signing 1 of N" and the skip or stop prompt.</li>
+      <li><b>New form notice</b> "Smart contract wallets can't bulk list yet" with Switch wallet; List disabled.</li>
+      <li><b>Two new messages</b> for a wrong network or a smart wallet found at List time; the matching banner or notice turns on too.</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">5</span><h3><code>src/types/my-domains/bulk.ts</code></h3><span class="tag size">Changed · 1 line</span></div>
+    <p>Two more failure reasons: <code>wrong-network</code> and <code>smart-wallet</code>.</p>
+  </div>
+
+  <h2 id="p3">Phase 3 · 20 Nov 2026 · sign once, post once (F2 part 2)</h2>
+  <div class="callout ok"><p>This is the phase that changes the screen: the bulk drawer now asks for one signature for all names and sends them in one request. Tested on uat with MetaMask (8 names, one signature). Committed 20 Nov as <code>7bda94f</code> (not pushed). The full detail (exact functions and line numbers, the click trace, and the checks against Mohit sir's PDF, our plan and Guru's test page) is in <code>bulk-listing-progress.html</code>, v2 Phase 3, and <code>bulk-listing-v2-flow-explained.html</code>, sections 8 and 9.</p></div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">1</span><h3><code>src/core/services/my-domains/bulkOrders.service.ts</code></h3><span class="tag new">New · 29 lines</span></div>
+    <p>Our layering rules say only <code>core/services</code> talks to the backend, so the call lives here. One function, <code>postBulkOrders(request)</code>: it sends <code>POST /marketplacev2/orders/bulk</code> and returns the backend's answer (a batch id and one result per name).</p>
+    <p><b>The one special case:</b> when the backend refuses <i>every</i> name, it answers with an error (400 <code>BATCH_ALL_REJECTED</code>) that still contains every name's reason. This file treats that as a normal answer, so the drawer can show the reasons instead of a vague error. Any other error is passed on.</p>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">2</span><h3><code>src/helpers/my-domains/bulkBatch.ts</code></h3><span class="tag new">New · the main work</span></div>
+    <p>Pure functions: the wallet, the backend call and the error sorting are handed in from outside, so the rules can be tested without a wallet or internet.</p>
+    <ol class="qs">
+      <li><b>runBulkBatch(items, days, deps)</b><span>The whole flow: prepare (wallet, counter, block time), build each order, leave out names that expire too soon, put the orders in one tree, ask for the one signature, check every signature leads back to you, then send. Returns one of three outcomes: "not signed" (back to the form), "post failed" (can retry), or "posted" (results).</span></li>
+      <li><b>postSignedBatch(batch, deps)</b><span>Only the sending part. Used for the first send and for every "Try again", with exactly the same bytes, so you never sign twice.</span></li>
+      <li><b>mapBulkAnswers(batch, answer)</b><span>Matches the backend's answers to our names by name (not by position, not by capital letters). A "duplicate order" answer means an earlier try already got through, so it counts as listed. A name with no answer is flagged.</span></li>
+      <li><b>BULK_REJECT_REASONS and bulkRejectReason(code)</b><span>The approved plain reasons for each backend code, e.g. <code>ALREADY_LISTED</code> becomes "Already listed". Signature or fee codes all become "Couldn't be checked, try again" and are logged as our bug.</span></li>
+      <li><b>isRetryableResult(result)</b><span>Decides who goes into "Try these again". Names that would fail the same way (already listed, not owned, name mismatch, older cheaper listing) are left out.</span></li>
+    </ol>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">3</span><h3><code>src/helpers/my-domains/bulkBatch.test.ts</code></h3><span class="tag new">New · 11 tests</span></div>
+    <p>Signs with two throwaway test wallets made from sentences (a seller and a stranger) and a fake backend. Proves: one signature and one send for 10 names; a single name works; rejected names get the right reasons; duplicates count as listed; answers match by name; expiring names are left out; a cancelled signature, a cancelled wallet check, or a signature from the wrong wallet sends nothing; a retry sends the same bytes with no new signature.</p>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">4</span><h3><code>src/hooks/my-domains/useBulkListingActions.ts</code></h3><span class="tag size">Changed · 4 new functions</span></div>
+    <p>The hook is where the pure rules meet the real world (the wallet and the backend).</p>
+    <dl class="rows">
+      <dt>signAndSubmitBulkOnce</dt><dd>Runs <code>runBulkBatch</code> with the real wallet, the real order builder and the real service. If the backend says the wallet proof went stale, it renews it once and sends the same batch again.</dd>
+      <dt>retryBulkPost</dt><dd>"Try again": resends the kept batch.</dd>
+      <dt>isWalletProofFresh, verifyWallet</dt><dd>For the form's "Verify your wallet first" notice: is the proof still fresh for this wallet, and the button that renews it.</dd>
+      <dt>Kept</dt><dd>The old one popup per name path (<code>signAndSubmitBulk</code>), for phase 4's fallback.</dd>
+    </dl>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">5</span><h3>The drawer: <code>BulkListingFlowModal</code>, <code>BulkListingSigningStep</code>, <code>BulkListingFormStep</code></h3><span class="tag size">Changed · on screen</span></div>
+    <ul>
+      <li><b>Form:</b> "Verify your wallet first" notice with a Verify wallet button; List stays disabled while it shows; the note now says "One signature covers all N names".</li>
+      <li><b>Progress:</b> three screens, Preparing N listings, Sign once for all N names, Publishing N listings (new <code>BulkBatchStep</code>).</li>
+      <li><b>Post failed:</b> new screen "Signed, but not published yet" with Try again and Close without listing (<code>BulkPostFailedStep</code>, <code>BulkPostFailedFooter</code>).</li>
+      <li><b>Back to the form</b> with an approved message when nothing was signed (cancelled signature, cancelled wallet check, failed local check, wallet not linked, anything else).</li>
+      <li><b>Result screen:</b> same look as before, now with the backend's reason per name; "Try these again" only offers names that could succeed.</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">6</span><h3><code>src/types/my-domains/bulk.ts</code> and <code>src/lib/marketplace-order-client.ts</code></h3><span class="tag size">Changed · small</span></div>
+    <ul>
+      <li><b>Types:</b> the shape of the request and the backend's answer, the kept signed batch, the three outcomes, and two new optional fields on a result (<code>code</code>, <code>olderOrderHashes</code>, the latter for phase 8's cancel prompt).</li>
+      <li><b>Order client:</b> backend errors now keep the full reply (<code>body</code>), needed for the "every name refused" case; and the wallet freshness check can now also check the proof belongs to the connected wallet. Nothing existing changes behaviour.</li>
+    </ul>
+  </div>
+
+  <h2 id="p2">Phase 2 · 19 Nov 2026 · bulk signature helpers (F2 part 1)</h2>
+  <div class="callout ok"><p>Four files, all new building blocks. Nothing on screen changed and no existing function was touched; phase 3 connects these to the drawer. Committed 20 Nov as <code>ce32655</code> (not pushed).</p></div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">1</span><h3><code>src/types/my-domains/bulk.ts</code></h3><span class="tag size">Changed · 33 lines added at the end</span></div>
+    <p>This file only describes the <b>shape</b> of data; it doesn't do anything. Our layering rules (CLAUDE.md §8 rule 5) say shared shapes live in <code>src/types</code>, so the three new ones went here.</p>
+    <dl class="rows">
+      <dt>Eip712Types</dt><dd>The format the wallet needs to know what it's signing: type names, each with its fields ("OrderComponents has offerer (address), zone (address), offer (list)…").</dd>
+      <dt>BulkOrderTree</dt><dd>Everything about one batch once the tree is built: <code>orders</code> (your real listings), <code>height</code> (levels, 6 for 50 names), <code>types</code> (the message description), <code>leaves</code> (a fingerprint per listing plus filler, 64 for 50 names), <code>layers</code> (every level from the leaves up to the root), <code>root</code> (the one fingerprint at the top) and <code>value</code> (the message the wallet signs, the orders nested in pairs).</dd>
+      <dt>DecodedBulkSignature</dt><dd>One listing's signature split back into its parts: the wallet's signature, the listing's position (<code>leafIndex</code>) and the <code>proof</code> (the neighbour fingerprints on the way up).</dd>
+    </dl>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">2</span><h3><code>src/helpers/my-domains/bulkOrderTree.ts</code></h3><span class="tag new">New · the main work</span></div>
+    <p>Pure functions: data in, data out. No wallet, no internet, no screen. The top comment says what the file does, that it is ported from Seaport.js 4.4.1 (MIT), and that it deliberately differs from Seaport.js's broken type hash helper.</p>
+    <h4>Constants</h4>
+    <ul>
+      <li><code>BULK_ORDER_MAX_HEIGHT = 24</code>: the biggest tree Seaport allows. Our cap of 50 names (height 6) never gets close.</li>
+      <li>The byte sizes, named so the code reads clearly: 3 for the position, 32 per proof word, 64 or 65 for the signature.</li>
+    </ul>
+    <h4>Functions, in the order they're used</h4>
+    <ol class="qs">
+      <li><b>bulkTreeHeight(count)</b><span>How many levels the tree needs: 1 or 2 names give 1, 3 or 4 give 2, 50 give 6. Refuses 0 names.</span></li>
+      <li><b>bulkOrderTypes(height)</b><span>Builds the message description for the wallet: one line <code>BulkOrder { tree: OrderComponents[2][2]... }</code>, one <code>[2]</code> per level, on top of the order description we already had (<code>EIP712_TYPES</code>). This is Mohit's "don't hand write the type strings": the code builds the text, so a typo is impossible.</span></li>
+      <li><b>bulkOrderTypeHash(height)</b><span>The "shape fingerprint", made from the full type text. This is where we deliberately differ from Seaport.js's <code>getBulkOrderTypeHash</code>, which gives a wrong value (explained in the progress log, phase 2).</span></li>
+      <li><b>emptyValue and emptyOrderComponents()</b><span>Make the filler order: every number zero, every address zero, no items. A tree needs a power of two leaves (2, 4, 8 … 64), so 50 listings get 14 fillers. Nobody can ever buy one. Built from the type description, as Seaport.js's <code>DefaultGetter</code> does, instead of writing the zeros out.</span></li>
+      <li><b>hashPair and nestInPairs</b><span>Two small helpers. <code>hashPair</code> fingerprints two fingerprints together (<code>keccak256(left ‖ right)</code>). <code>nestInPairs</code> turns <code>[a, b, c, d]</code> into <code>[[a, b], [c, d]]</code>, the shape the wallet signs.</span></li>
+      <li><b>buildBulkOrderTree(orders)</b><span>The main builder: works out the height, adds fillers, fingerprints every order (the leaves), pairs and fingerprints level by level until one root is left, and returns all of it plus the nested message for the wallet.</span></li>
+      <li><b>bulkOrderProof(tree, index)</b><span>For the listing at position <code>index</code>: its neighbour fingerprints on the way up, one per level (6 for 50 names). With them anyone can rebuild the root from that one listing.</span></li>
+      <li><b>bulkOrderDigest(root, height, chainId, seaport)</b><span>Mohit's formula from the PDF: <code>keccak256(0x1901 ‖ domainSeparator ‖ keccak256(typeHash ‖ root))</code>, the number the wallet really signs.</span></li>
+      <li><b>toCompactSignature(signature)</b><span>MetaMask returns 65 bytes; Seaport accepts a 64 byte form that means the same (EIP 2098). Seaport.js and F2 use the short one, so this shortens it.</span></li>
+      <li><b>encodeBulkSignature(walletSignature, index, proof)</b><span>One listing's own signature: 64 byte signature, then the position in 3 bytes, then the proof. 259 bytes each for 50 names.</span></li>
+      <li><b>bulkOrderSignatures(tree, walletSignature)</b><span>Does the step above for every listing. This is what phase 3 sends to the backend.</span></li>
+      <li><b>decodeBulkSignature(signature)</b><span>The reverse: splits a signature back into its parts, telling the 64 and 65 byte forms apart by length, the same rule as Seaport and the backend. A normal single listing signature returns "not a bulk signature".</span></li>
+      <li><b>rootFromProof(leaf, index, proof)</b><span>Starts from one listing's fingerprint and climbs the tree with the proof; at each level the position says left or right. The answer should be the root.</span></li>
+      <li><b>recoverBulkSigner(order, signature, chainId, seaport)</b><span>Who signed this listing: split the signature, rebuild the root, rebuild the digest, ask the maths which wallet made the signature. Returns nothing if anything is malformed.</span></li>
+      <li><b>findBadBulkSignatures(orders, signatures, seller, …)</b><span>The safety check before posting (F2 step 5): checks every listing's signer is the seller and returns the positions that fail. Empty list means all good. The bulk version of the <code>verifyTypedData</code> check in the single listing flow.</span></li>
+    </ol>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">3</span><h3><code>src/helpers/my-domains/bulkOrderTree.test.ts</code></h3><span class="tag new">New · 28 tests</span></div>
+    <p>Runs with <code>npm test</code> in about a second, with no wallet. It signs with a throwaway test key made from a sentence, so no secret key is stored anywhere.</p>
+    <div class="tablecard"><table>
+      <tr><th>Group</th><th>Tests</th><th>What it proves</th></tr>
+      <tr><td>Tree height</td><td>2</td><td>The right height for 1 to 65 names; 0 names refused</td></tr>
+      <tr><td>Empty order</td><td>1</td><td>The filler really is all zeros and empty</td></tr>
+      <tr><td>Against Seaport.js</td><td>15 (3 each for 1, 2, 3, 4, 50 names)</td><td>Our type, type hash, root and digest equal Seaport.js's; our wallet signature, short signature and every listing's signature equal it byte for byte; every signature passes our check with the right position and proof length</td></tr>
+      <tr><td>Catching tampering (50 names)</td><td>7</td><td>A changed proof byte, a wrong position, a position past the end, two signatures swapped, a price changed after signing, the wrong seller, the wrong chain: each fails exactly the listings it should</td></tr>
+      <tr><td>Signature formats</td><td>3</td><td>The 65 byte form also works; a normal signature isn't mistaken for a bulk one; fillers get no proof</td></tr>
+    </table></div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">4</span><h3><code>src/helpers/my-domains/__fixtures__/bulkOrderTree.fixtures.json</code></h3><span class="tag new">New · data, 120 KB</span></div>
+    <p>The answer key, made by running the official Seaport.js (script in <code>dev-docs/bulk-listing/scripts/</code>). It holds the test signer's address and the sentence its key comes from, the chain (137, Polygon), the Seaport address, and five cases (1, 2, 3, 4 and 50 listings). Each case has the listings plus what Seaport.js produced: height, type, type hash, root, digest, wallet signature, short signature and every listing's signature. The tests compare our output with these.</p>
+  </div>
+
+  <h2 id="p1">Phase 1 · 19 Nov 2026 · rebase onto uat (F1)</h2>
+  <div class="card">
+    <p><b>No file was edited by hand.</b> The branch was moved on top of today's uat. Our one bulk listing commit (45 files, from 28 Oct) was replayed unchanged as <code>8209a6a</code>; git's patch check proves it holds exactly the same changes. Everything else that arrived (Trails, dark mode fixes, Profile fixes) came from uat, not from us.</p>
+    <p>One local file was affected by accident: the ignored <code>CLAUDE.md</code> was overwritten by an old copy during the rebase and restored word for word. It isn't in git.</p>
+  </div>
+
+  <h2 id="p0">Phase 0 · 19 Nov 2026 · review</h2>
+  <div class="card"><p><b>No code changes.</b> Only notes in dev-docs (below).</p></div>
+
+  <h2 id="docs">Notes on this computer only (dev-docs, not in git)</h2>
+  <div class="tablecard"><table>
+    <tr><th>File</th><th>What it is</th><th>Last changed</th></tr>
+    <tr><td><code>bulk-listing-v2-plan.md</code></td><td>The phased plan with prompts and questions V1 to V10</td><td>20 Nov (Guru's test page, PR #1025, two questions answered)</td></tr>
+    <tr><td><code>bulk-listing-progress.html</code></td><td>Status, detailed entry per phase, v2 testing log</td><td>23 Nov (phase 8 entry)</td></tr>
+    <tr><td><code>bulk-listing-v2-review.html</code></td><td>Plan review: backend status, gaps, questions, what's left on the backend</td><td>20 Nov (test page, answered questions)</td></tr>
+    <tr><td><code>bulk-listing-v2-tickets-explained.html</code></td><td>F1 to F9 in simple words</td><td>19 Nov evening (backend live)</td></tr>
+    <tr><td><code>phase-explained/bulk-listing-v2-phase2-explained.html</code></td><td>Phase 2's 4 files in the simplest words, one page</td><td>20 Nov</td></tr>
+    <tr><td><code>phase-explained/bulk-listing-v2-phase3-explained.html</code></td><td>Phase 3's 10 files in the simplest words, one page</td><td>20 Nov</td></tr>
+    <tr><td><code>phase-explained/bulk-listing-v2-phase4-explained.html</code></td><td>Phase 4's safety nets and 8 files in the simplest words</td><td>20 Nov</td></tr>
+    <tr><td><code>phase-explained/bulk-listing-v2-phase8-explained.html</code></td><td>Phase 8, delisting for real, in the simplest words</td><td>23 Nov</td></tr>
+    <tr><td><code>phase-explained/bulk-listing-v2-safeguards-explained.html</code></td><td>Cancel safeguards in the simplest words</td><td>24 Nov</td></tr>
+    <tr><td><code>incident-24nov-backend-500.html</code></td><td>The 24 Nov stage outage: both 500s, cause, fix</td><td>24 Nov</td></tr>
+    <tr><td><code>phase-explained/bulk-listing-v2-phase7-explained.html</code></td><td>Phase 7 (product rules) in the simplest words</td><td>24 Nov</td></tr>
+    <tr><td><code>wording/phase7-wording.html</code></td><td>Phase 7 wording, drawn (approved 24 Nov, A to F, D1)</td><td>24 Nov</td></tr>
+    <tr><td><code>phase-explained/bulk-listing-v2-phase6-explained.html</code></td><td>Phase 6 (approvals per contract) in the simplest words</td><td>23 Nov</td></tr>
+    <tr><td><code>wording/phase6-wording.html</code></td><td>Phase 6 wording, drawn (approved 23 Nov, A to F)</td><td>23 Nov</td></tr>
+    <tr><td><code>phase-explained/bulk-listing-v2-phase5-explained.html</code></td><td>Phase 5 (drawer fixes) in the simplest words</td><td>23 Nov</td></tr>
+    <tr><td><code>wording/phase5-wording.html</code></td><td>Phase 5 wording, drawn (approved 23 Nov, E2)</td><td>23 Nov</td></tr>
+    <tr><td><code>phase-explained/bulk-listing-v2-edit-price-explained.html</code></td><td>Edit price (option B) in the simplest words</td><td>23 Nov</td></tr>
+    <tr><td><code>wording/edit-price-wording.html</code></td><td>Edit price wording, drawn (approved 23 Nov)</td><td>23 Nov</td></tr>
+    <tr><td><code>wording/delist-placement-options.html</code></td><td>The 4 places Delist could go (option 2 chosen)</td><td>23 Nov</td></tr>
+    <tr><td><code>wording/phase8-wording.html</code></td><td>Every phase 8 message drawn as it will look (approved 23 Nov)</td><td>23 Nov</td></tr>
+    <tr><td><code>FRONTEND_INTEGRATION_GUIDE 1.docx</code></td><td>The backend team's integration guide (read only)</td><td>Received 20 Nov</td></tr>
+    <tr><td><code>bulk-listing-v2-file-changes.html</code></td><td>This page</td><td>19 Nov</td></tr>
+    <tr><td><code>bulk-listing-v2-flow-explained.html</code></td><td>The whole journey, step by step, today vs v2</td><td>23 Nov (phase 8 section 11)</td></tr>
+    <tr><td><code>scripts/make-bulk-fixtures.js</code>, <code>scripts/README.md</code></td><td>Makes the fixtures answer key from Seaport.js</td><td>19 Nov</td></tr>
+  </table></div>
+
+  <footer>Bulk listing v2 · updated at the end of every phase · dev-docs is local only.</footer>
+</div>
+<script>
+  document.getElementById('toggle').addEventListener('click', function () {
+    var root = document.documentElement;
+    var current = root.getAttribute('data-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('dmplan-theme', next); } catch (e) {}
+  });
+</script>
+</body>
+</html>

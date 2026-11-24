@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trails plan, 12 Nov</title>
+<style>
+:root {
+  --bg: #f6f6f9; --surface: #ffffff; --fg: #1b1a24; --muted: #5c5a6b; --line: #dddbe7;
+  --ok: #17803d; --ok-bg: #e3f5e9; --warn: #9a5b00; --warn-bg: #fdf1dc; --no: #b42318; --no-bg: #fde8e6; --code: #eeedf4; --accent: #3b4fe0;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0d0d10; --surface: #17171b; --fg: #ecebf2; --muted: #a3a1b3; --line: #2b2a33;
+    --ok: #6fdc95; --ok-bg: #12301d; --warn: #f3c26b; --warn-bg: #33270f; --no: #ff9a8f; --no-bg: #3a1714; --code: #23222a; --accent: #8f9bff;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 900px; margin: 0 auto; padding: 32px 16px 64px; }
+h1 { font-size: 26px; margin: 0 0 4px; }
+h2 { font-size: 19px; margin: 34px 0 10px; padding-top: 14px; border-top: 1px solid var(--line); }
+h3 { font-size: 16px; margin: 18px 0 6px; }
+.sub { color: var(--muted); margin: 0 0 18px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; margin: 10px 0; }
+.tbl { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--line); }
+th { font-size: 13px; color: var(--muted); font-weight: 600; }
+tr:last-child td { border-bottom: 0; }
+code { font: 13px ui-monospace, Consolas, monospace; background: var(--code); padding: 1px 5px; border-radius: 4px; }
+.pill { display: inline-block; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+.free { color: var(--ok); background: var(--ok-bg); }
+.paid { color: var(--warn); background: var(--warn-bg); }
+.need { color: var(--no); background: var(--no-bg); }
+.pass { color: #fff; background: var(--ok); }
+ol, ul { padding-left: 22px; margin: 6px 0; }
+li { margin: 4px 0; }
+.check { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 4px 16px 12px; margin: 12px 0; }
+.check h3 .pill { margin-left: 8px; vertical-align: 2px; }
+.row { display: grid; grid-template-columns: 110px 1fr; gap: 4px 12px; margin: 4px 0; }
+.row b { color: var(--muted); font-weight: 600; font-size: 13px; padding-top: 1px; }
+@media (max-width: 560px) { .row { grid-template-columns: 1fr; } }
+.prompt { white-space: pre-wrap; word-break: break-word; font: 13px/1.5 ui-monospace, Consolas, monospace; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+blockquote { margin: 8px 0; padding: 10px 14px; border-left: 3px solid var(--accent); background: var(--surface); border-radius: 0 8px 8px 0; }
+</style>
+</head>
+<body>
+<main>
+<h1>Trails: plan for 12 Nov</h1>
+<p class="sub">Branch <code>trails</code>, latest pushed commit <code>1622027</code> · free checks first, paid checks once the funds arrive · log every result in <code>trails-progress.html</code> (Testing log: who, environment, result, gaps)</p>
+
+<div class="card">
+  <b>The day in order</b>
+  <ol>
+    <li>Morning: add the two MetaMask accounts and send the funding request (section 1), then set up (section 2).</li>
+    <li>Free checks 1 to 10 (section 3), while the funds arrive.</li>
+    <li>Paid checks 11 and 12 (section 4).</li>
+    <li>Log results; share anything new with Mohit (section 6).</li>
+  </ol>
+</div>
+
+<h2>1. Your test accounts and what to ask for (first thing)</h2>
+<p>You can do almost everything yourself with <b>two extra MetaMask accounts</b>. Your current account becomes the <b>seller</b>: it already owns the four domains bought through Trails on 10 and 11 Nov and has about 10 POL for gas. Listing needs POL, so the no POL account can only ever be a <b>buyer</b>.</p>
+<div class="tbl"><table>
+  <thead><tr><th>Account</th><th>Role</th><th>Needs</th></tr></thead>
+  <tbody>
+    <tr><td><b>Account 1</b> (current, <code>0x8FD5…4D0</code>)</td><td>Seller: lists domains it owns, own listing check, delist check</td><td>Nothing new: about 10 POL is enough for the listing approval and signatures</td></tr>
+    <tr><td><b>Trails buyer</b> (Account 3, <code>0x5b1c…A24E</code>)</td><td>Buys through Trails: main run, test E, WalletConnect run. In the lost race it is <b>both</b> buyers: Trails in one tab, direct USDT in the other.</td><td><b>2 USDC on Base</b>, <b>about $1 of ETH on Base</b>, <b>1 USDT on Polygon</b> (one request). <b>No POL until check 11 is done</b>, then about 0.5 POL from Account 1 for the direct buy's gas.</td></tr>
+  </tbody>
+</table></div>
+
+<h3>How to add an account in MetaMask</h3>
+<ol>
+  <li>Open the MetaMask extension and click the <b>account name</b> at the top.</li>
+  <li>Click <b>Add account or hardware wallet</b>, then <b>Add a new account</b> (choose <b>Ethereum account</b> if it asks for a type).</li>
+  <li>Name it <b>Trails buyer</b> and create it. Repeat for <b>Direct buyer</b>.</li>
+  <li>Nothing to back up: new accounts come from the same Secret Recovery Phrase you already have; each just has its own address.</li>
+  <li>To copy an account's address, select it and click the address under its name. Send the addresses to whoever funds them.</li>
+  <li>To use an account on the site, select it in MetaMask; if the site doesn't pick it up, open MetaMask's connected sites for <code>localhost:3002</code> and connect that account too. If the site asks you to link or verify the new wallet (Profile, Wallets), do it: it's a signature, no gas.</li>
+</ol>
+<p><b>Careful with the Trails buyer:</b> funds must arrive on the <b>Base</b> network (not Ethereum or Polygon). Don't send it POL, and don't use it for anything else, so the "no POL needed" run stays valid.</p>
+
+<h3>Listings you make yourself (Account 1)</h3>
+<ol>
+  <li>My Domains ▸ pick one of the bought domains (weiwuxianlanwangji.og, tawhidabdullah.og, westbengal.og, tpenguofficial.og) ▸ List ▸ <b>0.10 USDT</b>, <b>7 days</b>. The first listing asks for an approval transaction (POL gas) and a signature; later ones only a signature.</li>
+  <li>List <b>three</b>: main run (check 11), lost race (check 12), WalletConnect run (check 13). The bought domains end up in the Trails buyer account, which is fine.</li>
+  <li>Own listing check: Account 1 already lists twertsdfgsdfg.og (4 USDT), use that.</li>
+  <li>Not available check: delist one of your 0.10 listings (list a fourth if you need the others).</li>
+</ol>
+<p><b>Done 12 Nov (user, Account 1, stage marketplace):</b> five live listings, all on Polygon: twertsdfgsdfg.og 0.05 USDT (repriced from 4), tawhidabdullah.og 0.05, thefo….unstoppable 0.05, weiwuxianlanwangji.og 0.05, westbengal.og 0.10. Suggested use: own listing check (4) on twertsdfgsdfg.og; main run (11) westbengal.og; lost race (12) and WalletConnect run (13) two of the 0.05 .og ones; not available check (6) delists the last one. One new MetaMask account created: "Account 3", 0x5b1cf339C3591e1628C6B91053C48dD790C7A24E, empty, to be the <b>Trails buyer</b> (Base USDC + ETH, never POL). No Direct buyer account (plan changed: Account 3 races itself in check 12). Account 1 (seller) holds about 10.13 POL, a little BNB and ETH.</p>
+
+<h3>What to ask for</h3>
+<p>Only funds now, no listings from anyone else. Total about 4 USD, one request, all to Account 3. <b>Changed 12 Nov (user's choice):</b> no Direct buyer account; Account 3 races itself in check 12 (the race is about the listing being filled first, not who fills it). Account 1 needs nothing.</p>
+<blockquote>For today's Trails tests, could you send: 2 USDC and about $1 of ETH on the Base network, plus 1 USDT on Polygon, all to 0x5b1cf339C3591e1628C6B91053C48dD790C7A24E (please no POL).</blockquote>
+
+<h2>2. Setup</h2>
+<ol>
+  <li>Dev server on 3002 running the latest <code>trails</code> (<code>1622027</code>).</li>
+  <li>MetaMask extension updated (13.55 had a connect bug; the update fixed it). WalletConnect still works as a fallback.</li>
+  <li>DevTools open on <b>Console</b> and <b>Network</b>.</li>
+  <li>In the Console: <code>localStorage.removeItem('trails-checkouts')</code>, then a full reload, so nothing from 11 Nov is still being checked.</li>
+</ol>
+
+<h2>3. Free checks</h2>
+
+<div class="check"><h3>1. /history after the Trails purchases <span class="pill free">Free · 5 min</span><span class="pill pass">✓ Passed 12 Nov</span></h3>
+  <div class="row"><b>How</b><div>Open <code>/history</code> with your buyer wallet (<code>0x8FD5…4D0</code>).</div></div>
+  <div class="row"><b>Pass when</b><div>Each of these is a BUY row with its name, 0.10 USDT and transaction, and no "Purchase in progress" banner shows:
+    <ul>
+      <li>tpenguofficial.og, 10 Nov 07:02 UTC</li>
+      <li>westbengal.og, 10 Nov 07:37 UTC</li>
+      <li>tawhidabdullah.og, 11 Nov 10:20 UTC, tx <code>0x457221…915b</code></li>
+      <li>weiwuxianlanwangji.og, 11 Nov 10:46 UTC, tx <code>0x51406a…d387</code></li>
+    </ul></div></div>
+  <div class="row"><b>Note</b><div>Our backend's recent sales already list all four as sales to this wallet, so the data exists; this checks the page.</div></div>
+  <div class="row"><b>Result</b><div><b>Pass (user, 12 Nov, localhost:3002, Account 1).</b> All four as Purchase rows, 0.10 USDT, times in IST matching the UTC times above (plus theforceis.unstoppable, 10 Nov run 1). No "Purchase in progress" banner. The row shows the <b>order hash</b> (by design); its detail opened the right transaction (weiwuxianlanwangji.og ▸ <code>0x51406a…d387</code> on Polygonscan). Order to tx pairs also matched against our backend's sale records by Claude.</div></div>
+</div>
+
+<div class="check"><h3>2. Receipt, My Domains, emails <span class="pill free">Free · 10 min</span><span class="pill pass">✓ Passed 12 Nov</span></h3>
+  <div class="row"><b>How</b><div>Open the receipt page of one of them; open My Domains; check the buyer's and seller's inboxes.</div></div>
+  <div class="row"><b>Pass when</b><div>The names are in My Domains, the receipt shows the right domain, price and transaction, and both buy and sell emails arrived. <i>(Corrected 12 Nov: this first said "the receipt shows your wallet as buyer"; the receipt page has no buyer field and never had. The buyer is confirmed by /history and our sale record instead.)</i></div></div>
+  <div class="row"><b>Result</b><div><b>Pass (user, 12 Nov, localhost:3002, Account 1).</b> Receipt of weiwuxianlanwangji.og: order <code>0xe84b…6451b</code>, 0.10 USDT, tx <code>0x5140…9d387</code>, 11 Nov 16:16 IST, all four timeline steps done. All four names in My Domains. Buy and sell emails arrived. Seen on the receipt, not Trails bugs: "Seller received 0.10" and "Marketplace fee 0.00" are 0.0975 and 0.0025 rounded (predates Trails); "You paid 0.10 USDT" is the order price, though this buyer paid about 1.29 POL through Trails (sale records have no payment method; noted for Mohit).</div></div>
+</div>
+
+<div class="check"><h3>3. Test C, reload rule <span class="pill free">Free · 20 min</span><span class="pill pass">✓ Passed 11 Nov</span></h3>
+  <div class="row"><b>How</b><div>Buy on a listing ▸ Any token, any chain ▸ Continue ▸ pick a token so a price shows. Don't pay. Note the time. Reload within 15 minutes. Wait until 15 minutes have passed since the quote, reload again.</div></div>
+  <div class="row"><b>Pass when</b><div>After the first reload, <code>GetIntent</code> requests start again. After the second, none. No message either time.</div></div>
+  <div class="row"><b>Result</b><div><b>Pass (user, 11 Nov, localhost:3002).</b> Run on 11 Nov and reported on 12 Nov as working; not repeated today. Times, listing and token weren't recorded.</div></div>
+</div>
+
+<div class="check"><h3>4. Own listing screen <span class="pill free">Free</span><span class="pill pass">✓ Passed 12 Nov</span></h3>
+  <div class="row"><b>How</b><div>With Account 1 connected ▸ Buy Now on twertsdfgsdfg.og (its own listing) ▸ Any token ▸ Continue.</div></div>
+  <div class="row"><b>Pass when</b><div>"This is your own listing".</div></div>
+  <div class="row"><b>Result</b><div><b>Pass (user, 12 Nov, localhost:3002, Account 1).</b> The marketplace list shows Delist instead of Buy Now on your own listing (<code>pages/index.tsx</code> <code>isOwnListing</code>), so it was opened from the domain's detail page, which always shows Buy Now. The drawer showed "This is your own listing" straight away, before any payment choice: the original start up check (<code>loadOrder</code>) blocks both USDT and Any token. The Trails path's own check (<code>OWN_LISTING</code> from prepare, same screen) is only a backup and stays covered by <code>orderChecks.test.ts</code>.</div></div>
+</div>
+
+<div class="check"><h3>5. Expiring screen <span class="pill need">Can't be set up</span></h3>
+  <div class="row"><b>Why</b><div>The listing form only offers 7, 30 or 90 days, and no live stage listing ends soon (checked 11 Nov: only two active listings, both weeks away). The rule itself (an order must have more than 15 minutes left) is covered by the automated tests in <code>helpers/trails/orderChecks.test.ts</code>.</div></div>
+  <div class="row"><b>Do</b><div>Nothing tomorrow. Note it as "covered by automated tests only" and ask Mohit whether a short listing can be made from his probe harness if he wants it seen for real.</div></div>
+</div>
+
+<div class="check"><h3>6. Not available screen <span class="pill free">Free · delist costs a little POL</span><span class="pill pass">✓ Passed 12 Nov</span></h3>
+  <div class="row"><b>How</b><div>In tab A connect Account 3 (Trails buyer) and open thefo….unstoppable (0.05). In tab B, with Account 1, delist it. Back in tab A: Any token ▸ Continue.</div></div>
+  <div class="row"><b>Pass when</b><div>"No longer available: It was sold, cancelled or changed by the seller. Nothing was charged to you."</div></div>
+  <div class="row"><b>Result</b><div><b>Pass (user, 12 Nov).</b> Incognito window with Account 3 over WalletConnect opened thefo….unstoppable ▸ Buy Now ▸ Any token; normal window with Account 1 (extension) delisted it; then Continue. Drawer: "No longer available ▸ This listing is no longer available. It was sold, cancelled or changed by the seller. Nothing was charged to you. You can watch the name in case it is relisted, or look at similar ones." with Watch this name and See similar. That wording is the <code>unavailable</code> reason, set only by the Trails order check on Continue (<code>ORDER_NOT_FILLABLE</code>), so the Trails check is what caught it.</div></div>
+</div>
+
+<div class="check"><h3>7. Cancelled signature <span class="pill free">Free</span><span class="pill pass">✓ Passed 11 Nov (test B)</span></h3>
+  <div class="row"><b>How</b><div>Any token ▸ pick a token ▸ Pay ▸ reject in MetaMask.</div></div>
+  <div class="row"><b>Pass when</b><div>The widget offers "Try again", no message, no red errors from our code; the checks stop 15 minutes after the quote. (Whether we need our own screen here is Q19 for Mohit.)</div></div>
+  <div class="row"><b>Result</b><div><b>Pass (user, 11 Nov, test B in the progress doc).</b> Same steps and pass conditions as test B, which passed on 11 Nov; not repeated today. Our own screen for this stays Q19.</div></div>
+</div>
+
+<div class="check"><h3>8. Look and feel <span class="pill free">Free · 20 min</span><span class="pill pass">✓ Passed 12 Nov</span></h3>
+  <div class="row"><b>How</b><div>Light and dark; desktop, tablet (768 to 1039 px) and phone widths. Walk through the payment options, the preparing step, the widget, and any result screen you can reach.</div></div>
+  <div class="row"><b>Pass when</b><div>Matches the rest of the drawer, nothing cut off or overlapping, the widget follows the theme.</div></div>
+  <div class="row"><b>Result</b><div><b>Pass (user, 12 Nov, Account 3 on twertsdfgsdfg.og, no payment).</b> Reported "everything is okay". Which widths and themes were looked at wasn't itemised; the result screens (progress, is yours, no longer available) were seen in dark today during checks 11, 13 and 6.</div></div>
+</div>
+
+<div class="check"><h3>9. Trails switched off <span class="pill free">Free · dev restart</span><span class="pill pass">✓ Passed 12 Nov</span></h3>
+  <div class="row"><b>How</b><div>Set <code>NEXT_PUBLIC_TRAILS_ENABLED=false</code> in <code>.env</code>, restart the dev server, open Buy. Set it back to <code>true</code> and restart afterwards.</div></div>
+  <div class="row"><b>Pass when</b><div>Only the original payment cards; the drawer looks exactly like before Trails.</div></div>
+  <div class="row"><b>Result</b><div><b>Pass (user, 12 Nov, local dev server).</b> Reported as pass.</div></div>
+</div>
+
+<div class="check"><h3>10. Test G, page size <span class="pill free">Free · about 10 min · you only</span><span class="pill pass">✓ Passed 12 Nov</span></h3>
+  <div class="row"><b>How</b><div>Stop the dev server, run <code>npx next build</code>, note "First Load JS" for <code>/login</code> and <code>/profile</code>. Compare with the same build on the <code>dark-mode</code> branch. Start the dev server again.</div></div>
+  <div class="row"><b>Pass when</b><div>The numbers match <code>dark-mode</code> (no extra 38 kB). The local spike page shows up as its own route in the build output; it doesn't affect other pages and is never committed.</div></div>
+  <div class="row"><b>Result</b><div><b>Pass (user, 12 Nov, local <code>next build</code> on trails and dark-mode).</b> Reported as pass; the exact kB figures weren't recorded.</div></div>
+</div>
+
+<h2>4. Paid checks</h2>
+
+<div class="check"><h3>11. Mohit's main run + test E <span class="pill paid">Paid · about 0.15 USDC</span><span class="pill pass">✓ Passed 12 Nov</span></h3>
+  <div class="row"><b>How</b><div>Select the <b>Trails buyer</b> account in MetaMask. Buy a 0.10 USDT listing ▸ Any token, any chain ▸ pick <b>USDC on Base</b> ▸ before paying open "Transaction details" and the <code>QuoteIntent</code> request payload (slippage, Q13) ▸ Pay ▸ approve USDC, then confirm. At "Payment in progress" press <b>Keep browsing</b> and open <code>/history</code>.</div></div>
+  <div class="row"><b>Pass when</b><div>Two wallet steps (approve, then pay); the "Purchase in progress" banner on /history, then the "is yours" toast, then the banner clears without a reload. Then repeat checks 1 and 2 for this purchase. The burner never needed POL.</div></div>
+  <div class="row"><b>Record</b><div>Time of Pay, the intent id from the <code>GetIntent</code> payload, the transaction, and whether <code>slippageTolerance</code> appears in <code>QuoteIntent</code>.</div></div>
+  <div class="row"><b>Result</b><div><b>Pass (user, 12 Nov, Account 3 with no POL, westbengal.og, USDC on Base).</b> Paid 0.134575 USDC; Trails intent <code>0x3e1975f9…8901</code> SUCCEEDED 06:28:21 UTC; our sale record 06:28:22, tx <code>0x9180fb…53b9</code>, buyer Account 3. /history banner, then the success toast, then the banner cleared without a reload. westbengal.og in Account 3's My Domains; seller's "sold" email arrived. <b>One wallet popup, not two:</b> the pass condition was wrong. Trails' deposit for this route is a plain USDC transfer to its deposit address, which needs no approval; Account 3 sent exactly one Base transaction (gas about 0.0000004 ETH). <b>Q13:</b> no <code>slippageTolerance</code> in <code>QuoteIntent</code>, no "Max slippage" row; Trails' record shows Auto chose <code>maxSlippage 0.1</code> (10%).</div></div>
+</div>
+
+<div class="check"><h3>12. Lost race (refund) <span class="pill paid">Paid · about 0.10 USDC + 0.05 USDT</span><span class="pill pass">✓ Refund works on chain</span><span class="pill need">Refunded screen not seen</span></h3>
+  <div class="row"><b>In short</b><div><b>The money part passed; the screen part didn't happen.</b> The buyer lost the race and Trails gave the money back (0.05 USDT on Polygon, 29 seconds after Trails saw the order was gone). But our drawer showed "is yours" instead of "Payment refunded", because the same wallet (Account 3) won the race with its direct buy, and our rule 1 says a sale record naming this buyer means done. With a different person winning, the drawer goes to Refunded. <b>User decided 12 Nov: not repeated with a third wallet; the Refunded screen, its wording and the "View refund" link stay covered by automated tests only.</b></div></div>
+  <div class="row"><b>Before</b><div>Check 11 done. Send Account 3 about 0.5 POL from Account 1 (gas for the direct buy: USDT approval and the purchase).</div></div>
+  <div class="row"><b>How</b><div>Everything with <b>Account 3</b>, no account switching. Tab A: open tawhidabdullah.og (Account 1's 0.05 listing) ▸ Any token ▸ pick USDC on Base so a price shows. Don't pay yet. Tab B: open the same listing, buy it <b>directly with USDT</b> and wait for "is yours". Go back to tab A and press Pay. If tab A's quote expired meanwhile, pick the token again before Pay.</div></div>
+  <div class="row"><b>Result, run 1</b><div><b>Refund on chain: pass. Screen: not reached (user, 12 Nov, Account 3 in both tabs, tawhidabdullah.og).</b> Direct buy filled at 06:40:33 UTC; Trails intent <code>0x0d937952…3e01</code> REFUNDED at 06:41:02, 0.05 USDT back to Account 3 on Polygon. Both tabs showed "is yours": our rule 1 counts a sale record naming this buyer as done before reading Trails' status, and here the winner was the same wallet. <b>Lesson:</b> the direct buyer must be a different wallet from the Trails buyer to see the Refunded screen; the plan's "Account 3 races itself" was wrong for that part.</div></div>
+  <div class="row"><b>The money, step by step</b><div>
+    <ol>
+      <li>06:40:12 UTC, tab A: Trails price created; Account 3 paid <b>0.08382 USDC on Base</b>.</li>
+      <li>06:40:33, tab B: Account 3's direct buy filled the order: 0.04875 USDT to the seller (Account 1) + 0.00125 fee, tx <code>0xe49a84…dff89</code>. Gas: two Polygon transactions (USDT approval, purchase), about 0.094 POL (under 1 cent; not refundable).</li>
+      <li>06:41:02: Trails intent <code>0x0d937952…3e01</code> <b>REFUNDED</b>: <b>0.05 USDT to Account 3 on Polygon</b>, tx <code>0xb71abc…4661</code> (<a href="https://polygonscan.com/tx/0xb71abcca6f890af0b8f30810503d4acbbd1581bba5d3df298dbfb1bace444661">Polygonscan</a>).</li>
+      <li>Net: USDT 1.0826 ▸ 1.0826 (−0.05 direct, +0.05 refund). USDC 2.0137 ▸ 1.93. Of the 0.0838 USDC paid through Trails, 0.05 came back as USDT; about 0.034 was Trails' fees, not refunded. POL 0.5 ▸ 0.406 (gas).</li>
+    </ol></div></div>
+  <div class="row"><b>For Mohit</b><div>A buyer who pays directly in one tab and through Trails in another gets "is yours" (true: the domain is theirs) with no word about the refund of the other payment. Rare, nothing lost; his call whether it needs a line. No code changed.</div></div>
+  <div class="row"><b>Note</b><div>If tab A shows "No longer available" before Pay (it re-checks the order), that's check 6 seen for real, not the race. Then repeat with weiwuxianlanwangji.og, doing the direct buy in tab B <i>after</i> the MetaMask confirm popup from tab A's Pay is open, and confirm it last.</div></div>
+  <div class="row"><b>Pass when</b><div>"Payment refunded" with the new wording ("Trails refunded X USDT to your wallet on Polygon. It's not converted back to your original token.") and a working "View refund" link; the USDT arrives on Polygon in the burner.</div></div>
+</div>
+
+<div class="check"><h3>13. Second quote after Pay, over WalletConnect <span class="pill paid">Paid · about 0.15 USDC or POL</span><span class="pill pass">✓ Purchase passed 12 Nov</span><span class="pill need">Re-quote not reproduced</span></h3>
+  <div class="row"><b>Why</b><div>On 11 Nov, over WalletConnect, the widget switched to USDT and made a new quote 5 seconds after Pay, and the drawer lost the paid purchase. The fix (follow whichever of the last 3 quotes gets paid) is covered by automated tests but hasn't run in a real purchase: the later paid run on the extension had only one quote.</div></div>
+  <div class="row"><b>How</b><div>Connect with <b>WalletConnect</b>, using the <b>Trails buyer</b> account in MetaMask on the phone (same recovery phrase, so add the account there too). Buy a 0.10 USDT listing ▸ Any token ▸ pick a token ▸ Pay ▸ confirm on the phone. Watch whether the widget switches token after Pay; note the time.</div></div>
+  <div class="row"><b>Pass when</b><div>The drawer reaches "Payment in progress" and "is yours" even if the widget quotes again. If it doesn't quote again, the fix still isn't exercised: note that, no need to repeat.</div></div>
+  <div class="row"><b>Result</b><div><b>Purchase over WalletConnect: pass. The re-quote after Pay: didn't happen, so the fix wasn't exercised (not repeated, as planned).</b> User, 12 Nov, Account 3 on MetaMask mobile over WalletConnect, weiwuxianlanwangji.og 0.05 USDT, USDC on Base (0.084113). The widget first quoted USDT0 on Polygon (its default), then USDC on Base when picked; after Pay no token switch and no new <code>QuoteIntent</code> (user). Drawer: "Payment in progress" ▸ "weiwuxianlanwangji.og is yours", tx <code>0xff17…10b1d</code>. Trails intent <code>0x23ca82ad…9f01</code> SUCCEEDED 06:59:21 UTC (quote 06:58:24); our sale record 06:59:22, buyer Account 3.</div></div>
+</div>
+
+<h2>5. After testing</h2>
+<ol>
+  <li>Log every result in the progress doc's Testing log (automated or manual, who, environment, result, gaps).</li>
+  <li>Update the status doc for Mohit (<code>trails-status-for-mohit.html</code>) with what passed.</li>
+  <li>Anything new or broken: note the time and intent id so it can be traced on Trails.</li>
+</ol>
+
+<h2>6. Still waiting on Mohit</h2>
+<p>The Q numbers are the open questions table in <code>trails-implementation-plan.md</code> §6 (Q1 to Q12 are from the start of the project and mostly answered; Q13 to Q19 are the open ones). The same questions, with the reasons behind them, are in <code>trails-status-for-mohit.html</code>.</p>
+<div class="tbl"><table>
+  <thead><tr><th>#</th><th>Question</th><th>Default until he answers</th></tr></thead>
+  <tbody>
+    <tr><td>Q13</td><td>Slippage: the widget never sends our 0.5%, so Trails uses Auto. Keep Auto, or force it through the widget's own saved setting?</td><td>Keep Auto</td></tr>
+    <tr><td>Q14</td><td>Start status checks at the first quote (today) or when the buyer presses Pay?</td><td>First quote</td></tr>
+    <tr><td>Q15</td><td>Is the Trails rate limit per key? Every buyer's browser uses the same key.</td><td>Back off is in</td></tr>
+    <tr><td>Q16</td><td>Can an ABORTED payment ever have taken money? We end it quietly.</td><td>Quiet end</td></tr>
+    <tr><td>Q17</td><td>Who raises the widget issues with Trails (USDT re quote after Pay, status stuck on Swap, console errors)?</td><td>Mohit</td></tr>
+    <tr><td>Q18</td><td>Trails says succeeded but our sale record never shows the buyer in 20 min: we still show "is yours", and its View Receipt would open an empty receipt (same missing record). OK, or "receipt delayed" with a Polygonscan link? <b>We recommend "receipt delayed".</b></td><td>Keep until he answers</td></tr>
+    <tr><td>Q19</td><td>Is the widget's own "Try again" enough for a cancelled signature, or do we draw our own screen?</td><td>Widget's own</td></tr>
+  </tbody>
+</table></div>
+
+<h2>7. Road to production</h2>
+<p>Mohit's doc: the browser version is fine for uat and an internal prod pilot (staff wallets only), <b>not</b> for general availability, which needs the backend.</p>
+<h3>Before any prod pilot</h3>
+<ol>
+  <li>Mohit's answers to Q13 to Q19, and the code changes they lead to.</li>
+  <li>Phase 10 (on hold with your senior): after any purchase the bought domain still shows for sale and My Domains looks unchanged until a reload; the reject screen shows success text. Affects USDT buys too.</li>
+  <li>All checks above passed, plus the QA matrix (phase 12).</li>
+  <li>The "Double check before this ships" box in the progress doc cleared.</li>
+</ol>
+<h3>Release</h3>
+<ol>
+  <li>Delete the spike page (<code>pages/trails-spike.tsx</code>) when you say so.</li>
+  <li>PR from <code>trails</code>, reviewed by Mohit.</li>
+  <li>DevOps: <code>NEXT_PUBLIC_TRAILS_API_KEY</code>, <code>NEXT_PUBLIC_TRAILS_ENABLED</code>, <code>NEXT_PUBLIC_TRAILS_PILOT_WALLETS</code> on uat and prod, then a rebuild. Prod: pilot list set to staff wallets, only with Mohit's approval.</li>
+  <li>Kill switch today: set <code>NEXT_PUBLIC_TRAILS_ENABLED=false</code> and redeploy (minutes, not instant). Make sure DevOps knows.</li>
+  <li>A short support note: how to find a buyer's Trails purchase (intent id, Trails explorer, our sale record by order hash) and the MetaMask 13.55 connect issue.</li>
+</ol>
+<h3>For general availability</h3>
+<ol>
+  <li>Phase B, the backend checkout source: server tracking on any device, refund email, attach checks, two buyer soft hold, live kill switch, <code>paymentMethod</code> on sales, and status checks off buyers' browsers. The backend hasn't started it (checked 11 Nov).</li>
+  <li>Phase 11 analytics (needs GTM), so Trails vs direct sales and stuck purchases are visible until the backend has stats and alerts.</li>
+  <li>Drop the env pilot list once the backend switch is live.</li>
+</ol>
+
+<h2>8. Message for the new Claude session</h2>
+<p>Paste this as the first message of tomorrow's session, so it starts with the full context.</p>
+<pre class="prompt">We&#x27;re continuing the Trails &quot;pay with any token&quot; checkout in this repo (EndlessDomains marketplace frontend). Set up context before doing anything:
+
+1. Read these first: CLAUDE.md (root), dev-docs/trails/trails-plan-12-nov.html (today&#x27;s plan, checks 1 to 13), dev-docs/trails/trails-implementation-plan.md (§4 Phase R and Phase B, §6 open questions Q13 to Q19, §8 what&#x27;s left, §9 today), dev-docs/trails/trails-status-for-mohit.html (what Mohit has been told), and the latest &quot;Review fixes&quot; entries in dev-docs/trails/trails-progress.html. Mohit&#x27;s original doc is &quot;Trails Checkout: Frontend Work That Starts Now&quot; (I can attach the PDF).
+
+2. Where things stand: branch trails, last pushed commit 1622027 on origin/trails (10e06fc before it). All six points of Mohit&#x27;s review are fixed, plus four bugs found in testing: drawer restart on wallet network change during Trails steps, a cancelled payment treated as paid (effectiveIntentStatus, checkoutStatusFor), the widget quoting again after Pay (StoredCheckout.earlierIntentIds; automated tests only, not yet seen in a real purchase), and Trails rate limit back off. 92 Vitest tests pass, tsc and ESLint clean. Manual tests passed on 11 Nov: A (no widget logs), B (unpaid checks stop quietly 15 min after the newest quote), D (real POL purchase, weiwuxianlanwangji.og).
+
+3. How tracking works: one app wide tracker (src/core/services/trails/checkoutTracker.ts, started by src/hooks/trails/useTrailsTracker.ts from pages/_app.tsx) polls via watchCheckout.ts and browserCheckoutSource.getStatus (GetIntent, then GetIntentReceipt once the payment landed, then our sale record /marketplacev2/orders/transactions/:orderHash). The drawer (BuyFlowModal.tsx) only listens through useTrailsCheckout. Unpaid: stops 15 min after the newest quote (UNPAID_WATCH_MS, watchWindowStart). Paid: FAILED watched 20 min; SUCCEEDED without our sale record shows &quot;is yours&quot; after 20 min (that&#x27;s Q18). Rules live in src/helpers/trails/intentStatus.ts.
+
+4. Known open items: the widget ignores our slippageTolerance (0xtrails 0.20.0 drops it from QuoteIntent, so Trails uses Auto; Q13). Phase 10 (shared fixes) is on hold with my senior. Phase 11 analytics waits on GTM. Phase B (backend checkout source) waits on the backend, which hasn&#x27;t started. Q13 to Q19 wait on Mohit.
+
+5. Rules for this work: never run next build, next start or npm run dev (I run the dev server on 3002 and do builds myself); commit or push only when I say, with no Claude co-author line; CLAUDE.md and dev-docs/ are local only, never commit them; never edit anything outside this frontend repo (reading or git fetch of the backend repo at D:\Akshat Endless\backend\backend is fine); no new code in src/component; show me any new user facing wording before it goes in; don&#x27;t delete pages/trails-spike.tsx until I say; read the Trails API key from .env only when needed, never put it in code or output; follow the layering rules in CLAUDE.md §8.
+
+6. Logging: after each check I report, log it in dev-docs/trails/trails-progress.html (Testing log: who, environment, result, gaps; only claim what I confirmed) and tick it in trails-plan-12-nov.html; update trails-status-for-mohit.html when something changes for Mohit. Explain things to me in plain words.
+
+7. Diagnosis: Trails API is POST https://trails-api.sequence.app/rpc/Trails/{GetIntent, GetIntentReceipt, SearchIntents} with header X-Access-Key (key from .env NEXT_PUBLIC_TRAILS_API_KEY). SearchIntents by owner is unreliable; use byTransactionHash. Our backend: https://apistage.endlessdomains.io/api/v1/marketplacev2/orders/transactions/recent. Wallets: my Account 1 0x8FD5Fb2dbE512E5eb4C38Ea84E8e8D45b10Be4D0 is now the seller (owns the four Trails bought domains, about 10 POL); a new MetaMask account &quot;Trails buyer&quot; (USDC and ETH on Base, never POL) buys through Trails; a new account &quot;Direct buyer&quot; (USDT and a little POL on Polygon) does the direct buy in the lost race. The old seller wallet was 0xeF519A9DC8e62765B72ad9e22B26Aeb3e4ae5494. Listings can only be 7, 30 or 90 days, so the expiring screen check is covered by automated tests only.
+
+Today we start with the free checks in trails-plan-12-nov.html (check 1, /history). Confirm you&#x27;ve read the docs, then wait for my first result.</pre>
+
+<p class="sub" style="margin-top:28px">Sources: <code>trails-implementation-plan.md</code> §8 and §9, <code>trails-progress.html</code>, <code>trails-status-for-mohit.html</code>, Mohit's "Trails Checkout: Frontend Work That Starts Now".</p>
+</main>
+</body>
+</html>

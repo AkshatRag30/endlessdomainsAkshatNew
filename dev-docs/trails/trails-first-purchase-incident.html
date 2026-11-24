@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trails first purchase report</title>
+<script>
+  // Apply the saved theme before first paint (same key as the progress doc, so they stay in step).
+  try {
+    var saved = localStorage.getItem('dmplan-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  } catch (e) {}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* Same look as the other Trails explainers: sticky contents rail, one reading column. */
+:root {
+  --bg: #f6f6f9; --surface: #ffffff; --sunk: #eeedf4; --fg: #1b1a24; --muted: #5c5a6b; --line: #dddbe7;
+  --accent: #6a3fd6; --accent-soft: #ece6fb; --warn: #9a5b00; --warn-soft: #fff3df; --ok: #1d7a4c; --ok-soft: #e3f4ea;
+  --bad: #b3261e; --bad-soft: #fdeceb;
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f0e14; --surface: #18171f; --sunk: #211f2a; --fg: #ecebf2; --muted: #a3a1b3; --line: #2e2c3a;
+    --accent: #ac90ff; --accent-soft: #2a2240; --warn: #f0b45a; --warn-soft: #332611; --ok: #6fd39d; --ok-soft: #142a1e;
+    --bad: #ff8a80; --bad-soft: #351817; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f0e14; --surface: #18171f; --sunk: #211f2a; --fg: #ecebf2; --muted: #a3a1b3; --line: #2e2c3a;
+  --accent: #ac90ff; --accent-soft: #2a2240; --warn: #f0b45a; --warn-soft: #332611; --ok: #6fd39d; --ok-soft: #142a1e;
+  --bad: #ff8a80; --bad-soft: #351817; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0; background: var(--bg); color: var(--fg);
+  font-family: var(--font-body); font-size: 16px; line-height: 1.65;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 64px;
+}
+.wrap { max-width: 1120px; margin: 0 auto; display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 48px; }
+header.top { max-width: 1120px; margin: 0 auto; padding-block: 48px 32px; border-bottom: 1px solid var(--line); margin-bottom: 40px; }
+.eyebrow { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin: 0; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; line-height: 1.2; margin: 0; }
+h1 { font-size: clamp(30px, 5vw, 46px); margin-top: 8px; }
+.lede { font-size: 18px; color: var(--muted); max-width: 66ch; margin: 14px 0 0; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.chip { font-size: 13px; padding: 3px 10px; border-radius: 99px; background: var(--sunk); color: var(--muted); }
+nav.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 24px); align-self: start; font-size: 14px; max-height: calc(100vh - 48px); overflow-y: auto; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+nav.toc a { display: block; padding: 5px 10px; border-radius: 6px; color: var(--muted); text-decoration: none; }
+nav.toc a:hover, nav.toc a:focus-visible { background: var(--sunk); color: var(--fg); outline: none; }
+nav.toc .label { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; font-weight: 600; color: var(--muted); padding: 10px 10px 6px; }
+main { min-width: 0; display: flex; flex-direction: column; gap: 56px; }
+section { scroll-margin-top: 24px; display: flex; flex-direction: column; gap: 16px; }
+section > p, section > ul, section > ol { max-width: 70ch; margin: 0; }
+h2 { font-size: 28px; }
+h3 { font-size: 19px; margin-top: 8px; }
+.num { font-family: var(--font-mono); font-size: 13px; color: var(--accent); font-weight: 500; display: block; margin-bottom: 4px; }
+.oneline { background: var(--accent-soft); border-radius: 10px; padding: 14px 18px; max-width: 70ch; }
+.oneline b { display: block; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-bottom: 2px; }
+.callout { border-radius: 10px; padding: 14px 18px; max-width: 70ch; }
+.callout p { margin: 0; }
+.callout p + p { margin-top: 8px; }
+.callout.ok { background: var(--ok-soft); }
+.callout.ok b:first-child { color: var(--ok); }
+.callout.bad { background: var(--bad-soft); }
+.callout.bad b:first-child { color: var(--bad); }
+.callout.warn { background: var(--warn-soft); }
+.callout.warn b:first-child { color: var(--warn); }
+code { font-family: var(--font-mono); font-size: .86em; background: var(--sunk); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+pre { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; overflow-x: auto; font-family: var(--font-mono); font-size: 12.5px; line-height: 1.6; max-width: 76ch; }
+pre code { background: none; padding: 0; font-size: inherit; overflow-wrap: normal; }
+.tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; background: var(--sunk); }
+tr:last-child td { border-bottom: none; }
+.flow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.step { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; position: relative; font-size: 14px; }
+.step strong { display: block; font-family: var(--font-display); font-size: 15px; margin-bottom: 2px; }
+.step .where { font-size: 12px; color: var(--accent); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+.step.broken { border-color: var(--bad); }
+.step.broken .where { color: var(--bad); }
+.step:not(:last-child)::after { content: "→"; position: absolute; right: -11px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 14px; }
+.pill { display: inline-block; font-size: 12px; font-weight: 600; padding: 1px 8px; border-radius: 99px; }
+.pill.ok { background: var(--ok-soft); color: var(--ok); }
+.pill.bad { background: var(--bad-soft); color: var(--bad); }
+.pill.warn { background: var(--warn-soft); color: var(--warn); }
+.toggle { flex-shrink: 0; border: 1px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 14px; cursor: pointer; }
+.toggle:hover { border-color: var(--accent); }
+.toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.headrow { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.refs { font-size: 14px; color: var(--muted); max-width: 72ch; }
+.refs code { font-size: .9em; }
+@media (max-width: 860px) {
+  .wrap { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  nav.toc { position: static; max-height: none; border: 1px solid var(--line); border-radius: 10px; padding: 6px; background: var(--surface); }
+  nav.toc ol { display: grid; grid-template-columns: 1fr 1fr; }
+  .flow { grid-template-columns: minmax(0, 1fr); }
+  .step:not(:last-child)::after { content: "↓"; right: auto; left: 50%; top: auto; bottom: -15px; transform: translateX(-50%); }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="headrow">
+    <p class="eyebrow">Trails checkout · incident report · 10 Nov 2026</p>
+    <button class="toggle" id="toggle" type="button" aria-label="Switch between light and dark theme">Toggle theme</button>
+  </div>
+  <h1>The first real Trails purchases: what broke, why, and how it was fixed</h1>
+  <p class="lede">The full story of the first two real "pay with any token" purchases on uat: the drawer that got stuck after paying, the red errors in the console, how each was investigated with real evidence, what was changed in the code, and what was confirmed working afterwards. Written in plain words, with references to the exact files, ids and transactions.</p>
+  <div class="meta">
+    <span class="chip">Branch trails, committed 10e06fc (10 Nov) · follow up 11 Nov</span>
+    <span class="chip">Environment: localhost:3002 on uat (apistage) and Polygon mainnet</span>
+    <span class="chip">Tester: the user · Investigation and fixes: Claude</span>
+  </div>
+</header>
+
+<div class="wrap">
+<nav class="toc" aria-label="Contents">
+  <ol>
+    <li class="label">Overview</li>
+    <li><a href="#summary">1. Summary</a></li>
+    <li><a href="#background">2. How it was meant to work</a></li>
+    <li><a href="#timeline">3. Timeline</a></li>
+    <li class="label">Problems</li>
+    <li><a href="#stuck">4. Drawer stuck after paying</a></li>
+    <li><a href="#noise">5. Red GetIntentReceipt 400s</a></li>
+    <li class="label">Checks</li>
+    <li><a href="#resume">6. Toast after reload</a></li>
+    <li><a href="#run2">7. Second purchase</a></li>
+    <li><a href="#notbugs">8. Console lines that aren't Trails</a></li>
+    <li class="label">After</li>
+    <li><a href="#open">9. Found along the way</a></li>
+    <li><a href="#files">10. Files changed</a></li>
+    <li><a href="#verify">11. How to check it yourself</a></li>
+    <li><a href="#words">12. Words used</a></li>
+    <li class="label">Follow up</li>
+    <li><a href="#followup">13. Red lines again, 11 Nov</a></li>
+  </ol>
+</nav>
+
+<main>
+
+<section id="summary">
+  <div><span class="num">Section 1</span><h2>Summary</h2></div>
+  <div class="oneline"><b>In one line</b>The first real Trails purchase bought the domain correctly, but our drawer waited for a signal from the Trails box that never came; we now follow Trails' own status instead, and the second purchase went all the way to the receipt.</div>
+  <div class="tbl"><table>
+    <thead><tr><th>#</th><th>Problem</th><th>Real cause</th><th>Fix</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>After paying, the drawer stayed on the Trails payment screen. No progress, no Done, no View Receipt.</td><td>The drawer only switched when the Trails box fired "your payment has landed". For this payment Trails stored the deposit with a placeholder transaction hash, so that event never fired.</td><td>The drawer now watches Trails' own status from the moment a price is quoted, and switches when Trails says the payment is executing or done.</td><td><span class="pill ok">Fixed, confirmed in run 2</span></td></tr>
+      <tr><td>2</td><td>Red <code>GetIntentReceipt 400 (Bad Request)</code> lines every 3 seconds in the console.</td><td>A payment "receipt" only exists after paying. Asking for it while the buyer is still choosing a token returns "not found", and Chrome prints every failed request in red, even ones our code handles.</td><td>Ask Trails' <code>GetIntent</code> first (it answers normally for a quote) and only ask for the receipt once the payment has landed.</td><td><span class="pill ok">Fixed, confirmed in run 2</span></td></tr>
+    </tbody>
+  </table></div>
+  <p>Money was never at risk. In run 1 the domain arrived in the buyer's wallet and our backend recorded the sale correctly; only our screen didn't follow.</p>
+</section>
+
+<section id="background">
+  <div><span class="num">Section 2</span><h2>How it was meant to work</h2></div>
+  <p>Phase 8 of the plan built what happens after the buyer presses Pay inside the Trails box. The design, before 10 Nov:</p>
+  <div class="flow" role="list">
+    <div class="step" role="listitem"><span class="where">Trails box</span><strong>Price quoted</strong>Trails gives the payment an id ("intent id"). We save it in the browser.</div>
+    <div class="step" role="listitem"><span class="where">Wallet</span><strong>Buyer pays</strong>MetaMask sends the buyer's token on their chain.</div>
+    <div class="step broken" role="listitem"><span class="where">Trails box ▸ our drawer</span><strong>"Payment landed"</strong>The box fires an event (<code>onOriginConfirmation</code>). Only then did our drawer start checking and switch screens.</div>
+    <div class="step" role="listitem"><span class="where">Our drawer</span><strong>Progress ▸ Done</strong>We check Trails and our sale record every few seconds, then show Done and View Receipt.</div>
+  </div>
+  <p>The red step is the weak link: everything after it depended on one event from a package we don't control.</p>
+  <p class="refs">Reference: plan §4 phase 8; progress doc phase 8 entry; Mohit's doc page 8 ("Widget callbacks … onOriginConfirmation … instant progress while the drawer is open").</p>
+</section>
+
+<section id="timeline">
+  <div><span class="num">Section 3</span><h2>Timeline, 10 Nov 2026</h2></div>
+  <div class="tbl"><table>
+    <thead><tr><th>When</th><th>What happened</th></tr></thead>
+    <tbody>
+      <tr><td>Morning</td><td>User asked for the exact test process; it was written into the progress doc (section "Test process"). Stage was checked and is up.</td></tr>
+      <tr><td>06:26 to 06:27 UTC</td><td><b>Run 1.</b> User bought <b>theforceis.unstoppable</b> for 0.10 USDT, paying 0.0001903 BNB on BSC (about $0.13 with $0.03 fees). The wallet confirmed. User reported: "the transaction got confirmed but I did not see any view receipt screen … I got it inside my domains … the modal was stuck on the payment modal". Console showed yellow "[trails-sdk] Quote disabled" lines and red <code>GetIntentReceipt 400</code> lines.</td></tr>
+      <tr><td>After run 1</td><td>User pasted the browser's saved entry (<code>trails-checkouts</code>). Claude asked Trails and our backend directly about that purchase (section 4). Root cause found; fix written; 66 tests pass.</td></tr>
+      <tr><td>Next</td><td>User reloaded and saw red <code>GetIntentReceipt 400</code> lines repeating, now from our own file. User captured one request and response from the Network tab. Claude reproduced it and changed how status is read (section 5).</td></tr>
+      <tr><td>Next</td><td>User replayed run 1's saved entry with a console snippet and reloaded: the "theforceis.unstoppable is yours" message appeared (section 6).</td></tr>
+      <tr><td>07:02 UTC</td><td><b>Run 2.</b> User bought <b>tpenguofficial.og</b> for 0.10 USDT, paying in POL. Drawer went progress ▸ Done ▸ View Receipt ▸ receipt page. No red 400s (section 7).</td></tr>
+      <tr><td>After run 2</td><td>User asked how to reach the receipt after pressing "Keep browsing" on the progress screen. Found a gap, recorded for the senior (section 9).</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="stuck">
+  <div><span class="num">Section 4</span><h2>Problem 1: the drawer stayed on the payment screen</h2></div>
+
+  <h3>What the user saw</h3>
+  <ul>
+    <li>Paid in MetaMask, the wallet confirmed.</li>
+    <li>The drawer kept showing the Trails box with its Pay button. No "Payment in progress", no "is yours", no View Receipt.</li>
+    <li>The domain was in My Domains anyway.</li>
+  </ul>
+
+  <h3>What actually happened (the evidence)</h3>
+  <ol>
+    <li><b>The browser's saved entry</b> (DevTools ▸ Application ▸ Local storage ▸ <code>trails-checkouts</code>), pasted by the user:
+<pre><code>checkoutId:  81ab12f0-b091-4edb-8475-2df64fb10409
+orderHash:   0x6902dc9f…3faa
+intentId:    0x7d0af0c659d7ff0f13c6dde5e2f1af891901073b8ec34b6bcab63bb6057f4f01
+buyer:       0x8FD5Fb2dbE512E5eb4C38Ea84E8e8D45b10Be4D0
+amount:      "100000"   (0.10 USDT)
+domainLabel: "theforceis.unstoppable"
+(no "paid" field)</code></pre>
+      The intent id and name were saved, so the quote step worked. But there was <b>no <code>paid</code> flag</b>, which our code only sets when the "payment landed" handler runs. So that handler never ran.</li>
+    <li><b>Trails' own record</b>, asked directly with our API key (<code>POST https://trails-api.sequence.app/rpc/Trails/GetIntentReceipt</code>):
+<pre><code>status: SUCCEEDED
+originChainId: 56 (BSC)    destinationChainId: 137 (Polygon)
+depositTransaction.txnHash: 0x1111000000000000…0000   ← a placeholder, not a real hash
+depositTransaction.txnMinedAt: null
+destinationTransaction: SUCCEEDED, tokenAmount 100000 (exactly 0.10 USDT)</code></pre>
+      Trails converted the BNB and ran our two buying steps on Polygon. The deposit, though, is stored with a placeholder hash and no "mined" time.</li>
+    <li><b>Our backend's sale record</b> (<code>GET /marketplacev2/orders/transactions/0x6902dc9f…3faa</code>): a <code>SALE</code> with buyer <code>0x8FD5…e4D0</code>, price <code>100000</code>, fill transaction <code>0x00c55971…825a</code>. So "Done only when our record shows the buyer" would have passed.</li>
+    <li><b>The Trails package code</b> (<code>node_modules/0xtrails/dist/src-Cd_X4Rd1.js</code>, the hook that calls <code>onOriginConfirmation</code>): it only fires once it has the origin transaction hash <i>and</i> chain id. With the deposit recorded as a placeholder, that event never reached us.</li>
+  </ol>
+
+  <div class="callout bad"><b>Root cause</b><p>Our drawer depended on one event from the Trails box, and that event doesn't fire for every kind of payment. Everything else (saving the id, Trails' status, our sale record) was correct.</p></div>
+
+  <h3>The fix</h3>
+  <ol>
+    <li><b>Start watching at the quote, not after the event.</b> As soon as Trails gives a price and we save the intent id, the drawer starts checking Trails' status in the background (<code>useTrailsCheckout.attachIntent</code> now calls <code>track()</code>). Picking another token gives a new id; the check follows it automatically.</li>
+    <li><b>Switch screens from Trails' status.</b> A new rule, <code>hasPaymentLanded(status)</code>, is true once Trails says the payment is executing or finished. When it turns true while the Trails box is showing, the drawer switches to "Payment in progress" (<code>BuyFlowModal.tsx</code>, the effect starting at line 348). While it's only a price, the Trails box stays.</li>
+    <li><b>Mark the saved entry as paid at the same moment</b> (<code>useTrailsCheckout.ts</code> line 78), so the /history banner and the after-reload check know it's a real payment.</li>
+    <li><b>Keep the box's events as extra triggers.</b> If <code>onOriginConfirmation</code> or <code>onPaymentSuccess</code> do fire, they still switch the screen straight away. Signing in the wallet (<code>onSign</code>) restarts the check if it had stopped.</li>
+    <li><b>A price never paid is dropped quietly.</b> If the buyer leaves after seeing a price, the check gives up after 15 minutes with no message (<code>isFinal</code> and <code>checkoutOutcome</code> → "abandoned").</li>
+    <li><b>Every event from the box is now written to the console</b> as <code>[trails] widget onQuote</code>, <code>onSign</code>, <code>onOriginConfirmation</code> and so on (<code>TrailsWidget.tsx</code> line 41), so the next problem is quick to read.</li>
+  </ol>
+  <div class="callout ok"><b>Confirmed</b><p>Run 2 (section 7): progress ▸ Done ▸ View Receipt ▸ receipt page, confirmed by the user. 66 of 66 automated tests pass (2 new for <code>hasPaymentLanded</code>).</p></div>
+  <p class="refs">References: <code>src/hooks/trails/useTrailsCheckout.ts</code> (lines 66, 78, 96); <code>src/helpers/trails/intentStatus.ts</code> (lines 44, 100 to 103, 113 to 115); <code>src/design-system/composites/marketplace/buying-flow/BuyFlowModal/BuyFlowModal.tsx</code> (lines 348, 356 to 365, 513, 795 to 800); <code>.../trails/TrailsWidgetLoader/TrailsWidget.tsx</code> (line 41); progress doc phase 8, "First real purchase".</p>
+</section>
+
+<section id="noise">
+  <div><span class="num">Section 5</span><h2>Problem 2: red <code>GetIntentReceipt 400</code> lines in the console</h2></div>
+
+  <h3>What the user saw</h3>
+  <ul>
+    <li><b>During run 1:</b> a few red <code>POST https://trails-api.sequence.app/rpc/Trails/GetIntentReceipt 400 (Bad Request)</code> lines, coming from Trails' own file (<code>onramp-D6xxHSLW.js</code>). Our checking hadn't started then, so these were the Trails box's own requests.</li>
+    <li><b>After the problem 1 fix:</b> the same red line repeating every few seconds, now pointing at our file <code>trailsReceipt.service.ts:23</code>. The user said "I keep getting this in my log".</li>
+  </ul>
+
+  <h3>Investigation</h3>
+  <ol>
+    <li>Called the same endpoint for run 1's intent from outside the browser, first plainly, then with the browser's <code>Origin: http://localhost:3002</code> header, then through the exact client library our code uses (<code>@0xtrails/api</code>). All three answered <b>200, SUCCEEDED</b>. So run 1's id wasn't the failing one.</li>
+    <li>The user opened the Network tab on one red request and copied its payload and response:
+<pre><code>Payload:  { "intentId": "0xe298b26821b77fe2849e43cb712eab1596e9d3498a50692d4d74054ef1f92701" }
+Response: { "error": "NotFound", "code": 8000, "status": 400,
+            "cause": "intent receipt not found for intentId 0xe298…2701" }</code></pre>
+      That id was a new <b>price nobody had paid for yet</b>. A receipt only exists after paying, so Trails says "not found".</li>
+    <li>Our code already understood "not found" as "only a price, nothing paid" and would stop after 15 minutes. The red lines were <b>Chrome printing every failed request</b>, even ones our code handles. Since the problem 1 fix checks every 3 seconds from the quote, that meant a red line every 3 seconds while the buyer chooses a token.</li>
+    <li>Asked Trails' other call, <code>GetIntent</code>, about both ids: the unpaid price answered <b>200, QUOTED</b>; run 1's purchase answered <b>200, SUCCEEDED</b>. So <code>GetIntent</code> works for both, without an error.</li>
+  </ol>
+
+  <div class="callout bad"><b>Root cause</b><p>We asked for a payment's receipt before a receipt could exist. Not a wrong answer from our code, but a red error in the console on every check.</p></div>
+
+  <h3>The fix</h3>
+  <ol>
+    <li><code>getTrailsIntent</code> now asks <code>GetIntent</code> first. If the status is <code>QUOTED</code> or <code>COMMITTED</code> (paid not yet landed), it stops there: no receipt call, no error (<code>trailsReceipt.service.ts</code> lines 13, 30 to 31).</li>
+    <li>Only once Trails is executing or finished does it also ask <code>GetIntentReceipt</code> for the transaction and refund details (line 32).</li>
+    <li>A "not found" from either call still counts as "only a price" (line 47), so a made up or expired id is handled quietly.</li>
+    <li>Our backend's sale record is only fetched once the payment has landed, not on every check while choosing a token (<code>browserCheckoutSource.ts</code> line 107).</li>
+  </ol>
+  <div class="callout ok"><b>Confirmed</b><p>Through the same client library: unpaid price ▸ QUOTED, run 1 ▸ SUCCEEDED, made up id ▸ NotFound (handled). In run 2 the user saw no red <code>GetIntentReceipt</code> lines.</p></div>
+  <p class="refs">References: <code>src/core/services/trails/trailsReceipt.service.ts</code>; <code>src/core/services/trails/browserCheckoutSource.ts</code> line 107; Trails API <code>POST /rpc/Trails/GetIntent</code> and <code>/rpc/Trails/GetIntentReceipt</code> with header <code>X-Access-Key</code>; progress doc phase 8, "Follow up, same day".</p>
+</section>
+
+<section id="resume">
+  <div><span class="num">Section 6</span><h2>Check: the message after a reload (phase 9)</h2></div>
+  <p><b>What it tests:</b> if the page reloads or the tab closes mid purchase, the site should find the saved payment on the next load, check it, and show how it ended.</p>
+  <p><b>How it was tested, for free:</b> run 1's saved entry was put back into <code>localStorage</code> with a one line console snippet (marked <code>paid: true</code>), and the page was reloaded. The after-reload check (<code>useTrailsResume</code>, mounted in <code>pages/_app.tsx</code> line 78) asked Trails (SUCCEEDED) and our sale record (buyer matches).</p>
+  <div class="callout ok"><b>Passed</b><p>The message appeared: "<b>theforceis.unstoppable is yours</b> · Ownership transferred in the same transaction as the payment. It will appear in your account within 10 to 15 minutes." Removal of the entry afterwards wasn't separately confirmed.</p></div>
+  <p>The user hadn't noticed the message the first time; it shows only once, after a reload, in the corner.</p>
+</section>
+
+<section id="run2">
+  <div><span class="num">Section 7</span><h2>Check: the second purchase, after both fixes</h2></div>
+  <ul>
+    <li><b>Bought:</b> <b>tpenguofficial.og</b> for 0.10 USDT, paying in POL through Trails, wallet <code>0x8FD5…e4D0</code>.</li>
+    <li><b>Drawer:</b> "Payment in progress" ▸ "tpenguofficial.og is yours" ▸ View Receipt ▸ receipt page (confirmed by the user).</li>
+    <li><b>Our sale record</b> (<code>GET /marketplacev2/orders/transactions/0xfc4a720d…bfe30</code>): <code>SALE</code> to the buyer, price <code>100000</code>, fee <code>2500</code> (0.0025), seller <code>97500</code> (0.0975), Polygon transaction <code>0xf0438513…b603d</code>, 07:02:22 UTC.</li>
+    <li><b>Receipt page:</b> Completed, with all four steps ticked (order signed, payment sent, domain transferred, indexed).</li>
+    <li><b>Console:</b> no red <code>GetIntentReceipt</code> lines.</li>
+  </ul>
+  <div class="callout ok"><b>Passed</b><p>The normal Trails purchase works end to end. Not yet tested: a refund (someone else buys first), closing the drawer mid purchase, the /history banner, a phone wallet over WalletConnect.</p></div>
+</section>
+
+<section id="notbugs">
+  <div><span class="num">Section 8</span><h2>Console lines that aren't from Trails</h2></div>
+  <p>The screenshots also showed lines that look alarming but have other, known causes:</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Line</th><th>What it is</th></tr></thead>
+    <tbody>
+      <tr><td>Yellow "[trails-sdk] [useQuote] Quote disabled. Missing amount…"</td><td>The Trails box waiting for the buyer to pick a token and amount. Harmless, from Trails itself.</td></tr>
+      <tr><td>"Hydration failed…" (×5) and "error while hydrating"</td><td>An old header bug (the wallet button reads "Logout" on the server but the address in the browser), found 5 Nov, parked, listed in the progress doc's double check box.</td></tr>
+      <tr><td><code>GET …/marketplace/redirectauth/session 401</code></td><td>The existing login session check (<code>AppContent.tsx</code>), when the main site session isn't active.</td></tr>
+      <tr><td>"Do not add stylesheets using next/head", image width/height, chart width(0)</td><td>Existing warnings from older parts of the site, there before Trails.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="open">
+  <div><span class="num">Section 9</span><h2>Found along the way (to decide, not bugs in Trails code)</h2></div>
+  <ol>
+    <li><b>No way to the receipt after "Keep browsing"</b> (raised by the user). Pressing it on "Payment in progress" closes the drawer; the purchase still finishes and the "is yours" message appears, but the message has no link. Today the receipt is reached from the purchase's row on /history ("View receipt", <code>src/helpers/history/format.ts</code> line 50). The normal USDT purchase has the same gap. Proposed: a "View receipt" link inside that message, for both. Not in Mohit's doc; to check with the senior first.</li>
+    <li><b>Receipt page wording for Trails purchases.</b> "You paid 0.10 USDT" and "Payment and transfer settled in the same transaction" describe only the Polygon side; the buyer actually paid POL or BNB through Trails. The "is yours" message has the same nuance.</li>
+    <li><b>Rounding at tiny prices.</b> On a 0.10 listing the receipt shows "Seller received 0.10" and "Marketplace fee 0.00"; the real values are 0.0975 and 0.0025.</li>
+    <li><b>The "is yours" message has no title</b> (found in run 3, ETH, westbengal.og). The buyer sees only "Ownership transferred…", without "westbengal.og is yours". Our code passes the title, but the site's shared success message (<code>src/design-system/primitives/toast-message/success.tsx</code>) never draws one. Not a Trails bug: the normal USDT purchase and the "Link copied" messages lose their titles the same way. Two fixes: let the success message show a title whenever one is given (fixes all of them; "Link copied" titles start showing too), or only where we ask for it. Waiting for a decision.</li>
+    <li><b>A payment popup can outlive the screen that started it</b> (run 3, cause confirmed by the user). The user pressed Pay in the Trails widget, then went back. MetaMask kept the request, and it popped up later while the drawer showed the normal USDT screen. Confirming it still bought the domain and the background tracking finished it, but the buyer sees a payment with no context, and the site can't cancel a wallet request. To decide: a short warning when leaving the widget ("check your wallet for a waiting request"), or leave as is.</li>
+    <li><b>The red "another network" notice only offers Switch</b> (run 3). With the wallet on Ethereum, the drawer opens on "USDT from your wallet" and asks to switch to Polygon, even though "Any token, any chain" would work from Ethereum. It could point to that option, or select it automatically. New wording, so to approve first.</li>
+  </ol>
+  <p>All six are in the progress doc's "Double check before this ships" box.</p>
+</section>
+
+<section id="files">
+  <div><span class="num">Section 10</span><h2>Files changed on 10 Nov</h2></div>
+  <div class="tbl"><table>
+    <thead><tr><th>File</th><th>Change</th><th>For</th></tr></thead>
+    <tbody>
+      <tr><td><code>src/helpers/trails/intentStatus.ts</code></td><td>New <code>hasPaymentLanded</code>; unpaid quote rules in <code>isFinal</code> and <code>checkoutOutcome</code></td><td>Problem 1</td></tr>
+      <tr><td><code>src/helpers/trails/intentStatus.test.ts</code></td><td>Tests for <code>hasPaymentLanded</code></td><td>Problem 1</td></tr>
+      <tr><td><code>src/hooks/trails/useTrailsCheckout.ts</code></td><td>Watch starts at the quote; marks paid when the payment lands</td><td>Problem 1</td></tr>
+      <tr><td><code>src/design-system/composites/marketplace/buying-flow/BuyFlowModal/BuyFlowModal.tsx</code></td><td>Switch to progress on Trails' status; ignore abandoned quotes; <code>onSign</code> restarts the watch</td><td>Problem 1</td></tr>
+      <tr><td><code>src/design-system/composites/marketplace/buying-flow/trails/TrailsWidgetLoader/TrailsWidget.tsx</code></td><td>Console line for every widget event; passes <code>onSign</code></td><td>Problem 1</td></tr>
+      <tr><td><code>src/core/services/trails/trailsReceipt.service.ts</code></td><td><code>GetIntent</code> first, receipt only once landed; NotFound = only quoted</td><td>Problem 2</td></tr>
+      <tr><td><code>src/core/services/trails/browserCheckoutSource.ts</code></td><td>Sale record fetched only once the payment landed</td><td>Problem 2</td></tr>
+      <tr><td><code>dev-docs/trails/trails-progress.html</code></td><td>Test process, runs 1 and 2, resume test, Testing log, double check items</td><td>Records</td></tr>
+    </tbody>
+  </table></div>
+  <p>Checks after the changes: <code>tsc</code> clean, ESLint with no new warnings, 66 of 66 Vitest tests. Nothing committed yet.</p>
+</section>
+
+<section id="verify">
+  <div><span class="num">Section 11</span><h2>How to check any of this yourself</h2></div>
+  <ol>
+    <li><b>The saved payments:</b> DevTools ▸ Application ▸ Local storage ▸ <code>http://localhost:3002</code> ▸ <code>trails-checkouts</code>. Empty (<code>[]</code>) means nothing is running.</li>
+    <li><b>What our code saw:</b> DevTools ▸ Console, filter <code>[trails]</code>. Lines like <code>[trails] widget onQuote</code> show which events the Trails box sent.</li>
+    <li><b>A failing request:</b> DevTools ▸ Network, filter the name, click the row, read Payload and Response.</li>
+    <li><b>Trails' view of a payment:</b> <code>POST https://trails-api.sequence.app/rpc/Trails/GetIntent</code> with header <code>X-Access-Key: &lt;the key from .env&gt;</code> and body <code>{"intentId":"0x…"}</code>. Use <code>GetIntentReceipt</code> for the transaction details once paid.</li>
+    <li><b>Our backend's view of a sale:</b> <code>GET &lt;NEXT_PUBLIC_API_URL&gt;/marketplacev2/orders/transactions/&lt;orderHash&gt;</code>; the <code>buyer</code> field should be the buyer's wallet.</li>
+    <li><b>On chain:</b> polygonscan.com for the Polygon purchase; the origin chain's explorer (bscscan.com, basescan.org) for the buyer's payment.</li>
+  </ol>
+</section>
+
+<section id="words">
+  <div><span class="num">Section 12</span><h2>Words used</h2></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Word</th><th>Meaning here</th></tr></thead>
+    <tbody>
+      <tr><td>Intent / intent id</td><td>Trails' name for one payment, and its id (<code>0x…</code>, 64 hex characters).</td></tr>
+      <tr><td>Quote / QUOTED</td><td>Trails has given a price but nothing is paid yet.</td></tr>
+      <tr><td>COMMITTED, EXECUTING, SUCCEEDED, REFUNDED, FAILED</td><td>Trails' stages for a payment: agreed, being carried out, done, money sent back, didn't work.</td></tr>
+      <tr><td>Receipt (Trails)</td><td>Trails' record of the transactions for a payment; exists only after paying.</td></tr>
+      <tr><td>Sale record / receipt (ours)</td><td>Our backend's record of a sale on Seaport, with the buyer's wallet. The only thing allowed to say "Done".</td></tr>
+      <tr><td>Widget / Trails box</td><td>The payment box from the Trails package shown inside our drawer.</td></tr>
+      <tr><td><code>onOriginConfirmation</code></td><td>The widget's "the buyer's payment has landed" event; the one that didn't fire.</td></tr>
+      <tr><td>Placeholder hash</td><td>A fake transaction id (<code>0x1111000…</code>) Trails stored instead of the real one for the BNB deposit.</td></tr>
+      <tr><td>400 / NotFound</td><td>Trails' answer when asked about something that doesn't exist (yet). Shown red by Chrome even when our code handles it.</td></tr>
+      <tr><td><code>localStorage</code> / <code>trails-checkouts</code></td><td>The browser's small storage, and our note of unfinished Trails payments in it.</td></tr>
+      <tr><td>Toast</td><td>The small message that appears in the corner of the page.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+
+<section id="followup">
+  <div><span class="num">Section 13 · 11 Nov 2026</span><h2>Follow up: the red <code>GetIntentReceipt 400</code> lines again</h2></div>
+  <div class="oneline"><b>In one line</b>The red lines seen on 11 Nov come from the Trails widget's own code, not ours. Yesterday's fix (section 5) still holds. No code change needed.</div>
+
+  <h3>Context</h3>
+  <ul>
+    <li>On 11 Nov the user tested the fixes from Mohit's code review (<code>trails-mohit-review.html</code>). The MetaMask browser extension (13.55) could not connect to any site that day: it adds Tron to every connect request and then rejects it, including on app.uniswap.org; a colleague on 13.52 was fine. So the tests ran over <b>WalletConnect</b> with MetaMask on the phone. Unrelated to Trails or our code; logged in the progress doc's double check list.</li>
+    <li>While checking test A (no widget logging), the user saw red <code>POST …/GetIntentReceipt 400 (Bad Request)</code> lines again, on tawhidabdullah.og, quoting USDT0 and then POL on Polygon, without paying.</li>
+  </ul>
+
+  <h3>What these red lines are</h3>
+  <p>When the buyer picks a token, the Trails widget creates a <b>quote</b> (Trails' offer of how much to pay), and every quote gets an id. The widget then asks Trails "is there a receipt for this quote yet?" A receipt only exists once someone has paid, so before paying Trails answers "not found", and Chrome paints every "not found" answer red (400). Why the widget asks isn't visible from outside (most likely to check whether that quote was already paid). It does no harm: nothing breaks and nothing shows on screen.</p>
+
+  <h3>Investigation</h3>
+  <ol>
+    <li>The <b>Initiator</b> call stack of one red request showed only our files (<code>useTrailsCheckout.ts</code>, <code>BuyFlowModal.tsx</code>, <code>TrailsWidget.tsx</code>), which first suggested our code. But Chrome hides library frames by default (the "Show ignore-listed frames" link), so the widget's own code that made the request was hidden. Those visible files only pass the quote along.</li>
+    <li>The user copied the request's payload: <code>intentId 0xc3ad3afa6afaf76412efbfc7a5fcad1df664d49a6aeb3f4ef03f7939690b3f01</code>. Trails was asked directly, with the key from <code>.env</code>:
+<pre><code>GetIntent         ▸ 200, status QUOTED
+                    createdAt 08:00:55, updatedAt 08:00:55 (never changed),
+                    expiresAt 08:15:55 (15 minutes)
+GetIntentReceipt  ▸ 400 NotFound, "intent receipt not found"</code></pre></li>
+    <li>Our code (<code>trailsReceipt.service.ts</code>) asks for a receipt only when <code>GetIntent</code> says the status is <b>not</b> QUOTED or COMMITTED. This quote was QUOTED the whole time, so our code can't have asked for its receipt. The widget's package does contain its own receipt request.</li>
+    <li>The quote expired after exactly 15 minutes, which matches our rule for dropping an unpaid quote.</li>
+  </ol>
+  <div class="callout ok"><b>Result</b><p>The red lines are the Trails widget's own calls. Our status check works as designed and yesterday's fix holds. Nothing to change in our code.</p></div>
+
+  <h3>Yesterday and today, side by side</h3>
+  <div class="tbl"><table>
+    <thead><tr><th></th><th>Who asked for the receipt too early</th><th>How often</th><th>Fixed?</th></tr></thead>
+    <tbody>
+      <tr><td>10 Nov (section 5)</td><td>Our code: every status check asked for the receipt straight away</td><td>Every 3 seconds, as long as the quote lived</td><td><span class="pill ok">Yes</span> status first (<code>GetIntent</code>), receipt only after the payment lands</td></tr>
+      <tr><td>11 Nov</td><td>The Trails widget</td><td>A few times while the buyer chooses a token</td><td><span class="pill warn">Not ours</span> noted for Mohit / Trails</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Other widget messages seen the same day (also not ours)</h3>
+  <ul>
+    <li><b>Yellow <code>[trails-sdk] [useQuote] Quote disabled. Missing: amount …</code></b> and <b><code>… malformed or zero: "0.1"</code></b>: printed by the Trails package while the widget fills in its amount; the quote then worked ($0.10).</li>
+    <li><b>Red <code>Warning: Maximum update depth exceeded … at wM (0xtrails/dist/src-Cd_X4Rd1.js)</code></b>: a React development warning from the widget's own Pay screen (<code>wM</code>); every frame in the stack is inside the package. One of its effects re-applies the amount we pass whenever it differs from its own internal amount, which fits this warning and the "malformed" line. The widget kept working. Our props to the widget didn't change in the review fixes (only logging was removed).</li>
+    <li><b>"Failed to load resource: the server responded with a status of 400"</b>: Chrome's own line for the same red receipt requests.</li>
+    <li>Unrelated to Trails: chart size warnings (<code>LogUtils.js</code>, marketplace charts, there before Trails) and Reown font preload warnings (wallet window).</li>
+  </ul>
+  <p>All three widget messages are worth showing Mohit or Trails together, with the stack. We can't remove them from our side.</p>
+
+  <h3>Tests of the review fixes (11 Nov)</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>#</th><th>Test</th><th>Cost</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td><b>A</b></td><td>Console is quiet: No <code>[trails] widget …</code> lines in the Console.</td><td>Free, 2 min</td><td><span class="pill ok">Passed 11 Nov</span></td></tr>
+      <tr><td><b>B</b></td><td>An unpaid payment stops: A request every 3 s, every 15 s after 5 min, none after 15 min. No message on screen. The entry leaves <code>trails-checkouts</code> in Local Storage.</td><td>Free, about 35 min (mostly waiting)</td><td><span class="pill ok">Passed 11 Nov</span></td></tr>
+      <tr><td><b>C</b></td><td>Reload rule: Under 15 min: <code>GetIntent</code> requests start again. After 15 min: none.</td><td>Free, during and after B</td><td><span class="pill warn">To do</span></td></tr>
+      <tr><td><b>D</b></td><td>Drawer path still works: Payment in progress ▸ "name is yours" ▸ View Receipt ▸ receipt page. The quote goes through at 0.5% slippage (first run at 0.5%).</td><td>Paid, about 0.10 USDT</td><td><span class="pill ok">Passed 11 Nov</span></td></tr>
+      <tr><td><b>E</b></td><td>Change page during a purchase: "Purchase in progress" banner, then the "is yours" message (still no title, known), then the banner disappears without a reload. Also the old "closed drawer" test.</td><td>Paid, about 0.10 USDT</td><td><span class="pill warn">To do</span></td></tr>
+      <tr><td><b>F</b></td><td>Back, then confirm later: The "is yours" message still appears (before the fix, nothing tracked it).</td><td>Optional, paid</td><td><span class="pill warn">Optional</span></td></tr>
+      <tr><td><b>G</b></td><td>Page size: Same as the <code>dark-mode</code> branch, no extra 38 kB.</td><td>Yours, about 5 min</td><td><span class="pill warn">To do</span></td></tr>
+    </tbody>
+  </table></div>
+  <p>Automated: type check clean, ESLint clean, 76 tests pass. Steps for each test: <code>trails-mohit-review.html</code> section 9 and the progress doc, "Review fixes".</p>
+
+  <p class="refs">References: <code>src/core/services/trails/trailsReceipt.service.ts</code> (<code>PRE_RECEIPT_STATUSES</code>); <code>node_modules/@0xtrails/api/dist/index.js</code> (<code>IntentStatus</code>: QUOTED, COMMITTED, EXECUTING, FAILED, SUCCEEDED, ABORTED, REFUNDED, INVALID); <code>node_modules/0xtrails/dist/src-Cd_X4Rd1.js</code> (<code>wM</code>, the widget's Pay screen); Trails API <code>POST /rpc/Trails/GetIntent</code> and <code>/rpc/Trails/GetIntentReceipt</code> with header <code>X-Access-Key</code>; progress doc, "Review fixes", Results so far.</p>
+</section>
+
+</main>
+</div>
+<script>
+  document.getElementById('toggle').addEventListener('click', function () {
+    var root = document.documentElement;
+    var current = root.getAttribute('data-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('dmplan-theme', next); } catch (e) {}
+  });
+</script>
+</body>
+</html>

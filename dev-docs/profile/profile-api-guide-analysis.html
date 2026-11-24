@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Profile API Guide Analysis</title>
+<style>
+  :root {
+    --bg: #f9f9f9; --surface: #ffffff; --surface-soft: #f3f4fe;
+    --text: #111111; --text-muted: #5b5b66; --border: #e6e6e6;
+    --accent: #2639ED; --accent-soft: #e9ebfd;
+    --ok: #12805c; --ok-soft: #e4f5ee;
+    --warn: #a35a00; --warn-soft: #fdf1e2;
+    --bad: #c4282d; --bad-soft: #fde8e8;
+    --code-bg: #f1f1f4;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+      --text: #f2f2f3; --text-muted: #a3a3ad; --border: #2a2a2d;
+      --accent: #8f9bff; --accent-soft: #1c1f3d;
+      --ok: #4cc79a; --ok-soft: #10261d;
+      --warn: #f0a94b; --warn-soft: #2b1e0c;
+      --bad: #ff7b80; --bad-soft: #2d1213;
+      --code-bg: #1d1d1f;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+    --text: #f2f2f3; --text-muted: #a3a3ad; --border: #2a2a2d;
+    --accent: #8f9bff; --accent-soft: #1c1f3d;
+    --ok: #4cc79a; --ok-soft: #10261d;
+    --warn: #f0a94b; --warn-soft: #2b1e0c;
+    --bad: #ff7b80; --bad-soft: #2d1213;
+    --code-bg: #1d1d1f;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 980px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1 { font-size: 28px; line-height: 1.25; margin: 0 0 6px; }
+  h2 { font-size: 20px; margin: 40px 0 12px; }
+  h3 { font-size: 16px; margin: 24px 0 8px; }
+  p { margin: 0 0 12px; }
+  .meta { color: var(--text-muted); font-size: 13px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; margin: 16px 0; }
+  .verdict { border-left: 4px solid var(--accent); background: var(--accent-soft); }
+  .alert { border-left: 4px solid var(--bad); background: var(--bad-soft); }
+  .note { border-left: 4px solid var(--warn); background: var(--warn-soft); }
+  code { font-family: ui-monospace, Consolas, monospace; font-size: 13px; background: var(--code-bg); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+  .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); margin: 12px 0; }
+  table { border-collapse: collapse; width: 100%; min-width: 680px; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+  th { background: var(--surface-soft); font-weight: 600; }
+  tr:last-child td { border-bottom: 0; }
+  .pill { display: inline-block; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+  .real { color: var(--ok); background: var(--ok-soft); }
+  .partial { color: var(--warn); background: var(--warn-soft); }
+  .missing { color: var(--text-muted); background: var(--code-bg); }
+  .broken { color: var(--bad); background: var(--bad-soft); }
+  ol { padding-left: 22px; margin: 0 0 12px; }
+  li { margin: 6px 0; }
+  nav ol { columns: 2; column-gap: 32px; }
+  @media (max-width: 640px) { nav ol { columns: 1; } h1 { font-size: 24px; } }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Profile API guide: analysis</h1>
+  <p class="meta">Updated 26 Oct 2026, evening. The backend developer's <code>MPV2_PROFILE_MARKETPLACE_API_GUIDE.pdf</code> and Postman collection <code>MPV2_PROFILE-Marketplace-All-Sprints</code>, checked against backend <code>uat</code> at <code>ebcc85b9</code> (APIs from commit <code>7fd28f0e</code>, #994; no newer backend commit) and the frontend: his Profile integration <code>c6cda71</code> is merged into <code>dark-mode</code>, and <code>uat</code> and <code>dark-mode</code> are both at <code>f92a37e</code> and live on staging. Our six follow up fixes (section 3) are uncommitted. The plan side lives in <code>profile-settings-implementation-plan.md</code> §15.</p>
+
+  <div class="card verdict">
+    <p><strong>In short:</strong> the backend developer has already wired most of the 16 APIs into our Profile page himself, on the frontend's <code>uat</code> branch. That work is now merged into <code>dark-mode</code>. Profile fields, the photo, the account summary, notification switches, data requests, sign out others, the signed Solana link, the email links and the main site hand off all call the real backend now.</p>
+    <p>The <code>uat</code> build problem is solved: he merged our <code>dark-mode</code>, and staging deployed. We fixed six gaps in his integration on our side (section 3, not yet committed). What's left: two open questions, one small API change we need now (notification channels), and the parts of the page that have no API yet. The message sent to him is in section 14.</p>
+  </div>
+
+  <nav class="card">
+    <strong>Contents</strong>
+    <ol>
+      <li><a href="#merge">What happened in the merge</a></li>
+      <li><a href="#map">Every API and where it stands now</a></li>
+      <li><a href="#gaps">Gaps in his integration</a></li>
+      <li><a href="#conventions">Where it differs from our conventions</a></li>
+      <li><a href="#mistakes">Mistakes in the guide</a></li>
+      <li><a href="#logout">How "sign out other sessions" works</a></li>
+      <li><a href="#noapi">Parts of the page with no API</a></li>
+      <li><a href="#history">Does this help History?</a></li>
+      <li><a href="#questions">Questions for the backend</a></li>
+      <li><a href="#backend">What the backend still needs</a></li>
+      <li><a href="#glance">Backend at a glance</a></li>
+      <li><a href="#uatbuild">The uat build problem</a></li>
+      <li><a href="#testpage">Test page and Postman collection</a></li>
+      <li><a href="#message">Message sent to the backend</a></li>
+    </ol>
+  </nav>
+
+  <h2 id="merge">1. What happened in the merge</h2>
+  <div class="card alert">
+    <h3>His uat commit didn't compile</h3>
+    <p><code>c6cda71</code> committed leftover <code>git stash</code> conflict markers ("Updated upstream" and "Stashed changes") in <code>src/core/enum/api-endpoint.enum.ts</code> and <code>src/core/redux/userProfile.ts</code>. In the stash mix up, <code>userProfile.ts</code> also lost the <code>ChangePasswordApi</code> and <code>ResendVerificationEmailApi</code> imports and the <code>useResendVerificationEmailMutation</code> and <code>useChangePasswordMutation</code> exports. The frontend <code>uat</code> branch can't build until that is fixed.</p>
+    <p>Fixed in our merge <code>39dc0f5</code>: the markers are removed (the other side of each block was empty) and the four lines restored. Type check passes, lint has no errors. <strong>Resolved:</strong> he merged our <code>dark-mode</code> into <code>uat</code> (<code>f92a37e</code>), so <code>uat</code> builds again and staging deployed.</p>
+  </div>
+  <div class="card">
+    <h3>The 15 conflicting Profile files</h3>
+    <p>Both branches had added the same Profile files. Ours were unchanged since our Profile commit <code>db9b41d</code>, and his were that same version plus his API work, so the merge takes his versions. None of our Profile work is lost.</p>
+  </div>
+
+  <h2 id="map">2. Every API and where it stands now</h2>
+  <p><span class="pill real">Real</span> fully wired. <span class="pill partial">Partly</span> wired with a gap (see section 3). <span class="pill missing">Not used</span> no code calls it.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>API</th><th>Now</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Profile read<br><code>GET /users/user-multiple-wallet</code></td><td><span class="pill real">Real</span></td><td><code>mapUser.ts</code> now reads <code>username</code>, <code>bio</code>, <code>location</code>, <code>website</code>, <code>avatarUrl</code>.</td></tr>
+        <tr><td>2</td><td>Save profile<br><code>PUT /users</code></td><td><span class="pill real">Real</span></td><td>Sends the four new fields. <code>isVerified</code> is no longer sent.</td></tr>
+        <tr><td>3</td><td>Username check<br><code>GET /users/username/availability</code></td><td><span class="pill real">Real</span></td><td>Checked while typing (fixed 26 Oct); a 409 on save shows a friendly message.</td></tr>
+        <tr><td>4</td><td>Upload photo<br><code>POST /users/avatar</code></td><td><span class="pill real">Real</span></td><td>Uploads as soon as a photo is chosen; the error toast says PNG or JPG under 2 MB.</td></tr>
+        <tr><td>5</td><td>Remove photo<br><code>DELETE /users/avatar</code></td><td><span class="pill real">Real</span></td><td></td></tr>
+        <tr><td>6</td><td>Resend verification<br><code>POST /auth/verification-email</code></td><td><span class="pill real">Real</span></td><td>Now sends <code>source: 'marketplace'</code>.</td></tr>
+        <tr><td>7</td><td>Password reset email<br><code>POST /auth/forgot-password</code></td><td><span class="pill real">Real</span></td><td>Now sends <code>source: 'marketplace'</code>.</td></tr>
+        <tr><td>8</td><td>Solana nonce<br><code>GET /web3-auth/solana-generate-nonce</code></td><td><span class="pill real">Real</span></td><td>First step of the new linking flow.</td></tr>
+        <tr><td>9</td><td>Link Solana wallet<br><code>POST /web3-auth/solana-add-wallet</code></td><td><span class="pill real">Real</span></td><td>Was broken this morning. Now signs the nonce (<code>solana-signing.ts</code>, <code>base58.ts</code>) and sends the signature.</td></tr>
+        <tr><td>10</td><td>Sign out other sessions<br><code>POST /auth/logout/others</code></td><td><span class="pill real">Real</span></td><td>Saves the new tokens into the cookies. The session list itself is still sample.</td></tr>
+        <tr><td>11</td><td>Read notification switches<br><code>GET /users/notifications</code></td><td><span class="pill real">Real</span></td><td></td></tr>
+        <tr><td>12</td><td>Change notification switches<br><code>PATCH /users/notifications</code></td><td><span class="pill partial">Partly</span></td><td>The five switches save. The email and Telegram channel switches are kept in memory only and reset on reload.</td></tr>
+        <tr><td>13</td><td>Account summary<br><code>GET /marketplacev2/orders/summary</code></td><td><span class="pill real">Real</span></td><td>Divides the volume by 1e6. One shared request per page load (fixed 26 Oct).</td></tr>
+        <tr><td>14</td><td>Request export or deletion<br><code>POST /users/requests</code></td><td><span class="pill real">Real</span></td><td>"Delete account" is now "Request account deletion"; the toasts say the team will follow up.</td></tr>
+        <tr><td>15</td><td>List data requests<br><code>GET /users/requests</code></td><td><span class="pill real">Real</span></td><td>Your Data shows each request as requested or completed (fixed 26 Oct).</td></tr>
+        <tr><td>16</td><td>Main site hand off<br><code>POST /marketplace/redirectauth/redirect</code></td><td><span class="pill real">Real</span></td><td>Sends the Bearer header, from the body token or the session cookie (fixed 26 Oct).</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="gaps">3. Gaps in his integration</h2>
+  <p class="meta">Fixed on 26 Oct (uncommitted): items 1, 2, 4, 5, 6 and 7 below. Items 3 and 8 remain.</p>
+  <ol>
+    <li><strong>Account summary is fetched twice.</strong> <code>ProfileTabPanel</code> and <code>ProfileRail</code> each call <code>useAccountSummary</code>, and the hook has no shared cache, so every page load sends the same request twice.</li>
+    <li><strong>Errors are silent.</strong> The new summary and notification hooks catch errors without logging them, unlike the other pages, which log with a <code>[page]</code> prefix.</li>
+    <li><strong>Notification channels don't persist.</strong> The email and Telegram switches live in React state only, so they reset on every reload, while the card no longer shows the Sample data chip.</li>
+    <li><strong>Username is checked only on save.</strong> The user finds out a name is taken only after pressing Save.</li>
+    <li><strong>Data request status isn't shown.</strong> <code>GET /users/requests</code> is never called, so after requesting an export or deletion the user can't see that it's open.</li>
+    <li><strong>Member since can be blank.</strong> A null <code>memberSince</code> becomes an empty string; check how the card shows it.</li>
+    <li><strong>Redirect only works with a token in the body.</strong> If a caller passes no <code>access_token</code>, the request goes without Bearer and gets a 401.</li>
+    <li><strong>A test page ships in the app.</strong> <code>/dev/sprint1-test</code> is included in the build and only hidden by <code>NEXT_PUBLIC_MPV2_SPRINT1_TEST</code>. Confirm the variable is off in production.</li>
+  </ol>
+
+  <h2 id="conventions">4. Where it differs from our conventions</h2>
+  <div class="card note">
+    <p>The new calls go through <code>src/core/services/profile-settings.service.ts</code>, which has its own <code>fetch</code> wrapper. The rest of the Profile page uses RTK Query in <code>src/core/redux/</code> (plan §14.3), and the marketplace v2 pages use <code>callBackend</code>. Going around both means no shared cache (the double summary call above) and no automatic refresh after a save elsewhere on the site. It works, but it's a second data layer to maintain. A later clean up could move these calls into RTK Query endpoints, keeping the hooks' return shapes so components don't change.</p>
+  </div>
+
+  <h2 id="mistakes">5. Mistakes in the guide</h2>
+  <ol>
+    <li><strong>Photo limit is 2 MB, not 3 MB.</strong> The 3 MB is only the upload buffer. His frontend code correctly uses 2 MB.</li>
+    <li><strong>The account summary has no "domain statuses".</strong> It returns member since, domains owned, listed, volume sold and completed sales.</li>
+    <li><strong>The "where the marketplace uses it" column</strong> named files we didn't have this morning. They exist now that his commit is merged (<code>profile-settings.service</code> and its functions).</li>
+  </ol>
+
+  <h2 id="logout">6. How "sign out other sessions" works</h2>
+  <div class="card">
+    <ol>
+      <li><strong>This browser stays signed in</strong> because the new tokens are saved into the cookies (his code does this).</li>
+      <li><strong>Not instant on other devices.</strong> The backend keeps one refresh token per user. Other devices fail at their next refresh, but their current access token keeps working until it expires.</li>
+      <li><strong>History is safe.</strong> The wallet verification is carried into the new token.</li>
+    </ol>
+  </div>
+
+  <h2 id="noapi">7. Parts of the Profile page with no API</h2>
+  <ol>
+    <li><strong>Active sessions list</strong> (device, location, last active) and signing out one session. Still sample.</li>
+    <li><strong>Wallet settings</strong>: settlement network, hide other wallets, disconnect a wallet, set the primary wallet. Still sample.</li>
+    <li><strong>Sign in methods</strong>: disconnect Google, set a password for a Google or wallet only account.</li>
+    <li><strong>Notification channels</strong> (email and Telegram switches). Now in memory only, see section 3.</li>
+    <li><strong>Privacy and display preferences.</strong> Display can stay in the browser.</li>
+  </ol>
+
+  <h2 id="history">8. Does this help the History page?</h2>
+  <p>Not really. The account summary gives all time sales totals only, with no time period and no "spent" figure. The History Summary card still needs its own summary endpoint with a period.</p>
+
+  <h2 id="questions">9. Questions for the backend</h2>
+  <h3>Open</h3>
+  <ol>
+    <li><strong>Access token lifetime:</strong> the Postman collection says 1 hour, the backend's <code>env.sample</code> says <code>3d</code>. Which is real on staging and production? It decides how long other devices stay signed in after "Sign out other sessions".</li>
+    <li><strong>Test page:</strong> his commit <code>f92a37e</code> removed the <code>NEXT_PUBLIC_MPV2_SPRINT1_TEST</code> switch, so <code>/dev/sprint1-test</code> ships in every build. Put the switch back or remove it before production?</li>
+    <li><strong>Avatar:</strong> is <code>avatarUrl</code> a permanent public link, or can it expire?</li>
+    <li><strong>Redirect:</strong> which values does <code>source</code> accept besides <code>marketplace</code>?</li>
+    <li><strong>Data layer:</strong> fine to move the calls in <code>profile-settings.service.ts</code> into RTK Query later, to match the rest of the page?</li>
+  </ol>
+  <h3>Answered</h3>
+  <ol>
+    <li><strong>Broken uat build:</strong> fixed by merging our <code>dark-mode</code> (<code>f92a37e</code>).</li>
+    <li><strong>Data request statuses:</strong> only <code>open</code> and <code>done</code>; support closes requests by hand (backend enum, Postman collection).</li>
+    <li><strong>Notification channels:</strong> not saved anywhere yet; now asked for as an API change (section 10).</li>
+    <li><strong>Sessions, wallet settings, sign in methods, privacy, preferences:</strong> no APIs; asked for only if product wants them (section 10).</li>
+    <li><strong>Account summary period:</strong> not planned yet; listed with the History asks.</li>
+  </ol>
+<h2 id="backend">10. What the backend still needs</h2>
+  <p>Everything the Profile page still needs from the backend, with the shape our frontend already expects (from <code>src/types/profile-settings/index.ts</code>). The paths are suggestions; the backend can name them however it likes. Highest value first.</p>
+
+  <h3>Fix first</h3>
+  <ol>
+    <li><strong>Frontend <code>uat</code> doesn't build</strong> (his commit <code>c6cda71</code>): stash conflict markers in <code>src/core/enum/api-endpoint.enum.ts</code> and <code>src/core/redux/userProfile.ts</code>, plus two lost imports and two lost hook exports in <code>userProfile.ts</code>. <strong>Resolved</strong> on 26 Oct: <code>uat</code> merged our <code>dark-mode</code> (<code>f92a37e</code>).</li>
+  </ol>
+
+  <h3>New APIs needed</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>For</th><th>Suggested API</th><th>Shape we expect</th><th>Unlocks</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Active sessions list</td><td><code>GET /auth/sessions</code></td><td><code>[{ id, device, location, lastActive, current }]</code>, <code>lastActive</code> as an ISO date</td><td>Security tab: the real list of signed in devices</td></tr>
+        <tr><td>2</td><td>Sign out one session</td><td><code>DELETE /auth/sessions/:id</code></td><td>Ends that device's session right away</td><td>The Sign out button on each session row</td></tr>
+        <tr><td>3</td><td>Wallet settings</td><td><code>GET</code> and <code>PATCH /users/wallet-settings</code></td><td><code>{ settlementChainId, hideOtherWallets }</code></td><td>Wallets tab: Default Network card</td></tr>
+        <tr><td>4</td><td>Disconnect a wallet</td><td><code>DELETE /users/wallets/:id</code></td><td>Removes a linked EVM or Solana wallet</td><td>Wallets tab: Disconnect (now "coming soon")</td></tr>
+        <tr><td>5</td><td>Set the primary wallet</td><td><code>PATCH /users/wallets/:id/primary</code></td><td>Marks one wallet <code>primary: true</code></td><td>Wallets tab: the primary badge and choice</td></tr>
+        <tr><td>6</td><td>Disconnect Google</td><td><code>DELETE /auth/google</code></td><td>Only allowed while another sign in method remains</td><td>Security tab: How You Sign In</td></tr>
+        <tr><td>7</td><td>Set a password</td><td><code>POST /auth/set-password</code></td><td><code>{ newPassword }</code>, for Google or wallet only accounts that have none</td><td>Security tab: Change Password for those accounts</td></tr>
+        <tr><td>8</td><td>Privacy preferences</td><td><code>GET</code> and <code>PATCH /users/privacy</code></td><td><code>{ publicPortfolio, showSalesHistory }</code></td><td>Preferences tab: Privacy. These change what <em>other people</em> see, so they must be saved on the account and enforced by the public profile APIs.</td></tr>
+        <tr><td>9</td><td>Display preferences (optional)</td><td><code>GET</code> and <code>PATCH /users/preferences</code></td><td><code>{ theme, currency, language, dateFormat, timeFormat }</code></td><td>Only if they should follow the user across devices; otherwise they can stay in the browser</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Updates to APIs that already exist</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>API</th><th>Change</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td><code>GET</code> and <code>PATCH /users/notifications</code></td><td>Add <code>channels: { email, telegram }</code></td><td>The channel switches reset on every reload today</td></tr>
+        <tr><td>2</td><td><code>POST /auth/logout/others</code></td><td>Revoke other devices' access tokens immediately (for example a token version claim checked by the guard)</td><td>Today they keep working until the access token expires</td></tr>
+        <tr><td>3</td><td><code>GET /users/requests</code></td><td>Document the possible <code>status</code> values; optionally add <code>DELETE /users/requests/:id</code> to cancel an open request</td><td>So Your Data can show and explain each request</td></tr>
+        <tr><td>4</td><td><code>GET /marketplacev2/orders/summary</code></td><td>Optional <code>from</code> and <code>to</code> (or <code>period</code>), and a "spent" total</td><td>Shared with the History page's Summary card, which needs totals per period</td></tr>
+        <tr><td>5</td><td><code>POST /marketplace/redirectauth/redirect</code></td><td>Document which <code>source</code> values are accepted</td><td>We send <code>marketplace</code> and the main site hand off sources</td></tr>
+        <tr><td>6</td><td><code>POST /users/avatar</code></td><td>Confirm whether <code>avatarUrl</code> is permanent and public</td><td>If it expires, the photo breaks later and we need a refresh path</td></tr>
+        <tr><td>7</td><td>The API guide (PDF)</td><td>Photo limit is 2 MB, not 3 MB; the summary has no "domain statuses"</td><td>So the next reader isn't misled</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Not backend work (frontend, later)</h3>
+  <p>Show data request status (call <code>GET /users/requests</code>), check the username while typing, one shared account summary request, log errors like the other pages, and send Bearer on the redirect even without a body token. These are in the plan, §15.7.</p>
+  <h2 id="glance">11. Backend at a glance: what exists and what doesn't</h2>
+  <p>Checked against backend <code>uat</code> at <code>ebcc85b9</code> (26 Oct 2026), every controller route searched. Covers the Profile page and the History page.</p>
+
+  <h3>What exists</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Page</th><th>API</th><th>What it does</th><th>Wired?</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Profile</td><td><code>GET /users/user-multiple-wallet</code></td><td>Name, username, bio, location, website, photo, email, phone, Telegram, wallets</td><td><span class="pill real">Yes</span></td></tr>
+        <tr><td>2</td><td>Profile</td><td><code>PUT /users</code></td><td>Saves those profile fields</td><td><span class="pill real">Yes</span></td></tr>
+        <tr><td>3</td><td>Profile</td><td><code>GET /users/username/availability</code></td><td>Is a username free</td><td><span class="pill partial">On save only</span></td></tr>
+        <tr><td>4</td><td>Profile</td><td><code>POST /users/avatar</code></td><td>Upload the photo (PNG or JPEG, 2 MB)</td><td><span class="pill real">Yes</span></td></tr>
+        <tr><td>5</td><td>Profile</td><td><code>DELETE /users/avatar</code></td><td>Remove the photo</td><td><span class="pill real">Yes</span></td></tr>
+        <tr><td>6</td><td>Profile</td><td><code>POST /auth/verification-email</code></td><td>Resend the verification link</td><td><span class="pill real">Yes</span></td></tr>
+        <tr><td>7</td><td>Profile</td><td><code>PUT /auth/change-password</code></td><td>Change the password</td><td><span class="pill real">Yes</span></td></tr>
+        <tr><td>8</td><td>Profile</td><td><code>POST /auth/forgot-password</code></td><td>Send the reset email</td><td><span class="pill real">Yes</span></td></tr>
+        <tr><td>9</td><td>Profile</td><td><code>POST /auth/reset-password</code></td><td>Set the new password from the reset link</td><td><span class="pill real">Yes</span> (sign in flow)</td></tr>
+        <tr><td>10</td><td>Profile</td><td><code>POST /auth/logout/others</code></td><td>Sign out other devices</td><td><span class="pill real">Yes</span></td></tr>
+        <tr><td>11</td><td>Profile</td><td><code>GET /web3-auth/generate-nonce</code>, <code>POST /web3-auth/verify</code></td><td>Link an EVM wallet</td><td><span class="pill real">Yes</span></td></tr>
+        <tr><td>12</td><td>Profile</td><td><code>GET /web3-auth/solana-generate-nonce</code>, <code>POST /web3-auth/solana-add-wallet</code></td><td>Link a Solana wallet, signed</td><td><span class="pill real">Yes</span></td></tr>
+        <tr><td>13</td><td>Profile</td><td><code>GET /users/notifications</code></td><td>Read the five alert switches</td><td><span class="pill real">Yes</span></td></tr>
+        <tr><td>14</td><td>Profile</td><td><code>PATCH /users/notifications</code></td><td>Save the five alert switches</td><td><span class="pill real">Yes</span></td></tr>
+        <tr><td>15</td><td>Profile</td><td><code>GET /marketplacev2/orders/summary</code></td><td>Member since, domains owned, listed, volume sold, completed sales</td><td><span class="pill real">Yes</span></td></tr>
+        <tr><td>16</td><td>Profile</td><td><code>POST /users/requests</code></td><td>Request a data export or account deletion</td><td><span class="pill real">Yes</span></td></tr>
+        <tr><td>17</td><td>Profile</td><td><code>GET /users/requests</code></td><td>List those requests and their status</td><td><span class="pill missing">No</span></td></tr>
+        <tr><td>18</td><td>Profile</td><td><code>POST /marketplace/redirectauth/redirect</code></td><td>Hand the session to the main site</td><td><span class="pill real">Yes</span></td></tr>
+        <tr><td>19</td><td>History</td><td><code>GET /marketplacev2/history/get-all</code></td><td>Purchases, sales, active and cancelled listings, with search, sort, paging, totals</td><td><span class="pill real">Yes</span></td></tr>
+        <tr><td>20</td><td>History</td><td><code>GET /marketplacev2/wallet-verification/wallet-nonce</code>, <code>POST .../prove-wallet</code></td><td>The wallet signature the History API needs</td><td><span class="pill real">Yes</span> (Verify wallet)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>What doesn't exist yet</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Page</th><th>Missing</th><th>Until then</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Profile</td><td>Active sessions list, and signing out one session</td><td>Coming soon</td></tr>
+        <tr><td>2</td><td>Profile</td><td>Wallet settings: settlement network, hide other wallets</td><td>Coming soon</td></tr>
+        <tr><td>3</td><td>Profile</td><td>Disconnect a wallet, choose the primary wallet</td><td>Coming soon</td></tr>
+        <tr><td>4</td><td>Profile</td><td>Disconnect Google, set a password on an account without one</td><td>Coming soon</td></tr>
+        <tr><td>5</td><td>Profile</td><td>Privacy settings: public portfolio, show sales history</td><td>Coming soon</td></tr>
+        <tr><td>6</td><td>Profile</td><td>Display preferences saved to the account</td><td>Stay in the browser</td></tr>
+        <tr><td>7</td><td>Profile</td><td>Email and Telegram channel switches</td><td><strong>Worth asking for now</strong>: add <code>channels</code> to <code>/users/notifications</code></td></tr>
+        <tr><td>8</td><td>Profile</td><td>Cancel a data request</td><td>Not offered</td></tr>
+        <tr><td>9</td><td>History</td><td>Summary endpoint with a period (spent, earned, purchases, sold)</td><td>Page adds up purchases and sales itself</td></tr>
+        <tr><td>10</td><td>History</td><td>Several types in one request (<code>type=BUY,SOLD</code>)</td><td>Two requests per tab</td></tr>
+        <tr><td>11</td><td>History</td><td>Date range filter (<code>from</code>, <code>to</code>)</td><td>Filters loaded rows only</td></tr>
+        <tr><td>12</td><td>History</td><td>Renewals in the History API</td><td>Not shown</td></tr>
+        <tr><td>13</td><td>History</td><td>Offers, bids, transfers, withdrawals, account events</td><td>Empty tabs, Coming soon tiles (features don't exist yet)</td></tr>
+        <tr><td>14</td><td>History</td><td>A friendly reference ID like "#ED-2026-1013-00148"</td><td>Not needed: decided 26 Oct to keep the short order hash</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <h2 id="uatbuild">12. The uat build problem (26 Oct 2026)</h2>
+
+  <div class="card alert">
+    <p><strong>In short:</strong> the frontend <code>uat</code> branch doesn't build since commit <code>c6cda71</code> (26 Oct, 13:00). Two files contain leftover <code>git stash</code> conflict markers, and one of them lost four lines. His follow up <code>7302216</code> ("Resolved the conflict", 13:56) didn't touch those files, so <code>uat</code> was still broken. Our <code>dark-mode</code> branch had the fix.</p>
+    <p><strong>Resolved, 26 Oct 16:37:</strong> he merged our <code>dark-mode</code> into <code>uat</code> (<code>f92a37e</code>); the markers are gone, the four lines are back, staging deployed (<code>/dev/sprint1-test</code> and <code>/history</code> answer 200).</p>
+  </div>
+
+  <h3>What is broken, and where</h3>
+  <ol>
+    <li><strong><code>src/core/enum/api-endpoint.enum.ts</code></strong>, around line 47: conflict marker lines (<code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; Updated upstream</code>, <code>=======</code>, <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt; Stashed changes</code>) around the new endpoint names.</li>
+    <li><strong><code>src/core/redux/userProfile.ts</code></strong>, around line 58: the same markers around <code>resendVerificationEmail</code> and <code>changePassword</code>. The file also lost the <code>ChangePasswordApi</code> and <code>ResendVerificationEmailApi</code> imports at the top and the <code>useResendVerificationEmailMutation</code> and <code>useChangePasswordMutation</code> exports at the bottom. Change password and resend verification on the Profile page depend on them.</li>
+  </ol>
+  <p><strong>Fix on <code>uat</code>:</strong> delete the marker lines, keeping the code between them (the "Updated upstream" side is empty), then put the two imports and two exports back. Our <code>dark-mode</code> merge <code>39dc0f5</code> has exactly this.</p>
+
+  <h3>Proof that it fails</h3>
+  <p><code>uat</code> at <code>7302216</code> was unpacked untouched into a temporary folder and type checked (<code>tsc --noEmit</code>). Result, 6 errors:</p>
+  <div class="card"><code>src/core/enum/api-endpoint.enum.ts(47,1), (48,1), (58,1): error TS1185: Merge conflict marker encountered.</code><br><code>src/core/redux/userProfile.ts(58,1), (59,1), (78,1): error TS1185: Merge conflict marker encountered.</code></div>
+  <p>Removing only the markers is not enough: the check then fails with 4 more errors, <code>Cannot find name 'ResendVerificationEmailApi'</code>, <code>Cannot find name 'ChangePasswordApi'</code>, and no exported <code>useChangePasswordMutation</code> or <code>useResendVerificationEmailMutation</code>.</p>
+
+  <h3>When it started</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Commit</th><th>When</th><th>Markers</th><th>Lost lines</th></tr></thead>
+      <tbody>
+        <tr><td><code>d43ef3c</code> (merge of marketplace-v2 #229)</td><td>8 Oct</td><td>None</td><td>None</td></tr>
+        <tr><td><code>c6cda71</code> "Implemented new profile apis"</td><td>26 Oct 13:00</td><td>Yes, both files</td><td>Yes</td></tr>
+        <tr><td><code>7302216</code> "Resolved the conflict"</td><td>26 Oct 13:56</td><td>Still there</td><td>Still there</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p><code>7302216</code> only adds what <code>uat</code> was missing for the Profile code: <code>src/data/countries.ts</code>, <code>src/helpers/phone.ts</code> and the <code>libphonenumber-js</code> package (the same as our copies).</p>
+
+  <h3>How it happened: a stash popped onto another branch</h3>
+  <ol>
+    <li>His changes were built on our Profile work, which lives only on <code>dark-mode</code> (our commit <code>db9b41d</code>, 16 Oct). That version has the two imports, the two hooks and the Solana endpoint line.</li>
+    <li>He ran <code>git stash</code>, switched to <code>uat</code> (which never had our Profile work) and ran <code>git stash pop</code>.</li>
+    <li>Git merged the stash onto <code>uat</code> with <code>dark-mode</code> as the base. Where he had edited next to lines <code>uat</code> lacks, git couldn't decide and wrote markers (the 6 errors). Where he hadn't edited, the lines were in the base but missing on <code>uat</code>, so git read that as "uat deleted them" and quietly dropped them (the 4 lost lines).</li>
+    <li>It was committed and pushed without a build or type check.</li>
+  </ol>
+  <p><strong>To avoid it:</strong> after a <code>stash pop</code>, search for <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code> and run <code>npx tsc --noEmit</code> before committing. Don't pop a stash made on one branch onto another; commit it on its own branch and merge.</p>
+
+  <h3>Why staging still works</h3>
+  <p>Staging (<code>stagemarketplace.endlessdomains.io</code>) still serves a build from before <code>c6cda71</code>. Checked 26 Oct: <code>/dev/sprint1-test</code> answers 404, while any build with <code>c6cda71</code> would answer 200 (the page shows "Not available" when its switch is off). The home page and <code>/watchlist</code> answer 200, <code>/profile</code> redirects to sign in.</p>
+  <p>Staging deploys through AWS CodeDeploy (<code>appspec.yml</code>): copy the code, <code>npm install</code>, <code>scripts/build_frontend.sh</code> runs <code>npm run build</code>, and only then <code>scripts/start_frontend.sh</code> restarts the app with pm2. So either the deploy ran and failed at the build step (the restart never happened, the old version kept running; most likely), or staging hasn't been deployed since. The CodeDeploy history in the AWS console will say which. Until <code>uat</code> builds, no new change reaches staging.</p>
+
+  <h3>How to run a build test yourself</h3>
+  <p>A separate clone of <code>uat</code> is at <code>D:\Akshat Endless\marketplacev2UAT\endlessdomains-marketplace-frontend</code> (on <code>uat</code> at <code>7302216</code>, <code>node_modules</code> installed). In a terminal there:</p>
+  <ol>
+    <li><code>npx tsc --noEmit</code> (quick type check, about a minute)</li>
+    <li><code>npm run build</code> (the same build staging runs)</li>
+  </ol>
+  <p>Both should fail on the markers until he fixes <code>uat</code>. Notes: the clone has its own <code>.next</code>, so building there doesn't touch the dev server on 3002; staging uses Node 20.18.0 (this machine has 22.18.0, fine for this test); staging pulls its <code>.env</code> from S3, so if the build asks for missing values, copy the main repo's <code>.env</code> into the clone. After his fix, <code>git pull</code> in the clone and run both again; when both pass, staging can deploy.</p>
+
+  <h3>On our side</h3>
+  <p>When his fix lands we pull <code>uat</code> into <code>dark-mode</code> and, if those two files conflict, keep his version (decided 26 Oct), then run the type check and report anything still broken.</p>
+  <h2 id="testpage">13. Test page and Postman collection</h2>
+  <h3>The test page, <code>/dev/sprint1-test</code></h3>
+  <ol>
+    <li><strong>Sprint 1 panel:</strong> 19 checks in 5 phases: Solana sign in (needs <code>source</code>, refuses wrong or replayed signatures), Solana link (needs a signature and a token, refuses replays), the redirect needing Bearer, the email links accepting only a <code>source</code> value, and refresh keeping the wallet claims.</li>
+    <li><strong>Integrated panel:</strong> one button per API the Profile page uses.</li>
+    <li><strong>Always on now:</strong> <code>f92a37e</code> removed the env switch, so it ships in every build, production included.</li>
+    <li><strong>Real actions:</strong> its buttons sign out other sessions, file a deletion request, send emails and rotate the session tokens for the signed in user, and it has fields to paste tokens into.</li>
+    <li><strong>Conventions:</strong> inline <code>style={{}}</code> throughout (CLAUDE.md rule 5), <code>/* eslint-disable */</code>, raw <code>fetch</code>. Nothing else imports it, so removing or gating it is safe.</li>
+  </ol>
+  <h3>The Postman collection, checked against the backend</h3>
+  <ol>
+    <li>Username taken: <strong>409 <code>USERNAME_TAKEN</code></strong> (handled on our side now).</li>
+    <li>Data requests: statuses <strong><code>open</code></strong> and <strong><code>done</code></strong>; a new request is 201, a repeat is 200 with the same request.</li>
+    <li>Photo: <strong>2 MB</strong>, PNG or JPEG; WEBP and larger files are 400 (confirms the guide's 3 MB is wrong).</li>
+    <li>An empty <code>PATCH /users/notifications</code> is 400 (our hook never sends one).</li>
+    <li>Access tokens "1h" here, <code>3d</code> in <code>env.sample</code>: open question.</li>
+    <li><code>GET /users</code> exists as a lighter profile read; not needed, <code>user-multiple-wallet</code> returns the same plus wallets.</li>
+    <li>Solana sign in (<code>solana-login</code>, <code>solana-authenticate</code>) and refresh are included; the marketplace doesn't use Solana sign in.</li>
+    <li>The <code>notificationSettingId</code> variable is never used, and nothing covers channels, sessions, wallet settings or privacy, which confirms those APIs don't exist.</li>
+  </ol>
+
+  <h2 id="message">14. Message sent to the backend (26 Oct)</h2>
+  <div class="card">
+    <h3>1. Done on our side</h3>
+    <p>His Profile work is merged and live on staging. Fixed on the frontend: username checked while typing with a friendly 409, Your Data shows request status, the summary is fetched once, the redirect falls back to the cookie token, Member since shows a dash when null. Not pushed yet.</p>
+    <h3>2. Questions</h3>
+    <ol>
+      <li>Access token lifetime: 1 hour or 3 days?</li>
+      <li>Test page: put the switch back or remove it before production?</li>
+      <li>Is <code>avatarUrl</code> permanent?</li>
+      <li>Which redirect <code>source</code> values are accepted?</li>
+    </ol>
+    <h3>3. Needed now</h3>
+    <p>Add <code>channels: { email, telegram }</code> to <code>GET</code> and <code>PATCH /users/notifications</code>.</p>
+    <h3>4. Needed later, only if product wants them</h3>
+    <p>Active sessions list and single sign out; immediate revoke on sign out others; wallet settings; disconnect a wallet and set the primary; disconnect Google and set a password; privacy; display preferences; cancel a data request. Shapes in section 10.</p>
+    <h3>5. Doc fixes</h3>
+    <p>Guide: 2 MB not 3 MB, no "domain statuses". Collection: unused <code>notificationSettingId</code>.</p>
+    <h3>6. History reminder</h3>
+    <p>Summary with a period, several types per request, <code>from</code> and <code>to</code>, renewals. A period on <code>/marketplacev2/orders/summary</code> could serve both pages.</p>
+  </div>
+</main>
+
+
+
+</body>
+</html>

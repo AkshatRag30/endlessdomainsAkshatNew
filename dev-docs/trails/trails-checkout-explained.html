@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Trails Checkout Explained</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: sticky contents rail on the left, one reading column on the right; each doc section is a block with a "one line" summary, plain prose and the doc's own details */
+:root {
+  --bg: #f6f6f9;
+  --surface: #ffffff;
+  --sunk: #eeedf4;
+  --fg: #1b1a24;
+  --muted: #5c5a6b;
+  --line: #dddbe7;
+  --accent: #6a3fd6;
+  --accent-soft: #ece6fb;
+  --warn: #9a5b00;
+  --warn-soft: #fff3df;
+  --ok: #1d7a4c;
+  --ok-soft: #e3f4ea;
+  --bad: #b3261e;
+  --bad-soft: #fdeceb;
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f0e14; --surface: #18171f; --sunk: #211f2a; --fg: #ecebf2; --muted: #a3a1b3; --line: #2e2c3a;
+    --accent: #ac90ff; --accent-soft: #2a2240; --warn: #f0b45a; --warn-soft: #332611; --ok: #6fd39d; --ok-soft: #142a1e;
+    --bad: #ff8a80; --bad-soft: #351817; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f0e14; --surface: #18171f; --sunk: #211f2a; --fg: #ecebf2; --muted: #a3a1b3; --line: #2e2c3a;
+  --accent: #ac90ff; --accent-soft: #2a2240; --warn: #f0b45a; --warn-soft: #332611; --ok: #6fd39d; --ok-soft: #142a1e;
+  --bad: #ff8a80; --bad-soft: #351817; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0; background: var(--bg); color: var(--fg);
+  font-family: var(--font-body); font-size: 16px; line-height: 1.65;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 64px;
+}
+.wrap { max-width: 1120px; margin: 0 auto; display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 48px; }
+header.top { max-width: 1120px; margin: 0 auto; padding-block: 48px 32px; border-bottom: 1px solid var(--line); margin-bottom: 40px; }
+.eyebrow { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; line-height: 1.2; margin: 0; }
+h1 { font-size: clamp(32px, 5vw, 48px); margin-top: 8px; }
+.lede { font-size: 18px; color: var(--muted); max-width: 64ch; margin: 14px 0 0; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.chip { font-size: 13px; padding: 3px 10px; border-radius: 99px; background: var(--sunk); color: var(--muted); }
+
+nav.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 24px); align-self: start; font-size: 14px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; counter-reset: t; }
+nav.toc a { display: block; padding: 5px 10px; border-radius: 6px; color: var(--muted); text-decoration: none; }
+nav.toc a:hover, nav.toc a:focus-visible { background: var(--sunk); color: var(--fg); outline: none; }
+nav.toc .label { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; font-weight: 600; color: var(--muted); padding: 0 10px 8px; }
+
+main { min-width: 0; display: flex; flex-direction: column; gap: 56px; }
+section { scroll-margin-top: 24px; display: flex; flex-direction: column; gap: 16px; }
+section > p, section > ul, section > ol { max-width: 68ch; margin: 0; }
+h2 { font-size: 28px; }
+h3 { font-size: 19px; margin-top: 8px; }
+.num { font-family: var(--font-mono); font-size: 13px; color: var(--accent); font-weight: 500; display: block; margin-bottom: 4px; }
+.oneline { background: var(--accent-soft); border-radius: 10px; padding: 14px 18px; max-width: 68ch; }
+.oneline b { display: block; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-bottom: 2px; }
+.callout { border-radius: 10px; padding: 14px 18px; max-width: 68ch; }
+.callout.warn { background: var(--warn-soft); }
+.callout.warn b:first-child { color: var(--warn); }
+.callout.bad { background: var(--bad-soft); }
+.callout.bad b:first-child { color: var(--bad); }
+.callout.ok { background: var(--ok-soft); }
+.callout.ok b:first-child { color: var(--ok); }
+code { font-family: var(--font-mono); font-size: .88em; background: var(--sunk); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+pre { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; overflow-x: auto; font-family: var(--font-mono); font-size: 13px; line-height: 1.6; }
+pre code { background: none; padding: 0; font-size: inherit; overflow-wrap: normal; }
+.cm { color: var(--muted); }
+.tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; background: var(--sunk); }
+tr:last-child td { border-bottom: none; }
+.dl { display: grid; grid-template-columns: minmax(130px, 200px) minmax(0, 1fr); border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.dl > div { padding: 10px 14px; border-bottom: 1px solid var(--line); }
+.dl > div:nth-last-child(-n+2) { border-bottom: none; }
+.dl dt, .dl .term { font-weight: 600; }
+
+.flow { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.step { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; position: relative; font-size: 14px; }
+.step strong { display: block; font-family: var(--font-display); font-size: 15px; margin-bottom: 2px; }
+.step .where { font-size: 12px; color: var(--accent); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+.step:not(:last-child)::after { content: "→"; position: absolute; right: -11px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 14px; }
+
+.tasks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; max-width: 76ch; }
+.tasks li { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; }
+.tasks .n { font-family: var(--font-mono); color: var(--accent); font-weight: 500; }
+.tasks .d { font-family: var(--font-mono); font-size: 13px; color: var(--muted); white-space: nowrap; }
+.tasks p { margin: 4px 0 0; color: var(--muted); font-size: 15px; }
+.tasks li.derisk { border-color: var(--accent); }
+.tag { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); margin-left: 6px; }
+
+.states { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill { font-family: var(--font-mono); font-size: 13px; padding: 3px 10px; border-radius: 99px; border: 1px solid var(--line); background: var(--surface); }
+.pill.g { background: var(--ok-soft); color: var(--ok); border-color: transparent; }
+.pill.r { background: var(--bad-soft); color: var(--bad); border-color: transparent; }
+.pill.y { background: var(--warn-soft); color: var(--warn); border-color: transparent; }
+
+.checks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; max-width: 72ch; }
+.checks label { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; align-items: start; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; cursor: pointer; }
+.checks input { width: 18px; height: 18px; margin-top: 4px; accent-color: var(--accent); }
+.checks input:checked + span { color: var(--muted); text-decoration: line-through; }
+.checks input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+@media (max-width: 860px) {
+  .wrap { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  nav.toc { position: static; border: 1px solid var(--line); border-radius: 10px; padding: 12px 6px; background: var(--surface); }
+  nav.toc ol { display: grid; grid-template-columns: 1fr 1fr; }
+  .flow { grid-template-columns: minmax(0, 1fr); }
+  .step:not(:last-child)::after { content: "↓"; right: auto; left: 50%; top: auto; bottom: -15px; transform: translateX(-50%); }
+  .dl { grid-template-columns: minmax(0, 1fr); }
+  .dl > div:nth-child(odd) { border-bottom: none; padding-bottom: 0; }
+  .dl > div:nth-last-child(2) { border-bottom: none; }
+  .tasks li { grid-template-columns: 28px minmax(0, 1fr); }
+  .tasks .d { grid-column: 2; }
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="eyebrow">Plain language guide to Mohit's doc of 4 Nov 2026</div>
+  <h1>Trails Checkout Explained</h1>
+  <p class="lede">Every section of "Trails Checkout: Frontend Work That Starts Now", rewritten in easy words, so you understand what to build, why, and in what order before touching any code.</p>
+  <div class="meta"><span class="chip">Source: 12 page PDF by Mohit</span><span class="chip">About 12 working days of frontend work</span><span class="chip">No new backend endpoint needed to start</span></div>
+</header>
+
+<div class="wrap">
+<nav class="toc" aria-label="Contents">
+  <div class="label">Contents</div>
+  <ol>
+    <li><a href="#words">Words to know</a></li>
+    <li><a href="#summary">Summary</a></li>
+    <li><a href="#background">Background</a></li>
+    <li><a href="#tasks">Task list</a></li>
+    <li><a href="#seam">The seam</a></li>
+    <li><a href="#errors">Error codes</a></li>
+    <li><a href="#calls">Destination calls</a></li>
+    <li><a href="#checks">Live checks</a></li>
+    <li><a href="#fixture">Fixture test</a></li>
+    <li><a href="#status">Purchase status</a></li>
+    <li><a href="#backend">Waits for backend</a></li>
+    <li><a href="#testing">Test setup</a></li>
+    <li><a href="#done">Definition of done</a></li>
+  </ol>
+</nav>
+
+<main>
+
+<section id="words">
+  <h2>Words to know first</h2>
+  <p>The doc assumes you already know these. Read this once and the rest becomes much easier.</p>
+  <div class="dl">
+    <div class="term">Seaport</div><div>The smart contract on Polygon that runs our marketplace sales. A seller signs an "order" saying "I'll give this domain for this price", and anyone who calls Seaport with that signed order and pays the price gets the domain.</div>
+    <div class="term">Order / rawOrder</div><div>The seller's offer in Seaport format: who is selling (<code>offerer</code>), what they give (the domain NFT, in <code>offer</code>), what they want back (USDT amounts, in <code>consideration</code>), start and end time, and so on. <code>rawOrder</code> is that data as our API returns it.</div>
+    <div class="term">Signature</div><div>The seller's wallet signature over the order. It proves the seller really agreed. Without it Seaport refuses the sale.</div>
+    <div class="term">Order hash</div><div>A unique ID for one order, a long hex string. Our API looks orders up by it.</div>
+    <div class="term">USDT on Polygon</div><div>The only currency our listings are priced in today. Buyers currently must hold USDT on Polygon to buy.</div>
+    <div class="term">Trails</div><div>An outside payment service. The buyer pays with whatever token they have on whatever chain (for example USDC on Base), and Trails converts and delivers the exact USDT on Polygon, then runs the purchase for them.</div>
+    <div class="term">Intent</div><div>One Trails payment. When the buyer signs in the Trails widget, Trails creates an intent with an <code>intentId</code>. You can ask Trails for its status any time.</div>
+    <div class="term">Calls / calldata</div><div>A "call" is one instruction to a smart contract: which contract (<code>to</code>), which function with which arguments, encoded as hex bytes (<code>data</code>), and how much native coin to send (<code>value</code>). Trails needs us to hand it the exact calls to run on Polygon.</div>
+    <div class="term">Destination</div><div>Where the money finally needs to arrive and be used: Polygon (chain id 137), USDT, the listing price. The "origin" is where the buyer pays from.</div>
+    <div class="term">Recipient</div><div>Who receives the domain in a Seaport sale. This one word is the most important idea in the whole doc (see Destination calls).</div>
+    <div class="term">uat</div><div>Our testing environment. Note: it already points at real Polygon mainnet, so tests spend real money.</div>
+    <div class="term">Probe</div><div>Mohit's experiments that proved Trails works. "Probe P3" was a real 0.25 USDT purchase on mainnet; "probe E7" tested a refund.</div>
+    <div class="term">Poller</div><div>A backend job that watches the chain and records every Seaport sale in our database. That's how receipts, history and My Domains update.</div>
+    <div class="term">POL</div><div>Polygon's native coin, normally needed to pay gas. With Trails the buyer should need none.</div>
+  </div>
+</section>
+
+<section id="summary">
+  <div><span class="num">Section 1</span><h2>Summary</h2></div>
+  <div class="oneline"><b>In one line</b>You can build the whole "Pay with any token" checkout on the frontend today, and make real purchases on uat, without waiting for the backend.</div>
+  <p>Normally a new payment method needs new backend endpoints. Mohit's point is that two things our backend <em>already</em> does are enough to get started.</p>
+  <h3>Reason 1: we can already get the signed order</h3>
+  <p><code>GET /marketplacev2/orders/:orderHash</code> returns <code>rawOrder</code> and <code>signature</code>. With those two things the browser can build the exact purchase instructions itself, so there's no need for the server to build them.</p>
+  <h3>Reason 2: the rest of the site already notices the sale</h3>
+  <p>The backend poller records every Seaport sale under whoever <em>received</em> the domain (<code>OrderFulfilled.recipient</code>). A Trails purchase uses <code>fulfillAdvancedOrder</code> with the recipient set to the buyer. So the poller sees "buyer X bought domain Y" exactly like a normal sale, and receipts, history, My Domains, and the buy and sell emails all keep working with zero changes.</p>
+  <h3>What still needs the backend</h3>
+  <p>Server side tracking, verification and refund emails. So the instruction is: put all Trails logic behind one small interface now. When the backend endpoints arrive later, they replace the browser version and the UI doesn't change at all.</p>
+</section>
+
+<section id="background">
+  <div><span class="num">Section 2</span><h2>Background: what Trails actually does</h2></div>
+  <div class="oneline"><b>In one line</b>The buyer signs once on any chain with any token; a Trails wallet on Polygon pays the exact USDT and calls Seaport on the buyer's behalf.</div>
+  <div class="flow" role="list">
+    <div class="step" role="listitem"><span class="where">Buyer's chain</span><strong>Buyer signs</strong>Pays with, say, USDC on Base in the Trails widget inside our drawer.</div>
+    <div class="step" role="listitem"><span class="where">Trails</span><strong>Bridge and swap</strong>Trails moves the value across chains and turns it into USDT.</div>
+    <div class="step" role="listitem"><span class="where">Polygon</span><strong>Trails wallet pays</strong>A Trails owned wallet now holds the exact USDT price.</div>
+    <div class="step" role="listitem"><span class="where">Polygon</span><strong>Runs our 2 calls</strong>Approve USDT for Seaport, then fulfillAdvancedOrder.</div>
+    <div class="step" role="listitem"><span class="where">Polygon</span><strong>Domain to buyer</strong>Seaport sends the domain to the buyer and USDT to the seller and our fee wallet.</div>
+  </div>
+  <p>It has already been proven on Polygon mainnet on 3 Nov 2026 (probe P3): a real 0.25 USDT order was sold, the domain went to the buyer, and the payout split was exact. The full plan lives in a separate doc, "Trails Integration Plan: Marketplace Frontend"; this doc is just the slice you can start today.</p>
+</section>
+
+<section id="tasks">
+  <div><span class="num">Section 3</span><h2>Task list</h2></div>
+  <div class="oneline"><b>In one line</b>Ten tasks, about 12 days, done in this order. The first three remove risk, so don't skip ahead.</div>
+  <p>The order matters: tasks 1 to 3 find out early whether anything is going to block the project (wrong library versions, a widget that can't do what we need). Building UI before knowing that could waste days.</p>
+  <ol class="tasks">
+    <li class="derisk"><span class="n">1</span><div><strong>Keys and flags</strong><span class="tag">de risk</span><p>Get a uat Trails API key from Mohit. Add three env variables to the env map in <code>next.config.ts</code> and to the uat env file: <code>NEXT_PUBLIC_TRAILS_API_KEY</code>, <code>NEXT_PUBLIC_TRAILS_ENABLED</code> (on or off switch) and <code>NEXT_PUBLIC_TRAILS_PILOT_WALLETS</code> (comma separated list of wallets allowed to use it).</p></div><span class="d">0.5 d</span></li>
+    <li class="derisk"><span class="n">2</span><div><strong>Dependencies and regression</strong><span class="tag">de risk</span><p>Upgrade <code>viem</code> from 2.41.2 to 2.56.7 or newer and <code>@tanstack/react-query</code> from 5.90.12 to 5.101 or newer. Add the <code>0xtrails</code> package at exactly 0.20.0 and the Trails wagmi adapter, both pinned exactly. Run <code>npm ls wagmi @wagmi/core viem</code> and make sure the adapter uses our wagmi 2.19.5, not a second copy. Then test that a normal USDT buy, a listing and a delist still work on uat, since upgrading viem could break existing flows.</p></div><span class="d">1 d</span></li>
+    <li class="derisk"><span class="n">3</span><div><strong>Widget spike</strong><span class="tag">de risk</span><p>A throwaway experiment on a local only page that must never be committed (a test page leaked to prod last time). Render the Trails widget in Pay mode with the fixture calls. Confirm three things: (a) Pay mode accepts our custom <code>actions</code>; (b) the quote shows exactly approve plus <code>fulfillAdvancedOrder</code> with recipient = buyer; (c) it sits inside our drawer without z index or scroll lock fights. If (a) fails, stop and tell Mohit; the backup plan is Trails' headless <code>useQuote</code> hook (build our own UI instead of using the widget).</p></div><span class="d">1 d</span></li>
+    <li><span class="n">4</span><div><strong>Destination builder and live checks</strong><p>Write the function that checks the order is still buyable and builds the two calls, plus a Vitest test proving it outputs the exact bytes from the fixture.</p></div><span class="d">1 d</span></li>
+    <li><span class="n">5</span><div><strong>The seam</strong><p>The <code>CheckoutSource</code> interface and its browser implementation (explained in the next section).</p></div><span class="d">0.5 d</span></li>
+    <li><span class="n">6</span><div><strong>UI</strong><p>A new "Any token, any chain" card in <code>PaymentMethodSection</code>; a <code>paymentMethod</code> state and new steps in <code>BuyFlowModal</code>; a Trails mode in <code>WhatYouPaySection</code> and <code>PurchaseTermsFooter</code>; a <code>TrailsWidgetLoader</code> loaded with <code>next/dynamic</code> and <code>ssr: false</code> so it doesn't bloat other pages; a <code>TrailsPayStep</code>; and the status and refund screens using the copy from the frontend plan.</p></div><span class="d">4 d</span></li>
+    <li><span class="n">7</span><div><strong>Status and resume</strong><p>Hook up widget callbacks, poll the Trails receipt, use our existing sale receipt endpoint, resume purchases from <code>localStorage</code> after a reload, and show toasts when the drawer is closed.</p></div><span class="d">2 d</span></li>
+    <li><span class="n">8</span><div><strong>Fixes that help both methods</strong><p>After any successful purchase, invalidate the RTK Query tags <code>domain_listing</code> and <code>domain</code> so lists refresh. Fix the reject step that currently reuses the success subtext (<code>BuyFlowModal.tsx</code> lines 545 to 551).</p></div><span class="d">0.5 d</span></li>
+    <li><span class="n">9</span><div><strong>Analytics</strong><p>A small <code>trackEvent</code> helper that pushes events to <code>window.dataLayer</code>, with the event list from the frontend plan. Until the backend exists, this is the only way to tell Trails sales from direct sales.</p></div><span class="d">0.5 d</span></li>
+    <li><span class="n">10</span><div><strong>QA on uat</strong><p>Run the manual test matrix from the frontend plan using a real, cheap listing.</p></div><span class="d">1.5 d</span></li>
+  </ol>
+  <p>Exact paths and line numbers for every file are in the frontend plan's "Component and code changes" section, which is the other doc.</p>
+</section>
+
+<section id="seam">
+  <div><span class="num">Section 4</span><h2>The seam</h2></div>
+  <div class="oneline"><b>In one line</b>All Trails logic sits behind one interface, so swapping the browser version for a backend version later is a one file change.</div>
+  <p>"Seam" just means a clean cut point in the code. Components never talk to Trails or to the chain directly; they only call three methods on a <code>CheckoutSource</code>. Today a browser implementation does the work. Later a backend implementation calls the server's endpoints. Because both return the same shapes (copied from the backend plan's API contract), the components never notice the switch.</p>
+<pre><code><span class="cm">// buying-flow/trails/checkoutSource.ts</span>
+export type Hex = `0x${string}`
+
+export type PreparedCheckout = {
+  checkoutId: string       <span class="cm">// browser: crypto.randomUUID(); backend: server uuid</span>
+  orderHash: Hex
+  buyer: Hex               <span class="cm">// Seaport recipient</span>
+  expiresAt: string        <span class="cm">// ISO, now + 15 min</span>
+  destination: { chainId: 137; token: Hex; amount: string }   <span class="cm">// USDT minor units</span>
+  calls: { to: Hex; data: Hex; value: string }[]              <span class="cm">// [approve, fulfillAdvancedOrder]</span>
+  route: { bridgeProvider: 'RELAY'; bridgeProviderFallback: false; slippageTolerance: number }
+}
+
+export type CheckoutStatus =
+  | 'prepared' | 'attached' | 'executing' | 'succeeded'
+  | 'refunded' | 'failed' | 'expired' | 'mismatch'
+
+export type CheckoutState = {
+  status: CheckoutStatus
+  intentStatus?: string
+  destinationTxHash?: Hex
+  refundTxHash?: Hex
+  sale: { fillTxHash: Hex } | null
+  refund: { chainId: 137; token: Hex; amount: string; to: Hex } | null
+}
+
+export interface CheckoutSource {
+  prepare(orderHash: Hex, buyer: Hex): Promise&lt;PreparedCheckout&gt;   <span class="cm">// throws CheckoutError</span>
+  attachIntent(checkoutId: string, intentId: Hex): Promise&lt;void&gt;
+  getStatus(checkoutId: string): Promise&lt;CheckoutState&gt;
+}</code></pre>
+  <h3>Reading those types in plain words</h3>
+  <p><strong>PreparedCheckout</strong> is "everything Trails needs to start": an ID for this checkout attempt, which order, who the buyer is, when this prepared checkout goes stale (15 minutes), the destination (Polygon, USDT, the price in the smallest units, so 0.25 USDT is <code>"250000"</code>), the two calls to run, and the route settings (use the RELAY bridge, no fallback bridge, a slippage limit).</p>
+  <p><strong>CheckoutStatus</strong> is the list of states a purchase can be in. <strong>CheckoutState</strong> is a status plus useful details: transaction hashes, the sale (once our backend sees it), and the refund (if Trails sent money back).</p>
+  <h3>What each method does now vs later</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Method</th><th>What it means</th><th>Browser version (now)</th><th>Backend version (later)</th></tr></thead>
+    <tbody>
+      <tr><td><code>prepare</code></td><td>Check the order and build the calls</td><td>Existing <code>GET /orders/:orderHash</code>, live checks on the Polygon read RPC, build the two calls</td><td><code>POST /marketplacev2/trails/checkouts</code></td></tr>
+      <tr><td><code>attachIntent</code></td><td>Remember which Trails payment belongs to this checkout</td><td>Save <code>{checkoutId, orderHash, intentId}</code> to <code>localStorage</code></td><td><code>POST /checkouts/:id/intent</code></td></tr>
+      <tr><td><code>getStatus</code></td><td>Where is this purchase now?</td><td>Trails <code>GetIntentReceipt</code> plus our existing sale receipt endpoint</td><td><code>GET /checkouts/:id</code></td></tr>
+    </tbody>
+  </table></div>
+  <h3>Choosing which version to use</h3>
+  <p>Decide in exactly one place: if <code>GET /marketplacev2/trails/config</code> answers, the backend exists, so use the backend version. Otherwise use the browser version, but only when <code>NEXT_PUBLIC_TRAILS_ENABLED</code> is on.</p>
+</section>
+
+<section id="errors">
+  <div><span class="num">Section 5</span><h2>Error codes</h2></div>
+  <div class="oneline"><b>In one line</b>One error type with fixed codes, so each error screen is written once and works for both versions.</div>
+  <p><code>CheckoutError</code> carries the same codes the backend will use. The browser version can only ever throw the first six, because the last two depend on server features (holds and wallet verification).</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Code</th><th>Plain meaning</th><th>Thrown by browser?</th></tr></thead>
+    <tbody>
+      <tr><td><code>ORDER_NOT_FILLABLE</code></td><td>This listing can't be bought anymore (sold, cancelled, seller moved the domain, etc.)</td><td>Yes</td></tr>
+      <tr><td><code>OWN_LISTING</code></td><td>You're trying to buy your own listing</td><td>Yes</td></tr>
+      <tr><td><code>EXPIRING_SOON</code></td><td>The listing ends in under 15 minutes; a cross chain payment might not finish in time</td><td>Yes</td></tr>
+      <tr><td><code>PRICE_OUT_OF_RANGE</code></td><td>The price is outside what Trails checkout allows</td><td>Yes</td></tr>
+      <tr><td><code>TRAILS_DISABLED</code></td><td>The feature is turned off</td><td>Yes</td></tr>
+      <tr><td><code>CHAIN_UNAVAILABLE</code></td><td>Can't read Polygon right now</td><td>Yes</td></tr>
+      <tr><td><code>CHECKOUT_IN_PROGRESS</code></td><td>Someone else is already mid purchase on this listing (needs a server hold)</td><td>No, backend only</td></tr>
+      <tr><td><code>WALLET_NOT_VERIFIED</code></td><td>The server hasn't verified your wallet</td><td>No, backend only</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="calls">
+  <div><span class="num">Section 6</span><h2>Building the destination calls</h2></div>
+  <div class="oneline"><b>In one line</b>Build exactly two calls: approve USDT for Seaport, then <code>fulfillAdvancedOrder</code> with the buyer as recipient.</div>
+  <p>The Trails wallet on Polygon will run these two instructions in order, using data <code>loadOrder()</code> already fetches:</p>
+  <ol>
+    <li><strong><code>approve(Seaport, price)</code> on the USDT contract.</strong> Lets Seaport pull the price from the Trails wallet.</li>
+    <li><strong><code>fulfillAdvancedOrder(order, [], 0x0, buyer)</code> on Seaport.</strong> Buys the order. The last argument is the recipient.</li>
+  </ol>
+  <div class="callout bad"><b>The rule you must never break</b><br>The person who <em>pays</em> here is the Trails wallet, not the buyer. Seaport's simpler functions, <code>fulfillOrder</code> and <code>fulfillBasicOrder</code>, always send the domain to whoever paid. That would put the domain in the Trails wallet, where it gets stuck (the probe confirmed this really happens). Only <code>fulfillAdvancedOrder</code> lets us name a different recipient, so the domain goes to the buyer.</div>
+  <h3>The build code from the doc, explained</h3>
+<pre><code>import { encodeFunctionData, erc20Abi, parseAbi, zeroHash } from 'viem'
+import { toOrderParameters } from '@/lib/seaport-order-builder-v5'   <span class="cm">// lines 162 to 165, drops counter</span>
+
+const seaportFulfillAbi = parseAbi([
+  'struct OfferItem { uint8 itemType; address token; uint256 identifierOrCriteria; uint256 startAmount; uint256 endAmount; }',
+  'struct ConsiderationItem { uint8 itemType; address token; uint256 identifierOrCriteria; uint256 startAmount; uint256 endAmount; address recipient; }',
+  'struct OrderParameters { address offerer; address zone; OfferItem[] offer; ConsiderationItem[] consideration; uint8 orderType; uint256 startTime; uint256 endTime; bytes32 zoneHash; uint256 salt; bytes32 conduitKey; uint256 totalOriginalConsiderationItems; }',
+  'struct AdvancedOrder { OrderParameters parameters; uint120 numerator; uint120 denominator; bytes signature; bytes extraData; }',
+  'struct CriteriaResolver { uint256 orderIndex; uint8 side; uint256 index; uint256 identifier; bytes32[] criteriaProof; }',
+  'function fulfillAdvancedOrder(AdvancedOrder advancedOrder, CriteriaResolver[] criteriaResolvers, bytes32 fulfillerConduitKey, address recipient) payable returns (bool fulfilled)',
+])
+
+const price = rawOrder.consideration.reduce((s, c) =&gt; s + BigInt(c.startAmount), 0n)
+const calls = [
+  { to: DEFAULTS.usdtAddress, value: '0',
+    data: encodeFunctionData({ abi: erc20Abi, functionName: 'approve', args: [DEFAULTS.seaportAddress, price] }) },
+  { to: DEFAULTS.seaportAddress, value: '0',
+    data: encodeFunctionData({ abi: seaportFulfillAbi, functionName: 'fulfillAdvancedOrder',
+      args: [{ parameters: toViemParams(toOrderParameters(rawOrder)), numerator: 1n, denominator: 1n, signature, extraData: '0x' },
+             [], zeroHash, buyer] }) },
+]</code></pre>
+  <div class="dl">
+    <div class="term">The ABI block</div><div>A description of Seaport's function and its nested structs, so viem knows how to turn our JS object into bytes. It's the same one the probe used on mainnet, so copy it as is.</div>
+    <div class="term">price</div><div>The sum of all consideration amounts. A listing pays two parties (the seller and our 2.5% fee wallet), so the total price is both added together.</div>
+    <div class="term">Call 1</div><div>"Dear USDT contract, allow Seaport to take <code>price</code>." Sent to the USDT address.</div>
+    <div class="term">Call 2</div><div>"Dear Seaport, fill this order." Sent to the Seaport address.</div>
+    <div class="term">numerator 1, denominator 1</div><div>Buy the whole order (1 out of 1), not a fraction.</div>
+    <div class="term"><code>[]</code></div><div>No criteria resolvers. Those are for "any item from a collection" style offers, which we don't use.</div>
+    <div class="term"><code>zeroHash</code></div><div>No conduit for the fulfiller. Tokens move through Seaport directly.</div>
+    <div class="term"><code>buyer</code></div><div>The recipient. The whole point.</div>
+    <div class="term">toViemParams</div><div>A small helper you write. Our existing <code>toOrderParameters</code> keeps numbers as decimal strings (the way the API returns them) and sets <code>totalOriginalConsiderationItems</code> to the consideration length; viem wants <code>bigint</code>, so this converts the numeric fields.</div>
+    <div class="term">DEFAULTS</div><div>Existing constants in the marketplace order client in <code>src/lib</code> (lines 32 to 48): <code>seaportAddress</code>, <code>usdtAddress</code>, <code>domainNftAddress</code>.</div>
+  </div>
+</section>
+
+<section id="checks">
+  <div><span class="num">Section 7</span><h2>Live checks before building</h2></div>
+  <div class="oneline"><b>In one line</b>Before handing calls to Trails, confirm on chain that the order can really be bought right now.</div>
+  <p>Why bother? If any of these is false, Seaport would reject the purchase, and the buyer would have paid fees and waited for a refund for nothing. Checking first gives them a clear error screen instead. Use the existing <code>getPolygonReadProvider()</code> and <code>DEFAULTS</code>.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Check</th><th>What to read</th><th>Why it matters</th><th>Error</th></tr></thead>
+    <tbody>
+      <tr><td>Signature present</td><td><code>result.signature !== ''</code></td><td>The API blanks the signature for orders it won't serve</td><td><code>ORDER_NOT_FILLABLE</code></td></tr>
+      <tr><td>Not cancelled or filled</td><td>Seaport <code>getOrderStatus(orderHash)</code>, already in <code>loadOrder</code></td><td>Already sold or withdrawn</td><td><code>ORDER_NOT_FILLABLE</code></td></tr>
+      <tr><td>Ends more than 15 min after latest block</td><td><code>rawOrder.endTime</code> vs block timestamp</td><td>The cross chain payment needs time; it might land after the listing expires</td><td><code>EXPIRING_SOON</code></td></tr>
+      <tr><td>Seller still owns the domain</td><td>NFT <code>ownerOf(tokenId) == offerer</code></td><td>The seller may have moved it since listing</td><td><code>ORDER_NOT_FILLABLE</code></td></tr>
+      <tr><td>Seaport still approved</td><td><code>isApprovedForAll(offerer, Seaport)</code></td><td>Seaport can't move a domain it's not allowed to</td><td><code>ORDER_NOT_FILLABLE</code></td></tr>
+      <tr><td>Counter unchanged</td><td>Seaport <code>getCounter(offerer) == rawOrder.counter</code></td><td>Bumping the counter cancels all of a seller's old orders at once</td><td><code>ORDER_NOT_FILLABLE</code></td></tr>
+      <tr><td>Not the buyer's own listing</td><td>offerer vs connected address, already in <code>loadOrder</code></td><td>Can't buy from yourself</td><td><code>OWN_LISTING</code></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="fixture">
+  <div><span class="num">Section 8</span><h2>The fixture test</h2></div>
+  <div class="oneline"><b>In one line</b>A real past order with known correct output; your builder must produce exactly the same bytes.</div>
+  <p>Encoding mistakes are invisible until money is lost, so the doc gives you a proof. These exact inputs produced the calldata that bought probe order 99 on mainnet (tx <code>0x2cddc8c6…f664</code>). Put them in a Vitest test. If your output matches these values byte for byte, your builder is correct.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Expected</th><th>Value</th><th>What it proves</th></tr></thead>
+    <tbody>
+      <tr><td>Fulfill selector</td><td><code>0xe7acab24</code></td><td>The first 4 bytes name the function; this is <code>fulfillAdvancedOrder</code></td></tr>
+      <tr><td>Fulfill calldata length</td><td>1,444 bytes</td><td>The struct shape is right</td></tr>
+      <tr><td>keccak256 of fulfill calldata</td><td><code>0x81f1e320d5e724e314e10376fde125886a3c34072a965966da2530b4d1c7bd99</code></td><td>Every single byte matches</td></tr>
+      <tr><td>Approve calldata</td><td><code>0x095ea7b30000000000000000000000000000000000000068f116a894984e2db1123eb395000000000000000000000000000000000000000000000000000000000003d090</code></td><td>Approve Seaport for 250000 (0.25 USDT)</td></tr>
+    </tbody>
+  </table></div>
+  <p>The input JSON (order hash, recipient, signature and full <code>rawOrder</code>) is on page 7 of the PDF; copy it exactly into the test. Notice the consideration has two items, 243750 to the seller and 6250 to our fee wallet, adding up to 250000, which is 0.25 USDT. That 6250 is our 2.5% fee.</p>
+  <div class="callout warn"><b>Only for testing</b><br>This order uses the probe's test NFT contract, not our real domain contract, and it's already sold. Use it only for the encoding test and the widget spike. It can't be bought again.</div>
+</section>
+
+<section id="status">
+  <div><span class="num">Section 9</span><h2>Purchase status</h2></div>
+  <div class="oneline"><b>In one line</b>Trails tells you about progress and refunds; only our own sale receipt is allowed to say "Done, the domain is yours".</div>
+  <h3>Three sources of truth</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Source</th><th>How</th><th>What you get</th></tr></thead>
+    <tbody>
+      <tr><td>Widget callbacks</td><td><code>onQuote</code>, <code>onSign</code>, <code>onOriginConfirmation</code>, <code>onDestinationConfirmation</code>, <code>onPaymentSuccess</code>, <code>onPaymentError</code></td><td>The <code>intentId</code> early, then instant progress, but only while the drawer is open</td></tr>
+      <tr><td>Trails intent receipt</td><td><code>new TrailsApi(NEXT_PUBLIC_TRAILS_API_KEY).getIntentReceipt({ intentId })</code> from <code>@0xtrails/api</code> (comes with <code>0xtrails</code>)</td><td>Status, refund, transaction hashes; works even after a reload</td></tr>
+      <tr><td>Our sale receipt (already exists)</td><td><code>GET /marketplacev2/orders/transactions/:orderHash</code>, public</td><td>The SALE row with <code>buyer</code>, once the poller indexes it (about 30 to 60 seconds)</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Translating Trails status into ours</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Trails says</th><th>We show</th></tr></thead>
+    <tbody>
+      <tr><td>QUOTED, COMMITTED</td><td><span class="pill">attached</span></td></tr>
+      <tr><td>EXECUTING</td><td><span class="pill y">executing</span></td></tr>
+      <tr><td>SUCCEEDED</td><td><span class="pill g">succeeded</span></td></tr>
+      <tr><td>REFUNDED</td><td><span class="pill y">refunded</span></td></tr>
+      <tr><td>FAILED, ABORTED, INVALID</td><td><span class="pill r">failed</span></td></tr>
+    </tbody>
+  </table></div>
+  <p>Keep polling a failed intent for 20 minutes, because FAILED can still turn into REFUNDED.</p>
+  <h3>The five rules</h3>
+  <ol>
+    <li><strong>Done only from the chain.</strong> Show Done only when our sale receipt has a SALE whose <code>buyer</code> equals the connected address (compare lowercased). Before that, <code>succeeded</code> shows "Purchase confirmed. Preparing your receipt." Trails saying "succeeded" means the money moved; our receipt proves the domain arrived.</li>
+    <li><strong>Lost race.</strong> If the sale receipt shows a <em>different</em> buyer, someone else bought it first. Expect <code>refunded</code> from Trails within seconds.</li>
+    <li><strong>Refund can hide inside the failed transaction.</strong> In probe E7 the refund happened in the same Polygon transaction as the failed purchase. So <code>refundTransaction</code> may be null, with <code>destinationTransaction.status</code> REVERTED and <code>statusReason</code> "call reverted: refund triggered on destination". In that case link <code>destinationTransaction.txnHash</code> as the refund. The refund is the listing price in USDT on Polygon, sent to the buyer.</li>
+    <li><strong>Polling speed.</strong> Every 3 seconds while not finished, every 15 seconds after 5 minutes, stop at a terminal state.</li>
+    <li><strong>Survive reloads.</strong> At <code>onQuote</code>, save <code>{checkoutId, orderHash, intentId, buyer, createdAt}</code> to <code>localStorage</code>. On app load, resume anything under 24 hours old that hasn't finished and show the result as a toast. The <code>/history</code> banner reads the same store until the backend has a list endpoint.</li>
+  </ol>
+  <div class="callout warn"><b>Spike must confirm</b><br>The browser must be allowed to call <code>getIntentReceipt</code> with the public key (no CORS block). The SDK itself calls the same API from the browser, so it's expected to work, but verify it.</div>
+</section>
+
+<section id="backend">
+  <div><span class="num">Section 10</span><h2>What waits for the backend</h2></div>
+  <div class="oneline"><b>In one line</b>The browser version is complete for buyers but blind for us, so it's fine for uat and a staff pilot, not for everyone.</div>
+  <p>Funds are never at risk either way: Trails executes and refunds on chain whether or not our tab or server is watching. What we lose without the backend is visibility and control.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Capability</th><th>Browser version now</th><th>When the backend lands</th></tr></thead>
+    <tbody>
+      <tr><td>Server check that the intent pays our exact order to the buyer</td><td>None; only the buyer's own money is involved</td><td>Eight checks on every intent</td></tr>
+      <tr><td>Tracking after the tab closes</td><td><code>localStorage</code>, same browser only</td><td>Server tracker, any device</td></tr>
+      <tr><td>Refund email</td><td>On screen only</td><td><code>TRAILS_PURCHASE_REFUNDED</code> email</td></tr>
+      <tr><td>Two buyers at once</td><td>No hold; the loser gets an automatic refund</td><td>Soft hold returns <code>CHECKOUT_IN_PROGRESS</code></td></tr>
+      <tr><td>Admin stats, Trails vs direct</td><td>Not distinguishable; use analytics events</td><td><code>paymentMethod</code> on every sale</td></tr>
+      <tr><td>Alerts on stuck purchases</td><td>Buyer reports to support</td><td>Anomalies and alerts</td></tr>
+      <tr><td>Kill switch and pilot list</td><td>Env flags, redeploy to change</td><td><code>TRAILS_ENABLED</code>, live in 60 s</td></tr>
+      <tr><td>Allowed origins and route provider</td><td>Frontend env, Base USDC and RELAY</td><td>Backend config</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout ok"><b>Release rule</b><br>Until the backend lands: ship to uat freely. Ship to prod only with <code>NEXT_PUBLIC_TRAILS_PILOT_WALLETS</code> set to staff wallets, and only if Mohit approves that pilot. When the backend ships, switch <code>CheckoutSource</code> to the backend version and drop the env pilot list.</div>
+</section>
+
+<section id="testing">
+  <div><span class="num">Section 11</span><h2>Test setup</h2></div>
+  <div class="oneline"><b>In one line</b>No testnet exists, so every real test costs about 0.30 USD; keep listings tiny and use burner wallets.</div>
+  <div class="tbl"><table>
+    <thead><tr><th>You need</th><th>How to get it</th></tr></thead>
+    <tbody>
+      <tr><td>Trails API key for uat</td><td>From Mohit (dashboard.trails.build). It's separate from prod's key.</td></tr>
+      <tr><td>Buyer wallet</td><td>A fresh burner in MetaMask with about 2 USDC and 0.10 USD of ETH on Base. <strong>Never send it POL</strong>: proving buyers need no POL is part of the first test.</td></tr>
+      <tr><td>A real listing to buy</td><td>A team wallet that owns a real Endless domain lists it on uat for 0.10 to 0.30 USDT through the normal flow. The probe's test NFT can't be listed; the backend only accepts the real domain contract.</td></tr>
+      <tr><td>Repeat tests</td><td>Swap buyer and seller between two team wallets that may hold POL (relisting needs an approval transaction). Keep the no POL burner for the first run.</td></tr>
+      <tr><td>A lost race</td><td>Open the same listing in a second browser, buy it directly with USDT first, then finish the Trails purchase. You should see the refund.</td></tr>
+      <tr><td>Spike quotes</td><td>The fixture order is enough. Quoting doesn't execute the calls, so even a sold order still gets a quote.</td></tr>
+      <tr><td>A spike that executes</td><td>Ask Mohit for a fresh test order from his probe harness (<code>p3:setup &lt;tokenId&gt;</code>), about 0.30 USD.</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>Where the money goes in one 0.25 USDT test:</strong> about 0.29 USDC leaves the buyer on Base. Roughly 0.03 is Trails' fee, 0.00625 is our 2.5% fee (lands in our own fee wallet), and the rest just moves between team wallets. A refunded test returns 0.25 USDT on Polygon to the buyer.</p>
+</section>
+
+<section id="done">
+  <div><span class="num">Section 12</span><h2>Definition of done</h2></div>
+  <div class="oneline"><b>In one line</b>A pilot wallet on uat buys a real listing with Base USDC from the drawer, every outcome screen has been seen for real, and swapping in the backend later is a one file change.</div>
+  <p>Tick these off as you go; your ticks are remembered in this browser only.</p>
+  <ul class="checks" id="dod">
+    <li><label><input type="checkbox" id="dod1"><span>The Vitest fixture test passes: the fulfill calldata keccak and the approve calldata match the table exactly.</span></label></li>
+    <li><label><input type="checkbox" id="dod2"><span>Spike checks (a), (b) and (c) recorded with screenshots and the decoded quote.</span></label></li>
+    <li><label><input type="checkbox" id="dod3"><span>Regression after the upgrades: direct USDT buy, listing and delist all work on uat.</span></label></li>
+    <li><label><input type="checkbox" id="dod4"><span>Real Trails purchase on uat from a no POL burner: Done state, receipt page, history BUY row, My Domains, buyer and seller emails.</span></label></li>
+    <li><label><input type="checkbox" id="dod5"><span>Lost race seen for real: Refunded state with the refund link and the fixed copy.</span></label></li>
+    <li><label><input type="checkbox" id="dod6"><span>Not available, cancelled signature, own listing and expiring listing screens all seen.</span></label></li>
+    <li><label><input type="checkbox" id="dod7"><span>Close the drawer and reload mid purchase: the outcome still arrives as a toast.</span></label></li>
+    <li><label><input type="checkbox" id="dod8"><span>Light and dark mode, desktop and mobile, MetaMask and one WalletConnect mobile wallet.</span></label></li>
+    <li><label><input type="checkbox" id="dod9"><span><code>tsc</code>, ESLint and <code>next build</code> pass; no page's First Load JS grew, because the widget loads in its own chunk.</span></label></li>
+    <li><label><input type="checkbox" id="dod10"><span>With <code>NEXT_PUBLIC_TRAILS_ENABLED</code> off, the drawer is identical to today's.</span></label></li>
+    <li><label><input type="checkbox" id="dod11"><span>Components only use <code>CheckoutSource</code>; nothing outside <code>trails/</code> imports Trails packages directly.</span></label></li>
+  </ul>
+  <div class="callout warn"><b>Escalate the same day</b><br>Anything that doesn't behave as the doc describes, especially spike check (a) or the browser's access to <code>getIntentReceipt</code>, goes to Mohit the same day.</div>
+</section>
+
+</main>
+</div>
+
+<script>
+(function () {
+  var KEY = 'trails-dod';
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { saved = {}; }
+  var boxes = document.querySelectorAll('#dod input[type="checkbox"]');
+  boxes.forEach(function (b) {
+    if (saved[b.id]) b.checked = true;
+    b.addEventListener('change', function () {
+      saved[b.id] = b.checked;
+      try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {}
+    });
+  });
+})();
+</script>
+</body>
+</html>

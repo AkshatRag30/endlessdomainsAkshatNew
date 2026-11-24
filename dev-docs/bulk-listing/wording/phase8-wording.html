@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phase 8 Wording</title>
+<script>
+  try {
+    var saved = localStorage.getItem('dmplan-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  } catch (e) {}
+</script>
+<style>
+  :root {
+    --bg: #f9f9f9; --surface: #ffffff; --surface-soft: #f3f4fe;
+    --text: #111111; --text-muted: #5b5b66; --border: #e6e6e6;
+    --accent: #2639ED; --accent-soft: #e9ebfd;
+    --wait: #9457f6; --wait-soft: #f4eefe;
+    --ok: #12805c; --ok-soft: #e4f5ee;
+    --warn: #b4540a; --warn-soft: #fdf1e4;
+    --bad: #c4314b; --bad-soft: #fdecef;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+      --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+      --accent: #7f8cff; --accent-soft: #1d2150;
+      --wait: #b996fa; --wait-soft: #2c2142;
+      --ok: #4fd1a0; --ok-soft: #173229;
+      --warn: #f5a35c; --warn-soft: #3a2614;
+      --bad: #ff7d93; --bad-soft: #3a1c24;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+    --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+    --accent: #7f8cff; --accent-soft: #1d2150;
+    --wait: #b996fa; --wait-soft: #2c2142;
+    --ok: #4fd1a0; --ok-soft: #173229;
+    --warn: #f5a35c; --warn-soft: #3a2614;
+    --bad: #ff7d93; --bad-soft: #3a1c24;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: "Satoshi", system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.6; }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 48px 16px 80px; }
+  header.top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+  .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; }
+  h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.15; margin: 0 0 12px; }
+  .lede { color: var(--text-muted); margin: 0; max-width: 680px; }
+  .lede a { color: var(--accent); }
+  .toggle { flex-shrink: 0; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 14px; cursor: pointer; }
+  .toggle:hover { border-color: var(--accent); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 32px; }
+  nav.toc a { font-size: 14px; text-decoration: none; color: var(--accent); background: var(--accent-soft); padding: 6px 12px; border-radius: 999px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 0 0 16px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+  .stat b { display: block; font-size: 26px; line-height: 1.2; }
+  .stat span { font-size: 13px; color: var(--text-muted); }
+  h2 { font-size: 22px; margin: 52px 0 16px; }
+  h3 { font-size: 18px; margin: 0; }
+  h4 { font-size: 15px; margin: 22px 0 8px; color: var(--accent); }
+  p { margin: 0 0 12px; }
+  .muted { color: var(--text-muted); font-size: 15px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
+  .card p:last-child { margin-bottom: 0; }
+  .card ul, .card ol { margin: 8px 0 0; padding-left: 20px; }
+  .card li { margin-bottom: 6px; }
+  code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .86em; background: var(--surface-soft); border-radius: 6px; padding: 1px 6px; word-break: break-word; }
+  .findings { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .finding { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+  .finding h3 { font-size: 16px; margin-bottom: 6px; }
+  .finding p { font-size: 15px; margin: 0; color: var(--text-muted); }
+  .tablecard { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow-x: auto; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: 0; }
+  th { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+  td.grp { font-weight: 600; color: var(--accent); background: var(--surface-soft); font-size: 13px; }
+  .sw { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .chip { width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(128,128,128,.45); flex-shrink: 0; }
+  .callout { border-left: 4px solid var(--wait); background: var(--wait-soft); border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; }
+  .callout p { margin: 0; }
+  .callout.ok { border-color: var(--ok); background: var(--ok-soft); }
+  .callout.warn { border-color: var(--warn); background: var(--warn-soft); }
+  .issue { display: grid; grid-template-columns: 28px 1fr; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--bad); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+  .issue .n { font-weight: 700; color: var(--bad); }
+  .issue p { margin: 0; font-size: 15px; }
+  .issue .where { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+  .phase { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px 24px; margin-bottom: 14px; }
+  .phase-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  .num { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 15px; flex-shrink: 0; }
+  .tag { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+  .tag.now { background: var(--ok-soft); color: var(--ok); }
+  .tag.wait { background: var(--wait-soft); color: var(--wait); }
+  .tag.size { background: var(--surface-soft); color: var(--text-muted); }
+  .tag.new { background: var(--warn-soft); color: var(--warn); }
+  .rows { display: grid; grid-template-columns: 130px 1fr; gap: 6px 16px; font-size: 15px; }
+  .rows dt { color: var(--text-muted); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; padding-top: 2px; }
+  .rows dd { margin: 0; }
+  ol.qs { counter-reset: q; list-style: none; padding: 0; margin: 0; }
+  ol.qs li { counter-increment: q; position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px 14px 56px; margin-bottom: 10px; }
+  ol.qs li::before { content: counter(q); position: absolute; left: 16px; top: 14px; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  ol.qs.team li::before { background: var(--wait-soft); color: var(--wait); }
+  ol.qs b { display: block; margin-bottom: 2px; }
+  ol.qs span { color: var(--text-muted); font-size: 15px; }
+  footer { margin-top: 56px; font-size: 13px; color: var(--text-muted); }
+  @media (max-width: 700px) {
+    header.top { flex-direction: column; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .findings { grid-template-columns: 1fr; }
+    .card, .phase { padding: 18px; }
+    .rows { grid-template-columns: 1fr; }
+    .rows dt { padding-top: 8px; }
+    ol.qs li { padding-left: 50px; }
+  }
+</style>
+<style>
+  .mock { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin: 10px 0 14px; }
+  .drawer { max-width: 420px; border: 1px solid var(--border); border-radius: 14px; overflow: hidden; background: var(--surface); margin: 10px 0 14px; }
+  .drawer .dh { padding: 12px 16px; border-bottom: 1px solid var(--border); font-weight: 600; display: flex; justify-content: space-between; }
+  .drawer .db { padding: 18px 16px; text-align: center; }
+  .drawer .db.left { text-align: left; }
+  .drawer .df { padding: 12px 16px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; align-items: center; }
+  .btn { display: inline-block; background: var(--accent); color: #fff; padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 600; }
+  .btn.full { display: block; width: 100%; text-align: center; }
+  .btn.dark { background: #222; }
+  .btn.ghost { background: transparent; color: var(--text-muted); font-weight: 500; padding: 4px; }
+  .btn.small { padding: 4px 10px; font-size: 12px; }
+  .toast { display: inline-flex; gap: 10px; align-items: flex-start; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 10px; padding: 10px 14px; font-size: 14px; max-width: 460px; margin: 4px 0; }
+  .toast.ok { border-left-color: var(--ok); } .toast.bad { border-left-color: var(--bad); } .toast.info { border-left-color: var(--wait); }
+  .row { display: grid; grid-template-columns: 1fr auto auto; gap: 12px; align-items: center; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; margin: 6px 0; font-size: 14px; }
+  .chip { font-size: 12px; font-weight: 600; padding: 2px 10px; border-radius: 999px; background: var(--wait-soft); color: var(--wait); }
+  .chip.warn { background: var(--warn-soft); color: var(--warn); }
+  .chip.ok { background: var(--ok-soft); color: var(--ok); }
+  .banner { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-soft); font-size: 14px; }
+  .warnbox { border: 1px solid var(--warn); background: var(--warn-soft); color: var(--text); border-radius: 10px; padding: 10px 12px; font-size: 13px; text-align: left; }
+  .icon { font-size: 30px; line-height: 1; margin-bottom: 8px; }
+  .sub { color: var(--text-muted); font-size: 13px; margin: 6px 0 0; }
+  .ba { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .ba > div { border: 1px solid var(--border); border-radius: 12px; padding: 12px; background: var(--surface); font-size: 14px; }
+  .ba h5 { margin: 0 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); }
+  .ba .after h5 { color: var(--ok); }
+  .q { border-left: 4px solid var(--accent); background: var(--accent-soft); border-radius: 10px; padding: 10px 14px; margin: 8px 0 0; font-size: 14px; }
+  @media (max-width: 700px) { .ba { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">Bulk listing v2 · phase 8 · wording to approve</p>
+      <h1>Delisting on the blockchain: what you'll see</h1>
+      <p class="lede">Each card below is one screen or message, drawn roughly as it will look, with when it appears and what changes from today. Colours and spacing will follow the real design system; this page is only about the words and where they go. Approve each part (A to G), or tell me what to change.</p>
+    </div>
+    <button class="toggle" id="toggle" type="button">Toggle theme</button>
+  </header>
+
+  <div class="callout ok"><p><b>Approved 23 Nov, A to G as drawn.</b> For C, the Quick Actions placement was kept. Built the same day.</p></div>
+  <nav class="toc"><a href="#why">Why it changes</a><a href="#a">A Delist button</a><a href="#b">B Row labels</a><a href="#c">C New quick action</a><a href="#d">D Select bar</a><a href="#e">E Delist drawer</a><a href="#f">F Older listing prompt</a><a href="#g">G Old notes fixed</a></nav>
+
+  <h2 id="why">Why anything changes</h2>
+  <div class="ba">
+    <div><h5>Today</h5>Delist only <b>hides</b> the listing on our site. It's free, but the listing can still be bought on the blockchain at the old price until it expires. That's why 3 of your names were refused last week.</div>
+    <div class="after"><h5>After phase 8</h5>Delist <b>cancels</b> the listing on the blockchain. Nobody can buy it after that. It costs a small network fee in POL (a fraction of a cent to a few cents), and MetaMask shows the fee before you confirm.</div>
+  </div>
+
+  <!-- A -->
+  <h2 id="a">A. The Delist button on a row (one listing)</h2>
+  <p class="muted">Where: My Domains rows and cards, and your own listings on the marketplace home page. The button itself still says <b>Delist</b>; what happens after the click is new.</p>
+  <div class="ba">
+    <div><h5>Today</h5>Click Delist → (sometimes a free wallet check) → toast "Listing removed."</div>
+    <div class="after"><h5>After</h5>Click Delist → toast below → MetaMask opens with a <b>transaction</b> (shows the fee) → you confirm → toast "Listing cancelled."</div>
+  </div>
+  <div class="mock">
+    <p class="muted" style="margin:0 0 6px">Right after you click Delist:</p>
+    <div class="toast info">Confirm the cancel in your wallet. It costs a small network fee in POL.</div>
+    <p class="muted" style="margin:12px 0 6px">When it worked:</p>
+    <div class="toast ok">Listing cancelled. It's off the marketplace and can't be bought at this price any more.</div>
+    <p class="muted" style="margin:12px 0 6px">When something stops it (only one of these shows):</p>
+    <div class="toast info">You cancelled in your wallet. The listing is still live.</div><br>
+    <div class="toast bad">Switch your wallet to Polygon to cancel this listing.</div><br>
+    <div class="toast bad">Connect your wallet to cancel this listing.</div><br>
+    <div class="toast bad">This listing was made by a different wallet. Connect that wallet to cancel it.</div><br>
+    <div class="toast bad">Not enough POL to pay the network fee. Add a little POL and try again.</div><br>
+    <div class="toast info">This listing was already sold or cancelled.</div><br>
+    <div class="toast info">Cancel sent on the blockchain. The marketplace may take a minute to update.</div><br>
+    <div class="toast bad">Couldn't cancel this listing. Nothing was sent. Please try again.</div>
+  </div>
+
+  <!-- B -->
+  <h2 id="b">B. What a row shows after you delist</h2>
+  <p class="muted">Where: My Domains, on the row of the name you just delisted. The blockchain takes about a minute to confirm; the page checks every 20 seconds.</p>
+  <div class="mock">
+    <p class="muted" style="margin:0 0 6px">1. Right after delisting (about a minute):</p>
+    <div class="row"><span><b>alpha.crypto</b></span><span class="chip">Cancelling</span><span class="btn small dark">List</span></div>
+    <p class="sub">Hovering "Cancelling" shows: <i>Your cancel is on its way to the blockchain. This usually takes about a minute.</i></p>
+    <p class="muted" style="margin:14px 0 6px">2. Once confirmed: the label disappears and the row is a normal "Not listed" row.</p>
+    <div class="row"><span><b>alpha.crypto</b></span><span></span><span class="btn small dark">List</span></div>
+    <p class="muted" style="margin:14px 0 6px">3. Rare: the cancel failed, or wasn't seen after 30 minutes (the backend also emails you):</p>
+    <div class="row" style="grid-template-columns:1fr auto"><span><b>alpha.crypto</b><br><span class="chip warn" style="display:inline-block;margin-top:6px">Cancel not confirmed</span> <span class="sub" style="display:inline">This name can still be bought at the old price.</span></span><span class="btn small">Cancel again</span></div>
+  </div>
+
+  <!-- C -->
+  <h2 id="c">C. A new Quick Action: "Bulk delist"</h2>
+  <p class="muted">Where: the Quick Actions panel on the right of My Domains. <b>This is the only part not in Figma</b>: it's a new item, added under "Bulk list", in the same style.</p>
+  <div class="mock" style="max-width:360px">
+    <div style="padding:8px 0;border-bottom:1px solid var(--border)"><b>List a domain</b><div class="sub">Set A Price And Publish On Chain</div></div>
+    <div style="padding:8px 0;border-bottom:1px solid var(--border)"><b>Bulk list</b><div class="sub">Price Many Names In One Approval</div></div>
+    <div style="padding:8px 0;border-bottom:1px solid var(--border);background:var(--ok-soft);border-radius:6px"><b>Bulk delist</b> <span class="chip ok">new</span><div class="sub">Cancel Many Listings In One Transaction</div></div>
+    <div style="padding:8px 0"><b>Appraise a domain</b><div class="sub">Signals Free, Valuation Paid</div></div>
+  </div>
+  <div class="q"><b>Question:</b> is the Quick Actions panel a good place, or would you rather start bulk delist another way (for example a button on the "For sale" tab)?</div>
+
+  <!-- D -->
+  <h2 id="d">D. The select bar while picking listings to delist</h2>
+  <p class="muted">Where: under the filters, the same bar as bulk list, but it picks <b>listed</b> names. Each listed row gets Select / Selected instead of Delist.</p>
+  <div class="mock">
+    <div class="banner"><span><b>6</b> listed names in this view. Cancel them in one transaction instead of one at a time.</span><span><span class="btn small dark">Delist 2</span> <span class="btn small">Select All 6</span> <span class="btn ghost">close</span></span></div>
+    <p class="sub">"Delist 2" appears once something is picked. Other texts this bar can show:</p>
+    <div class="banner" style="margin-top:8px"><span>No listed names in this view. Switch to the For sale tab to pick some.</span><span><span class="btn ghost">close</span></span></div>
+    <div class="banner" style="margin-top:8px"><span><b>50</b> names picked, the most one transaction can hold. Delist these first, then pick more.</span><span><span class="btn small dark">Delist 50</span> <span class="btn ghost">close</span></span></div>
+  </div>
+
+  <!-- E -->
+  <h2 id="e">E. The bulk delist drawer</h2>
+  <p class="muted">Opens from "Delist N" in the bar. Four steps.</p>
+  <div class="ba" style="grid-template-columns:repeat(2,1fr)">
+    <div class="drawer"><div class="dh"><span>Delist 2 listings</span><span>✕</span></div>
+      <div class="db left"><div>alpha.crypto · 999,999 USDT</div><div>beta.x · 999,999 USDT</div>
+      <p class="sub">One transaction cancels all 2 on the blockchain. You pay a small network fee in POL, once. After that, nobody can buy them at these prices.</p></div>
+      <div class="df"><span class="btn full">Delist 2</span><span class="btn ghost">Keep them listed</span></div></div>
+    <div class="drawer"><div class="dh"><span>Delisting</span></div>
+      <div class="db"><div class="icon">⏳</div><b>Confirm in your wallet</b><p class="sub">One transaction cancels all 2. It costs a small network fee in POL.</p></div>
+      <div class="df"><span class="sub">Before this: "Preparing 2 listings". After: "Saving. Telling the marketplace these listings are cancelled."</span></div></div>
+    <div class="drawer"><div class="dh"><span>Delisted</span><span>✕</span></div>
+      <div class="db"><div class="icon">✅</div><b>2 listings cancelled</b><p class="sub">or, if some were already gone: "1 cancelled. 1 was already sold or cancelled."</p></div>
+      <div class="df"><span class="btn full">Done</span></div></div>
+    <div class="drawer"><div class="dh"><span>Delisting</span><span>✕</span></div>
+      <div class="db"><div class="icon">⚠️</div><b>Nothing was cancelled</b><p class="sub">One reason line, the same as part A but for "these listings", e.g. "Not enough POL to pay the network fee. Add a little POL and try again."</p></div>
+      <div class="df"><span class="btn full">Back</span></div></div>
+  </div>
+
+  <!-- F -->
+  <h2 id="f">F. The "older, cheaper listing" prompt</h2>
+  <p class="muted">Where: the bulk listing result screen, only when some names were refused with "An older, cheaper listing is still live" (like your 3 names last week).</p>
+  <div class="ba">
+    <div><h5>Today</h5>The names are listed as "Not listed · An older, cheaper listing is still live" and you can't do anything about it.</div>
+    <div class="after"><h5>After</h5>A box under the list lets you cancel those old listings, then list again.</div>
+  </div>
+  <div class="drawer"><div class="dh"><span>Successfully Listed</span><span>✕</span></div>
+    <div class="db left"><b>5 of 8 domains are live</b>
+      <div class="sub" style="margin-top:8px">Not listed: theforceis.unstoppable, mohitagarwal.lfg, ishasingh.og · An older, cheaper listing is still live</div>
+      <div class="warnbox" style="margin-top:12px"><b>3</b> of these names still have an older, cheaper listing that can be bought. Cancel those older listings first (one transaction, small network fee), then list them again.<div style="margin-top:8px"><span class="btn small">Cancel older listings</span></div></div>
+      <p class="sub">After it works, the box changes to: <i>Older listings cancelled. You can list these names again now.</i> and the 3 names join <b>Try these again</b>.</p></div>
+    <div class="df"><span class="btn full">Try these 3 again</span><span class="btn ghost">Done</span></div></div>
+
+  <!-- G -->
+  <h2 id="g">G. Two old notes that become wrong</h2>
+  <div class="ba">
+    <div><h5>Today (bulk listing result screen)</h5>"Cancel any of them any time, free and instant. Cancelling stops us serving the listing immediately, though the signature exists until the expiry above."</div>
+    <div class="after"><h5>After</h5>"You can delist any of them any time. Delisting cancels the listing on the blockchain for a small network fee."</div>
+  </div>
+  <div class="ba" style="margin-top:12px">
+    <div><h5>Today (bulk listing form, under List)</h5>"No gas to list. One signature covers all 8 names, and cancelling is free."</div>
+    <div class="after"><h5>After</h5>"No gas to list. One signature covers all 8 names. Delisting later costs a small network fee."</div>
+  </div>
+
+  <h2>How to answer</h2>
+  <div class="card"><p>Reply in chat with something like: <b>"A to G approved"</b>, or <b>"approve all except C, put bulk delist on the For sale tab"</b>, or the exact words to change. Nothing on screen changes until you approve.</p></div>
+
+  <footer>Bulk listing v2 · phase 8 wording to approve · 23 Nov 2026 · dev-docs is local only.</footer>
+</div>
+<script>
+  document.getElementById('toggle').addEventListener('click', function () {
+    var root = document.documentElement;
+    var current = root.getAttribute('data-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('dmplan-theme', next); } catch (e) {}
+  });
+</script>
+</body>
+</html>

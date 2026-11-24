@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phase 5 Explained</title>
+<script>
+  try {
+    var saved = localStorage.getItem('dmplan-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  } catch (e) {}
+</script>
+<style>
+  :root {
+    --bg: #f9f9f9; --surface: #ffffff; --surface-soft: #f3f4fe;
+    --text: #111111; --text-muted: #5b5b66; --border: #e6e6e6;
+    --accent: #2639ED; --accent-soft: #e9ebfd;
+    --wait: #9457f6; --wait-soft: #f4eefe;
+    --ok: #12805c; --ok-soft: #e4f5ee;
+    --warn: #b4540a; --warn-soft: #fdf1e4;
+    --bad: #c4314b; --bad-soft: #fdecef;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+      --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+      --accent: #7f8cff; --accent-soft: #1d2150;
+      --wait: #b996fa; --wait-soft: #2c2142;
+      --ok: #4fd1a0; --ok-soft: #173229;
+      --warn: #f5a35c; --warn-soft: #3a2614;
+      --bad: #ff7d93; --bad-soft: #3a1c24;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+    --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+    --accent: #7f8cff; --accent-soft: #1d2150;
+    --wait: #b996fa; --wait-soft: #2c2142;
+    --ok: #4fd1a0; --ok-soft: #173229;
+    --warn: #f5a35c; --warn-soft: #3a2614;
+    --bad: #ff7d93; --bad-soft: #3a1c24;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: "Satoshi", system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.6; }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 48px 16px 80px; }
+  header.top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+  .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; }
+  h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.15; margin: 0 0 12px; }
+  .lede { color: var(--text-muted); margin: 0; max-width: 680px; }
+  .lede a { color: var(--accent); }
+  .toggle { flex-shrink: 0; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 14px; cursor: pointer; }
+  .toggle:hover { border-color: var(--accent); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 32px; }
+  nav.toc a { font-size: 14px; text-decoration: none; color: var(--accent); background: var(--accent-soft); padding: 6px 12px; border-radius: 999px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 0 0 16px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+  .stat b { display: block; font-size: 26px; line-height: 1.2; }
+  .stat span { font-size: 13px; color: var(--text-muted); }
+  h2 { font-size: 22px; margin: 52px 0 16px; }
+  h3 { font-size: 18px; margin: 0; }
+  h4 { font-size: 15px; margin: 22px 0 8px; color: var(--accent); }
+  p { margin: 0 0 12px; }
+  .muted { color: var(--text-muted); font-size: 15px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
+  .card p:last-child { margin-bottom: 0; }
+  .card ul, .card ol { margin: 8px 0 0; padding-left: 20px; }
+  .card li { margin-bottom: 6px; }
+  code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .86em; background: var(--surface-soft); border-radius: 6px; padding: 1px 6px; word-break: break-word; }
+  .findings { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .finding { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+  .finding h3 { font-size: 16px; margin-bottom: 6px; }
+  .finding p { font-size: 15px; margin: 0; color: var(--text-muted); }
+  .tablecard { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow-x: auto; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: 0; }
+  th { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+  td.grp { font-weight: 600; color: var(--accent); background: var(--surface-soft); font-size: 13px; }
+  .sw { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .chip { width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(128,128,128,.45); flex-shrink: 0; }
+  .callout { border-left: 4px solid var(--wait); background: var(--wait-soft); border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; }
+  .callout p { margin: 0; }
+  .callout.ok { border-color: var(--ok); background: var(--ok-soft); }
+  .callout.warn { border-color: var(--warn); background: var(--warn-soft); }
+  .issue { display: grid; grid-template-columns: 28px 1fr; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--bad); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+  .issue .n { font-weight: 700; color: var(--bad); }
+  .issue p { margin: 0; font-size: 15px; }
+  .issue .where { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+  .phase { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px 24px; margin-bottom: 14px; }
+  .phase-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  .num { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 15px; flex-shrink: 0; }
+  .tag { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+  .tag.now { background: var(--ok-soft); color: var(--ok); }
+  .tag.wait { background: var(--wait-soft); color: var(--wait); }
+  .tag.size { background: var(--surface-soft); color: var(--text-muted); }
+  .tag.new { background: var(--warn-soft); color: var(--warn); }
+  .rows { display: grid; grid-template-columns: 130px 1fr; gap: 6px 16px; font-size: 15px; }
+  .rows dt { color: var(--text-muted); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; padding-top: 2px; }
+  .rows dd { margin: 0; }
+  ol.qs { counter-reset: q; list-style: none; padding: 0; margin: 0; }
+  ol.qs li { counter-increment: q; position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px 14px 56px; margin-bottom: 10px; }
+  ol.qs li::before { content: counter(q); position: absolute; left: 16px; top: 14px; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  ol.qs.team li::before { background: var(--wait-soft); color: var(--wait); }
+  ol.qs b { display: block; margin-bottom: 2px; }
+  ol.qs span { color: var(--text-muted); font-size: 15px; }
+  footer { margin-top: 56px; font-size: 13px; color: var(--text-muted); }
+  @media (max-width: 700px) {
+    header.top { flex-direction: column; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .findings { grid-template-columns: 1fr; }
+    .card, .phase { padding: 18px; }
+    .rows { grid-template-columns: 1fr; }
+    .rows dt { padding-top: 8px; }
+    ol.qs li { padding-left: 50px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">Bulk listing v2 · phase 5 explained</p>
+      <h1>Phase 5 in simple words: the drawer tells the truth</h1>
+      <p class="lede">Phase 5 is Mohit sir's F4, F6 items 1 to 3 and the design issues in F8. Most of it makes sure what the drawer shows is exactly what gets signed, plus a Cancel button that really works. Written 23 Nov 2026; line numbers as of that day.</p>
+    </div>
+    <button class="toggle" id="toggle" type="button">Toggle theme</button>
+  </header>
+
+  <nav class="toc"><a href="#story">The story</a><a href="#parts">The seven parts</a><a href="#cancel">How Cancel is safe</a><a href="#dates">Why the date moved</a><a href="#files">The files</a><a href="#tested">Tested</a><a href="#faq">Questions</a></nav>
+
+  <div class="stats">
+    <div class="stat"><b>2</b><span>pricing cards (was 3)</span></div>
+    <div class="stat"><b>7</b><span>parts, A to G</span></div>
+    <div class="stat"><b>11</b><span>new tests (216 in total)</span></div>
+    <div class="stat"><b>Passed</b><span>bulk drawer, uat, MetaMask</span></div>
+  </div>
+
+  <h2 id="story">1. The story in five sentences</h2>
+  <div class="card"><ol>
+    <li>Mohit sir's PDF lists things the drawer gets wrong or that can't work: a pricing card with no data behind it, a date from your computer's clock, a button you can't press, and some wording that overpromises.</li>
+    <li>Seven of his 11 design issues were already fixed, so phase 5 did the rest (one goes to phase 7).</li>
+    <li>You approved every wording change first on a drawn page.</li>
+    <li>The biggest change you can feel is a real <b>Cancel</b> while the wallet is open: press it, and even if you approve in the wallet later, nothing is listed.</li>
+    <li>The other changes keep the drawer's numbers and dates identical to the signed order.</li>
+  </ol></div>
+
+  <h2 id="parts">2. The seven parts</h2>
+  <div class="tablecard"><table>
+    <tr><th>Part</th><th>Before</th><th>Now</th></tr>
+    <tr><td>A Pricing</td><td>Three cards, one of them "Percentage of model estimate" (no estimates exist)</td><td>Two cards: one price for all, or each yourself</td></tr>
+    <tr><td>B Fee label</td><td>"2.5%" typed in</td><td>Read from the fee setting (still 2.5%)</td></tr>
+    <tr><td>C Expiry</td><td>Your computer's clock</td><td>Polygon's clock, the same sum as the signed order; names ending sooner are named</td></tr>
+    <tr><td>D Skip count</td><td>"5 names left" counted names that would be skipped</td><td>Counts only names that will really be signed</td></tr>
+    <tr><td>E2 Cancel</td><td>A grey "Cancel in wallet" you can't click</td><td>A working Cancel</td></tr>
+    <tr><td>F Approval</td><td>"Approve once, list forever"</td><td>"One approval per contract"</td></tr>
+    <tr><td>G Auction</td><td>"Timed bidding. In the contract, not yet in the interface."</td><td>"Not available yet."</td></tr>
+  </table></div>
+
+  <h2 id="cancel">3. How Cancel is safe</h2>
+  <div class="card">
+    <p>Only the wallet can close its own popup, so pressing Cancel can't take MetaMask's request away. What Cancel does is make the drawer <b>stop caring</b> about the answer. Each attempt gets a number; Cancel changes the number. When the wallet answers later, the code sees the number changed and throws the signature away <b>before</b> anything is posted.</p>
+    <p>If you were signing names one by one and some were already listed, those stay listed, and Cancel shows you which ones. Cancel is hidden while the batch is being posted, because that can't be called back.</p>
+  </div>
+
+  <h2 id="dates">4. Why the date moved 5 minutes</h2>
+  <div class="card"><p>Every order starts 5 minutes in the past (so a slow block can't make it "not started yet") and runs for your chosen days from there. The form now shows exactly that end time, using Polygon's clock. That's why it reads 15:17 when you open it at 15:22. The result screen shows the time actually signed, which can be a minute later if you took a minute to click List.</p></div>
+
+  <h2 id="files">5. The files</h2>
+  <div class="tablecard"><table>
+    <tr><th>File</th><th>What changed</th></tr>
+    <tr><td><code>helpers/my-domains/bulkListing.ts</code></td><td>Percent rules gone; <code>signedEndTime</code> (155), <code>bulkExpiry</code> (159), <code>bulkCutShort</code> (178), <code>bulkSignableCount</code> (193), <code>signedExpiries</code> (200)</td></tr>
+    <tr><td><code>helpers/my-domains/bulkBatch.ts</code>, <code>bulkSigning.ts</code></td><td>Stop when cancelled; record each signed end time; the real remaining count</td></tr>
+    <tr><td><code>helpers/my-domains/bulkPhase5.test.ts</code></td><td>New: 11 tests</td></tr>
+    <tr><td><code>hooks/my-domains/useBulkListingActions.ts</code></td><td><code>readChainNow</code> (222); Cancel passed through</td></tr>
+    <tr><td><code>BulkListingFlowModal.tsx</code>, <code>ListingFlowModal.tsx</code></td><td>The Cancel buttons; block time on open; signed dates on the result</td></tr>
+    <tr><td><code>BulkPricingOptions</code>, <code>BulkNamesList</code>, <code>BulkListingFormStep</code>, <code>BulkListingSuccessStep</code></td><td>Two cards, no estimate, named names, "Ends sooner" rows</td></tr>
+    <tr><td><code>OneTimeApprovalStep</code>, <code>ListingFormStep</code>, <code>ConfirmToSignStep</code>, <code>FeeBreakdownRow</code></td><td>Approval wording, auction text, fee label</td></tr>
+  </table></div>
+
+  <h2 id="tested">6. Tested</h2>
+  <div class="card"><ul>
+    <li>Two pricing cards and "Not available yet." on screen; Expires 15:17 opened at 15:22.</li>
+    <li>Cancel while MetaMask was open, then approved in MetaMask: <b>nothing was listed</b>.</li>
+    <li>A normal bulk list of 2 names: one signature, "2 domains are live", All expire 15:18.</li>
+    <li>Not tried by hand yet: Cancel in the single drawer, light mode, phone width.</li>
+  </ul></div>
+
+  <h2 id="faq">7. Questions you might have</h2>
+  <ol class="qs">
+    <li><b>Why is the result time a minute later than the form?</b><span>The form shows the time when you opened it; the result shows the time actually signed, a minute later.</span></li>
+    <li><b>Does Cancel close MetaMask?</b><span>No, only the wallet can. You can reject or ignore it there; approving does nothing now.</span></li>
+    <li><b>Where did the percentage option go?</b><span>Removed, as Mohit sir's decision 5 says: there's no estimate data behind it.</span></li>
+    <li><b>Is this all of Mohit sir's design issues?</b><span>All but one: mixed chains in one batch is phase 7.</span></li>
+  </ol>
+
+  <footer>Bulk listing v2 · phase 5 explained · 23 Nov 2026 · dev-docs is local only.</footer>
+</div>
+<script>
+  document.getElementById('toggle').addEventListener('click', function () {
+    var root = document.documentElement;
+    var current = root.getAttribute('data-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('dmplan-theme', next); } catch (e) {}
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bulk List Code Review</title>
+<script>
+  try {
+    var saved = localStorage.getItem('dmplan-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  } catch (e) {}
+</script>
+<style>
+  :root {
+    --bg: #f9f9f9; --surface: #ffffff; --surface-soft: #f3f4fe;
+    --text: #111111; --text-muted: #5b5b66; --border: #e6e6e6;
+    --accent: #2639ED; --accent-soft: #e9ebfd;
+    --wait: #9457f6; --wait-soft: #f4eefe;
+    --ok: #12805c; --ok-soft: #e4f5ee;
+    --warn: #b4540a; --warn-soft: #fdf1e4;
+    --bad: #c4314b; --bad-soft: #fdecef;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+      --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+      --accent: #7f8cff; --accent-soft: #1d2150;
+      --wait: #b996fa; --wait-soft: #2c2142;
+      --ok: #4fd1a0; --ok-soft: #173229;
+      --warn: #f5a35c; --warn-soft: #3a2614;
+      --bad: #ff7d93; --bad-soft: #3a1c24;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+    --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+    --accent: #7f8cff; --accent-soft: #1d2150;
+    --wait: #b996fa; --wait-soft: #2c2142;
+    --ok: #4fd1a0; --ok-soft: #173229;
+    --warn: #f5a35c; --warn-soft: #3a2614;
+    --bad: #ff7d93; --bad-soft: #3a1c24;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: "Satoshi", system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.6; }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 48px 16px 80px; }
+  header.top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+  .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; }
+  h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.15; margin: 0 0 12px; }
+  .lede { color: var(--text-muted); margin: 0; max-width: 680px; }
+  .lede a { color: var(--accent); }
+  .toggle { flex-shrink: 0; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 14px; cursor: pointer; }
+  .toggle:hover { border-color: var(--accent); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 32px; }
+  nav.toc a { font-size: 14px; text-decoration: none; color: var(--accent); background: var(--accent-soft); padding: 6px 12px; border-radius: 999px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 0 0 16px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+  .stat b { display: block; font-size: 26px; line-height: 1.2; }
+  .stat span { font-size: 13px; color: var(--text-muted); }
+  h2 { font-size: 22px; margin: 52px 0 16px; }
+  h3 { font-size: 18px; margin: 0; }
+  h4 { font-size: 15px; margin: 22px 0 8px; color: var(--accent); }
+  p { margin: 0 0 12px; }
+  .muted { color: var(--text-muted); font-size: 15px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
+  .card p:last-child { margin-bottom: 0; }
+  .card ul, .card ol { margin: 8px 0 0; padding-left: 20px; }
+  .card li { margin-bottom: 6px; }
+  code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .86em; background: var(--surface-soft); border-radius: 6px; padding: 1px 6px; word-break: break-word; }
+  .findings { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .finding { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+  .finding h3 { font-size: 16px; margin-bottom: 6px; }
+  .finding p { font-size: 15px; margin: 0; color: var(--text-muted); }
+  .tablecard { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow-x: auto; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: 0; }
+  th { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+  td.grp { font-weight: 600; color: var(--accent); background: var(--surface-soft); font-size: 13px; }
+  .sw { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .chip { width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(128,128,128,.45); flex-shrink: 0; }
+  .callout { border-left: 4px solid var(--wait); background: var(--wait-soft); border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; }
+  .callout p { margin: 0; }
+  .callout.ok { border-color: var(--ok); background: var(--ok-soft); }
+  .callout.warn { border-color: var(--warn); background: var(--warn-soft); }
+  .issue { display: grid; grid-template-columns: 28px 1fr; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--bad); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+  .issue .n { font-weight: 700; color: var(--bad); }
+  .issue p { margin: 0; font-size: 15px; }
+  .issue .where { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+  .phase { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px 24px; margin-bottom: 14px; }
+  .phase-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  .num { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 15px; flex-shrink: 0; }
+  .tag { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+  .tag.now { background: var(--ok-soft); color: var(--ok); }
+  .tag.wait { background: var(--wait-soft); color: var(--wait); }
+  .tag.size { background: var(--surface-soft); color: var(--text-muted); }
+  .tag.new { background: var(--warn-soft); color: var(--warn); }
+  .rows { display: grid; grid-template-columns: 130px 1fr; gap: 6px 16px; font-size: 15px; }
+  .rows dt { color: var(--text-muted); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; padding-top: 2px; }
+  .rows dd { margin: 0; }
+  ol.qs { counter-reset: q; list-style: none; padding: 0; margin: 0; }
+  ol.qs li { counter-increment: q; position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px 14px 56px; margin-bottom: 10px; }
+  ol.qs li::before { content: counter(q); position: absolute; left: 16px; top: 14px; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  ol.qs.team li::before { background: var(--wait-soft); color: var(--wait); }
+  ol.qs b { display: block; margin-bottom: 2px; }
+  ol.qs span { color: var(--text-muted); font-size: 15px; }
+  footer { margin-top: 56px; font-size: 13px; color: var(--text-muted); }
+  @media (max-width: 700px) {
+    header.top { flex-direction: column; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .findings { grid-template-columns: 1fr; }
+    .card, .phase { padding: 18px; }
+    .rows { grid-template-columns: 1fr; }
+    .rows dt { padding-top: 8px; }
+    ol.qs li { padding-left: 50px; }
+  }
+</style>
+<style>
+  .extra { display: grid; grid-template-columns: 150px 1fr; gap: 6px 16px; font-size: 15px; margin-top: 10px; }
+  .extra dt { color: var(--text-muted); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; padding-top: 2px; }
+  .extra dd { margin: 0; }
+  blockquote { margin: 0; background: var(--surface-soft); border-radius: 12px; padding: 16px 20px; font-size: 15px; }
+  blockquote ol { margin: 8px 0; padding-left: 20px; }
+  .who { font-weight: 600; color: var(--warn); }
+  @media (max-width: 700px) { .extra { grid-template-columns: 1fr; } }
+</style>
+<style>.issue .where{margin-top:6px}.issue p{margin:0 0 4px}</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">Bulk listing v2 · code review · 24 Nov 2026</p>
+      <h1>bulk-list: overall code review</h1>
+      <p class="lede">Everything on the <code>bulk-list</code> branch that isn't on uat (from <code>5c0b0a90</code>), plus today's uncommitted work: 89 changed files and 3 new ones, about 9,200 added lines. Four independent read only reviews (signing core; delist, cancel and approvals; screens and wiring; project rules), each finding then checked against the code. Nothing was changed while reviewing.</p>
+    </div>
+    <button class="toggle" id="toggle" type="button">Toggle theme</button>
+  </header>
+
+  <nav class="toc"><a href="#verdict">Verdict</a><a href="#checks">Checks</a><a href="#high">High</a><a href="#medium">Medium</a><a href="#low">Low</a><a href="#rules">Project rules</a><a href="#tests">Tests</a><a href="#good">Done well</a><a href="#plan">Fix plan</a><a href="#method">How</a><a href="#fixplan">Fix plan explained</a></nav>
+
+  <div class="stats">
+    <div class="stat"><b>0</b><span>critical</span></div>
+    <div class="stat"><b>5</b><span>high</span></div>
+    <div class="stat"><b>17</b><span>medium</span></div>
+    <div class="stat"><b>29</b><span>low</span></div>
+  </div>
+
+  <div class="callout ok"><p><b>Update 24 Nov, after the review:</b> you decided to remove the cancel safeguards (pending Mohit sir) and keep only the clearer toast. That resolves <b>H1, H2, H3, M6, M12, M13 and L18</b> (and the safeguard specific half of M9). Fix order step 1 is no longer needed; the next steps are step 2 (Cancel after signing) and step 3 (post result handling). See <code>incident-24nov-backend-500.html</code>, section 6.</p></div>
+
+  <h2 id="verdict">1. Verdict</h2>
+  <div class="callout ok"><p><b>The core is solid.</b> The Seaport bulk signature code (tree, type hash, proofs, compact signatures, leaf index) matches Seaport.js byte for byte for 1 to 50 orders, every signature is checked locally before posting, money stays in exact 6 decimal integers, and the time window maths matches the backend. No critical issue was found.</p></div>
+  <div class="callout warn"><p><b>Fix before the PR:</b> the cancel safeguards added today have three holes that can lose their memory (and allow the very second paid cancel they exist to stop); the single listing drawer's Cancel stays clickable after the signature is in; and a few post results are classified wrongly. Separately, the branch adds layering exceptions to CLAUDE.md §8 that should be fixed or written down.</p></div>
+
+  <h2 id="checks">2. Automated checks (24 Nov)</h2>
+  <div class="tablecard"><table>
+    <tr><th>Check</th><th>Result</th></tr>
+    <tr><td><code>npx tsc --noEmit -p .</code></td><td>Clean (exit 0)</td></tr>
+    <tr><td>ESLint on every changed file</td><td>0 errors; 4 warnings, all already on uat (unused <code>summary</code> in WatchlistHeroBanner, unused disable in ListingFlowModal:141, <code>any</code> in marketplace-order-client:82, unused <code>_counter</code> in seaport-order-builder-v5:163)</td></tr>
+    <tr><td><code>npx vitest run</code></td><td>15 files, 238 tests, all pass (3.5 s)</td></tr>
+    <tr><td>CLAUDE.md §4 (no img, no a, no !important, no fragments in map, inline style)</td><td>Clean; the only inline style is the runtime progress width (allowed)</td></tr>
+    <tr><td>CLAUDE.md §8 greps</td><td>New hits: <code>bulkListing.ts</code> (helper imports a primitive), BulkDelistModal / BulkListingFlowModal / ListingFlowModal (composites call data hooks); <code>listingOrder.ts</code> calls the backend but the greps don't catch it. See section 6</td></tr>
+  </table></div>
+
+  <h2 id="high">3. High severity (5)</h2>
+
+  <div class="issue"><span class="n">H1</span><div><p><b>Cancel safeguard memory is wiped when My Domains fails to load.</b> The page passes the live listings to <code>usePendingCancels</code> as soon as loading ends. On a load error, the summary is empty, so the "live listings" set is empty and <code>settledSentCancels</code> deletes every remembered cancel, including ones the backend never recorded.</p><p class="where"><code>pages/seller-hub/my-domains/index.tsx:94</code> (only <code>isLoading</code> becomes null), <code>helpers/my-domains/onChainCancel.ts:208</code>, <code>hooks/my-domains/usePendingCancels.ts:16</code></p><p class="where"><b>Scenario:</b> exactly the 24 Nov outage: cancel-bulk fails (unrecorded), the seller reloads while my-domains also 500s → memory erased → when the backend is back the row shows for sale, Delist is allowed, second paid cancel. <b>Fix:</b> pass null on <code>isError</code> too, and never prune an unrecorded entry because its row is missing; prune only on a successful record or backend state. <b>Checked: confirmed.</b></p></div></div>
+
+  <div class="issue"><span class="n">H2</span><div><p><b>A sent cancel is remembered only after the backend call finishes.</b> <code>saveSentCancels</code> runs after <code>runOnChainCancel</code> returns, i.e. after the whole cancel-bulk record loop. <code>callBackend</code> has no timeout.</p><p class="where"><code>hooks/my-domains/useOnChainCancel.ts:73</code>, <code>helpers/my-domains/onChainCancel.ts:73-100</code></p><p class="where"><b>Scenario:</b> transaction sent, cancel-bulk hangs, the seller closes the tab or delists again from another place → no memory, no guard, no retry → second paid cancel. <b>Fix:</b> save the entries (recorded false) the moment the transaction hash exists (an <code>onSent</code> step), mark them recorded after the record; add a timeout to the record call. <b>Checked: confirmed.</b></p></div></div>
+
+  <div class="issue"><span class="n">H3</span><div><p><b>The cleanup deletes cancels for orders that aren't listed rows.</b> "Cancel again" (an unconfirmed cancel, row not for sale) and "Cancel older listings" (old hidden orders) cancel hashes that are never in the live listings set, so the next refresh prunes them at once.</p><p class="where"><code>onChainCancel.ts:208</code>, <code>usePendingCancels.ts:44-46</code></p><p class="where"><b>Scenario:</b> Cancel again → cancel-bulk fails → entry pruned, never retried, guard gone → the button is still there → second paid cancel. <b>Fix:</b> same as H1: never prune unrecorded entries by "row absent"; expire recorded ones by time or by the my-listings state. <b>Checked: confirmed.</b></p></div></div>
+
+  <div class="issue"><span class="n">H4</span><div><p><b>The single listing drawer's Cancel stays clickable after the signature is in.</b> While the old listing is being hidden (Edit price) or the new one posted, Cancel still shows. Pressing it says "Cancelled. Nothing was listed." and drops the result, but the hide and post carry on. Found independently by two reviewers.</p><p class="where"><code>listing-flow/ListingFlowModal/ListingFlowModal.tsx:230-236, 277, 467</code>, <code>listingOrder.ts:79-92</code>; the per name bulk fallback has the same gap (<code>BulkListingFlowModal.tsx:243-257</code>)</p><p class="where"><b>Scenario:</b> Edit price, sign, press Cancel during the hide: the old listing is hidden, the new post fails, and the seller is told nothing changed (the "your old listing was taken down" toast is swallowed): no live listing and a wrong message. In the per name fallback, a name posted just after Cancel shows as "Stopped before signing". <b>Fix:</b> report a "publishing" phase once signing is done and hide Cancel from then on (the one signature bulk path already does this). <b>Checked: confirmed.</b></p></div></div>
+
+  <div class="issue"><span class="n">H5</span><div><p><b>Layering (CLAUDE.md §8): backend calls and data hooks inside the design system.</b> <code>listingOrder.ts</code> (new on this branch) builds, signs and POSTs orders from a composite folder; <code>useBulkListingActions</code> (a hook) imports <code>useListingFlowActions</code> and <code>listingOrder</code> from that composite folder; <code>BulkListingFlowModal</code>, <code>BulkDelistModal</code> and <code>ListingFlowModal</code> call data hooks (<code>useBulkListingActions</code>, <code>useNftApprovals</code>, <code>useOnChainCancel</code>). None of these is in §8's allowed exceptions or the known violations list.</p><p class="where"><code>listing-flow/listingOrder.ts:84</code>, <code>hooks/my-domains/useBulkListingActions.ts:12-13</code>, <code>BulkListingFlowModal.tsx:17-22</code>, <code>BulkDelistModal.tsx:9</code></p><p class="where"><b>Risk:</b> no runtime bug; it breaks the agreed structure and makes the drawer hard to test. <b>Fix:</b> move the POST to <code>core/services/my-domains</code>, the flow logic and <code>useListingFlowActions</code> to <code>hooks/my-domains</code>, and either lift the hooks into a connected wrapper or record these as known violations in §8 and the layering plan. Larger refactor: worth your decision. <b>Checked: confirmed.</b></p></div></div>
+
+  <h2 id="medium">4. Medium severity (17)</h2>
+  <div class="tablecard"><table>
+    <tr><th>#</th><th>Finding</th><th>Where</th><th>Fix</th></tr>
+    <tr><td>M1</td><td>A <b>rejected</b> <code>DUPLICATE_ORDER</code> is shown as listed. The backend already turns a safe retry into "listed"; it leaves DUPLICATE_ORDER rejected only when the stored order is no longer active (sold, delisted, expired). The test encodes the wrong behaviour. <i>Confirmed.</i></td><td><code>helpers/my-domains/bulkBatch.ts:121</code>, <code>bulkBatch.test.ts:124</code></td><td>Trust <code>status === 'listed'</code> only; map rejected DUPLICATE_ORDER to "No longer active", not retryable</td></tr>
+    <tr><td>M2</td><td>A 2xx answer with an empty or HTML body makes <code>mapBulkAnswers</code> throw outside the try: the drawer stays on "Publishing" with no Cancel. <i>Confirmed.</i></td><td><code>bulkBatch.ts:149</code>, <code>core/services/my-domains/bulkOrders.service.ts</code></td><td>Check <code>Array.isArray(result.results)</code> in the service; turn a bad body into post-failed</td></tr>
+    <tr><td>M3</td><td>Retry after a wallet switch proves the <b>new</b> wallet; every order then comes back OFFERER_NOT_CALLER, shown as "Couldn't be checked, try again" (logged as a builder bug) and still retryable. <i>Likely.</i></td><td><code>useBulkListingActions.ts:123-131</code>, <code>bulkBatch.ts:70</code></td><td>Compare the wallet with the batch's offerer before re proving; give OFFERER_NOT_CALLER its own reason</td></tr>
+    <tr><td>M4</td><td>Every failed post shows "We couldn't reach the marketplace. Try again", including wallet mismatch, a rejected proof and batch level 400s (BATCH_TOO_LARGE, BATCH_MIXED_MAKER…) that will fail again. <i>Confirmed mapping.</i></td><td><code>BulkListingFlowModal.tsx:315-318, 610-613</code>, <code>useBulkListingActions.ts:41-50</code></td><td>Offer Try again only for network, 5xx, 429; send the rest back to the form with a real reason</td></tr>
+    <tr><td>M5</td><td>Names skipped for expiring within 14 days are still counted in "applies to all N", the Domains row, combined price, fee, "You receive", the title and the approval step, while the button says "List N−1". <i>Confirmed.</i></td><td><code>BulkListingFormStep.tsx:155, 222-232</code>, <code>BulkListingFlowModal.tsx:490, 542</code></td><td>Work out counts and totals from the names that will be listed</td></tr>
+    <tr><td>M6</td><td>A local unrecorded cancel blocks re cancelling for 24 h and hides the row's actions, without ever checking the transaction. If it was dropped or replaced ("speed up" changes the hash), the listing stays buyable and can't be cancelled for a day; the retry runs all day. <i>Likely.</i></td><td><code>onChainCancel.ts:181</code>, <code>useOnChainCancel.ts:43</code>, <code>MyDomainRow.tsx:115</code>, <code>MyDomainCard.tsx:131</code></td><td>Check the receipt on each tick; drop failed or unknown transactions after a few minutes; offer Cancel again after ~30 min</td></tr>
+    <tr><td>M7</td><td>Pressing Escape to close a filter dropdown also leaves bulk mode and clears the whole selection. The dropdown calls <code>preventDefault</code>; the page's window handler doesn't check it. <i>Confirmed.</i></td><td><code>pages/seller-hub/my-domains/index.tsx</code> Escape handler, <code>FilterDropdown.tsx:100</code></td><td>Return early on <code>event.defaultPrevented</code></td></tr>
+    <tr><td>M8</td><td>Cancel on the approval waiting screen doesn't stop the transaction already sent; submitting again before it's mined reads "not approved" and sends a second paid approval. <i>Confirmed.</i></td><td><code>BulkListingFlowModal.tsx</code> approval-pending, <code>hooks/my-domains/useNftApprovals.ts:105-121</code></td><td>Keep the in flight approval per contract and wait for it, or hide Cancel once the wallet returned a hash</td></tr>
+    <tr><td>M9</td><td>"Cancel older listings" turns to done when the cancel is broadcast (not mined, even if unrecorded), so Try these again hits CHEAPER_ORDER_STILL_VALID again; and an "already on its way" answer goes back to idle, so those names can never be retried from the drawer. <i>Likely / confirmed.</i></td><td><code>BulkListingFlowModal.tsx:395-407, 621-623</code></td><td>Treat already-sent as done; say "waiting for confirmation" until the backend shows it</td></tr>
+    <tr><td>M10</td><td>Smart wallet and wallet proof checks rerun only on open/connect, not when the account changes inside the wallet: the "Switch wallet" banner stays after switching. <i>Likely.</i></td><td><code>BulkListingFlowModal.tsx:176-202</code></td><td>Add the connected address to those effects</td></tr>
+    <tr><td>M11</td><td>The "Discard this bulk listing?" check covers only the form step; a backdrop click on the approval step loses every typed price. <i>Confirmed.</i></td><td><code>BulkListingFlowModal.tsx:483-487</code></td><td>Also confirm on approval and fallback offer</td></tr>
+    <tr><td>M12</td><td>The cancel memory isn't tied to a wallet: another linked wallet or another user on the same browser retries the first wallet's hashes (403 forever) or prunes them. <i>Confirmed paths.</i></td><td><code>core/services/my-domains/sentCancels.store.ts:11</code></td><td>Store the seller address per entry and filter by the current wallet; stop retrying on 403/400</td></tr>
+    <tr><td>M13</td><td>Pending cancels keep polling every 20 s for as long as a tab is open (cancel_unconfirmed rows never change by themselves) and go stale once the wallet proof lapses. <i>Confirmed.</i></td><td><code>usePendingCancels.ts:44-54, 86-91</code></td><td>Poll only for cancel_pending rows and local entries; stop and clear when the proof isn't fresh</td></tr>
+    <tr><td>M14</td><td>Before paying for a cancel, the order's status from the backend isn't checked: an order already filled or cancelled from another device gets a second paid cancel. <i>Likely.</i></td><td><code>cancelOrders.service.ts:15-20</code>, <code>onChainCancel.ts:58-71</code></td><td>Read the status in the same GET; skip filled or confirmed cancelled orders</td></tr>
+    <tr><td>M15</td><td>Shared types live outside <code>src/types</code> (§8 rule 5): <code>CancelPhase</code>, <code>BulkBatchPhase</code>, <code>BulkSigningPhase</code>, <code>BulkRejectChoice</code>; and <code>bulkListing.ts</code> imports <code>MAX_PRICE</code> from a primitive (§8 rule 3). <i>Confirmed.</i></td><td><code>onChainCancel.ts:20</code>, <code>bulkBatch.ts:32</code>, <code>bulkSigning.ts:9,12</code>, <code>bulkListing.ts:3</code></td><td>Move the types to <code>types/my-domains/bulk.ts</code>, <code>MAX_PRICE</code> to data/constants</td></tr>
+    <tr><td>M16</td><td>Test gaps on money and storage: no tests for <code>validateBulkPrice</code>, <code>toMinorUnits</code>, <code>bulkTotals</code>, <code>editBulkRow</code>, <code>setBulkMode</code>, <code>delistIneligibleReason</code>, the sent cancel store, or any hook level path (H1 to H3 would have been caught). <i>Confirmed.</i></td><td><code>bulkListing.ts:104-171</code>, <code>sentCancels.store.ts</code></td><td>Add <code>bulkListing.test.ts</code>, a store test, and tests for the save, record and prune order</td></tr>
+    <tr><td>M17</td><td>Accessibility: the "Cancel not confirmed" warning (can still be bought at the old price) lives only in a hover tooltip on an unfocusable span; the disabled Select's reason can't be reached by keyboard or touch. <i>Confirmed.</i></td><td><code>PendingCancelChip.tsx:16-24</code>, <code>BulkSelectButton.tsx:41-46</code></td><td>Visible or screen reader text; <code>aria-disabled</code> instead of <code>disabled</code></td></tr>
+  </table></div>
+
+  <h2 id="low">5. Low severity (29)</h2>
+  <div class="tablecard"><table>
+    <tr><th>#</th><th>Finding</th><th>Where</th></tr>
+    <tr><td>L1</td><td>No minimum price: a price under 0.00004 USDT makes the fee round to 0, the order builder throws and the whole batch fails with no name given</td><td><code>bulkListing.ts:124</code>, <code>seaport-order-builder-v5.ts:123</code></td></tr>
+    <tr><td>L2</td><td>Account switched between preparing and signing → local check fails as bad signature → the per name fallback is offered, which F3 says must not happen for a wrong wallet</td><td><code>useBulkListingActions.ts:155-183</code></td></tr>
+    <tr><td>L3</td><td>Leftover <code>useListingFlowActions(domains[0])</code> in the bulk hook still reads approval on every account or chain change, duplicating <code>useNftApprovals</code></td><td><code>useBulkListingActions.ts:76</code></td></tr>
+    <tr><td>L4</td><td>Per name fallback doesn't stop on a persistent wallet error (tries every name); a name whose post fails after Cancel is labelled "Stopped before signing"</td><td><code>bulkSigning.ts:73-96</code></td></tr>
+    <tr><td>L5</td><td>The result title is always "Successfully Listed", even over "Nothing was listed"</td><td><code>BulkListingFlowModal.tsx:502</code></td></tr>
+    <tr><td>L6</td><td>One keystroke in "Same price" while in "Set each one myself" wipes all hand typed prices; switching to "each" blanks the rows</td><td><code>BulkPricingOptions.tsx</code>, <code>bulkListing.ts:104</code></td></tr>
+    <tr><td>L7</td><td>During a retry the signing screen has no way out (no footer, no run id); a hung post has no timeout</td><td><code>BulkListingFlowModal.tsx:409-419, 594</code></td></tr>
+    <tr><td>L8</td><td>Per name progress counts skipped and rejected names as done ("Signing 2 of 5", "1 of 5 done" before anything listed)</td><td><code>BulkListingSigningStep.tsx:180-198</code></td></tr>
+    <tr><td>L9</td><td>The compact price field silently drops a keystroke above the maximum; the row's "Above the maximum price" can never show</td><td><code>primitives/inputs/price-input/PriceInput.tsx:65-70, 91</code></td></tr>
+    <tr><td>L10</td><td>Focus is lost to the page when the drawer's step changes (the pressed button unmounts)</td><td><code>primitives/modal/Modal.tsx:88-126</code></td></tr>
+    <tr><td>L11</td><td>Escape meant for the wallet connect modal also closes the drawer (AppKit modal isn't seen as the top dialog); not checked in a browser</td><td><code>Modal.tsx:75-82</code></td></tr>
+    <tr><td>L12</td><td>Single drawer: <code>finally setSubmitting(false)</code> runs after Cancel moved on, so the button can be pressed twice in a new run</td><td><code>ListingFlowModal.tsx:330-344</code></td></tr>
+    <tr><td>L13</td><td><code>?list=</code> and <code>?bulk=1</code> together open both; each clears the other query keys</td><td><code>pages/seller-hub/my-domains/index.tsx:143-183</code></td></tr>
+    <tr><td>L14</td><td><code>approveOne</code> doesn't check the wallet's chain after switching, and uses the render time <code>chainId</code> for the second contract (harmless with one contract today)</td><td><code>useNftApprovals.ts:104-117</code></td></tr>
+    <tr><td>L15</td><td>The approval fee uses <code>maxFeePerGas</code> (a ceiling), so "≈" shows about twice the real cost</td><td><code>useNftApprovals.ts:46</code></td></tr>
+    <tr><td>L16</td><td>Approval rejection detected by message text instead of <code>isUserRejection</code>; <code>isRejection</code> duplicates it; a rejected chain switch reads as "Approval was cancelled"</td><td><code>BulkListingFlowModal.tsx:62-66, 473</code></td></tr>
+    <tr><td>L17</td><td>Comments call cancel-bulk "all or nothing"; the backend writes per order, and each resend resets its 30 min timeout</td><td><code>onChainCancel.ts:10-12</code>, <code>cancelOrders.service.ts:23-27</code></td></tr>
+    <tr><td>L18</td><td>Bulk delist counts names that were skipped as already sent ("5 listings cancelled" when 3 were sent); locally pending rows can still be picked; "Nothing was cancelled" next to "already on its way"</td><td><code>BulkDelistModal.tsx:41-49, 97-123</code></td></tr>
+    <tr><td>L19</td><td>Stale comments: the bulk hook header still says signing is one per name; a JSDoc in listingOrder sits above the wrong item</td><td><code>useBulkListingActions.ts:67-74</code>, <code>listingOrder.ts:26-32</code>, <code>types/my-domains/bulk.ts</code> header</td></tr>
+    <tr><td>L20</td><td>Fee label comes from <code>feeBps</code> but the single drawer's amounts still use a hardcoded 2.5% (<code>PLATFORM_FEE_RATE</code>)</td><td><code>FeeBreakdownRow.tsx</code>, <code>tokenFormat.ts</code></td></tr>
+    <tr><td>L21</td><td>SCSS: lavender banner hex shared with other components should be a token; <code>--color-text-primary</code> used as a fill; the green success gradient copied in 3 files</td><td><code>BulkSelectBanner.module.scss:16-90</code>, <code>BulkDelistModal</code>, <code>BulkListingSuccessStep</code>, <code>OneTimeApprovalStep</code></td></tr>
+    <tr><td>L22</td><td>The sent cancel store is browser storage, not backend access, so <code>core/services</code> is the wrong home</td><td><code>sentCancels.store.ts</code></td></tr>
+    <tr><td>L23</td><td>A my-domains composite imports <code>ConfirmDrawer</code> from the profile composites (cross domain)</td><td><code>BulkListingFlowModal.tsx:35</code></td></tr>
+    <tr><td>L24</td><td><code>createAppKit</code> with the full network list runs on every render (copied from ListingFlowModal)</td><td><code>BulkListingFlowModal.tsx:98-103</code></td></tr>
+    <tr><td>L25</td><td>Row price errors are <code>role="alert"</code> not tied to the input (<code>aria-describedby</code>) and re announce while typing</td><td><code>BulkNamesList.tsx:80-84</code></td></tr>
+    <tr><td>L26</td><td>A chain mismatch in <code>bulkReasonInBatch</code> returns 'not-polygon' (wrong once multi chain lands; unreachable today)</td><td><code>bulkListing.ts:56</code></td></tr>
+    <tr><td>L27</td><td>Test files named after plan phases (<code>bulkPhase5</code>, <code>bulkPhase7</code>, <code>cancelSafeguards</code>) instead of the module they test</td><td><code>src/helpers/my-domains/*.test.ts</code></td></tr>
+    <tr><td>L28</td><td>§8 wording: helpers import <code>@/lib/seaport-order-builder-v5</code> (pure, fine in spirit) but the rule doesn't mention <code>lib</code>; write down that pure lib modules are allowed, never <code>marketplace-order-client</code></td><td>CLAUDE.md §8</td></tr>
+    <tr><td>L29</td><td>Batch level 400 codes and a hook level test for <code>classifyBulkBatchError</code> / proof renewal are missing</td><td><code>useBulkListingActions.ts</code></td></tr>
+  </table></div>
+
+  <h2 id="rules">6. Project rules summary (CLAUDE.md)</h2>
+  <div class="tablecard"><table>
+    <tr><th>Rule</th><th>State</th></tr>
+    <tr><td>§4 no native img / a, no !important, no fragments in map, inline style</td><td>Clean</td></tr>
+    <tr><td>§3 tokens and breakpoints</td><td>Mostly clean; a few hex values that should be tokens (L21); no raw @media</td></tr>
+    <tr><td>§7 dark mode</td><td>Followed: role tokens, dark blocks last, <code>solidInDark</code> as an opt in prop, footer fixed today</td></tr>
+    <tr><td>§8 layering</td><td>New exceptions: H5 (backend call and data hooks in the design system), M15 (types outside src/types, helper importing a primitive). Decide: refactor, or record as known violations</td></tr>
+  </table></div>
+
+  <h2 id="tests">7. Tests</h2>
+  <div class="card"><ul>
+    <li><b>Strong:</b> the bulk order tree against Seaport.js fixtures (1, 2, 3, 4, 50 orders) plus tamper tests; the batch rules (one signature, retry with the same bytes, wrong signer, rejections, cancel before post); the on chain cancel flow (409 resend with the same hash, wrong wallet refused before gas); phase 5 and 7 rules; the safeguard helpers. Fixed clocks, no flaky time.</li>
+    <li><b>Missing:</b> the drawer's money maths and validation (M16), the sent cancel store, every hook level path (the order of save, record and prune: H1 to H3), post classification (M1 to M4), malformed responses.</li>
+  </ul></div>
+
+  <h2 id="good">8. Done well</h2>
+  <div class="card"><ul>
+    <li>Exact port of Seaport's bulk signature scheme, proven against Seaport.js and checked again with ethers' own EIP712 hash.</li>
+    <li>Every signature verified locally against the seller before anything is posted; padding leaves can't get a proof.</li>
+    <li>Money as 6 decimal integers from the typed text to the signature (never <code>Number()</code>); totals use the same split as the signed order.</li>
+    <li>A failed post is retried with the same signed bytes, no new signature; a late signature after Cancel is never posted in the one signature path.</li>
+    <li>On chain cancel recomputes each order's hash and checks the offerer before any gas is spent; the 409 resend loop is capped.</li>
+    <li>Pure, injected, testable cores (<code>runBulkBatch</code>, <code>runOnChainCancel</code>, the tree); approvals read on the right chain; one Multicall3 read for expiries; dark mode and §4 rules followed; all browser storage access guarded.</li>
+  </ul></div>
+
+  <h2 id="plan">9. Suggested fix order</h2>
+  <div class="tablecard"><table>
+    <tr><th>Step</th><th>What</th><th>Findings</th><th>Size</th></tr>
+    <tr><td>1</td><td><s>Rework the cancel memory</s> Resolved 24 Nov by removing the safeguards (pending Mohit sir)</td><td>H1, H2, H3, M6, M12, M13, L18</td><td>Done</td></tr>
+    <tr><td>2</td><td>Hide Cancel once signing is done (single drawer and per name fallback)</td><td>H4, L4, L12</td><td>Small</td></tr>
+    <tr><td>3</td><td>Post result handling: DUPLICATE_ORDER, malformed body, wallet switch on retry, which failures offer Try again</td><td>M1 to M4, L2, L7</td><td>Small to medium</td></tr>
+    <tr><td>4</td><td>Drawer details: skipped names in totals, Escape in dropdowns, approval double send, cancel older state, account switch, discard on approval, result title</td><td>M5, M7 to M11, L5, L6, L8</td><td>Small each</td></tr>
+    <tr><td>5</td><td>Tests for money maths, the store and the hook paths</td><td>M16, L29</td><td>Medium</td></tr>
+    <tr><td>6</td><td>Layering: move the POST and flow hooks, types and MAX_PRICE; or record them in §8</td><td>H5, M15, L22, L23, L28</td><td>Large; your decision</td></tr>
+    <tr><td>7</td><td>Remaining low items (a11y, tokens, comments, fee estimate)</td><td>M17, L9 to L11, L13 to L17, L19 to L21, L24 to L27</td><td>Small</td></tr>
+  </table></div>
+  <p class="muted">Steps 1 to 4 change behaviour only where noted; any new wording (e.g. "waiting for confirmation", a "No longer active" reason, the result title) would be shown for approval first.</p>
+
+  <h2 id="method">10. How this review was done</h2>
+  <div class="card"><ul>
+    <li>Scope: <code>git diff 5c0b0a90</code> (where bulk-list last took in uat) plus the working tree and untracked files.</li>
+    <li>Four independent reviewers, each with one area and the requirements PDF, CLAUDE.md and the backend source (read only), none told the others' findings or the author's view.</li>
+    <li>Each finding was then checked against the code; the ones marked "likely" depend on a backend answer or a browser behaviour not tried.</li>
+    <li>No file was edited during the review; nothing was built or served.</li>
+  </ul></div>
+
+  <h2 id="fixplan">11. Fix plan explained, step by step</h2>
+  <div class="callout ok"><p><b>Progress, 24 Nov:</b> steps 2, 3 and 4 are <b>built and tested by you on 3002</b>, step 6 done (option B); all committed (<code>8df9b76</code>, <code>0a070bd</code>, <code>a59939a</code>) and pushed 24 Nov. Logged in the progress log ("v2 Code review fixes"), the file changes page and the flow page. Wording approved in <code>wording/review-fixes-wording.html</code> (A to H, plus I: "Your login has expired. Please log in again." for a 401, added after your test hit one). Also fixed while testing: Escape on a filter dropdown opened with the mouse (the dropdown now closes itself and marks the key handled, so bulk mode keeps the selection; this also fixes every filter dropdown in the app). Tests: 240, all pass; tsc and ESLint clean. Next: step 5 (tests), then step 7.</p></div>
+  <div class="callout"><p>Written 24 Nov after you asked for each step in plain words before any fix. <b>Step 1 is done</b> (safeguards removed, pending Mohit sir). Each remaining step lists what's wrong, what I'd change, the files, and any new wording; new wording is drawn for your approval first, as usual. Nothing below is built yet.</p></div>
+
+  <h3>Step 2 · Cancel only while it can really cancel (H4, L4, L12)</h3>
+  <div class="tablecard"><table>
+    <tr><th>#</th><th>What's wrong, in plain words</th><th>What I'd change</th></tr>
+    <tr><td>H4</td><td>In the single listing drawer, the <b>Cancel</b> button stays on screen after you've signed, while the old listing is being hidden (Edit price) or the new one posted. If you press it then, the drawer says "Cancelled. Nothing was listed." but the hide and post carry on. Worst case in Edit price: the old listing is hidden, the new post fails, and you're told nothing changed.</td><td>The signing code reports a new "publishing" moment right after your signature is checked, before anything is hidden or posted. From that moment the drawer hides Cancel (the one signature bulk path already does exactly this). Any result after that is shown normally, never swallowed.</td></tr>
+    <tr><td>H4 (bulk)</td><td>In "Sign each name separately", pressing Cancel while a name is being posted marks it "Stopped before signing" even if it then goes live.</td><td>The same "publishing" moment per name: Cancel is hidden while a name is posting, and a name is only marked stopped if it never reached posting.</td></tr>
+    <tr><td>L4</td><td>"Sign each name separately" keeps trying every remaining name when the wallet has a lasting problem (wrong chain, Ledger unplugged), failing them one by one.</td><td>Stop after two names fail in a row with the same wallet error, and mark the rest as stopped.</td></tr>
+    <tr><td>L12</td><td>Single drawer: after Cancel on the approval screen, the old approval finishing later re-enables the button during your new attempt, so it can be pressed twice.</td><td>Only reset the button for the attempt that's still current.</td></tr>
+  </table></div>
+  <p class="muted"><b>Files:</b> <code>listing-flow/listingOrder.ts</code>, <code>useListingFlowActions.ts</code>, <code>ListingFlowModal.tsx</code>, <code>helpers/my-domains/bulkSigning.ts</code>, <code>hooks/my-domains/useBulkListingActions.ts</code>, <code>BulkListingFlowModal.tsx</code>. <b>New wording:</b> the waiting screen while posting ("Publishing your listing…" or similar) and the L4 reason ("Stopped after repeated wallet errors"); drawn first. <b>Tests:</b> the per name loop (stop after repeated errors; cancel during posting).</p>
+
+  <h3>Step 3 · Read the marketplace's answers correctly (M1 to M4, M14, L2, L7)</h3>
+  <div class="tablecard"><table>
+    <tr><th>#</th><th>What's wrong, in plain words</th><th>What I'd change</th></tr>
+    <tr><td>M1</td><td>If a retried batch comes back "duplicate order" because the earlier listing is <b>no longer active</b> (sold or delisted since), we show the name as live.</td><td>Trust only "listed". A rejected duplicate gets its own reason ("No longer active") and isn't offered in Try these again. The test that expects the old behaviour is corrected.</td></tr>
+    <tr><td>M2</td><td>If the server answers "OK" with an empty or broken body (a proxy error page, say), the drawer crashes and stays stuck on "Publishing" with no way out.</td><td>The service checks the answer has the expected list; if not, it's treated as a failed post, so you get the normal "Try again" screen with the same signed batch.</td></tr>
+    <tr><td>M3</td><td>If you switch wallet and press Try again an hour later, we prove the <b>new</b> wallet; every name then fails with a confusing "Couldn't be checked, try again" and keeps offering retry.</td><td>Before renewing the wallet proof, check the connected wallet is the one that signed. If not, go back to the form with the existing "This wallet is not linked…" message. The backend's "signed by a different wallet" answer gets a clear, non retryable reason.</td></tr>
+    <tr><td>M4</td><td>Every failed post says "We couldn't reach the marketplace. Try again", even when retrying can't help (wrong wallet, you rejected the proof, the batch itself refused).</td><td>Only network trouble, server errors (5xx) and "too many requests" offer Try again. Wrong wallet and a rejected proof go back to the form with their existing messages; a refused batch goes back with a real reason.</td></tr>
+    <tr><td>M14</td><td>Before you pay for a delist, we don't check whether the order is already sold or cancelled (for example from another device), so you can pay for a cancel that does nothing.</td><td>The order fetch we already make returns its status; orders already filled or confirmed cancelled are skipped and reported as "already sold or cancelled" (existing text) before the wallet opens.</td></tr>
+    <tr><td>L2</td><td>If you switch account in the wallet between pressing List and signing, the signature check fails and we offer "Sign each name separately", which can't help.</td><td>Re read the account just before signing; if it changed, show the wrong wallet message instead of offering the fallback.</td></tr>
+    <tr><td>L7</td><td>During Try again, if the wallet proof popup or the post hangs, the screen has no way out.</td><td>A Cancel while the wallet proof is open, and a time limit on the post that ends in the normal Try again screen.</td></tr>
+  </table></div>
+  <p class="muted"><b>Files:</b> <code>helpers/my-domains/bulkBatch.ts</code> (+ test), <code>core/services/my-domains/bulkOrders.service.ts</code>, <code>hooks/my-domains/useBulkListingActions.ts</code>, <code>BulkListingFlowModal.tsx</code>, <code>helpers/my-domains/onChainCancel.ts</code> (+ test), <code>core/services/my-domains/cancelOrders.service.ts</code>. <b>New wording:</b> "No longer active", "Signed with a different wallet", the refused batch message; drawn first. <b>Tests:</b> answer mapping, bad body, batch level refusals, order status before cancel.</p>
+
+  <h3>Step 4 · Drawer details (M5, M7 to M11, M13, L5, L6, L8)</h3>
+  <div class="tablecard"><table>
+    <tr><th>#</th><th>What's wrong, in plain words</th><th>What I'd change</th></tr>
+    <tr><td>M5</td><td>Names skipped for expiring within 14 days still count in "applies to all N", the Domains row, the combined price, the fee, "You receive", the title and the approval step, while the button says "List N−1".</td><td>Count and add up only the names that will really be listed, everywhere in the drawer.</td></tr>
+    <tr><td>M7</td><td>Pressing Escape to close a filter dropdown also leaves bulk mode and clears your whole selection.</td><td>The page ignores an Escape that a dropdown already handled.</td></tr>
+    <tr><td>M8</td><td>If you press Cancel on the approval screen while the approval transaction is still being mined, then try again, a <b>second paid approval</b> can be sent.</td><td>Remember an approval already sent for that contract and wait for it instead of sending another.</td></tr>
+    <tr><td>M9</td><td>"Cancel older listings" says "cancelled, list them again now" as soon as the cancel is sent, before the marketplace knows; Try these again then fails the same way.</td><td>Show "sent, waiting for the marketplace" until it confirms, then enable Try these again.</td></tr>
+    <tr><td>M10</td><td>Switching account inside the wallet doesn't recheck "smart wallet" or "verify wallet first", so the wrong banner stays until you reopen the drawer.</td><td>Recheck whenever the connected account changes.</td></tr>
+    <tr><td>M11</td><td>Clicking outside the drawer on the approval step loses all the prices you typed, with no "Discard?" question.</td><td>Ask "Discard this bulk listing?" on the approval step too.</td></tr>
+    <tr><td>M13</td><td>My Domains keeps checking for unconfirmed cancels every 20 s for as long as the tab is open, and the labels go stale once the wallet proof lapses.</td><td>Check only while a cancel is really pending; stop when the wallet proof isn't fresh.</td></tr>
+    <tr><td>L5</td><td>The result screen's title always says "Successfully Listed", even over "Nothing was listed".</td><td>Title follows the result.</td></tr>
+    <tr><td>L6</td><td>One keystroke in "Same price" while setting each price wipes every price you typed; switching to "Set each one myself" empties the rows.</td><td>Switching to "each" starts from the same price; leaving "each" with typed prices asks first.</td></tr>
+    <tr><td>L8</td><td>"Sign each name separately" counts skipped names as done ("1 of 5 done" before anything listed).</td><td>Count only names that are really signed and listed.</td></tr>
+  </table></div>
+  <p class="muted"><b>Files:</b> <code>BulkListingFlowModal.tsx</code>, <code>BulkListingFormStep.tsx</code>, <code>BulkListingSigningStep.tsx</code>, <code>BulkListingSuccessStep.tsx</code>, <code>bulkListing.ts</code>, <code>hooks/my-domains/useNftApprovals.ts</code>, <code>hooks/my-domains/usePendingCancels.ts</code>, <code>pages/seller-hub/my-domains/index.tsx</code>. <b>New wording:</b> the M9 waiting line, the L5 titles, the L6 question; drawn first.</p>
+
+  <h3>Step 5 · Tests for money and the flows (M16, L29)</h3>
+  <div class="card"><p><b>What's missing:</b> the drawer's money maths and checks (price validation, exact USDT units, totals, editing rows, switching pricing) and the hook level paths (renewing the wallet proof, sorting errors) have no tests. <b>What I'd add:</b> <code>bulkListing.test.ts</code> for the money and validation rules, and tests for the step 2 to 4 behaviour as they're built. No product change.</p></div>
+
+  <h3>Step 6 · Project structure (H5, M15, L22, L23, L28) · <span class="tag wait">your decision</span></h3>
+  <div class="card"><p><b>What's wrong:</b> CLAUDE.md §8 says only <code>src/core</code> talks to the backend, hooks fetch, and design system components only draw. On this branch, <code>listingOrder.ts</code> posts orders from a design system folder, a hook imports from a design system folder, the drawers call data hooks, some shared types live outside <code>src/types</code>, and a helper imports a value from a primitive. No bug, but it breaks the agreed structure.</p>
+    <p><b>Option A, refactor:</b> move the POST into <code>core/services/my-domains</code>, the flow logic into <code>hooks/my-domains</code>, the types into <code>types/my-domains</code>, <code>MAX_PRICE</code> into data, and lift the drawers' hooks into the page. Large, touches the single listing drawer too, needs a full retest.<br><b>Option B, record it:</b> add these to §8's "known outstanding violations" and the layering plan, and fix them later with the other pages. Small, no risk now.<br><b>My suggestion:</b> B before the PR (A is a separate cleanup, like the other pages in the layering plan), plus the cheap parts of A now: move the types and <code>MAX_PRICE</code>.</p></div>
+
+  <div class="callout ok"><p><b>Step 6 done 24 Nov, option B (your choice).</b> Recorded as known violation 6 in CLAUDE.md §8 and rows M8 to M10 in <code>dev-docs/layering/layering-cleanup-plan.md</code> §3.5, to be refactored with the other pages. The cheap parts were done too: the shared phase types (<code>BulkBatchPhase</code>, <code>BulkSigningPhase</code>, <code>BulkRejectChoice</code>, <code>BulkFailureReason</code>, <code>CancelPhase</code>) moved to <code>types/my-domains/bulk.ts</code> (the helpers re-export them, so no import broke) and <code>MAX_PRICE</code> to <code>data/my-domains/pricing.ts</code> (PriceInput re-exports it). <code>helpers/my-domains</code> now passes the §8 rule 3 grep. Resolves M15 and the helper half of H5; L22, L23 and L28 stay listed for later.</p></div>
+
+  <h3>Step 7 · Remaining small items</h3>
+  <div class="tablecard"><table>
+    <tr><th>Group</th><th>Items</th><th>What I'd change</th></tr>
+    <tr><td>Accessibility</td><td>M17, L9, L10, L11, L25</td><td>"Cancel not confirmed" and the disabled Select reason readable by keyboard and screen readers; the price field says when a digit is over the maximum; focus stays in the drawer when its step changes; Escape for the wallet modal doesn't close the drawer; row errors tied to their field</td></tr>
+    <tr><td>Correctness, latent</td><td>L1, L13, L14, L26</td><td>A minimum price so the fee never rounds to 0; one deep link wins when both are given; approval checks the wallet's chain after switching; a proper "different chain" reason for multi chain</td></tr>
+    <tr><td>Display</td><td>L15, L16, L20</td><td>Approval fee from the real gas price (today about twice the real cost); one shared "user rejected" check; single drawer amounts from the fee setting, not a fixed 2.5%</td></tr>
+    <tr><td>Clean up</td><td>L17, L19, L21, L24, L27</td><td>Correct the "all or nothing" and stale comments; turn repeated colours into tokens; set up the wallet connect library once, not per render; name test files after what they test</td></tr>
+  </table></div>
+
+  <h3>Suggested order and size</h3>
+  <div class="tablecard"><table>
+    <tr><th>Step</th><th>Size</th><th>Wording to approve</th><th>Before the PR?</th></tr>
+    <tr><td>2 Cancel after signing</td><td>Small</td><td>Approved</td><td><b>Done, tested</b></td></tr>
+    <tr><td>3 Marketplace answers</td><td>Small to medium</td><td>Approved</td><td><b>Done, tested</b></td></tr>
+    <tr><td>4 Drawer details</td><td>Small each</td><td>Approved</td><td><b>Done, tested</b></td></tr>
+    <tr><td>5 Tests</td><td>Medium</td><td>No</td><td>Yes</td></tr>
+    <tr><td>6 Structure</td><td>B small / A large</td><td>No</td><td><b>Done (option B, your choice 24 Nov)</b>; A later</td></tr>
+    <tr><td>7 Small items</td><td>Small</td><td>Maybe (accessibility texts)</td><td>Ideally</td></tr>
+  </table></div>
+
+  <footer>Bulk listing v2 · overall code review · 24 Nov 2026 · dev-docs is local only.</footer>
+</div>
+<script>
+  document.getElementById('toggle').addEventListener('click', function () {
+    var root = document.documentElement;
+    var current = root.getAttribute('data-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('dmplan-theme', next); } catch (e) {}
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trails For Seniors</title>
+<script>
+  try {
+    var saved = localStorage.getItem('dmplan-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  } catch (e) {}
+</script>
+<style>
+  :root {
+    --bg: #f9f9f9; --surface: #ffffff; --surface-soft: #f3f4fe;
+    --text: #111111; --text-muted: #5b5b66; --border: #e6e6e6;
+    --accent: #2639ED; --accent-soft: #e9ebfd;
+    --wait: #9457f6; --wait-soft: #f4eefe;
+    --ok: #12805c; --ok-soft: #e4f5ee;
+    --warn: #b4540a; --warn-soft: #fdf1e4;
+    --bad: #c4314b; --bad-soft: #fdecef;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+      --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+      --accent: #7f8cff; --accent-soft: #1d2150;
+      --wait: #b996fa; --wait-soft: #2c2142;
+      --ok: #4fd1a0; --ok-soft: #173229;
+      --warn: #f5a35c; --warn-soft: #3a2614;
+      --bad: #ff7d93; --bad-soft: #3a1c24;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+    --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+    --accent: #7f8cff; --accent-soft: #1d2150;
+    --wait: #b996fa; --wait-soft: #2c2142;
+    --ok: #4fd1a0; --ok-soft: #173229;
+    --warn: #f5a35c; --warn-soft: #3a2614;
+    --bad: #ff7d93; --bad-soft: #3a1c24;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: "Satoshi", system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.6; }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 48px 16px 80px; }
+  header.top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+  .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; }
+  h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.15; margin: 0 0 12px; }
+  .lede { color: var(--text-muted); margin: 0; max-width: 680px; }
+  .lede a { color: var(--accent); }
+  .toggle { flex-shrink: 0; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 14px; cursor: pointer; }
+  .toggle:hover { border-color: var(--accent); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 32px; }
+  nav.toc a { font-size: 14px; text-decoration: none; color: var(--accent); background: var(--accent-soft); padding: 6px 12px; border-radius: 999px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 0 0 16px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+  .stat b { display: block; font-size: 26px; line-height: 1.2; }
+  .stat span { font-size: 13px; color: var(--text-muted); }
+  h2 { font-size: 22px; margin: 52px 0 16px; }
+  h3 { font-size: 18px; margin: 0; }
+  h4 { font-size: 15px; margin: 22px 0 8px; color: var(--accent); }
+  p { margin: 0 0 12px; }
+  .muted { color: var(--text-muted); font-size: 15px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
+  .card p:last-child { margin-bottom: 0; }
+  .card ul, .card ol { margin: 8px 0 0; padding-left: 20px; }
+  .card li { margin-bottom: 6px; }
+  code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .86em; background: var(--surface-soft); border-radius: 6px; padding: 1px 6px; word-break: break-word; }
+  .findings { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .finding { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+  .finding h3 { font-size: 16px; margin-bottom: 6px; }
+  .finding p { font-size: 15px; margin: 0; color: var(--text-muted); }
+  .tablecard { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow-x: auto; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: 0; }
+  th { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+  td.grp { font-weight: 600; color: var(--accent); background: var(--surface-soft); font-size: 13px; }
+  .sw { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .chip { width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(128,128,128,.45); flex-shrink: 0; }
+  .callout { border-left: 4px solid var(--wait); background: var(--wait-soft); border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; }
+  .callout p { margin: 0; }
+  .callout.ok { border-color: var(--ok); background: var(--ok-soft); }
+  .callout.warn { border-color: var(--warn); background: var(--warn-soft); }
+  .issue { display: grid; grid-template-columns: 28px 1fr; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--bad); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+  .issue .n { font-weight: 700; color: var(--bad); }
+  .issue p { margin: 0; font-size: 15px; }
+  .issue .where { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+  .phase { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px 24px; margin-bottom: 14px; }
+  .phase-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  .num { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 15px; flex-shrink: 0; }
+  .tag { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+  .tag.now { background: var(--ok-soft); color: var(--ok); }
+  .tag.wait { background: var(--wait-soft); color: var(--wait); }
+  .tag.size { background: var(--surface-soft); color: var(--text-muted); }
+  .tag.new { background: var(--warn-soft); color: var(--warn); }
+  .rows { display: grid; grid-template-columns: 130px 1fr; gap: 6px 16px; font-size: 15px; }
+  .rows dt { color: var(--text-muted); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; padding-top: 2px; }
+  .rows dd { margin: 0; }
+  ol.qs { counter-reset: q; list-style: none; padding: 0; margin: 0; }
+  ol.qs li { counter-increment: q; position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px 14px 56px; margin-bottom: 10px; }
+  ol.qs li::before { content: counter(q); position: absolute; left: 16px; top: 14px; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  ol.qs.team li::before { background: var(--wait-soft); color: var(--wait); }
+  ol.qs b { display: block; margin-bottom: 2px; }
+  ol.qs span { color: var(--text-muted); font-size: 15px; }
+  footer { margin-top: 56px; font-size: 13px; color: var(--text-muted); }
+  @media (max-width: 700px) {
+    header.top { flex-direction: column; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .findings { grid-template-columns: 1fr; }
+    .card, .phase { padding: 18px; }
+    .rows { grid-template-columns: 1fr; }
+    .rows dt { padding-top: 8px; }
+    ol.qs li { padding-left: 50px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">Trails checkout · for a senior walkthrough</p>
+      <h1>How "Pay with any token" works, and how to show it in the Network tab</h1>
+      <p class="lede">The technical flow as it is in our code today (server path, backend APIs 1 to 5), then a request by request guide to demo it in DevTools. Written 23 Nov 2026 from the code on the bulk-list branch, which includes uat.</p>
+    </div>
+    <button class="toggle" id="toggle" type="button">Toggle theme</button>
+  </header>
+
+  <nav class="toc"><a href="#idea">The idea</a><a href="#cast">Who's involved</a><a href="#steps">Step by step</a><a href="#why">Why fulfillAdvancedOrder</a><a href="#network">Network tab demo</a><a href="#extras">Extra things to show</a><a href="#faq">Senior questions</a><a href="#files">Files</a></nav>
+
+  <div class="stats">
+    <div class="stat"><b>5</b><span>backend routes, all under /marketplacev2/trails</span></div>
+    <div class="stat"><b>2</b><span>Polygon calls Trails runs for us</span></div>
+    <div class="stat"><b>1</b><span>wallet transaction for the buyer</span></div>
+    <div class="stat"><b>5 s</b><span>status check, 15 s after 5 min</span></div>
+  </div>
+
+  <h2 id="idea">1. The idea in one line</h2>
+  <div class="card"><p>The buyer pays with whatever token and chain they have (POL, BNB, USDT on BSC, ETH…). Trails converts it to USDT on Polygon and buys the domain on the buyer's behalf through Seaport. The domain goes straight to the buyer's wallet and the seller gets USDT, exactly like a normal buy.</p></div>
+
+  <h2 id="cast">2. Who's involved</h2>
+  <div class="tablecard"><table>
+    <tr><th>Part</th><th>What it does</th></tr>
+    <tr><td><b>Our frontend</b></td><td>The buy drawer plus the <b>Trails widget</b> (Trails' own React component, <code>Pay</code> from <code>0xtrails/widget</code>), loaded as its own JS chunk only when Trails is chosen</td></tr>
+    <tr><td><b>Our backend</b></td><td>Five routes under <code>/marketplacev2/trails</code>, the only Trails calls the frontend makes</td></tr>
+    <tr><td><b>Trails</b></td><td>Their API (<code>trails-api.sequence.app</code>) gives the quote. Their <b>intent wallet</b> receives the buyer's money, swaps and bridges it through the <b>Relay</b> bridge, then runs our two calls on Polygon</td></tr>
+    <tr><td><b>Polygon</b></td><td>Where Seaport and USDT live, and where the sale really happens</td></tr>
+  </table></div>
+
+  <h2 id="steps">3. Step by step, in technical terms</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">1</span><h3>Drawer opens: is Trails allowed?</h3></div>
+    <p><code>GET /marketplacev2/trails/config</code> → <code>{ enabled, available, minPriceUsdt, maxPriceUsdt, route }</code>.</p>
+    <p>The "Pay with any token" option shows only when <b>all</b> of these hold (<code>isTrailsAvailable</code>, <code>helpers/trails/checkoutGate.ts</code>): our env switch <code>NEXT_PUBLIC_TRAILS_ENABLED=true</code> and an API key; the server says <code>enabled</code> and <code>available</code>; the price is inside min and max. The server decides who may use it and fails closed.</p>
+  </div>
+  <div class="phase">
+    <div class="phase-head"><span class="num">2</span><h3>Wallet proof (only if the old one is stale)</h3></div>
+    <p><code>GET /marketplacev2/orders/auth/wallet-nonce</code> → free MetaMask signature → <code>POST /marketplacev2/orders/auth/prove-wallet</code>. Needed because the backend always treats the wallet in the login as the buyer, never a wallet we send.</p>
+  </div>
+  <div class="phase">
+    <div class="phase-head"><span class="num">3</span><h3>Prepare the checkout</h3></div>
+    <p><code>POST /marketplacev2/trails/checkouts</code> with <code>{ orderHash }</code>.</p>
+    <ul>
+      <li><b>The server checks</b> the listing is still live on Polygon: not cancelled or filled, the seller still owns the domain and has approved Seaport, it doesn't expire soon, the price is in range, and it isn't your own listing.</li>
+      <li><b>The server builds two Polygon calls:</b> <code>approve(Seaport, price)</code> on USDT, then <code>fulfillAdvancedOrder(order, [], 0x0, buyer)</code> on Seaport.</li>
+      <li><b>It returns</b> <code>checkoutId</code>, <code>buyer</code>, <code>expiresAt</code> (15 minutes), <code>destination</code> (chain 137, USDT, amount in 6 decimal units), <code>calls</code>, <code>route</code>.</li>
+      <li><b>Frontend safety check:</b> if the returned <code>buyer</code> isn't the connected wallet, it stops (<code>backendCheckoutSource.ts</code>).</li>
+    </ul>
+  </div>
+  <div class="phase">
+    <div class="phase-head"><span class="num">4</span><h3>The widget makes a quote</h3></div>
+    <p>We hand the widget the destination (USDT on Polygon, the amount) and the two calls as <code>actions</code>. The buyer picks a token and chain; the widget asks Trails' API for a quote, which comes with an <code>intentId</code>. We set <code>disablePassthrough</code>, so every payment has an intent we can track, even USDT already on Polygon.</p>
+  </div>
+  <div class="phase">
+    <div class="phase-head"><span class="num">5</span><h3>Attach the quote</h3></div>
+    <p><code>POST /marketplacev2/trails/checkouts/{checkoutId}/intent</code> with <code>{ intentId }</code>. The server checks the quote really contains our two calls with the right amount. Answers: <code>attached</code> (carry on), <code>mismatch</code> (stop), <code>expired</code> (prepare again).</p>
+  </div>
+  <div class="phase">
+    <div class="phase-head"><span class="num">6</span><h3>Buyer presses Pay</h3></div>
+    <p>One wallet transaction on the buyer's own chain sends their token to Trails' intent wallet. Trails swaps and bridges to USDT on Polygon, then runs <code>approve</code> + <code>fulfillAdvancedOrder</code> in one Polygon transaction. Seaport pays the seller, takes the 2.5% fee and sends the domain NFT to the buyer.</p>
+  </div>
+  <div class="phase">
+    <div class="phase-head"><span class="num">7</span><h3>Tracking until it's done</h3></div>
+    <p><code>GET /marketplacev2/trails/checkouts/{checkoutId}</code> every 5 s, every 15 s after 5 minutes (<code>watchCheckout.ts</code>). The backend refreshes from Trails and from our own sale record by itself.</p>
+    <ul>
+      <li><b>Statuses:</b> <code>prepared</code> → <code>attached</code> → <code>executing</code> → <code>succeeded</code>. Other endings: <code>refunded</code>, <code>failed</code>, <code>expired</code>, <code>mismatch</code>.</li>
+      <li><b>The final answer</b> carries <code>destinationTxHash</code>, plus <code>sale.fillTxHash</code> on success or <code>refund</code> details if Trails gave the money back.</li>
+      <li><b>After a reload:</b> the checkout is kept in localStorage, so tracking resumes; <code>GET /marketplacev2/trails/checkouts?status=…</code> lists the buyer's checkouts, and History shows a notice.</li>
+    </ul>
+  </div>
+
+  <h2 id="why">4. Why fulfillAdvancedOrder (the key technical point)</h2>
+  <div class="callout warn"><p>It's the only Seaport function with a <b>recipient</b> argument. Trails' wallet is the one paying, so a plain <code>fulfillOrder</code> or <code>fulfillBasicOrder</code> would send the domain to Trails' wallet. Our early probe saw exactly that happen. So <code>buildDestinationCalls.ts</code> only ever uses <code>fulfillAdvancedOrder</code> with the buyer as recipient, and the <code>approve</code> must come first or Seaport's USDT pull reverts.</p></div>
+
+  <h2 id="network">5. How to demo it in the Network tab</h2>
+  <div class="card"><ol>
+    <li>Open DevTools → <b>Network</b>, tick <b>Preserve log</b>.</li>
+    <li>Click <b>Fetch/XHR</b> and type <code>trails</code> in the filter. That shows our backend's Trails routes and Trails' own API.</li>
+    <li>Open a listing, choose "Pay with any token", and buy something cheap (like the 0.10 USDT test).</li>
+  </ol></div>
+  <div class="tablecard"><table>
+    <tr><th>#</th><th>Request you see</th><th>Click it and show</th><th>Say</th></tr>
+    <tr><td>1</td><td><code>trails/config</code></td><td>Response: <code>available: true</code>, min and max price</td><td>"The server decides who can use it."</td></tr>
+    <tr><td>2</td><td><code>wallet-nonce</code>, <code>prove-wallet</code> (maybe)</td><td>Payload of prove-wallet: address, signature, nonce</td><td>"Proving the wallet is mine, a free signature."</td></tr>
+    <tr><td>3</td><td><code>POST trails/checkouts</code></td><td><b>Payload:</b> only <code>orderHash</code>. <b>Response:</b> <code>calls</code>, <code>buyer</code>, <code>destination.amount</code>, <code>expiresAt</code></td><td>"Our backend checked the listing and built the purchase."</td></tr>
+    <tr><td>4</td><td>Requests to <code>trails-api.sequence.app</code></td><td>Any quote request and its response</td><td>"The widget asking Trails for a quote in the token I picked."</td></tr>
+    <tr><td>5</td><td><code>POST trails/checkouts/{id}/intent</code></td><td><b>Payload:</b> <code>intentId</code>. <b>Response:</b> <code>status: attached</code></td><td>"We tell our backend which quote is being paid, and it checks it."</td></tr>
+    <tr><td>6</td><td>Many <code>GET trails/checkouts/{id}</code></td><td>A few in a row: <code>status</code> going attached → executing → succeeded</td><td>"Polling until it finishes."</td></tr>
+    <tr><td>7</td><td>The last one</td><td>Copy <code>destinationTxHash</code> or <code>sale.fillTxHash</code>, open it on polygonscan.com</td><td>"Here's the USDT approve, the Seaport call, USDT to the seller plus the fee, and the domain NFT to me."</td></tr>
+  </table></div>
+
+  <h2 id="extras">6. Extra things to show</h2>
+  <div class="card"><ul>
+    <li><b>Payload</b> and <b>Response</b> tabs on each request; <b>Preview</b> is easier to read.</li>
+    <li>The <b>JS</b> filter with <code>trails</code>: the widget's code loads only when Trails is chosen, as its own chunk, so the normal page isn't slowed down.</li>
+    <li><b>Application → Local Storage</b>: the saved checkout entry that lets tracking survive a reload.</li>
+  </ul></div>
+
+  <h2 id="faq">7. Questions seniors usually ask</h2>
+  <ol class="qs">
+    <li><b>Who signs what?</b><span>The buyer signs one deposit transaction on their own chain. Trails' wallet signs the Polygon purchase; Seaport's recipient argument makes sure the domain goes to the buyer.</span></li>
+    <li><b>What if it fails?</b><span>Trails refunds the buyer, and our tracker shows "Refunded" with the amount.</span></li>
+    <li><b>Where's the trust?</b><span>Our backend builds and checks the calls, and checks every quote before anything is paid. The frontend never decides who the buyer is.</span></li>
+    <li><b>How do we switch it off?</b><span><code>NEXT_PUBLIC_TRAILS_ENABLED</code> on our side, <code>enabled</code> on the server. <code>NEXT_PUBLIC_TRAILS_SOURCE=browser</code> was the rollback to the older browser only version.</span></li>
+    <li><b>Does the seller do anything different?</b><span>No. It's the same signed Seaport listing; only the payer is different.</span></li>
+  </ol>
+
+  <h2 id="files">8. Where it lives in the code</h2>
+  <div class="tablecard"><table>
+    <tr><th>File</th><th>Role</th></tr>
+    <tr><td><code>src/core/services/trails/trailsBackend.service.ts</code></td><td>The five backend routes</td></tr>
+    <tr><td><code>src/core/services/trails/backendCheckoutSource.ts</code></td><td>prepare / attach / status, plus the buyer check</td></tr>
+    <tr><td><code>src/core/services/trails/watchCheckout.ts</code></td><td>Status polling, rate limit and expired login handling</td></tr>
+    <tr><td><code>src/helpers/trails/buildDestinationCalls.ts</code></td><td>The approve + fulfillAdvancedOrder calls (browser path; the server builds the same)</td></tr>
+    <tr><td><code>src/helpers/trails/checkoutGate.ts</code>, <code>intentStatus.ts</code></td><td>Who sees the option; status rules and poll timings</td></tr>
+    <tr><td><code>src/hooks/trails/useTrailsCheckout.ts</code></td><td>Holds the checkout for the drawer</td></tr>
+    <tr><td><code>buying-flow/trails/TrailsWidgetLoader/TrailsWidget.tsx</code></td><td>The only file that imports the Trails widget</td></tr>
+    <tr><td><code>buying-flow/BuyFlowModal/BuyFlowModal.tsx</code></td><td>The trails-* steps of the buy drawer</td></tr>
+    <tr><td><code>src/constants/trails.ts</code></td><td>The env switches</td></tr>
+  </table></div>
+
+  <footer>Trails checkout · senior walkthrough · 23 Nov 2026 · related: <code>trails-flow-explained.html</code>, <code>trails-backend-progress.html</code> · dev-docs is local only.</footer>
+</div>
+<script>
+  document.getElementById('toggle').addEventListener('click', function () {
+    var root = document.documentElement;
+    var current = root.getAttribute('data-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('dmplan-theme', next); } catch (e) {}
+  });
+</script>
+</body>
+</html>

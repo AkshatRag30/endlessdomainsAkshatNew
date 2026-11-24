@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Promotions Progress</title>
+<script>
+  try {
+    var saved = localStorage.getItem('dmplan-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  } catch (e) {}
+</script>
+<style>
+  :root {
+    --bg: #f9f9f9; --surface: #ffffff; --surface-soft: #f3f4fe;
+    --text: #111111; --text-muted: #5b5b66; --border: #e6e6e6;
+    --accent: #2639ED; --accent-soft: #e9ebfd;
+    --wait: #9457f6; --wait-soft: #f4eefe;
+    --ok: #12805c; --ok-soft: #e4f5ee;
+    --warn: #b4540a; --warn-soft: #fdf1e4;
+    --bad: #c4314b; --bad-soft: #fdecef;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+      --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+      --accent: #7f8cff; --accent-soft: #1d2150;
+      --wait: #b996fa; --wait-soft: #2c2142;
+      --ok: #4fd1a0; --ok-soft: #173229;
+      --warn: #f5a35c; --warn-soft: #3a2614;
+      --bad: #ff7d93; --bad-soft: #3a1c24;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+    --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+    --accent: #7f8cff; --accent-soft: #1d2150;
+    --wait: #b996fa; --wait-soft: #2c2142;
+    --ok: #4fd1a0; --ok-soft: #173229;
+    --warn: #f5a35c; --warn-soft: #3a2614;
+    --bad: #ff7d93; --bad-soft: #3a1c24;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: "Satoshi", system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.6; }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 48px 16px 80px; }
+  header.top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+  .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; }
+  h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.15; margin: 0 0 12px; }
+  .lede { color: var(--text-muted); margin: 0; max-width: 680px; }
+  .lede a { color: var(--accent); }
+  .toggle { flex-shrink: 0; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 14px; cursor: pointer; }
+  .toggle:hover { border-color: var(--accent); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 32px; }
+  nav.toc a { font-size: 14px; text-decoration: none; color: var(--accent); background: var(--accent-soft); padding: 6px 12px; border-radius: 999px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 0 0 16px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+  .stat b { display: block; font-size: 26px; line-height: 1.2; }
+  .stat span { font-size: 13px; color: var(--text-muted); }
+  h2 { font-size: 22px; margin: 52px 0 16px; }
+  h3 { font-size: 18px; margin: 0; }
+  h4 { font-size: 15px; margin: 22px 0 8px; color: var(--accent); }
+  p { margin: 0 0 12px; }
+  .muted { color: var(--text-muted); font-size: 15px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
+  .card p:last-child { margin-bottom: 0; }
+  .card ul, .card ol { margin: 8px 0 0; padding-left: 20px; }
+  .card li { margin-bottom: 6px; }
+  code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .86em; background: var(--surface-soft); border-radius: 6px; padding: 1px 6px; word-break: break-word; }
+  .findings { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .finding { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+  .finding h3 { font-size: 16px; margin-bottom: 6px; }
+  .finding p { font-size: 15px; margin: 0; color: var(--text-muted); }
+  .tablecard { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow-x: auto; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: 0; }
+  th { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+  td.grp { font-weight: 600; color: var(--accent); background: var(--surface-soft); font-size: 13px; }
+  .sw { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .chip { width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(128,128,128,.45); flex-shrink: 0; }
+  .callout { border-left: 4px solid var(--wait); background: var(--wait-soft); border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; }
+  .callout p { margin: 0; }
+  .callout.ok { border-color: var(--ok); background: var(--ok-soft); }
+  .callout.warn { border-color: var(--warn); background: var(--warn-soft); }
+  .issue { display: grid; grid-template-columns: 28px 1fr; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--bad); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+  .issue .n { font-weight: 700; color: var(--bad); }
+  .issue p { margin: 0; font-size: 15px; }
+  .issue .where { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+  .phase { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px 24px; margin-bottom: 14px; }
+  .phase-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  .num { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 15px; flex-shrink: 0; }
+  .tag { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+  .tag.now { background: var(--ok-soft); color: var(--ok); }
+  .tag.wait { background: var(--wait-soft); color: var(--wait); }
+  .tag.size { background: var(--surface-soft); color: var(--text-muted); }
+  .tag.new { background: var(--warn-soft); color: var(--warn); }
+  .rows { display: grid; grid-template-columns: 130px 1fr; gap: 6px 16px; font-size: 15px; }
+  .rows dt { color: var(--text-muted); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; padding-top: 2px; }
+  .rows dd { margin: 0; }
+  ol.qs { counter-reset: q; list-style: none; padding: 0; margin: 0; }
+  ol.qs li { counter-increment: q; position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px 14px 56px; margin-bottom: 10px; }
+  ol.qs li::before { content: counter(q); position: absolute; left: 16px; top: 14px; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  ol.qs.team li::before { background: var(--wait-soft); color: var(--wait); }
+  ol.qs b { display: block; margin-bottom: 2px; }
+  ol.qs span { color: var(--text-muted); font-size: 15px; }
+  footer { margin-top: 56px; font-size: 13px; color: var(--text-muted); }
+  @media (max-width: 700px) {
+    header.top { flex-direction: column; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .findings { grid-template-columns: 1fr; }
+    .card, .phase { padding: 18px; }
+    .rows { grid-template-columns: 1fr; }
+    .rows dt { padding-top: 8px; }
+    ol.qs li { padding-left: 50px; }
+  }
+</style>
+<style>
+  .tag.done { background: var(--ok-soft); color: var(--ok); }
+  .tag.todo { background: var(--surface-soft); color: var(--text-muted); }
+  .meta { font-size: 14px; color: var(--text-muted); margin: 0 0 14px; }
+  .phase ul { margin: 6px 0 0; padding-left: 20px; font-size: 15px; }
+  .phase li { margin-bottom: 6px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <div>
+    <p class="eyebrow">Promotions · progress log</p>
+    <h1>Promotions page</h1>
+    <p class="lede">Build log for the Promotions page (Figma 212:16535), following <a href="promotions-implementation-plan.md">promotions-implementation-plan.md</a>. Branch <code>promotions</code>, cut from <code>portfolio</code> on 4 Nov 2026. Everything runs on sample data until the backend endpoints in plan §7 arrive.</p>
+  </div>
+  <button class="toggle" id="toggle" type="button">Toggle theme</button>
+</header>
+
+<div class="stats">
+  <div class="stat"><b>10 / 11</b><span>phases done (10 waits on the API)</span></div>
+  <div class="stat"><b>1</b><span>real data source (My Domains list in the picker)</span></div>
+  <div class="stat"><b>13</b><span>open questions (plan §11)</span></div>
+  <div class="stat"><b>1</b><span>commit (c907ba3, pushed)</span></div>
+</div>
+
+<h2>Phases</h2>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">0</span><h3>Messages</h3><span class="tag done">Written</span></div>
+  <p class="meta">3 Nov 2026 · <code>promotions-phase0-messages.md</code> · not sent yet</p>
+  <ul><li>Product (payment model, prices, chain, already promoted, entry points), backend (endpoints with shapes), designer (Figma quirks, missing states).</li></ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">1</span><h3>Foundations</h3><span class="tag done">Done</span></div>
+  <p class="meta">4 Nov 2026 · not committed</p>
+  <h4>Built</h4>
+  <ul>
+    <li>Route <code>/promotions</code> (protected like My Domains), <code>PROMOTIONS_HREF</code> and <code>promotionHref(listingId)</code> in <code>routes.ts</code>; the sidebar item is a real link (no Soon badge); the bottom nav marks Account, like Portfolio, since Sell is still a placeholder.</li>
+    <li>Types <code>src/types/promotions</code>; sample data <code>src/data/promotions</code> (plans, vision.eth, wallet balances, preview rows, estimate uplifts).</li>
+    <li>Pure helpers <code>src/helpers/promotions</code>: pricing, schedule, estimate, preview, selection (URL query parsing). Node checks pass.</li>
+    <li>Hooks <code>src/hooks/promotions</code>: selection (URL), domain, plans, wallet, token balances, estimate, preview, checkout (simulated). All sample data through <code>useMockQuery</code> with module level loaders.</li>
+    <li>The single API file <code>src/core/redux/promotions.ts</code>: <code>injectEndpoints</code> with no endpoints yet, plus the invoice re-export. <code>usePromotionWallet.ts</code> is the only file allowed to touch the chain (sample for now).</li>
+    <li>Page skeleton <code>pages/promotions</code>: hero, steps and rail placeholders wired to the hooks, Sample data chip, and a choose a domain state when there is no <code>?domain</code>.</li>
+  </ul>
+  <h4>Decisions</h4>
+  <ul>
+    <li>Sample plan prices rise with reach (Boost 0.15, Featured 0.30, Premium 0.50 ETH) instead of Figma's identical 0.15 (plan §2.9 item 1, Q2).</li>
+    <li>USDC is priced at the plan's dollar price, ETH and WETH at its ETH price; with the sample wallet WETH (0.05) is Low for every plan.</li>
+    <li>The plan's §5.6 grep matched import paths like <code>@/hooks/marketplace/...</code>; tightened to URL strings only.</li>
+  </ul>
+  <h4>Checks</h4>
+  <ul>
+    <li><code>tsc</code> clean; eslint clean on every new file (two old warnings in <code>main-layout</code>, lines 135 and 136, not from this change).</li>
+    <li>CLAUDE.md §8 greps and the plan §5.6 greps print nothing.</li>
+    <li>Not yet seen in a browser: the dev server on 3002 was down on 4 Nov.</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">2</span><h3>Hero and stat tiles</h3><span class="tag done">Done</span></div>
+  <p class="meta">4 Nov 2026 · Figma 212:18373 (desktop, light and dark the same), 212:19180 (mobile) · not committed</p>
+  <h4>Built</h4>
+  <ul>
+    <li><code>composites/promotions/hero/PromotionHeroBanner</code>: purple brand gradient with the faint polygons, eyebrow with the Sample data chip, title and subtitle, letter tile, name with the verified badge, .eth and Premium chips, characters, listed price with USD, and four stat tiles. Loading keeps the copy and holds the domain and tile space. A null stat shows a dash.</li>
+    <li>Mobile: the domain row at Figma's 0.805 scale (price 0.756), tiles 2 × 2.</li>
+    <li>New curated barrel <code>composites/promotions/index.ts</code>; the page now renders the hero.</li>
+    <li>Assets in <code>public/assets/img/promotions</code>: <code>hero-shapes.svg</code>, <code>verified.svg</code>, <code>stat-views/visitors/watchers/offers.svg</code>. The badge grain is the existing <code>buying-flow/status-grain.png</code> (byte identical to Figma's).</li>
+  </ul>
+  <h4>Shared change (additive)</h4>
+  <ul>
+    <li><code>SummaryTile</code> gets an optional <code>icon</code>: a 58px row tile, icon level with a muted label. Without an icon the markup and styles are unchanged, so Portfolio, the domain overview and the receipt are untouched.</li>
+    <li>The glossy badge reuses <code>ActionTile</code>'s badge class rather than copying it; the hero repeats only its blue glow for dark, because Figma keeps it blue on the brand banner.</li>
+  </ul>
+  <h4>Decisions</h4>
+  <ul>
+    <li>The banner is a brand fill in both themes (CLAUDE.md §7.1): fixed colours, and the tiles pin SummaryTile's role tokens to Figma's light values locally, so they stay light in dark mode as drawn.</li>
+    <li>The .eth and Premium chips are local: <code>ExtensionBadge</code> (amber outline) and <code>Badge</code> (theme surfaces) don't read on the purple art.</li>
+  </ul>
+  <h4>Checks</h4>
+  <ul>
+    <li><code>tsc</code> and eslint clean; SCSS compiles; layering greps print nothing; no <code>&lt;img&gt;</code>, <code>&lt;a&gt;</code>, <code>!important</code> or inline styles.</li>
+    <li>Dev server on 3002 still down, so checked with the real compiled SCSS in a static page in headless Chrome: desktop light and dark, mobile light and dark, against Figma. The icon was centred at first; fixed to sit level with the label as in Figma.</li>
+    <li>Still to see in the app once the server is up (fonts, the real shell, tablet width).</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">3</span><h3>Choose Your Reach</h3><span class="tag done">Done</span></div>
+  <p class="meta">4 Nov 2026 · Figma 212:20128 (light), 212:18461 (dark), 212:19268 (mobile) · not committed</p>
+  <h4>Built</h4>
+  <ul>
+    <li>New primitive <code>primitives/progress/segment-meter</code>: a captioned row of equal segments (glossy blue full, lilac half, grey empty) with <code>role="meter"</code>.</li>
+    <li><code>plans/PromotionStepCard</code> (GlassCard plain, re-cut to the step panel; reused by step 2), <code>PromotionPlanCard</code>, <code>PromotionPlanList</code> and <code>PromotionReachStep</code>; all in the barrel.</li>
+    <li>Real radio inputs inside each card's label: click anywhere, arrow keys and screen readers work natively; keyboard focus rings the whole card. An already promoted domain disables the plans.</li>
+    <li>"How promotion works" shows a coming soon toast (Q10). The page groups the steps 9px apart as Figma does.</li>
+    <li>Assets: <code>plan-boost/featured/premium.svg</code> with <code>-dark</code> pairs (light white glyph on blue, dark blue glyph on white), <code>external-link.svg</code> pair, <code>eth.svg</code>, <code>section-noise.png</code>. Grain is the existing <code>status-grain.png</code>.</li>
+    <li>Sample plan descriptions now use Figma's text.</li>
+  </ul>
+  <h4>Decisions</h4>
+  <ul>
+    <li>Card surface uses the SummaryTile roles in light and ActionTile's Figma dark values in dark. Text uses roles, with dark blocks where Figma dark draws captions white.</li>
+    <li>Meter caption and USD use the secondary role, not tertiary, for contrast (CLAUDE.md §7.5).</li>
+    <li>Two Figma quirks added to plan §2.9: uneven light meter segments (built equal), and the mobile help link drawn off canvas (wraps under the title instead).</li>
+  </ul>
+  <h4>Checks</h4>
+  <ul>
+    <li><code>tsc</code>, eslint, SCSS compile and layering greps clean.</li>
+    <li>Static render with the real SCSS (server still down), desktop and mobile in both themes, against Figma. Caught and fixed: the meter collapsing to dots on desktop. Also fixed the test page itself, which had not been applying dark overrides; re-checked the hero in dark afterwards.</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">4</span><h3>Pay With and pay bar</h3><span class="tag done">Done</span></div>
+  <p class="meta">4 Nov 2026 · Figma 212:20282 / 212:20354 (light), 212:18615 / 212:18687 (dark), 212:19422 / 212:19498 (mobile) · not committed</p>
+  <h4>Built</h4>
+  <ul>
+    <li><code>payment/PayTokenTile</code>, <code>PromotionPayStep</code> (on PromotionStepCard, "Balances from …" on the right) and <code>PromotionPayBar</code> (shield, the sentence, <code>PrimaryButton</code> Add Funds); all in the barrel.</li>
+    <li>Token tiles are native radios like the plan cards; the selected one is the black card in both themes. Choosing a token writes <code>?token=</code>.</li>
+    <li>Pay bar: "You pay X · balance after Y", or, when the balance is short (not in Figma), "You pay X · you need Y more". Add Funds shows a coming soon toast (Q10).</li>
+    <li>Assets: <code>token-eth/usdc/weth.svg</code>, <code>check-selected/unselected.svg</code>, <code>shield.svg</code> + <code>shield-dark.svg</code>. Sample WETH balance is now Figma's 0.20.</li>
+  </ul>
+  <h4>Decisions</h4>
+  <ul>
+    <li>Figma dark dims the unselected token tiles to 36% (Q7, still open). Built at full strength on the plan cards' dark tile, so they don't read as disabled; one line to change if the designer says dimmed is intended.</li>
+  </ul>
+  <h4>Checks</h4>
+  <ul>
+    <li><code>tsc</code>, eslint, SCSS compile, layering greps and the helper Node checks (Boost: nothing low; Featured: USDC and WETH low) clean.</li>
+    <li>First look in the real app (dev server back up): headless Chrome over the DevTools protocol with a dummy token cookie, the Next dev overlay hidden (it shows an Unauthorized error from the sidebar's My Domains count with that dummy token, not from Promotions). Desktop light and dark, tablet dark and mobile light all match Figma; mobile shows the short balance sentence.</li>
+    <li>Seen for phase 5/6: at tablet width the rail placeholder sits above the steps (the shell's tablet order); mobile puts it after the pay bar as Figma does.</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">5</span><h3>Right rail</h3><span class="tag done">Done</span></div>
+  <p class="meta">4 Nov 2026 · Figma 212:20365 (light), 212:18698 (dark), 212:19509 (mobile summary) · not committed</p>
+  <h4>Built</h4>
+  <ul>
+    <li><code>right-rail/PromotionRailPanel</code> (the double card), <code>PromotionPreviewRow</code>, <code>PromotionPreviewPanel</code> (Live preview in FadeScrollList plus the tiles), <code>PromotionEstimateTiles</code>, <code>PromotionSummaryCard</code> (KeyValueRows, PrimaryButton small full width with the arrow, lock line) and <code>PromotionTipCard</code>; all in the barrel.</li>
+    <li>The summary total follows the selected token. Continue To Checkout shows a coming soon toast until the drawer (phase 7); it is disabled while loading or for an already promoted domain.</li>
+    <li>Mobile keeps only the summary, after the pay bar; preview and tip are hidden below the mobile breakpoint, as Figma's mobile frame drops them.</li>
+    <li>Sample preview rows are Figma's (visionary.eth, vision.og, envision.eth); the own row reads "6 characters · Premium".</li>
+    <li>Assets: <code>arrow-right.svg</code>, <code>lock.svg</code> + dark, <code>bulb.svg</code> + dark. Reused: <code>section-noise.png</code> (panel noise), <code>stat-card-noise.png</code> (tile noise), <code>eth.svg</code>. Figma's "Vector" layer behind the panels is an empty SVG, so nothing to place.</li>
+  </ul>
+  <h4>Shared changes (additive)</h4>
+  <ul>
+    <li><code>KeyValueRows</code>: new <code>compact</code> variant (no dividers, 13px label and medium value); added the mixins import its dark rule needs.</li>
+    <li><code>NoticeBanner</code>: new <code>success</code> tone (the green tip card, a status, not an alert).</li>
+  </ul>
+  <h4>Decisions</h4>
+  <ul>
+    <li>Summary heading follows dark (none), plan Q8.</li>
+    <li>No fade on the live preview (user request, 4 Nov): FadeScrollList replaced by a plain list, all four rows in full. The neighbouring rows stay at Figma's 50% so the boosted row stands out.</li>
+    <li>StatCard not reused for the tiles (34px value, 103px height, required sublabel, other gradients).</li>
+  </ul>
+  <h4>Checks</h4>
+  <ul>
+    <li><code>tsc</code>, eslint, SCSS compile, layering greps and helper checks clean.</li>
+    <li>Real app, desktop light and dark and mobile dark, against Figma. Fixed: the CTA was the full 57px button; now the small size like Figma's 40px.</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">6</span><h3>Mobile and tablet</h3><span class="tag done">Done</span></div>
+  <p class="meta">4 Nov 2026 · Figma 212:19142 / 212:19582 (mobile); tablet not drawn · not committed</p>
+  <h4>Built</h4>
+  <ul>
+    <li>Mobile was already in place from phases 2 to 5 (hero tiles 2 × 2, plan meter and price under the text, token tiles stacked, pay bar wraps, only the summary in the rail). Checked again at 390.</li>
+    <li>The page now uses the shell's <code>after-main-tablet</code>: below desktop the rail sits under the pay bar, where mobile's summary goes, instead of above the steps.</li>
+    <li>Tablet (768 to 1039) rail: two columns, the live preview with its tiles on the left, summary and tip stacked on the right (like Marketplace's railGroup, CLAUDE.md §5).</li>
+  </ul>
+  <h4>Checks</h4>
+  <ul>
+    <li><code>tsc</code>, eslint and SCSS compile clean.</li>
+    <li>Real app at 390 (light, earlier dark), 834 (light and dark), 1024 (light). Desktop (1440 and up) is untouched by these rules and was checked in phase 5.</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">7</span><h3>Checkout drawer</h3><span class="tag done">Done</span></div>
+  <p class="meta">4 Nov 2026 · Figma 212:16923 (light), 212:17182 (dark), 212:17440 (mobile) · not committed</p>
+  <h4>Built</h4>
+  <ul>
+    <li><code>flow/PromotionFlowModal</code> on the shared <code>Modal</code>, opened by Continue To Checkout; <code>PromotionCheckoutStep</code> (domain, Pay with, shortfall, order summary, schedule, terms, non custodial line); <code>BalanceShortfallCard</code>, <code>PromotionOrderSummary</code>, <code>PromotionSchedule</code>; footer is the buy flow's <code>PurchaseTermsFooter</code> (Confirm & Pay + Back). All in the barrel.</li>
+    <li>Token rows edit the same <code>?token=</code> as step 2 (Q6). Confirm & Pay is disabled until the terms are ticked, and while the token is short or the wallet is on the wrong network. Back closes; Change closes and focuses step 1's chosen plan (plan §6.9). Confirm & Pay shows a coming soon toast until phase 8.</li>
+    <li>Correct data instead of Figma's copies (plan §2.9): the promoted domain, not <code>banking .ud</code>; the shortfall box uses the selected token for balance, bar and message; the schedule comes from the plan length (today 4 Nov: midway Nov 8, ends Nov 11).</li>
+    <li>The wallet hook (the only chain file) now reports network name, wrong network and the network fee (sample 0.0012 ETH); <code>PromotionWallet</code> moved to <code>types/promotions</code>.</li>
+    <li>Assets: <code>checkout-token-eth/usdc/weth.svg</code>, <code>warning-red.svg</code>, <code>info.svg</code> (CSS mask, follows text colour), <code>schedule-live/midway/end.svg</code>, <code>shield-check.svg</code>. Reused: plan icons, grain, <code>buying-flow/network-alert.svg</code>, <code>Checkbox</code>'s green box.</li>
+  </ul>
+  <h4>Shared changes (additive)</h4>
+  <ul>
+    <li><code>PaymentMethodCard</code>: optional <code>icon</code>, <code>chip</code>, <code>trailing</code>; passing <code>icon</code> switches to the row layout. Without it the buy flow card renders exactly as before (styles nested under <code>.row</code>).</li>
+    <li><code>KeyValueRows</code>: optional <code>labelSuffix</code> per row (the fee's info tooltip).</li>
+  </ul>
+  <h4>Decisions</h4>
+  <ul>
+    <li>The amber banner is Figma's copied buy flow text; it shows only for its real case, a wallet on the wrong network (never with the sample wallet). A low balance is covered by the red shortfall box.</li>
+    <li>Unselected token rows are not dimmed (Figma light dims them to 60%), consistent with step 2 (Q7).</li>
+    <li>The terms link goes to the privacy policy, as the buy flow does, since no terms page exists.</li>
+    <li>The schedule is drawn here: TransactionChecklist only has status icons, not per stop icons on a line. DomainPriceHeader needs a chain and a USDT price, so the identity is composed from DomainAvatar and ExtensionBadge.</li>
+  </ul>
+  <h4>Checks</h4>
+  <ul>
+    <li><code>tsc</code>, eslint (incl. rules of hooks), SCSS compile and layering greps clean (the only inline style is the bar's runtime width).</li>
+    <li>Real app, drawer opened by clicking Continue: desktop light (Featured + WETH, short: shortfall shown, Confirm disabled), desktop dark (ETH, terms ticked: Confirm enabled), mobile light (full width drawer).</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">8</span><h3>Sign, progress, live, error</h3><span class="tag done">Done</span></div>
+  <p class="meta">4 Nov 2026 · Figma 212:16657 / 212:16733 (sign), 212:16809 / 212:16866 (progress), 212:16537 / 212:16597 (live) · not committed</p>
+  <h4>Built</h4>
+  <ul>
+    <li><code>usePromotionCheckout</code> is now a step machine: checkout, sign, processing (four rows a moment apart), live, or rejected; reset on close. Owned by the page, passed into the drawer.</li>
+    <li><code>PromotionFlowModal</code> draws each step: <code>PromotionSignStep</code> (green pen, request card: wallet, site, amount, plan, domain, fee, contract) with Confirm / Reject; processing on <code>WalletPendingStep</code> + <code>TransactionChecklist</code> with no footer; live on <code>BuyResultStep</code> + <code>PromotionLiveDetails</code> (tx chip with copy, plan card, Plan / Paid / Ends) with Promote again / View analytics; rejected with Try again / Back to checkout.</li>
+    <li>A "Preview only" toast when it goes live: nothing is paid. Promote again closes and focuses step 1; View analytics is a coming soon toast.</li>
+    <li>Wallet data adds the payment contract (Figma's placeholder <code>0xED00…Pr0m</code>). Types: <code>PromotionCheckoutStage</code>, <code>PROMOTION_PROGRESS_STEPS</code>.</li>
+    <li>Assets: <code>buying-flow/status-pen.svg</code>, <code>buying-flow/status-check-sm.svg</code>, <code>promotions/eth-disc.svg</code>, <code>promotions/copy.svg</code> (CSS mask).</li>
+  </ul>
+  <h4>Shared changes (additive)</h4>
+  <ul>
+    <li><code>StatusIcon</code>: <code>size="sm"</code> (58px, scaled blooms, 6px ring, Figma's smaller check) and a <code>pen</code> glyph. The default 96px icon is unchanged.</li>
+    <li><code>BuyResultStep</code>: optional <code>children</code> under the subtext. Without it the buy flow's screens are unchanged.</li>
+  </ul>
+  <h4>Decisions (Figma quirks, plan §2.9 items 5 and 6)</h4>
+  <ul>
+    <li>Sign and live use the chosen plan, amount and length (Figma: Featured 0.30 ETH on a Boost order, "14 days").</li>
+    <li>Processing says "Processing your promotion" and has no footer (Figma reused the live heading and kept Confirm / Reject).</li>
+    <li>The small icon has the 6px ring on the sign step too (Figma draws it there without one).</li>
+  </ul>
+  <h4>Checks</h4>
+  <ul>
+    <li><code>tsc</code>, eslint, SCSS compile and layering greps clean.</li>
+    <li>Real app, the flow driven by clicks in headless Chrome: sign, processing, live and rejected in light, sign and live in dark.</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">9</span><h3>Entry points and states</h3><span class="tag done">Done</span></div>
+  <p class="meta">4 Nov 2026 · no Figma frames for these states (plan Q4, Q5) · not committed</p>
+  <h4>Built</h4>
+  <ul>
+    <li><b>No ?domain</b>: the hero in a "pick a name" mode plus <code>picker/PromotionDomainPicker</code>, the seller's listed names (REAL, through My Domains' own <code>useMyDomainsData</code> via <code>usePromotableDomains</code> and the pure <code>promotableDomains</code> helper), each linking to <code>?domain=&lt;listing id&gt;</code>; loading, error with Try again, and an empty state pointing to My Domains.</li>
+    <li><b>A ?domain that fails or isn't the seller's</b>: the same picker with an error or warning notice above it.</li>
+    <li><b>Already promoted</b>: <code>shared/PromotionActiveNotice</code> (NoticeBanner info) above the steps; plans and tokens disabled, Continue disabled. Preview it with <code>?domain=promoted-demo</code> until the API reports it.</li>
+    <li><b>Wallet not connected</b> (REAL, wagmi <code>useAccount</code> + AppKit, in <code>usePromotionWallet</code> only): step 2 shows "Connect wallet" and tiles ask to connect; the pay bar says so with a Connect wallet button; Continue To Checkout opens the Connect modal.</li>
+    <li><b>Sidebar promo card</b> shows signed in too (Q9, as Figma) and its "Choose a domain" links to /promotions.</li>
+    <li>Page styles reduced to layout only; the old phase 1 placeholder styles removed.</li>
+    <li><b>Chosen domain stays sample</b> (decided 4 Nov 2026): any <code>?domain=</code> shows vision.eth until the per listing endpoint arrives (plan §7); then <code>usePromotionDomain</code> fetches the listing by id and the page shows the picked name. A brief switch to My Domains data was reverted at the user's request.</li>
+  </ul>
+  <h4>Shared changes</h4>
+  <ul>
+    <li><code>useMyDomainsData</code> now also returns <code>refetch</code> (additive; My Domains unchanged).</li>
+    <li><code>SidebarPromoCard</code> always shows and links to Promotions (it used to hide when signed in and show a toast).</li>
+  </ul>
+  <h4>Not done</h4>
+  <ul>
+    <li>Promote buttons on My Domains rows and cards (Q13): only if product confirms.</li>
+    <li>Wrong network: the banner is wired but the check stays false until the chain is decided (Q3).</li>
+  </ul>
+  <h4>Checks</h4>
+  <ul>
+    <li><code>tsc</code>, eslint (two old warnings in MobileDrawerMenu, untouched), SCSS compile, CLAUDE.md §8 and plan §5.6 greps clean; Node check for <code>promotableDomains</code>.</li>
+    <li>Real app: picker (error state with the dummy login), already promoted in light and dark, no wallet on desktop and mobile, the promo card on History.</li>
+    <li>With no wallet in headless Chrome, the drawer is now reached only after connecting; phases 7 and 8 were checked before this change.</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">11</span><h3>Final QA</h3><span class="tag done">Done</span></div>
+  <p class="meta">4 Nov 2026 · after commit c907ba3 on branch promotions · no code changes needed</p>
+  <h4>Passed</h4>
+  <ul>
+    <li><code>tsc</code> clean; eslint on every file changed since Portfolio (only the two old <code>no-css-tags</code> warnings in main-layout, lines 135 and 136); all 29 changed SCSS files compile.</li>
+    <li>CLAUDE.md §8 layering greps, plan §5.6 "one place for API calls" greps and CLAUDE.md §4 rules (no <code>&lt;img&gt;</code>, <code>&lt;a&gt;</code>, <code>!important</code>, fragments in maps; one inline style, the shortfall bar's runtime width) all clean.</li>
+    <li>13 helper checks in Node (pricing, low balance, shortfall, schedule, estimate, preview, URL selection, promoted sample, promotable filter).</li>
+    <li>Screenshot sweep of the page at 390, 834, 1024 and 1440 in light and dark: layout, mobile 2 × 2 tiles, tablet two column rail, no wallet states all as intended.</li>
+    <li>Keyboard (real key events): plan group ArrowDown / ArrowUp move the choice and the URL; the focused card shows a 2px ring; token group ArrowDown moves it; both groups are labelled by their step titles; Tab leaves the tokens to the next control.</li>
+    <li>Shared components: no existing CSS line removed or changed in SummaryTile, KeyValueRows, NoticeBanner, PaymentMethodCard or StatusIcon; the TSX renders the same markup when the new props aren't passed.</li>
+  </ul>
+  <h4>Not checked here (and why)</h4>
+  <ul>
+    <li>The drawer in this pass: since phase 9 it opens only with a wallet connected, which headless Chrome can't do. It was checked in phases 7 and 8 (light, dark, mobile, every step). Please run Continue → Confirm & Pay → Confirm once with your wallet.</li>
+    <li>ArrowLeft / ArrowRight on the token tiles: synthetic key events didn't register in headless Chrome (ArrowDown did), likely a test limitation; worth one manual try.</li>
+    <li>Portfolio, buy flow, receipt and Watchlist with real data: they need a real login and wallet; covered by the code review above instead of screenshots.</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">10</span><h3>Real data</h3><span class="tag todo">Waiting</span></div>
+  <p class="meta">Needs product's answers (Q1 payment model, Q2 prices, Q3 chain) and the backend endpoints in plan §7. The phase 0 messages are not sent yet.</p>
+</div>
+
+<footer>Updated 4 Nov 2026.</footer>
+</div>
+<script>
+  document.getElementById('toggle').addEventListener('click', function () {
+    var root = document.documentElement;
+    var current = root.getAttribute('data-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('dmplan-theme', next); } catch (e) {}
+  });
+</script>
+</body>
+</html>

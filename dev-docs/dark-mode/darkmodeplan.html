@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dark Mode Plan</title>
+<script>
+  try {
+    var saved = localStorage.getItem('dmplan-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  } catch (e) {}
+</script>
+<style>
+  :root {
+    --bg: #f9f9f9; --surface: #ffffff; --surface-soft: #f3f4fe;
+    --text: #111111; --text-muted: #5b5b66; --border: #e6e6e6;
+    --accent: #2639ED; --accent-soft: #e9ebfd;
+    --wait: #9457f6; --wait-soft: #f4eefe;
+    --ok: #12805c; --ok-soft: #e4f5ee;
+    --warn: #b4540a; --warn-soft: #fdf1e4;
+    --bad: #c4314b; --bad-soft: #fdecef;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+      --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+      --accent: #7f8cff; --accent-soft: #1d2150;
+      --wait: #b996fa; --wait-soft: #2c2142;
+      --ok: #4fd1a0; --ok-soft: #173229;
+      --warn: #f5a35c; --warn-soft: #3a2614;
+      --bad: #ff7d93; --bad-soft: #3a1c24;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+    --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+    --accent: #7f8cff; --accent-soft: #1d2150;
+    --wait: #b996fa; --wait-soft: #2c2142;
+    --ok: #4fd1a0; --ok-soft: #173229;
+    --warn: #f5a35c; --warn-soft: #3a2614;
+    --bad: #ff7d93; --bad-soft: #3a1c24;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: "Satoshi", system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.6; }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 48px 16px 80px; }
+  header.top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+  .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; }
+  h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.15; margin: 0 0 12px; }
+  .lede { color: var(--text-muted); margin: 0; max-width: 680px; }
+  .lede a { color: var(--accent); }
+  .toggle { flex-shrink: 0; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 14px; cursor: pointer; }
+  .toggle:hover { border-color: var(--accent); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 32px; }
+  nav.toc a { font-size: 14px; text-decoration: none; color: var(--accent); background: var(--accent-soft); padding: 6px 12px; border-radius: 999px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 0 0 16px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+  .stat b { display: block; font-size: 26px; line-height: 1.2; }
+  .stat span { font-size: 13px; color: var(--text-muted); }
+  h2 { font-size: 22px; margin: 52px 0 16px; }
+  h3 { font-size: 18px; margin: 0; }
+  h4 { font-size: 15px; margin: 22px 0 8px; color: var(--accent); }
+  p { margin: 0 0 12px; }
+  .muted { color: var(--text-muted); font-size: 15px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
+  .card p:last-child { margin-bottom: 0; }
+  .card ul, .card ol { margin: 8px 0 0; padding-left: 20px; }
+  .card li { margin-bottom: 6px; }
+  code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .86em; background: var(--surface-soft); border-radius: 6px; padding: 1px 6px; word-break: break-word; }
+  .findings { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .finding { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+  .finding h3 { font-size: 16px; margin-bottom: 6px; }
+  .finding p { font-size: 15px; margin: 0; color: var(--text-muted); }
+  .tablecard { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow-x: auto; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: 0; }
+  th { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+  td.grp { font-weight: 600; color: var(--accent); background: var(--surface-soft); font-size: 13px; }
+  .sw { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .chip { width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(128,128,128,.45); flex-shrink: 0; }
+  .callout { border-left: 4px solid var(--wait); background: var(--wait-soft); border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; }
+  .callout p { margin: 0; }
+  .callout.ok { border-color: var(--ok); background: var(--ok-soft); }
+  .callout.warn { border-color: var(--warn); background: var(--warn-soft); }
+  .issue { display: grid; grid-template-columns: 28px 1fr; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--bad); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+  .issue .n { font-weight: 700; color: var(--bad); }
+  .issue p { margin: 0; font-size: 15px; }
+  .issue .where { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+  .phase { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px 24px; margin-bottom: 14px; }
+  .phase-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  .num { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 15px; flex-shrink: 0; }
+  .tag { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+  .tag.now { background: var(--ok-soft); color: var(--ok); }
+  .tag.wait { background: var(--wait-soft); color: var(--wait); }
+  .tag.size { background: var(--surface-soft); color: var(--text-muted); }
+  .tag.new { background: var(--warn-soft); color: var(--warn); }
+  .rows { display: grid; grid-template-columns: 130px 1fr; gap: 6px 16px; font-size: 15px; }
+  .rows dt { color: var(--text-muted); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; padding-top: 2px; }
+  .rows dd { margin: 0; }
+  ol.qs { counter-reset: q; list-style: none; padding: 0; margin: 0; }
+  ol.qs li { counter-increment: q; position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px 14px 56px; margin-bottom: 10px; }
+  ol.qs li::before { content: counter(q); position: absolute; left: 16px; top: 14px; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  ol.qs.team li::before { background: var(--wait-soft); color: var(--wait); }
+  ol.qs b { display: block; margin-bottom: 2px; }
+  ol.qs span { color: var(--text-muted); font-size: 15px; }
+  footer { margin-top: 56px; font-size: 13px; color: var(--text-muted); }
+  @media (max-width: 700px) {
+    header.top { flex-direction: column; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .findings { grid-template-columns: 1fr; }
+    .card, .phase { padding: 18px; }
+    .rows { grid-template-columns: 1fr; }
+    .rows dt { padding-top: 8px; }
+    ol.qs li { padding-left: 50px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">Marketplace V2 · Planning · Revision 3</p>
+      <h1>Dark Mode Plan</h1>
+      <p class="lede">How we bring dark mode to the complete marketplace, based on every dark design in Figma (<a href="https://www.figma.com/design/hq6HmB04UFUlFiJp9f9eGv/marketplace-akshat">marketplace akshat</a>): home page, sidebar, My Domains, watchlist, listing flow, buying flow with the domain page and receipt, login and signup, and 404. Planning only, no code has been written.</p>
+    </div>
+    <button class="toggle" id="toggle" type="button">Toggle theme</button>
+  </header>
+
+  <nav class="toc">
+    <a href="#workplan">Work plan</a>
+    <a href="#source">Design map</a>
+    <a href="#findings">Findings</a>
+    <a href="#issues">Figma issues</a>
+    <a href="#scale">Proposed scale</a>
+    <a href="#icons">Icons</a>
+    <a href="#questions">Questions</a>
+    <a href="#howto">Reading Figma</a>
+  </nav>
+
+  <div class="stats">
+    <div class="stat"><b>~660</b><span>hardcoded colours in SCSS outside tokens.scss, across 101 files</span></div>
+    <div class="stat"><b>8</b><span>areas with a dark design, each with a light twin</span></div>
+    <div class="stat"><b>~45</b><span>distinct colours in the dark designs, before consolidation</span></div>
+    <div class="stat"><b>11</b><span>problems found in the Figma file that need the designer</span></div>
+  </div>
+
+  <h2>What changed in this revision</h2>
+  <div class="card">
+    <ul>
+      <li><b>Decision:</b> one surface colour, <code>#141415</code>, for every card, table, panel and drawer box on every page, instead of the different opacities in the designs. No per page surface tokens.</li>
+      <li>Every dark design has been read, not just the home page. They all live in the same Figma file, next to their light versions, so no extra links are needed.</li>
+      <li>Added a full work plan in phases, ordered so shared pieces are done once and every phase can ship on its own.</li>
+      <li>Extended the proposed colour scale for the drawers and forms: inputs, selected options, error, warning and success banners, status icons, and charts.</li>
+      <li>Added a list of 11 problems in the Figma file, mostly light mode colours left inside dark frames, for the designer to fix or confirm.</li>
+      <li>The open question "will other pages get dark designs?" is answered. Every main page has one, except older pages like privacy policy and the watchlist card view.</li>
+    </ul>
+  </div>
+
+  <h2 id="workplan">Work plan</h2>
+  <div class="callout ok">
+    <p><b>How the phases are ordered.</b> First a foundation that changes nothing visually, then the parts every page shares (shell and primitives), then one page area per phase. Each phase is a separate PR that's safe to merge, because the theme toggle stays hidden behind a flag until the final phase. Light mode must look pixel identical after every phase.</p>
+  </div>
+
+  <div class="tablecard">
+    <table>
+      <thead><tr><th>Phase</th><th>What</th><th>Size</th><th>Needs first</th></tr></thead>
+      <tbody>
+        <tr><td>0</td><td>Design alignment with the designer</td><td>S</td><td>Nothing</td></tr>
+        <tr><td>1</td><td>Semantic tokens, light values only</td><td>M</td><td>Nothing</td></tr>
+        <tr><td>2</td><td>Theme mechanism and hidden toggle</td><td>S</td><td>Phase 1</td></tr>
+        <tr><td>3</td><td>Primitives migrated to tokens</td><td>L</td><td>Phase 1</td></tr>
+        <tr><td>4</td><td>Dark values, shell and shared assets</td><td>M</td><td>Phases 0, 2, 3</td></tr>
+        <tr><td>5</td><td>Home page</td><td>M</td><td>Phase 4</td></tr>
+        <tr><td>6</td><td>My Domains</td><td>M</td><td>Phase 4</td></tr>
+        <tr><td>7</td><td>Watchlist</td><td>M</td><td>Phase 4</td></tr>
+        <tr><td>8</td><td>Listing flow drawer</td><td>M</td><td>Phase 4</td></tr>
+        <tr><td>9</td><td>Buying flow, domain page and receipt</td><td>L</td><td>Phase 4</td></tr>
+        <tr><td>10</td><td>Login, signup and recovery</td><td>M</td><td>Phase 4</td></tr>
+        <tr><td>11</td><td>404 and pages without a dark design</td><td>S</td><td>Phase 4</td></tr>
+        <tr><td>12</td><td>Final QA, enable the toggle, lock it in</td><td>M</td><td>All</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="muted">Sizes are rough: S is a day or two, M is about three to five days, L is about a week or more. Phases 5 to 11 don't depend on each other, so they can run in any order or in parallel once phase 4 is done.</p>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">0</span><h3>Design alignment</h3><span class="tag new">Before dark values</span><span class="tag size">S</span></div>
+    <dl class="rows">
+      <dt>Goal</dt><dd>Agree the final dark palette and get the Figma problems fixed or confirmed.</dd>
+      <dt>Work</dt><dd>One session with the designer covering the <a href="#questions">questions</a> and the <a href="#issues">Figma issues</a>. Approve the proposed scale. Agree where the toggle goes on mobile and tablet. Get exports of the dark hero, white logo, noise tile and 404 illustration if it changes.</dd>
+      <dt>Done when</dt><dd>The proposed scale table is approved (with any changes), and every issue has an answer.</dd>
+      <dt>Blocks</dt><dd>Phase 4 onward. Phases 1 to 3 can run in parallel with this.</dd>
+    </dl>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">1</span><h3>Semantic tokens (light values only)</h3><span class="tag now">Can start now</span><span class="tag size">M</span></div>
+    <dl class="rows">
+      <dt>Goal</dt><dd>A layer of role based tokens that every component will use, with zero visual change.</dd>
+      <dt>Work</dt><dd>Add the roles from the <a href="#scale">proposed scale</a> to <code>tokens.scss</code> (surfaces, text, borders, controls, status, data, brand). Each role points at today's light colour. Document each role in a comment so it's clear when to use which.</dd>
+      <dt>Files</dt><dd><code>src/design-system/styles/tokens.scss</code></dd>
+      <dt>Done when</dt><dd>Tokens exist, nothing uses them yet, and the site looks identical.</dd>
+    </dl>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">2</span><h3>Theme mechanism and hidden toggle</h3><span class="tag now">Can start now</span><span class="tag size">S</span></div>
+    <dl class="rows">
+      <dt>Goal</dt><dd>The site can switch themes, but users can't see the switch yet.</dd>
+      <dt>Work</dt><dd>A theme attribute on the <code>html</code> element. A tiny inline script in <code>pages/_document.tsx</code> that applies the saved or OS preference before first paint, so there's no white flash. A small theme context and hook in <code>_app.tsx</code>. The CSS <code>color-scheme</code> property. The theme colour meta tag in <code>layouts/main-layout</code> switching with the theme. A new toggle primitive matching Figma node 93:54892 (54×22 pill, sun and moon), placed right of Connect Wallet in <code>layouts/header</code>, and wherever phase 0 decides for mobile.</dd>
+      <dt>Flag</dt><dd>The toggle only renders when an environment flag is on (for example <code>NEXT_PUBLIC_DARK_MODE</code>), so we can test dark mode on staging while production users never see a half finished theme.</dd>
+      <dt>Done when</dt><dd>With the flag on, switching sets the attribute, survives a reload, and causes no flash. With the flag off, nothing changes.</dd>
+    </dl>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">3</span><h3>Primitives migrated to tokens</h3><span class="tag now">Can start now</span><span class="tag size">L</span></div>
+    <dl class="rows">
+      <dt>Goal</dt><dd>Every primitive reads its colours from semantic tokens, with no visual change.</dd>
+      <dt>Work</dt><dd>Replace raw hex and rgba values, and direct palette token use, with semantic tokens in all of <code>src/design-system/primitives</code>: avatars, badges (badge, chain, coming soon, extension, status chip, status icon, trend delta, trend indicator), banners (info note, notice banner), buttons (cart, default, pill, primary, secondary, tab), cards (action tile, glass card, info list, key value rows, payment method, stat, summary tile), charts (interest bars, price trend, sparkline, including colours set in TSX), inputs (checkbox, filter dropdown, price input, search input), lists, modal, breadcrumb, transaction checklist, toast message, segmented and view toggles, token chain icon, token suffix, tooltip, wallet pending step, and the my domains icon.</dd>
+      <dt>Order</dt><dd>Heaviest first: ActionTile (22 raw colours), KeyValueRows (19), Toast (18), StatusIcon (16), NoticeBanner (15).</dd>
+      <dt>Icons</dt><dd>Convert the 10 dark icons that would vanish into inline <code>currentColor</code> components (see <a href="#icons">Icons and images</a>). Light mode looks identical, so this belongs here rather than in a dark phase.</dd>
+      <dt>Done when</dt><dd>No raw colours remain in primitives, and a visual check of the design preview pages shows no change.</dd>
+    </dl>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">4</span><h3>Dark values, shell and shared assets</h3><span class="tag wait">After phase 0</span><span class="tag size">M</span></div>
+    <dl class="rows">
+      <dt>Goal</dt><dd>Dark mode works for the parts every page shares.</dd>
+      <dt>Work</dt><dd>Fill in the dark value for every semantic token, as approved in phase 0. Migrate and check the shell: <code>layouts/header</code>, <code>layouts/sidebar</code> (MarketplaceSidebar, MobileDrawerMenu, SidebarNavItem, SidebarPromoCard, SidebarSection), <code>layouts/footer-stripe</code>, <code>layouts/main-layout</code>, MarketplacePageShell and MobileBottomNav. Add the shared assets: white text logo, noise texture as one shared CSS rule, dark versions or CSS rebuilds of the 10 multicolour files with dark parts, and the contrast check on the 3 coloured icons (see <a href="#icons">Icons and images</a>).</dd>
+      <dt>Check against</dt><dd>Header and sidebar in desktop frame 93:53455, iPad header in 93:56018, mobile header in 93:54920, open mobile drawer 93:55797.</dd>
+      <dt>Done when</dt><dd>With the flag on, the shell matches Figma in dark at desktop, tablet and mobile, and light mode is unchanged.</dd>
+    </dl>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">5</span><h3>Home page</h3><span class="tag wait">After phase 4</span><span class="tag size">M</span></div>
+    <dl class="rows">
+      <dt>Components</dt><dd>MarketplaceHero (swap to the dark hero image), PromotedDomainsSection and PromotedDomainCard, ListingCategoryTabs, ListingFilterBar, ListingsHeading, LiveListingsTable and ListingRow, LiveActivityPanel, LiveActivityTicker, ActivityItem, MarketActivityPanel and MarketMetricCard.</dd>
+      <dt>Figma</dt><dd>Section 93:53454: desktop 93:53455, iPad 93:56018, mobile 93:54920, drawer 93:55797. A second desktop copy is at 93:57160.</dd>
+      <dt>Done when</dt><dd>The page matches all four frames in dark, and light mode is unchanged.</dd>
+    </dl>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">6</span><h3>My Domains</h3><span class="tag wait">After phase 4</span><span class="tag size">M</span></div>
+    <dl class="rows">
+      <dt>Components</dt><dd>MyDomainsHeroBanner, PortfolioStatsRow and StatCard gradients, MyDomainsCategoryTabs, MyDomainsFilterBar, MyDomainsTable, MyDomainRow, MyDomainCard, and the right rail panels (NeedsAttentionPanel, MostViewedPanel, QuickActionsPanel), plus <code>pages/seller-hub/my-domains</code>.</dd>
+      <dt>Figma</dt><dd>Desktop 93:49561. The mobile versions sit inside the listing section (93:86389 and 93:87041).</dd>
+      <dt>Note</dt><dd>This frame still has many white surfaces with near black text (see issue 10). Confirm with the designer first.</dd>
+    </dl>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">7</span><h3>Watchlist</h3><span class="tag wait">After phase 4</span><span class="tag size">M</span></div>
+    <dl class="rows">
+      <dt>Components</dt><dd>WatchlistHeroBanner, WatchlistNotice, WatchlistCategoryTabs, WatchlistFilterBar, WatchlistTable, WatchlistRow, WatchlistDomainIdentity, WatchlistPriceCell, WatchlistActions, WatchlistCard, WatchlistOverviewPanel, WatchlistNeedsLookPanel, WatchlistAlertsPanel, WatchlistUndoToast, plus <code>pages/watchlist</code>.</dd>
+      <dt>Figma</dt><dd>Desktop 93:89796, mobile 93:75401.</dd>
+      <dt>Note</dt><dd>The card view has no dark design (issue 9).</dd>
+    </dl>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">8</span><h3>Listing flow drawer</h3><span class="tag wait">After phase 4</span><span class="tag size">M</span></div>
+    <dl class="rows">
+      <dt>Components</dt><dd>ListingFlowModal, ListingFormStep, DomainInsightsCard, FeeBreakdownRow, OneTimeApprovalStep, ConfirmToSignStep, LoadingStep, ListingSuccessStep, and the price input, option cards and banners they use.</dd>
+      <dt>Figma</dt><dd>Section 93:77717. Desktop drawer states: form 93:84978, wrong network 93:85916, success 93:84332, first listing 93:84384, signing and insufficient funds 93:84522, loading 93:85898. Mobile drawer frames start at 93:87693.</dd>
+      <dt>Done when</dt><dd>Every state matches its frame in dark, on desktop and mobile.</dd>
+    </dl>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">9</span><h3>Buying flow, domain page and receipt</h3><span class="tag wait">After phase 4</span><span class="tag size">L</span></div>
+    <dl class="rows">
+      <dt>Components</dt><dd>Buying flow: BuyFlowModal, ReviewPurchaseStep, PaymentMethodSection, WhatYouPaySection, AfterYouBuySection, PurchaseTermsFooter, ApprovalExplainerStep, BuyPendingStep, BuyResultStep. Domain page and receipt: DomainOverviewShell, DomainHeroCard, DomainOverviewTabs, DomainSummaryTiles, InterestCard, NameFactsCard, SellerCard, DomainActivityCard, PriceHistoryPanel, ComparableSalesPanel, OrderHeaderCard, OrderReceiptCard, OrderTimelineCard, OrderNextStepsCard, DomainPriceHeader, and <code>_domainOverview.scss</code>, plus <code>pages/details</code> and <code>pages/receipt</code>.</dd>
+      <dt>Figma</dt><dd>Section 93:91182. Drawer: normal purchase 93:91183 (review 93:91283, confirm 93:91235), USDT approval 93:91594, wrong network 93:92614, no funds 93:92439, no longer available 93:92388, rejected 93:91953. Page: overview 93:94579, price history 93:95598, comparable sales 93:97028, receipt 93:98454, full page 93:99366.</dd>
+      <dt>Note</dt><dd>The largest phase. It can be split into "drawer" and "domain page and receipt" if needed. The no funds frame is mostly still light (issue 3).</dd>
+    </dl>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">10</span><h3>Login, signup and recovery</h3><span class="tag wait">After phase 4</span><span class="tag size">M</span></div>
+    <dl class="rows">
+      <dt>Components</dt><dd>AuthShell, AuthPanel, AuthHeader, AuthMethodTabs, AuthEmailFields, AuthProviderButton, AuthRecoveryForm, AuthResultPanel, AuthFooterLink, plus <code>pages/login</code>, <code>pages/register</code>, <code>pages/forgot-password</code>, <code>pages/reset-password</code>.</dd>
+      <dt>Figma</dt><dd>Section 93:38530: login 93:38626, mobile wallet signup 93:38531, states section 93:39185 (wallet signup 93:39186, email 93:39763, create account 93:40321, forgot 93:40905, signup 93:41409, verification success 93:41927).</dd>
+      <dt>Note</dt><dd>Login shows only the dark theme if the user has already chosen it, so the toggle may need to be reachable here too (question 11). The illustration panel on the left is an image that needs a dark export.</dd>
+    </dl>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">11</span><h3>404 and pages without a dark design</h3><span class="tag wait">After phase 4</span><span class="tag size">S</span></div>
+    <dl class="rows">
+      <dt>Work</dt><dd><code>pages/404.tsx</code> against desktop 93:89003 and mobile 93:77158. Then the pages with no dark design (privacy policy, redirect and any others) follow the token roles so they at least look consistent, or are kept light if the team decides so (team question 4).</dd>
+    </dl>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="num">12</span><h3>Final QA, enable the toggle, lock it in</h3><span class="tag wait">Last</span><span class="tag size">M</span></div>
+    <dl class="rows">
+      <dt>QA</dt><dd>Every page in both themes at 390px, iPad widths (834 and 1024) and desktop. Theme survives reload and route changes, with no flash on first load. Drawers, dropdowns, tooltips, toasts and modals all checked. Contrast check on text, especially the faint levels.</dd>
+      <dt>Release</dt><dd>Turn the flag on in production with the default theme the team chose.</dd>
+      <dt>Lock in</dt><dd>Add rules to <code>CLAUDE.md</code>: no raw colours in module SCSS, components use semantic tokens only, surfaces solid with translucent text and borders, and new components checked in both themes.</dd>
+    </dl>
+  </div>
+
+  <h2 id="source">Design map</h2>
+  <p class="muted">Everything is on Page 1 of our copy of the design (file marketplace akshat). Each area has a dark section and a light twin. Node IDs let anyone jump straight to a frame.</p>
+  <div class="tablecard">
+    <table>
+      <thead><tr><th>Area</th><th>Dark</th><th>Light twin</th><th>Sizes in dark</th></tr></thead>
+      <tbody>
+        <tr><td>Home page and sidebar</td><td><code>93:53454</code></td><td><code>93:33399</code></td><td>Desktop, iPad, mobile, mobile drawer</td></tr>
+        <tr><td>My Domains</td><td><code>93:49561</code></td><td><code>93:52868</code></td><td>Desktop (mobile inside listing section)</td></tr>
+        <tr><td>Watchlist</td><td><code>93:89796</code>, <code>93:75401</code></td><td><code>93:71930</code></td><td>Desktop, mobile (no card view)</td></tr>
+        <tr><td>Listing flow</td><td><code>93:77717</code></td><td><code>93:42484</code></td><td>Desktop drawer states, mobile</td></tr>
+        <tr><td>Buying flow, domain page, receipt</td><td><code>93:91182</code></td><td><code>93:58625</code></td><td>Desktop drawer states, page sections, mobile</td></tr>
+        <tr><td>Login and signup</td><td><code>93:38530</code></td><td><code>93:67967</code></td><td>Desktop states, mobile</td></tr>
+        <tr><td>404</td><td><code>93:89003</code>, <code>93:77158</code></td><td><code>93:75837</code></td><td>Desktop, mobile</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="findings">What the dark designs tell us</h2>
+  <div class="findings">
+    <div class="finding"><h3>Black and white with opacity</h3><p>Confirmed by the designer: no Figma variables. We define the scale ourselves and the designer approves it.</p></div>
+    <div class="finding"><h3>True black base, mixed surfaces</h3><p>Pages and drawers are pure <code>#000000</code>. Cards, tables and panels use about seven different backgrounds across pages (solid near blacks and white at 5% or 9%). We're unifying them into one surface.</p></div>
+    <div class="finding"><h3>Far too many text levels</h3><p>Across all pages, text uses white at over 20 different opacities, from 23% to 88%. They group naturally into four levels.</p></div>
+    <div class="finding"><h3>Selected states invert or glow</h3><p>Active tabs, chips, Quick sale and the toggle are white with black text. Selected option cards in drawers use a black to <code>#333</code> gradient with a white border.</p></div>
+    <div class="finding"><h3>Status colours vary a lot</h3><p>Eight different greens, four reds, an amber warning, and three purples for charts and links. These need to be cut down to one per meaning.</p></div>
+    <div class="finding"><h3>Drawers share one pattern</h3><p>Black body, header with a divider, a footer with a soft white glow above it, and a wide primary button. Building this once covers both listing and buying flows.</p></div>
+    <div class="finding"><h3>Status icons are glowing badges</h3><p>Success is a green gradient circle, failure red, pending blue, and warnings a red tinted circle. These are probably worth one shared primitive.</p></div>
+    <div class="finding"><h3>Login keeps light buttons</h3><p>The Google and wallet login buttons stay light (<code>#f3f3fe</code> and white with <code>#282828</code> text) on the black page. This needs confirming as intentional.</p></div>
+    <div class="finding"><h3>Assets need dark versions</h3><p>The home hero, login illustration panel, white text logo and the noise tile. The 404 illustration appears to be the same in both.</p></div>
+    <div class="finding"><h3>Toggle is desktop only</h3><p>The sun and moon pill appears in desktop headers on every page, but on no mobile or iPad frame.</p></div>
+  </div>
+
+  <h2 id="issues">Problems found in the Figma file</h2>
+  <p class="muted">Light mode colours left inside dark frames, plus inconsistencies. Each needs the designer to fix it or confirm it's intended.</p>
+  <div class="issue"><span class="n">1</span><div><p>Drawer header dividers are a light gray <code>#eeedf3</code> at full strength, while other dividers in the same drawers are <code>#eeedf3</code> at 35% or 47%. On black, the full strength line looks much brighter.</p><p class="where">All listing and buying drawers, for example 93:84333, 93:91425</p></div></div>
+  <div class="issue"><span class="n">2</span><div><p>A white fade from the top edge sits over the black buying drawers.</p><p class="where">93:91423, 93:91962, 93:92579</p></div></div>
+  <div class="issue"><span class="n">3</span><div><p>The "no funds" buying drawer is mostly still light: domain name <code>#070707</code>, labels <code>#7e7a93</code>, values <code>#171429</code> and <code>#474747</code>, a light green note (<code>#e7f6ee</code> with <code>#0c7a46</code> text), black "Card" text, a white checkbox and a purple terms link.</p><p class="where">93:92439</p></div></div>
+  <div class="issue"><span class="n">4</span><div><p>"Already have an account? login now" is black text on the black page, so it's invisible.</p><p class="where">93:40886</p></div></div>
+  <div class="issue"><span class="n">5</span><div><p>The error alert on create account is the light version: white background with dark red text.</p><p class="where">93:40887</p></div></div>
+  <div class="issue"><span class="n">6</span><div><p>The <code>.ud</code> badge in the listing drawer has black text on black, so it's invisible. On the home page the same badge has white text.</p><p class="where">93:85017, 93:85955</p></div></div>
+  <div class="issue"><span class="n">7</span><div><p>"Demand: High" in Domain insights is olive <code>#6d9300</code>, while "High" elsewhere is neon green <code>#27ff00</code>.</p><p class="where">93:85111</p></div></div>
+  <div class="issue"><span class="n">8</span><div><p>Unselected option cards use two different styles: a <code>#e2e0ec</code> border at 28% opacity in the listing drawer, and a white 17% border at 60% opacity in the buying drawer.</p><p class="where">93:85043, 93:91344</p></div></div>
+  <div class="issue"><span class="n">9</span><div><p>The watchlist card view has a light design but no dark one.</p><p class="where">Light only: 93:73286</p></div></div>
+  <div class="issue"><span class="n">10</span><div><p>The My Domains dark frame still has 46 white fills and 51 uses of near black <code>#070707</code> text. These may be intentional light buttons (like Edit Price), or leftovers.</p><p class="where">93:49561</p></div></div>
+  <div class="issue"><span class="n">11</span><div><p>Form inputs use two styles: solid <code>#141414</code> with a white 30% border in drawers, and white 9% with a pinkish <code>#ded2d9</code> border on login.</p><p class="where">93:85061, 93:40861</p></div></div>
+
+  <h2 id="scale">Proposed dark scale</h2>
+  <div class="callout ok">
+    <p><b>One surface everywhere.</b> The designs use about seven different card and panel backgrounds across pages. We deliberately replace all of them with a single solid surface, <code>#141415</code>, on a pure black page. Every card, table, panel and drawer box looks the same on every page, which keeps the dark theme calm and consistent. When a card sits inside a panel, a white 10% border separates them instead of a second shade. Only text and borders use white at an opacity, so they blend naturally with whatever they sit on.</p>
+  </div>
+  <div class="tablecard">
+    <table>
+      <thead><tr><th>Token role</th><th>Proposed dark value</th><th>Replaces these Figma values</th></tr></thead>
+      <tbody>
+        <tr><td colspan="3" class="grp">Surfaces</td></tr>
+        <tr><td>Page and drawer background</td><td><span class="sw"><span class="chip" style="background:#000"></span><code>#000000</code></span></td><td><code>#000000</code></td></tr>
+        <tr><td><b>Surface</b> (every card, table, table row, panel, drawer section, input and the header, on every page)</td><td><span class="sw"><span class="chip" style="background:#141415"></span><code>#141415</code></span></td><td>white 5% panels, white 9% inputs, <code>#141414</code>, <code>#141415</code>, <code>#171717</code>, <code>#19191a</code>, <code>#191919</code></td></tr>
+        <tr><td>Active or hover</td><td><span class="sw"><span class="chip" style="background:#2f2f2f"></span><code>#2f2f2f</code></span></td><td><code>#2f2f2f</code>, <code>#333</code></td></tr>
+        <tr><td>Selected option</td><td>Gradient <code>#000000</code> to <code>#333333</code>, white border</td><td>Option cards, duration chips</td></tr>
+        <tr><td colspan="3" class="grp">Text</td></tr>
+        <tr><td>Primary</td><td><span class="sw"><span class="chip" style="background:#fff"></span><code>white 100%</code></span></td><td>100%, 88%, 83%</td></tr>
+        <tr><td>Secondary</td><td><span class="sw"><span class="chip" style="background:rgba(255,255,255,.7)"></span><code>white 70%</code></span></td><td>77% down to 63%</td></tr>
+        <tr><td>Tertiary</td><td><span class="sw"><span class="chip" style="background:rgba(255,255,255,.5)"></span><code>white 50%</code></span></td><td>61% down to 47%</td></tr>
+        <tr><td>Disabled</td><td><span class="sw"><span class="chip" style="background:rgba(255,255,255,.25)"></span><code>white 25%</code></span></td><td>31%, 23%</td></tr>
+        <tr><td>Mono muted</td><td><span class="sw"><span class="chip" style="background:#a6a1bb"></span><code>#a6a1bb</code></span></td><td><code>#a6a1bb</code>, <code>#aba7bc</code>, <code>#7e7a93</code>, <code>#868686</code>, <code>#808080</code>, <code>#7f7f7f</code></td></tr>
+        <tr><td>On light controls</td><td><span class="sw"><span class="chip" style="background:#000"></span><code>#000000</code></span></td><td>Text on white tabs, chips, toggle</td></tr>
+        <tr><td colspan="3" class="grp">Borders</td></tr>
+        <tr><td>Subtle</td><td><span class="sw"><span class="chip" style="background:rgba(255,255,255,.1)"></span><code>white 10%</code></span></td><td>9%, 13%, divider <code>#eeedf3</code> at 35%</td></tr>
+        <tr><td>Strong</td><td><span class="sw"><span class="chip" style="background:rgba(255,255,255,.3)"></span><code>white 30%</code></span></td><td>27%, 30%, 31%, 37%</td></tr>
+        <tr><td>Emphasis</td><td><span class="sw"><span class="chip" style="background:rgba(255,255,255,.57)"></span><code>white 57%</code></span></td><td>Note boxes, chain chips (57%)</td></tr>
+        <tr><td colspan="3" class="grp">Controls and brand</td></tr>
+        <tr><td>Selected control</td><td><code>#ffffff</code> bg, <code>#000000</code> text</td><td>Active tab, 24h chip, Quick sale, toggle</td></tr>
+        <tr><td>Accent</td><td><span class="sw"><span class="chip" style="background:#2639ED"></span><code>#2639ED</code></span></td><td>Unchanged, plus its 47% gradient end</td></tr>
+        <tr><td>Extension badge border</td><td><span class="sw"><span class="chip" style="background:#fdc651"></span><code>#fdc651</code></span></td><td><code>#fdc651</code></td></tr>
+        <tr><td colspan="3" class="grp">Status</td></tr>
+        <tr><td>Success</td><td><span class="sw"><span class="chip" style="background:#27ff00"></span><code>#27ff00</code></span></td><td><code>#27ff00</code>, <code>#11d000</code>, <code>#209e09</code>, <code>#9dff00</code>, <code>#6d9300</code></td></tr>
+        <tr><td>Success text (sentences)</td><td><span class="sw"><span class="chip" style="background:#1fff95"></span><code>#1fff95</code></span></td><td><code>#1fff95</code>, <code>#0cd878</code>, <code>#12a05c</code></td></tr>
+        <tr><td>Error</td><td><span class="sw"><span class="chip" style="background:#ef4444"></span><code>#ef4444</code></span>, banner bg at 13%</td><td><code>#ef4444</code>, <code>#ff1744</code>, <code>#ff0030</code>, <code>#ff1133</code>, <code>#ff0004</code></td></tr>
+        <tr><td>Warning</td><td><span class="sw"><span class="chip" style="background:#ffab0b"></span><code>#ffab0b</code></span>, banner bg at 13%</td><td><code>#ffab0b</code>, <code>#f0dfbe</code></td></tr>
+        <tr><td colspan="3" class="grp">Data</td></tr>
+        <tr><td>Chart primary</td><td><span class="sw"><span class="chip" style="background:#5b3df5"></span><code>#5b3df5</code></span></td><td><code>#5b3df5</code>, <code>#a98fff</code></td></tr>
+        <tr><td>Chart secondary</td><td><span class="sw"><span class="chip" style="background:#dcd3fb"></span><code>#dcd3fb</code></span></td><td><code>#dcd3fb</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="muted">About 45 distinct colours in the designs come down to about 24 token roles, with just three surface colours: black page, one surface, and one active state. Every value is either taken straight from Figma or merged with its nearest neighbour, so the screens should look the same to the eye. The designer confirms that in phase 0.</p>
+
+  <h2 id="icons">Icons and images</h2>
+  <p class="muted">Scanned on 9 October 2026: the design system and pages reference 54 SVG files, about 30 react-icons, a few inline SVG components, and 10 raster images. Most need no work. The ones that do fall into clear groups.</p>
+
+  <div class="tablecard">
+    <table>
+      <thead><tr><th>Group</th><th>What to do</th><th>Files</th></tr></thead>
+      <tbody>
+        <tr><td><b>Already theme aware</b><br><span class="muted">No work</span></td><td>These draw with <code>currentColor</code>, so they automatically take the text colour and turn white in dark mode.</td><td>All react-icons (FiHeart, FiCheck, FiX, FiSearch, FiEye and others, about 30 uses), MyDomainsIcon, all toast message icons</td></tr>
+        <tr><td><b>Dark icons that would vanish</b><br><span class="muted">10 files, must fix</span></td><td>Black or dark gray single colour icons. Convert each into a small inline icon component using <code>currentColor</code>, the way MyDomainsIcon works, so they follow the text colour in both themes. The breadcrumb slash is a CSS background, so it becomes a CSS mask filled with <code>currentColor</code> instead.</td><td><code>domain-overview</code>: bookmark, calendar, calendar small, clock face, clock hands, eye, info, share. <code>breadcrumb</code>: back arrow (<code>#474747</code>), slash (<code>#1f2937</code>)</td></tr>
+        <tr><td><b>Multicolour with dark parts</b><br><span class="muted">10 files, need a dark version or rework</span></td><td>These contain black, near black or light gray shapes that won't work on black. Logos get a dark variant (Figma has the white text logo). UI shapes like the header chips, auth tab rail and checkboxes are better rebuilt in CSS on our tokens than exported twice.</td><td>Main <code>logo.svg</code> (<code>#070707</code> text), <code>auth/logo.svg</code>, Ethereum chain logo (dark grays), header chip shape, header search chip, auth tabs rail, buying flow checkbox checked and unchecked, status exclamation, network alert</td></tr>
+        <tr><td><b>Colour icons to contrast check</b><br><span class="muted">3 files</span></td><td>Single colour status or brand icons that may be too dark on black. Check them in phase 4, and lighten or recolour only if they're hard to see.</td><td>Buying flow shield (<code>#0c7a46</code>), domain overview shield (<code>#5b3df5</code>), Polygon logo (<code>#6c00f6</code>)</td></tr>
+        <tr><td><b>Fine in both themes</b><br><span class="muted">About 31 files</span></td><td>White icons that sit on coloured badges, bright status icons, and multicolour chain and token logos.</td><td>Trend up and down, mood icons, bell icons, brand blue markers, sidebar bracket, USDT, BNB, Arbitrum, Freename, the white checklist and next step icons</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4>Raster images</h4>
+  <div class="card">
+    <ul>
+      <li><b>Need a dark export:</b> the home hero (<code>hero-network-bg.jpg</code>, Figma 93:53558), the old hero banner (<code>bannerbg.jpg</code>) if it's still used, and the login illustration (<code>auth/logo-grid.png</code>).</li>
+      <li><b>Check, probably fine:</b> the 404 illustration (the dark Figma frame seems to use the same art), <code>success-check.png</code>, <code>promoted-glow.png</code> and <code>sidebar-active-pill.png</code>.</li>
+      <li><b>Fine:</b> the noise textures (stat card, hero, status grain). They're blended on top, so they work on any background.</li>
+    </ul>
+  </div>
+
+  <h4>How light and dark images swap</h4>
+  <div class="card">
+    <p>For the few images that need a dark version, render both and let CSS show the right one based on the theme attribute on <code>html</code> (for example, hide the light one under the dark theme). Because the inline script sets that attribute before the first paint, the correct image shows immediately. Choosing the image in JavaScript instead would show the light image for a moment, then swap, which is the flash we're trying to avoid. CSS background images (like the hero) simply get a second rule under the dark theme.</p>
+  </div>
+
+  <h4>Rules going forward</h4>
+  <div class="card">
+    <ul>
+      <li>Monochrome UI icons are inline components or react-icons using <code>currentColor</code>, never black or gray SVG files.</li>
+      <li>An SVG file is only for multicolour artwork, logos and illustrations.</li>
+      <li>Every new image is checked on both a white and a black background before it's added.</li>
+    </ul>
+  </div>
+
+  <h2 id="questions">Questions to ask</h2>
+  <p class="muted">Everything needed before phase 4. Phases 1 to 3 can start without these answers.</p>
+
+  <h4>For the designer</h4>
+  <ol class="qs">
+    <li><b>Is the four step text scale okay?</b><span>Over 20 text opacities rounded to four: 100%, 70%, 50% and 25%.</span></li>
+    <li><b>Please confirm one surface for all cards and tables.</b><span>We've decided every card, table, panel and drawer box uses one solid <code>#141415</code> on the black page, instead of the different opacities in each frame, with a white 10% border where a card sits inside a panel. Does anything look wrong to you with that?</span></li>
+    <li><b>Which green, which red?</b><span>Eight greens and five reds are in the designs. Can we use one green for values and icons (<code>#27ff00</code>), one softer green for sentences (<code>#1fff95</code>), and one red (<code>#ef4444</code>)?</span></li>
+    <li><b>Can the muted grays merge?</b><span><code>#a6a1bb</code>, <code>#aba7bc</code>, <code>#7e7a93</code>, <code>#868686</code>, <code>#808080</code> and <code>#7f7f7f</code> into one.</span></li>
+    <li><b>Can you fix or confirm the 11 Figma issues?</b><span>Listed in "Problems found in the Figma file", mostly light colours left in dark frames.</span></li>
+    <li><b>Are the light login buttons intentional?</b><span>Google and wallet buttons stay light on the black login page.</span></li>
+    <li><b>Should every selected control invert?</b><span>Active tabs and chips are white with black text, while selected option cards use a dark gradient with a white border. Is that the rule everywhere?</span></li>
+    <li><b>Where does the toggle go on mobile and tablet?</b><span>Only desktop headers have it.</span></li>
+    <li><b>What do hover, pressed, focus and disabled look like?</b><span>The frames mostly show resting states.</span></li>
+    <li><b>How do dropdowns, tooltips and toasts look?</b><span>Filter dropdowns, tooltips and toast messages aren't shown in dark.</span></li>
+    <li><b>Should the toggle be on login and signup?</b><span>Those pages have no header, so there's currently no way to switch theme there.</span></li>
+    <li><b>Is the faint text readable enough?</b><span>White at 23% to 31% on black falls below normal contrast guidelines. Is it only for disabled or decorative text?</span></li>
+    <li><b>Should the noise texture be on every dark surface?</b><span>Or only on the page background and panels?</span></li>
+    <li><b>Can you export the dark assets?</b><span>Dark hero (93:53558), login illustration panel, white text logo, and the noise tile.</span></li>
+    <li><b>Will the watchlist card view get a dark design?</b><span>Only the light version exists.</span></li>
+  </ol>
+
+  <h4>For the team</h4>
+  <ol class="qs team">
+    <li><b>What's the default theme?</b><span>Follow the user's OS setting, or always start in light with dark as an opt in? Needed before phase 12.</span></li>
+    <li><b>Where is the choice saved?</b><span>Per device in the browser, which is simple, or on the user's account so it follows them across devices, which needs a backend field?</span></li>
+    <li><b>All at once, or in stages?</b><span>The plan keeps the toggle hidden until every page is done, so users never see a mixed experience. Is that okay, or does the team want an earlier partial release?</span></li>
+    <li><b>Pages without a dark design?</b><span>Privacy policy, redirect and any other older pages. Follow the token roles, or stay light?</span></li>
+  </ol>
+
+  <h2 id="howto">Reading colours from Figma</h2>
+  <div class="card">
+    <ul>
+      <li><b>All colours in a frame:</b> select the frame and check "Selection colors" in the right panel. It lists every colour with hex and opacity, and clicking one shows which layers use it.</li>
+      <li><b>One element:</b> turn on Dev Mode (Shift D), click a layer, and read its fill, border and opacity in the Inspect panel.</li>
+      <li><b>Variables:</b> this file has none, confirmed by the designer, so the token scale is defined by us.</li>
+      <li><b>Through Claude:</b> the Figma connection reads every colour in a frame from its node ID. That's how the tables and issues above were built.</li>
+    </ul>
+  </div>
+
+  <footer>First version 7 October 2026. Revisions 1 and 2 on 9 October 2026 for the home page. Revision 3 the same day, after reading every dark design in the file. Source: our copy of the design, file marketplace akshat, Page 1. Proposed values are pending designer approval. No code has been written.</footer>
+</div>
+<script>
+  document.getElementById('toggle').addEventListener('click', function () {
+    var root = document.documentElement;
+    var current = root.getAttribute('data-theme') ||
+      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('dmplan-theme', next); } catch (e) {}
+  });
+</script>
+</body>
+</html>

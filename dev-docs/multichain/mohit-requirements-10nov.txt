@@ -1,0 +1,1151 @@
+
+===== PAGE 1 =====
+Bulk Listing and Multi Chain Marketplace: 
+Backend and WebUI Requirements
+Nov 10, 2026  · ​@Mohit
+Summary
+Both features extend the Seaport 1.6 marketplace (marketplacev2) that is live today for
+UD on Polygon only, and neither needs a new smart contract. Seaport 1.6 is deployed at
+the same address on all five target chains, so multi chain is a config and indexing job, not a
+contract job. Bulk listing uses Seaport's native bulk order signature, so one wallet
+signature can cover many orders on one chain.
+Recommended order of work, after Trails ships:
+1. Bulk listing for UD on Polygon. No chain work. The drawer already exists on the
+unmerged bulk-list  branch; the work is switching it to one signature and adding a
+bulk endpoint.
+2. Multi chain foundation. Turn the single Polygon config into a per chain and per
+collection registry across backend, poller and frontend, including ERC1155 support for
+ENS. Nothing user visible changes yet.
+3. All providers in one release. UD Base, Freename (Polygon, Base, BNB), SPACE ID .arb
+and .bnb, and ENS (unwrapped, wrapped and ENSv2). ENS is the largest piece: two
+ERC1155 contracts, mutable ENSv2 token ids, NameWrapper fuses and mainnet gas.
+Out of scope here: auctions (the design already marks them Coming Soon), offers, bulk
+buy, Solana and non EVM providers, and a smart contract audit (none is needed while we
+only use Seaport).
+All product questions are decided; the answers and their effect on the plan are in the
+Open questions section.
+Where the code is today
+Single listing works end to end for UD on Polygon, and a bulk drawer is already built on an
+unmerged branch, but every layer assumes one chain, one NFT contract, one currency
+and one signature per order. Read from marketplace frontend uat  and origin/bulk-
+list , backend uat@465c09fe , webui origin/uat@caf8013c .
+Bulk Listing and Multi Chain Marketplace: Backend and WebUI Requirements
+Page 1 of 21
+
+===== PAGE 2 =====
+Area
+What exists
+What blocks bulk or multi chain
+Listing flow
+(marketplace FE)
+ListingFlowModal  builds a
+Seaport order in seaport-
+order-builder-v5.ts : one
+ERC721 offer, two USDT legs
+(seller, 2.5% fee to 0xeF51…
+5494 ), FULL_OPEN, no zone
+or conduit, 7/30/90 days.
+Approves Seaport directly,
+signs with _signTypedData ,
+posts POST
+/marketplacev2/orders  with
+{ parameters, signature,
+domainName } .
+DEFAULTS  in marketplace-
+order-client.ts:30-50
+hardcodes chainId 137, Polygon
+RPCs, USDT, the UD contract,
+fee recipient and fee bps.
+ItemType.ERC721  is
+hardcoded. List buttons are
+disabled for every chain except
+Polygon.
+Bulk drawer
+( origin/bulk-list ,
+commit 5968cbc4 , not
+merged)
+Select mode, banner with
+Select All, cap of 50, three
+pricing modes, 7/30/90 days,
+per name rows, fee summary
+from the same integer split
+that gets signed, approval
+step, partial success screen
+with retry. Orders end 1 day
+before domain expiry.
+Signs one EIP712 signature per
+name and posts each
+separately, so up to 50 wallet
+popups. No Seaport bulk
+signature in any branch.
+Percentage of estimate mode
+is dead because
+estimatedValueUsd  is
+hardcoded to 0. Polygon only.
+Order API (backend
+marketplacev2 )
+Strong validation: signer
+recovery, offer and fee shape,
+time window (1 hour to 90
+days), on chain counter,
+ownerOf  and
+isApprovedForAll . Server
+computes the order hash. One
+DB transaction per order.
+MARKETPLACEV2_CHAIN_ID =
+137  and a single ChainConfig .
+ERC721 and USDT only. No
+chainId  in the DTO. Unique
+index on (tokenContract,
+tokenId) has no chainId. Plain
+ECDSA only, so a bulk
+signature is rejected. No bulk
+endpoint.
+Legacy bulk API
+POST /marketplace/bulk-
+listing  on the old v1 custom
+contract marketplace.
+Not Seaport, trusts one tx
+hash, no per item validation. Do
+not reuse.
+Bulk Listing and Multi Chain Marketplace: Backend and WebUI Requirements
+Page 2 of 21
+
+===== PAGE 3 =====
+Trails now lives on the `trails` branch (second review on 18 Nov 2026 at 02cd1d99, still has
+must fix items). It changes only the buy flow and history, so it does not collide with `bulk-
+list`, but multi chain buy work (C4, C5) must start after Trails merges. `bulk-list`,
+`portfolio` and `promotions` all edit `useMyDomainsData.ts`; whichever merges later
+resolves that file.
+Area
+What exists
+What blocks bulk or multi chain
+Poller (B04)
+15 second ticks, 5
+confirmations, handles fills,
+cancels, counter bumps,
+transfers and approval
+revokes, reactivates orders.
+One chain, one cursor, one NFT
+contract, ERC721 events only.
+Cancel
+POST /orders/:hash/cancel
+hides the order.
+Off chain only. The signed
+order stays fillable on chain
+until endTime . Already flagged
+in earlier reviews and gets
+worse with 50 orders per
+batch.
+Seller domains
+GET /orders/my-domains
+reads
+tbl_domain_detail_bc , filled
+at login per provider.
+Rows carry no chainId or
+contract; chain is guessed from
+provider. ENS NameWrapper
+names are not discovered.
+Freename rows have null token
+id.
+Estimates
+Two appraisal endpoints: a
+heuristic one (TLD lookup bug
+makes every TLD fall back to
+1000) and an external API
+proxy.
+Neither feeds My Domains, so
+the design's "est value" column
+has no source today.
+Webui
+One generic "List on
+Marketplace" button on the
+empty Listed tab, opening the
+marketplace home.
+No per domain List action, no
+deep link, listing status
+overloaded into expiryStatus
+= 'Listed' .
+Bulk Listing and Multi Chain Marketplace: Backend and WebUI Requirements
+Page 3 of 21
+
+===== PAGE 4 =====
+Bulk listing: product flow
+The attached designs describe five screens, and the target is one approval per
+unapproved contract plus one signature per chain, whatever the batch size. The flow
+below is the designs with the gaps closed.
+1. Select names (My Domains, list view). Bulk List in the hero or Quick Actions enters
+select mode. Each row's action becomes Select or Selected. Ineligible rows (listed,
+sold, expired, expiring within the listing window, chain not enabled, no token id) show
+a disabled Select with the reason on hover. The banner reads "N unlisted names in this
+view" with List (selected count), Select All N and close. Esc also exits. A batch holds
+names from one chain only, so the chain filter must be set before selecting (decision
+2).
+2. Bulk list drawer. Pricing (applies to all): same price for every name, or set each myself.
+The percentage of model estimate option is dropped (decision 5). Listing type: Fixed
+price, Auction marked Coming Soon. How long it runs: 7, 30 or 90 days, with one line
+saying when they expire and which names end early because the domain expires first.
+The names: extension chips with counts, one row per name with editable price and
+remove. Summary: domain count, combined asking price, platform fee, you receive if
+all sell. CTA reads Approve, then list N when any approval is missing, otherwise List N.
+3. One time approval (skipped when every contract in the batch is already approved).
+One setApprovalForAll(Seaport)  transaction per unapproved NFT contract. The
+modal lists each contract with its chain and estimated gas.
+4. Sign. The app builds every order, the wallet shows one Seaport bulk order signature
+per chain, the app posts the batch. Progress reads Preparing orders, then Waiting for
+signature, then Publishing. The button is Cancel, which closes the flow; it cannot
+cancel anything inside the wallet.
+5. Done. "N domains are live" with combined asking price, you receive if all sell, and the
+expiry. If some names failed server checks, show "N of M are live" with each failed
+name, its reason and Try these again (already built on the branch). Buttons: Done and
+List more.
+Single listing stays as it is. It can later use the same code path with a batch of one.
+Bulk listing: marketplace frontend requirements
+Start from origin/bulk-list  rather than from scratch; the main change is replacing per
+name signing with one Seaport bulk order signature.
+Bulk Listing and Multi Chain Marketplace: Backend and WebUI Requirements
+Page 4 of 21
+
+===== PAGE 5 =====
+F1. Rebase the branch. origin/bulk-list  was last merged with dark-mode on 2026-10-
+29. Rebase onto current uat  and keep the listingOrder.ts  refactor.
+F2. One signature per batch (Seaport bulk order).
+1. Build every OrderComponents  first (counter and block time read once per batch, as
+the branch already does).
+2. Tree height h = max(1, ceil(log2(n))) ; pad the leaves to 2^h  with an empty
+OrderComponents . With the cap of 50, h  is 6 (64 leaves).
+3. Sign the EIP712 type BulkOrder(OrderComponents[2]...[2] tree)  (one [2]  per
+level) against the chain's Seaport domain. Port the tree and type helpers from
+Seaport.js ( Eip712MerkleTree ); do not hand write the type strings.
+4. Per order signature = 64 byte compact signature, then the 3 byte leaf index, then h
+proof hashes of 32 bytes. Each order stores its own signature; Seaport verifies it on
+every fill path.
+5. Verify locally before posting: rebuild the root from each proof and recover the signer,
+mirroring the existing verifyTypedData  check.
+6. Post once to the bulk endpoint (B1) and render each item's result.
+F3. Keep per name signing as a fallback. Some wallets will fail on a 64 leaf typed data
+payload (hardware wallets, some WalletConnect mobile wallets, smart contract wallets).
+Keep the branch's sequential signing behind a "Sign each name separately" option shown
+when the bulk signature errors. Ship a wallet test matrix with the PR: MetaMask, Rabby,
+Coinbase Wallet, Trust, Ledger through MetaMask, one WalletConnect mobile wallet.
+F4. Drop the percentage mode. Remove the percentage of model estimate option from
+BulkPricingOptions  and the estimate column from BulkNamesList . Keep same price
+for every name and set each myself (decision 5).
+F5. Approval step. Group the batch by (chainId, contract), read isApprovedForAll  for
+each, and list only the missing ones with a real gas estimate (today a mock). Replace the
+useListingFlowActions(domains[0])  reuse with an approval hook that takes a contract
+and chain.
+F6. Correctness fixes found in the branch.
+1. Fee label is hardcoded "2.5%"; derive it from the configured fee bps.
+2. Expiry shown on the form and success screen uses Date.now() , while orders use
+block time minus 300 seconds. Show the latest endTime  actually signed, and name
+the ones cut short.
+Bulk Listing and Multi Chain Marketplace: Backend and WebUI Requirements
+Page 5 of 21
+
+===== PAGE 6 =====
+3. The reject prompt's "remaining" count includes names that will be skipped as expiring
+too soon.
+4. After a POST failure the retry asks for a new signature. With bulk signing, keep the
+signed orders in memory and retry only the POST.
+F7. Delist on chain, single and bulk. Add multi select delist using the same select mode,
+and move the existing single delist ( useDelistListing.ts ) to the same path. Fetch each
+order's rawOrder , send one Seaport cancel(OrderComponents[])  tx covering every
+selected order, then call cancel or cancel-bulk (B5) with the tx hash. Show three states on
+My Domains: Cancelling ( cancel_pending ), Cancelled, and Cancel not confirmed
+( cancel_unconfirmed ), the last with a warning that the listing is still fillable and a Cancel
+again button. When a listing or bulk listing is rejected with CHEAPER_ORDER_STILL_VALID
+(B7), offer to cancel those orders on chain first. A price cut may skip the cancel (decision
+1).
+F8. Copy fixes from the designs are listed under Open questions.
+F9. Apply the product decisions. Orders end 7 days before domain expiry instead of 1 day
+( bulkListing.ts:173-178 ), and names with under 14 days left are not eligible (decision
+8). Select mode limits a batch to one chain (decision 2). Show a clear message when the
+connected wallet is a smart contract wallet (decision 10).
+Bulk listing: backend requirements
+Add one bulk endpoint on marketplacev2 that runs every order through the existing
+single order pipeline, plus bulk signature verification. The legacy POST
+/marketplace/bulk-listing  belongs to the v1 custom contract marketplace and should
+not be extended.
+B1. POST /api/v1/marketplacev2/orders/bulk . Same guards as create
+( AccessTokenGuard , RequireVerifiedWalletGuard ).
+{
+  "chainId": 137,
+  "orders": [
+    { "parameters": { "...OrderComponents as today": "" }, "signature": 
+"0x...", "domainName": "name.crypto" }
+  ]
+}
+Bulk Listing and Multi Chain Marketplace: Backend and WebUI Requirements
+Page 6 of 21
+
+===== PAGE 7 =====
+Response: { batchId, results: [{ domainName, orderHash, status: "listed" |
+"rejected", code?, message? }] } . Limit 50 orders, one maker, one chain per call.
+B2. Bulk signature verification in @endlessdomains/order-builder , shared with the
+frontend.
+1. Detect a bulk signature by length: 64 or 65 bytes, plus 3, plus a multiple of 32.
+Anything else follows today's ECDSA path.
+2. Read the leaf index and proof. Leaf = the order hash
+( hashStruct(OrderComponents) ). Walk up the tree using the index bits for left or
+right.
+3. Digest = keccak256(0x1901 ‖ domainSeparator ‖
+keccak256(bulkOrderTypehash(h) ‖ root)) , recover, compare to the offerer.
+4. Tests against signatures produced by Seaport.js for heights 1, 2 and 6, and one fork
+test that fills a bulk signed order on Polygon.
+B3. Validation per item, reads batched. Reuse checks 1 to 10 in order.service.ts
+unchanged per order. Batch the chain reads through Multicall3: one getCounter  per
+maker, one isApprovedForAll  per contract, one ownerOf  (or balanceOf  for ERC1155)
+per token. A single RPC failure still returns 503 for the whole batch, as today.
+B4. Partial success. A rejected item must not block the rest. Insert accepted orders one
+transaction per order (reusing create() ), so an ALREADY_LISTED  race on one name does
+not roll back the others. DUPLICATE_ORDER  on a retry of the same signed order counts as
+listed, which makes the frontend retry idempotent.
+B5. Batch record and bulk cancel. Add batchId  (uuid) to tbl_marketplacev2_orders
+and the listing history. Send one seller email per batch, not one per order. Add POST
+/marketplacev2/orders/cancel-bulk  taking order hashes plus the on chain cancel  tx
+hash. Single cancel follows the same rules (decision 1). Agreed with the backend dev on 16
+Nov:
+1. The tx hash is a hint, the events are the proof. On request, check only that the hash is
+well formed and that every order belongs to the caller, sits on one chain and is active.
+Then set the orders to cancel_pending  (hidden from browse) and store the hash. Do
+not require the RPC to see the tx; public nodes often cannot see a pending one.
+2. Only OrderCancelled  events, matched by order hash, move an order to cancelled.
+Wallet speed up and replace send a new tx hash, so matching on the submitted hash
+would miss real cancels. If the stored hash's receipt shows a revert, or lands without
+cancelling some orders, flag those orders at once.
+Bulk Listing and Multi Chain Marketplace: Backend and WebUI Requirements
+Page 7 of 21
+
+===== PAGE 8 =====
+3. Never landed. After a per chain timeout (30 minutes, 60 on Ethereum) with no
+OrderCancelled , set cancel_unconfirmed . Keep the order hidden, tell the seller it is
+still fillable on chain, and offer Cancel again. Not final: a later OrderCancelled  still
+moves it to cancelled, and a later fill to filled.
+B6. No estimates needed for launch. The percentage mode is dropped (decision 5), so My
+Domains needs no estimate field. The heuristic estimator's TLD case bug ( '.Eth'  keys
+never match lowercase input) should still be fixed for its other callers.
+B7. Edit price stays cancel then relist, and the backend enforces it. There is no update
+endpoint and Seaport orders cannot be edited. On create, look for an older order by the
+same maker for the same chain, contract and token that is still valid on chain (not filled,
+cancel not confirmed, endTime  in the future, counter current). If it is cheaper than the
+new order and has no pending cancel, reject with CHEAPER_ORDER_STILL_VALID  and
+return those order hashes so the frontend can prompt the cancel. With a cancel pending,
+allow the relist: if the old order fills first, the token moves and the new order invalidates
+itself through owner_changed . Price cuts need no check (decision 1). A bulk reprice is one
+cancel tx plus one bulk signature.
+B8. Trails check. Before launch, fill one bulk signed order through the Trails path
+( fulfillAdvancedOrder , recipient = buyer) on the probe rig. Seaport accepts bulk
+signatures on every fill function, but Trails passes the signature through its own calldata.
+The probe showed Trails only rewrites the amounts it is told to hydrate, so the signature
+bytes should arrive unchanged; this one test confirms it.
+Multi chain: provider and chain matrix
+Seaport 1.6 answers information()  with version 1.6 at
+0x0000000000000068F116a894984e2DB1123eB395  on Ethereum, Base, Arbitrum, BNB and
+Polygon, so every target can use the same contract. Each chain has its own EIP712 domain
+separator, so a signature for one chain is useless on another. Everything in this table was
+checked against live contracts on 2026-11-10 (token standard via supportsInterface )
+unless marked otherwise.
+Provider
+Chain (id)
+NFT contract
+Standard
+Token id
+Expiry
+Stable to list in
+(decimals)
+UD (live
+today)
+Polygon
+(137)
+0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f
+ERC721
+namehash
+per name:
+expiryOf, 0
+means never
+USDT0
+0xc2132D05…
+8e8F  (6)
+UD Base
+Base
+(8453)
+0xF6c1b83977DE3dEffC476f5048A0a84d3375d498
+ERC721
+namehash
+per name:
+expiryOf, 0
+means never
+USDC
+0x833589fC…
+2913  (6)
+Bulk Listing and Multi Chain Marketplace: Backend and WebUI Requirements
+Page 8 of 21
+
+===== PAGE 9 =====
+Traps the devs must design for:
+BNB stables use 18 decimals. Every other row uses 6. The order table stores
+priceUsdt  as a bigint in 6 decimal units, and order-builder hardcodes USDT_DECIMALS
+= 6 . Amounts must be stored with the token address and its decimals.
+Expiring names can be sold after they lapse. ENS and SPACE ID transfers revert once
+the name expires, so a fill fails safely. UD names can expire too: expiryOf(tokenId)
+returns 0 for most names (brad.crypto) but a real date for some newer ones, so UD is
+checked per name. The listing must still end before the name's expiry, or a buyer pays
+gas for a failed fill. Backend already caps listings at 90 days. It must also cap at expiry
+minus a buffer.
+ERC721 transfer does not reset records on ENS v1 and SPACE ID. The buyer receives
+the registrant NFT, but the registry controller and resolver records stay with the
+seller until the buyer calls reclaim  and edits records. The receipt and the buyer's
+manage page need a "claim control" step. UD and Freename are the opposite: UD
+emits ResetRecords in every transfer (3 Polygon transfers checked), and Freename
+emits a matching reset event keyed by the token id before every transfer (2 checked),
+so their buyers start with empty records and need no claim step.
+NameWrapper fuses. A wrapped name with the CANNOT_TRANSFER  fuse burned can
+never be sold. Listing must check fuses and refuse it.
+ENSv2 token ids change. When an ENSv2 token id is regenerated, any order signed
+against the old id becomes unfillable. Checked on mainnet: the registry burns the old
+id and mints the new one as TransferSingle events, then emits
+Provider
+Chain (id)
+NFT contract
+Standard
+Token id
+Expiry
+Stable to list in
+(decimals)
+Freename
+Polygon,
+Base, BNB
+0x465ea4967479A96D4490d575b5a6cC2B4A4BEE65
+on all three
+ERC721
+not derivable
+from the name;
+read from chain,
+name from
+Freename's
+metadata API
+none (no
+expiry
+function on
+the contract)
+same as the
+chain's row
+SPACE ID
+.arb
+Arbitrum
+(42161)
+0x5d482D501b369F5bA034DEC5c5fb7A50d2D6Ca20
+ERC721
+labelhash
+yes, 90 day
+grace
+USD₮0
+0xFd086bC7…
+bb9  (6)
+SPACE ID
+.bnb
+BNB (56)
+0xE3b1D32e43Ce8d658368e2CBFF95D57Ef39Be8a6
+ERC721
+labelhash
+yes, 90 day
+grace
+USDT
+0x55d39832…
+7955  (18)
+ENS v1
+unwrapped
+Ethereum
+(1)
+BaseRegistrar
+0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85
+ERC721
+labelhash
+yes
+USDC
+0xA0b86991…
+eB48  (6)
+ENS v1
+wrapped
+Ethereum
+(1)
+NameWrapper
+0xD4416b13d2b3a9aBae7AcD5D6C2BbDBE25686401
+ERC1155
+namehash
+yes, plus
+fuses
+same as above
+ENSv2
+Ethereum
+(1)
+ETHRegistry
+0xF60aBa43e1f7F3DAB1186Ff03B561401C9DF85e2
+ERC1155
+mutable, low 32
+bits are a version
+yes, 28 day
+grace
+same as above
+Bulk Listing and Multi Chain Marketplace: Backend and WebUI Requirements
+Page 9 of 21
+
+===== PAGE 10 =====
+TokenRegenerated(uint256,uint256). Watching TransferSingle (M4) therefore
+invalidates the order.
+Freename discovery is reseller only. Backend reads Freename names from our
+reseller API, so it sees only names bought through Endless Domains, and it stores
+token_id  and expiryDate  as null. Checked on chain: top level ids are keccak of the
+label, but second level ids follow no rule we can reproduce (the contract's own
+childIdOf gives a different id). So discovery must read token ids from chain and names
+from metadata.freename.io/metadata/<tokenId>. Freename names do not expire.
+Approval is per contract per chain. A seller with UD Polygon and Freename Polygon
+names needs two setApprovalForAll  transactions, on two contracts. Gas for that
+approval is roughly 0.02 POL on Polygon but a few dollars on Ethereum mainnet.
+Multi chain: backend requirements
+The marketplacev2 module is built around one constant, MARKETPLACEV2_CHAIN_ID = 137
+( marketplacev2/config/chain-config.constants.ts:4 ), and one flat ChainConfig
+holding one RPC, one Seaport address, one USDT, one NFT contract, one fee and one
+poller start block. It is read in about 25 places across order.service.ts , the poller, the
+reconciler, the expiry scheduler and email formatting. The core work is replacing that
+single config with a registry.
+M1. Chain and collection registry.
+1. Add a ChainConfig[]  keyed by chainId: RPC (primary and fallback), Seaport address,
+conduit key (zero for now), fee recipient, fee bps, poller start block, confirmations and
+block range, explorer URL, enabled flag.
+2. Add a CollectionConfig[]  keyed by (chainId, contract): provider, token standard
+( ERC721  or ERC1155 ), Seaport item type (2 or 3), tld list, token id scheme (namehash,
+labelhash, ENSv2), whether names expire, grace days, enabled flag.
+3. Add a CurrencyConfig[]  keyed by (chainId, token): symbol, decimals, enabled flag.
+4. Load all three from the AWS secret or a DB table, validated at boot like chain-
+config.validators.ts  does today. Reuse the chain map pattern in gm-
+verification.service.ts:23-45 .
+5. Fix the enums while here. Blockchain  has no Base and lists Freename as a chain. Two
+BlockchainEnvironment  Base values carry trailing spaces.
+6. Bump @endlessdomains/order-builder  (pinned at 855e344a ) so
+EXPECTED_CHAIN_ID  and USDT_DECIMALS  become parameters.
+Bulk Listing and Multi Chain Marketplace: Backend and WebUI Requirements
+Page 10 of 21
+
+===== PAGE 11 =====
+M2. Order schema migration on tbl_marketplacev2_orders .
+1. Add provider , itemType , currencyToken , currencyDecimals .
+2. Rename priceUsdt , feeUsdt , sellerUsdt  to priceAmount , feeAmount ,
+sellerAmount , stored in token units, plus a priceUsd  numeric column for sorting
+and filtering across currencies.
+3. Change the partial unique index from (tokenContract, tokenId) to (chainId,
+tokenContract, tokenId) where status is active.
+4. Add chainId and tokenContract to tbl_marketplacev2_listing_status  (unique
+today on userId, domainName, tokenId only).
+5. Backfill every existing row with chainId 137, provider UD, USDT0 and 6 decimals.
+M3. Create order validation, per collection.
+1. Add chainId  to CreateOrderDto . Resolve chain, collection and currency from the
+registries and reject anything not enabled.
+2. Compute the digest with that chain's Seaport domain, not the constant.
+3. Check 3 today accepts only ERC721 from the one UD contract. Accept the collection's
+item type. For ERC1155, require amount 1 and check balanceOf(offerer, id) == 1
+instead of ownerOf .
+4. Check 4 today requires USDT. Require the configured currency for that chain.
+5. Approval check: isApprovedForAll(offerer, seaport)  on the collection contract
+(same call for ERC721 and ERC1155).
+6. Name to token id: today checked against tbl_domain_detail_bc  only. Add a provider
+adapter that derives the token id from the name (namehash for UD, labelhash for
+SPACE ID and ENS v1, registry lookup for ENSv2, Freename's metadata API for
+Freename since its ids cannot be derived) and compare, so a missing DB row does not
+block a valid listing.
+7. Expiry: for expiring collections and for UD names whose expiryOf is not 0, reject if the
+name expires before endTime  plus a buffer (7 days, and names with under 14 days left
+are refused, decision 8). Read expiry on chain, not from the DB.
+8. ENS only: reject wrapped names with CANNOT_TRANSFER  burned. Reject ENSv2 names
+whose current token id differs from the signed one.
+M4. Poller per chain.
+1. One cursor row per chainId in tbl_marketplacev2_poller_cursor  (single row
+today). One advisory lock per chain.
+Bulk Listing and Multi Chain Marketplace: Backend and WebUI Requirements
+Page 11 of 21
+
+===== PAGE 12 =====
+2. Seaport logs per chain: OrderFulfilled , OrderCancelled , CounterIncremented .
+3. Collection logs per enabled collection: Transfer  and ApprovalForAll  for ERC721;
+add TransferSingle , TransferBatch  and ApprovalForAll  for ERC1155 (not in
+poller-events.abi.ts  today).
+4. ENSv2: regeneration burns the old id and mints the new one as TransferSingle events,
+then emits TokenRegenerated(uint256,uint256) (checked on mainnet). The burn
+already triggers owner_changed; use TokenRegenerated only to tell the seller why
+the listing ended.
+5. Tune per chain. Arbitrum and Base produce blocks far faster than Polygon, so 500
+block ranges at 15 second ticks will fall behind. Ethereum needs fewer confirmations
+in blocks but each block is slower.
+6. Health endpoint reports lag per chain.
+M5. Reads and stats.
+1. Add chainId  and provider  filters to GET /marketplacev2/orders  and my-
+domains . Sort by priceUsd .
+2. GET /orders/my-domains  joins listed state only against the Polygon UD contract
+( order.service.ts:988 ). Join on (chainId, contract, tokenId).
+3. Account summary hardcodes token: 'USDT'  ( order.service.ts:1047 ). Return per
+currency totals or a USD total.
+4. Sales, receipts and emails must carry chain name, currency symbol and the right
+explorer link ( email-format.util.ts:42  maps only 137).
+M5b. Domain discovery for sellers. My Domains depends on tbl_domain_detail_bc ,
+filled at login. Before a provider is enabled for listing:
+1. ENS: add the NameWrapper to discovery. EnsAlchmeyService  queries the
+BaseRegistrar and ETHRegistry only, so wrapped names never appear.
+2. Freename: discovery comes from our reseller API and stores null token id and expiry.
+Add on chain discovery (Alchemy getNftsForOwner  on the Freename contract per
+chain) and fill token id.
+3. Add a refresh endpoint the frontend can call before opening the bulk drawer, so a
+seller who just received a name does not wait for the next login.
+M6. Fees. FEE_BPS  and FEE_RECIPIENT  are global today. Move both into ChainConfig .
+Decision 7: 2.5% and the same EOA recipient on every chain.
+Bulk Listing and Multi Chain Marketplace: Backend and WebUI Requirements
+Page 12 of 21
+
+===== PAGE 13 =====
+Multi chain: marketplace frontend and webui requirements
+The marketplace frontend must stop reading DEFAULTS  and take chain, contract,
+currency and fee from the backend registry; webui needs a per domain List action and a
+real listing status field.
+Marketplace frontend
+C1. Config from the backend. Add GET /marketplacev2/config  returning the M1
+registries (enabled chains, collections, currencies, fee bps and recipient per chain).
+Replace DEFAULTS  in marketplace-order-client.ts  with it. One source stops the fee
+label and fee math drifting apart, as they already have.
+C2. Reads per chain. Replace the singleton getPolygonReadProvider  with
+getReadProvider(chainId)  with the same retry and fallback logic. Fold the six separate
+createAppKit  calls into one.
+C3. Order builder parameters. seaport-order-builder-v5.ts  takes chainId, item type
+(ERC721 or ERC1155), currency token and decimals. Remove ItemType.ERC721  and the 6
+decimal constant.
+C4. Listing and buying on the name's chain. Switch network to the name's chain before
+approval and signing (wagmi useSwitchChain ). Buy reads allowance and fills on that
+chain's Seaport. Trails already makes the buyer's source chain irrelevant; the destination
+becomes the listing's chain.
+C5. Amounts. Every place that divides by 1e6  or uses USDT_DECIMALS  moves to the
+order's currency decimals: useMyDomainsData.ts , useLiveListings.ts ,
+orderDetails.ts , watchlist.ts , mapApiActivity.ts , summarizeHistory.ts ,
+watchlistItems.ts , profile-settings.service.ts , listing-flow/format.ts ,
+useBuyFlowActions.ts .
+C6. Types and keys. Add chainId  and tokenContract  to MyDomainsOrderRow  and
+MarketplaceOrderRow . Use chainId:contract:tokenId  as the row id instead of tokenId
+alone ( useMyDomainsData.ts:133 ). Stop forcing Polygon in mapApiActivity.ts ,
+useLiveListings.ts , orderDetails.ts , watchlist.ts  and useWatchlist.ts .
+C7. Providers. Add SPACE ID and Freename to chaincurrency.ts  provider maps.
+Freename is a provider, not a chain, in data/marketplace/domains.ts . Chain filters come
+from the config, not static lists.
+Bulk Listing and Multi Chain Marketplace: Backend and WebUI Requirements
+Page 13 of 21
+
+===== PAGE 14 =====
+C8. One chain per batch. Select mode requires a single chain filter; Select All and the
+banner count only names on that chain (decision 2). Switch the wallet to that chain before
+approval and signing.
+C9. Buyer handover for ENS v1 and SPACE ID. The receipt for these names must tell the
+buyer to claim control, and link to the webui manage page that does it (W5).
+Webui
+W1. List action per domain. Add "List for sale" to DomainCardView , DomainTableView  and
+DomainCardActionMenu  for providers enabled in the marketplace config. It reuses the
+postRedirect  session handoff and opens /seller-hub/my-domains?list=
+<name>&chainId=<id> . The marketplace deep link handler today refuses non Polygon
+names ( my-domains/index.tsx:119 ).
+W2. Bulk entry. A "List several" action on the Listed tab and in the header opening the
+marketplace in select mode ( ?bulk=1 ), rather than building a second bulk drawer in
+webui.
+W3. Listing status as its own field. Backend /domain/detail  overloads expiryStatus =
+'Listed' , so a listed name hides that it is expiring, and reputation eligibility drops listed
+names. Return listing: { status, priceAmount, currencySymbol, chainId,
+orderHash }  separately and update the Listed tab, analytics and reputation filter.
+W4. Map identifiers. DomainItem  drops token_id  that the API already sends. Map it,
+plus contract and chainId once the backend returns them.
+W5. Claim control after purchase. ENS v1 and SPACE ID manage pages need a "claim
+control" action calling reclaim  on the base registrar for a buyer whose registry owner is
+still the seller. ENS NameWrapper names have no webui support at all today.
+W6. No marketplace price on taken names. Search keeps the disabled Taken button
+(decision 11).
+Open questions and design issues
+All twelve product questions were answered on 10 Nov 2026. Three went against the
+original recommendation and changed the plan: ENS ships in the first multi chain release,
+the percentage of estimate pricing mode is dropped, and webui search will not show
+marketplace prices.
+Bulk Listing and Multi Chain Marketplace: Backend and WebUI Requirements
+Page 14 of 21
+
+===== PAGE 15 =====
+#
+Question
+Answer
+Effect on the plan
+Decision
+1
+Is delisting off chain
+only, or also an on
+chain Seaport
+cancel ?
+On chain cancel  for
+delists and price
+increases. Price cuts
+stay off chain and
+free.
+B5, B7 and F7 send
+one cancel  tx
+covering every
+selected order.
+Design copy
+"cancelling is free"
+changes (issue 6).
+​ Agreed
+2
+Can one bulk batch
+mix chains?
+No, one chain per
+batch.
+Select mode requires
+a single chain filter
+(C8, F9).
+​ Agreed
+3
+Which stablecoin
+does each chain list
+in?
+USDT0 on Polygon and
+Arbitrum, USDC on
+Base and Ethereum,
+USDT on BNB. Prices
+shown as USD.
+Fills the M1 currency
+registry and the
+matrix above.
+​ Agreed
+4
+Is ENS in the first
+multi chain release?
+Yes, all of ENS:
+unwrapped, wrapped
+and ENSv2.
+Old phases 3 and 4
+merge. ERC1155 and
+ENSv2 work starts in
+phase 2.
+​ Changed
+5
+Where does "model
+estimate" come
+from?
+Nowhere for now: the
+percentage of
+estimate mode is
+dropped.
+Two pricing modes
+remain. F4 becomes a
+removal, B6 is no
+longer needed for
+launch.
+​ Changed
+6
+Freename: only
+names bought
+through Endless
+Domains, or any
+Freename name in
+the wallet?
+Any Freename NFT in
+the wallet, discovered
+on chain.
+M5b item 2 stands.
+Token ids come from
+chain and names
+from Freename's
+metadata API; ids
+cannot be derived
+from names (checked
+on chain).
+​ Agreed
+7
+Is the fee 2.5% on
+every chain, to the
+same recipient?
+Yes, 2.5% and the
+same EOA
+everywhere.
+M6 holds the same
+values per chain.
+​ Agreed
+Bulk Listing and Multi Chain Marketplace: Backend and WebUI Requirements
+Page 15 of 21
+
+===== PAGE 16 =====
+Errors and confusions in the attached designs
+1. Drawer dates disagree. "Expires 15 Oct 2026, 16:50" (in the past) sits next to "All 18
+expire 20 Nov 2026". 30 days from today is 10 Dec 2026. Use one computed date.
+2. Drawer fee math is wrong. Platform fee 2.5% of 8,460.00 shows as −2,233.95 (it is
+211.50), and "Total 8,460.42" is above the asking price. The last line should be "You
+receive if all sell: 8,248.50". Also 18 names at 810 is 14,580, not 8,460.
+3. Success screen numbers and copy. "Combined asking price 810.00" and "You receive
+0.42" are wrong. "Ownership transferred in the same transaction as the payment…
+within 10 to 15 minutes" is buyer receipt copy; a listing transfers nothing.
+4. "Approving" screen is the signing screen. The title says Approving but the body is
+"Sign once for all 18". The button "Cancel in wallet" cannot do that; it should be Cancel.
+5. "Approve once, list forever" overpromises. Approval is per NFT contract per chain. A
+seller with UD, Freename and ENS names approves three times. "≈ 0.02 POL" must
+follow the chain.
+6. "No gas to list… cancelling is free" is true only for off chain delisting (question 1).
+#
+Question
+Answer
+Effect on the plan
+Decision
+8
+Minimum life left on
+an expiring name to
+list it?
+Listings end 7 days
+before expiry; names
+with under 14 days
+left cannot be listed.
+M3 item 7, and the
+branch's 1 day cut
+becomes 7 (F9).
+​ Agreed
+9
+Batch cap?
+50 names.
+Tree height 6; confirm
+with the wallet test
+matrix.
+​ Agreed
+10
+Do we support smart
+contract wallets?
+Not in phase 1.
+Show a clear
+message when the
+wallet is a contract
+(F9).
+​ Agreed
+11
+Should webui search
+show "for sale" on
+taken names?
+No.
+W6 dropped.
+​ Changed
+12
+Durations: only 7, 30,
+90 days?
+Yes, the three
+presets.
+No change.
+​ Agreed
+Bulk Listing and Multi Chain Marketplace: Backend and WebUI Requirements
+Page 16 of 21
+
+===== PAGE 17 =====
+7. Auction copy is wrong for Seaport. "Timed bidding. In the contract, not yet in the
+interface" describes the old v1 contract. Seaport has no on chain auction; auctions
+would be a new build.
+8. Extension chips mix providers. .eth , .crypto , .og , .ai  and others in one batch
+imply mixed chains, which conflicts with one signature (question 2).
+9. No partial success state. The designs show only "18 domains are live". The branch
+already has "N of M are live" with retry; design it.
+10. Selection states. Screen 2 shows two different Selected styles (blue with a tick and
+dark). Screen 1 lacks the List button that screen 2 has in the banner.
+11. Mock data. Tab "Sole 19" should read Sold; "All domain 14,208" conflicts with the
+Domains card showing 24; every row is the same .ud  name.
+Suggested phasing and acceptance criteria
+Four phases, each closed by a gate; ticket ids refer to the requirement sections above.
+Phase 1 is highlighted because it is the next thing devs can start, on a branch, while Trails
+finishes.
+phasing · 4 phases, each with an exit gate
+Bulk Listing and Multi Chain Marketplace: Backend and WebUI Requirements
+Page 17 of 21
+
+===== PAGE 18 =====
+Acceptance criteria
+Phase 1, bulk listing
+Phase 2, foundation
+Phase 3, ERC721 providers
+Phase 3, ENS (same release)
+Listing 50 UD Polygon names needs at most one approval and exactly one signature in
+MetaMask, Rabby and Coinbase Wallet.
+Every order in the batch fills on chain directly and through Trails, and the poller
+records each sale.
+A batch containing one already listed name lists the rest and reports
+ALREADY_LISTED for that one.
+Retrying after a network error asks for no new signature and creates no duplicate
+orders.
+Fee, "you receive" and expiry shown in the drawer equal the signed values exactly.
+Bulk delist removes every selected listing, with one on chain cancel transaction.
+Every existing order is backfilled with chainId 137, currency and decimals; browse, buy
+and receipts behave exactly as before.
+No reference to MARKETPLACEV2_CHAIN_ID  or DEFAULTS  remains outside the registry
+loaders.
+The poller runs one cursor per enabled chain and reports lag per chain.
+For UD Base, Freename on Polygon, Base and BNB, and SPACE ID .arb and .bnb: list,
+buy directly, buy through Trails, delist, and invalidation on transfer away all pass on a
+fork, then once with a real low value name.
+A BNB listing round trips with 18 decimal amounts.
+A SPACE ID name inside the expiry buffer cannot be listed.
+The webui List action opens the right name on the right chain.
+Unwrapped, wrapped and ENSv2 names list and fill.
+A wrapped name with CANNOT_TRANSFER  burned is refused.
+An ENSv2 token id change invalidates the open order.
+Bulk Listing and Multi Chain Marketplace: Backend and WebUI Requirements
+Page 18 of 21
+
+===== PAGE 19 =====
+Frontend work breakdown (2 devs)
+The marketplace frontend work splits between two devs: Dev A owns signing and chain
+plumbing, Dev B owns the drawer, delist and data mapping, and both test together before
+each phase gate.
+Phase
+Ticket
+Work
+Owner
+Backend
+dependency
+What it needs from
+backend, and what can be
+built before
+1
+F1
+Rebase bulk-list  onto uat,
+then onto trails  once it
+merges
+Dev A
+​ Independent
+none
+1
+F2
+Seaport bulk signature: tree,
+types, local verify, fixtures
+checked against Seaport.js
+Dev A
+​ Independent
+none; share the helpers with
+the backend's B2 once
+written
+1
+F2
+Post to the bulk endpoint, per
+item results, retry without
+signing again
+Dev A
+​ Mock first
+B1 request and response
+shape now, the endpoint on
+uat to integrate
+1
+F3
+Per name fallback and the
+wallet test matrix
+Dev A
+​ Independent
+none; the fallback uses the
+existing single order
+endpoint
+1
+F4
+Drop the percentage mode
+Dev B
+​ Independent
+none
+1
+F5
+Approval per chain and
+contract, real gas estimate
+Dev B
+​ Independent
+none; on chain reads only
+1
+F6
+Fee label, signed expiry,
+counts
+Dev B
+​ Independent
+none
+1
+F7
+On chain delist (single and
+bulk), cancel states, cheaper
+order prompt
+Dev B
+​ Mock first
+The Seaport cancel tx can
+be built now; the cancel
+states need B5 and the
+cheaper order prompt
+needs B7
+1
+F8
+Copy fixes from the designs
+Dev B
+​ Independent
+none
+1
+F9
+7 day expiry buffer, one chain
+select mode, smart wallet
+message
+Dev B
+​ Independent
+none
+1
+QA
+Bulk list, delist, buy directly
+and via Trails on uat
+Both
+​ Blocked
+B1 to B8 on uat
+Bulk Listing and Multi Chain Marketplace: Backend and WebUI Requirements
+Page 19 of 21
+
+===== PAGE 20 =====
+Phase
+Ticket
+Work
+Owner
+Backend
+dependency
+What it needs from
+backend, and what can be
+built before
+2
+C1
+Config from the backend,
+remove DEFAULTS
+Dev A
+​ Mock first
+M1 config response shape
+now (stub it as a local
+JSON), the endpoint to
+integrate
+2
+C2
+Read provider per chain, one
+createAppKit
+Dev A
+​ Independent
+none
+2
+C3
+Order builder takes item
+type, currency and decimals
+Dev A
+​ Independent
+none
+2
+C5
+Decimals sweep across 10
+files, 18 decimal tests
+Dev B
+​ Mock first
+Formatting helpers can be
+built now; reading decimals
+from responses needs the
+M2 field names
+2
+C6
+Types and row keys with
+chainId and contract, stop
+forcing Polygon
+Dev B
+​ Mock first
+M2 and M5 response shapes
+now, the endpoints to
+integrate
+2
+QA
+Polygon regression: list, bulk,
+buy, Trails, delist, history,
+watchlist
+Both
+​ Blocked
+M1 and M2 on uat
+3
+C4
+List and buy on the name's
+chain, Trails destination per
+chain
+Dev A
+​ Mock first
+Network switch and per
+chain approval can be built
+now; a listing on a new chain
+only succeeds once M3
+accepts it
+3
+ENS
+ERC1155 orders, fuse and
+token id messages, mainnet
+gas copy
+Dev A
+​ Mock first
+ERC1155 order building can
+be built now; the fuse and
+token id rejections come
+from M3, the invalidations
+from M4
+3
+C7
+Provider maps, chain filters
+from config
+Dev B
+​ Mock first
+M1 config shape now, the
+endpoint to integrate
+3
+C8
+One chain per batch in select
+mode
+Dev B
+​ Independent
+none
+3
+C9
+Buyer claim control copy and
+links
+Dev B
+​ Independent
+none; links to webui W5
+3
+Rigs
+Fork scripts and one low
+value name per collection for
+testing
+Dev B
+​ Independent
+none
+Bulk Listing and Multi Chain Marketplace: Backend and WebUI Requirements
+Page 20 of 21
+
+===== PAGE 21 =====
+Independent tickets can start today and need nothing from the backend: F1, F2 signing,
+F3, F4, F5, F6, F8, F9, C2, C3, C8, C9 and the test rigs. Mock first tickets are built against
+the agreed request and response shapes, then switched to the real endpoint when it
+reaches uat. Blocked tickets are the three QA rounds, which need the backend live on uat.
+To keep the mock first tickets moving, the backend should publish its request and
+response shapes before building: B1 and B5 for bulk list and cancel, the
+CHEAPER_ORDER_STILL_VALID  error from B7, the M1 config endpoint and the M2 and M5
+field changes. Frontend mocks then match what ships.
+Not in this breakdown: webui tickets W1 to W5, which need a webui dev (W3 needs a
+backend change first). Biggest frontend risks: wallets failing the 64 leaf bulk signature (F3
+is the fallback), Trails merging late, which blocks phase 2. Trails quotes exact delivery into
+the listing stablecoin on all five chains from both Base USDC and Polygon USDT0, but real
+buys have only run on Polygon, so phase 3 QA includes one real Trails buy per chain.
+Phase
+Ticket
+Work
+Owner
+Backend
+dependency
+What it needs from
+backend, and what can be
+built before
+3
+QA
+Every flow on all 8 collections
+Both
+​ Blocked
+M3 to M6 on uat
+Bulk Listing and Multi Chain Marketplace: Backend and WebUI Requirements
+Page 21 of 21

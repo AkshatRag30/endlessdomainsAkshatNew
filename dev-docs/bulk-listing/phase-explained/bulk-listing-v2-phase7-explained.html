@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phase 7 Explained</title>
+<script>
+  try {
+    var saved = localStorage.getItem('dmplan-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  } catch (e) {}
+</script>
+<style>
+  :root {
+    --bg: #f9f9f9; --surface: #ffffff; --surface-soft: #f3f4fe;
+    --text: #111111; --text-muted: #5b5b66; --border: #e6e6e6;
+    --accent: #2639ED; --accent-soft: #e9ebfd;
+    --wait: #9457f6; --wait-soft: #f4eefe;
+    --ok: #12805c; --ok-soft: #e4f5ee;
+    --warn: #b4540a; --warn-soft: #fdf1e4;
+    --bad: #c4314b; --bad-soft: #fdecef;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+      --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+      --accent: #7f8cff; --accent-soft: #1d2150;
+      --wait: #b996fa; --wait-soft: #2c2142;
+      --ok: #4fd1a0; --ok-soft: #173229;
+      --warn: #f5a35c; --warn-soft: #3a2614;
+      --bad: #ff7d93; --bad-soft: #3a1c24;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+    --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+    --accent: #7f8cff; --accent-soft: #1d2150;
+    --wait: #b996fa; --wait-soft: #2c2142;
+    --ok: #4fd1a0; --ok-soft: #173229;
+    --warn: #f5a35c; --warn-soft: #3a2614;
+    --bad: #ff7d93; --bad-soft: #3a1c24;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: "Satoshi", system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.6; }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 48px 16px 80px; }
+  header.top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+  .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; }
+  h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.15; margin: 0 0 12px; }
+  .lede { color: var(--text-muted); margin: 0; max-width: 680px; }
+  .lede a { color: var(--accent); }
+  .toggle { flex-shrink: 0; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 14px; cursor: pointer; }
+  .toggle:hover { border-color: var(--accent); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 32px; }
+  nav.toc a { font-size: 14px; text-decoration: none; color: var(--accent); background: var(--accent-soft); padding: 6px 12px; border-radius: 999px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 0 0 16px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+  .stat b { display: block; font-size: 26px; line-height: 1.2; }
+  .stat span { font-size: 13px; color: var(--text-muted); }
+  h2 { font-size: 22px; margin: 52px 0 16px; }
+  h3 { font-size: 18px; margin: 0; }
+  h4 { font-size: 15px; margin: 22px 0 8px; color: var(--accent); }
+  p { margin: 0 0 12px; }
+  .muted { color: var(--text-muted); font-size: 15px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
+  .card p:last-child { margin-bottom: 0; }
+  .card ul, .card ol { margin: 8px 0 0; padding-left: 20px; }
+  .card li { margin-bottom: 6px; }
+  code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .86em; background: var(--surface-soft); border-radius: 6px; padding: 1px 6px; word-break: break-word; }
+  .findings { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .finding { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+  .finding h3 { font-size: 16px; margin-bottom: 6px; }
+  .finding p { font-size: 15px; margin: 0; color: var(--text-muted); }
+  .tablecard { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow-x: auto; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: 0; }
+  th { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+  td.grp { font-weight: 600; color: var(--accent); background: var(--surface-soft); font-size: 13px; }
+  .sw { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .chip { width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(128,128,128,.45); flex-shrink: 0; }
+  .callout { border-left: 4px solid var(--wait); background: var(--wait-soft); border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; }
+  .callout p { margin: 0; }
+  .callout.ok { border-color: var(--ok); background: var(--ok-soft); }
+  .callout.warn { border-color: var(--warn); background: var(--warn-soft); }
+  .issue { display: grid; grid-template-columns: 28px 1fr; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--bad); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+  .issue .n { font-weight: 700; color: var(--bad); }
+  .issue p { margin: 0; font-size: 15px; }
+  .issue .where { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+  .phase { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px 24px; margin-bottom: 14px; }
+  .phase-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  .num { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 15px; flex-shrink: 0; }
+  .tag { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+  .tag.now { background: var(--ok-soft); color: var(--ok); }
+  .tag.wait { background: var(--wait-soft); color: var(--wait); }
+  .tag.size { background: var(--surface-soft); color: var(--text-muted); }
+  .tag.new { background: var(--warn-soft); color: var(--warn); }
+  .rows { display: grid; grid-template-columns: 130px 1fr; gap: 6px 16px; font-size: 15px; }
+  .rows dt { color: var(--text-muted); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; padding-top: 2px; }
+  .rows dd { margin: 0; }
+  ol.qs { counter-reset: q; list-style: none; padding: 0; margin: 0; }
+  ol.qs li { counter-increment: q; position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px 14px 56px; margin-bottom: 10px; }
+  ol.qs li::before { content: counter(q); position: absolute; left: 16px; top: 14px; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  ol.qs.team li::before { background: var(--wait-soft); color: var(--wait); }
+  ol.qs b { display: block; margin-bottom: 2px; }
+  ol.qs span { color: var(--text-muted); font-size: 15px; }
+  footer { margin-top: 56px; font-size: 13px; color: var(--text-muted); }
+  @media (max-width: 700px) {
+    header.top { flex-direction: column; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .findings { grid-template-columns: 1fr; }
+    .card, .phase { padding: 18px; }
+    .rows { grid-template-columns: 1fr; }
+    .rows dt { padding-top: 8px; }
+    ol.qs li { padding-left: 50px; }
+  }
+</style>
+<style>
+  .ba { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .ba > div { border: 1px solid var(--border); border-radius: 12px; padding: 12px; background: var(--surface); font-size: 15px; }
+  .ba h5 { margin: 0 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); }
+  .ba .after h5 { color: var(--ok); }
+  @media (max-width: 640px) { .ba { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">Bulk listing v2 · phase 7 explained</p>
+      <h1>Phase 7 in simple words: the safety rules</h1>
+      <p class="lede">Phase 7 is Mohit sir's F9: rules about which names can go into a bulk listing, so nobody buys a name that's about to lapse and one signature never mixes two blockchains. Written 24 Nov 2026; line numbers as of that day.</p>
+    </div>
+    <button class="toggle" id="toggle" type="button">Toggle theme</button>
+  </header>
+
+  <nav class="toc"><a href="#story">The story</a><a href="#numbers">7 and 14 days</a><a href="#chain">One chain</a><a href="#onchain">Expiry on chain</a><a href="#link">The link</a><a href="#files">The files</a><a href="#faq">Questions</a></nav>
+
+  <div class="stats">
+    <div class="stat"><b>7</b><span>days: a listing ends this early</span></div>
+    <div class="stat"><b>14</b><span>days: minimum life to be listed</span></div>
+    <div class="stat"><b>1</b><span>chain per batch</span></div>
+    <div class="stat"><b>7</b><span>new tests (231 in total)</span></div>
+  </div>
+
+  <h2 id="story">1. The story in five sentences</h2>
+  <div class="card"><ol>
+    <li>Some domains expire. If someone buys one the day before it lapses, they've paid for a dying name.</li>
+    <li>So a listing now always ends 7 days before the domain expires, and a name with under 14 days left can't be listed at all.</li>
+    <li>One signature covers one blockchain, so a batch must be names from one chain, picked in the chain filter first.</li>
+    <li>The real expiry date is read from the blockchain itself before signing, as Mohit sir's document says.</li>
+    <li>And a link, <code>?bulk=1</code>, lets the main website open bulk listing directly.</li>
+  </ol></div>
+
+  <h2 id="numbers">2. The 7 and 14 day rules, with an example</h2>
+  <div class="tablecard"><table>
+    <tr><th>Domain expires 31 Dec, today is…</th><th>Days left</th><th>What happens</th></tr>
+    <tr><td>1 Dec, 30 day listing</td><td>30</td><td>Can be listed; the listing ends <b>24 Dec</b> (7 days early)</td></tr>
+    <tr><td>15 Dec</td><td>16</td><td>Can be listed; ends 24 Dec at the latest</td></tr>
+    <tr><td>20 Dec</td><td>11</td><td><b>Can't be selected:</b> "Expires within 14 days. Renew it to list it"</td></tr>
+    <tr><td>Never expires ("Lifetime")</td><td>∞</td><td>Full duration, no change (all your names today)</td></tr>
+  </table></div>
+
+  <h2 id="chain">3. One chain per batch</h2>
+  <div class="card"><p>A signature is tied to one blockchain, so Polygon and Ethereum names can't share one. Today only Polygon names can be listed, so entering select mode just sets the chain filter to Polygon (and leaving it puts your filter back). Once multi chain adds more chains, you'll be asked to pick a chain first: "Pick a chain in the chain filter to start selecting. One batch lists on one chain."</p></div>
+
+  <h2 id="onchain">4. Expiry read from the blockchain</h2>
+  <div class="card"><p>The page uses our database's date to grey out names quickly. When the drawer opens, and again when you press List, it asks the Unstoppable Domains contract for each name's real expiry (<code>expiryOf</code>; 0 means never expires). If the blockchain says a name has under 14 days left, the drawer says "Skipped: alpha.og expires within 14 days." and lists the rest. If the blockchain can't be reached, the database date is used.</p></div>
+
+  <h2 id="link">5. The ?bulk=1 link</h2>
+  <div class="card"><p>The main website is getting a "List several" button. It will open <code>/seller-hub/my-domains?bulk=1</code>, and My Domains then starts in select mode, ready to pick names. Test it by typing that address on 3002.</p></div>
+
+  <h2 id="files">6. The files</h2>
+  <div class="tablecard"><table>
+    <tr><th>File</th><th>What changed</th></tr>
+    <tr><td><code>helpers/my-domains/bulkListing.ts</code></td><td>The 7 and 14 day numbers (19, 20), the reasons (23), the chain rule (46, 52), chain dates (237), skipped names (242)</td></tr>
+    <tr><td><code>hooks/my-domains/useBulkListingActions.ts</code></td><td><code>readChainExpiries</code> (239)</td></tr>
+    <tr><td><code>BulkListingFlowModal</code>, <code>BulkListingFormStep</code></td><td>Reads the chain date, the Skipped line, "7 days before"</td></tr>
+    <tr><td><code>BulkSelectButton</code>, <code>BulkSelectBanner</code></td><td>The new tooltips, the pick a chain banner</td></tr>
+    <tr><td><code>pages/seller-hub/my-domains/index.tsx</code></td><td>Chain filter in select mode, <code>?bulk=1</code></td></tr>
+    <tr><td><code>helpers/my-domains/bulkPhase7.test.ts</code></td><td>New: 7 tests</td></tr>
+  </table></div>
+
+  <h2 id="faq">7. Questions you might have</h2>
+  <ol class="qs">
+    <li><b>Why 7 and 14, not just 7?</b><span>7 is how early a listing ends; 14 is the minimum life a name needs to be listed at all. Both are in decision 8.</span></li>
+    <li><b>Will my names be affected?</b><span>No: they never expire, so they list for the full duration.</span></li>
+    <li><b>Why read the blockchain if we have the date?</b><span>Mohit sir's document says to: the database date can be out of date, the contract's can't.</span></li>
+    <li><b>Why are my .eth names hidden in select mode?</b><span>The chain filter is on Polygon, the only chain you can list on today. They come back when you leave select mode.</span></li>
+  </ol>
+
+  <footer>Bulk listing v2 · phase 7 explained · 24 Nov 2026 · dev-docs is local only.</footer>
+</div>
+<script>
+  document.getElementById('toggle').addEventListener('click', function () {
+    var root = document.documentElement;
+    var current = root.getAttribute('data-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('dmplan-theme', next); } catch (e) {}
+  });
+</script>
+</body>
+</html>

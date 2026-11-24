@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phase 8 Explained</title>
+<script>
+  try {
+    var saved = localStorage.getItem('dmplan-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  } catch (e) {}
+</script>
+<style>
+  :root {
+    --bg: #f9f9f9; --surface: #ffffff; --surface-soft: #f3f4fe;
+    --text: #111111; --text-muted: #5b5b66; --border: #e6e6e6;
+    --accent: #2639ED; --accent-soft: #e9ebfd;
+    --wait: #9457f6; --wait-soft: #f4eefe;
+    --ok: #12805c; --ok-soft: #e4f5ee;
+    --warn: #b4540a; --warn-soft: #fdf1e4;
+    --bad: #c4314b; --bad-soft: #fdecef;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+      --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+      --accent: #7f8cff; --accent-soft: #1d2150;
+      --wait: #b996fa; --wait-soft: #2c2142;
+      --ok: #4fd1a0; --ok-soft: #173229;
+      --warn: #f5a35c; --warn-soft: #3a2614;
+      --bad: #ff7d93; --bad-soft: #3a1c24;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+    --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+    --accent: #7f8cff; --accent-soft: #1d2150;
+    --wait: #b996fa; --wait-soft: #2c2142;
+    --ok: #4fd1a0; --ok-soft: #173229;
+    --warn: #f5a35c; --warn-soft: #3a2614;
+    --bad: #ff7d93; --bad-soft: #3a1c24;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: "Satoshi", system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.6; }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 48px 16px 80px; }
+  header.top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+  .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; }
+  h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.15; margin: 0 0 12px; }
+  .lede { color: var(--text-muted); margin: 0; max-width: 680px; }
+  .lede a { color: var(--accent); }
+  .toggle { flex-shrink: 0; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 14px; cursor: pointer; }
+  .toggle:hover { border-color: var(--accent); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 32px; }
+  nav.toc a { font-size: 14px; text-decoration: none; color: var(--accent); background: var(--accent-soft); padding: 6px 12px; border-radius: 999px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 0 0 16px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+  .stat b { display: block; font-size: 26px; line-height: 1.2; }
+  .stat span { font-size: 13px; color: var(--text-muted); }
+  h2 { font-size: 22px; margin: 52px 0 16px; }
+  h3 { font-size: 18px; margin: 0; }
+  h4 { font-size: 15px; margin: 22px 0 8px; color: var(--accent); }
+  p { margin: 0 0 12px; }
+  .muted { color: var(--text-muted); font-size: 15px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
+  .card p:last-child { margin-bottom: 0; }
+  .card ul, .card ol { margin: 8px 0 0; padding-left: 20px; }
+  .card li { margin-bottom: 6px; }
+  code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .86em; background: var(--surface-soft); border-radius: 6px; padding: 1px 6px; word-break: break-word; }
+  .findings { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .finding { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+  .finding h3 { font-size: 16px; margin-bottom: 6px; }
+  .finding p { font-size: 15px; margin: 0; color: var(--text-muted); }
+  .tablecard { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow-x: auto; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: 0; }
+  th { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+  td.grp { font-weight: 600; color: var(--accent); background: var(--surface-soft); font-size: 13px; }
+  .sw { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .chip { width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(128,128,128,.45); flex-shrink: 0; }
+  .callout { border-left: 4px solid var(--wait); background: var(--wait-soft); border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; }
+  .callout p { margin: 0; }
+  .callout.ok { border-color: var(--ok); background: var(--ok-soft); }
+  .callout.warn { border-color: var(--warn); background: var(--warn-soft); }
+  .issue { display: grid; grid-template-columns: 28px 1fr; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--bad); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+  .issue .n { font-weight: 700; color: var(--bad); }
+  .issue p { margin: 0; font-size: 15px; }
+  .issue .where { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+  .phase { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px 24px; margin-bottom: 14px; }
+  .phase-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  .num { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 15px; flex-shrink: 0; }
+  .tag { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+  .tag.now { background: var(--ok-soft); color: var(--ok); }
+  .tag.wait { background: var(--wait-soft); color: var(--wait); }
+  .tag.size { background: var(--surface-soft); color: var(--text-muted); }
+  .tag.new { background: var(--warn-soft); color: var(--warn); }
+  .rows { display: grid; grid-template-columns: 130px 1fr; gap: 6px 16px; font-size: 15px; }
+  .rows dt { color: var(--text-muted); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; padding-top: 2px; }
+  .rows dd { margin: 0; }
+  ol.qs { counter-reset: q; list-style: none; padding: 0; margin: 0; }
+  ol.qs li { counter-increment: q; position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px 14px 56px; margin-bottom: 10px; }
+  ol.qs li::before { content: counter(q); position: absolute; left: 16px; top: 14px; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  ol.qs.team li::before { background: var(--wait-soft); color: var(--wait); }
+  ol.qs b { display: block; margin-bottom: 2px; }
+  ol.qs span { color: var(--text-muted); font-size: 15px; }
+  footer { margin-top: 56px; font-size: 13px; color: var(--text-muted); }
+  @media (max-width: 700px) {
+    header.top { flex-direction: column; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .findings { grid-template-columns: 1fr; }
+    .card, .phase { padding: 18px; }
+    .rows { grid-template-columns: 1fr; }
+    .rows dt { padding-top: 8px; }
+    ol.qs li { padding-left: 50px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">Bulk listing v2 · phase 8 explained</p>
+      <h1>Phase 8 in simple words: delisting for real</h1>
+      <p class="lede">Until now, Delist only hid a listing on our site; it could still be bought on the blockchain. Phase 8 makes Delist cancel the listing on the blockchain, lets you delist many at once, shows "Cancelling" on the row, and fixes names blocked by an older, cheaper listing. What every file does, why, and how to try it. Written 23 Nov 2026; line numbers as of that day.</p>
+    </div>
+    <button class="toggle" id="toggle" type="button">Toggle theme</button>
+  </header>
+
+  <nav class="toc">
+    <a href="#story">The story</a><a href="#words">Words to know</a><a href="#before">Before and after</a><a href="#map">The map</a><a href="#service">Service</a><a href="#rules">Rules</a><a href="#tests">Tests</a><a href="#hooks">Hooks</a><a href="#screens">New screens</a><a href="#changed">Changed screens</a><a href="#small">Small changes</a><a href="#walk">Walk through</a><a href="#safety">Safety checks</a><a href="#faq">Questions</a><a href="#next">Not done yet</a>
+  </nav>
+
+  <div class="stats">
+    <div class="stat"><b>26</b><span>files: 7 new, 19 changed</span></div>
+    <div class="stat"><b>1</b><span>transaction to delist up to 50 listings</span></div>
+    <div class="stat"><b>10</b><span>new tests (203 in total, all passing)</span></div>
+    <div class="stat"><b>0</b><span>real transactions tried yet</span></div>
+  </div>
+
+  <h2 id="story">1. The story in six sentences</h2>
+  <div class="card">
+    <ol>
+      <li>A listing is a signed message. Our old Delist only told our backend "stop showing it"; the signed message stayed valid on the blockchain until it expired.</li>
+      <li>So anyone with a copy could still buy the name at the old price, and the backend refused to let you relist higher (your 3 refused names).</li>
+      <li>Mohit sir's F7 says: delist on the blockchain, with one Seaport <code>cancel</code> transaction for any number of listings.</li>
+      <li>Phase 8 does exactly that for the Delist button, adds "Bulk delist" for many at once, and adds a button to cancel the older listings that block a relist.</li>
+      <li>The blockchain takes about a minute to confirm, so My Domains shows "Cancelling" until it does, and "Cancel not confirmed" with Cancel again if it fails (you chose this instead of a separate My Listings page).</li>
+      <li>Cancelling costs a tiny network fee in POL; listing stays free.</li>
+    </ol>
+  </div>
+
+  <h2 id="words">2. Words to know first</h2>
+  <div class="tablecard"><table>
+    <tr><th>Word</th><th>In simple words</th></tr>
+    <tr><td><b>Off chain delist</b> (old)</td><td>Only our backend forgets the listing. Free, but the listing can still be bought on the blockchain.</td></tr>
+    <tr><td><b>On chain cancel</b> (new)</td><td>A transaction to Seaport saying "these orders are dead". After it, Seaport refuses them forever. Costs a small fee.</td></tr>
+    <tr><td><b>Signed order (rawOrder)</b></td><td>The exact listing you signed. Seaport needs it back to know what to cancel. Our backend keeps it.</td></tr>
+    <tr><td><b>Order hash</b></td><td>A listing's fingerprint. We check the signed order matches it before cancelling.</td></tr>
+    <tr><td><b>Transaction hash</b></td><td>The receipt number of the cancel transaction. We give it to the backend, which watches the blockchain for it.</td></tr>
+    <tr><td><b>Cancel pending / Cancelling</b></td><td>Sent, but the backend hasn't seen the blockchain confirm it yet (usually about a minute).</td></tr>
+    <tr><td><b>Cancel not confirmed</b></td><td>No confirmation after 30 minutes, or the transaction failed. The listing is hidden but can still be bought, so cancel again.</td></tr>
+    <tr><td><b>Older, cheaper listing</b></td><td>An old listing of the same name at a lower price that is still valid. The backend won't let you list higher while it exists.</td></tr>
+  </table></div>
+
+  <h2 id="before">3. Before and after</h2>
+  <div class="tablecard"><table>
+    <tr><th>What</th><th>Before</th><th>After phase 8</th></tr>
+    <tr><td>Delist one</td><td>Free, instant, only hidden; still buyable on chain</td><td>One small transaction; cancelled for good</td></tr>
+    <tr><td>Delist many</td><td>Not possible</td><td>Quick Actions → Bulk delist: one transaction for up to 50</td></tr>
+    <tr><td>Row after delisting</td><td>"Not listed" straight away</td><td>"Cancelling" for about a minute, then "Not listed"; "Cancel not confirmed" + Cancel again if it fails</td></tr>
+    <tr><td>Name refused for an older, cheaper listing</td><td>Stuck</td><td>"Cancel older listings", then Try these again</td></tr>
+    <tr><td>"Cancelling is free" notes</td><td>Shown</td><td>Replaced: delisting costs a small network fee</td></tr>
+  </table></div>
+
+  <h2 id="map">4. The map</h2>
+  <div class="tablecard"><table>
+    <tr><th>Layer</th><th>File</th><th>Role</th></tr>
+    <tr><td class="grp" colspan="3">Talking to the backend</td></tr>
+    <tr><td>Service</td><td><code>cancelOrders.service.ts</code> (new)</td><td>Get signed orders, record cancels, read pending cancels</td></tr>
+    <tr><td class="grp" colspan="3">The logic</td></tr>
+    <tr><td>Helper</td><td><code>onChainCancel.ts</code> (new) + tests</td><td>The cancel recipe, the row label map, the messages</td></tr>
+    <tr><td class="grp" colspan="3">The glue</td></tr>
+    <tr><td>Hooks</td><td><code>useOnChainCancel.ts</code>, <code>usePendingCancels.ts</code> (new), <code>useDelistListing.ts</code> (rewritten)</td><td>Wallet, Seaport, refreshing</td></tr>
+    <tr><td class="grp" colspan="3">What you see</td></tr>
+    <tr><td>Screens</td><td><code>BulkDelistModal</code>, <code>PendingCancelChip</code> (new); page, rows, cards, table, select bar, select button, bulk listing drawer and result screen, Quick Actions (changed)</td><td>The drawer, the labels, the new box and notes</td></tr>
+  </table></div>
+
+  <h2 id="service">5. The service · <code>src/core/services/my-domains/cancelOrders.service.ts</code></h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">1</span><h3>Four backend calls</h3><span class="tag new">New · 49 lines</span></div>
+    <ol class="qs">
+      <li><b><code>fetchSignedOrder(hash)</code> · line 15</b><span>Asks <code>GET /orders/{hash}</code> for the exact signed listing (<code>rawOrder</code>). Works even for listings delisted the old way, so your old ones can be cancelled too.</span></li>
+      <li><b><code>recordCancel(hashes, txHash)</code> · line 28</b><span>Tells the backend "these are cancelled, here's the transaction" (<code>POST /orders/cancel-bulk</code>), for one listing or many.</span></li>
+      <li><b><code>notCancellableHashes(err)</code> · line 33</b><span>If the backend says "some of these are already sold or cancelled" (a 409), this reads which ones.</span></li>
+      <li><b><code>fetchRecentCancels()</code> · line 45</b><span>Reads your 50 most recent cancelled listings (<code>my-listings</code>), to find the ones still "Cancelling".</span></li>
+    </ol>
+  </div>
+
+  <h2 id="rules">6. The rules · <code>src/helpers/my-domains/onChainCancel.ts</code></h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">2</span><h3>The cancel recipe</h3><span class="tag new">New · 146 lines · pure</span></div>
+    <ol class="qs">
+      <li><b><code>runOnChainCancel(hashes, deps)</code> · line 40</b><span>
+        1. Remove duplicates.<br>
+        2. Prepare: wallet connected, on Polygon, wallet proof fresh.<br>
+        3. Get every signed listing from the backend.<br>
+        4. Check each one is really that listing (its fingerprint matches) and was made by your wallet.<br>
+        5. Send <b>one</b> Seaport cancel transaction for all of them.<br>
+        6. Tell the backend with the transaction's receipt number. If it says some were already sold or cancelled, tell it about the rest, with the same receipt number.<br>
+        If telling the backend fails for another reason, the cancel still happened on the blockchain; the backend notices on its own within a minute.</span></li>
+      <li><b><code>pendingCancelsByToken(rows)</code> · line 103</b><span>From your recent cancels, keeps only the ones still waiting, one per name, with whether they're "not confirmed".</span></li>
+      <li><b><code>cancelOutcomeText(outcome)</code> · line 117</b><span>Turns the result into the message you approved, like "Listing cancelled…" or "Not enough POL…".</span></li>
+    </ol>
+  </div>
+
+  <h2 id="tests">7. The tests · <code>onChainCancel.test.ts</code></h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">3</span><h3>10 tests</h3><span class="tag new">New</span></div>
+    <div class="tablecard"><table>
+      <tr><th>#</th><th>The test checks that…</th></tr>
+      <tr><td>1</td><td>3 listings are cancelled with exactly one transaction and all recorded with its receipt</td></tr>
+      <tr><td>2</td><td>The same listing picked twice is cancelled once</td></tr>
+      <tr><td>3</td><td>If one was already sold, the others are recorded again with the same transaction</td></tr>
+      <tr><td>4</td><td>If all were already gone, it still counts as sent</td></tr>
+      <tr><td>5</td><td>If telling the backend fails, the blockchain cancel still counts</td></tr>
+      <tr><td>6</td><td>A listing made by another wallet is refused before anything is sent (no wasted fee)</td></tr>
+      <tr><td>7</td><td>A signed listing that doesn't match its fingerprint is refused</td></tr>
+      <tr><td>8</td><td>A closed popup, not enough POL, or a failed preparation send nothing</td></tr>
+      <tr><td>9</td><td>An empty selection does nothing</td></tr>
+      <tr><td>10</td><td>The "Cancelling" map keeps only waiting cancels, newest first</td></tr>
+    </table></div>
+  </div>
+
+  <h2 id="hooks">8. The hooks</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">4</span><h3>The glue</h3><span class="tag size">2 new, 1 rewritten</span></div>
+    <ol class="qs">
+      <li><b><code>useOnChainCancel</code></b><span>Gives the recipe the real tools: your wallet, Polygon, Seaport's <code>cancel</code>, the backend calls. After a cancel it refreshes the page's data and tells the row labels to refresh.</span></li>
+      <li><b><code>usePendingCancels</code></b><span>Reads which names are "Cancelling" when the page opens (only if your wallet proof is fresh, so it never pops your wallet on its own), right after any cancel, and every 20 seconds while any are waiting.</span></li>
+      <li><b><code>useDelistListing</code> (rewritten)</b><span>The single Delist button. Same outside, so every page that uses it keeps working, but it now cancels on the blockchain and shows the approved messages.</span></li>
+    </ol>
+  </div>
+
+  <h2 id="screens">9. New screens</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">5</span><h3><code>BulkDelistModal</code> and <code>PendingCancelChip</code></h3><span class="tag new">New</span></div>
+    <ul>
+      <li><b>BulkDelistModal:</b> "Delist N listings" with the names and prices and the fee note → Preparing → Confirm in your wallet → Saving → "N listings cancelled" (or "N cancelled. M were already sold or cancelled.") → Done. If stopped: "Nothing was cancelled" with the reason and Back.</li>
+      <li><b>PendingCancelChip:</b> the small "Cancelling" label (tooltip: about a minute) or the orange "Cancel not confirmed" label (tooltip: can still be bought at the old price).</li>
+    </ul>
+  </div>
+
+  <h2 id="changed">10. Changed screens</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">6</span><h3>Page, rows, bar, drawer</h3><span class="tag size">Changed</span></div>
+    <ul>
+      <li><b>My Domains page:</b> Quick Actions → Bulk delist switches to For sale and enters select mode; the bar says "Delist N"; the delist drawer; the row labels.</li>
+      <li><b>Rows and cards:</b> the label, and "Cancel again" instead of List when a cancel wasn't confirmed.</li>
+      <li><b>Select bar:</b> the delist texts. <b>Select button:</b> on names that aren't for sale, "Not for sale, so there's nothing to delist".</li>
+      <li><b>Bulk listing result screen:</b> the "Cancel older listings" box; the note now says delisting costs a small fee. <b>Bulk listing form:</b> same note fix.</li>
+    </ul>
+  </div>
+
+  <h2 id="small">11. Small changes</h2>
+  <div class="card"><ul>
+    <li>Seaport's <code>cancel</code> added to our list of Seaport functions (added only; the multi chain developer shares this file).</li>
+    <li><code>delistIneligibleReason</code>: which names can be picked for delisting (for sale, Polygon, with a listing).</li>
+    <li><code>useBulkSelection</code> now takes a rule, so the same select mode works for listing and delisting.</li>
+    <li>New shapes and the <code>bulk-delist</code> action in the types; the new Quick Action and its icon; the drawer exported.</li>
+  </ul></div>
+
+  <h2 id="walk">12. Walk through: you delist 2 listings</h2>
+  <div class="tablecard"><table>
+    <tr><th>#</th><th>You see</th><th>What happens</th></tr>
+    <tr><td>1</td><td>Quick Actions → Bulk delist; For sale tab, Select buttons</td><td>Delist select mode</td></tr>
+    <tr><td>2</td><td>Pick 2, click Delist 2</td><td>The drawer lists them with prices</td></tr>
+    <tr><td>3</td><td>Click Delist 2 → "Preparing 2 listings"</td><td>Signed listings fetched and checked</td></tr>
+    <tr><td>4</td><td>"Confirm in your wallet"; MetaMask shows one transaction with a fee</td><td>Seaport cancel for both</td></tr>
+    <tr><td>5</td><td>"Saving" → "2 listings cancelled" → Done</td><td>Backend told; select mode closes</td></tr>
+    <tr><td>6</td><td>Both rows: Not listed + "Cancelling"</td><td>Waiting for the blockchain</td></tr>
+    <tr><td>7</td><td>About a minute later: plain Not listed</td><td>Confirmed; nobody can buy them now</td></tr>
+  </table></div>
+
+  <h2 id="safety">13. Safety checks before any fee is paid</h2>
+  <div class="card"><ul>
+    <li>Your wallet must be on Polygon.</li>
+    <li>Every signed listing must match its fingerprint, so we never cancel the wrong thing.</li>
+    <li>Every listing must be yours: Seaport would refuse someone else's, and you'd still pay the fee.</li>
+    <li>If any check fails, nothing is sent and nothing is charged.</li>
+  </ul></div>
+
+  <h2 id="faq">14. Questions you might have</h2>
+  <ol class="qs">
+    <li><b>How much does a cancel cost?</b><span>A small fee in POL on Polygon, usually a fraction of a cent to a few cents. MetaMask shows it before you confirm. One transaction covers up to 50 listings.</span></li>
+    <li><b>Does listing cost anything now?</b><span>No. Listing is still a free signature. Only delisting costs a fee.</span></li>
+    <li><b>Why "Cancelling" and not just "Not listed"?</b><span>The blockchain needs about a minute, and the backend confirms by watching it. Until then, the label tells you it's on its way.</span></li>
+    <li><b>Why don't I always see the labels?</b><span>Reading them needs a fresh wallet proof (under about an hour). We don't pop your wallet on page load just for that; right after a delist the proof is fresh.</span></li>
+    <li><b>Can I cancel my old listings from before phase 8?</b><span>Yes. The backend still has their signed copies, so Delist (if still shown) or the "Cancel older listings" box works for them.</span></li>
+    <li><b>What about lowering a price?</b><span>For now it's delist (small fee) then list again. Whether price cuts should stay free is Mohit sir's call (V7).</span></li>
+    <li><b>Is there a My Listings page?</b><span>No, you decided My Domains shows the states instead (option A).</span></li>
+  </ol>
+
+  <h2 id="next">15. Not done yet</h2>
+  <div class="card"><ul>
+    <li>Not committed (nor phase 4).</li>
+    <li>No real transaction yet: single Delist, bulk delist, Cancel older listings, a closed popup; light and dark, phone and desktop.</li>
+    <li>The single listing drawer still shows the older listing refusal as a toast only.</li>
+    <li>V7 (price cuts) open with Mohit sir.</li>
+  </ul></div>
+
+  <h2>Where to go next</h2>
+  <div class="tablecard"><table>
+    <tr><th>If you want…</th><th>Open</th></tr>
+    <tr><td>Every approved message, drawn</td><td><code>wording/phase8-wording.html</code></td></tr>
+    <tr><td>Every file with line numbers, and the checks against the PDF, our plan and the backend guide</td><td><code>bulk-listing-progress.html</code>, v2 Phase 8</td></tr>
+    <tr><td>The journey step by step</td><td><code>bulk-listing-v2-flow-explained.html</code>, section 11</td></tr>
+    <tr><td>The code, start here</td><td><code>src/helpers/my-domains/onChainCancel.ts</code>, <code>runOnChainCancel</code> at line 40</td></tr>
+  </table></div>
+
+  <footer>Bulk listing v2 · phase 8 explained · 23 Nov 2026 · dev-docs is local only.</footer>
+</div>
+<script>
+  document.getElementById('toggle').addEventListener('click', function () {
+    var root = document.documentElement;
+    var current = root.getAttribute('data-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('dmplan-theme', next); } catch (e) {}
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Backend 500 Incident</title>
+<script>
+  try {
+    var saved = localStorage.getItem('dmplan-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  } catch (e) {}
+</script>
+<style>
+  :root {
+    --bg: #f9f9f9; --surface: #ffffff; --surface-soft: #f3f4fe;
+    --text: #111111; --text-muted: #5b5b66; --border: #e6e6e6;
+    --accent: #2639ED; --accent-soft: #e9ebfd;
+    --wait: #9457f6; --wait-soft: #f4eefe;
+    --ok: #12805c; --ok-soft: #e4f5ee;
+    --warn: #b4540a; --warn-soft: #fdf1e4;
+    --bad: #c4314b; --bad-soft: #fdecef;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+      --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+      --accent: #7f8cff; --accent-soft: #1d2150;
+      --wait: #b996fa; --wait-soft: #2c2142;
+      --ok: #4fd1a0; --ok-soft: #173229;
+      --warn: #f5a35c; --warn-soft: #3a2614;
+      --bad: #ff7d93; --bad-soft: #3a1c24;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+    --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+    --accent: #7f8cff; --accent-soft: #1d2150;
+    --wait: #b996fa; --wait-soft: #2c2142;
+    --ok: #4fd1a0; --ok-soft: #173229;
+    --warn: #f5a35c; --warn-soft: #3a2614;
+    --bad: #ff7d93; --bad-soft: #3a1c24;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: "Satoshi", system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.6; }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 48px 16px 80px; }
+  header.top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+  .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; }
+  h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.15; margin: 0 0 12px; }
+  .lede { color: var(--text-muted); margin: 0; max-width: 680px; }
+  .lede a { color: var(--accent); }
+  .toggle { flex-shrink: 0; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 14px; cursor: pointer; }
+  .toggle:hover { border-color: var(--accent); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 32px; }
+  nav.toc a { font-size: 14px; text-decoration: none; color: var(--accent); background: var(--accent-soft); padding: 6px 12px; border-radius: 999px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 0 0 16px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+  .stat b { display: block; font-size: 26px; line-height: 1.2; }
+  .stat span { font-size: 13px; color: var(--text-muted); }
+  h2 { font-size: 22px; margin: 52px 0 16px; }
+  h3 { font-size: 18px; margin: 0; }
+  h4 { font-size: 15px; margin: 22px 0 8px; color: var(--accent); }
+  p { margin: 0 0 12px; }
+  .muted { color: var(--text-muted); font-size: 15px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
+  .card p:last-child { margin-bottom: 0; }
+  .card ul, .card ol { margin: 8px 0 0; padding-left: 20px; }
+  .card li { margin-bottom: 6px; }
+  code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .86em; background: var(--surface-soft); border-radius: 6px; padding: 1px 6px; word-break: break-word; }
+  .findings { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .finding { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+  .finding h3 { font-size: 16px; margin-bottom: 6px; }
+  .finding p { font-size: 15px; margin: 0; color: var(--text-muted); }
+  .tablecard { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow-x: auto; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: 0; }
+  th { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+  td.grp { font-weight: 600; color: var(--accent); background: var(--surface-soft); font-size: 13px; }
+  .sw { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .chip { width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(128,128,128,.45); flex-shrink: 0; }
+  .callout { border-left: 4px solid var(--wait); background: var(--wait-soft); border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; }
+  .callout p { margin: 0; }
+  .callout.ok { border-color: var(--ok); background: var(--ok-soft); }
+  .callout.warn { border-color: var(--warn); background: var(--warn-soft); }
+  .issue { display: grid; grid-template-columns: 28px 1fr; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--bad); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+  .issue .n { font-weight: 700; color: var(--bad); }
+  .issue p { margin: 0; font-size: 15px; }
+  .issue .where { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+  .phase { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px 24px; margin-bottom: 14px; }
+  .phase-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  .num { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 15px; flex-shrink: 0; }
+  .tag { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+  .tag.now { background: var(--ok-soft); color: var(--ok); }
+  .tag.wait { background: var(--wait-soft); color: var(--wait); }
+  .tag.size { background: var(--surface-soft); color: var(--text-muted); }
+  .tag.new { background: var(--warn-soft); color: var(--warn); }
+  .rows { display: grid; grid-template-columns: 130px 1fr; gap: 6px 16px; font-size: 15px; }
+  .rows dt { color: var(--text-muted); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; padding-top: 2px; }
+  .rows dd { margin: 0; }
+  ol.qs { counter-reset: q; list-style: none; padding: 0; margin: 0; }
+  ol.qs li { counter-increment: q; position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px 14px 56px; margin-bottom: 10px; }
+  ol.qs li::before { content: counter(q); position: absolute; left: 16px; top: 14px; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  ol.qs.team li::before { background: var(--wait-soft); color: var(--wait); }
+  ol.qs b { display: block; margin-bottom: 2px; }
+  ol.qs span { color: var(--text-muted); font-size: 15px; }
+  footer { margin-top: 56px; font-size: 13px; color: var(--text-muted); }
+  @media (max-width: 700px) {
+    header.top { flex-direction: column; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .findings { grid-template-columns: 1fr; }
+    .card, .phase { padding: 18px; }
+    .rows { grid-template-columns: 1fr; }
+    .rows dt { padding-top: 8px; }
+    ol.qs li { padding-left: 50px; }
+  }
+</style>
+<style>
+  .ba { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .ba > div { border: 1px solid var(--border); border-radius: 12px; padding: 12px; background: var(--surface); font-size: 15px; }
+  .ba h5 { margin: 0 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); }
+  .ba .after h5 { color: var(--ok); }
+  @media (max-width: 640px) { .ba { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">Bulk listing v2 · incident · 24 Nov 2026</p>
+      <h1>Stage backend returning 500 on listing and delisting</h1>
+      <p class="lede">Two problems found while testing phase 7 on localhost:3002 against stage (<code>apistage.endlessdomains.io</code>). Both come from the backend crashing on marketplace POST calls; the second also exposed a gap on our side that let a cancel be paid for twice.</p>
+    </div>
+    <button class="toggle" id="toggle" type="button">Toggle theme</button>
+  </header>
+
+  <nav class="toc"><a href="#summary">Summary</a><a href="#issue1">Issue 1 · Bulk listing</a><a href="#issue2">Issue 2 · Delist</a><a href="#checked">What we checked</a><a href="#cause">Likely cause</a><a href="#ours">Our side</a><a href="#guru">Message for Guru</a><a href="#next">Next steps</a></nav>
+
+  <div class="stats">
+    <div class="stat"><b>2</b><span>backend endpoints failing with 500</span></div>
+    <div class="stat"><b>0</b><span>frontend request changes involved</span></div>
+    <div class="stat"><b>2</b><span>cancel transactions for one listing</span></div>
+    <div class="stat"><b>Half</b><span>delist healed; bulk post not rechecked</span></div>
+  </div>
+
+  <h2 id="summary">1. Summary</h2>
+  <div class="card"><ul>
+    <li><b>Issue 1:</b> bulk listing two names failed with <code>500 Internal server error</code> on every try, including Try again with the same signed batch. Nothing was listed or charged.</li>
+    <li><b>Issue 2:</b> delisting westbengal.og from the Edit price drawer sent the on chain cancel, but the backend call that records it also failed with 500. The row kept showing Edit price, Delist was pressed again, and a second cancel transaction was sent.</li>
+    <li><b>Read calls still work</b> (my-domains, my-listings, get-pending-domains-listing: 200 or 304). Only the marketplace POST calls fail.</li>
+    <li><b>Not caused by phase 7 or any frontend change:</b> the requests have the same shape that worked on 20 and 23 Nov.</li>
+  </ul></div>
+
+  <h2 id="issue1">2. Issue 1 · Bulk listing: POST /orders/bulk returns 500</h2>
+  <div class="tablecard"><table>
+    <tr><th>Field</th><th>Value</th></tr>
+    <tr><td>Endpoint</td><td><code>POST https://apistage.endlessdomains.io/api/v1/marketplacev2/orders/bulk</code></td></tr>
+    <tr><td>When</td><td>24 Nov 2026, late morning IST; first try and Try again</td></tr>
+    <tr><td>Response</td><td><code>{"statusCode":500,"message":"Internal server error"}</code>, in about 0.37 s (server wait 366 ms)</td></tr>
+    <tr><td>Batch</td><td>2 names: weiwuxianlanwangji.og, tpenguofficial.og · maker 0x8FD5…Be4D0 · chain 137</td></tr>
+    <tr><td>Request body</td><td><code>{ chainId: 137, orders: [{ parameters, signature, domainName } × 2] }</code>; each signature is the bulk form (64 bytes + 3 byte index + proof)</td></tr>
+    <tr><td>What the drawer did</td><td>"Signed, but not published yet. We couldn't reach the marketplace. Try again. You won't need to sign again." with Try again and Close without listing. Correct handling.</td></tr>
+    <tr><td>History of these names</td><td>Both were cancelled on chain on 23 Nov (bulk delist of 6, confirmed). weiwuxianlanwangji.og was also relisted after an on chain cancel on 23 Nov, and that worked.</td></tr>
+  </table></div>
+
+  <h2 id="issue2">3. Issue 2 · Delist: POST /orders/cancel-bulk returns 500, cancel sent twice</h2>
+  <div class="tablecard"><table>
+    <tr><th>Field</th><th>Value</th></tr>
+    <tr><td>Endpoint</td><td><code>POST https://apistage.endlessdomains.io/api/v1/marketplacev2/orders/cancel-bulk</code></td></tr>
+    <tr><td>When</td><td>Tue, 24 Nov 2026 06:37:31 GMT (12:07 IST)</td></tr>
+    <tr><td>Response</td><td>500 Internal Server Error, 52 bytes, in about 285 ms</td></tr>
+    <tr><td>Name</td><td>westbengal.og (listed at 300 USDT)</td></tr>
+  </table></div>
+  <div class="phase">
+    <div class="phase-head"><span class="num">!</span><h3>What happened, step by step</h3></div>
+    <ol>
+      <li>Edit price → Remove this listing → <b>Delist</b>. MetaMask sent the Seaport <code>cancel</code> transaction: the listing is <b>really cancelled on the blockchain</b>.</li>
+      <li>Our code then called <code>cancel-bulk</code> with the transaction hash so the backend records it. That call failed with 500.</li>
+      <li>Our code showed "Cancel sent on the blockchain. The marketplace may take a minute to update.", closed the drawer and refreshed the table.</li>
+      <li>The backend still thinks the order is active, so the row kept showing <b>Edit price</b> and no "Cancelling" label (that label also comes from the backend).</li>
+      <li>Delist pressed again: our code had no memory of the first cancel, so MetaMask asked for a <b>second cancel transaction</b>. Harmless on chain (Seaport cancels it again), but a second small fee.</li>
+    </ol>
+    <p class="muted">Once the backend is fixed, its chain watcher (BL-08 sweep) should see the cancel on chain and update the row by itself.</p>
+    <div class="callout ok"><p><b>Update, 24 Nov (later the same morning): recovered by itself.</b> The backend's chain watcher saw the cancel on the blockchain and confirmed it: the cancel email arrived, and after a refresh westbengal.og shows <b>List</b>. So an unrecorded cancel heals on its own; the seller just can't tell meanwhile, which is why the guard in section 6 still matters.</p></div>
+  </div>
+
+  <h2 id="checked">4. What we checked (ruled out)</h2>
+  <div class="tablecard"><table>
+    <tr><th>Suspect</th><th>Finding</th></tr>
+    <tr><td>Our request changed in phase 7</td><td>No. Phase 7's only change near signing is the expiry read before signing; the body sent is unchanged</td></tr>
+    <tr><td>A rejection of our data</td><td>No. The backend would answer with a code (ALREADY_LISTED, STALE_COUNTER…) or a 400, not a crash</td></tr>
+    <tr><td>Relist rule (BL-08, <code>relist-guard.service.ts</code>)</td><td>Handles cancelled and cancel pending orders without crashing; a failed chain read becomes a 503, not a 500</td></tr>
+    <tr><td>Cancel confirmation (<code>applyCancelByHash</code>)</td><td>Handles a null transaction hash safely</td></tr>
+    <tr><td>"One active listing per name" index</td><td>Cancelled orders don't count against it</td></tr>
+    <tr><td>Listing history insert</td><td>Uses ignore on conflict; its index migration is from October</td></tr>
+    <tr><td>Login token change (23 Nov, <code>access-token.strategy.ts</code>)</td><td>Would give 401, not 500</td></tr>
+  </table></div>
+
+  <h2 id="cause">5. Likely cause (to confirm with Guru)</h2>
+  <div class="callout warn"><p><b>A database migration timing gap on stage, from the multi chain work. No code fix was needed; it healed once the database caught up.</b></p></div>
+  <div class="tablecard"><table>
+    <tr><th>When (UTC)</th><th>What</th></tr>
+    <tr><td>23 Nov 10:25</td><td>MC-06 merged into the multi chain branch: new amount columns and a chain aware "one active listing per name" index on the orders table, with a backfill on start</td></tr>
+    <tr><td>24 Nov 06:08</td><td>MC-07 merged: <code>chainId</code> and <code>tokenContract</code> on listing status and listing history, and a new unique key <code>(userId, chainId, tokenContract, tokenId)</code></td></tr>
+    <tr><td>24 Nov morning</td><td>Bulk post 500 (every try)</td></tr>
+    <tr><td>24 Nov 06:37</td><td><code>cancel-bulk</code> 500, half an hour after MC-07</td></tr>
+    <tr><td>24 Nov later</td><td>Cancel recorded by the chain watcher, email sent, row shows List: writes work again</td></tr>
+  </table></div>
+  <div class="card"><ol>
+    <li>With MC-07, every listing and every cancel writes the listing status row with the new key (<code>upsertListed</code> / <code>upsertUnlisted</code> on <code>userId, chainId, tokenContract, tokenId</code>).</li>
+    <li>If the new code ran on stage before its migration added those columns and that key, the database refuses the write, the server doesn't catch it, and the answer is a 500. Both the bulk post and <code>cancel-bulk</code> do this write.</li>
+    <li>Reads don't touch these columns, so my-domains and my-listings kept working. The error comes straight from the database, which fits the fast failure (under 0.4 s).</li>
+    <li>MC-07 even logs this case: <i>"MARKETPLACEV2 SCHEMA NOT MIGRATED: the MC-07 migration has not run on this database"</i>.</li>
+    <li>Once the migration ran (or the backfill finished), writes worked again and the chain watcher confirmed the westbengal cancel.</li>
+  </ol>
+  <p class="muted">Not confirmed: which branch stage runs and when the migration ran. Earlier suspects (the 23 Nov S3 and Google login changes) don't explain a 500 on these writes.</p></div>
+  <div class="card"><p><b>Question for Guru:</b> "This morning POST /orders/bulk and /orders/cancel-bulk gave 500 on stage, and it cleared by itself around noon. Was stage running the multichain branch (MC-06 / MC-07) before its migration ran? Just want to confirm so we note the cause correctly."</p></div>
+
+  <h2 id="ours">6. Our side: safeguards built, then removed pending Mohit sir</h2>
+  <div class="callout warn"><p><b>24 Nov, later:</b> the four safeguards were built, then the overall code review (<code>bulk-list-code-review.html</code>) found three high and several medium issues in them. They aren't in Mohit sir's requirements, so you decided to <b>remove them and ask Mohit sir</b>. Only safeguard 1, the clearer message, was kept.</p></div>
+  <div class="tablecard"><table>
+    <tr><th>#</th><th>Safeguard</th><th>State</th></tr>
+    <tr><td>1</td><td>Clearer toast when the record fails: "Your listing is cancelled on the blockchain. The marketplace hasn't caught up yet, so it may still show as listed for a while. You don't need to delist it again."</td><td><b>Kept</b></td></tr>
+    <tr><td>2</td><td>"Cancelling" on the row at once from the browser's memory of the sent transaction</td><td>Removed</td></tr>
+    <tr><td>3</td><td>Block a second paid cancel ("A cancel for this listing is already on its way…")</td><td>Removed</td></tr>
+    <tr><td>4</td><td>Retry <code>cancel-bulk</code> with the same transaction hash on load and every 20 s</td><td>Removed</td></tr>
+  </table></div>
+  <div class="card"><p><b>Message for Mohit sir:</b> Sir, on 24 Nov the stage backend failed to record a delist (cancel-bulk returned 500) after the cancel transaction had already gone through on chain. The row kept showing the listing, and pressing Delist again sent a second paid cancel. The backend healed itself a few minutes later from the chain. We built safeguards for this (remember a sent cancel in the browser, show "Cancelling" at once, block a second paid cancel, retry recording with the same transaction hash), but they are not in your requirements and the code review found holes in them, so we removed them and kept only a clearer message: "Your listing is cancelled on the blockchain. The marketplace hasn't caught up yet, so it may still show as listed for a while. You don't need to delist it again." Do you want the full safeguards in this release?</p></div>
+  <div class="card"><p><b>If he says yes, rebuild them this way</b> (the review's fixes):</p>
+    <ul>
+      <li><b>Save at the moment of sending:</b> write the entry (recorded false) as soon as the transaction hash exists, then mark it recorded; add a timeout to the record call (review H2).</li>
+      <li><b>Never prune an unrecorded entry because its row is missing</b> (a failed page load or a non listed order like "Cancel again" or "Cancel older listings"); prune only after a successful record or when the backend shows the order settled (H1, H3).</li>
+      <li><b>Tie entries to the seller wallet</b> and filter by the connected wallet; stop retrying on 403 or 400 (M12).</li>
+      <li><b>Check the transaction receipt</b>; drop dropped, reverted or replaced transactions and offer Cancel again after about 30 minutes (M6).</li>
+      <li><b>Poll only while something can still change</b>, and stop when the wallet proof lapses (M13); count only the hashes actually sent in bulk delist (L18).</li>
+      <li>The removed code is kept locally in the scratchpad folder <code>safeguards-removed-24nov</code> (files plus a diff) for reference.</li>
+    </ul></div>
+
+  <h2 id="guru">7. Message for Guru</h2>
+  <div class="card"><p>Hi Guru, on stage (apistage.endlessdomains.io) the marketplacev2 POST calls are returning 500 "Internal server error" since this morning:</p>
+    <ul>
+      <li>POST /marketplacev2/orders/bulk: every try, incl. retry with the same signed batch (2 names: weiwuxianlanwangji.og, tpenguofficial.og).</li>
+      <li>POST /marketplacev2/orders/cancel-bulk: 24 Nov 06:37:31 GMT, for westbengal.og. The Seaport cancel transaction itself went through on chain (twice), so the order is cancelled on chain but not recorded.</li>
+    </ul>
+    <p>GET calls (my-domains, my-listings) work fine. Same flows worked on 23 Nov. Could you check the server log? Maybe something from yesterday's deploy (S3 / Google auth changes).</p></div>
+
+  <h2 id="next">8. Next steps</h2>
+  <div class="tablecard"><table>
+    <tr><th>#</th><th>Step</th><th>Who</th><th>State</th></tr>
+    <tr><td>1</td><td>Send the message above to Guru</td><td>You</td><td>To do</td></tr>
+    <tr><td>2</td><td>Optional check: bulk list two names never listed before, and one single List; tells Guru whether every POST fails</td><td>You</td><td>To do</td></tr>
+    <tr><td>3</td><td>Frontend safeguards (section 6)</td><td>You</td><td>Built, then removed 24 Nov after the review; toast kept; ask Mohit sir</td></tr>
+    <tr><td>4</td><td>Check westbengal.og updates by itself</td><td>You</td><td>Done: email arrived, row shows List</td></tr>
+    <tr><td>5</td><td>Try the bulk listing again to see whether the bulk 500 is gone too; then finish the phase 7 manual tests</td><td>You</td><td>To do</td></tr>
+  </table></div>
+
+  <footer>Bulk listing v2 · incident 24 Nov 2026 · related: <code>bulk-listing-progress.html</code> (v2 Phase 7) · dev-docs is local only.</footer>
+</div>
+<script>
+  document.getElementById('toggle').addEventListener('click', function () {
+    var root = document.documentElement;
+    var current = root.getAttribute('data-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('dmplan-theme', next); } catch (e) {}
+  });
+</script>
+</body>
+</html>

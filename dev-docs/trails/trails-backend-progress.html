@@ -1,0 +1,695 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trails Backend Integration</title>
+<script>
+  try {
+    var saved = localStorage.getItem('dmplan-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  } catch (e) {}
+</script>
+<style>
+  :root {
+    --bg: #f9f9f9; --surface: #ffffff; --surface-soft: #f3f4fe;
+    --text: #111111; --text-muted: #5b5b66; --border: #e6e6e6;
+    --accent: #2639ED; --accent-soft: #e9ebfd;
+    --wait: #9457f6; --wait-soft: #f4eefe;
+    --ok: #12805c; --ok-soft: #e4f5ee;
+    --warn: #b4540a; --warn-soft: #fdf1e4;
+    --bad: #c4314b; --bad-soft: #fdecef;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+      --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+      --accent: #7f8cff; --accent-soft: #1d2150;
+      --wait: #b996fa; --wait-soft: #2c2142;
+      --ok: #4fd1a0; --ok-soft: #173229;
+      --warn: #f5a35c; --warn-soft: #3a2614;
+      --bad: #ff7d93; --bad-soft: #3a1c24;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+    --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+    --accent: #7f8cff; --accent-soft: #1d2150;
+    --wait: #b996fa; --wait-soft: #2c2142;
+    --ok: #4fd1a0; --ok-soft: #173229;
+    --warn: #f5a35c; --warn-soft: #3a2614;
+    --bad: #ff7d93; --bad-soft: #3a1c24;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: "Satoshi", system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.6; }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 48px 16px 80px; }
+  header.top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+  .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; }
+  h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.15; margin: 0 0 12px; }
+  .lede { color: var(--text-muted); margin: 0; max-width: 680px; }
+  .lede a { color: var(--accent); }
+  .toggle { flex-shrink: 0; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 14px; cursor: pointer; }
+  .toggle:hover { border-color: var(--accent); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 32px; }
+  nav.toc a { font-size: 14px; text-decoration: none; color: var(--accent); background: var(--accent-soft); padding: 6px 12px; border-radius: 999px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 0 0 16px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+  .stat b { display: block; font-size: 26px; line-height: 1.2; }
+  .stat span { font-size: 13px; color: var(--text-muted); }
+  h2 { font-size: 22px; margin: 52px 0 16px; }
+  h3 { font-size: 18px; margin: 0; }
+  h4 { font-size: 15px; margin: 22px 0 8px; color: var(--accent); }
+  p { margin: 0 0 12px; }
+  .muted { color: var(--text-muted); font-size: 15px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
+  .card p:last-child { margin-bottom: 0; }
+  .card ul, .card ol { margin: 8px 0 0; padding-left: 20px; }
+  .card li { margin-bottom: 6px; }
+  code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .86em; background: var(--surface-soft); border-radius: 6px; padding: 1px 6px; word-break: break-word; }
+  .findings { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .finding { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+  .finding h3 { font-size: 16px; margin-bottom: 6px; }
+  .finding p { font-size: 15px; margin: 0; color: var(--text-muted); }
+  .tablecard { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow-x: auto; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: 0; }
+  th { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+  td.grp { font-weight: 600; color: var(--accent); background: var(--surface-soft); font-size: 13px; }
+  .sw { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .chip { width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(128,128,128,.45); flex-shrink: 0; }
+  .callout { border-left: 4px solid var(--wait); background: var(--wait-soft); border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; }
+  .callout p { margin: 0; }
+  .callout.ok { border-color: var(--ok); background: var(--ok-soft); }
+  .callout.warn { border-color: var(--warn); background: var(--warn-soft); }
+  .issue { display: grid; grid-template-columns: 28px 1fr; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--bad); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+  .issue .n { font-weight: 700; color: var(--bad); }
+  .issue p { margin: 0; font-size: 15px; }
+  .issue .where { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+  .phase { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px 24px; margin-bottom: 14px; }
+  .phase-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  .num { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 15px; flex-shrink: 0; }
+  .tag { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+  .tag.now { background: var(--ok-soft); color: var(--ok); }
+  .tag.wait { background: var(--wait-soft); color: var(--wait); }
+  .tag.size { background: var(--surface-soft); color: var(--text-muted); }
+  .tag.new { background: var(--warn-soft); color: var(--warn); }
+  .rows { display: grid; grid-template-columns: 130px 1fr; gap: 6px 16px; font-size: 15px; }
+  .rows dt { color: var(--text-muted); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; padding-top: 2px; }
+  .rows dd { margin: 0; }
+  ol.qs { counter-reset: q; list-style: none; padding: 0; margin: 0; }
+  ol.qs li { counter-increment: q; position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px 14px 56px; margin-bottom: 10px; }
+  ol.qs li::before { content: counter(q); position: absolute; left: 16px; top: 14px; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  ol.qs.team li::before { background: var(--wait-soft); color: var(--wait); }
+  ol.qs b { display: block; margin-bottom: 2px; }
+  ol.qs span { color: var(--text-muted); font-size: 15px; }
+  footer { margin-top: 56px; font-size: 13px; color: var(--text-muted); }
+  @media (max-width: 700px) {
+    header.top { flex-direction: column; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .findings { grid-template-columns: 1fr; }
+    .card, .phase { padding: 18px; }
+    .rows { grid-template-columns: 1fr; }
+    .rows dt { padding-top: 8px; }
+    ol.qs li { padding-left: 50px; }
+  }
+</style>
+<style>
+  .tag.done { background: var(--ok-soft); color: var(--ok); }
+  .tag.todo { background: var(--surface-soft); color: var(--text-muted); }
+  .meta { font-size: 14px; color: var(--text-muted); margin: 0 0 14px; }
+  .phase ul { margin: 6px 0 0; padding-left: 20px; font-size: 15px; }
+  .phase li { margin-bottom: 6px; }
+</style>
+<style>pre{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;overflow-x:auto;font-size:13px}</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <div>
+    <p class="eyebrow">Trails checkout · backend integration log</p>
+    <h1>Switching Trails to our backend</h1>
+    <p class="lede">Build log for moving "Pay with any token" from the buyer's browser onto our server's Trails APIs, following <a href="trails-backend-integration-plan.md">trails-backend-integration-plan.md</a> and the backend team's document "Trails Checkout: Backend APIs for Frontend Integration" (v2, 16 Nov 2026). Branch <code>trails</code>, starting from <code>1622027</code>. Updated after every phase. The earlier build (phases 0 to 12, review fixes, 12 Nov checks) stays in <a href="trails-progress.html">trails-progress.html</a>. The whole flow, before and after, explained in plain words: <a href="trails-flow-explained.html">trails-flow-explained.html</a>.</p>
+  </div>
+  <button class="toggle" id="toggle" type="button">Toggle theme</button>
+</header>
+
+<div class="stats">
+  <div class="stat"><b>7 / 11</b><span>phases built (0 to 6); 4, 5 and 6 checked with real purchases on 18 Nov</span></div>
+  <div class="stat"><b>150</b><span>automated tests passing</span></div>
+  <div class="stat"><b>5</b><span>real purchases 18 Nov (4 Trails, 1 USDT), all bought</span></div>
+  <div class="stat"><b>3</b><span>commits, all pushed: <code>02cd1d9</code>, <code>95d448a</code>, <code>389614c</code>; production build passes</span></div>
+</div>
+
+<div class="callout ok" id="now">
+  <p><b>Where things stand (18 Nov 2026, end of day)</b></p>
+  <p><b>Merged into uat 18 Nov 2026</b> as pull request #237 (<code>abad68e</code>, includes <code>389614c</code>). Reminder for uat: DevOps needs <code>NEXT_PUBLIC_TRAILS_ENABLED</code> and <code>NEXT_PUBLIC_TRAILS_API_KEY</code> set for "Any token" to show, and testers should not pay with USDT on Polygon through Trails until F9 is fixed.</p>
+  <ol>
+    <li><b>Built:</b> phases 0 to 6 (<code>02cd1d9</code>, pushed 17 Nov). Mohit's code review R1 to R3, the backend developer's follow up and Claude's final review 1 to 8 are fixed in <code>95d448a</code>, the T6 findings (toast name, login notice) in <code>389614c</code>; all pushed to <code>origin/trails</code> 18 Nov, and the production build passes.</li>
+    <li><b>Tested with real money:</b> T5, T6, T8, T9, T17 passed (Account 3, USDC on Base); T19, the normal USDT purchase, passed (Account 1). See the <a href="#testing">Testing log</a>.</li>
+    <li><b>Next, in order:</b> 1) send Mohit one message with only the three release questions (F9 fix, deploy order, wording); 3) while waiting, T18 (POL or USDC on Polygon, decides the F9 fix), then T7, T11, T15.</li>
+    <li><b>Not started, waits on others:</b> A1 (retry a failed attach, needs the user's go ahead), phase 7 (API 6), phase 8 (F1), phase 9 (after production).</li>
+  </ol>
+</div>
+<div class="callout warn" id="waiting">
+  <p><b>Waiting on others</b> (kept at the top; tick off here)</p>
+  <ol>
+    <li><b>F9 fixed in backend code 18 Nov</b> (backend uat <code>abe9657c</code>, Guru, "Trails Sprint 20": the verifier accepts the same chain shape for USDT on Polygon, every origin call checked, fee capped at 1 USDT). <b>Seen working on stage 18 Nov (T14 passed).</b> POL or USDC on Polygon are not covered by the new shape: <b>T18</b> still checks them. <s> (verifier check 3, no destination calls). Mohit received the alert emails. Options in plan §3 (Q27); run T18 first. <b>Decides the deploy:</b> server path once F9 is solved, otherwise ship with <code>NEXT_PUBLIC_TRAILS_SOURCE=browser</code>.</s></li>
+    <li><b>F1, same wallet race shown as success, no refund email:</b> backend fix. Phase 8 waits on it. Note to the backend (plan §7) not sent yet.</li>
+    <li><b>Sprint 21 merged in backend uat 18 Nov</b> (<code>abe9657c</code>): a paid intent after a mismatch is watched 30 minutes, alerted once and follows the normal success or refund path with its email. Covers <b>mismatch only</b>: a paid quote refused as <code>expired</code> is still not tracked by the backend (our frontend follows it anyway); question B1 answered "no". <s> (backend developer, 18 Nov): keep tracking a paid intent the server refused, and send the normal emails. Two questions for him: does it also cover a quote refused as <code>expired</code>? Can a paid refused checkout be reported after a reload (final review point 10)?</s></li>
+    <li><b>Mohit:</b> the 12 questions in his status doc, plus Q18, Q28, Q29 and wording W1 to W5. Only three block release: F9 fix, deploy order, wording.</li>
+    <li><b>API 6 (receipt network fee note)</b> reaches uat after the next production release. Phase 7 waits on it.</li>
+  </ol>
+</div>
+
+<p class="meta"><b>Status page for Mohit sir (17 Nov):</b> <a href="trails-backend-status-for-mohit.html">trails-backend-status-for-mohit.html</a>, with the 12 questions that need his answer (not yet updated with the 18 Nov fixes and tests). <b>Short status for Mohit sir (18 Nov, done and left only):</b> <a href="trails-status-for-mohit-18-nov.html">trails-status-for-mohit-18-nov.html</a>. <b>Whole flow explained:</b> <a href="trails-flow-explained.html">trails-flow-explained.html</a>.</p>
+<p class="meta">Jump to: <a href="#status">Status</a> · <a href="#findings">Findings</a> · <a href="#code-review">Mohit's review</a> · <a href="#final-review">Final review</a> · <a href="#t6-fixes">T6 fixes</a> · <a href="#doc-check">Check against the document</a> · <a href="#phases">Phase log</a> · <a href="#testing">Testing log</a> · <a href="#problems">Problems we ran into</a> · <a href="#future-tests">Tests still to do</a> · <a href="#bug-same-chain">Bug report for Mohit</a> · <a href="#mohit-wording">Wording for Mohit</a> · <a href="#decisions">Decisions</a> · <a href="#questions">Open questions</a> · <a href="#how-to-test">How to test</a> · <a href="#files">Files</a></p>
+
+<h2 id="status">Status by phase</h2>
+<div class="tablecard"><table>
+  <thead><tr><th>Phase</th><th>What</th><th>Status</th></tr></thead>
+  <tbody>
+    <tr><td>0</td><td>Confirm the APIs are live on stage</td><td><span class="tag done">Done 17 Nov</span> (note to backend not sent)</td></tr>
+    <tr><td>1</td><td>Contract and types</td><td><span class="tag done">Done 17 Nov, committed 02cd1d9</span></td></tr>
+    <tr><td>2</td><td>Backend checkout source</td><td><span class="tag done">Done 17 Nov, committed 02cd1d9</span></td></tr>
+    <tr><td>3</td><td>Who sees the option (API 1)</td><td><span class="tag done">Done 17 Nov, committed 02cd1d9</span></td></tr>
+    <tr><td>4</td><td>Starting a purchase (APIs 2 and 3)</td><td><span class="tag done">Done; 4 real purchases 18 Nov</span> Screens still to see: decline, own listing, price hold (T1 to T4), someone else paying (T7)</td></tr>
+    <tr><td>5</td><td>Status (API 4)</td><td><span class="tag done">Done; T5, T6 passed 18 Nov</span> Fixes in <code>95d448a</code> and the uncommitted T6 fixes</td></tr>
+    <tr><td>6</td><td>Resume and the /history banner (API 5); flip the default to backend</td><td><span class="tag done">Done; T8, T9, T17 passed 18 Nov</span> T10 (no money) still to see</td></tr>
+    <tr><td>7</td><td>Receipt network fee note (API 6)</td><td><span class="tag todo">Waits on the production release</span></td></tr>
+    <tr><td>8</td><td>Refund wording and the same wallet case</td><td><span class="tag todo">Waits on backend fix F1</span></td></tr>
+    <tr><td>9</td><td>Clean up the browser path</td><td><span class="tag todo">After production is proven</span></td></tr>
+    <tr><td>10</td><td>QA on uat with real money</td><td><span class="tag todo">In progress</span> 5 of 12 money tests done; T7, T11, T15, T18 next</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="findings">What we found in the backend document (17 Nov)</h2>
+<p class="meta">Checked against frontend <code>1622027</code> and backend <code>origin/uat</code> <code>dffd15e2</code>. File references, data shapes, the eight statuses and the error codes all match.</p>
+<div class="tablecard"><table>
+  <thead><tr><th>#</th><th>Finding</th><th>Who</th><th>Status</th></tr></thead>
+  <tbody>
+    <tr><td>F1</td><td><b>Refund shown as "is yours".</b> The server copied our rule 1 (<code>trails-tracker.rules.ts:132</code>, <code>trails-checkout-state.mapper.ts</code>): when the same wallet owns the domain, the checkout is saved as succeeded even though Trails refunded it. No refund screen, no refund email (<code>onRefunded</code> skipped), admin counts a sale. Suggested fix: succeeded only when the sale's transaction is the checkout's <code>destinationTxHash</code>.</td><td>Backend</td><td>Note not sent</td></tr>
+    <tr><td>F2</td><td>Resume advice <code>status=attached,executing</code> would show unpaid quotes as "in progress".</td><td>Frontend</td><td>Done in phase 6: the banner lists <code>executing,failed</code>; resume also reads finished ones once</td></tr>
+    <tr><td>F3</td><td>Slippage 0.005 has no effect: the widget's quote request has no slippage field (seen 12 Nov).</td><td>Mohit, Q13</td><td>Open</td></tr>
+    <tr><td>F4</td><td><code>/config</code> timing contradicts itself (each drawer open vs once).</td><td>Frontend</td><td>Each drawer open; <code>getCheckoutSource()</code> doesn't read it (done in phase 2)</td></tr>
+    <tr><td>F5</td><td>Attach now answers <code>{ status, intentId }</code>; our contract returned nothing.</td><td>Frontend</td><td>Done in phase 1</td></tr>
+    <tr><td>F6</td><td><code>/config</code> returns min and max price; the document doesn't say to use them.</td><td>Frontend</td><td>Done in phase 3: the option is hidden outside the range</td></tr>
+    <tr><td>F7</td><td>401 on status (login expired) has no action.</td><td>Frontend</td><td>Done in phase 5: never ends the purchase, retried every 15 s, message shown</td></tr>
+    <tr><td>F8</td><td>New error <code>ALREADY_ATTACHED</code>.</td><td>Frontend</td><td>Done: added in phase 1, logged only (phase 4)</td></tr>
+    <tr><td>F9</td><td><b>Server refused a fresh quote (17 Nov, phase 4 browser test).</b> Account 1 had the widget open on swaparena.og (0.10 USDT); Account 2 (buyer <code>0x5b1cf339C3591e1628C6B91053C48dD790C7A24E</code>) pressed Continue: prepare 200 (checkout <code>47685799-0645-4797-9960-8da4ad00d58c</code>, buyer and calls correct), the widget quoted (intent <code>0x9c64ab12d6e532d06e9cc128e0d1e724bcbc3c03e1145b49ccf65d5566a3a001</code>), attach answered 200 <code>{ status: "mismatch", intentId: null }</code>, so the drawer showed "Couldn't start the payment". The server keeps the reason (<code>mismatchReason</code>, alert email) but doesn't return it. From the backend verifier (<code>intent-verifier.ts</code>), the price, chain, token, buyer and calls are ruled out by the prepare answer; left: check 8 (route provider not Relay), check 1 (quote created before the checkout, e.g. a reused quote), or the quote already on another checkout. <b>Cause found (17 Nov, Claude read both intents with Trails <code>GetIntent</code>):</b> Account 2 alone still got mismatch on a fresh checkout (<code>e799e978-8119-463d-8bb8-4e0f45c2be58</code>, intent <code>0xd34e9460c5f2c61a4842ebec0bc6e4624eea1f1fdff61adf592b8b6549a45701</code>). Both intents pay <b>USDT on Polygon to USDT on Polygon</b> (origin and destination chain 137, same token), so no bridge is needed and Trails returns <code>quote.routeProviders: []</code>. <b>Corrected 17 Nov from the server's own alert email (forwarded by Mohit):</b> the check that fails first is <b>check 3</b>, "destinationCalls is not the three call shape" (<code>intent-verifier.ts</code> <code>parse</code>): for a same chain, same token quote Trails sends <b>no <code>destinationCalls</code></b> and puts its 4 calls in <code>originCalls</code> (checked in all three intents with GetIntent). Check 8 (empty provider list, <code>intent-verifier.ts:141</code>) would also fail. Third checkout from the alert: <code>a947238c-78a3-4db3-b169-1d9bf450204a</code>, intent <code>0xd06d4f8e6eeff6feeae314cc098668352ba7fae849227af35dd5593fa3f75b01</code>, 06:41 UTC. The server emails an internal alert for every refused quote, so each of our three tries reached Mohit. Everything else in the intents is right (v1.5, created seconds after the checkout, EXACT_OUTPUT 100000, owner the buyer). Account 1 passed because it paid BNB on BSC (Relay). Impact: the widget defaults to Polygon USDT for wallets that hold it (seen 12 Nov), so those buyers hit "Couldn't start the payment" at once. Asked of the backend: support the same chain shape in the verifier (calls in originCalls, no bridge), or refuse it up front with a clear code so the drawer can point the buyer to "USDT from your wallet"? Frontend question (after their answer, new wording): tell such buyers to use "USDT from your wallet".</td><td>Backend (verifier rule); user and Mohit (wording)</td><td>Fixed 18 Nov (Sprint 20, <code>abe9657c</code>); confirmed on stage by T14</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="code-review">Code review by Mohit (18 Nov 2026)</h2>
+<p class="meta">Review of <code>02cd1d9</code>. Fixes committed as <code>95d448a</code> (18 Nov), not pushed yet.</p>
+<div class="tablecard"><table>
+  <thead><tr><th>#</th><th>Comment</th><th>Checked</th><th>Fix</th><th>Status</th></tr></thead>
+  <tbody>
+    <tr><td>R1</td><td><b>Must fix before prod: the drawer can say "Nothing was charged" after the buyer has paid.</b> (a) <code>BuyFlowModal.tsx:595</code> still acts on the server's answer to a quote (mismatch or expired) after Pay; if it arrives a second after Pay, the buyer reads "Nothing was charged" while money moves. (b) A checkout that ends as mismatch is always closed quietly, even if paid (<code>intentStatus.ts:191</code>). (c) Backend: <code>trails-checkout-attach.service.ts:152</code> marks a first failed quote as mismatch and doesn't store that intent, so a paid one isn't tracked and gets no refund email.</td><td>All three confirmed in the code (backend on uat <code>dffd15e2</code>, <code>mismatch()</code> stores only the reason, never the new intent id). Not only theoretical: our F9 is exactly a good quote wrongly refused.</td><td><b>Frontend (done):</b> the drawer remembers that Pay was pressed (widget <code>onSign</code>, or the payment landed) and from then on ignores the server's answer to a quote, keeps the widget and keeps tracking. A mismatch ends quietly only when Pay was never pressed; after Pay it ends as failed ("Payment didn't go through… If money left your wallet, Trails refunds it. Contact support…"), on the drawer or as the app toast. The flag is never cleared by a rejected wallet request, because the widget can ask twice and the first answer may already have sent the money (seen in T5). Files: <code>BuyFlowModal.tsx</code>, <code>useTrailsCheckout.ts</code> (<code>markPayPressed</code>), <code>checkoutTracker.ts</code> (<code>markCheckoutPayPressed</code>, <code>payPressed</code> passed to the app), <code>intentStatus.ts</code> (<code>checkoutOutcome(state, payPressed)</code>), <code>types/trails/checkout.ts</code> (<code>CheckoutLabel.payPressed</code>), <code>pages/_app.tsx</code>. <b>Backend (Mohit's team):</b> if Trails reports a deposit for an intent the backend refused, keep tracking it and raise an alert.</td><td>Frontend done 18 Nov, committed in <code>95d448a</code>: 131 tests (5 new), tsc clean, ESLint no errors (old <code>handleConnectWallet</code> warning), §8 clean. Manual check pending (hard to trigger on purpose: Polygon USDT, F9, pressing Pay before the attach answer). Backend part open.</td></tr>
+      <tr><td>R1b</td><td><b>Backend developer's reply (18 Nov):</b> backend half of R1 is being fixed in <b>Sprint 21</b> (it will keep tracking a paid intent it had rejected and send the normal success or refund email). Frontend asked for the same two changes as Mohit, with one difference: a mismatch checkout that shows a payment (deposit done, executing or later) must be <b>kept tracked to its real outcome</b> (success or refund), not closed out. Tests asked: mismatch before Pay shows "Couldn't start the payment" as today; mismatch after Pay keeps tracking with no "Nothing was charged"; a normal purchase and a refund behave exactly as before.</td><td>Our first R1 fix ended a paid mismatch at once as "Payment didn't go through". That's correct today (the backend stops tracking it) but would hide the real result once Sprint 21 is live.</td><td>A refused checkout is now watched to its outcome (<code>intentStatus.ts</code>: <code>mismatchShowsPayment</code>, <code>isMismatchFinal</code>; <code>isFinal</code> and <code>checkoutOutcome</code> take it into account; the tracker tells the poller whether Pay was pressed). Rules: a refund or our sale record ends it at once; Trails succeeded waits for our sale record like any success; a payment showing (EXECUTING, a destination or refund transaction) is watched up to 20 minutes; Pay pressed with nothing showing yet is watched up to 15 minutes, then "Payment didn't go through… Trails refunds it"; nothing paid ends quietly at once. Outcome: SUCCEEDED or our sale record = "is yours", REFUNDED = refund screen. FAILED/ABORTED/INVALID alone don't count as a payment (they also happen when a wallet request was cancelled). Files: <code>intentStatus.ts</code>, <code>watchCheckout.ts</code>, <code>checkoutTracker.ts</code>, tests.</td><td>Done 18 Nov (committed in <code>95d448a</code>): 140 tests (8 new), tsc clean, ESLint clean. Not covered: an <code>expired</code> attach answer after Pay is ignored in the drawer as asked, but a checkout whose status is <code>expired</code> still ends quietly; ask the backend developer whether Sprint 21 also tracks a paid intent refused as expired. Manual tests pending (see below).</td></tr>
+    <tr><td>R2</td><td><b>A new device shows old results again.</b> After a load, finished purchases from the last 24 hours that this browser hasn't shown are toasted (<code>intentStatus.ts:197</code>), so logging in on a new phone can pop up "X is yours" for purchases already seen elsewhere. Suggestion: only running purchases and refunds.</td><td>Confirmed: <code>RESUME_LIST_STATUSES</code> included <code>succeeded</code>, and "seen" is kept per browser (plan Q23), so every new device counted as not seen.</td><td>Resume now lists <code>executing</code>, <code>failed</code> and <code>refunded</code> only, as suggested. A running purchase that ends as succeeded is still toasted (it's watched while running). Also: a <code>failed</code> one is only picked up while it can still become refunded (20 minutes); after that it is finished and would be another old result. <code>intentStatus.ts</code> (<code>RESUME_LIST_STATUSES</code>, <code>resumableFromList</code>) and its tests.</td><td>Done 18 Nov (committed in <code>95d448a</code>). A refund can still show once per device; kept on purpose, it's money the buyer must know about.</td></tr>
+    <tr><td>R3</td><td><b>Logging in later doesn't pick up purchases.</b> Running purchases are only picked up if the buyer is logged in when the page first loads; logging in later in the same session misses them until a reload.</td><td>Confirmed: <code>useTrailsTracker</code> read the list once, on mount, only if the login cookie was there. It ran in <code>_app</code> above <code>AuthProvider</code>, so it couldn't see logins.</td><td>The list is now read on load when logged in <b>and again on every login</b> (<code>useAuth().authenticated</code>, the same signal the watchlist uses; every login flow calls <code>login()</code>). The hook moved into a small <code>TrailsPurchaseWatcher</code> in <code>pages/_app.tsx</code> rendered inside <code>AuthProvider</code> (draws nothing). Already watched purchases aren't watched twice, and ones already shown in this browser are skipped. Files: <code>useTrailsTracker.ts</code>, <code>pages/_app.tsx</code>.</td><td>Done 18 Nov (committed in <code>95d448a</code>). Manual check pending: start a Trails payment, log out in another tab and back in, see the result arrive without a reload (fits with T6).</td></tr>
+</tbody>
+</table></div>
+<p><b>How to test R1 by hand (backend developer's three checks):</b> 1) mismatch before Pay: pay with USDT on Polygon (F9 refuses it); expect "Couldn't start the payment". 2) mismatch after Pay: the server answers in about 0.3 s, too fast to press Pay first, so slow the attach call down: DevTools, Network, throttling "Slow 4G" (or a custom profile with a few seconds of latency) just before choosing Polygon USDT, then press Pay at once; expect no "Nothing was charged", "Payment in progress", then the real result. Real money, and only meaningful with F9 still live; agree with Mohit before trying. 3) A normal purchase and a refund (T5, T11) behave as before.</p>
+<p><b>What the frontend still can't do for R1:</b> after a reload, a paid checkout the server marked mismatch isn't picked up again (the list API resume skips mismatch, and the server has no record of the paid intent). Only the backend half of R1 covers that case.</p>
+<h2 id="final-review">Final code review by Claude (18 Nov 2026)</h2>
+<p class="meta">Full review of the Trails changes from <code>1622027</code> to the working tree (phases 1 to 6 plus the review fixes R1 to R3 and R1b), every finding checked against the code. Phases 1 to 6 came out clean; all ten findings were in the same day's review fixes. 1 to 8 fixed, committed in <code>95d448a</code>: 148 tests (8 new), tsc clean, ESLint no errors (old <code>handleConnectWallet</code> warning), section 8 layering clean.</p>
+<div class="tablecard"><table>
+  <thead><tr><th>#</th><th>Problem</th><th>Fix</th><th>Status</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>A login after an automatic logout didn't pick up running purchases (R3 incomplete). <code>AutoLogoutHandler</code> deletes the cookies without telling <code>AuthProvider</code>, so <code>authenticated</code> stays true across logout and login and the "read the list on login" effect never ran again.</td><td>The list is read whenever the login state <b>or the page</b> changes and the access token is a new one (a new login always has a new token; logging in goes to a new page). A failed read lets the next change try again. <code>useTrailsTracker.ts</code>.</td><td>Fixed</td></tr>
+    <tr><td>2</td><td>Right after a refusal following Pay, the drawer jumped to "Payment in progress" (<code>hasPaymentLanded</code> counts mismatch as landed) and removed the widget while the wallet could still be asking for its second approval.</td><td>New <code>showsPaymentProgress</code>: a refused checkout (mismatch or expired) shows progress only once money visibly moved. <code>intentStatus.ts</code>, <code>BuyFlowModal.tsx</code>.</td><td>Fixed</td></tr>
+    <tr><td>3</td><td>An <code>expired</code> attach answer after Pay was ignored in the drawer, but the checkout then ended silently: the buyer was left on a dead widget with no message even if money had left the wallet.</td><td>New <code>isRefused</code>: <code>expired</code> after Pay is followed like a mismatch (watched, real outcome, or "Payment didn't go through" if none in time), unless Trails says it was never paid (QUOTED or COMMITTED), which stays quiet so a cancelled wallet request doesn't produce a failure message.</td><td>Fixed (ask the backend developer whether Sprint 21 covers expired too)</td></tr>
+    <tr><td>4</td><td>Pressing Pay before the attach answered started tracking without the domain name, and later calls with the name were ignored, so the end toast said "Your domain is yours".</td><td><code>markPayPressed(domainLabel)</code> passes the name, and <code>track()</code> hands a late name to the tracker even when already following. <code>useTrailsCheckout.ts</code>, <code>BuyFlowModal.tsx</code>.</td><td>Fixed</td></tr>
+    <tr><td>5</td><td>A refused checkout where Trails reports FAILED after Pay was closed at 15 minutes, though a refund can come up to 20.</td><td>Same 20 minute window as any paid failure. <code>isRefusedFinal</code>.</td><td>Fixed</td></tr>
+    <tr><td>6</td><td>A refund on a refused checkout showed a toast with no amount (<code>state.refund</code> is only filled for status refunded).</td><td>The toast falls back to the purchase price the tracker already holds. <code>pages/_app.tsx</code>. (The drawer's refund screen already fell back to the price.)</td><td>Fixed</td></tr>
+    <tr><td>7</td><td>"Pay pressed" was kept in two places (drawer ref and tracker) with different resets, so drawer and toast could disagree; plus a duplicate <code>track()</code>.</td><td>The tracker is the only record: it passes Pay pressed to the drawer's <code>onFinal</code>, the drawer asks <code>trails.isPayPressed()</code>; the drawer ref and the extra call are gone. <code>checkoutTracker.ts</code> (<code>isCheckoutPayPressed</code>), <code>useTrailsCheckout.ts</code>, <code>BuyFlowModal.tsx</code>.</td><td>Fixed</td></tr>
+    <tr><td>8</td><td>Repeated checks in the new mismatch rules.</td><td>Rules regrouped into <code>isRefused</code>, <code>refusedShowsPayment</code>, <code>isRefusedFinal</code>, <code>showsPaymentProgress</code>, one shared state type.</td><td>Fixed</td></tr>
+    <tr><td>9</td><td>R2 side effect: a purchase that finishes while the tab is closed gets no "is yours" when the buyer comes back, though the progress screen promises "we'll let you know". Refunds are still resumed and can repeat on a new device, the same issue R2 removed for successes.</td><td>Decision for Mohit (Q29): keep R2 as is, or also show successes that finished in the last few minutes.</td><td>Open</td></tr>
+    <tr><td>10</td><td>A paid refused checkout is lost after a reload: Pay pressed lives only in the tab's memory and the list API doesn't return mismatch rows.</td><td>Needs the backend (after Sprint 21: report it, e.g. move the status once a payment shows, or list it). Note for the backend developer.</td><td>Open</td></tr>
+  </tbody>
+</table></div>
+<h2 id="t6-fixes">Fixes from the T6 test (18 Nov 2026)</h2>
+<p class="meta">Found while testing a login that expires during a purchase. Not committed yet. 150 tests, tsc clean, ESLint no errors.</p>
+<div class="tablecard"><table>
+  <thead><tr><th>#</th><th>Problem</th><th>Fix</th><th>Status</th></tr></thead>
+  <tbody>
+    <tr><td>A</td><td>Every "is yours" toast only said "Ownership transferred…": the design system's success toast shows one line and drops the title (since Sept), so the buyer never saw which domain.</td><td>One line with the name, approved by the user: "&lt;name&gt; is yours. It will appear in your account within 10 to 15 minutes." Used by the Trails toast and the USDT path toast (<code>BOUGHT_TOAST_TEXT</code> in <code>data/trails/copy.ts</code>).</td><td>Fixed, seen in the repeat run (thesoaltee.og)</td></tr>
+    <tr><td>B1</td><td>The "Log in again" notice could come from a background watch of a quote that was never paid.</td><td>Shown only when Pay was pressed or the payment landed (<code>checkoutTracker.ts</code>); the console line names the checkout (<code>watchCheckout.ts</code>).</td><td>Fixed</td></tr>
+    <tr><td>B2</td><td>After Pay the drawer stays on the widget until a status read shows the payment. With the login expired every read is 401, so the progress screen (which carries the "Log in again" line) never came, and the drawer's listener kept the app toast away: the buyer saw nothing.</td><td>The drawer shows the same "Log in again…" toast once in that case, and keeps the widget (the wallet may still be asking). <code>BuyFlowModal.tsx</code>.</td><td>Fixed; recheck once in the next purchase</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="doc-check">Code checked against the document, point by point (18 Nov)</h2>
+<p class="meta">Commit <code>02cd1d9</code> read line by line against every rule in the backend API document v2 (16 Nov). Plain words: almost everything matches; three places differ from the document in a way that matters, two more are known and already tracked.</p>
+<div class="tablecard"><table>
+  <thead><tr><th>#</th><th>Document says</th><th>Our code</th><th>Result</th></tr></thead>
+  <tbody>
+    <tr><td>C1</td><td>Base path <code>/marketplacev2/trails</code>, through <code>callBackend</code>, bearer from the login cookie, payload in <code>result</code>, errors as <code>{ code, message }</code></td><td><code>trailsBackend.service.ts</code> does exactly this for APIs 1 to 5</td><td>Matches</td></tr>
+    <tr><td>C2</td><td>API 1: call <code>/config</code> when the drawer opens; show the option only when <code>available</code>; drop the pilot wallet list</td><td>Read on every drawer opening, hidden until it answers, needs <code>enabled</code> and <code>available</code> and a price in range (F6); pilot list removed</td><td>Matches (the document's "getCheckoutSource calls it once" contradicts this, F4)</td></tr>
+    <tr><td>C3</td><td>API 1/2: pass <code>route</code> (slippage 0.005) to the widget</td><td><code>TrailsWidget.tsx:52-54</code> passes <code>checkout.route</code> from the server's prepare answer</td><td>Matches (the widget still ignores slippage, F3)</td></tr>
+    <tr><td>C4</td><td>API 2: send only <code>orderHash</code>; buyer comes from the token</td><td>Body is <code>{ orderHash }</code>; we also stop if the server's buyer isn't the connected wallet</td><td>Matches, with an extra safety check</td></tr>
+    <tr><td>C5</td><td>API 2: run <code>ensureWalletVerified</code> before prepare; WALLET_NOT_VERIFIED shows the sign step</td><td>Verify first, one forced retry on WALLET_NOT_VERIFIED, then the "wrong wallet" screen</td><td>Matches</td></tr>
+    <tr><td>C6</td><td>API 2: map each error code to a screen</td><td>All nine codes mapped; ORDER_NOT_FILLABLE goes to "no longer available"</td><td>Matches. Small gap: 429 (more than 10 tries a minute) and 400 show the general "Couldn't start the payment" screen; fine, its text already says try again in a moment</td></tr>
+    <tr><td>C7</td><td>API 3: attach on every quote; carry on unless <code>mismatch</code>; <code>expired</code> with null intent means start again; ALREADY_ATTACHED is log only</td><td>All four done in <code>handleTrailsAttached</code> and the <code>onQuote</code> catch</td><td>Matches</td></tr>
+    <tr><td>C8</td><td>API 3: CHAIN_UNAVAILABLE (503) means "nothing changed; retry"</td><td>A failed attach (503, network, 401, WALLET_NOT_VERIFIED) is only logged. No retry, and the widget still lets the buyer press Pay on a quote the server never stored</td><td><b>Differs, needs a fix (A1)</b></td></tr>
+    <tr><td>C9</td><td>API 4: poll status; 404 means expired; 401 is no token</td><td>Polls every 5 s (15 s after 5 min); 404 ends quietly as expired; 401 shows "log in again" and keeps tracking (F7)</td><td>Matches</td></tr>
+    <tr><td>C10</td><td>Status <code>failed</code>: "can still turn into refunded; keep polling"</td><td>We stop after 20 minutes and show "Payment didn't go through"</td><td><b>Differs (A2)</b></td></tr>
+    <tr><td>C11</td><td>Status <code>succeeded</code>: "show success once <code>sale</code> is set"</td><td>We wait for <code>sale</code>, but after 20 minutes without it we show "is yours" anyway</td><td><b>Differs (A3)</b>, already open as Q18</td></tr>
+    <tr><td>C12</td><td>API 5: resume and the /history banner read the list; drop the localStorage store</td><td>Both read API 5 on the server path (<code>executing,failed</code>, F2); the store stays only for the browser rollback and the domain name</td><td>Matches (removal is phase 9)</td></tr>
+    <tr><td>C13</td><td>Refund copy: say the listing changed before the payment arrived; never say it was sold</td><td>Says "The purchase couldn't complete"; never says sold</td><td>Partly: not the document's wording yet; planned in phase 8 (waits on F1)</td></tr>
+    <tr><td>C14</td><td>API 6: receipt network fee note</td><td>Not built</td><td>Expected: phase 7, after the production release</td></tr>
+  </tbody>
+</table></div>
+<h3>What needs a fix</h3>
+<ol>
+  <li><b>A1, a failed attach is ignored (most important).</b> If attaching a quote fails (server busy, network drop, login expired, or wallet verification older than 60 minutes, which can happen when prepare ran with a 54 minute old verification and the buyer paid 10 minutes later), the server never stores that quote. The buyer can still press Pay. The server then can't link the payment to the checkout, so neither the drawer nor the backend's background tracker sees it finish, and no email is sent. Suggested fix: retry the attach (for example 3 tries, 2 s apart); if it still fails, take the buyer off the pay step to a "Couldn't start the payment, nothing was charged" screen before they can pay, and for WALLET_NOT_VERIFIED verify again and re attach. Needs the user's go ahead (new screen behaviour).</li>
+  <li><b>A2, failed shown too early.</b> The document says <code>failed</code> can still become <code>refunded</code>. We give up after 20 minutes and say "didn't go through". Our text already says "If money left your wallet, Trails refunds it", so the buyer isn't misled, but the refund screen never appears if it comes later. Options: keep polling a failed checkout longer (the server tracks it anyway), or keep it as is and rely on the backend's refund email. Question for Mohit (Q28).</li>
+  <li><b>A3, success without our sale record.</b> Same as Q18, already with Mohit. No change until he answers.</li>
+</ol>
+<h2 id="phases">Phase log</h2>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">0</span><h3>Confirm the APIs are live</h3><span class="tag done">Done 17 Nov</span></div>
+  <p><b>In plain words:</b> before changing any code, we checked that the server's Trails APIs answer on stage exactly as the backend document says. They do. No code changed.</p>
+  <ul>
+    <li><b>Settings (<code>GET /marketplacev2/trails/config</code>):</b> 200, <code>Cache-Control: no-store</code>; enabled, available (also with no login: Trails is open to everyone on stage), minimum price <b>0.10 USDT</b> ("100000"), no maximum, route RELAY with slippage 0.005. A broken token counts as no login (200), as documented.</li>
+    <li><b>List, status and prepare without login:</b> 401, as documented. Opening the list link in the address bar also gives 401: the address bar sends no login header, which is the protection we want.</li>
+    <li><b>List with the user's login:</b> 200, <code>{ "message": "trails checkouts", "result": [] }</code>. Empty is expected: every purchase so far went through the browser path.</li>
+    <li><b>For later tests:</b> listings must be at least 0.10 USDT; the 0.05 USDT listings of 12 Nov would be refused (PRICE_OUT_OF_RANGE).</li>
+    <li><b>Slip:</b> while looking up the stage address, a command printed the Trails browser key into Claude's own output. It's the public key shipped inside the website, nothing new exposed; noted so it isn't repeated.</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">1</span><h3>Contract and types</h3><span class="tag done">Done 17 Nov, committed 02cd1d9</span></div>
+  <p><b>In plain words:</b> taught our code the shapes of the new server answers. Nothing changes on screen and the purchase still runs the old browser way.</p>
+  <div class="tablecard"><table><thead><tr><th>File</th><th>Change</th></tr></thead><tbody>
+    <tr><td><code>src/types/trails/checkout.ts</code></td><td><code>AttachResult</code> ({ status, intentId }); <code>CheckoutSource.attachIntent</code> returns it; <code>CheckoutListItem</code> (API 5 row); <code>ALREADY_ATTACHED</code> added to <code>CheckoutErrorCode</code></td></tr>
+    <tr><td><code>src/types/trails/config.ts</code></td><td><code>TrailsRoute</code>, <code>TrailsServerConfig</code> (API 1 answer)</td></tr>
+    <tr><td><code>src/core/services/trails/browserCheckoutSource.ts</code></td><td>Attach answers <code>{ status: 'attached', intentId }</code> (the browser has no server check)</td></tr>
+    <tr><td><code>src/hooks/trails/useTrailsCheckout.ts</code></td><td><code>attachIntent</code> returns the answer (the drawer acts on it from phase 4)</td></tr>
+    <tr><td><code>src/core/services/trails/browserCheckoutSource.test.ts</code></td><td>One test for the attach answer</td></tr>
+  </tbody></table></div>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">2</span><h3>Backend checkout source</h3><span class="tag done">Done 17 Nov, committed 02cd1d9</span></div>
+  <p><b>In plain words:</b> built the connection to our server's five Trails APIs, behind the same interface the drawer already uses, so switching needs no other change. It is <b>off by default</b>: the old browser way runs unless <code>NEXT_PUBLIC_TRAILS_SOURCE=backend</code> is set. Switching the default now would break resume after reload until phase 6, so the default flips at the end of phase 6 (Q22).</p>
+  <div class="tablecard"><table><thead><tr><th>File</th><th>Change</th></tr></thead><tbody>
+    <tr><td><code>src/core/services/trails/trailsBackend.service.ts</code> (new)</td><td>The only caller of the Trails routes: <code>getTrailsConfig</code>, <code>prepareCheckout</code>, <code>attachCheckoutIntent</code>, <code>getCheckoutState</code>, <code>listCheckouts</code>, through <code>callBackend</code></td></tr>
+    <tr><td><code>src/core/services/trails/backendCheckoutSource.ts</code> (new)</td><td>CheckoutSource on the server. Prepare refuses with WALLET_NOT_VERIFIED when the server's buyer isn't the connected wallet (so a domain never goes to the wrong wallet); 404 "Checkout not found" ends quietly as expired; 401 and 429 are passed on unchanged</td></tr>
+    <tr><td><code>src/helpers/trails/checkoutError.ts</code></td><td><code>toCheckoutError</code> (a backend code becomes the CheckoutError the screens know; anything else returns null so the original is rethrown) and <code>isCheckoutNotFound</code>; pure, duck typed (CLAUDE.md §8 rule 3)</td></tr>
+    <tr><td><code>src/core/services/trails/index.ts</code></td><td>Picks the source by <code>TRAILS_CONFIG.source</code>; doesn't read <code>/config</code> (F4)</td></tr>
+    <tr><td><code>src/constants/trails.ts</code>, <code>src/types/trails/config.ts</code></td><td><code>source: 'browser' | 'backend'</code> from <code>NEXT_PUBLIC_TRAILS_SOURCE</code></td></tr>
+    <tr><td>Tests (new)</td><td><code>backendCheckoutSource.test.ts</code> (12, against a fake backend), <code>checkoutError.test.ts</code> (5); <code>checkoutGate.test.ts</code> helper gains <code>source</code></td></tr>
+  </tbody></table></div>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">3</span><h3>Who sees the option (API 1)</h3><span class="tag done">Done 17 Nov, committed 02cd1d9</span></div>
+  <p><b>In plain words:</b> the "Any token, any chain" option now appears only when our server says this buyer may use Trails, and only for listings whose price is within the server's range (on stage: 0.10 USDT or more, no upper limit). Each time the drawer opens it asks the server again. Until the server answers, or if the call fails, the option stays hidden and the drawer looks exactly like the USDT only drawer. The pilot wallet list in the env file is no longer read. This works for both checkout sources, so nothing needs to change in <code>.env</code> to see it.</p>
+  <div class="tablecard"><table><thead><tr><th>File</th><th>Change</th></tr></thead><tbody>
+    <tr><td><code>src/helpers/trails/checkoutGate.ts</code></td><td>Rewritten. <code>isTrailsAvailable(config, serverConfig, priceUsdt)</code>: our switch and key on, the server enabled and available, price in range. New <code>isPriceInTrailsRange</code> (price to USDT minor units, rounded, compared with the server bounds; null maximum means no cap). <code>parsePilotWallets</code> removed</td></tr>
+    <tr><td><code>src/helpers/trails/checkoutGate.test.ts</code></td><td>Rewritten: 12 tests (minimum exactly, below it, no cap, a set cap, float rounding, zero and missing prices; switch off, no key, no server answer, server off or not available, price below the minimum)</td></tr>
+    <tr><td><code>src/hooks/trails/useTrailsCheckout.ts</code></td><td>Takes <code>isOpen</code>; reads <code>GET /config</code> on every open (starts from no answer, ignores a late answer after closing, logs a failure); returns <code>serverConfig</code></td></tr>
+    <tr><td><code>src/design-system/composites/marketplace/buying-flow/BuyFlowModal/BuyFlowModal.tsx</code></td><td>The gate moved below the hook and uses the server answer and the listing price</td></tr>
+    <tr><td><code>src/types/trails/config.ts</code>, <code>src/constants/trails.ts</code></td><td><code>pilotWallets</code> removed from the env config</td></tr>
+  </tbody></table></div>
+  <ul>
+    <li><b>Checked:</b> when the option is hidden, the payment cards always show USDT selected and the drawer pays with USDT (<code>PaymentMethodSection</code>, <code>WhatYouPaySection</code>); every new opening starts on USDT.</li>
+    <li><b>Small visible difference:</b> the option appears a moment after the drawer opens (the time the server takes to answer, usually well under a second).</li>
+    <li><b>Left for phase 9:</b> the <code>NEXT_PUBLIC_TRAILS_PILOT_WALLETS</code> line in <code>.env</code> and in the AWS env is now ignored; remove it then and tell DevOps.</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">4</span><h3>Starting a purchase (APIs 2 and 3)</h3><span class="tag done">Done 17 Nov (02cd1d9); 4 real purchases 18 Nov; T1 to T4, T7 screens still to see</span></div>
+  <p><b>In plain words:</b> on the server path, pressing "Continue to payment" now first makes sure the server knows this wallet is the buyer's. If the login has no fresh check for this wallet, the buyer signs one free message ("Verify your wallet"); otherwise nothing extra happens. Then the server checks the listing and prepares the payment. Every problem the server can report has its screen, including the new "Someone else is paying for this domain". When the widget quotes a price, the drawer now reads the server's answer: a quote that fails the server's check stops the purchase (nothing was paid), and a price hold that ran out offers "Start again". All of this only runs with <code>NEXT_PUBLIC_TRAILS_SOURCE=backend</code>; the default browser path is unchanged.</p>
+  <div class="tablecard"><table><thead><tr><th>File</th><th>Change</th></tr></thead><tbody>
+    <tr><td><code>src/design-system/composites/marketplace/buying-flow/useBuyFlowActions.ts</code></td><td>New <code>verifyWallet({ force, onVerifying })</code>: wraps <code>ensureWalletVerified</code> with the connected wallet's signer (same as the listing flow and Delist)</td></tr>
+    <tr><td><code>src/design-system/composites/marketplace/buying-flow/BuyFlowModal/BuyFlowModal.tsx</code></td><td>New step <code>trails-verifying</code> (also in the Trails steps a wallet change mustn't restart). <code>handleTrailsContinue</code>: verify, then prepare; on WALLET_NOT_VERIFIED from the server verify again with <code>force</code> and retry once; declined signature goes back to the payment options; wallet not linked to the account shows its screen. New blocked reasons <code>trails-busy</code> (CHECKOUT_IN_PROGRESS), <code>trails-wallet</code> (wallet not linked, or still not verified), <code>trails-quote-expired</code> (footer "Start again" and "Back"). New <code>handleTrailsAttached</code>: acts on the attach answer only while the drawer is on the payment step (mismatch: the existing "Couldn't start the payment" screen; expired: the price hold screen); ALREADY_ATTACHED is logged only</td></tr>
+    <tr><td><code>src/helpers/trails/intentStatus.ts</code></td><td><code>checkoutOutcome</code>: a <code>mismatch</code> checkout ends quietly like an unpaid quote, so the app never shows "Payment didn't go through" for a quote that was refused before Pay</td></tr>
+    <tr><td><code>src/helpers/trails/intentStatus.test.ts</code></td><td>New test for that; the old test that listed mismatch as failed updated, R</td></tr>
+  </tbody></table></div>
+  <ul>
+    <li><b>Why the mismatch change is safe:</b> the browser path never produces <code>mismatch</code>, and on the server only the attach step sets it, when the checkout has no valid quote yet (backend <code>trails-checkout-attach.service.ts:162, 173</code>), so before any payment.</li>
+    <li><b>Small risk noted:</b> if a buyer pressed Pay in the same instant the server refused the quote, the drawer leaves the payment step and that checkout ends quietly. The server decides what Trails runs, so this is the backend's check; worth one question to the backend team if it ever shows up.</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">5</span><h3>Status (API 4)</h3><span class="tag done">Done 17 Nov (02cd1d9); checked 18 Nov (T5, T6)</span></div>
+  <p><b>In plain words:</b> on the server path the app now asks <b>our server</b> how a purchase is going, every 5 seconds (the server itself refreshes from Trails every 5 seconds, so asking faster gains nothing), then every 15 seconds after 5 minutes. The old browser path keeps its 3 seconds. If the buyer's login expires while a purchase is running, nothing fails and nothing ends: the drawer says "Log in again to see your purchase status. Your purchase keeps going in the meantime." (or one small notice appears if the drawer is closed), the app keeps asking every 15 seconds, and it carries on by itself after the buyer logs in again. The server keeps tracking the purchase meanwhile and emails a refund if there is one.</p>
+  <p>Already in place from phase 2 and unchanged here: status comes from <code>GET /checkouts/:id</code> (including our sale record, so "is yours" comes from the server), an unknown checkout (404) ends quietly, and the browser no longer calls Trails for the status on the server path.</p>
+  <div class="tablecard"><table><thead><tr><th>File</th><th>Change</th></tr></thead><tbody>
+    <tr><td><code>src/helpers/trails/intentStatus.ts</code></td><td><code>BACKEND_FAST_POLL_MS</code> (5 s), <code>LOGIN_RETRY_MS</code> (15 s); <code>pollIntervalMs(elapsed, fastMs)</code> takes the fast interval</td></tr>
+    <tr><td><code>src/helpers/trails/checkoutError.ts</code></td><td><code>isLoginExpired</code> (401)</td></tr>
+    <tr><td><code>src/core/services/trails/watchCheckout.ts</code></td><td>5 s on the server path; on 401 calls <code>onLoginRequired(true)</code> once and waits 15 s; on the next good answer <code>onLoginRequired(false)</code></td></tr>
+    <tr><td><code>src/core/services/trails/checkoutTracker.ts</code></td><td>Passes it to the open drawer, or once per purchase to the app (<code>setCheckoutLoginRequiredHandler</code>) when nothing on screen follows it; a drawer that opens later is told at once</td></tr>
+    <tr><td><code>src/hooks/trails/useTrailsCheckout.ts</code></td><td><code>loginRequired</code> for the drawer</td></tr>
+    <tr><td><code>src/hooks/trails/useTrailsTracker.ts</code>, <code>pages/_app.tsx</code></td><td>Second handler: the "log in again" notice</td></tr>
+    <tr><td><code>src/design-system/composites/marketplace/buying-flow/trails/trailsOutcomeToast.ts</code></td><td><code>showTrailsLoginRequiredToast</code> (INFO toast)</td></tr>
+    <tr><td><code>src/data/trails/copy.ts</code></td><td><code>TRAILS_LOGIN_REQUIRED_TEXT</code></td></tr>
+    <tr><td><code>src/design-system/composites/marketplace/buying-flow/BuyFlowModal/BuyFlowModal.tsx</code></td><td>"Payment in progress" shows the login text instead of its subtext while the login is expired</td></tr>
+    <tr><td>Tests</td><td><code>intentStatus.test.ts</code> (5 s interval), <code>checkoutError.test.ts</code> (401), <code>checkoutTracker.test.ts</code> (3: drawer told, app notice once and nothing ended, late drawer told at once)</td></tr>
+  </tbody></table></div>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">6</span><h3>Resume and the /history banner (API 5); server path becomes the default</h3><span class="tag done">Done 17 Nov (02cd1d9); checked 18 Nov (T8, T9, T17)</span></div>
+  <p><b>In plain words:</b> the server now remembers running purchases, so the app no longer depends on the browser's storage. When the site loads and the buyer is logged in, it asks the server for their purchases from the last day and keeps watching the paid ones: a reload, a closed tab or <b>another device</b> picks a running purchase back up, and a purchase that finished while they were away shows its result once. The History banner "Purchase in progress" now comes from the server too, from any device, and only lists purchases that were actually paid, never a price someone only looked at. A small note in the browser remembers which results were already shown, so nothing is shown twice here. The end message still has the domain name: the drawer and the server list pass it to the tracker, since the server path saves nothing in the browser. <b>The server path is now the default</b>; <code>NEXT_PUBLIC_TRAILS_SOURCE=browser</code> brings back the old way.</p>
+  <div class="tablecard"><table><thead><tr><th>File</th><th>Change</th></tr></thead><tbody>
+    <tr><td><code>src/types/trails/checkout.ts</code></td><td><code>CheckoutLabel</code> (name and price for the end message), <code>PendingTrailsPurchase</code> (banner row)</td></tr>
+    <tr><td><code>src/helpers/trails/intentStatus.ts</code></td><td><code>RESUME_LIST_STATUSES</code>; <code>resumableFromList</code> (paid only, under a day old, not already shown); <code>pendingFromList</code> (executing or failed, with names)</td></tr>
+    <tr><td><code>src/core/services/trails/checkoutStore.service.ts</code></td><td><code>readSeenCheckoutIds</code>, <code>markCheckoutSeen</code> (localStorage <code>trails-checkouts-seen</code>, last 50 ids)</td></tr>
+    <tr><td><code>src/core/services/trails/checkoutTracker.ts</code></td><td><code>trackCheckout(id, startedAt, listener, label)</code>: takes the name when nothing is stored, or from a later caller; every finished purchase is marked as shown; handlers take <code>CheckoutLabel</code></td></tr>
+    <tr><td><code>src/hooks/trails/useTrailsCheckout.ts</code></td><td><code>track(domainLabel)</code> passes the name and price to the tracker; attach passes the domain name</td></tr>
+    <tr><td><code>src/hooks/trails/useTrailsTracker.ts</code></td><td>Server path: when logged in, lists <code>executing, failed, succeeded, refunded</code> (20) and tracks what <code>resumableFromList</code> keeps; the backend service is loaded on demand, so <code>_app</code> stays light (Mohit's review point 1). Browser path unchanged</td></tr>
+    <tr><td><code>src/hooks/trails/useTrailsPendingCheckouts.ts</code></td><td>Server path: lists <code>executing, failed</code> every 15 s when logged in; returns <code>PendingTrailsPurchase[]</code> for both paths</td></tr>
+    <tr><td><code>src/constants/trails.ts</code>, <code>src/types/trails/config.ts</code>, <code>src/core/services/trails/index.ts</code></td><td>Default flipped: server path unless <code>NEXT_PUBLIC_TRAILS_SOURCE=browser</code></td></tr>
+    <tr><td>Tests</td><td><code>intentStatus.test.ts</code> (3: what is resumed, seen and old skipped, banner rows), <code>checkoutTracker.test.ts</code> (3: name passed in, name from a later caller, finished marked as shown; the storage fake gains <code>markCheckoutSeen</code>)</td></tr>
+  </tbody></table></div>
+  <ul>
+    <li><b>Known limits (updated 18 Nov):</b> resume now runs on load and after every new login (R3, final review fix 1), and only picks up running purchases and refunds (R2), so a purchase that finished while the tab was closed shows no toast when the buyer returns (Q29). Purchases still saved by the old browser path aren't resumed on the server path (they finish on their own; the server never knew them).</li>
+    <li><b>Deploy note:</b> see the "Before this ships" item at the top (F9).</li>
+  </ul>
+</div>
+
+<h2 id="testing">Testing log</h2>
+<p class="meta">Per phase: what was tested, automated by Claude or manual by the user, where, the result, and what wasn't covered. Only what the user confirmed is claimed as manual.</p>
+<div class="tablecard"><table>
+  <thead><tr><th>Phase</th><th>Automated (Claude)</th><th>Manual / live (user)</th><th>Result</th></tr></thead>
+  <tbody>
+    <tr><td>0 APIs live</td><td>curl on apistage: config with no token and a broken token; list, status and prepare without login</td><td>List call from the user's logged in browser on localhost:3002: 200, empty</td><td>Pass</td></tr>
+    <tr><td>1 Contract and types</td><td>tsc clean; 93 tests</td><td>None needed (no change on screen)</td><td>Pass</td></tr>
+    <tr><td>2 Backend source</td><td>tsc clean; 110 tests (17 new); ESLint clean on changed files; §8 greps show only the five known old violations</td><td>None needed (backend path off by default)</td><td>Pass</td></tr>
+    <tr><td>3 Who sees the option</td><td>tsc clean; 114 tests (12 gate tests rewritten); ESLint: one old warning in BuyFlowModal (<code>handleConnectWallet</code> unused, there before this phase); §8: the drawer's <code>useTrailsCheckout</code> is the allowed exception (plan Q5)</td><td>User, 17 Nov, localhost:3002: option shown for a listing of 0.10 USDT or more, hidden below 0.10</td><td>Pass</td></tr>
+    <tr><td>4 Starting a purchase</td><td>tsc clean; 115 tests (mismatch ends quietly); ESLint: no errors, two warnings that were already there; §8 unchanged</td><td>User, 17 Nov, backend path on: prepare, quote and attach accepted with a token on another chain (Account 1 BNB on BSC, Account 2 another chain); Polygon USDT refused by the server (F9). Other screens still to see</td><td>Main path pass; partly pending</td></tr>
+    <tr><td>5 Status</td><td>tsc clean; 120 tests (5 new); ESLint: no errors, the two old warnings</td><td><b>T5</b> (user, 18 Nov, localhost:3002, server path, Account 3, USDC on Base, phone wallet over WalletConnect): bought <b>swaparena.og</b> (0.10); drawer showed "is yours" with the receipt; Network showed our attach (<code>intent</code> 200) and status calls (<code>checkouts/:id</code> 200/304); the <code>GetIntentReceipt</code> 400s and one <code>ExecuteIntent</code> 422 came from the widget's own code. The user rejected a second wallet request on purpose: the widget showed its own "Try again" though the money had gone, and our drawer still showed the right result (P14). No email to check (Account 3 has no email). No <code>[trails]</code> or <code>[buying-flow]</code> errors.<br><b>T6</b> (18 Nov, after <code>95d448a</code>): bought <b>twertsdfgsdfg.og</b>; cookie deleted during "Payment in progress": no failure, "Log in again…" shown; after logging in again, without a reload, the result came (final review fix 1 and R3 work). Findings A and B (see <a href="#t6-fixes">T6 fixes</a>). <b>Repeat run:</b> bought <b>thesoaltee.og</b>; cookie deleted while the drawer was still on the widget: nothing shown (B2); after logging in the purchase finished and the new toast "thesoaltee.og is yours…" showed (A confirmed). The user had to press Logout to reach the login page: deleting the cookie by hand doesn't log the header out (the site's own behaviour).</td><td>T5, T6 pass; B2 fixed, recheck</td></tr>
+    <tr><td>6 Resume and banner</td><td>tsc clean; 126 tests (6 new); ESLint clean on the Trails code</td><td>User, 18 Nov, localhost:3002, server path, Account 3. <b>T17:</b> after T5, a reload showed no second "is yours" toast. <b>T9:</b> during a purchase, /history on another tab or device showed "Purchase in progress", gone once it finished. <b>T8:</b> in the same purchase the laptop page was reloaded during "Payment in progress"; the purchase was picked up again and "is yours" showed once by itself. Pending: T10</td><td>T8, T9, T17 pass; T10 pending</td></tr>
+    <tr><td>Review fixes (<code>95d448a</code>)</td><td>Mohit's R1 to R3, the backend developer's request and the final review 1 to 8: tsc clean; 148 tests; ESLint no errors (old <code>handleConnectWallet</code> warning); §8 layering clean</td><td>T6 above covers the login fixes (R3, final review 1). R1 (refusal after Pay) can't be produced on purpose without slowing the network; steps in <a href="#code-review">Mohit's review</a></td><td>Automated pass; R1 manual pending</td></tr>
+    <tr><td>T6 fixes (uncommitted)</td><td>tsc clean; 150 tests (2 new); ESLint no errors</td><td>Toast name seen in the repeat run (thesoaltee.og). Drawer notice (B2): recheck in the next purchase by deleting the cookie after Pay</td><td>A pass; B2 recheck pending</td></tr>
+    <tr><td>T14 Polygon USDT (F9 fix)</td><td>None</td><td>User, 18 Nov, localhost:3002, server path, after backend <code>abe9657c</code>: Account 1 (0x8FD5…Be4D0) bought <b>weiwuxianlanwangji.og</b> (0.10) with "Any token", paying <b>0.106831 USDT0 on Polygon</b> (Trails fee about 0.007). Drawer showed "is yours" with the receipt; status calls (<code>checkouts/cdd9ab0e…</code>, named by the checkout id in the Network tab) every few seconds. Until 17 Nov this payment was always refused (F9)</td><td>Pass: F9 fix live on stage</td></tr>
+    <tr><td>T19 USDT regression</td><td>None</td><td>User, 18 Nov, localhost:3002 at <code>389614c</code>, Account 1 (0x8FD5…Be4D0), "USDT from your wallet": bought <b>westbengal.og</b> (0.10 USDT). MetaMask asked for a spending cap of exactly 0.1 for Seaport on Polygon (MetaMask names Polygon USDT "USDT0", the token's new name; same contract our listings use), then confirm, "Settling on polygon" (tx 0x572f…12c86), "westbengal.og is yours" with the receipt. Same as before the Trails work</td><td>Pass</td></tr>
+    <tr><td>Production build (<code>389614c</code>)</td><td>18 Nov: <code>next build</code> run by Claude on an exact copy of the pushed commit in a temporary folder (the project folder's <code>.next</code> is used by the dev server). Compiled successfully, exit 0. Only Trails related warnings: the two old ones from September (<code>handleConnectWallet</code>, one <code>any</code> in <code>useBuyFlowActions.ts</code>) and the Sass <code>@import</code> notice every style file shows; the other 176 lint warnings are in older parts of the site. Copy deleted afterwards</td><td>None needed</td><td>Pass</td></tr>
+  </tbody>
+</table></div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">0</span><h3>APIs live: testing</h3></div>
+  <ul>
+    <li><b>Automated by Claude (17 Nov, curl against apistage.endlessdomains.io):</b> <code>GET /config</code> with no token and with a broken token: 200, no-store, shape as documented. List, status and prepare without a token: 401. Pass.</li>
+    <li><b>Manual (user, 17 Nov, logged in browser on localhost:3002, console snippet that never prints the token):</b> <code>GET /checkouts?limit=5</code>: 200, empty list. Pass.</li>
+    <li><b>Not covered:</b> prepare, attach and status with a real listing and login (phases 4 and 5); the list with real checkouts in it.</li>
+  </ul>
+</div>
+<div class="phase">
+  <div class="phase-head"><span class="num">1</span><h3>Contract and types: testing</h3></div>
+  <ul>
+    <li><b>Automated by Claude (17 Nov):</b> <code>npx tsc --noEmit</code> clean; <code>npx vitest run</code> 93 of 93, including the new attach answer test.</li>
+    <li><b>Manual:</b> none needed; nothing on screen changed.</li>
+  </ul>
+</div>
+<div class="phase">
+  <div class="phase-head"><span class="num">2</span><h3>Backend source: testing</h3></div>
+  <ul>
+    <li><b>Automated by Claude (17 Nov):</b> tsc clean; vitest 110 of 110. New: prepare sends only the order hash; a different wallet is refused; backend codes map to CheckoutError; a 429 keeps its status; attach answers incl. expired and ALREADY_ATTACHED; status; 404 becomes expired; 401 is rethrown; list query string; config. ESLint on changed files clean; layering greps.</li>
+    <li><b>Manual:</b> none needed; the browser path is unchanged and the backend path is off by default.</li>
+    <li><b>Not covered:</b> the backend path against the real stage server (phases 3 to 5, when the drawer uses it).</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">3</span><h3>Who sees the option: testing</h3></div>
+  <ul>
+    <li><b>Automated by Claude (17 Nov):</b> tsc clean; vitest 114 of 114 (gate and price range, 12 tests); ESLint on changed files: no errors, one warning that was already there; layering check.</li>
+    <li><b>Manual (user, 17 Nov, localhost:3002 on the stage API):</b> Buy Now on a listing of 0.10 USDT or more shows "Any token, any chain"; below 0.10 USDT only USDT shows. Pass, as reported ("yes its happening").</li>
+    <li><b>Not covered:</b> light and dark, phone and tablet widths weren't reported separately; a buyer the server refuses (stage allows everyone, so this can't be produced on stage; covered by tests); a failed config call in the browser (covered by tests).</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">4</span><h3>Starting a purchase: testing</h3></div>
+  <ul>
+    <li><b>Automated by Claude (17 Nov):</b> tsc clean; vitest 115 of 115; ESLint on changed files: no errors (warnings <code>handleConnectWallet</code> unused and one <code>any</code> in <code>useBuyFlowActions.ts:140</code>, both there before this phase).</li>
+    <li><b>Manual (user, 17 Nov, localhost:3002 on the stage API, <code>NEXT_PUBLIC_TRAILS_SOURCE=backend</code>):</b> step 1 <b>passed</b> with a token on another chain: prepare 200, widget quoted, attach accepted ("attached"), status polling followed (Account 1 with BNB on BSC; Account 2, buyer 0x5b1c…A24E, after switching away from Polygon USDT). No "Verify your wallet" screen appeared: both sessions were wallet logins, already fresh (expected). Polygon USDT quotes are refused by the server: F9. Step 4 ("Someone else is paying") did not show while Account 1 only had a price open: the server only answers CHECKOUT_IN_PROGRESS once another buyer has <b>paid</b> (within 2 minutes), so it needs a real payment (phase 5 or 10).</li>
+    <li><b>Still to do (user):</b> Setup: add <code>NEXT_PUBLIC_TRAILS_SOURCE=backend</code> to <code>.env</code>, restart the dev server on 3002. Then, on a listing of 0.10 USDT or more:
+      <ol>
+        <li>Any token, Continue: "Verify your wallet" and a signature if needed (or straight on), then the widget. Pick a token so it quotes; no "attach failed" in the console.</li>
+        <li>Decline the signature: back on the payment options, nothing else.</li>
+        <li>Your own listing (from the domain page): "This is your own listing".</li>
+        <li>Second account (another browser or incognito) presses Continue on the same listing while the first has a quote open: "Someone else is paying for this domain".</li>
+        <li>Quote, wait over 15 minutes, change the token so it quotes again: "Your price hold ran out", then "Start again" brings a fresh widget.</li>
+        <li>Console snippet (How to test): the list shows the checkout as attached.</li>
+      </ol>
+    </li>
+    <li><b>Not covered yet:</b> a real payment on the server path (with phase 5); the mismatch screen (can't be produced on purpose; covered by code review and the outcome test).</li>
+  </ul>
+</div>
+
+<h2 id="problems">Problems we ran into (17 Nov 2026)</h2>
+<p class="meta">Everything that went wrong or confused us while switching to the backend, in plain words: what happened, why, and where it stands. Newest last.</p>
+<div class="tablecard"><table>
+  <thead><tr><th>#</th><th>What happened</th><th>Why</th><th>Where it stands</th></tr></thead>
+  <tbody>
+    <tr><td>P1</td><td>The backend document's "refunded" handling copies our old rule: when the same wallet buys a domain directly and also pays through Trails, the refunded Trails payment is shown as "is yours", and the server sends no refund email.</td><td>The server counts any sale of the listing to that wallet as success, without checking that the Trails payment itself made the purchase.</td><td>Backend fix asked (F1, note in plan §7); our phase 8 waits on it.</td></tr>
+    <tr><td>P2</td><td>The document's advice for resuming purchases would show unpaid price quotes as "Purchase in progress".</td><td>"attached" means a price was shown, not that money was paid.</td><td>We use "executing,failed" (F2, phase 6). Told to the backend in the note.</td></tr>
+    <tr><td>P3</td><td>The 0.5% slippage setting we pass does nothing.</td><td>The Trails widget doesn't send it in its quote request (seen 12 Nov).</td><td>Open with Mohit (Q13, F3).</td></tr>
+    <tr><td>P4</td><td>Opening the purchases list link in the browser's address bar gives "Unauthorized" (401).</td><td>The address bar sends no login; the API wants the login in a header, which only the app (and the console snippet) adds. This is the protection we want.</td><td>Not a problem; explained. Only <code>/config</code> works without login.</td></tr>
+    <tr><td>P5</td><td>A command printed the Trails browser key into Claude's own output.</td><td>The key's line wasn't hidden in one command.</td><td>The key is public (it ships inside the website), nothing new exposed; commands now hide it.</td></tr>
+    <tr><td>P6</td><td>"Continue to payment" looked dead.</td><td>It stays disabled until the terms box is ticked ("Tick the box above to continue").</td><td>Not a bug; works as designed.</td></tr>
+    <tr><td>P7</td><td>"Verify your wallet" never appeared.</td><td>A wallet login already counts as a fresh wallet check, so no signature is needed. It only appears for email or Google logins, a stale check, or a switched MetaMask account.</td><td>Not a bug; works as designed. To see it: switch MetaMask to another account and press Continue.</td></tr>
+    <tr><td>P8</td><td>"Couldn't start the payment" on Account 2 (0x5b1c…A24E), every time, even alone and with a fresh checkout. Account 1 worked.</td><td>Account 2 paid with <b>USDT on Polygon</b>, the same token and chain the purchase needs, so Trails does everything on Polygon in one go: the quote has no bridge (<code>routeProviders: []</code>) and <b>no destination calls</b> (its calls are on the starting side). The server's check 3 expects the 3 part destination shape and refuses it ("destinationCalls is not the three call shape"; check 8 would fail too). The server emails an internal alert to Mohit for each refusal: all three of our tries. Account 1 paid BNB on BSC through Relay and passed. Found by reading both quotes from Trails.</td><td>Backend asked to accept same chain, same token quotes (F9). Works with a token on another chain (checked by the user). Real buyers whose widget starts on Polygon USDT will hit this until fixed.</td></tr>
+    <tr><td>P9</td><td>"Someone else is paying for this domain" didn't show when two accounts had the widget open on the same listing.</td><td>The server only says that when the other buyer has actually <b>paid</b> in the last 2 minutes; a price on screen doesn't count.</td><td>Not a bug; to be seen with a real payment (T7).</td></tr>
+    <tr><td>P10</td><td>Red <code>GetIntentReceipt</code> 400 rows in the Network tab.</td><td>The Trails widget asks for a receipt of a quote that isn't paid yet; Trails answers "not found".</td><td>Harmless; seen in every test since 10 Nov.</td></tr>
+    <tr><td>P11</td><td>Status calls show <code>304</code>.</td><td>"Nothing changed since last time": the browser reuses the previous answer.</td><td>Harmless.</td></tr>
+    <tr><td>P12</td><td>An old test said a refused quote counts as a failed payment; following it, the app could show "Payment didn't go through" for a quote refused before Pay.</td><td>The old rule was written before the server existed.</td><td>Fixed in phase 4: a refused quote ends quietly; test updated.</td></tr>
+    <tr><td>P13</td><td><code>.env</code> changes (like <code>NEXT_PUBLIC_TRAILS_SOURCE=backend</code>) don't apply until the dev server restarts.</td><td>Next reads NEXT_PUBLIC values when it starts.</td><td>Not a bug; restart after any env change.</td></tr>
+      <tr><td>P14</td><td>The widget showed "Try again: Please approve the request in your wallet" after the money had already gone (18 Nov, T5). The user rejected a second wallet request on the phone on purpose; the purchase still finished.</td><td>The payment was already sent (widget <code>ExecuteIntent</code> 200) before the second request; the "Try again" screen is the widget's own, not ours. Pressing it is safe: Trails refused a second run (422).</td><td>Our drawer followed the server and showed "is yours", so our code is fine. A buyer could still think they haven't paid: tell Mohit (ties in with Q19). We can't change the widget's text.</td></tr>
+    <tr><td>P15</td><td>Logging in again after the site's automatic logout didn't pick up running purchases (18 Nov, final review).</td><td><code>AutoLogoutHandler</code> deletes the cookies without telling <code>AuthProvider</code>, so the app still thinks the buyer is logged in.</td><td>Fixed in <code>95d448a</code>: a new login token is spotted on any page change. The automatic logout itself is the site's own code, left as is.</td></tr>
+    <tr><td>P16</td><td>The "is yours" toast never showed the domain name (18 Nov, T6).</td><td>The design system's success toast shows one line and drops the title.</td><td>Fixed (uncommitted): the name is in the line (finding A).</td></tr>
+    <tr><td>P17</td><td>With the login expired after Pay, the buyer saw no message at all (18 Nov, T6 repeat).</td><td>The drawer was still on the widget, the only "Log in again" line is on the progress screen, and the listening drawer keeps the app toast away.</td><td>Fixed (uncommitted): the drawer shows the toast once (finding B2).</td></tr>
+    <tr><td>P18</td><td>Deleting the cookie by hand didn't log the header out; the user had to press Logout.</td><td>The site only logs out on its own timers.</td><td>Not a Trails bug; expected for this test.</td></tr>
+</tbody>
+</table></div>
+
+<h2 id="future-tests">Tests still to do</h2>
+<p class="meta">Every test, from all phases (✓ = done, with the date). All on localhost:3002 with the stage API; the server path is the default, no <code>.env</code> line needed. Done 18 Nov: T5, T6, T8, T9, T14 (Polygon USDT, F9 fixed), T17, T19 (USDT purchase unchanged). Next: T18, then T7, T11, T15; no money: T1 to T4, T10, T14, T16. Listings of 0.10 USDT or more; pay with a token on <b>another chain</b> than Polygon until F9 is fixed. Tick here when done, then log the result in the phase's testing entry.</p>
+<div class="tablecard"><table>
+  <thead><tr><th>#</th><th>Test</th><th>How</th><th>Expected</th><th>Phase</th><th>Money?</th></tr></thead>
+  <tbody>
+    <tr><td>T1</td><td>Decline the wallet signature</td><td>Switch MetaMask to an account you didn't log in with, Any token, Continue, reject the signature</td><td>Back on the payment options, nothing else</td><td>4</td><td>No</td></tr>
+    <tr><td>T2</td><td>Wallet not linked to the account</td><td>Same as T1 but sign with a wallet that isn't linked to your login</td><td>"This wallet isn't linked to your account"</td><td>4</td><td>No</td></tr>
+    <tr><td>T3</td><td>Your own listing</td><td>Open your own listing from its domain page, Any token, Continue</td><td>"This is your own listing"</td><td>4</td><td>No</td></tr>
+    <tr><td>T4</td><td>Price hold ran out</td><td>Get a price, wait over 15 minutes, change the token</td><td>"Your price hold ran out"; Start again gives a fresh widget</td><td>4</td><td>No</td></tr>
+    <tr><td>T5 ✓ 18 Nov</td><td>A real purchase on the server path</td><td>Pay a 0.10 to 0.30 USDT listing (0.10 is the server minimum; the backend team advises small listings because stage uses real money) with a token on a chain other than Polygon, e.g. USDC on Base, so the known F9 bug (Polygon USDT refused) can't hide whether our code works. Polygon tokens are tested separately in T18</td><td>Payment in progress, then "is yours", receipt, emails; Network shows status calls to <code>/trails/checkouts/:id</code> about every 5 s and no browser calls to Trails' <code>GetIntentReceipt</code> from our code</td><td>5</td><td>Yes</td></tr>
+    <tr><td>T6 ✓ 18 Nov</td><td>Login expires during a purchase</td><td>During T5, delete the <code>access_token</code> cookie in DevTools (Application, Cookies), wait, then log in again</td><td>No failure; "Log in again to see your purchase status…" on the drawer (or one notice if closed); status resumes after logging in</td><td>5</td><td>Yes (part of T5)</td></tr>
+    <tr><td>T7</td><td>Someone else is paying</td><td>Account 1 pays a listing; within 2 minutes Account 2 presses Continue on the same listing</td><td>"Someone else is paying for this domain"</td><td>4</td><td>Yes (part of T5)</td></tr>
+    <tr><td>T8 ✓ 18 Nov</td><td>Reload during a purchase</td><td>Reload the page while a server path payment runs</td><td>Resumes, result shown once (needs phase 6)</td><td>6</td><td>Yes</td></tr>
+    <tr><td>T9 ✓ 18 Nov</td><td>Another device</td><td>Pay on the laptop, open /history on the phone (same account)</td><td>"Purchase in progress" banner (needs phase 6)</td><td>6</td><td>Yes</td></tr>
+    <tr><td>T10</td><td>Unpaid quote isn't "in progress"</td><td>Get a price, don't pay, open /history</td><td>No banner (needs phase 6)</td><td>6</td><td>No</td></tr>
+    <tr><td>T11</td><td>Lost race to another wallet</td><td>Account 2 buys directly while Account 1's Trails payment is on its way</td><td>Refund screen and refund email</td><td>8, 10</td><td>Yes</td></tr>
+    <tr><td>T12</td><td>Same wallet pays directly and through Trails</td><td>Two tabs, one wallet (the 12 Nov check 12), after the backend fixes F1</td><td>Domain owned, refund shown and emailed</td><td>8</td><td>Yes</td></tr>
+    <tr><td>T13</td><td>Receipt note for a Trails sale</td><td>Open the receipt of a Trails purchase after API 6 is on uat</td><td>"Network fee: included in the Trails fee"; a direct sale's receipt unchanged</td><td>7</td><td>No (uses an old purchase)</td></tr>
+    <tr><td>T14 ✓ 18 Nov</td><td>Polygon USDT after the backend fix (F9)</td><td>Pay with USDT on Polygon in the widget</td><td>The quote is accepted</td><td>4</td><td>No (stop before Pay)</td></tr>
+    <tr><td>T15</td><td>Rollback switch</td><td>Add <code>NEXT_PUBLIC_TRAILS_SOURCE=browser</code>, restart, buy with Any token</td><td>The old browser path still works</td><td>2, 10</td><td>Yes</td></tr>
+    <tr><td>T17 ✓ 18 Nov</td><td>A result is shown only once</td><td>After a purchase finishes on screen, reload the page</td><td>No second "is yours" toast</td><td>6</td><td>Yes (part of T5)</td></tr>
+    <tr><td>T18</td><td>Other Polygon tokens on the server path (decides F9 option, Q27)</td><td>Buy a 0.10 listing paying POL or USDC on Polygon</td><td>Either it succeeds (then only Polygon USDT is affected, option 2 is enough) or it ends as mismatch with a check 3 alert (then option 1 is needed)</td><td>4</td><td>Yes</td></tr>
+    <tr><td>T19 ✓ 18 Nov</td><td>The normal USDT purchase still works (regression before uat)</td><td>Buy a 0.10 listing with "USDT from your wallet"</td><td>Approve exactly 0.10, confirm, settling, "&lt;name&gt; is yours"</td><td>All</td><td>Yes</td></tr>
+    <tr><td>T16</td><td>Look and feel of the new screens</td><td>Verify your wallet, Someone else is paying, Wrong wallet, Price hold, Log in again: light and dark, phone and desktop</td><td>Readable, same style as the other drawer screens</td><td>4, 5</td><td>No</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="bug-same-chain">Bug report for Mohit: same chain USDT quotes refused (17 Nov)</h2>
+<p class="meta">Written 17 Nov 2026 for Mohit sir after he forwarded the server's "intent mismatch" alert email. Subject: "Trails: same chain USDT quotes refused (verifier check 3)". Status: <b>to be sent by the user</b>; waiting on the backend's choice of fix. Linked: finding F9, problem P8, test T14.</p>
+<div class="phase">
+  <div class="phase-head"><span class="num">1</span><h3>What happens</h3></div>
+  <ol>
+    <li>When the buyer picks <b>USDT on Polygon</b> in the Trails widget, <code>POST /trails/checkouts/:id/intent</code> returns 200 with <code>status: "mismatch"</code> and the drawer shows "Couldn't start the payment".</li>
+    <li>Every time, for every buyer, with that token. Tokens on other chains (BNB on BSC, USDC on Base) attach fine.</li>
+    <li>Each refusal sends the internal alert email. The ones Mohit received are from our tests with wallet <code>0x5b1c…A24E</code> on swaparena.og (0.10 USDT): checkouts <code>47685799-0645-4797-9960-8da4ad00d58c</code>, <code>e799e978-8119-463d-8bb8-4e0f45c2be58</code>, <code>a947238c-78a3-4db3-b169-1d9bf450204a</code>, 17 Nov 06:31 to 06:41 UTC.</li>
+    <li>Nothing is paid; the frontend stops before payment.</li>
+  </ol>
+</div>
+<div class="phase">
+  <div class="phase-head"><span class="num">2</span><h3>Cause</h3></div>
+  <ol>
+    <li>For a cross chain quote Trails sends <code>destinationCalls</code> with 3 calls (hydrate, execute and sweep wrapper), and the verifier is built for exactly that shape.</li>
+    <li>For a <b>same chain, same token</b> quote (USDT on Polygon to USDT on Polygon) Trails skips the destination side: no <code>destinationCalls</code>, the 4 calls are in <code>originCalls</code>, and <code>quote.routeProviders</code> is empty. Confirmed with <code>GetIntent</code> on all three intents (<code>0x9c64…a001</code>, <code>0xd34e…5701</code>, <code>0xd06d…5b01</code>).</li>
+    <li>So <code>intent-verifier.ts</code> fails <b>check 3</b> in <code>parse</code> ("destinationCalls is not the three call shape"); it would also fail <b>check 8</b> ("quote.routeProviders is missing").</li>
+    <li>Prepare, price, buyer and our calls are all correct; the frontend works as intended.</li>
+  </ol>
+</div>
+<div class="phase">
+  <div class="phase-head"><span class="num">3</span><h3>Why it matters</h3></div>
+  <ol>
+    <li>The widget often starts on USDT on Polygon for buyers who hold it, so those buyers hit the error at once.</li>
+    <li>Every such try sends an alert email.</li>
+  </ol>
+</div>
+<div class="phase">
+  <div class="phase-head"><span class="num">4</span><h3>Suggested fix (backend, choose one)</h3></div>
+  <ol>
+    <li><b>Support the same chain shape in the verifier:</b> when origin and destination are the same chain and token, verify the calls in <code>originCalls</code> instead, with the same checks as today (exactly one Seaport call with our <code>fulfillCalldataHash</code>, USDT approve before it, recipient and sweep to the buyer, price <code>EXACT_OUTPUT</code>); allow an empty provider list only in this case.</li>
+    <li><b>Or refuse it up front with a clear code</b> (for example <code>SAME_CHAIN_NOT_SUPPORTED</code>) instead of <code>mismatch</code>, and skip the alert email for it. The frontend would then show: "You already have USDT on Polygon. Use 'USDT from your wallet' to buy it directly." (new wording, needs approval)</li>
+  </ol>
+</div>
+<div class="phase">
+  <div class="phase-head"><span class="num">5</span><h3>Frontend side</h3></div>
+  <ol>
+    <li>No change needed for fix 1; for fix 2 we add that one message once the code exists (a small follow up to phase 4).</li>
+    <li>Until then, testers pick a token on another chain in the widget.</li>
+  </ol>
+</div>
+
+<h2 id="mohit-wording">Wording waiting for Mohit's approval</h2>
+<p class="meta">Approved by the user on 17 Nov 2026 and already in the code (<code>BuyFlowModal.tsx</code>), so phase 4 isn't blocked. For Mohit sir to approve or change; reply per line.</p>
+<div class="tablecard"><table>
+  <thead><tr><th>#</th><th>When the buyer sees it</th><th>Title</th><th>Heading</th><th>Text</th><th>Buttons</th><th>Mohit</th></tr></thead>
+  <tbody>
+    <tr><td>W1</td><td>Server path, before the payment step, only when the login has no fresh check for this wallet (a signature is coming)</td><td>Review purchase</td><td>Verify your wallet</td><td>Your wallet is open. Sign the message to confirm you own this wallet. It's free and doesn't move any money.</td><td>None (waiting for the wallet)</td><td>Approve / change</td></tr>
+    <tr><td>W2</td><td>The server answers CHECKOUT_IN_PROGRESS: another buyer is paying for this listing right now (under 2 minutes)</td><td>Not available</td><td>Someone else is paying for this domain</td><td>Another buyer started paying for it a moment ago. Try again in a couple of minutes.</td><td>Back, Close</td><td>Approve / change</td></tr>
+    <tr><td>W3</td><td>The signature came from a wallet that isn't linked to the buyer's account, or the server still doesn't accept the wallet after one retry</td><td>Wrong wallet</td><td>This wallet isn't linked to your account</td><td>Connect the wallet you use with your Endless Domains account, or buy with USDT from your wallet.</td><td>Back, Close</td><td>Approve / change</td></tr>
+    <tr><td>W4</td><td>The widget quotes again after the 15 minute hold (attach answers expired)</td><td>Price expired</td><td>Your price hold ran out</td><td>Prices are held for 15 minutes. Start again to get a new price. Nothing was charged.</td><td>Start again, Back</td><td>Approve / change</td></tr>
+    <tr><td>W5</td><td>The buyer's login expired while a Trails purchase runs (phase 5): on "Payment in progress" instead of its usual text, or once as a small notice when the drawer is closed</td><td>Payment in progress (unchanged)</td><td>Buying name.og (unchanged)</td><td>Log in again to see your purchase status. Your purchase keeps going in the meantime.</td><td>Keep browsing (unchanged)</td><td>Approve / change</td></tr>
+  </tbody>
+</table></div>
+<p class="meta">Questions for Mohit on these: is "price hold" the right name for the 15 minute window? Is 2 minutes (the server's CHECKOUT_IN_PROGRESS window) right for "a couple of minutes"? The titles (Not available, Wrong wallet, Price expired) were added by Claude with the approved text; approve them too.</p>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">5</span><h3>Status: testing</h3></div>
+  <ul>
+    <li><b>Automated by Claude (17 Nov):</b> tsc clean; vitest 120 of 120; ESLint on changed files: no errors, the two warnings that were already there.</li>
+    <li><b>Manual (user), pending:</b> see <a href="#future-tests">Tests still to do</a>, items T5 and T6.</li>
+    <li><b>Not covered by automated tests:</b> <code>watchCheckout</code> itself has no test file (its 401 and interval rules are covered through the helpers and the tracker tests).</li>
+  </ul>
+</div>
+<div class="phase">
+  <div class="phase-head"><span class="num">6</span><h3>Resume and banner: testing</h3></div>
+  <ul>
+    <li><b>Automated by Claude (17 Nov):</b> tsc clean; vitest 126 of 126; ESLint on the Trails code clean.</li>
+    <li><b>Manual (user), pending:</b> <a href="#future-tests">Tests still to do</a> T8 (reload during a purchase), T9 (another device), T10 (an unpaid quote isn't in progress). <code>NEXT_PUBLIC_TRAILS_SOURCE</code> can now be left out of <code>.env</code> (the server path is the default); restart the dev server after removing it.</li>
+    <li><b>Not covered by automated tests:</b> the two hooks' calls to the list API (the filtering they use is tested); the seen list in localStorage.</li>
+  </ul>
+</div>
+<h2 id="decisions">Decisions</h2>
+<div class="tablecard"><table>
+  <thead><tr><th>Date</th><th>Decision</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td>17 Nov</td><td>Start the phases with Q22 to Q26 set aside; the plan's defaults stand</td><td>User</td></tr>
+    <tr><td>17 Nov</td><td>Browser source stays the default until phases 3 to 6 are done; the backend path only with <code>NEXT_PUBLIC_TRAILS_SOURCE=backend</code></td><td>The backend path doesn't save to browser storage, so resume after reload would break until phase 6</td></tr>
+    <tr><td>17 Nov</td><td>Read <code>/config</code> each time the drawer opens, not in <code>getCheckoutSource()</code></td><td>The response is no-store and access can change (F4)</td></tr>
+    <tr><td>17 Nov</td><td>Resume and the banner list <code>executing,failed</code>, not <code>attached</code></td><td>"attached" is an unpaid quote (F2)</td></tr>
+    <tr><td>17 Nov</td><td>A different wallet in the prepared checkout stops the purchase</td><td>The server always buys for the wallet in the login; the domain must not go to another wallet</td></tr>
+    <tr><td>17 Nov</td><td>Backend progress kept in this separate file</td><td>User</td></tr>
+    <tr><td>17 Nov</td><td>The option is hidden until the server answers, and when the call fails</td><td>The server fails closed; showing it first and hiding it later would be worse than appearing a moment late</td></tr>
+    <tr><td>17 Nov</td><td>The pilot wallet list is no longer read, for both checkout sources</td><td>The server decides access (backend document API 1)</td></tr>
+    <tr><td>17 Nov</td><td>Listings outside the server's price range don't show the option</td><td>The buyer would otherwise meet PRICE_OUT_OF_RANGE after choosing it (F6)</td></tr>
+    <tr><td>17 Nov</td><td>Phase 4 wording approved by the user; to be approved by Mohit later</td><td>User asked for it to be recorded as a structured question for Mohit</td></tr>
+    <tr><td>17 Nov</td><td>A declined signature goes back to the payment options with no message</td><td>Nothing happened and nothing was charged; same as declining any wallet request in the drawer</td></tr>
+    <tr><td>17 Nov</td><td>A refused quote (mismatch) reuses the approved "Couldn't start the payment" screen and ends quietly in the background</td><td>It happens before Pay, so nothing was paid; no new wording needed</td></tr>
+    <tr><td>17 Nov</td><td>Server path status every 5 s, then 15 s after 5 minutes (Q26 default)</td><td>The server refreshes from Trails every 5 s</td></tr>
+    <tr><td>17 Nov</td><td>An expired login never ends a purchase; retried every 15 s; message W5 approved by the user</td><td>The server keeps tracking the purchase; a failure screen would be wrong (F7)</td></tr>
+    <tr><td>17 Nov</td><td>The server path is the default from phase 6 (Q22); the browser path stays behind <code>NEXT_PUBLIC_TRAILS_SOURCE=browser</code></td><td>Planned flip at the end of phase 6; rollback kept until production is proven</td></tr>
+    <tr><td>17 Nov</td><td>Finished results are shown once per browser (Q23 default), with a small localStorage list</td><td>The list API has no "seen" flag</td></tr>
+    <tr><td>17 Nov</td><td>Resume reads purchases from the last day only</td><td>Same limit as the browser path (RESUME_MAX_AGE_MS)</td></tr>
+    <tr><td>18 Nov</td><td>Work paused until the code review, then resumed the same day when it arrived</td><td>User</td></tr>
+    <tr><td>18 Nov</td><td>Once Pay is pressed, a refused (mismatch) or expired answer never closes the widget; the checkout is followed to its real outcome</td><td>Mohit's R1 and the backend developer's request</td></tr>
+    <tr><td>18 Nov</td><td>"Pay pressed" is never undone by a rejected wallet request</td><td>The widget can ask twice; the first answer may already have moved the money (T5)</td></tr>
+    <tr><td>18 Nov</td><td>After a load, resume only running purchases and refunds</td><td>Mohit's R2; side effect recorded as Q29</td></tr>
+    <tr><td>18 Nov</td><td>Spot a new login by its token on any page change, not only by <code>authenticated</code></td><td>The automatic logout doesn't update <code>AuthProvider</code> (P15)</td></tr>
+    <tr><td>18 Nov</td><td>"&lt;name&gt; is yours. It will appear in your account within 10 to 15 minutes." for the success toast, Trails and USDT</td><td>Approved by the user (T6 finding A)</td></tr>
+    <tr><td>18 Nov</td><td>Fix 1 to 8 of the final review; leave 9 (Q29) and 10 (backend) to Mohit and the backend developer</td><td>User</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="questions">Open questions (plan §6)</h2>
+<div class="tablecard"><table>
+  <thead><tr><th>#</th><th>Question</th><th>Default in use</th></tr></thead>
+  <tbody>
+    <tr><td>Q22</td><td>Keep the browser path as a rollback until production is proven?</td><td>Yes; removed in phase 9</td></tr>
+    <tr><td>Q23</td><td>Show "finished while you were away" once per browser or once per account?</td><td>Once per browser</td></tr>
+    <tr><td>Q24</td><td>Same branch <code>trails</code>?</td><td>Yes, one commit per phase when the user says commit</td></tr>
+    <tr><td>Q25</td><td>Wording for CHECKOUT_IN_PROGRESS, the 401 message and the refund text</td><td>Drafted in phases 4, 5 and 8, shown to the user first</td></tr>
+    <tr><td>Q26</td><td>Status poll every 5 s, then 15 s after 5 minutes?</td><td>Yes</td></tr>
+    <tr><td>Q27</td><td>F9: backend accepts same chain Polygon USDT (option 1), or frontend keeps Polygon USDT out of Trails and sends those buyers to the USDT option (option 2)? Options in plan §3. Test T18 first.</td><td>Option 2 if no answer before deploy</td></tr>
+    <tr><td>Q28</td><td>A2: keep watching a <code>failed</code> checkout longer than 20 minutes so a late refund shows on screen, or rely on the refund email?</td><td>Keep 20 minutes; the email covers it</td></tr>
+    <tr><td>Q29</td><td>Final review point 9: after a reload, show only running purchases and refunds (Mohit's R2, current), or also successes that finished in the last few minutes, as the progress screen promises?</td><td>Keep R2 until Mohit decides</td></tr>
+    <tr><td>Q13</td><td>Slippage (F3)</td><td>Keep passing the value; no buyer facing promise</td></tr>
+    <tr><td>Q20</td><td>Same wallet race (now F1)</td><td>Wait for the backend fix</td></tr>
+    <tr><td>Q21</td><td>"You paid 0.10 USDT" for a Trails sale</td><td>Wait for the backend <code>paymentMethod</code></td></tr>
+    <tr><td>Q18</td><td>Show "is yours" after 20 minutes when our sale record never arrived (from 12 Nov)?</td><td>Yes, as built</td></tr>
+    <tr><td>B1</td><td>(Backend developer) Does Sprint 21 also keep tracking a paid quote refused as <code>expired</code>, not only mismatch?</td><td>We follow both on the frontend</td></tr>
+    <tr><td>B2</td><td>(Backend developer) Can a paid refused checkout be reported after a reload, e.g. by moving its status once a payment shows? (final review point 10)</td><td>Lost after a reload until then</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="how-to-test">How to test</h2>
+<ol>
+  <li><b>Which path runs:</b> since phase 6 the server path is the default (no <code>.env</code> line needed). To go back to the old browser path, add <code>NEXT_PUBLIC_TRAILS_SOURCE=browser</code> to <code>.env</code> and restart the dev server on 3002 (NEXT_PUBLIC values are read at start).</li>
+  <li><b>Check the settings:</b> open <code>https://apistage.endlessdomains.io/api/v1/marketplacev2/trails/config</code> in the address bar (the only route that needs no login).</li>
+  <li><b>Check your checkouts:</b> on localhost:3002 while logged in, run in the console:
+    <pre>(async () =&gt; {
+  const t = document.cookie.split('; ').find(c =&gt; c.startsWith('access_token='))?.split('=')[1]
+  if (!t) return console.log('Not logged in')
+  const r = await fetch('https://apistage.endlessdomains.io/api/v1/marketplacev2/trails/checkouts?limit=5', { headers: { Authorization: 'Bearer ' + t } })
+  console.log(r.status, JSON.stringify(await r.json(), null, 2))
+})()</pre>
+  </li>
+  <li><b>Automated:</b> <code>npx vitest run</code> and <code>npx tsc --noEmit</code>. Claude never runs <code>next build</code> or <code>next start</code>.</li>
+  <li><b>Real purchases:</b> listings of 0.10 to 0.30 USDT (0.10 is the server's minimum), burner wallets, Polygon mainnet.</li>
+</ol>
+
+<h2 id="files">All files changed so far</h2>
+<p class="meta">R = the 18 Nov review fixes (<code>95d448a</code>); T6 = the fixes from the T6 test (uncommitted).</p>
+<div class="tablecard"><table>
+  <thead><tr><th>File</th><th>Phase</th><th>New or changed</th></tr></thead>
+  <tbody>
+    <tr><td><code>src/types/trails/checkout.ts</code></td><td>1, 6, R</td><td>Changed</td></tr>
+    <tr><td><code>src/types/trails/config.ts</code></td><td>1, 2, 3, 6</td><td>Changed</td></tr>
+    <tr><td><code>src/core/services/trails/browserCheckoutSource.ts</code></td><td>1</td><td>Changed</td></tr>
+    <tr><td><code>src/core/services/trails/browserCheckoutSource.test.ts</code></td><td>1</td><td>Changed</td></tr>
+    <tr><td><code>src/hooks/trails/useTrailsCheckout.ts</code></td><td>1, 3, 5, 6, R</td><td>Changed</td></tr>
+    <tr><td><code>src/core/services/trails/trailsBackend.service.ts</code></td><td>2</td><td>New</td></tr>
+    <tr><td><code>src/core/services/trails/backendCheckoutSource.ts</code></td><td>2</td><td>New</td></tr>
+    <tr><td><code>src/core/services/trails/backendCheckoutSource.test.ts</code></td><td>2</td><td>New</td></tr>
+    <tr><td><code>src/helpers/trails/checkoutError.ts</code></td><td>2, 5</td><td>Changed</td></tr>
+    <tr><td><code>src/helpers/trails/checkoutError.test.ts</code></td><td>2, 5</td><td>New</td></tr>
+    <tr><td><code>src/helpers/trails/checkoutGate.test.ts</code></td><td>2, 3</td><td>Changed</td></tr>
+    <tr><td><code>src/core/services/trails/index.ts</code></td><td>2, 6</td><td>Changed</td></tr>
+    <tr><td><code>src/constants/trails.ts</code></td><td>2, 3, 6</td><td>Changed</td></tr>
+    <tr><td><code>src/helpers/trails/checkoutGate.ts</code></td><td>3</td><td>Changed</td></tr>
+    <tr><td><code>src/design-system/composites/marketplace/buying-flow/useBuyFlowActions.ts</code></td><td>4</td><td>Changed</td></tr>
+    <tr><td><code>src/helpers/trails/intentStatus.ts</code></td><td>4, 5, 6, R</td><td>Changed</td></tr>
+    <tr><td><code>src/helpers/trails/intentStatus.test.ts</code></td><td>4, 5, 6</td><td>Changed</td></tr>
+    <tr><td><code>src/core/services/trails/watchCheckout.ts</code></td><td>5, R, T6</td><td>Changed</td></tr>
+    <tr><td><code>src/core/services/trails/checkoutTracker.ts</code></td><td>5, 6, R, T6</td><td>Changed</td></tr>
+    <tr><td><code>src/core/services/trails/checkoutTracker.test.ts</code></td><td>5, 6, R, T6</td><td>Changed</td></tr>
+    <tr><td><code>src/hooks/trails/useTrailsTracker.ts</code></td><td>5, 6, R</td><td>Changed</td></tr>
+    <tr><td><code>src/hooks/trails/useTrailsPendingCheckouts.ts</code></td><td>6</td><td>Changed</td></tr>
+    <tr><td><code>src/core/services/trails/checkoutStore.service.ts</code></td><td>6</td><td>Changed</td></tr>
+    <tr><td><code>pages/_app.tsx</code></td><td>5, R</td><td>Changed</td></tr>
+    <tr><td><code>src/design-system/composites/marketplace/buying-flow/trails/trailsOutcomeToast.ts</code></td><td>5, T6</td><td>Changed</td></tr>
+    <tr><td><code>src/data/trails/copy.ts</code></td><td>5, T6</td><td>Changed</td></tr>
+    <tr><td><code>src/design-system/composites/marketplace/buying-flow/BuyFlowModal/BuyFlowModal.tsx</code></td><td>3, 4, 5, R, T6</td><td>Changed</td></tr>
+  </tbody>
+</table></div>
+
+<footer>Updated 18 Nov 2026: code reviews (Mohit, backend developer, Claude) fixed, five real money tests passed, T6 fixes waiting to be committed.</footer>
+</div>
+<script>
+  document.getElementById('toggle').addEventListener('click', function () {
+    var root = document.documentElement;
+    var current = root.getAttribute('data-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('dmplan-theme', next); } catch (e) {}
+  });
+</script>
+</body>
+</html>

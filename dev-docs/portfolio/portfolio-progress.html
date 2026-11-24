@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Portfolio Progress</title>
+<script>
+  try {
+    var saved = localStorage.getItem('dmplan-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  } catch (e) {}
+</script>
+<style>
+  :root {
+    --bg: #f9f9f9; --surface: #ffffff; --surface-soft: #f3f4fe;
+    --text: #111111; --text-muted: #5b5b66; --border: #e6e6e6;
+    --accent: #2639ED; --accent-soft: #e9ebfd;
+    --wait: #9457f6; --wait-soft: #f4eefe;
+    --ok: #12805c; --ok-soft: #e4f5ee;
+    --warn: #b4540a; --warn-soft: #fdf1e4;
+    --bad: #c4314b; --bad-soft: #fdecef;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+      --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+      --accent: #7f8cff; --accent-soft: #1d2150;
+      --wait: #b996fa; --wait-soft: #2c2142;
+      --ok: #4fd1a0; --ok-soft: #173229;
+      --warn: #f5a35c; --warn-soft: #3a2614;
+      --bad: #ff7d93; --bad-soft: #3a1c24;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+    --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+    --accent: #7f8cff; --accent-soft: #1d2150;
+    --wait: #b996fa; --wait-soft: #2c2142;
+    --ok: #4fd1a0; --ok-soft: #173229;
+    --warn: #f5a35c; --warn-soft: #3a2614;
+    --bad: #ff7d93; --bad-soft: #3a1c24;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: "Satoshi", system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.6; }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 48px 16px 80px; }
+  header.top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+  .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; }
+  h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.15; margin: 0 0 12px; }
+  .lede { color: var(--text-muted); margin: 0; max-width: 680px; }
+  .lede a { color: var(--accent); }
+  .toggle { flex-shrink: 0; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 14px; cursor: pointer; }
+  .toggle:hover { border-color: var(--accent); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 32px; }
+  nav.toc a { font-size: 14px; text-decoration: none; color: var(--accent); background: var(--accent-soft); padding: 6px 12px; border-radius: 999px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 0 0 16px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+  .stat b { display: block; font-size: 26px; line-height: 1.2; }
+  .stat span { font-size: 13px; color: var(--text-muted); }
+  h2 { font-size: 22px; margin: 52px 0 16px; }
+  h3 { font-size: 18px; margin: 0; }
+  h4 { font-size: 15px; margin: 22px 0 8px; color: var(--accent); }
+  p { margin: 0 0 12px; }
+  .muted { color: var(--text-muted); font-size: 15px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
+  .card p:last-child { margin-bottom: 0; }
+  .card ul, .card ol { margin: 8px 0 0; padding-left: 20px; }
+  .card li { margin-bottom: 6px; }
+  code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .86em; background: var(--surface-soft); border-radius: 6px; padding: 1px 6px; word-break: break-word; }
+  .findings { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .finding { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+  .finding h3 { font-size: 16px; margin-bottom: 6px; }
+  .finding p { font-size: 15px; margin: 0; color: var(--text-muted); }
+  .tablecard { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow-x: auto; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: 0; }
+  th { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+  td.grp { font-weight: 600; color: var(--accent); background: var(--surface-soft); font-size: 13px; }
+  .sw { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .chip { width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(128,128,128,.45); flex-shrink: 0; }
+  .callout { border-left: 4px solid var(--wait); background: var(--wait-soft); border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; }
+  .callout p { margin: 0; }
+  .callout.ok { border-color: var(--ok); background: var(--ok-soft); }
+  .callout.warn { border-color: var(--warn); background: var(--warn-soft); }
+  .issue { display: grid; grid-template-columns: 28px 1fr; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--bad); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+  .issue .n { font-weight: 700; color: var(--bad); }
+  .issue p { margin: 0; font-size: 15px; }
+  .issue .where { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+  .phase { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px 24px; margin-bottom: 14px; }
+  .phase-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  .num { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 15px; flex-shrink: 0; }
+  .tag { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+  .tag.now { background: var(--ok-soft); color: var(--ok); }
+  .tag.wait { background: var(--wait-soft); color: var(--wait); }
+  .tag.size { background: var(--surface-soft); color: var(--text-muted); }
+  .tag.new { background: var(--warn-soft); color: var(--warn); }
+  .rows { display: grid; grid-template-columns: 130px 1fr; gap: 6px 16px; font-size: 15px; }
+  .rows dt { color: var(--text-muted); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; padding-top: 2px; }
+  .rows dd { margin: 0; }
+  ol.qs { counter-reset: q; list-style: none; padding: 0; margin: 0; }
+  ol.qs li { counter-increment: q; position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px 14px 56px; margin-bottom: 10px; }
+  ol.qs li::before { content: counter(q); position: absolute; left: 16px; top: 14px; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  ol.qs.team li::before { background: var(--wait-soft); color: var(--wait); }
+  ol.qs b { display: block; margin-bottom: 2px; }
+  ol.qs span { color: var(--text-muted); font-size: 15px; }
+  footer { margin-top: 56px; font-size: 13px; color: var(--text-muted); }
+  @media (max-width: 700px) {
+    header.top { flex-direction: column; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .findings { grid-template-columns: 1fr; }
+    .card, .phase { padding: 18px; }
+    .rows { grid-template-columns: 1fr; }
+    .rows dt { padding-top: 8px; }
+    ol.qs li { padding-left: 50px; }
+  }
+</style>
+<style>
+  .tag.done { background: var(--ok-soft); color: var(--ok); }
+  .tag.review { background: var(--warn-soft); color: var(--warn); }
+  .tag.todo { background: var(--surface-soft); color: var(--text-muted); }
+  .meta { font-size: 14px; color: var(--text-muted); margin: 0 0 14px; }
+  .phase h4:first-of-type { margin-top: 14px; }
+  .phase ul { margin: 6px 0 0; padding-left: 20px; font-size: 15px; }
+  .phase li { margin-bottom: 6px; }
+  .preview { display: flex; gap: 12px; flex-wrap: wrap; margin: 8px 0 4px; }
+  .pill { position: relative; width: 108px; height: 44px; border-radius: 999px; border: 2.5px solid; }
+  .pill i { position: absolute; top: 3.5px; width: 32.5px; height: 32.5px; border-radius: 50%; border: 1.4px solid; }
+  .pill.l { background: #000; border-color: #000; } .pill.l i { left: 5px; background: #fff; border-color: #000; }
+  .pill.d { background: #fff; border-color: #fff; box-shadow: 0 0 0 1px var(--border); } .pill.d i { left: 63.5px; background: #000; border-color: #fff; }
+  .preview span { font-size: 13px; color: var(--text-muted); display: block; margin-top: 4px; }
+</style>
+<style>
+  .tag.done { background: var(--ok-soft); color: var(--ok); }
+  .tag.review { background: var(--warn-soft); color: var(--warn); }
+  .tag.todo { background: var(--surface-soft); color: var(--text-muted); }
+  .meta { font-size: 14px; color: var(--text-muted); margin: 0 0 14px; }
+  .phase h4:first-of-type { margin-top: 14px; }
+  .phase ul, .card ul { margin: 6px 0 0; padding-left: 20px; font-size: 15px; }
+  .phase li { margin-bottom: 6px; }
+  td code { white-space: normal; }
+  td.ph { white-space: nowrap; color: var(--text-muted); font-size: 13px; }
+  .folder { font-size: 15px; margin: 26px 0 8px; color: var(--text); }
+  .folder code { font-size: .92em; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">Portfolio page · progress log</p>
+      <h1>Portfolio progress</h1>
+      <p class="lede">A seller's portfolio: the signed in seller's own at <code>/portfolio</code> and anyone's public one at <code>/u/&lt;username&gt;</code> (Figma section <code>193:16444</code>). Plan and paste ready phase prompts: <code>dev-docs/portfolio/portfolio-implementation-plan.md</code>. Sample data first behind the hooks; own mode goes live in phase 7, public mode once the backend has a public API.</p>
+    </div>
+    <button class="toggle" id="toggle" type="button">Toggle theme</button>
+  </header>
+
+  <nav class="toc"><a href="#status">Status</a><a href="#decisions">Decisions</a><a href="#phase9">Phase 9</a><a href="#phase8">Phase 8</a><a href="#phase7">Phase 7</a><a href="#phase6">Phase 6</a><a href="#phase4">Phases 4 and 5</a><a href="#phase3">Phase 3</a><a href="#phase2">Phase 2</a><a href="#phase1">Phase 1</a><a href="#answers">Waiting on</a></nav>
+
+  <h2 id="status">Status</h2>
+  <div class="tablecard"><table>
+    <tr><th>Phase</th><th>Scope</th><th>State</th></tr>
+    <tr><td>0</td><td>Backend and designer messages (no code)</td><td><span class="tag todo">Not started</span></td></tr>
+    <tr><td>1</td><td>Routes, navigation, shell no rail mode, page skeleton, types, sample data, hook scaffold</td><td><span class="tag done">Built and checked 30 Oct</span></td></tr>
+    <tr><td>2</td><td>Hero banner and stat tiles</td><td><span class="tag done">Built and checked 30 Oct</span></td></tr>
+    <tr><td>3</td><td>Tabs, toolbar, status legend, pagination primitive</td><td><span class="tag done">Built and checked 30 Oct</span></td></tr>
+    <tr><td>4</td><td>Desktop list rows and grid cards, shared actions</td><td><span class="tag done">Built and checked 30 Oct</span></td></tr>
+    <tr><td>5</td><td>Mobile and tablet</td><td><span class="tag done">Built and checked 30 Oct</span></td></tr>
+    <tr><td>6</td><td>Behaviour: filters, sort, search, pages, tabs, share, heart, coming soon actions</td><td><span class="tag done">Built and checked 30 Oct</span></td></tr>
+    <tr><td>7</td><td>Live data for own mode, then public mode when the backend lands</td><td><span class="tag done">Own mode live 30 Oct; public waits on backend</span></td></tr>
+    <tr><td>8</td><td>Links from Profile, Public Preview and the details page SellerCard</td><td><span class="tag done">Done 30 Oct (two links wait on the backend)</span></td></tr>
+    <tr><td>9</td><td>Final QA</td><td><span class="tag done">Done 30 Oct</span></td></tr>
+  </table></div>
+
+  <h2 id="decisions">Decisions · 30 Oct 2026</h2>
+  <div class="card"><ul>
+    <li><b>Routes (Q1):</b> both. <code>/portfolio</code> (own, signed in, Seller Hub) and <code>/u/[username]</code> (public). The public address can change later: one helper, the page folder and a redirect; free until public mode is live.</li>
+    <li><b>Public mode before the backend (Q2):</b> sample data with the Sample data chip.</li>
+    <li><b>Navigation (Q10):</b> Portfolio right after My domains in Seller Hub; the header's Portfolio link goes to <code>/portfolio</code>.</li>
+    <li><b>Branch (Q12):</b> a new <code>portfolio</code> branch off <code>dark-mode</code>.</li>
+    <li><b>Change chip:</b> the existing <code>TrendDelta</code>, as is.</li>
+    <li><b>Reuse (plan §3, checked against the code):</b> <code>SummaryTile</code> for the tiles (not <code>StatCard</code>), <code>ProfileTabs</code> for the tabs (not <code>ListingCategoryTabs</code>), Watchlist's card, row, table and filter bar as the pattern for the list.</li>
+  </ul></div>
+
+  <h2 id="after9">After QA · 30 Oct 2026</h2>
+  <div class="card"><ul>
+    <li><b>Reverted the same day (user):</b> the layering cleanup below was undone. <code>src/component</code> is not used anymore, so the wiring can't live there; Portfolio is back to its original structure (<code>PortfolioPageView</code> in the composites folder, <code>deriveChain</code> exported from <code>useMyDomainsData</code>). Tracked in <code>dev-docs/layering/layering-cleanup-plan.md</code> §3.0 (PF1, PF2) and portfolio plan §14. tsc and eslint clean; both routes checked in the browser after the revert.</li>
+    <li><b>Layering cleanup (user review, since reverted):</b> the user spotted a helper reaching into a hook file and data hooks inside a composite. Rules for which folder may do what are now CLAUDE.md §8 (agreed: Portfolio only for now; action hooks owned by one button and the app shell's counts are the only exceptions; the remaining violations elsewhere are listed there). Fixed: <code>deriveChain</code> moved to <code>helpers/marketplace/chain.ts</code> (My Domains and Portfolio import it there; 3 comments updated); the page wiring moved from <code>design-system/composites/portfolio/shared/PortfolioPageView</code> to <code>src/component/portfolio-page</code> (both routes render it; the composites barrel is drawing only). The §8 check prints nothing for Portfolio. tsc and eslint clean; both routes and My Domains' chains (4 Polygon, 1 Ethereum) checked in the browser, identical to before.</li>
+    <li><b>Own portfolio buttons, decided by the user:</b> exactly like Figma. View Details or Make Offer, heart and bell on every row, and Message in the hero, on <code>/portfolio</code> too. The own mode hiding (my phase 4 to 6 proposal) is removed from PortfolioDomainActions, the row, the card and the page; <code>viewer</code> now only picks the empty state wording. Checked in the browser at 1440 light and 390 dark with backend shaped data. tsc and eslint clean.</li>
+  </ul></div>
+
+  <h2 id="phase9">Phase 9 · final QA · 30 Oct 2026</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">9</span><h3>Final QA</h3><span class="tag done">Done</span></div>
+    <h4>Static</h4>
+    <ul>
+      <li><code>tsc</code> clean. <code>eslint</code>: 0 errors and 0 warnings in every new file; every changed shared file has exactly the warnings it had before.</li>
+      <li>Rule scan (CLAUDE.md §4, §7): no native img or a, no !important, no inline style, no fragments in .map(); every raw colour carries a reason comment (three inline comments added). Diffs to shared files are small and keep CRLF line endings.</li>
+      <li>Node: data, filter and format checks, 18 pagination checks, all passing.</li>
+    </ul>
+    <h4>Accessibility (headless Chrome, real key presses)</h4>
+    <ul>
+      <li>No unnamed buttons or links, no image without alt, no duplicate ids, one h1 (the seller's name).</li>
+      <li>Tabs: roving tabindex, Arrow Right, End and Home move and select; the panel is labelled by the active tab.</li>
+      <li>List: role table with 4 column headers and 4 cells in every row; grid drops the table role. Pagination is a labelled nav with aria-current on the page.</li>
+      <li>Tab order: panel, search, search button, Extension, Type, Status, Sort by, grid and list toggles, then each row's View Details, heart and bell.</li>
+    </ul>
+    <h4>States (backend shaped fixtures)</h4>
+    <ul>
+      <li>Loading (skeleton hero, tiles and list), error with Retry, filtered empty with Clear filters, Coming soon tabs, Sold History unavailable, own mode empty account.</li>
+      <li><b>Fixed in this pass:</b> when the names request failed, the tiles stayed on skeletons; they now show the summary and say "Names held" instead of a TLD count. Own mode's empty tabs now speak to the owner ("You don't hold any names yet") with a Go to My Domains link; 0 domains reads "No names yet".</li>
+      <li>Not built: a not found or private state for <code>/u/[username]</code>, which needs the public API (plan §7 item 4, §8.2 items 1 and 2).</li>
+    </ul>
+    <h4>Layout sweep</h4>
+    <ul>
+      <li>Public and own at 1440, 1024, 834 and 390 in light and dark (16 screenshots): no overflow or broken layout; table where it fits, cards elsewhere.</li>
+    </ul>
+    <h4>Shared components on their other pages</h4>
+    <ul>
+      <li>MarketplacePageShell: every other page keeps its rail (grid read on 5 pages at 3 widths, phase 1).</li>
+      <li>Header: Marketplace still active on <code>/</code>. Profile: rail links to <code>/portfolio</code>, Wallets badge intact. History: tabs unchanged. My Domains: same names from the shared query.</li>
+      <li>SummaryTile default on <code>/details</code>: 76px tiles, 17px medium values, no sub line, exactly as before.</li>
+    </ul>
+    <h4>Still open</h4>
+    <ul>
+      <li>Real session on stage; whether stage has my-domains SOLD; the share sheet on a real phone; a real name's heart against the API.</li>
+      <li>Designer: Q4, Q5, Q7 (.sol tag, change chip meaning), Q8, Q9 (five pills vs four), Q11. Backend: plan §8.2 (public portfolio, privacy, username on orders). Which address public portfolio links use (Profile copies endless.domains, Share uses the current site).</li>
+    </ul>
+  </div>
+
+  <h2 id="phase8">Phase 8 · 30 Oct 2026</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">8</span><h3>Links into the page</h3><span class="tag done">Done</span></div>
+    <ul>
+      <li><b>Profile rail, "View portfolio" (both rows):</b> now <code>PORTFOLIO_HREF</code> (<code>/portfolio</code>) instead of My Domains. Checked in the browser: both links point there and a click lands on it.</li>
+      <li><b>Profile tab, portfolio URL:</b> still copy only (plan §4.7 item 2): <code>/u/[username]</code> shows sample data until the public API exists. Comment updated.</li>
+      <li><b>Details page SellerCard, "View Portfolio":</b> still inert: orders carry the maker's address only, no username (plan §8.2 item 6). Comment updated.</li>
+      <li><b>To decide:</b> the Profile tab copies <code>https://endless.domains/u/&lt;username&gt;</code> (hardcoded), while Portfolio's Share copies the current site's origin + <code>/u/&lt;username&gt;</code>. They match only if the marketplace is served from endless.domains.</li>
+      <li><code>tsc</code> clean, no new lint warnings.</li>
+    </ul>
+  </div>
+
+  <h2 id="phase7">Phase 7 · 30 Oct 2026</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">7</span><h3>Live data, own mode</h3><span class="tag done">Built and checked</span></div>
+    <p class="meta">Backend clone fast forwarded to origin/uat c7b60c49 (read only). Nothing committed.</p>
+    <h4>Backend findings</h4>
+    <ul>
+      <li><code>GET /marketplacev2/orders/my-domains</code> now takes <code>status=SOLD</code> (and ALL): sold rows come with their filled order (<code>priceUsdt</code>, <code>filledAt</code>). It may not be on stage yet.</li>
+      <li>Still no public portfolio endpoint, privacy flags, appraisal, views or Endless Score.</li>
+      <li>Guru's 7e86bbeb fixed the verified email reset: PUT /users now only reopens verification when the email differs from the stored one. Same commit disabled .sol in domain search.</li>
+    </ul>
+    <h4>Own mode, now real</h4>
+    <ul>
+      <li>Hero: GET /users/user-multiple-wallet (name, @username, photo, bio, wallet) plus member since from the summary. No last active or primary name in the API, so they drop out. Verified seller = verified email and a linked wallet (Q6 proposal). No Sample data chip.</li>
+      <li>Tiles: GET /marketplacev2/orders/summary (domains, listed, sold, volume in USDT); TLD count and "this month" from the names; Endless Score Coming soon.</li>
+      <li>Names: my-domains LISTED, UNLISTED (shared RTK cache with My Domains and the sidebar) and SOLD. Mapped by <code>helpers/portfolio/mapOwnPortfolio.ts</code>; filtered and paged client side as before.</li>
+      <li>If the SOLD call fails, the page still works: Sold History shows "Your sales will show here once sales history is available.", its tab has no count, and Domains sold says "All time".</li>
+      <li>Public <code>/u/[username]</code> stays on sample data and makes none of these calls.</li>
+    </ul>
+    <h4>Shared code (additive)</h4>
+    <ul>
+      <li><code>getMyDomainsOrders</code> and <code>MyDomainsOrderRow.status</code> accept SOLD; <code>MyDomainsOrder.filledAt</code>.</li>
+      <li><code>useAccountSummary({ skip })</code>; Profile's calls unchanged.</li>
+      <li><code>deriveChain</code> exported from <code>useMyDomainsData</code>.</li>
+    </ul>
+    <h4>Checked</h4>
+    <ul>
+      <li><code>tsc</code> clean; <code>eslint</code> clean on changed files (Domain.ts's 5 warnings were there before).</li>
+      <li>Browser with backend shaped fixtures served locally (nothing sent to staging): own mode at 1440 light list, dark grid, 390; Sold History; the SOLD rejected case; <code>/u/vision</code> signed in makes no profile, summary or SOLD requests.</li>
+      <li><b>Not checked:</b> a real session on stage, and whether stage already has SOLD.</li>
+    </ul>
+  </div>
+
+  <h2 id="phase6">Phase 6 · 30 Oct 2026</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">6</span><h3>Behaviour</h3><span class="tag done">Built and checked</span></div>
+    <p class="meta">Filters, sort, search, tabs and pages in the URL were already done in phases 1 and 3. Nothing committed.</p>
+    <h4>New</h4>
+    <ul>
+      <li><code>hooks/portfolio/usePortfolioShare</code>: the <code>/u/&lt;username&gt;</code> link; the system share sheet on touch devices, otherwise copy with "Portfolio link copied."; an error toast that shows the link if copying fails; "No public link yet" without a username (own mode points to My Profile).</li>
+      <li><code>hooks/portfolio/usePortfolioWatch</code>: real names go through <code>useWatchlist</code> by token id (sign in prompt when signed out, error toasts, sidebar count refresh); sample names have no token id, so they're saved on this page only, with a "Sample data" toast. Never sends a made up id to the API.</li>
+      <li><code>PortfolioDomain.tokenId</code> (null for sample names). Heart shows outline or filled from the viewer's saved state, aria-pressed, busy while its request runs.</li>
+      <li>Message, Make Offer and the bell answer with coming soon toasts, worded like Watchlist's alerts toast (no backend, plan Q11).</li>
+    </ul>
+    <h4>Decisions</h4>
+    <ul>
+      <li>Toasts instead of hover tooltips for the coming soon actions: disabled buttons get no hover, and Watchlist already uses a toast for its bell and Notify.</li>
+      <li>The success toast style shows only its message, so the copy toast says "Portfolio link copied." (Watchlist's Share List passes a title that never shows; left alone.)</li>
+    </ul>
+    <h4>Checked</h4>
+    <ul>
+      <li><code>tsc</code> and <code>eslint</code> clean.</li>
+      <li>In the browser, reading the page after each click: heart saves then unsaves (pressed count back to start), heart drawn filled when saved; Make Offer, Message and bell show their toasts (bell also on a 390 dark phone); Share copies the link (headless Chrome needed clipboard permission and focus to allow it).</li>
+      <li>Not checked: a real name's heart against the API (all names are sample until phase 7), and the share sheet on a real phone.</li>
+    </ul>
+  </div>
+
+  <h2 id="phase4">Phases 4 and 5 · 30 Oct 2026</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">4</span><h3>Rows, cards, actions, mobile and tablet</h3><span class="tag done">Built and checked</span></div>
+    <p class="meta">Figma: row 193:22207, card 193:16942, list 193:22186, grid 193:16677, mobile cards in 193:20104. Nothing committed.</p>
+    <h4>New</h4>
+    <ul>
+      <li><code>composites/portfolio/shared/PortfolioDomainParts</code>: <code>PortfolioDomainIdentity</code> (WatchlistDomainIdentity with "polygon · 7 chars · 2,329 views" and the crown; name links to <code>/details</code> only for a real listing), <code>PortfolioPrice</code> (USDT with the Tether icon and TrendDelta; "Not listed" with no price), <code>PortfolioAppraisal</code>, <code>PortfolioDomainActions</code> (View Details, Make Offer, or "Sold Oct 12, 2026"; heart and bell).</li>
+      <li><code>listings/PortfolioDomainRow</code> (four columns, status edge green / charcoal / red), <code>listings/PortfolioDomainCard</code>, <code>listings/PortfolioDomainList</code> (legend per tab, header row, rows or 4 column grid, Pagination; loading skeletons, error with Retry, empty per tab, "No names match" with Clear filters, Coming soon panel for Offer Receive, Collection and Activity), <code>listings/portfolioStatus.ts</code>, <code>listings/_columns.scss</code>.</li>
+      <li><code>helpers/portfolio/format.ts</code>: <code>formatPrice</code>, <code>formatShortDate</code>.</li>
+      <li>Page view: the placeholder list and inline legend are gone; View Details opens <code>/details/[orderHash]</code> for a real listing and shows a "sample data" toast for sample names.</li>
+    </ul>
+    <h4>Mobile and tablet (phase 5)</h4>
+    <ul>
+      <li>Cards only on mobile and from 1040 to 1279px (the same <code>useIsMobile</code> ranges as Watchlist and My Domains); the view toggle hides in both ranges.</li>
+      <li>Grid auto fills: four cards at 1440, three at tablet, one on mobile. The list fits as a table at tablet (768 to 1039, sidebar in the drawer) and at 1280 and up.</li>
+      <li>Pills wrap, legend hidden, compact pager on mobile; the fixed bottom nav clears the pager at 390 and 1024.</li>
+      <li>The toolbar is hidden on Offer Receive, Collection and Activity (nothing to search).</li>
+    </ul>
+    <h4>Decisions made while building</h4>
+    <ul>
+      <li>Heart and bell copy WatchlistIconActions' markup instead of extending it: it is typed to watchlist items and only removes. Watchlist is untouched. Disabled until phase 6 gives them handlers.</li>
+      <li>Bell stays grey like Watchlist's (alerts aren't built); Figma's is yellow.</li>
+      <li>Make Offer is PrimaryButton charcoal, which keeps its light look in dark (Figma's dark one is outlined).</li>
+      <li>Figma's second tag (".sol") isn't drawn: the chain is already in the meta line (plan §2.10 item 6, Q7).</li>
+      <li>Sold names show the sale price ("Sold for") and date; the change chip is only for names for sale (sample data changed to match).</li>
+      <li>Own mode: no Make Offer, heart or bell; not for sale names have no button.</li>
+    </ul>
+    <h4>Checked</h4>
+    <ul>
+      <li><code>tsc</code> and <code>eslint</code> clean on every portfolio file and the changed shared ones. Rule scan: no native img or a, no !important, no inline style, no fragments in .map().</li>
+      <li>Node: 26 data, filter and format checks, 18 pagination checks, all passing.</li>
+      <li>Screenshots: list and grid at 1440 in light and dark; 1280 light; 1024 light full page; 834 dark grid full page; 390 light and dark full page; own mode; Sold History; Offer Receive; filtered empty; View Details toast.</li>
+    </ul>
+  </div>
+
+  <h2 id="phase3">Phase 3 · 30 Oct 2026</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">3</span><h3>Tabs, toolbar, legend, pagination</h3><span class="tag done">Built and checked</span></div>
+    <p class="meta">Figma: tabs 193:22030, toolbar 193:22126, legend 193:22187, pagination 193:22762. Nothing committed. The rows are still the phase 1 placeholder (phase 4).</p>
+    <h4>New</h4>
+    <ul>
+      <li><code>primitives/navigation/pagination</code>: <code>Pagination</code> (« Previous, numbers with ellipsis, Next »; 38px cells with 1px rules; current page grey with aria-current; "2 of 10" on phones via CSS; nothing for one page) and <code>getPageItems</code> (first, last, current ± 1, first or last three near the ends; a one page gap shows the page, so page 1 of 10 is "1 2 3 … 10").</li>
+      <li><code>composites/portfolio/listings/PortfolioToolbar</code>: count line, SearchInput 243 × 48 (full width on mobile), pills, ViewToggle (hidden on mobile). Same layout as WatchlistFilterBar.</li>
+      <li>Status legend ("Not for sale", "For sale") inline in the page view for now, hidden on mobile; moves into the list in phase 4.</li>
+      <li>Page change scrolls the list section into view.</li>
+    </ul>
+    <h4>Changed shared code</h4>
+    <ul>
+      <li><code>ProfileTabs</code> (additive): optional <code>count</code> on <code>PillTab</code>, the grey chip after the label (surface active + secondary text, so dark follows). Profile and History pass no counts and look the same (checked History in dark).</li>
+    </ul>
+    <h4>Decisions made while building</h4>
+    <ul>
+      <li><b>Four pills, not five (Q9 still open):</b> All TLDs, All Type, All Status, and one "Sort by: …" pill with Figma's muted prefix. Figma's "Sort by: For sale" repeats All Status next to a separate "Price: low to high" pill. Sorts: Price low/high, Newest, Most viewed.</li>
+      <li>The All tab has no count chip (Figma draws none); Listing and Sold History show theirs; Offer Receive, Collection and Activity show none until they have data.</li>
+      <li>Status pill only on the All tab. Switching tabs clears Status and TLD (a hidden "For sale" would empty Sold History; each tab has its own extensions).</li>
+      <li>"Showing X of Y" uses the secondary text role; Figma's #a29dc7 is too faint (2.4:1).</li>
+    </ul>
+    <h4>Checked</h4>
+    <ul>
+      <li><code>tsc</code> and <code>eslint</code> clean. Node: 18 <code>getPageItems</code> cases pass (1 to 50 pages, edges, out of range pages, unique gap keys).</li>
+      <li>Screenshots: 1440 light (page 1) and dark (page 5: "1 … 4 5 6 … 10"), 1024 light, 390 light and dark (wrapped pills, compact pager, no toggle or legend). Clicking Listing with <code>?status=not-for-sale</code> goes to <code>?tab=listing</code> with status cleared. Profile and History tabs unchanged.</li>
+    </ul>
+  </div>
+
+  <h2 id="phase2">Phase 2 · 30 Oct 2026</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">2</span><h3>Hero banner and stat tiles</h3><span class="tag done">Built and checked</span></div>
+    <p class="meta">Figma: hero 193:21955, mobile hero 193:20048, tiles 193:21989 (light) and 193:18908 (dark). Nothing committed.</p>
+    <h4>New</h4>
+    <ul>
+      <li><code>composites/portfolio/hero/PortfolioHeroBanner</code>: ProfileAvatar as an 83px circle (119px on mobile) in a white ring, name (name, else @username, else wallet), Verified seller pill, meta line, bio, Message (hidden on your own portfolio) and Share; stacks and centres on mobile; skeleton while loading. Message and Share are disabled until phase 6 gives them handlers.</li>
+      <li><code>composites/portfolio/summary/PortfolioStatTiles</code>: five SummaryTiles, 5 across from 1280px, 3 + 2 below, one per row on mobile; Total volume in USDT with the Tether icon, compact above 100,000 ("437.5K USDT"); Endless Score shows ComingSoonBadge when null; skeleton tiles while loading.</li>
+      <li><code>helpers/portfolio/format.ts</code> (counts, tile amounts, whole dollars); <code>labels.ts</code> gained <code>formatJoined</code>, <code>formatLastActive</code>, <code>ownerMetaLine</code>.</li>
+      <li>Assets from Figma in <code>public/assets/img/portfolio/</code>: <code>verified-tick.svg</code>, <code>message.svg</code>, <code>share.svg</code>.</li>
+    </ul>
+    <h4>Changed shared code</h4>
+    <ul>
+      <li><code>SummaryTile</code> (additive): <code>variant="stat"</code> (94px, muted label, 20px bold value in the accent, white in dark, no mobile shrink), <code>sublabel</code>, <code>sublabelTone="positive"</code>. Default tiles unchanged (the only other user is DomainSummaryTiles on <code>/details</code>).</li>
+    </ul>
+    <h4>Decisions made while building</h4>
+    <ul>
+      <li>Green sub lines use <code>--color-status-success-text</code>; Figma's #1bb100 is too faint on white.</li>
+      <li>Figma's dark tile (black to #161616, #3a3a3a border) maps to the same surface roles as every other tile (one surface rule).</li>
+      <li>Message and Share stay white on the banner in dark, as the dark frame draws them.</li>
+      <li><code>bannerbg.jpg</code> has a light 3px edge on every side; at this banner's proportions it showed as a white frame in dark. The image is drawn on a layer 8px larger all round so the edge is always clipped. My Domains and Watchlist don't show it at their sizes, so they're untouched.</li>
+      <li>Avatar initials come from the bare name (not "@vision", which gave "@").</li>
+    </ul>
+    <h4>Checked</h4>
+    <ul>
+      <li><code>tsc</code> clean; <code>eslint</code> clean on the new and changed files.</li>
+      <li>Screenshots of <code>/u/vision</code> at 1440, 1280, 1024, 834 and 390 in light and dark, plus <code>/portfolio</code> signed in (Message hidden), and the loading skeletons.</li>
+    </ul>
+  </div>
+
+  <h2 id="phase1">Phase 1 · 30 Oct 2026</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">1</span><h3>Foundations</h3><span class="tag done">Built and checked</span></div>
+    <p class="meta">Branch <code>portfolio</code> from <code>dark-mode</code> at 6cb6ac2. Nothing committed.</p>
+    <h4>New</h4>
+    <ul>
+      <li><code>pages/portfolio/index.tsx</code> (own, protected) and <code>pages/u/[username].tsx</code> (public, title "@username on Endless Domains"). Both render one shared <code>PortfolioPageView</code>.</li>
+      <li><code>src/design-system/composites/portfolio/</code>: barrel <code>index.ts</code> and <code>shared/PortfolioPageView</code>. The hero, tiles and list are plain placeholders wired to the real hooks; tabs are already <code>ProfileTabs</code> (no counts yet).</li>
+      <li><code>src/types/portfolio/index.ts</code>: target (own or public), tabs, statuses, sorts, owner, stats, domain, filters, page.</li>
+      <li><code>src/data/portfolio/</code>: 112 held names (37 for sale) and 58 sold, seeded so every render matches; the sample seller with Figma's text; the Endless Score.</li>
+      <li><code>src/helpers/portfolio/</code>: <code>labels.ts</code> (tab and pill words, hero name fallback: name, @username, wallet), <code>filterPortfolio.ts</code> (tab, search, TLD, type, status, four sorts, 12 per page with clamping, tab counts, TLD options), <code>summarizePortfolio.ts</code> (the five tiles from a list), <code>target.ts</code> (cache key per seller).</li>
+      <li><code>src/hooks/portfolio/</code>: <code>usePortfolioFilters</code> (every filter, the page and the view in the URL; defaults left out; any change but the page goes back to page 1; search on Enter), <code>usePortfolioOwner</code>, <code>usePortfolioStats</code>, <code>usePortfolioDomains</code> (all sample through <code>useMockQuery</code>).</li>
+    </ul>
+    <h4>Changed shared code</h4>
+    <ul>
+      <li><code>MarketplacePageShell</code>: <code>rightRail</code> optional; with none, one column at every width (<code>data-no-rail</code>). Every existing caller still passes a rail, so nothing else changes.</li>
+      <li><code>routes.ts</code>: <code>PORTFOLIO_HREF</code>, <code>portfolioHref(username)</code>.</li>
+      <li><code>navigation.ts</code>: Portfolio after My domains (Lucide briefcase; Figma's icon differs between its light and dark frames).</li>
+      <li>Header: Portfolio links to <code>/portfolio</code>; any real link can now show active, not just Marketplace.</li>
+      <li>Bottom nav: <code>/portfolio</code> and <code>/u/[username]</code> select Account.</li>
+      <li><code>ProtectedRoute</code>: <code>/u/</code> is public and always renderable, so signed in visitors aren't bounced to the home page.</li>
+    </ul>
+    <h4>Checked</h4>
+    <ul>
+      <li><code>tsc --noEmit</code> clean. <code>eslint</code> on every changed and new file: 0 errors, no new warnings (the 15 in the header and main layout were there before).</li>
+      <li>Node: 18 checks passed (unique names; tiles 112 / 37 / 58, 7 TLDs; 10 pages of 12; unpriced last in price order; page clamps; tab, status, TLD, search, type and newest; coming soon tab empty; name fallbacks).</li>
+      <li><b>Browser (dev server on 3002, headless Chrome, staging calls blocked, dummy login cookie):</b> <code>/portfolio</code> signed in at 1440 in light and dark; <code>/portfolio</code> signed out goes to <code>/login</code>; <code>/u/vision</code> signed out opens (title "@vision on Endless Domains"); <code>/u/alice?tab=listing&amp;page=2</code> at 390 dark shows page 2 of 4 with Account selected in the bottom nav; Next on Sold History moves the address to <code>page=2</code>; header and sidebar show Portfolio active.</li>
+      <li><b>Shell unchanged elsewhere:</b> grid columns and areas read from the page on Home, History, Profile, Watchlist and My Domains at 1440, 834 and 390 all keep their rail where it was; only Portfolio has <code>data-no-rail</code> (one column).</li>
+      <li><b>Bug found and fixed in the browser:</b> the page stayed on "Loading" because the hooks passed inline loaders to <code>useMockQuery</code>, which reruns whenever its loader changes. The loaders are module level now and the public username is read from the cache key (<code>usernameFromTargetKey</code>).</li>
+</ul>
+  </div>
+
+  <h2 id="answers">Waiting on</h2>
+  <ol class="qs team">
+    <li><b>Designer: Q4 (the five undesigned tabs and the missing states), Q5, Q7, Q8, Q9, Q11</b><span>Building on the plan's proposals until then.</span></li>
+    <li><b>Backend: the public portfolio endpoints (plan §8.2) and privacy settings</b><span>Public mode stays on sample data until they exist.</span></li>
+    <li><b>Q6: what makes a Verified seller</b><span>Proposal: email verified and a wallet linked.</span></li>
+  </ol>
+
+  <footer>Started 30 October 2026 · branch <code>portfolio</code> · dev-docs is local only.</footer>
+</div>
+<script>
+  document.getElementById('toggle').addEventListener('click', function () {
+    var root = document.documentElement;
+    var current = root.getAttribute('data-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('dmplan-theme', next); } catch (e) {}
+  });
+</script>
+</body>
+</html>

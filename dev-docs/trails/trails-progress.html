@@ -1,0 +1,1171 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trails Checkout Progress</title>
+<script>
+  try {
+    var saved = localStorage.getItem('dmplan-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  } catch (e) {}
+</script>
+<style>
+  :root {
+    --bg: #f9f9f9; --surface: #ffffff; --surface-soft: #f3f4fe;
+    --text: #111111; --text-muted: #5b5b66; --border: #e6e6e6;
+    --accent: #2639ED; --accent-soft: #e9ebfd;
+    --wait: #9457f6; --wait-soft: #f4eefe;
+    --ok: #12805c; --ok-soft: #e4f5ee;
+    --warn: #b4540a; --warn-soft: #fdf1e4;
+    --bad: #c4314b; --bad-soft: #fdecef;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+      --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+      --accent: #7f8cff; --accent-soft: #1d2150;
+      --wait: #b996fa; --wait-soft: #2c2142;
+      --ok: #4fd1a0; --ok-soft: #173229;
+      --warn: #f5a35c; --warn-soft: #3a2614;
+      --bad: #ff7d93; --bad-soft: #3a1c24;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+    --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+    --accent: #7f8cff; --accent-soft: #1d2150;
+    --wait: #b996fa; --wait-soft: #2c2142;
+    --ok: #4fd1a0; --ok-soft: #173229;
+    --warn: #f5a35c; --warn-soft: #3a2614;
+    --bad: #ff7d93; --bad-soft: #3a1c24;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: "Satoshi", system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.6; }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 48px 16px 80px; }
+  header.top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+  .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; }
+  h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.15; margin: 0 0 12px; }
+  .lede { color: var(--text-muted); margin: 0; max-width: 680px; }
+  .lede a { color: var(--accent); }
+  .toggle { flex-shrink: 0; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 14px; cursor: pointer; }
+  .toggle:hover { border-color: var(--accent); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 32px; }
+  nav.toc a { font-size: 14px; text-decoration: none; color: var(--accent); background: var(--accent-soft); padding: 6px 12px; border-radius: 999px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 0 0 16px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+  .stat b { display: block; font-size: 26px; line-height: 1.2; }
+  .stat span { font-size: 13px; color: var(--text-muted); }
+  h2 { font-size: 22px; margin: 52px 0 16px; }
+  h3 { font-size: 18px; margin: 0; }
+  h4 { font-size: 15px; margin: 22px 0 8px; color: var(--accent); }
+  p { margin: 0 0 12px; }
+  .muted { color: var(--text-muted); font-size: 15px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
+  .card p:last-child { margin-bottom: 0; }
+  .card ul, .card ol { margin: 8px 0 0; padding-left: 20px; }
+  .card li { margin-bottom: 6px; }
+  code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .86em; background: var(--surface-soft); border-radius: 6px; padding: 1px 6px; word-break: break-word; }
+  .findings { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .finding { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+  .finding h3 { font-size: 16px; margin-bottom: 6px; }
+  .finding p { font-size: 15px; margin: 0; color: var(--text-muted); }
+  .tablecard { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow-x: auto; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: 0; }
+  th { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+  td.grp { font-weight: 600; color: var(--accent); background: var(--surface-soft); font-size: 13px; }
+  .sw { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .chip { width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(128,128,128,.45); flex-shrink: 0; }
+  .callout { border-left: 4px solid var(--wait); background: var(--wait-soft); border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; }
+  .callout p { margin: 0; }
+  .callout.ok { border-color: var(--ok); background: var(--ok-soft); }
+  .callout.warn { border-color: var(--warn); background: var(--warn-soft); }
+  .issue { display: grid; grid-template-columns: 28px 1fr; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--bad); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+  .issue .n { font-weight: 700; color: var(--bad); }
+  .issue p { margin: 0; font-size: 15px; }
+  .issue .where { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+  .phase { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px 24px; margin-bottom: 14px; }
+  .phase-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  .num { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 15px; flex-shrink: 0; }
+  .tag { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+  .tag.now { background: var(--ok-soft); color: var(--ok); }
+  .tag.wait { background: var(--wait-soft); color: var(--wait); }
+  .tag.size { background: var(--surface-soft); color: var(--text-muted); }
+  .tag.new { background: var(--warn-soft); color: var(--warn); }
+  .rows { display: grid; grid-template-columns: 130px 1fr; gap: 6px 16px; font-size: 15px; }
+  .rows dt { color: var(--text-muted); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; padding-top: 2px; }
+  .rows dd { margin: 0; }
+  ol.qs { counter-reset: q; list-style: none; padding: 0; margin: 0; }
+  ol.qs li { counter-increment: q; position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px 14px 56px; margin-bottom: 10px; }
+  ol.qs li::before { content: counter(q); position: absolute; left: 16px; top: 14px; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  ol.qs.team li::before { background: var(--wait-soft); color: var(--wait); }
+  ol.qs b { display: block; margin-bottom: 2px; }
+  ol.qs span { color: var(--text-muted); font-size: 15px; }
+  footer { margin-top: 56px; font-size: 13px; color: var(--text-muted); }
+  @media (max-width: 700px) {
+    header.top { flex-direction: column; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .findings { grid-template-columns: 1fr; }
+    .card, .phase { padding: 18px; }
+    .rows { grid-template-columns: 1fr; }
+    .rows dt { padding-top: 8px; }
+    ol.qs li { padding-left: 50px; }
+  }
+</style>
+<style>
+  .tag.done { background: var(--ok-soft); color: var(--ok); }
+  .tag.todo { background: var(--surface-soft); color: var(--text-muted); }
+  .meta { font-size: 14px; color: var(--text-muted); margin: 0 0 14px; }
+  .phase ul { margin: 6px 0 0; padding-left: 20px; font-size: 15px; }
+  .phase li { margin-bottom: 6px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <div>
+    <p class="eyebrow">Trails checkout · progress log</p>
+    <h1>Trails checkout</h1>
+    <p class="lede">Build log for "Pay with any token" inside the buy drawer, following <a href="trails-implementation-plan.md">trails-implementation-plan.md</a> and Mohit's doc of 4 Nov 2026 (plain version: <a href="trails-checkout-explained.html">trails-checkout-explained.html</a>). Branch <code>trails</code>, cut from <code>dark-mode</code> (3226d4a) on 5 Nov 2026.</p>
+  </div>
+  <button class="toggle" id="toggle" type="button">Toggle theme</button>
+</header>
+
+<div class="stats">
+  <div class="stat"><b>8 / 12</b><span>phases done (0 to 7); 8 and 9 built, waiting on a real purchase test</span></div>
+  <div class="stat"><b>Yes</b><span>uat Trails key in <code>.env</code></span></div>
+  <div class="stat"><b>11</b><span>open questions left (plan §6)</span></div>
+  <div class="stat"><b>1</b><span>commit</span></div>
+</div>
+
+<div class="callout" id="backend-integration"><p><b>Backend integration (from 17 Nov 2026)</b> has its own progress log: <a href="trails-backend-progress.html">trails-backend-progress.html</a>, following <a href="trails-backend-integration-plan.md">trails-backend-integration-plan.md</a>.</p></div>
+
+<div class="callout warn" id="double-check">
+  <p><b>Double check before this ships</b> (kept at the top on purpose; tick them off here as they're done)</p>
+  <ol>
+    <li><b>Refunded, but the drawer said "is yours" (found 12 Nov, check 12, not fixed, waiting on Mohit Q20).</b> Trails refunded the buyer's payment (intent <code>0x0d937952…3e01</code> REFUNDED, 0.05 USDT back on Polygon), yet the Trails tab showed "tawhidabdullah.og is yours" and never "Payment refunded". Cause: <code>toCheckoutState</code> (<code>helpers/trails/intentStatus.ts:146</code>) checks our sale record first; if it names this buyer, the purchase counts as done and Trails' REFUNDED is never read. Here the same wallet had also bought directly in another tab, so the record named it. Effect for a real buyer who does that: "is yours" is true, but they're never told their Trails payment came back as USDT, minus about 0.03 USD in fees. Against a different winning buyer the drawer goes to Refunded (not seen for real yet). Possible fix if Mohit wants it: when the sale record names this buyer <i>and</i> Trails says REFUNDED, still show "is yours" plus a refund line (wording to the user first).</li>
+    <li><b>MetaMask extension 13.55 can't connect to any site (found 11 Nov, not our code).</b> Connecting fails with "Connection declined" and the console error <code>Invalid approved permissions request: endowment:caip25 … tron:728126428 … not supported by the wallet</code>. MetaMask adds Tron to the connect request itself and then rejects it: even a Polygon only <code>wallet_requestPermissions</code> from the console failed the same way, and app.uniswap.org fails too. A colleague on 13.52 connects fine, so it most likely came with a recent MetaMask update. Nothing in our wallet code changed. Workaround: connect through WalletConnect with MetaMask on the phone (used for the review fix tests, which also covers the pending WalletConnect run). Tell the senior: real buyers on 13.55 may hit it on our site until MetaMask fixes it.</li>
+    <li><b>Mohit's code review, 11 Nov 2026: six points, all confirmed against the code.</b> Page weight from the resume code in <code>_app</code>; tracking stops on page change or a second purchase; refund wording; slippage 5% to 0.5%; unpaid committed intents polled forever; widget console logging. Full check, fixes and decisions: <code>dev-docs/trails/trails-mohit-review.html</code>. <b>All six fixed 11 Nov (not committed yet)</b>, see <a href="#review-fixes">Review fixes</a>. Still to do: a free run (console quiet), a paid run with a page change, and your <code>next build</code> to confirm page sizes are back to normal.</li>
+    <li><b>Phase 10, problem 1: check with your senior before fixing.</b> After a purchase the site doesn't refresh its remembered lists, so the bought name still shows for sale and My Domains looks unchanged until a reload. Proposed fix: after any successful purchase, mark <code>domain_listing</code> and <code>domain</code> as out of date, reload once at once and once ~30 s later (the backend's poller takes 20 to 60 s). Ask: is this the right approach, and should <code>all_domain_listing</code> and <code>recent_transactions</code> (the activity feed) also refresh (plan Q10)? Full explanation in the <a href="#phase-10">phase 10 entry</a>.</li>
+    <li><b>Phase 10, problem 2: check with your senior before fixing.</b> When a USDT purchase fails, the "Transaction fail" screen shows the success text ("Ownership transferred… will appear in your account within 10 to 15 minutes"), copied by mistake in Figma 1:1051. Proposed fix: real failure text, one version each for cancelled in the wallet, failed before sending (nothing charged) and failed on chain (gas spent). Ask: OK to change copy Figma drew, should design write it, and should the title "Reject" and heading "Transaction fail" change too? Full explanation in the <a href="#phase-10">phase 10 entry</a>.</li>
+    <li><b>No way to the receipt after "Keep browsing" (both USDT and Trails): check with your senior.</b> Closing the drawer during a purchase leaves only the "is yours" toast, which has no link; today the receipt is reached from the purchase's row on /history. Proposed: a "View receipt" link in that toast (additive change to the shared toast component, new link wording). Not in Mohit's doc.</li>
+    <li><b>"is yours" toast has no title (USDT and Trails, existing toast).</b> The SUCCESS toast primitive ignores its title, so buyers see only "Ownership transferred…" without the domain name. Options: let the SUCCESS toast draw a title when one is given (fixes every caller, also makes "Link copied" titles appear site wide) or show the title only where we opt in. Decide before changing a shared primitive.</li>
+    <li><b>A Trails payment popup can outlive the screen that started it (seen in run 3, cause confirmed by the user).</b> MetaMask asked to send ETH to a Trails deposit address while the drawer was back on the USDT review screen. A wallet request can't be cancelled from the site, so the buyer gets a payment popup with no context. Decide with your senior whether to warn on going back from the widget ("check your wallet for a waiting request") or leave it. Also: when the wallet is on another network and "Any token" is available, the red notice only offers Switch; it could point to the Any token option (new copy, ask first).</li>
+    <li><b>Receipt page for Trails purchases (existing page):</b> "You paid 0.10 USDT" and "Payment and transfer settled in the same transaction" describe only the Polygon side; the buyer actually paid another token through Trails. The Done toast's "Ownership transferred in the same transaction as the payment" has the same nuance. Also at tiny prices the fee and seller rows round (0.0025 shows 0.00). Decide with Mohit or design whether Trails purchases need their own wording.</li>
+    <li><b>Three drawer lines that promise something about money or time: confirm with Mohit.</b> <s>"Trails' conversion fees aren't refunded"</s> (removed 11 Nov on Mohit's review); "This usually takes a minute or two" / "takes a few minutes"; "Contact support if it hasn't arrived within a few hours". Details in <a href="#copy">Where the drawer's wording comes from</a>, group 4.</li>
+    <li><b>Testing log claims to confirm.</b> Phase 7 lists light mode, phone width and the dev overlay as checked, based on "it's good" after being asked to check them; phase 6 lists phone, tablet and desktop as things to check. Correct the <a href="#testing">Testing log</a> if any of these weren't actually looked at.</li>
+    <li><b>Trails switched off = today's drawer</b> hasn't been confirmed in the browser yet (<code>NEXT_PUBLIC_TRAILS_ENABLED=false</code>, restart, two cards only).</li>
+    <li><b>Slippage (Q13): answered by Mohit 11 Nov.</b> Now 0.005 (0.5%), as in his probe. All three real purchases ran at 5%, so the next paid run is the first at 0.5%: check the quote still goes through.</li>
+    <li><b>Remaining real Trails runs.</b> <i>Done 10 Nov:</i> the normal purchase after the fix (run 2, tpenguofficial.og, POL: progress ▸ Done ▸ View Receipt), the after-reload message, and paying from Ethereum mainnet (run 3, westbengal.og, ETH). <i>Still to run:</i> paying with a token like USDC (adds an approve step in the wallet; every run so far paid with the network's own coin), closing the drawer mid purchase (toast), the /history "Purchase in progress" banner, a refund (someone else buys first), one WalletConnect phone wallet run, and the free checks (unpaid price leaves nothing behind; Trails switched off).</li>
+    <li><b>Delete the spike page</b> <code>pages/trails-spike.tsx</code> and its SCSS before the feature ships (kept on disk at the user's request, hidden from git by <code>.git/info/exclude</code>).</li>
+    <li><b>Committed and pushed 10 Nov 2026</b> at the user's request: <code>10e06fc</code> "Trails: pay with any token in the buy drawer" on <code>origin/trails</code> (Bitbucket), 49 files, <code>package.json</code> and <code>package-lock.json</code> together. Not included, by design: <code>.env</code>, <code>CLAUDE.md</code>, <code>dev-docs/</code>, the spike page. Checked before committing: 66 Vitest tests pass, <code>tsc</code> clean, no API key in the code. <b>Still open:</b> DevOps adds the three <code>NEXT_PUBLIC_TRAILS_*</code> variables to uat (build time, plan §7); without them the Any token option stays hidden there. No pull request opened yet.</li>
+    <li><b>Header hydration bug</b> (wallet button "Logout" vs address) is parked, not fixed; it's old and not from Trails.</li>
+  </ol>
+</div>
+
+<h2 id="test-process">Test process (written 10 Nov 2026)</h2>
+<p class="muted">The exact steps for testing phases 3 to 9 end to end, in the order to run them: free tests first, paid ones after. Results go into the <a href="#testing">Testing log</a>. Paid runs use real money on Polygon mainnet because Trails has no test network (plan §5).</p>
+
+<div class="card">
+  <h3>A. Before starting</h3>
+  <ol>
+    <li><b>Site:</b> dev server running on <code>localhost:3002</code>; <code>.env</code> has <code>NEXT_PUBLIC_TRAILS_ENABLED=true</code> and the key; stage API up (if every page shows "Failed to fetch", stage is down; wait).</li>
+    <li><b>Seller wallet</b> (a team wallet that owns Endless domains): list <b>4 or 5 domains</b> on stage for 0.10 to 0.30 USDT each, up front. One per paid run, because the buyer can't relist a bought name without POL.</li>
+    <li><b>Buyer wallet:</b> a fresh MetaMask account with about 2 USDC and about 0.10 USD of ETH on <b>Base</b>, and <b>no POL at all</b>. Log in to the site with your account and connect this wallet.</li>
+    <li><b>Browser:</b> DevTools open, Console, "Preserve log" on, filter <code>trails|buying-flow</code>.</li>
+    <li><b>Explorers</b> ready: basescan.org (the payment) and polygonscan.com (the purchase or refund).</li>
+  </ol>
+</div>
+
+<div class="card">
+  <h3>B. Free tests (no money moves)</h3>
+  <ol>
+    <li><b>Look and layout:</b> on any listing you don't own, Buy Now ▸ "Any token, any chain". Check the review step, then Continue ▸ the payment screen, in light and dark, at phone, tablet and desktop widths. <i>Expect:</i> three cards, Trails wording, the Trails box fits the drawer, no overlap or double scrollbars.</li>
+    <li><b>USDT mode unchanged:</b> switch back to USDT. <i>Expect:</i> exactly today's review (balance after, POL fee, "Buy for X USDT").</li>
+    <li><b>Back:</b> on the payment screen press Back. <i>Expect:</i> the review with the payment options.</li>
+    <li><b>Own listing:</b> with the seller wallet, Buy Now on its own listing ▸ Any token ▸ Continue. <i>Expect:</i> "This is your own listing".</li>
+    <li><b>Cancelled signature:</b> in the Trails box get a price, press Pay, then <b>Reject</b> in MetaMask. <i>Expect:</i> still on the Trails box, nothing charged, no toast.</li>
+    <li><b>Unpaid quote:</b> get a price, don't pay, close the drawer, reload, open /history. <i>Expect:</i> no banner now, and no toast ever (the saved quote is dropped after 15 minutes).</li>
+    <li><b>Trails off:</b> set <code>NEXT_PUBLIC_TRAILS_ENABLED=false</code>, restart the dev server, open Buy Now. <i>Expect:</i> exactly today's drawer, two cards. Set it back to <code>true</code> and restart.</li>
+  </ol>
+</div>
+
+<div class="card">
+  <h3>C. Paid tests (about 0.30 USD in fees each; the listing price goes to the team seller wallet)</h3>
+  <ol>
+    <li><b>Run 1, happy path, drawer open:</b> Buy Now ▸ Any token ▸ tick terms ▸ Continue ▸ USDC on Base ▸ Pay ▸ confirm in MetaMask. <i>Expect:</i> Trails box progress ▸ our "Payment in progress" ▸ possibly "Purchase confirmed / Preparing your receipt..." ▸ "name.og is yours" ▸ View Receipt. Then check: receipt page; BUY row on /history; the name in the buyer's My Domains; buyer and seller emails; on Polygonscan the domain went to the buyer, not a Trails wallet.</li>
+    <li><b>Run 2, drawer closed:</b> same as run 1, but close the drawer on "Payment in progress". <i>Expect:</i> a "name.og is yours" toast within a few minutes.</li>
+    <li><b>Run 3, reload:</b> same, but <b>reload the page</b> on "Payment in progress", then open /history straight away. <i>Expect:</i> "Purchase in progress" banner on /history, then a "name.og is yours" toast, then the banner disappears.</li>
+    <li><b>Run 4, lost race (refund):</b> in a second browser, the seller's teammate buys the same listing directly with USDT just after you press Pay in the Trails box. <i>Expect:</i> "Payment refunded" with the amount and a "View refund" link to Polygonscan; the USDT back in the buyer's wallet on Polygon. (Costs a Trails fee with nothing bought; do it once.)</li>
+    <li><b>Run 5, WalletConnect:</b> run 1 again from a phone wallet over WalletConnect. <i>Expect:</i> same as run 1.</li>
+  </ol>
+</div>
+
+<div class="card">
+  <h3>D. What to send back after each test</h3>
+  <ul>
+    <li>Screenshots of each screen in the order seen, plus anything that looks wrong.</li>
+    <li>The console lines filtered by <code>trails|buying-flow</code>.</li>
+    <li>For paid runs: the Base payment transaction and the Polygon purchase or refund transaction (links or hashes), and the two emails.</li>
+    <li>Pass or fail for each step, in your own words. Claude records it in the Testing log and only marks what you confirmed.</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h3>E. Later, not today</h3>
+  <ul>
+    <li><b>"Ending soon" screen</b> needs a listing with under 15 minutes left; only if a short listing can be made.</li>
+    <li><b>Phase 10</b> fixes are on hold until your senior answers; after them, a USDT buy regression again.</li>
+    <li><b>Final step (phase 12):</b> stop the dev server and run <code>next build</code> once yourself; check no page's First Load JS grew.</li>
+  </ul>
+</div>
+
+<h2>Phases</h2>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">0</span><h3>Prep</h3><span class="tag done">Done</span></div>
+  <p class="meta">5 Nov 2026</p>
+  <ul>
+    <li>Q1: no companion doc (Mohit). We write the screen copy and event list ourselves.</li>
+    <li>Q2: branch <code>trails</code> from <code>dark-mode</code>, the closest to uat.</li>
+    <li>Still to get: the uat Trails key, with <code>http://localhost:3002</code> allowed in the Trails dashboard. The widget needs <code>apiKey</code>; without it phase 3 can't run.</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">1</span><h3>Keys and flags</h3><span class="tag done">Done</span></div>
+  <p class="meta">5 Nov 2026 · not committed</p>
+  <h4>Built</h4>
+  <ul>
+    <li><code>.env</code> (gitignored): <code>NEXT_PUBLIC_TRAILS_API_KEY</code> (blank for now), <code>NEXT_PUBLIC_TRAILS_ENABLED=true</code>, <code>NEXT_PUBLIC_TRAILS_PILOT_WALLETS</code> (empty). No <code>next.config.ts</code> change (plan §1.2.1).</li>
+    <li><code>src/types/trails/config.ts</code>: <code>TrailsConfig</code>.</li>
+    <li><code>src/helpers/trails/checkoutGate.ts</code> (pure): <code>parsePilotWallets</code>, <code>isTrailsAvailable(address, config)</code>.</li>
+    <li><code>src/constants/trails.ts</code>: <code>TRAILS_CONFIG</code>, read once from env, same pattern as <code>constants/BaseUrl.ts</code> and <code>isDarkModeEnabled</code>.</li>
+  </ul>
+  <h4>Decisions</h4>
+  <ul>
+    <li>The switch is opt in: only the exact value <code>true</code> turns it on (dark mode is the opposite, on unless <code>false</code>), so an environment with no line stays as today.</li>
+    <li>A blank API key also hides the option, so a missing key can never show a broken widget.</li>
+    <li>Empty pilot list means every wallet (Q4 default). With a list set, a visitor with no wallet connected doesn't see the option.</li>
+  </ul>
+  <h4>Checks</h4>
+  <ul>
+    <li><code>tsc</code> clean; eslint clean on the new files.</li>
+    <li>CLAUDE.md §8 greps for helpers and the <code>0xtrails</code> outside <code>trails/</code> grep print nothing.</li>
+    <li>Gate logic run on 7 sample cases (off, no key, empty list, mixed case address, not in list, no wallet), all pass. Will move into Vitest in phase 2.</li>
+    <li>Nothing renders yet, so no browser check this phase. The dev server needs a restart to pick up the new env lines.</li>
+  </ul>
+  <h4>In plain words</h4>
+  <p>Nothing changes on screen yet. These files only start being used in phase 6, when the UI is built.</p>
+  <ul>
+    <li><b>Three settings in <code>.env</code>.</b> The Trails API key (blank until Mohit sends it), the on/off switch (set to <code>true</code>), and the pilot wallet list (empty, which means every wallet). <code>.env</code> is gitignored, so these never get committed. <code>next.config.ts</code> did not need a change, because anything named <code>NEXT_PUBLIC_</code> is picked up by Next automatically.</li>
+    <li><b><code>config.ts</code></b> describes the shape of the Trails settings, so TypeScript knows what they contain.</li>
+    <li><b><code>checkoutGate.ts</code></b> holds the single rule that decides whether a wallet sees the "Any token" option. It is pure logic: no network, no React.</li>
+    <li><b><code>constants/trails.ts</code></b> reads the three settings once, the same way <code>BaseUrl.ts</code> and the dark mode switch already do.</li>
+  </ul>
+  <p>Why the three decisions above:</p>
+  <ul>
+    <li><b>Only the exact value <code>true</code> turns it on.</b> Dark mode works the other way round (on unless set to <code>false</code>). For a payment method it is safer that an environment without the line simply stays as it is today.</li>
+    <li><b>A blank key hides the option.</b> The widget cannot get a price without a key, so users never see a broken widget just because the key is missing.</li>
+    <li><b>Pilot list set means a connected wallet is needed.</b> We can't check whether someone is on the list without knowing their wallet, so the option stays hidden until they connect.</li>
+  </ul>
+  <p>Remember: after editing <code>.env</code>, restart the dev server on 3002 so it reads the new lines. It matters from phase 6 onwards.</p>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">2</span><h3>Dependencies and regression</h3><span class="tag done">Done</span></div>
+  <p class="meta">5 Nov 2026 · not committed · user ran the wallet regression 5 Nov: direct USDT buy to the receipt page, list and delist all worked. Console checked after: nothing new. Every line came from a package the install did not touch (lock file compared before and after: @reown/appkit 1.8.14, lit 3.3.0, lit-html 3.3.1, recharts 2.15.4, sass 1.94.2, next 15.5.7, wagmi 2.19.5, all unchanged): Sass @import deprecation warnings, Next.js scroll-behavior and Image fill/size warnings, unused preload warnings, Lit change-in-update and svg width/height errors from AppKit, Recharts width(0) warnings. Nothing mentions viem, wagmi or react-query.</p>
+  <h4>Built</h4>
+  <ul>
+    <li><code>viem</code> 2.41.2 to 2.57.16 (range <code>^2.57.16</code>), <code>@tanstack/react-query</code> 5.90.12 to 5.106.1 (range <code>^5.106.1</code>). Both above the doc's minimums (2.56.7, 5.101), which <code>0xtrails</code> itself requires.</li>
+    <li><code>0xtrails</code> and <code>@0xtrails/adapter-wagmi</code>, both pinned exactly at <code>0.20.0</code> (no caret).</li>
+    <li><code>vitest</code> 3.2.4 (dev only), <code>vitest.config.ts</code> (alias <code>@</code> to <code>src</code>, tests are <code>src/**/*.test.ts</code>, Node environment), <code>npm test</code> script.</li>
+    <li><code>src/helpers/trails/checkoutGate.test.ts</code>: the phase 1 gate checks as 8 real tests.</li>
+  </ul>
+  <h4>Decisions</h4>
+  <ul>
+    <li>Installed with the dev server stopped (port 3002 was free), so nothing under a running server changed.</li>
+    <li>npm picked the newest versions inside the ranges (2.57.16, 5.106.1) instead of the exact doc minimums. Both satisfy every package that depends on them.</li>
+  </ul>
+  <h4>Checks</h4>
+  <ul>
+    <li><code>npm ls wagmi @wagmi/core viem</code>: the Trails adapter uses our wagmi 2.19.5 (deduped, one shared copy) and the main viem 2.57.16.</li>
+    <li>Lock file before vs after: same set of copies, only the versions moved. The extra nested viem 2.31.0 and 2.23.2 and <code>@wagmi/core</code> 3.0.0 were already there before (WalletConnect and AppKit internals).</li>
+    <li><code>npm test</code>: 8 of 8 pass.</li>
+    <li><code>tsc</code> on the whole project: clean after the upgrade.</li>
+    <li>ESLint on the new files: clean. <code>npx eslint .</code> reports 405 errors, all in generated or vendor files (<code>.next/</code>, <code>next-env.d.ts</code>, <code>public/assets/js/owl.carousel.min.js</code>); none in <code>src</code> or <code>pages</code>.</li>
+    <li>No <code>next build</code> run.</li>
+  </ul>
+  <h4>Regression to run (user, real wallet, real money)</h4>
+  <ul>
+    <li>Restart the dev server first (new packages and the new <code>.env</code> lines).</li>
+    <li>Direct USDT buy of a cheap listing: review, approve if asked, confirm, Bought screen, receipt page.</li>
+    <li>List a domain from My Domains: approve if asked, sign, it shows as listed.</li>
+    <li>Delist it: it shows as unlisted.</li>
+    <li>Watch the browser console for new errors while connecting the wallet (AppKit and wagmi both sit on viem, which moved).</li>
+  </ul>
+  <h4>In plain words</h4>
+  <ul>
+    <li><b>What changed:</b> two libraries we already had got newer versions (viem talks to the blockchain, react query manages data fetching), because the Trails package won't work with the old ones. Then we installed Trails itself and its connector to our wallet library, and Vitest, the testing tool.</li>
+    <li><b>Why "pinned exactly":</b> the Trails packages are written as <code>0.20.0</code> with no <code>^</code>, so a future install can never quietly pull a different Trails version. Mohit asked for this.</li>
+    <li><b>The wagmi check:</b> wagmi is our wallet library. If the Trails connector had brought its own second copy, the wallet could show as connected in one copy and disconnected in the other. The check shows it reuses ours, so there's only one.</li>
+    <li><b>Why the regression test:</b> the viem upgrade touches every wallet action on the site. TypeScript says the code still fits together, but only a real buy, list and delist proves the wallet flows still work. That needs a real wallet, so it's yours to run.</li>
+    <li><b>The 405 lint errors:</b> they come from files nobody edits (Next's build output and a minified library), which the normal lint skips. Our code has none.</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">3</span><h3>Widget spike</h3><span class="tag done">Done</span></div>
+  <p class="meta">5 Nov 2026 · local only, never committed · closed 5 Nov by the user: (a) (b) (d) pass, (c) seen in dark on desktop and looks fine; light, phone width and the dev overlay "3 Issues" not checked, to be covered in phase 7 when the real step is built. Test page kept on disk for now at the user's request (still in <code>.git/info/exclude</code>); delete before the feature ships.</p>
+  <h4>Built</h4>
+  <ul>
+    <li><code>pages/trails-spike.tsx</code> and <code>pages/trails-spike.module.scss</code>, both listed in <code>.git/info/exclude</code> first. <code>git status</code> does not show them.</li>
+    <li>The page renders the Trails <code>Pay</code> widget (from <code>0xtrails/widget</code>) inside our drawer <code>Modal</code>, loaded with <code>next/dynamic</code>, <code>ssr: false</code> in its own chunk. It uses the wagmi adapter (<code>wagmiAdapter()</code>, which reuses our <code>WagmiProvider</code>), our theme (light or dark), and the doc's route settings (<code>bridgeProvider="RELAY"</code>, no fallback).</li>
+    <li>Destination: Polygon, USDT, 0.25, recipient = the connected wallet. The two calls go in as <code>actions</code>: <code>custom()</code> approve on USDT, then <code>custom()</code> <code>fulfillAdvancedOrder</code> on Seaport, both built with the doc's ABI from the fixture order.</li>
+    <li>Line by line guide to the page, basic to advanced: <a href="trails-spike-explained.html">trails-spike-explained.html</a>.</li>
+    <li>On screen: fixture encoding check, a quote check for (b), a button for (d), a renderInline switch for (c), and a log of every widget callback with its data (also in the console as <code>[trails-spike]</code>).</li>
+  </ul>
+  <h4>Found while building</h4>
+  <ul>
+    <li><b>(a), type level: yes.</b> In the installed <code>0xtrails@0.20.0</code>, <code>PayProps</code> has <code>actions?: ActionItem[]</code>, and <code>custom({ to, data })</code> wraps any raw call. The browser run still has to confirm a quote comes back.</li>
+    <li>In Pay mode with <code>actions</code>, <code>to.recipient</code> is only the address shown to the user; the real recipient is whatever each action says. For us that's the <code>recipient</code> argument inside <code>fulfillAdvancedOrder</code>, which is the buyer.</li>
+    <li>Callbacks available: <code>onPaymentStart</code>, <code>onQuote</code> (has <code>intentId</code> and the full quote), <code>onSignRequest</code>, <code>onSign</code>, <code>onSignReject</code>, <code>onApproveRequest</code>, <code>onApprove</code>, <code>onStatus</code>, <code>onOriginConfirmation</code>, <code>onDestinationConfirmation</code>, <code>onPaymentSuccess</code>, <code>onPaymentError</code>, <code>onOpen</code>, <code>onClose</code>. More than the doc lists; <code>onSignReject</code> is useful for the "cancelled signature" screen.</li>
+    <li>Theming (Q12): <code>theme</code> takes <code>"light" | "dark" | "auto"</code>, plus <code>customCss</code> for overrides. We pass our resolved theme.</li>
+    <li><code>getIntentReceipt</code> comes from <code>@0xtrails/api@0.20.0</code>, installed with <code>0xtrails</code> (not a direct dependency): <code>new TrailsApi(apiKey).getIntentReceipt({ intentId })</code>.</li>
+    <li><b>Fixture encoding matches the doc exactly</b> (Node run with viem 2.57.16): selector <code>0xe7acab24</code>, 1,444 bytes, keccak <code>0x81f1e320…7bd99</code>, approve calldata identical. Phase 4's test should pass first time.</li>
+    <li>Typo fixed in <code>trails-checkout-explained.html</code>: its approve calldata was one zero short (copy error, the PDF is right).</li>
+  </ul>
+  <h4>Checks</h4>
+  <ul>
+    <li><code>tsc</code> clean on the whole project; ESLint clean on the page.</li>
+  </ul>
+  <h4>Results so far (5 Nov, user run, dark, desktop)</h4>
+  <ul>
+    <li>Key read (35 chars), flag true, buyer = connected wallet 0x8FD5…e4D0, decoded fulfill recipient = same wallet.</li>
+    <li>Fixture encoding in the browser: all four true.</li>
+    <li><b>(d) pass.</b> <code>getIntentReceipt</code> from the browser reached the Trails API: <code>NotFound 8000 400 Resource not found</code> for a made up intent id. That is a real API answer, so CORS is fine with the public key.</li>
+    <li>(a) and (b) not reached yet: the widget opened a "Connect Wallet" picker (MetaMask, Phantom, WalletConnect, Rabby) although wagmi already had the wallet connected. The adapter did bridge to our <code>WagmiProvider</code> (it throws otherwise), and its code treats "connector already connected" as fine, so picking MetaMask should reuse the existing connection. Next run: pick MetaMask there.</li>
+    <li><b>(a) pass.</b> After picking MetaMask in the widget's list it reused the connected wallet (0x8F…e4D0, no new approval asked) and quoted: pay 2.94153837 POL on Polygon, about $0.29 including $0.01 fees, for the 0.25 USDT destination with our two custom actions. So Pay mode accepts <code>actions</code> and quotes them.</li>
+    <li><b>(b) pass.</b> The quote's destination batch goes to <code>0x000000004f702C8398e158108937814d074cD74b</code> (Trails' executor on Polygon) with 1,860 bytes of calldata, and that calldata contains our approve bytes and our <code>fulfillAdvancedOrder</code> bytes exactly, with recipient 0x8FD5…e4D0 (the buyer). Trails wraps our two calls without changing them.</li>
+    <li>Look in our drawer, dark, desktop: the widget is its own rounded dark card centred in the 540px drawer, under our "Pay with any token" header, with its own Pay button. No overlap or clipping seen. Light and phone width still to check.</li>
+    <li>Next.js dev overlay "3 Issues", read 5 Nov: all one old hydration mismatch in the header, not from Trails. The header button shows the wallet address on the client but "Logout" on the server (the server can't know the wallet), so React throws "Text content did not match" and redraws the whole page in the browser. Same code since commit a059160, wagmi unchanged (2.19.5). Shows on every page with a wallet connected, in dev only. Fix offered separately (draw "Logout" until the page has mounted); not part of Trails.</li>
+  </ul>
+  <h4>To record in the browser (user)</h4>
+  <ul>
+    <li>Log in, connect MetaMask, open <code>/trails-spike</code>. All four fixture lines should say true.</li>
+    <li>(a) Open the drawer. The widget loads; pick a token you hold on another chain. A quote appears and <code>onQuote</code> is logged. <b>Stop there: never press the final Pay.</b> The fixture order is already sold, so it would revert and refund minus fees.</li>
+    <li>(b) The quote check line should say true for both "contains our approve bytes" and "contains our fulfillAdvancedOrder bytes", with the recipient = your wallet.</li>
+    <li>(c) Light and dark, desktop and phone width: the widget fits the 540px drawer, no double scrollbars, the page behind doesn't scroll, Escape and the X close it, and the token picker isn't hidden behind the drawer. Repeat with renderInline off (the widget opens its own popup over our drawer).</li>
+    <li>(d) Press "Run check (d)". "Reached the API (CORS fine)" or "OK" = pass; "BLOCKED" = fail.</li>
+    <li>Screenshots of the widget in both themes and of the quote check go here.</li>
+  </ul>
+  <h4>In plain words</h4>
+  <ul>
+    <li><b>What a spike is:</b> a throwaway test page to answer "does this actually work in our app?" before we build the real screens. It is never committed (a test page reached prod once), and it gets deleted at the end.</li>
+    <li><b>Why it's safe to try:</b> the page uses Mohit's old test order, which is already sold. We only go as far as the price quote. Nothing gets paid unless someone presses the final Pay button, so don't.</li>
+    <li><b>(a)</b> asks: will the Trails payment box accept our own two instructions ("let Seaport take the USDT", then "buy this order for this buyer")? The package's code says yes; the browser shows it for real.</li>
+    <li><b>(b)</b> asks: did Trails keep our instructions byte for byte, with the domain going to you and not to the Trails wallet? The page compares the quote with what we sent.</li>
+    <li><b>(c)</b> asks: does the Trails box sit nicely inside our side drawer, in both themes and on a phone, without the two fighting over scrolling or over which one is on top?</li>
+    <li><b>(d)</b> asks: can the browser ask Trails "how is this payment doing?" directly? We need that later to show progress after a page reload.</li>
+    <li><b>Bonus:</b> our code turns the test order into exactly the bytes Mohit's doc expects, so the core encoding is already proven correct.</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">4</span><h3>Types and the destination builder</h3><span class="tag done">Done</span></div>
+  <p class="meta">5 Nov 2026 · not committed · fixture test green first run</p>
+  <h4>Built</h4>
+  <ul>
+    <li><code>src/types/trails/checkout.ts</code>: <code>Hex</code>, <code>PreparedCheckout</code>, <code>CheckoutStatus</code>, <code>CheckoutState</code>, <code>CheckoutSource</code>, <code>CheckoutErrorCode</code> (all 8 codes) copied exactly from the doc, plus <code>StoredCheckout</code>, <code>DestinationCall</code>, <code>DestinationContracts</code> and <code>SeaportRawOrder</code> (the order as our API returns it, big numbers as strings).</li>
+    <li><code>src/helpers/trails/checkoutError.ts</code>: <code>CheckoutError</code> (an <code>Error</code> with a <code>code</code>) and <code>isCheckoutError</code>.</li>
+    <li><code>src/helpers/trails/buildDestinationCalls.ts</code>: <code>seaportFulfillAbi</code> (the doc's ABI, word for word), <code>toViemParams</code>, <code>orderPrice</code>, <code>buildDestinationCalls(order, signature, buyer, contracts)</code> returning <code>[approve, fulfillAdvancedOrder]</code>.</li>
+    <li><code>src/helpers/trails/buildDestinationCalls.test.ts</code>: 14 tests with the doc's fixture verbatim.</li>
+  </ul>
+  <h4>Decisions</h4>
+  <ul>
+    <li><b>Addresses come in as an argument</b> (<code>contracts: { seaport, usdt }</code>) instead of importing <code>DEFAULTS</code>, and <code>toViemParams</code> does the <code>toOrderParameters</code> mapping itself (drop <code>counter</code>, add the item count). Reason: helpers may only import types, data and other helpers (CLAUDE.md §8 rule 3), and both live in <code>src/lib</code>. The service in phase 5 passes <code>DEFAULTS</code>' addresses. The fixture test proves the result is byte for byte the same as the doc's.</li>
+    <li><b>Extra safety the doc didn't ask for:</b> <code>orderPrice</code> throws <code>ORDER_NOT_FILLABLE</code> unless every consideration item is a fixed USDT amount. Otherwise the approve and the amount Trails delivers wouldn't cover the sale and the buyer would get a refund minus fees. All our listings are fixed USDT today, so nothing real is blocked.</li>
+    <li><code>BigInt(0)</code>, not <code>0n</code>: the project compiles to ES2017, which has no bigint literals.</li>
+  </ul>
+  <h4>Checks</h4>
+  <ul>
+    <li><code>npm test</code>: 22 of 22 pass (8 gate, 14 builder). Fixture: selector <code>0xe7acab24</code>, 1,444 bytes, keccak <code>0x81f1e320…7bd99</code>, approve calldata exact. Also: approve comes first, both calls carry zero value, decoding the bytes gives <code>fulfillAdvancedOrder</code> with the buyer as recipient, 1/1, no resolvers, no conduit; <code>counter</code> is dropped; the 77 digit salt survives; non USDT and moving prices throw.</li>
+    <li><code>tsc</code> clean; ESLint clean on <code>types/trails</code> and <code>helpers/trails</code>.</li>
+    <li>CLAUDE.md §8 greps: nothing new. The two helper hits are the known old ones (<code>historyApi.ts</code>, <code>CreateFileFromUrl .tsx</code>). No <code>0xtrails</code> import outside <code>trails/</code> folders except the local spike page.</li>
+    <li>Nothing renders yet, so no browser check this phase.</li>
+  </ul>
+  <h4>In plain words</h4>
+  <ul>
+    <li><b>Types file:</b> a list of the shapes the Trails feature passes around, like "a prepared checkout has an id, the order, the buyer, an expiry, the amount and the two calls". Copied from Mohit's doc so the browser version now and the backend version later agree on the same shapes.</li>
+    <li><b>CheckoutError:</b> one kind of error with a short code such as <code>OWN_LISTING</code>. Each code will get its own screen in phase 7, so screens never need to read error messages.</li>
+    <li><b>The builder:</b> the spike's two buying steps (approve USDT, then buy for the buyer), moved into the real codebase as a clean, reusable function that works for any listing, not only the test order.</li>
+    <li><b>The test:</b> feeds Mohit's real past order into the builder and checks the output against the exact bytes that bought it on the blockchain. If anyone ever breaks the encoding, <code>npm test</code> fails before any money moves.</li>
+    <li><b>Why the addresses are passed in:</b> our rules keep helper files free of app wiring. The next phase hands in the real Seaport and USDT addresses.</li>
+  </ul>
+
+  <h4>Phase 4 explained in full (asked for 5 Nov)</h4>
+  <p><b>In one sentence:</b> phase 4 takes the two buying steps we tried on the spike page and turns them into proper, reusable code with an automatic test, so later phases can build the real feature on top. Nothing shows on screen yet. Like building an engine and testing it on a bench before it goes into the car.</p>
+
+  <p><b>The four files, and where each comes from in Mohit's doc</b></p>
+  <ol>
+    <li><b><code>checkout.ts</code>, the shapes.</b> Descriptions of the data the feature passes around: a "prepared checkout" (an id, the order, the buyer, an expiry time, the amount, the two calls), the stages a payment can be in (prepared, executing, succeeded, refunded…), and the eight reasons a purchase can be refused. Source: doc page 3 (shapes) and page 4 (the eight codes), copied exactly; the saved checkout record is from page 9, rule 5.</li>
+    <li><b><code>checkoutError.ts</code>, the error.</b> One kind of error carrying a short code like <code>OWN_LISTING</code>. The doc (page 4) says the error carries these codes "so error screens are written once". In phase 7 each code gets its own screen.</li>
+    <li><b><code>buildDestinationCalls.ts</code>, the builder.</b> You give it a listing, the seller's signature, the buyer's wallet and the two contract addresses. It returns the two instructions Trails runs on Polygon: "USDT contract, let Seaport take the price", then "Seaport, buy this order and send the domain to this buyer". Source: doc pages 4 to 6, including the ABI (the description of Seaport's buy function), copied word for word.</li>
+    <li><b><code>buildDestinationCalls.test.ts</code>, the test.</b> Runs automatically with <code>npm test</code> and checks that the builder produces the right bytes.</li>
+  </ol>
+
+  <p><b>Where the 14 checks come from</b></p>
+  <p>Four come straight from Mohit's doc (pages 6 and 7). The doc gives a real past order, the one actually bought on Polygon in his experiment, and the exact output that worked on the blockchain. The test feeds that order into our builder and compares:</p>
+  <ol>
+    <li>The first 4 bytes are <code>0xe7acab24</code>, meaning the function is <code>fulfillAdvancedOrder</code>.</li>
+    <li>The buy instruction is exactly 1,444 bytes long.</li>
+    <li>Its fingerprint (keccak) is <code>0x81f1e320…7bd99</code>, which proves every single byte matches.</li>
+    <li>The approve instruction matches the doc's value exactly.</li>
+  </ol>
+  <p>The doc says in its own words: "Put it in a Vitest test; your builder must reproduce the expected values." These four do exactly that, and passed on the first run.</p>
+  <p>Ten more were added by us, to protect rules the doc describes in words but doesn't test:</p>
+  <ol>
+    <li><b>Approve comes first, then the buy, and neither sends any POL.</b> If the order flipped, Seaport would try to take USDT before being allowed to, and the purchase would fail.</li>
+    <li><b>Decoding our own bytes gives <code>fulfillAdvancedOrder</code>, never the simpler buy functions.</b> The doc's biggest warning (page 4): <code>fulfillOrder</code> and <code>fulfillBasicOrder</code> send the domain to the Trails wallet.</li>
+    <li><b>The recipient inside the bytes is the buyer we passed in.</b> The doc's main point again, tested with the user's own wallet address, not only Mohit's.</li>
+    <li><b>It buys the whole order (1 out of 1), with no extra options.</b> The values the doc's code uses.</li>
+    <li><b><code>counter</code> is dropped and the item count is added.</b> What the doc says the conversion does (page 6).</li>
+    <li><b>The 77 digit salt number survives without losing digits.</b> Ordinary JavaScript numbers would quietly round it.</li>
+    <li><b>The price is 243,750 + 6,250 = 250,000.</b></li>
+    <li><b>A listing priced in another token is refused.</b></li>
+    <li><b>A listing whose price changes over time is refused.</b></li>
+    <li><b>The error type carries its code and still behaves like a normal error.</b></li>
+  </ol>
+
+  <p><b>Did we do exactly what Mohit's doc says?</b></p>
+  <p>The core of it, yes: the ABI word for word, the same two calls in the same order, the same buy inputs (the order, an empty list, the zero value, the buyer), the same 1 out of 1 and empty extra data, and the price worked out the same way, by adding up what the seller asked for. The test proves it: the output matches his real transaction byte for byte.</p>
+  <p>Five small differences, each for a reason:</p>
+  <ol>
+    <li><b>Where the code lives.</b> The doc puts everything in one file, <code>buying-flow/trails/checkoutSource.ts</code>. Our layering rules put shapes in <code>src/types</code>, pure logic in <code>src/helpers</code> and network calls in <code>src/core/services</code>, so it's split. Decided together in plan §1.2 before any code was written.</li>
+    <li><b>The addresses are passed in.</b> The doc's code reads Seaport and USDT addresses from <code>DEFAULTS</code> in <code>src/lib</code>. Helper files may not import from <code>src/lib</code>, so the builder receives them, and phase 5 hands in the same <code>DEFAULTS</code> values. Same result; only where the addresses come from changed.</li>
+    <li><b>The old <code>toOrderParameters</code> isn't called.</b> The doc uses it for one small step (remove <code>counter</code>, add the item count). It also lives in <code>src/lib</code> and is built for our older library, ethers. Those same two lines are written inside the builder instead; the matching fingerprint proves the result is identical.</li>
+    <li><b>One extra safety check.</b> If a listing isn't priced in a fixed USDT amount, the builder refuses it. Otherwise Trails could deliver the wrong amount, the purchase would fail and the buyer would get a refund minus fees. All our listings are fixed USDT today, so it blocks nothing real. The doc doesn't mention this case.</li>
+    <li><b><code>BigInt(0)</code> instead of <code>0n</code>.</b> Same value. Our TypeScript settings target an older JavaScript version that doesn't support the short form.</li>
+  </ol>
+
+  <p><b>What phase 4 doesn't do yet</b></p>
+  <p>It doesn't read the blockchain (checking the seller still owns the domain, the listing is still valid and so on is phase 5), doesn't save anything, doesn't talk to Trails or our backend, and shows nothing on screen. It's only the piece that turns "this listing, this buyer" into the right bytes, plus the test proving those bytes are correct.</p>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">5</span><h3>Live checks and the seam</h3><span class="tag done">Done</span></div>
+  <p class="meta">5 Nov 2026 · not committed · 56 tests green, live read test on uat passed</p>
+  <h4>Built</h4>
+  <ul>
+    <li><b>Pure rules</b> (<code>src/helpers/trails/</code>): <code>orderChecks.ts</code> has <code>assertOrderBuyable</code>, the doc's page 5 table as rules over the order and the chain state, throwing the right <code>CheckoutError</code>. <code>intentStatus.ts</code> has Trails status to ours, "is it finished", the poll interval, the refund link rule (probe E7), "Done only when the sale buyer is us", and "resume only under 24 h".</li>
+    <li><b>Services</b> (<code>src/core/services/trails/</code>): <code>orderChecks.service.ts</code> (block time, <code>getOrderStatus</code>, <code>ownerOf</code>, <code>isApprovedForAll</code>, <code>getCounter</code> in parallel on the read only Polygon RPC), <code>trailsReceipt.service.ts</code> (<code>getIntentReceipt</code>, loaded on first use so it stays out of the main bundle), <code>checkoutStore.service.ts</code> (localStorage key <code>trails-checkouts</code>, every access in try/catch), <code>browserCheckoutSource.ts</code> (<code>prepare</code>, <code>attachIntent</code>, <code>getStatus</code>), <code>index.ts</code> (<code>getCheckoutSource()</code>, the one place that picks the implementation).</li>
+    <li><b>Types added</b> to <code>checkout.ts</code>: <code>CheckoutContracts</code>, <code>OrderChainState</code>, <code>TrailsIntentSnapshot</code>, <code>SaleReceiptSnapshot</code>, and <code>amount</code> on <code>StoredCheckout</code>.</li>
+    <li><b>Tests</b>: <code>orderChecks.test.ts</code> (12), <code>intentStatus.test.ts</code> (22).</li>
+  </ul>
+  <h4>How it fits together</h4>
+  <ul>
+    <li><code>prepare(orderHash, buyer)</code>: switch and key on, else <code>TRAILS_DISABLED</code> &#9656; fetch the order (same endpoint as <code>loadOrder</code>) &#9656; read the chain &#9656; run the checks &#9656; build the two calls &#9656; return a <code>PreparedCheckout</code> with a fresh id, expiry in 15 min, the amount and the route.</li>
+    <li><code>attachIntent(checkoutId, intentId)</code>: called from the widget's <code>onQuote</code> in phase 8; saves <code>{checkoutId, orderHash, intentId, buyer, createdAt, amount}</code> to localStorage.</li>
+    <li><code>getStatus(checkoutId)</code>: before an intent, <code>prepared</code> or <code>expired</code>; after, asks Trails and our sale receipt together and combines them with the doc's rules 1 to 3.</li>
+  </ul>
+  <h4>Decisions (where this differs from the doc or the plan)</h4>
+  <ul>
+    <li><b>Your own listing is checked first</b>, before any chain read, same order as <code>loadOrder</code>. The doc's table lists it last; checking it first gives the clearer screen and saves five RPC calls.</li>
+    <li><b>Two checks added to the doc's table:</b> the offer must be exactly one domain from our domain contract, and the order must have started. Both would make Seaport reject the fill; <code>loadOrder</code> already blocks "not started".</li>
+    <li><b>"Seller no longer owns it" includes a burned or missing NFT</b>: <code>ownerOf</code> reverting is read as "no owner". Any other failed read is <code>CHAIN_UNAVAILABLE</code>.</li>
+    <li><b><code>amount</code> added to the stored record</b> so a refund can still show "0.25 USDT back to you" after a reload. The doc's record has no amount.</li>
+    <li><b>Prepared checkouts stay in memory until Trails gives an intent id.</b> Nothing can be resumed before that, so nothing is written to storage before that.</li>
+    <li><b><code>getCheckoutSource</code> always returns the browser version for now.</b> The backend probe (<code>GET /marketplacev2/trails/config</code>) is described in a comment in that one file, to add when the backend ships; a stub that throws would break things if the backend deployed its config first. No separate <code>checkoutSource.ts</code>: the interface lives in types and <code>index.ts</code> re-exports it.</li>
+    <li><b>Slippage 0.5%</b> as a placeholder: the doc's shape has the field but no value. New question Q13 in the plan.</li>
+    <li>A failed backend call other than a 404 is passed through as is; phase 7 shows it as a generic "try again" screen.</li>
+  </ul>
+  <h4>Checks</h4>
+  <ul>
+    <li><code>npm test</code>: 56 of 56 (8 gate, 14 builder, 12 order checks, 22 status).</li>
+    <li><b>Live read test against uat and Polygon</b> (temporary test file, read only, deleted after): fetched the first 5 uat listings and each full order, ran the real chain reads and checks. As the user's wallet the first one correctly said <code>OWN_LISTING</code> (it is the user's own listing, price 4 USDT). As another buyer all 5 (twertsdfgsdfg.og, songzuer.og, weiwuxianlanwangji.og, jayhk47.og, rajakiarani.og) came back buyable, and the built calls were approve (68 bytes) then <code>0xe7acab24</code> (1,444 bytes). The API's order has exactly the fields <code>SeaportRawOrder</code> describes.</li>
+    <li><code>tsc</code> clean; ESLint clean on <code>types/trails</code>, <code>helpers/trails</code>, <code>core/services/trails</code>.</li>
+    <li>CLAUDE.md §8 greps and <code>layer_audit.py</code>: nothing from Trails (only the known old files). No <code>0xtrails</code> import outside <code>trails/</code> folders.</li>
+    <li><code>checkoutStore.service</code> has no unit test (it needs a browser); it gets exercised in the browser in phases 8 and 9.</li>
+  </ul>
+  <h4>In plain words</h4>
+  <ul>
+    <li><b>What phase 5 adds:</b> the part between "the buyer picked Pay with any token" and "the Trails box opens". It answers three questions: can this listing really be bought right now, what exactly should Trails run, and later, how is the payment going?</li>
+    <li><b>The checks before paying:</b> is it your own listing, does it have a signature, is it still for sale, does it have more than 15 minutes left, does the seller still own the domain and still allow Seaport to move it, and has the seller not cancelled all their listings. If anything fails, the buyer gets a clear message <i>before</i> paying anything, instead of paying fees and waiting for a refund.</li>
+    <li><b>Where the answers come from:</b> the blockchain itself, through the same read only connection the normal buy flow uses, not our backend's copy, because the backend can be a minute behind.</li>
+    <li><b>Remembering a payment:</b> once Trails gives the payment an id, we save a small note in the browser (which listing, which payment, which buyer, when, how much). If the page reloads mid payment, phase 9 uses this note to find out what happened and tell the buyer.</li>
+    <li><b>Status:</b> Trails tells us how the payment is going and whether it was refunded, but only our own sale record may say "Done, the domain is yours", because it comes from the blockchain sale itself.</li>
+    <li><b>The seam:</b> everything goes through one small interface with three actions (prepare, attach, status). Today the browser does the work; when the backend team builds their version, only one file changes and the screens stay the same.</li>
+    <li><b>The live test:</b> this ran the real code against real uat listings and the real Polygon blockchain, without buying anything. It worked, and it even caught that the first listing was your own.</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">6</span><h3>UI part 1: Pay with, and review</h3><span class="tag done">Done</span></div>
+  <p class="meta">6 Nov 2026 · not committed · checked in the browser by the user 6 Nov: looks good. (Earlier the same day stage was down, 503 on every endpoint, which showed as a "Failed to fetch" overlay from the session check in AppContent.tsx; not our code.)</p>
+  <h4>Decided with the user first (6 Nov)</h4>
+  <ul>
+    <li><b>Layout</b> (no Figma, Q3): USDT and "Any token, any chain" side by side, the disabled Card on its own full row underneath. Phones stack all three, as today.</li>
+    <li><b>Copy, approved as drafted:</b> card "Any token, any chain" / "Pay with tokens on other chains. Powered by Trails". What you pay: "Trails fee: Shown in the next step", Total "X USDT + Trails fee", no "Your balance after" row, callout "Trails turns your token into USDT and buys the domain for you on Polygon, sent straight to your wallet. If the purchase can't complete, the USDT is refunded to your wallet on Polygon." Terms: "…once the transaction settles, that payments in other tokens are processed by Trails, and I have read the privacy policy." Button "Continue to payment"; helper "Choose your token in the next step" (ticked) or "Tick the box above to continue".</li>
+  </ul>
+  <h4>Built</h4>
+  <ul>
+    <li><code>BuyPaymentMethod</code> type (<code>'usdt' | 'trails'</code>) in <code>types/trails/checkout.ts</code>.</li>
+    <li><code>PaymentMethodCard</code> (primitive): optional <code>className</code>, so the grid can make Card span a row. Additive only.</li>
+    <li><code>PaymentMethodSection</code>: optional <code>trailsAvailable</code>, <code>method</code>, <code>onMethodChange</code>; third card and the full row Card only when available.</li>
+    <li><code>WhatYouPaySection</code>: optional <code>method</code>; Trails rows, total and callout as approved.</li>
+    <li><code>PurchaseTermsFooter</code>: optional <code>trailsTerms</code> adds the Trails clause.</li>
+    <li><code>ReviewPurchaseStep</code>: passes the three new props through.</li>
+    <li><code>useBuyFlowActions</code>: also returns the connected <code>address</code> (it already read it), for the pilot list check.</li>
+    <li><code>BuyFlowModal</code>: <code>paymentMethod</code> state, reset to USDT every time the drawer opens; <code>trailsAvailable</code> from <code>isTrailsAvailable(address, TRAILS_CONFIG)</code>; in Trails mode only the "Connect your wallet" notice can show, the CTA reads "Continue to payment", the terms get the Trails clause.</li>
+  </ul>
+  <h4>Decisions</h4>
+  <ul>
+    <li><b>Trails off is today's drawer.</b> Every new prop is optional and defaults to the current behaviour; with Trails unavailable the USDT card is selected with no click handler and Card has no extra class, exactly as before.</li>
+    <li><b>"Continue to payment" stays disabled</b> (<code>TRAILS_PAY_STEP_READY = false</code> in <code>BuyFlowModal</code>) until phase 7 builds the payment step. Nothing is committed in between.</li>
+    <li>The payment choice resets to USDT on every open, so a buyer is never dropped into Trails mode by accident on another listing.</li>
+    <li>The wrong network, POL and USDT warnings are skipped in Trails mode, but the wallet still has to be connected (the Trails box reuses it, as the spike showed).</li>
+  </ul>
+  <h4>Checks</h4>
+  <ul>
+    <li><code>tsc</code> clean. ESLint: no new warnings (the 3 in <code>BuyFlowModal.tsx</code> and <code>useBuyFlowActions.ts</code> were there before; checked against the original files).</li>
+    <li><code>npm test</code>: 56 of 56.</li>
+    <li>CLAUDE.md §8 rule 6 grep on <code>buying-flow</code> and primitives: nothing. No <code>0xtrails</code> import outside <code>trails/</code> folders. The composite only reads the static <code>TRAILS_CONFIG</code> and the pure <code>isTrailsAvailable</code> helper.</li>
+  </ul>
+  <h4>To check in the browser (user)</h4>
+  <ul>
+    <li>Open Buy Now on any listing you don't own. "Pay with" shows three cards; click "Any token, any chain" and back to USDT.</li>
+    <li>Trails mode: no network/POL/USDT warning, new fee rows and callout, new terms sentence, "Continue to payment" disabled.</li>
+    <li>USDT mode: exactly as before (balance after, POL network fee, Buy for X USDT).</li>
+    <li>Light and dark; phone, tablet and desktop widths.</li>
+    <li>Trails off: set <code>NEXT_PUBLIC_TRAILS_ENABLED=false</code> in <code>.env</code>, restart the dev server, and the drawer should look exactly like before (two cards). Set it back to <code>true</code> after.</li>
+  </ul>
+  <h4>In plain words</h4>
+  <ul>
+    <li><b>What changed on screen:</b> the buy drawer now offers a third way to pay, "Any token, any chain". Picking it changes the summary to explain that Trails converts your token and buys the domain for you, and that a failed purchase gets refunded.</li>
+    <li><b>What didn't change:</b> paying with USDT works and looks exactly as before. If Trails is switched off, nobody sees the new option at all.</li>
+    <li><b>Why the button is greyed out:</b> the screen that opens the Trails payment box is phase 7. Until then the button can't go anywhere, so it stays off.</li>
+    <li><b>Why the warnings disappear in Trails mode:</b> they're about having USDT and POL on Polygon. With Trails you pay from another chain and Trails covers those, so the warnings would be wrong.</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">7</span><h3>UI part 2: the widget step</h3><span class="tag done">Done</span></div>
+  <p class="meta">6 Nov 2026 · not committed · checked in the browser by the user 6 Nov: good (after the padding fix). Do not press the final Pay until phase 8.</p>
+  <h4>Copy approved by the user first (6 Nov)</h4>
+  <ul>
+    <li>Checking screen: "Checking this listing" / "Making sure it can still be bought before you pay..."</li>
+    <li>Payment screen: title "Pay with any token"; line "Pick a token and network to pay X USDT for name. Trails shows the full cost, fees included, before you confirm."; footer link "Back".</li>
+    <li>Errors: sold/cancelled/changed ▸ "No longer available / This listing is no longer available / It was sold, cancelled or changed by the seller. Nothing was charged to you." [Watch this name] [See similar]. Own listing ▸ existing screen. Ends in under 15 min ▸ "Ending soon / This listing ends too soon / Paying with another token takes a few minutes, and this listing ends in less than 15 minutes. You can still buy it with USDT from your wallet." Trails off ▸ "Not available / Paying with other tokens is unavailable / This option isn't available right now. You can still buy with USDT from your wallet." Price ▸ "Not available / This price can't be paid with another token / You can still buy it with USDT from your wallet." Polygon unreachable ▸ existing "Connection issue" copy. Anything else ▸ "Something went wrong / Couldn't start the payment / Nothing was charged. Please try again in a moment." All Trails errors except own listing get [Back] [Close].</li>
+  </ul>
+  <h4>Built</h4>
+  <ul>
+    <li><code>src/hooks/trails/useTrailsCheckout.ts</code>: <code>prepare(orderHash, buyer)</code> through <code>getCheckoutSource()</code>, holds the <code>PreparedCheckout</code>, <code>reset()</code>. Phase 8 adds attach and status.</li>
+    <li><code>buying-flow/trails/TrailsWidgetLoader/</code>: <code>TrailsWidget.tsx</code> is the only file importing <code>0xtrails/widget</code>, <code>0xtrails</code> and <code>@0xtrails/adapter-wagmi</code> (Pay mode, the checkout's calls as <code>custom()</code> actions, recipient = buyer, RELAY, no fallback, the checkout's slippage, our theme, callbacks passed through). <code>TrailsWidgetLoader.tsx</code> loads it with <code>next/dynamic</code>, <code>ssr: false</code>, with a "Loading payment options…" placeholder the size of the widget.</li>
+    <li><code>buying-flow/trails/TrailsPayStep/</code>: the intro line plus the widget.</li>
+    <li><code>BuyFlowModal</code>: steps <code>trails-preparing</code> and <code>trails-pay</code>; "Continue to payment" now enabled (only needs a connected wallet and the ticked terms); <code>handleTrailsContinue</code> runs prepare and maps each <code>CheckoutError</code> code to a screen; <code>handleTrailsBack</code> returns to review; new <code>BlockedReason</code> values and a third <code>soldReason</code> ('unavailable').</li>
+  </ul>
+  <h4>Decisions</h4>
+  <ul>
+    <li><b>Slippage fixed:</b> phase 5's placeholder was <code>0.005</code>, but the Trails widget's own default (when nothing is passed, as in the spike) is <code>0.05</code>, written as a fraction. Set to <code>0.05</code> so passing it changes nothing versus the spike; Q13 updated.</li>
+    <li><b>Sold, cancelled or changed</b> no longer says "bought by another wallet": the checks can't tell which happened, so a new neutral wording is used (approved).</li>
+    <li><b>The drawer owns <code>useTrailsCheckout</code></b>, the same way it owns <code>useBuyFlowActions</code> (CLAUDE.md §8 exception 1, plan Q5 default). This is the one line the rule 6 grep prints.</li>
+    <li><b>Padding fix (user, 6 Nov):</b> the intro line sat against the drawer edge, because <code>Modal</code> gives its body no padding and each step adds its own. <code>TrailsPayStep</code> now uses the review step's insets (20px, 16px on phones).</li>
+    <li><b>Widget callbacks are not wired yet.</b> That's phase 8 (attach the intent on quote, track the status, Done/refund screens). Until then the widget shows Trails' own progress if someone pays, but our drawer doesn't track it, so the final Pay must not be pressed.</li>
+  </ul>
+  <h4>Checks</h4>
+  <ul>
+    <li><code>tsc</code> clean. ESLint: no new warnings (2 old ones in <code>BuyFlowModal.tsx</code> and <code>useBuyFlowActions.ts</code>).</li>
+    <li><code>npm test</code>: 56 of 56.</li>
+    <li>Rule 6 grep prints only the allowed <code>useTrailsCheckout</code> import. No <code>0xtrails</code> import outside <code>trails/</code> folders except the local spike page. Nothing imports <code>TrailsWidget.tsx</code> except the dynamic loader, so Trails stays in its own chunk.</li>
+  </ul>
+  <h4>To check in the browser (user)</h4>
+  <ul>
+    <li>Buy Now on a listing you don't own ▸ Any token, any chain ▸ tick terms ▸ Continue to payment ▸ "Checking this listing" ▸ the payment screen with the intro line and the Trails box. Get as far as a price. <b>Do not press the final Pay.</b></li>
+    <li>"Back" returns to the review with the payment options.</li>
+    <li>Your own listing ▸ Any token ▸ Continue ▸ the existing "This is your own listing" screen.</li>
+    <li>Phase 3 carry overs: the Trails box in light mode and at phone width inside the drawer; anything new in the Next dev overlay while it's open.</li>
+  </ul>
+  <h4>In plain words</h4>
+  <ul>
+    <li><b>What's new:</b> "Continue to payment" now works. It checks the listing can still be bought, then opens the Trails payment box inside the drawer, set up to buy this exact domain for you.</li>
+    <li><b>If something's wrong:</b> instead of letting you pay and then refunding, the drawer tells you why up front (sold, ending too soon, your own listing, network trouble) and offers Back so you can still pay with USDT.</li>
+    <li><b>Why the Trails box loads separately:</b> it's big, so it only downloads the first time someone opens this step. Every other page stays exactly as fast as before.</li>
+    <li><b>Why not to pay yet:</b> the screens that follow your payment (progress, done, refunded) are phase 8.</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">8</span><h3>Status, Done and refunds</h3><span class="tag todo">Normal path passed; refund and closed drawer runs pending</span></div>
+  <p class="meta">6 Nov 2026 · not committed · code done; needs the first real Trails purchase (real money, cheap listing, burner wallet)</p>
+  <h4>Copy approved by the user first (6 Nov)</h4>
+  <ul>
+    <li>Progress (title "Payment in progress"): "Buying name.og / Trails is converting your payment and buying the domain for you on Polygon. This usually takes a minute or two. You can close this, we'll let you know when it's done." Then "Purchase confirmed / Preparing your receipt..." once Trails is done but our receipt isn't in yet; "Taking longer than expected / Trails hit a problem and may refund your payment. We'll keep checking for up to 20 minutes." while a failed intent is still watched. Footer [Keep browsing].</li>
+    <li>Done: the existing Bought screen.</li>
+    <li>Refunded (title "Refunded"): "Payment refunded / The purchase couldn't complete, so X USDT was sent back to your wallet on Polygon. Trails' conversion fees aren't refunded." Row "Refund transaction". [View refund] (Polygonscan) [Close].</li>
+    <li>Failed after 20 min (title "Payment failed"): "Payment didn't go through / Trails couldn't complete this payment. If money left your wallet, Trails refunds it. Contact support if it hasn't arrived within a few hours." [Close].</li>
+    <li>Toasts when the drawer was closed: the existing "name.og is yours"; "Payment refunded / X USDT was sent back to your wallet on Polygon."; "Payment didn't go through / If money left your wallet, Trails refunds it."</li>
+  </ul>
+  <h4>Built</h4>
+  <ul>
+    <li><code>useTrailsCheckout</code>: <code>attachIntent(intentId)</code> (widget <code>onQuote</code>; a re-quote replaces it), <code>track()</code> (polls <code>getStatus</code> every 3 s, every 15 s after 5 min, removes the stored entry when final), <code>state</code>, <code>tracking</code>; stops on unmount and on reset/prepare.</li>
+    <li><code>helpers/trails/intentStatus.ts</code>: <code>isFinal(state, elapsed)</code>, stricter than <code>isTerminal</code>: a <code>succeeded</code> intent keeps polling until our sale receipt shows the buyer (rule 1), up to 20 min. 3 new tests.</li>
+    <li><code>browserCheckoutSource</code>: attached checkouts are also kept in memory, so tracking works in the tab even with localStorage blocked.</li>
+    <li><code>TrailsWidget</code>: <code>disablePassthrough</code>, so every payment (even USDT already on Polygon) gets an intent id to track.</li>
+    <li><code>BuyFlowModal</code>: steps <code>trails-progress</code>, <code>trails-refunded</code>, <code>trails-failed</code>; widget <code>onQuote</code> ▸ attach, <code>onOriginConfirmation</code> / <code>onPaymentSuccess</code> ▸ start tracking and show progress; one effect turns the final state into the Done / refunded / failed screen when the drawer is still on progress, or the matching toast otherwise; <code>onPurchased(listing, fillTxHash)</code> on Done.</li>
+  </ul>
+  <h4>Decisions</h4>
+  <ul>
+    <li><b>The widget stays until the payment has landed.</b> Our progress screen replaces it on <code>onOriginConfirmation</code> (or <code>onPaymentSuccess</code> if that comes first). Before that the buyer's wallet may still be sending, and unmounting the widget then could interrupt it.</li>
+    <li><b>Done</b> = our sale receipt shows this buyer. If Trails says succeeded but the receipt never arrives within 20 min, it's still shown as Done with the destination transaction hash (the money and domain moved on chain; only our indexer is late).</li>
+    <li><b>Closing the drawer doesn't stop tracking</b>, and reopening the drawer (for any listing) doesn't reset a purchase still being tracked; its result arrives as a toast. Starting a <i>second</i> Trails purchase in the same tab stops tracking the first in this tab; its stored entry stays for phase 9's resume after a reload.</li>
+    <li>"View refund" opens Polygonscan with <code>window.open</code> (no native <code>&lt;a&gt;</code>, CLAUDE.md §4).</li>
+  </ul>
+  <h4>Checks</h4>
+  <ul>
+    <li><code>tsc</code> clean. ESLint: no new warnings (2 old ones).</li>
+    <li><code>npm test</code>: 59 of 59.</li>
+    <li>Layering greps: only the allowed drawer hook import; helpers still pure; no <code>0xtrails</code> import outside <code>trails/</code> folders except the local spike page.</li>
+  </ul>
+  <h4>First real purchase, 10 Nov 2026: bought, but the drawer got stuck (fixed)</h4>
+  <p>Full write up, start to finish, with evidence and references: <a href="trails-first-purchase-incident.html">trails-first-purchase-incident.html</a>.</p>
+  <ul>
+    <li><b>What the user did:</b> bought <b>theforceis.unstoppable</b> for 0.10 USDT, paying about $0.13 in BNB on BSC (0.0001903 BNB, $0.03 of it fees) from wallet 0x8FD5…e4D0.</li>
+    <li><b>What worked:</b> the purchase. The domain arrived in the buyer's My Domains. Trails' receipt for intent <code>0x7d0af0c6…4f01</code> says <code>SUCCEEDED</code>: deposit on chain 56 (BSC), destination on 137 (Polygon) delivering exactly <code>100000</code> (0.10 USDT) and running our calls. Our backend's sale record for order <code>0x6902dc9f…3faa</code> is a <code>SALE</code> with buyer 0x8FD5…e4D0 (fill tx <code>0x00c55971…825a</code>). So saving the intent, the status rules and "Done only when our sale shows the buyer" were all right.</li>
+    <li><b>What failed:</b> after paying in the wallet the drawer stayed on the Trails payment screen: no progress screen, no Done, no View Receipt.</li>
+    <li><b>Evidence:</b> the browser's saved entry (<code>trails-checkouts</code>) had the right intent id and name but no <code>paid</code> flag, so the drawer's "payment landed" handler never ran. Asking Trails directly (<code>GetIntentReceipt</code> with that id) showed the deposit recorded with a placeholder hash (<code>0x1111000…</code>) and no mined time; the widget's <code>onOriginConfirmation</code> is built from that hash, so it never fired.</li>
+    <li><b>Fix (10 Nov):</b> the drawer no longer waits for that widget event. It starts watching Trails' status as soon as the price is quoted (the intent is saved then, which worked), keeps the Trails box on screen while the status is only a quote, and switches to our progress screen the moment Trails says the payment is executing or finished (<code>hasPaymentLanded</code>), then on to Done. The widget events stay as extra triggers, signing restarts the watch if needed, and every widget event now writes a <code>[trails] widget …</code> console line. A Trails "not found" answer now counts as "only quoted", so an unpaid quote stops being checked after 15 minutes instead of forever. Our sale record is only fetched once the payment has landed.</li>
+    <li><b>Console lines seen:</b> yellow "[trails-sdk] Quote disabled. Missing amount…" are the Trails widget waiting for input (harmless). Red <code>POST …/rpc/Trails/GetIntentReceipt 400</code> means "not found"; our own check wasn't running at the time (it never started), so these most likely came from the Trails widget itself. Our code now treats that answer correctly either way; if they still appear in the next run, they're the widget's.</li>
+    <li><b>Checks after the fix:</b> <code>tsc</code> clean; no new ESLint warnings; 66 of 66 tests (2 new for <code>hasPaymentLanded</code>).</li>
+    <li><b>Follow up, same day: red <code>GetIntentReceipt 400</code> every 3 s while the Trails box was open.</b> After the fix above, the drawer watches from the quote, and the browser showed a red line on every poll, now from our <code>trailsReceipt.service.ts</code>. The user captured one from the Network tab: intent <code>0xe298b268…2701</code>, response <code>{"error":"NotFound","code":8000,"cause":"intent receipt not found…","status":400}</code>. Our code already read that as "only quoted" and would stop after 15 minutes; the red lines are Chrome printing every failed request, even handled ones. Asking Trails directly showed <code>GetIntent</code> answers normally for the same id (<code>QUOTED</code>, HTTP 200) and for the paid one (<code>SUCCEEDED</code>). <b>Fix:</b> <code>getTrailsIntent</code> now calls <code>GetIntent</code> first and stops there while the status is <code>QUOTED</code> or <code>COMMITTED</code>; only once the payment is executing or finished does it also fetch the receipt (destination and refund transactions). Verified through the same client library: unpaid quote ▸ <code>QUOTED</code>, the real purchase ▸ <code>SUCCEEDED</code>, a made up id ▸ <code>NotFound</code> (still treated as nothing paid). <code>tsc</code> and ESLint clean.</li>
+    <li><b>Free bonus test:</b> that purchase's saved entry is still in the user's browser, unfinished. On the next page load the resume (phase 9) should pick it up, see Trails SUCCEEDED and our sale record, show a "theforceis.unstoppable is yours" toast and remove the entry.</li>
+  </ul>
+  <h4>Second real purchase, 10 Nov 2026, after the fixes</h4>
+  <ul>
+    <li><b>What the user did:</b> bought <b>tpenguofficial.og</b> for 0.10 USDT, paying in POL through Trails, wallet 0x8FD5…e4D0.</li>
+    <li><b>Confirmed:</b> our backend's sale record for order <code>0xfc4a720d…bfe30</code> is a <code>SALE</code> to the buyer, price <code>100000</code> (0.10 USDT), fee <code>2500</code>, seller <code>97500</code>, Polygon transaction <code>0xf0438513…b603d</code>, at 07:02:22 UTC. The receipt page shows it Completed with all four steps (order signed, payment sent, domain transferred, indexed). No red <code>GetIntentReceipt</code> lines in the console, so the <code>GetIntent</code> fix works in a real run.</li>
+    <li><b>Confirmed by the user:</b> the drawer went "Payment in progress" ▸ "tpenguofficial.og is yours" ▸ View Receipt ▸ receipt page. <b>Run 1's stuck drawer is fixed.</b> (The <code>[trails] widget …</code> console lines weren't captured.)</li>
+    <li><b>Gap found by the user:</b> the progress screen's "Keep browsing" closes the drawer; the purchase still finishes in the background and the "is yours" toast appears, but the toast has no link to the receipt. Today the receipt is reachable from the purchase's row on /history ("View receipt"). The USDT path has the same gap ("Purchase submitted" ▸ Keep browsing ▸ toast with no link). Possible improvement, not in Mohit's doc: a "View receipt" link in the toast for both methods (needs an additive change to the shared toast component). Added to the double check list.</li>
+    <li><b>Seen on the receipt page (existing page, not Trails code):</b> at a 0.10 price "Seller received 0.10" and "Marketplace fee 0.00" are rounded to two decimals (really 0.0975 and 0.0025); and for a Trails purchase, "You paid 0.10 USDT" and "settled in the same transaction" describe only the Polygon side (the buyer paid in POL through Trails). Added to the double check list.</li>
+  </ul>
+  <h4>What happens after Pay, step by step</h4>
+  <ol>
+    <li>Trails quotes a price ▸ the payment's id is saved straight away (a different token picked replaces it).</li>
+    <li>The buyer presses Pay in the Trails box and confirms in the wallet. The box stays on screen until the payment has landed on the buyer's chain; removing it earlier could interrupt the wallet while it's still sending.</li>
+    <li>Payment landed ▸ the drawer switches to "Payment in progress" ("Buying name.og…") and checks every 3 s, then every 15 s after 5 min. <i>Since 10 Nov: "landed" comes from Trails' own status, watched from the moment of the quote, not from the widget's event (see above).</i></li>
+    <li>Trails done, our sale record not in yet ▸ "Purchase confirmed / Preparing your receipt...". Trails reports a problem ▸ "Taking longer than expected", watched for up to 20 min.</li>
+    <li>Our sale record shows this buyer ▸ <b>Done</b>: the existing "name.og is yours" screen with View Receipt.</li>
+    <li>Trails refunds ▸ <b>Refunded</b>: the amount sent back to the buyer's wallet on Polygon, with "View refund" opening Polygonscan.</li>
+    <li>No success after 20 min ▸ <b>Failed</b>.</li>
+    <li>Drawer closed at any point after the payment landed ▸ checking carries on in the background and the result arrives as a toast. Reopening the drawer doesn't cancel it.</li>
+    <li>Every payment goes through Trails' normal route (<code>disablePassthrough</code>), so even USDT already on Polygon gets an id to track.</li>
+  </ol>
+  <h4>Real purchase test (user, real money, plan §5)</h4>
+  <p>There is no Trails test network, so this costs real money: about 0.30 USD per run.</p>
+  <ol>
+    <li><b>Seller:</b> a team wallet lists a real Endless domain on uat for 0.10 to 0.30 USDT.</li>
+    <li><b>Buyer:</b> a fresh burner wallet with about 2 USDC and a little ETH on Base, and <b>no POL at all</b>. That proves Trails pays the Polygon side.</li>
+    <li><b>Run 1, drawer open:</b> Buy Now ▸ Any token, any chain ▸ tick terms ▸ Continue to payment ▸ pick USDC on Base ▸ Pay ▸ confirm in the wallet ▸ expect the progress screen ▸ Done ▸ View Receipt.</li>
+    <li><b>Check after run 1:</b> the receipt page; the BUY row on /history; the domain in the burner's My Domains; both emails (buyer and seller).</li>
+    <li><b>Run 2, drawer closed:</b> same, but close the drawer on the progress screen and wait for the "name.og is yours" toast.</li>
+  </ol>
+  <h4>What the user sends back</h4>
+  <ul>
+    <li>A screenshot of each screen: Trails box with the price, progress, Purchase confirmed (if seen), Done, receipt page, /history row, My Domains.</li>
+    <li>Screenshots of anything that looks wrong.</li>
+    <li>The console lines starting with <code>[buying-flow]</code> or <code>[trails]</code>.</li>
+    <li>The two email screenshots.</li>
+  </ul>
+  <h4>In plain words</h4>
+  <ul>
+    <li><b>What's new:</b> everything after you press Pay in the Trails box. Once your payment has left your wallet, the drawer switches to a progress screen and checks every few seconds how it's going.</li>
+    <li><b>When it says Done:</b> only when our own records show the domain was bought by you, because that comes from the blockchain sale itself, not from Trails.</li>
+    <li><b>If it fails:</b> Trails sends the USDT back to your wallet on Polygon, and the drawer shows "Payment refunded" with a link to the refund on Polygonscan.</li>
+    <li><b>If you close the drawer:</b> it keeps checking in the background and tells you the result with a small message in the corner.</li>
+    <li><b>Why a real purchase is needed now:</b> there is no Trails test network, so the only way to see Done, the receipt and the emails is to buy a real cheap domain.</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">9</span><h3>Resume after reload</h3><span class="tag todo">Toast passed; banner test pending</span></div>
+  <p class="meta">6 Nov 2026 · not committed · code done; testing needs a real Trails purchase (same as phase 8). The user chose to move on and test later.</p>
+  <h4>Copy approved by the user first (6 Nov)</h4>
+  <ul>
+    <li>/history banner, one purchase: "Purchase in progress / Your payment for name.og is still being processed by Trails. It will appear here once the purchase completes, usually within a few minutes."</li>
+    <li>Two or more: "Purchases in progress / N payments are still being processed by Trails. They will appear here once each purchase completes, usually within a few minutes."</li>
+    <li>No name saved: "Your payment is still being processed by Trails…"</li>
+    <li>Toasts after a reload: the same ones approved in phase 8.</li>
+  </ul>
+  <h4>Built</h4>
+  <ul>
+    <li><code>core/services/trails/watchCheckout.ts</code>: one polling loop (3 s, then 15 s after 5 min) that removes the stored entry when final. Used by both the drawer and the resume, so they behave the same. It counts from when the purchase started, not from the reload.</li>
+    <li><code>hooks/trails/useTrailsResume.ts</code>: on app load, drops saved entries older than 24 h and watches the rest in the background; reports each ending through a callback.</li>
+    <li><code>pages/_app.tsx</code>: mounts <code>useTrailsResume</code> (plan Q8) and turns each ending into a toast.</li>
+    <li><code>hooks/trails/useTrailsPendingCheckouts.ts</code>: the paid, still running entries for the banner (re-read every 15 s and on the browser's storage event).</li>
+    <li><code>composites/history/listings/HistoryTrailsNotice</code>: the banner (NoticeBanner info tone, the Watchlist's info icon), shown above the History list by <code>pages/history/index.tsx</code>.</li>
+    <li><code>data/trails/copy.ts</code>: the toast wording and <code>BOUGHT_SUBTEXT</code> in one place; <code>composites/.../trails/trailsOutcomeToast.ts</code>: the one function both the drawer and <code>_app</code> call to show them.</li>
+    <li><code>helpers/trails/intentStatus.ts</code>: <code>checkoutOutcome</code> (done / refunded / failed / abandoned); <code>helpers/trails/usdtAmount.ts</code>: minor units to USDT.</li>
+    <li>Stored record now also keeps <code>domainLabel</code> (saved on quote) and <code>paid</code> (set when the payment landed).</li>
+  </ul>
+  <h4>Decisions</h4>
+  <ul>
+    <li><b>Gap found and closed: a price that was never paid.</b> If a buyer gets a quote and then leaves, the saved entry stays "quoted" forever. Without a fix, after a reload it would be checked for 24 h, the banner would say "in progress", and it could end in "Payment didn't go through" for money that never moved. Now an unpaid quote older than 15 minutes is "abandoned": removed silently, no toast; and the banner lists paid entries only.</li>
+    <li><b>Toasts are drawn by the page, not the hook.</b> Hooks may not draw (CLAUDE.md §8), so <code>_app.tsx</code> (a page) wires the hook's result to the shared toast function.</li>
+    <li><b>Wording in one file</b> (<code>data/trails/copy.ts</code>), so the drawer and the after-reload toasts can't say different things. The USDT path now imports <code>BOUGHT_SUBTEXT</code> from there too; its text is unchanged.</li>
+    <li>A reload between pressing Pay and the payment landing isn't marked paid, so the banner won't show it; the resume still watches it and the toast still arrives.</li>
+  </ul>
+  <h4>Checks</h4>
+  <ul>
+    <li><code>tsc</code> clean. ESLint: no new warnings (2 old ones).</li>
+    <li><code>npm test</code>: 64 of 64 (5 new: outcome rules, unpaid quote).</li>
+    <li>Layering greps: only the allowed drawer hook import; helpers and data pure; History composite uses no hooks (the page does); no <code>0xtrails</code> outside <code>trails/</code> folders except the local spike page.</li>
+  </ul>
+  <h4>To test later (user, with the phase 8 real purchase)</h4>
+  <ol>
+    <li>Pay with any token, wait for the progress screen, then <b>reload the page</b>. Within a few minutes a "name.og is yours" toast should appear.</li>
+    <li>While it runs, open <b>/history</b>: the "Purchase in progress" banner shows, and disappears once the purchase finishes.</li>
+    <li>Get a price in the Trails box but <b>don't pay</b>, close the drawer and reload: no banner, and no toast ever.</li>
+  </ol>
+  <h4>In plain words</h4>
+  <ul>
+    <li><b>What's new:</b> if you close or reload the page in the middle of a Trails payment, the site remembers it. When you come back, it keeps checking quietly and tells you with a small message when the purchase finishes, or if you were refunded.</li>
+    <li><b>The History banner:</b> while a payment is still being processed, History says so at the top, so you don't think the purchase vanished.</li>
+    <li><b>Only real payments count:</b> just looking at a price in the Trails box and leaving never shows a banner or a message.</li>
+  </ul>
+</div>
+
+<div class="phase" id="phase-10">
+  <div class="phase-head"><span class="num">10</span><h3>Fixes that help both methods</h3><span class="tag todo">On hold: user checking with senior</span></div>
+  <p class="meta">Two old problems in the buy flow, found while reading the code for Trails. They affect the normal USDT purchase today, and would affect Trails purchases the same way. Mohit's doc lists both (task 8). Explained to the user 6 Nov; nothing changed yet.</p>
+
+  <h4>Problem 1: after buying, the site still shows the old picture</h4>
+  <p><b>How it works today.</b> The site keeps a short memory (a cache) of what it last loaded from the backend, so pages open fast without asking again. That memory is RTK Query, and each kind of data has a label (a "tag"):</p>
+  <ul>
+    <li><code>domain_listing</code>: the marketplace's live listings (<code>getMarketplaceOrders</code>, used by <code>useLiveListings</code>).</li>
+    <li><code>domain</code>: your own domains and listings on My Domains (<code>getMyDomainsOrders</code>, <code>getDomainListForSeller</code>, the expiry lists).</li>
+    <li><code>all_domain_listing</code>: older listing and filter endpoints (<code>domainListing.ts</code>, <code>filterDomain.ts</code>).</li>
+    <li><code>recent_transactions</code>: the live activity feed of recent sales.</li>
+  </ul>
+  <p>Listing and delisting already tell the cache "this is out of date, reload it" (<code>invalidatesTags: ['domain_listing', 'domain']</code> in <code>domainListing.ts</code>). <b>Buying doesn't.</b> Of the places that open the buy drawer, only the domain details page reacts after a purchase (it reloads its own page via <code>onPurchased={refetch}</code>); the marketplace list, the watchlist and the rest do nothing.</p>
+  <p><b>What the buyer sees.</b> They buy a name, close the drawer, and the marketplace still shows it as for sale with a Buy button; My Domains doesn't show the new name yet; the activity feed doesn't show the sale. Clicking Buy again leads to "This listing just ended", which looks like a bug. It only fixes itself after a reload or once the cache expires.</p>
+  <p><b>The fix.</b> After any successful purchase, USDT or Trails, tell the cache that <code>domain_listing</code> and <code>domain</code> are out of date (and, if plan Q10 says yes, <code>all_domain_listing</code> and <code>recent_transactions</code> too). Every list on screen then reloads itself.</p>
+  <p><b>One timing detail.</b> Our backend learns about a sale from its poller, which watches the chain and takes about 20 to 60 seconds. For a <b>Trails</b> purchase the drawer only says Done once our sale record exists, so reloading at that moment gets fresh data. For a <b>USDT</b> purchase the drawer says Bought as soon as the transaction is mined, which can be before the poller has caught up, so a reload at that instant can still return the old list. The fix should reload once at once, and once more about 30 seconds later, so the second load catches the poller.</p>
+
+  <h4>Problem 2: the "Transaction fail" screen shows the success message</h4>
+  <p><b>How it works today.</b> When a USDT purchase doesn't go through, the drawer shows the <code>reject</code> step: title "Reject", heading "Transaction fail", and under it the text from the <b>success</b> screen: "Ownership transferred in the same transaction as the payment. It will appear in your account within 10 to 15 minutes." The Figma frame (1:1051) was drawn with that text copied by mistake, and the code kept it as drawn with a comment flagging it for design. So a buyer whose purchase failed is told the domain is on its way.</p>
+  <p><b>Three different situations all land on this one screen</b> (from <code>runPurchase</code> in <code>BuyFlowModal.tsx</code> and <code>confirmPurchase</code> / <code>awaitSettlement</code> in <code>useBuyFlowActions.ts</code>):</p>
+  <ol>
+    <li><b>Cancelled in the wallet</b> (the buyer pressed Reject in MetaMask). Nothing was sent, nothing was charged.</li>
+    <li><b>Failed before sending</b> (the order couldn't be prepared, the pre-check couldn't reach Polygon, or the wallet failed to send). Nothing was charged.</li>
+    <li><b>Sent but failed on chain</b> (the transaction was mined but reverted). The domain wasn't bought and no USDT moved, but the <b>gas (POL) was spent</b>. The toast for this case when the drawer is closed already says so: "Gas was spent, but the purchase did not go through."</li>
+  </ol>
+  <p><b>The fix.</b> Replace the success text with real failure text, one line per situation, so the buyer knows whether anything was charged. The wording is drafted by us and shown to the user for approval before it goes in (same as every other screen). The "Try Again" and "Keep browsing" buttons stay. The title "Reject" and heading "Transaction fail" come from Figma too and read oddly; whether to change them is a question for the user.</p>
+  <p><b>Does this touch Trails?</b> Not directly: Trails has its own failed and refunded screens (phase 8). But it's the same drawer, and Mohit's doc asks for this fix as part of the work.</p>
+
+  <h4>In plain words</h4>
+  <ul>
+    <li><b>Problem 1:</b> the site remembers lists to load pages fast, but nobody tells it to forget them after you buy something, so you keep seeing the domain for sale and your My Domains looks unchanged until you reload.</li>
+    <li><b>Problem 2:</b> when a purchase fails, the screen says the domain is on its way, because its text was copied from the success screen by mistake.</li>
+  </ul>
+</div>
+
+<div class="phase" id="review-fixes">
+  <div class="phase-head"><span class="num">R</span><h3>Review fixes (Mohit's code review)</h3><span class="tag todo">Code done 11 Nov; manual tests pending</span></div>
+  <p class="meta">11 Nov 2026 · not committed · six points from Mohit, checked first in <code>dev-docs/trails/trails-mohit-review.html</code>. User's decisions: refund wording approved as drafted, cut off 30 minutes, remove only the widget logging, small fixes first then the tracker.</p>
+
+  <h4>What changed</h4>
+  <ul>
+    <li><b>Point 6, console logging:</b> <code>TrailsWidget.tsx</code> no longer prints a <code>[trails] widget …</code> line per event (it printed full event data, wallet included). The <code>console.error</code> lines stay, matching the drawer's style before Trails.</li>
+    <li><b>Point 4, slippage:</b> <code>browserCheckoutSource.ts</code> <code>SLIPPAGE_TOLERANCE</code> 0.05 to <b>0.005</b> (Q13 answered).</li>
+    <li><b>Point 3, refund wording:</b> drawer refund screen (<code>BuyFlowModal.tsx</code>) and refund message (<code>data/trails/copy.ts</code>): "sent back" became "refunded", "not converted back to your original token" added, the unconfirmed fees sentence removed.</li>
+    <li><b>Point 5, endless polling</b> (<code>helpers/trails/intentStatus.ts</code>): new <code>UNPAID_WATCH_MS</code> = 30 minutes. A <code>COMMITTED</code> intent whose payment never lands now stops after 30 minutes and ends quietly as "abandoned". On reload, an unpaid entry is only picked up while under 30 minutes old (paid ones still 24 hours). A status this code doesn't know stops after 20 minutes, like a failure. One old test had asserted the bug ("committed is watched as usual") and was replaced.</li>
+    <li><b>Points 1 and 2, page weight and tracking:</b>
+      <ul>
+        <li>New <code>core/services/trails/checkoutTracker.ts</code>: one tracker for the whole tab that watches every running purchase. It loads the polling code (and with it the Seaport encoder and order checks) with <code>import()</code> only when there's something to watch.</li>
+        <li>New <code>hooks/trails/useTrailsTracker.ts</code> replaces <code>useTrailsResume.ts</code> (deleted). Mounted in <code>pages/_app.tsx</code>: picks up saved purchases on load and shows the end toast for any purchase nothing on screen showed.</li>
+        <li><code>hooks/trails/useTrailsCheckout.ts</code> now only <b>listens</b> to the tracker. Back, a new purchase, or the drawer going away (page change) stops listening, never the watch. <code>prepare</code> and <code>attachIntent</code> also load the checkout code on demand, so the marketplace, details and watchlist pages don't carry it either until "Any token" is used.</li>
+        <li><code>BuyFlowModal.tsx</code>: the old "outcome" effect became <code>handleTrailsFinal</code>, which shows the done, refunded or failed screen when the drawer is on the Trails screens and otherwise lets <code>_app</code> show the toast. The drawer no longer shows Trails toasts itself.</li>
+        <li><code>browserCheckoutSource.ts</code>: a purchase another tab already finished now ends quietly instead of erroring on every poll (found while doing this).</li>
+      </ul>
+    </li>
+    <li><b>Not done from the review doc:</b> splitting "read status" from "prepare" into separate files. Not needed: the whole chunk now loads only when a purchase is pending or "Any token" is used.</li>
+  </ul>
+
+  <h4>The whole story of 11 Nov, in plain words</h4>
+  <p><b>The feature.</b> "Pay with any token": a domain listed at 0.10 USDT on Polygon can be paid with POL, BNB, ETH… on any network. Trails takes the buyer's token, turns it into USDT and buys the domain for the buyer. One purchase: the buyer picks "Any token, any chain" ▸ the Trails widget shows a quote ("pay 1.36 POL") ▸ the buyer presses Pay and approves in the wallet ▸ Trails converts and buys ▸ our site keeps asking Trails "how is it going?" every few seconds (our <b>tracking</b>) and shows "name is yours" at the end. Most of the day's work is about that last step.</p>
+  <p><b>Part 1, Mohit's review (six problems), before ▸ now:</b></p>
+  <ol>
+    <li>The tracking code loaded on every page (about 38 kB more on login, profile…) ▸ it loads only when a Trails purchase is started or pending.</li>
+    <li>Tracking lived inside the drawer, so changing page stopped it (no "is yours", History stuck on "in progress") ▸ tracking lives at site level; the drawer only listens.</li>
+    <li>Refund text said "sent back" and "conversion fees aren't refunded" (unconfirmed) ▸ "Trails refunded X USDT to your wallet on Polygon. It's not converted back to your original token."</li>
+    <li>Slippage 5% ▸ 0.5%.</li>
+    <li>A payment agreed to but never paid was checked forever ▸ stops after 30 minutes.</li>
+    <li>Every widget event printed in the console ▸ removed.</li>
+  </ol>
+  <p><b>Part 2, two bugs found by the user while testing:</b></p>
+  <ol>
+    <li><b>The drawer jumped back to Review after Pay.</b> Pressing Pay makes the widget get the wallet ready on the network the buyer pays from; the drawer was built to restart whenever the wallet's network changes (right for the USDT purchase), so it restarted and the widget vanished. Now a network change during the Trails steps doesn't restart it; the USDT purchase is unchanged.</li>
+    <li><b>Red 404s after cancelling.</b> Trails labels a payment "executing" as soon as Pay is pressed, before anything is approved. Our code read "executing" as "the money arrived", so after a cancel it saved the purchase as paid and kept asking our backend "is the sale recorded?" (404 every time, even after reloads). Now it also reads Trails' details: deposit not done and Trails' own transaction still on hold means not paid, so no sale checks and no red lines.</li>
+    <li><b>And when Trails gives up on it.</b> Watching the cancelled payment to the end showed that after its quote expires Trails marks it "invalid" (deposit failed). Our code would have read that as "a paid purchase failed" and shown "Payment didn't go through". Now a payment whose money never arrived ends quietly, whatever final label Trails gives it; a paid one that fails still shows the failure and any refund.</li>
+  </ol>
+  <p><b>Why GetIntent and GetIntentReceipt keep appearing after a cancel.</b> They're our tracker. After a cancel the widget shows "Try again", because the same quote can still be paid until it expires. Each check is two requests: <code>GetIntent</code> ("what's the status?", Trails answers "executing" once Pay was pressed) and, because of that answer, <code>GetIntentReceipt</code> ("did money actually move?", answer: deposit not done, origin on hold, so not paid). Both are 200. Every 3 s for 5 minutes, then every 15 s, and they stop for good 30 minutes after Pay, quietly, with no message.</p>
+  <p><b>Why keep watching after a cancel at all.</b> A cancel in the widget doesn't guarantee no money moves, and money moving while nobody watches means the buyer pays and the site says nothing (no "is yours", or worse no refund message). Three real cases:</p>
+  <ol>
+    <li><b>"Try again" on the same quote:</b> the buyer can pay a minute later.</li>
+    <li><b>A wallet request still waiting:</b> as in run 3 (ETH), the buyer went Back but the request stayed in the wallet and was approved later; the site can't cancel a request already in the wallet.</li>
+    <li><b>A slow network:</b> the buyer approves but the deposit takes minutes to confirm (e.g. Ethereum mainnet); until then it looks exactly like "not paid".</li>
+  </ol>
+  <p>Cost of watching: a small request every 15 s for at most 15 minutes (30 until the user shortened it later on 11 Nov), only in the buyer's browser; no money, no pop ups, nothing on screen. Why 30 and not 15: Trails' quote expires after 15 minutes, so no new payment is accepted after that; the extra 15 minutes only covers case 3 (approved just before expiry, slow to land). The cut off was the user's choice; stopping exactly at the quote's expiry is possible if wanted.</p>
+  <p><b>Not our problem:</b> the MetaMask extension 13.55 can't connect to any site (MetaMask bug, testing moved to WalletConnect), and the other red and yellow lines ("Quote disabled", "Maximum update depth", red <code>GetIntentReceipt</code> before paying) come from the Trails widget's own code. <b>No money was lost in any test on 11 Nov.</b></p>
+
+  <h4>File by file</h4>
+  <div class="tablecard"><table>
+    <thead><tr><th>File</th><th>Change</th><th>Point</th><th>What</th></tr></thead>
+    <tbody>
+      <tr><td><code>src/design-system/composites/marketplace/buying-flow/trails/TrailsWidgetLoader/TrailsWidget.tsx</code></td><td>Edited</td><td>6</td><td>Removed <code>logEvent</code> and its 7 calls; each widget callback now just forwards the event. No more <code>[trails] widget …</code> console lines.</td></tr>
+      <tr><td><code>src/core/services/trails/browserCheckoutSource.ts</code></td><td>Edited</td><td>4, extra</td><td><code>SLIPPAGE_TOLERANCE</code> 0.05 ▸ 0.005. <code>getStatus</code> for a checkout neither prepared in this tab nor stored (another tab finished it) returns <code>expired</code> instead of throwing on every poll.</td></tr>
+      <tr><td><code>src/data/trails/copy.ts</code></td><td>Edited</td><td>3</td><td><code>TRAILS_REFUNDED_TOAST_BODY</code>: "X USDT was refunded to your wallet on Polygon, not converted back to your original token."</td></tr>
+      <tr><td><code>src/design-system/composites/marketplace/buying-flow/BuyFlowModal/BuyFlowModal.tsx</code></td><td>Edited</td><td>3, 2</td><td>Refund screen text (approved wording, fees sentence removed). The old outcome <code>useEffect</code> became <code>handleTrailsFinal(state)</code>, passed to <code>useTrailsCheckout</code>: shows success, refunded or failed when the drawer is on <code>trails-pay</code> / <code>trails-progress</code> and returns true, else returns false so <code>_app</code> toasts. Removed <code>handledCheckoutRef</code> and the <code>showTrailsOutcomeToast</code> import. Comment on Back: it stops listening, not tracking.</td></tr>
+      <tr><td><code>src/helpers/trails/intentStatus.ts</code></td><td>Edited</td><td>5</td><td>New <code>UNPAID_WATCH_MS</code> (30 min). <code>isFinal</code>: <code>COMMITTED</code> stops at 30 min; an unknown Trails status stops at 20 min. <code>checkoutOutcome</code>: <code>COMMITTED</code> ▸ <code>abandoned</code> (silent). <code>isResumable</code>: paid entries 24 h, unpaid only 30 min.</td></tr>
+      <tr><td><code>src/helpers/trails/intentStatus.test.ts</code></td><td>Edited</td><td>5</td><td>Replaced the test that asserted the bug ("committed is watched as usual"); added tests for the 30 min cut off, unknown statuses, a known EXECUTING still watched, unpaid resume window.</td></tr>
+      <tr><td><code>src/core/services/trails/checkoutTracker.ts</code></td><td>New</td><td>1, 2</td><td>The app wide tracker: a map of running purchases, one watch each, listeners (the drawer), marks the entry paid once, calls the app handler when no listener showed the result. Loads <code>watchCheckout</code> with <code>import()</code> only when there is something to watch.</td></tr>
+      <tr><td><code>src/core/services/trails/checkoutTracker.test.ts</code></td><td>New</td><td>1, 2</td><td>7 tests (listed under Testing).</td></tr>
+      <tr><td><code>src/hooks/trails/useTrailsTracker.ts</code></td><td>New</td><td>1, 2</td><td>Mounted in <code>_app</code>: registers the end of purchase handler (toast) and, on load, tracks every resumable saved purchase and drops the rest.</td></tr>
+      <tr><td><code>src/hooks/trails/useTrailsResume.ts</code></td><td>Deleted</td><td>1, 2</td><td>Replaced by <code>useTrailsTracker</code>.</td></tr>
+      <tr><td><code>src/hooks/trails/useTrailsCheckout.ts</code></td><td>Edited</td><td>1, 2</td><td>No longer polls. <code>track()</code> subscribes to the tracker; <code>reset</code>, <code>prepare</code> and unmount only unsubscribe. Takes <code>onFinal</code> from the drawer. <code>prepare</code> and <code>attachIntent</code> load the checkout source with <code>import()</code>.</td></tr>
+      <tr><td><code>pages/_app.tsx</code></td><td>Edited</td><td>1, 2</td><td><code>useTrailsResume</code> ▸ <code>useTrailsTracker</code>; the toast reads <code>entry?.domainLabel</code> (the entry can be missing).</td></tr>
+    </tbody>
+  </table></div>
+
+  <h4>In plain words</h4>
+  <ul>
+    <li>Pages no longer download the purchase building code unless a Trails purchase is actually running or being started.</li>
+    <li>A Trails purchase is now followed by the site as a whole, not by one drawer: changing page, going Back or starting another purchase no longer loses it, and the History banner clears when it ends.</li>
+    <li>A payment the buyer agreed to but never sent is dropped after 30 minutes instead of being asked about forever.</li>
+    <li>The refund message no longer makes promises Trails hasn't confirmed, and says plainly the refund is USDT on Polygon.</li>
+    <li>Slippage is 0.5%, and the console no longer shows widget events.</li>
+  </ul>
+
+  <h4>Testing</h4>
+  <p><b>Automated (Claude, 11 Nov):</b> <code>tsc</code> clean; ESLint clean on all changed files (two warnings remain, both in the drawer and <code>useBuyFlowActions</code> before Trails); Vitest <b>76 pass</b> (69 helper tests and 7 new tracker tests: keeps watching after the drawer stops listening; no toast when the drawer showed the result; a toast when it didn't; one watch per purchase and a second purchase doesn't stop the first; a late listener gets the latest state; paid marked once; watched again after an abandoned quote). CLAUDE.md §8 greps show only the known old violations. A grep confirms nothing imports the checkout source statically except inside its own on demand chunk.</p>
+
+  <h4>What you have to test, step by step</h4>
+  <p>Before starting: dev server running on 3002 with the new code (restart it if it was running before 11 Nov), DevTools open on the Console and Network tabs. Free tests first.</p>
+  <ol>
+    <li><b>Test A, console is quiet (free, 2 min, point 6).</b> Open Buy on any listing ▸ "Any token, any chain" ▸ tick ▸ Continue to payment ▸ in the widget pick a token so a price appears ▸ press Back. <i>Expect:</i> no <code>[trails] widget …</code> lines in the Console.</li>
+    <li><b>Test B, an unpaid payment stops (free, about 35 min, point 5).</b> In the widget pick a token, press Pay, then <b>reject</b> in MetaMask (or just leave the widget). In Network filter <code>GetIntent</code>. <i>Expect:</i> a request every 3 s, every 15 s after 5 min, and <b>none after 15 minutes</b> (QUOTED or COMMITTED alike; was up to 30 before 11 Nov); no message appears; in Application ▸ Local Storage, <code>trails-checkouts</code> no longer has that entry.</li>
+    <li><b>Test C, reload rule (free, part of B, point 5).</b> Reload while B is still under 15 min: the <code>GetIntent</code> requests start again. Reload after 30 min: no <code>GetIntent</code> requests at all.</li>
+    <li><b>Test D, drawer path still works (paid, about 0.10 USDT, points 2 and 4).</b> A normal Trails purchase, staying on the drawer: Payment in progress ▸ "name is yours" ▸ View Receipt ▸ receipt page. <i>Expect:</i> same as run 2, and the quote goes through at 0.5% slippage. Tell me the token and network you paid with.</li>
+    <li><b>Test E, change page during a purchase (paid, points 1 and 2; also the old "closed drawer" test).</b> Start a Trails purchase; when "Payment in progress" shows, press Keep browsing ▸ go to <b>/history</b>. <i>Expect:</i> the "Purchase in progress" banner; within a few minutes the "is yours" message (still without a title, the known toast issue); the banner disappears within about 15 s <b>without reloading</b>; the purchase's row has View receipt.</li>
+    <li><b>Test F, Back then confirm later (optional, paid).</b> Press Pay in the widget, press Back in the drawer before confirming, then confirm the waiting MetaMask request. <i>Expect:</i> the "is yours" message still appears (before, nothing tracked it).</li>
+    <li><b>Test G, page size (yours, point 1).</b> Stop the dev server, run <code>npx next build</code>, note First Load JS for <code>/login</code> and <code>/profile</code>. Compare with the same pages on the <code>dark-mode</code> branch (or with Mohit's numbers). <i>Expect:</i> they match again (no +38 kB). Start the dev server again after.</li>
+    <li><b>Refund wording (point 3):</b> only visible on a real refund (the "someone else buys first" run, still pending). The text is checked in the code.</li>
+  </ol>
+  <p>Send me the results (and screenshots of anything unexpected); each one goes into this Testing log.</p>
+  <h4>Results so far</h4>
+  <ul>
+    <li><b>Connection, 11 Nov:</b> the MetaMask extension (13.55) can't connect to any site (Tron scope bug, see the double check list), so tests run over <b>WalletConnect with MetaMask on the phone</b>.</li>
+    <li><b>Test A, 11 Nov (user, WalletConnect): pass.</b> tawhidabdullah.og, widget quoted 0.107498 USDT0 on Polygon, Back pressed: no <code>[trails] widget</code> lines. Other console lines seen, none from our code: <code>[trails-sdk] [useQuote] Quote disabled…</code> warnings (Trails package, while the widget fills in its amount; the quote then worked); red <code>POST …/GetIntentReceipt 400</code> from <code>@0xtrails/api</code>: <b>the widget's own calls, confirmed 11 Nov.</b> Asked Trails directly about one of them (<code>0xc3ad3afa…3f01</code>): <code>GetIntent</code> says QUOTED, never updated (created 08:00:55, expired 08:15:55, i.e. 15 min, matching our rule); <code>GetIntentReceipt</code> NotFound. Our code asks for a receipt only when the status isn't QUOTED or COMMITTED, so it can't have made these. The Initiator call stack showed only our files because Chrome hides library frames ("Show ignore-listed frames"). No code change; listed with the other widget noise for Mohit / Trails; chart size warnings (<code>LogUtils.js</code>, marketplace charts, before Trails); Reown font preload warnings; one long red React error with a component stack.</li>
+    <li><b>That long red error, identified 11 Nov:</b> <code>Warning: Maximum update depth exceeded … at wM (0xtrails/dist/src-Cd_X4Rd1.js)</code>. <code>wM</code> is the Trails widget's own Pay screen (it receives <code>toAmount</code>, <code>toToken</code>, <code>actions</code>…); every frame in the stack is inside the <code>0xtrails</code> package. It's a React development warning: the widget kept working (quote shown, Back fine). Reading the package: its effects that react to our props depend on plain strings (amount, token, chain, recipient), and one re-applies <code>toAmount</code> whenever it differs from the widget's internal amount, which fits both this warning and the <code>Quote disabled … "0.1" … malformed</code> line. Not caused by the review fixes (the widget's props didn't change; only logging was removed). Not fixable in our code without guessing; to raise with Mohit / Trails with the stack. Whether it also appeared in runs 1 to 3 isn't known.</li>
+  
+    <li><b>Bug found 11 Nov, while starting test B (user, WalletConnect, tawhidabdullah.og, POL on Polygon):</b> after pressing Pay in the widget the drawer jumped back to Review ("USDT from your wallet", "Resolve the notice above"), not to progress. <b>Cause:</b> the drawer's start up effect in <code>BuyFlowModal.tsx</code> depends on <code>checkNetwork</code> (and the other wallet functions from <code>useBuyFlowActions</code>), which change when the wallet's network changes; pressing Pay makes the widget switch or re-announce the network, so the effect re-ran and restarted the drawer, unmounting the widget mid payment. There since phase 7, not from the review fixes. <b>Fix (11 Nov):</b> the effect now tells a new session (opened, or another listing) from a wallet change, and on the Trails steps (<code>TRAILS_STEPS</code>) a wallet change no longer restarts the drawer; the USDT path behaves exactly as before. Back from the widget re-checks the network so the USDT option's notice is right. tsc clean, 76 tests pass. <b>Money:</b> none left the wallet (POL balance 12.7145 before and after; Trails' deposit address for the intent holds 0). Trails intent <code>0x85f05ea6…a801</code>: EXECUTING with a placeholder deposit hash, origin and destination ON_HOLD, quote expiry 08:29:56 UTC; what Trails does with it after expiry is being checked. Note: our tracker counted EXECUTING as "payment landed" and polled our sale record (red 404s every few seconds) for a payment that was never sent.</li>
+    <li><b>Second bug from the same test, fixed 11 Nov:</b> the user then pressed Pay and <b>cancelled on the phone</b>; the red <code>404</code> on our sale record (<code>/marketplacev2/orders/transactions/0x367075…</code>) kept repeating, across reloads. <b>Cause:</b> Trails sets an intent to EXECUTING as soon as Pay is pressed, before anything is sent. Compared in Trails' records: the cancelled intent <code>0x85f05ea6…a801</code> showed deposit SENT (placeholder hash), origin ON_HOLD with no hash; yesterday's paid run 1 <code>0x7d0af0c6…4f01</code> showed deposit SUCCEEDED and a real origin hash. Our code took EXECUTING as "paid", saved the entry as paid (resumed for 24 h) and kept asking our backend for a sale. <b>Fix:</b> new pure helper <code>effectiveIntentStatus</code> in <code>helpers/trails/intentStatus.ts</code>: EXECUTING with the deposit not SUCCEEDED and the origin ON_HOLD with no hash counts as COMMITTED (agreed, not paid): no progress screen, no sale checks, not marked paid, ends quietly after 30 min. Used by <code>toCheckoutState</code> and <code>browserCheckoutSource.getStatus</code>; <code>trailsReceipt.service.ts</code> now also reads the deposit and origin transaction from the receipt (type <code>TrailsIntentSnapshot</code> extended). 4 new tests, <b>80 pass</b>, tsc and ESLint clean. To stop an existing stuck entry at once: <code>localStorage.removeItem('trails-checkouts')</code> and reload.</li>
+    <li><b>Third case, found 11 Nov by watching the cancelled intent to the end:</b> at 08:31 UTC, after its quote expired (08:29:56), Trails changed <code>0x85f05ea6…a801</code> to <b>INVALID</b>, "deposit transaction FAILED", origin and destination ABORTED. INVALID maps to our "failed", which counts as "money landed", so the code would have checked our sale record again (red 404s) and after 20 minutes shown "Payment didn't go through" for a payment never made. <b>Fix:</b> new <code>checkoutStatusFor</code> in <code>helpers/trails/intentStatus.ts</code>: FAILED, ABORTED or INVALID with the deposit not succeeded and no origin hash (origin ON_HOLD or ABORTED) becomes <code>expired</code>, which ends at once and quietly. A FAILED intent that was paid stays "failed" (it can still become a refund). Used by <code>toCheckoutState</code> and <code>browserCheckoutSource.getStatus</code>. 3 new tests, <b>83 pass</b>, tsc and ESLint clean.</li>
+    <li><b>Fourth bug, test D, 11 Nov (user, WalletConnect, tawhidabdullah.og, POL on Polygon): paid, but the drawer stayed on the widget.</b> The widget's own "Transaction Status" sat on Swap ("taking longer than expected") and our drawer never moved to "Payment in progress" or "is yours", though the domain was bought and the confirmation email arrived. <b>Checked:</b> our backend recorded the sale at 10:20:37 UTC (tx <code>0x457221…915b</code>, sent by a Trails relayer <code>0x1b19…4f16</code>). Trails has two quotes for this purchase: <code>0x978ca2c4…8001</code> (POL), created 10:20:07, <b>SUCCEEDED</b> at 10:20:36, the one paid; and <code>0xbaa3567f…7d01</code> (USDT), created 10:20:12, five seconds later, never paid, QUOTED. <b>Cause:</b> the widget made a new quote right after Pay. Our code treats every new quote as "the buyer picked another token" and replaced the stored one, so the tracker followed the unpaid quote and lost the paid one; it would have ended quietly at the quote's expiry with no "is yours". Probably possible since phase 6, not from the review fixes. <b>Fix:</b> a checkout now keeps its last 3 earlier quotes (<code>earlierIntentIds</code> on <code>StoredCheckout</code>, <code>types/trails/checkout.ts</code>); in <code>browserCheckoutSource.ts</code>, while the newest quote isn't paid, the status check also asks Trails about the earlier ones and from the first paid one on follows only that one. Cost: up to 3 extra status requests per check while nothing is paid. New <code>browserCheckoutSource.test.ts</code>, 4 tests, <b>87 pass</b>, tsc and ESLint clean. The widget being stuck on Swap is the widget's own screen; to show Mohit / Trails. <b>Money:</b> paid once, domain received, nothing lost. Test D to redo.</li>
+    <li><b>Connection, later on 11 Nov:</b> the user updated the MetaMask extension again and it connects normally; the runs below are on the extension. The widget no longer switched to USDT after Pay, which points the earlier USDT re quote at the WalletConnect connection rather than our code (not proven; to keep an eye on).</li>
+    <li><b>Test B on the extension, 11 Nov (user): Pay pressed, then Cancel in MetaMask</b> on weiwuxianlanwangji.og (1.291 POL quoted). Nothing sent; the user then closed the drawer. Quiet end of the watch not yet confirmed by the user.</li>
+    <li><b>Test D, 11 Nov (user, MetaMask extension): pass.</b> weiwuxianlanwangji.og, paid 1.2896 POL on Polygon at 0.5% slippage. The widget kept POL after Pay; its own status showed Deposit, Swap, Execute; then the drawer showed "weiwuxianlanwangji.og is yours" with transaction <code>0x51406ab3…d387</code>. Checked: our backend recorded the sale to the buyer at 10:46:01 UTC; Trails intent <code>0x8a6381f6…</code> SUCCEEDED at 10:46:01, one quote only. "Payment in progress" wasn't noticed: on Polygon deposit, swap and purchase finish within one or two 3 second checks, and the progress screen now waits for the deposit to land (cancelled payment fix), so it shows at most briefly; expected, worth seeing on a slower chain (ETH on Ethereum). View Receipt and the end of the GetIntent requests still to confirm.</li>
+    <li><b>Rate limit, 11 Nov (user, after test D):</b> the dev overlay showed <code>Runtime QuotaRateLimit: Quota rate limit exceeded</code> from <code>getTrailsIntent</code> (both <code>GetIntent</code> and <code>GetIntentReceipt</code>), i.e. Trails answering 429 to our status checks. Nothing broke (the watch already caught errors and kept going); the red overlay appeared because the dev server shows every <code>console.error</code>. Likely causes in this session: several watches at once (the cancelled attempt, the earlier entries, and in dev each hot reload of the tracker code starts new watches while the old timers keep running until a full reload), the widget's own status polling, and a few manual checks with the same key. <b>Fix:</b> on a rate limit the watch now waits 30 s, 60 s, then 2 min between tries until a check goes through, and logs a warning instead of an error (<code>watchCheckout.ts</code>; pure helpers <code>isRateLimited</code>, <code>rateLimitDelayMs</code> in <code>helpers/trails/intentStatus.ts</code>); the earlier quote lookup stops on a rate limit too (<code>browserCheckoutSource.ts</code>). 2 new tests, <b>89 pass</b>, tsc and ESLint clean. <b>Question for Mohit / Trails:</b> what is the rate limit on our key? Every buyer's browser polls with the same public key, so if the limit is per key, many buyers at once could hit it; the long term answer is the backend checkout source from Mohit's doc checking status (not phase 10, which is the shared fixes; corrected 11 Nov).</li>
+    <li><b>Unpaid cut off shortened to 15 minutes, 11 Nov (user's decision):</b> <code>UNPAID_WATCH_MS</code> in <code>helpers/trails/intentStatus.ts</code> is now 15 minutes, the life of a Trails quote, instead of 30. An agreed but unpaid payment (COMMITTED, or "executing" with nothing sent) stops being checked 15 minutes after it started, and after a reload an unpaid entry is only picked up while under 15 minutes old (paid ones still 24 h). Same as QUOTED, which already stopped at 15. Trade off: a payment approved just before its quote expires on a very slow chain (Ethereum mainnet on a busy day) could land after the watch stopped; the domain still arrives on chain, only the on screen message would be missing. Comment in <code>useTrailsTracker.ts</code> and test names updated; <b>89 pass</b>, tsc clean. Earlier entries in this log that say 30 minutes describe the code at the time.</li>
+    <li><b>End to end check, 11 Nov (Claude, asked by the user), against Mohit's six points:</b>
+      <ol>
+        <li><b>Page weight:</b> holds. Traced every static import: <code>_app</code> loads only <code>useTrailsTracker</code>, <code>checkoutTracker</code>, <code>checkoutStore.service</code>, <code>helpers/trails/intentStatus</code> (types only) and the toast helper; <code>watchCheckout</code>, the checkout source, the Seaport encoder and order checks are reachable only through the on demand <code>import()</code>, and <code>@0xtrails/api</code> is imported on demand too. The 38 kB figure still needs the user's <code>next build</code> (test G).</li>
+        <li><b>Tracking app wide:</b> holds. One watch per purchase in <code>checkoutTracker</code>; the drawer only listens (and records which listing the purchase is for at the first quote); Back, a page change or a second purchase only remove the listener; the stored entry is removed when the purchase ends, so the /history banner clears. Test E still to run.</li>
+        <li><b>Refund wording:</b> holds, in the drawer and the toast (<code>copy.ts</code>), as approved.</li>
+        <li><b>Slippage:</b> holds in our code: 0.005 is passed to the widget, which puts it into every quote request (read in the <code>0xtrails</code> package). Trails' API doesn't return it (the stored <code>quote.maxSlippage</code> is 0.1 on every purchase, 5% and 0.5% alike, so it's Trails' own field). Visible to the user in the widget's "Transaction details" before paying. Test D paid at this setting.</li>
+        <li><b>Unpaid watch:</b> holds, 15 minutes. <b>One gap found and fixed:</b> the unpaid clock counted from the first quote, so a buyer who switched tokens for a while and then paid a fresh quote could have the watch stop while the payment was landing. New pure helper <code>watchWindowStart</code> (<code>helpers/trails/intentStatus.ts</code>), used in <code>watchCheckout.ts</code>: while unpaid the window counts from the newest quote (each quote lives 15 minutes); once paid, from when tracking started, as before. Matches the reload rule, which already used the newest quote's time.</li>
+        <li><b>Logging:</b> holds; no <code>console.log</code>/<code>info</code>/<code>debug</code> left in the Trails code. Errors still use <code>console.error</code>; a rate limit is a <code>console.warn</code>.</li>
+      </ol>
+      Checks: <b>all 92 tests in the repo pass</b> (6 files), tsc clean, ESLint clean on every changed file except the two old warnings (<code>handleConnectWallet</code> unused, an <code>any</code> in <code>useBuyFlowActions.ts</code>). Layering greps (CLAUDE.md §8): only the known old violations, plus <code>BuyFlowModal</code> using <code>useTrailsCheckout</code>, which is allowed exception 1 (an action hook owned by the drawer).</li>
+    <li><b>Slippage isn't reaching Trails (found 11 Nov, user check + package reading). Point 4 is not in effect yet.</b> The user opened the widget's "Transaction details": no "Max slippage" row. Then the <code>QuoteIntent</code> request payload: <code>options</code> has <code>bridgeProvider</code>, <code>bridgeProviderFallback</code>, <code>disablePassthrough</code>, <code>intentProtocol</code>, but <b>no <code>slippageTolerance</code></b>. Cause, read in <code>0xtrails</code> 0.20.0 (<code>dist/src-Cd_X4Rd1.js</code>): the Pay widget accepts a <code>slippageTolerance</code> prop but its quote call (<code>useQuote</code>) doesn't pass it on; without it the quote falls back to the widget's own saved setting, localStorage <code>trails-slippage-tolerance</code> (a decimal, e.g. <code>0.005</code>), and when that's empty or <code>auto</code> it sends nothing, so Trails uses <b>Auto</b> ("calculates optimal slippage based on transaction size and routing"). So every purchase so far, the 5% runs on 10 Nov and the 0.5% run on 11 Nov, ran on Trails' Auto slippage; our value had no effect either way. 0.20.0 is the newest version (22 Oct 2026), so upgrading doesn't help. <b>Options, for Mohit:</b> (a) keep Auto and report the ignored prop to Trails; (b) a workaround: set <code>trails-slippage-tolerance</code> to <code>0.005</code> in the buyer's localStorage just before the widget opens, which the widget then sends with every quote; it relies on the widget's internals (could stop working after an upgrade) and overrides a buyer's own choice in the widget's settings, if it shows one. No code change until decided.</li>
+    <li><b>Test B, quiet stop confirmed, 11 Nov (user, MetaMask extension): pass.</b> An unpaid quote (<code>0xdf10b4d0…6801</code>, POL for a $1.00 listing, made 11:07:18 UTC, Trails expiry 11:22:18) was watched with the drawer closed; the <code>GetIntent</code> requests stopped around 11:22 UTC, with no message. Confirms the 15 minute cut off counted from the newest quote.</li>
+    <li><b>Check against Mohit's doc, 11 Nov (Claude, asked by the user), every Trails file read against "Trails Checkout: Frontend Work That Starts Now":</b>
+      <ol>
+        <li><b>Matches the doc:</b> dependencies (viem 2.57.16, react-query 5.106.1, <code>0xtrails</code> and <code>@0xtrails/adapter-wagmi</code> pinned 0.20.0, one wagmi 2.19.5); the three env vars; spike page local only (<code>.git/info/exclude</code>); <code>CheckoutSource</code>, <code>PreparedCheckout</code>, <code>CheckoutStatus</code>, <code>CheckoutState</code> and the eight <code>CheckoutError</code> codes copied exactly (<code>types/trails/checkout.ts</code>); the destination calls (approve then <code>fulfillAdvancedOrder(order, [], zeroHash, buyer)</code>, the probe's struct ABI, price = sum of the consideration) with the fixture test pinning selector, 1,444 bytes, keccak and approve calldata; every live check in the page 5 table (plus two extra: single domain NFT, order started); <code>route</code> RELAY with no fallback (seen in the <code>QuoteIntent</code> payload); <code>expiresAt</code> now + 15 min; widget in Pay mode with <code>actions</code>, loaded with <code>next/dynamic</code> and <code>ssr: false</code>; Trails packages imported only in <code>TrailsWidget.tsx</code> and (on demand) <code>trailsReceipt.service.ts</code>; status mapping, the 20 minute failed window, rule 1 (Done only when the sale receipt buyer matches, lowercased; "Purchase confirmed / Preparing your receipt..." before that), rule 3 (refund link from the reverted destination transaction), rule 4 (3 s, 15 s after 5 min), rule 5 (saved at the quote, resumed on load with a toast, <code>/history</code> banner from the same store); pilot wallet gate; the browser source picked in one place, gated by <code>NEXT_PUBLIC_TRAILS_ENABLED</code>.</li>
+        <li><b>Differs on purpose (each recorded with its reason):</b> no <code>next.config.ts</code> env map (NEXT_PUBLIC_ vars are inlined; plan §1.2); files split across types, helpers, core/services and hooks instead of one <code>buying-flow/trails/checkoutSource.ts</code> (layering); status asks <code>GetIntent</code> first and the receipt only after the payment lands (stopped the red 400s, 10 Nov); never paid FAILED, ABORTED or INVALID ends quietly instead of "failed" (Q16); EXECUTING with nothing sent counts as unpaid; unpaid purchases stop after 15 minutes and are resumed only for 15 minutes, not 24 h (Mohit's own review point 5); earlier quotes followed; rate limit back off; <code>PRICE_OUT_OF_RANGE</code> never thrown (no range given, Q11); <code>mismatch</code> never produced (a lost race leaves the sale empty and Trails reports refunded, as rule 2 expects).</li>
+        <li><b>Differs from the doc and needs Mohit's OK:</b> (a) <b>Rule 1 fallback</b>: if Trails says SUCCEEDED but our sale receipt never shows the buyer within 20 minutes, the drawer still shows "is yours" (and the toast), using Trails' destination hash; the doc says Done only from our sale receipt. Kept so a slow indexer doesn't leave the buyer without an answer; either keep it, or show "Purchase confirmed, receipt delayed" instead. (b) <b>Slippage</b>: the doc's <code>route.slippageTolerance</code> is passed, but the widget doesn't send it (Q13). (c) <b>Cancelled signature</b>: the doc's definition of done lists a cancelled signature screen; we don't draw one, the widget's own "Try again" is what the buyer sees (<code>onSignReject</code> is passed through <code>TrailsWidget</code> but the drawer doesn't use it).</li>
+        <li><b>Doc tasks not done:</b> task 8 (shared fixes: refresh <code>domain_listing</code> and <code>domain</code> after any purchase, real reject text) on hold as phase 10; task 9 analytics (phase 11, waits on GTM); task 10 QA (phase 12); backend switch (Phase B, backend not started).</li>
+        <li><b>Definition of done, page 11 and 12:</b> done: fixture test; regression after the upgrades (5 Nov); <code>tsc</code> and ESLint; components only through <code>CheckoutSource</code>, no Trails imports outside the Trails folders. Partly: spike (c) (dark desktop only); reload mid purchase toast (passed 10 Nov), closed drawer not yet (test E); MetaMask and WalletConnect both used, light and mobile pass not yet. <b>Not yet:</b> a real purchase from a <b>no POL burner paying Base USDC</b> (every run so far used a wallet holding POL and paid with POL, BNB or ETH), with receipt page, history BUY row, My Domains and both emails checked; a <b>lost race</b> (refunded screen and refund link); <b>not available, cancelled signature, own listing and expiring</b> screens seen; <code>next build</code> First Load JS (test G); Trails switched off.</li>
+      </ol>
+    </li>
+    <li><b>Passed 12 Nov (user), see the Testing log, "12 Nov checks".</b> Original note: the <code>/history</code> page after the Trails purchases. Check that each one shows as a BUY row for the buyer wallet (<code>0x8FD5…4D0</code>) with the right name, price (0.10 USDT) and transaction: tpenguofficial.og (10 Nov 07:02 UTC), westbengal.og (10 Nov 07:37 UTC), tawhidabdullah.og (11 Nov 10:20 UTC, tx <code>0x457221…915b</code>), weiwuxianlanwangji.og (11 Nov 10:46 UTC, tx <code>0x51406a…d387</code>). Also that the "Purchase in progress" banner isn't showing for any of them. Our backend's recent sales list already has all four as SALE rows to this buyer, so the data is there; this checks the page.</li>
+    <li><b>Committed and pushed, 11 Nov:</b> all review and testing fixes as <code>1622027</code> on <code>origin/trails</code> (16 files; docs stay local, <code>dev-docs/</code> is gitignored). Still open: tests C, E, G, the slippage decision, Mohit's questions.</li>
+  </ul>
+</div>
+
+
+<h2 id="copy">Where the drawer's wording comes from</h2>
+<p class="muted">Every new line of text in the buy drawer (phases 6, 7 and 8) was written by Claude and approved by the user before it went into the code. There was no other source: Mohit said the companion doc with screen copy wasn't needed (plan Q1), and there is no Figma for these screens (plan Q3). The wording isn't free invention, though; each line rests on one of the four sources below.</p>
+
+<div class="card">
+  <h3>1. Mohit's doc (the words, or the facts behind them)</h3>
+  <ul>
+    <li><b>"Any token, any chain"</b>: the doc's own name for the new option.</li>
+    <li><b>"Purchase confirmed. Preparing your receipt..."</b>: copied word for word from the doc's status rules (page 8, rule 1).</li>
+    <li><b>"…this listing ends in less than 15 minutes"</b>: the doc's check that an order must have more than 15 minutes left (page 5).</li>
+    <li><b>"…was sent back to your wallet on Polygon"</b>: the doc says the refund is the listing price in USDT on Polygon, at the buyer's address (page 9, rule 3).</li>
+    <li><b>"We'll keep checking for up to 20 minutes"</b>: the doc's rule that a failed payment is watched for 20 minutes, since it can still turn into a refund (page 8).</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h3>2. Our existing drawer copy, reused unchanged</h3>
+  <ul>
+    <li>The "This is your own listing" screen and the "Connection issue" screen.</li>
+    <li>The "name.og is yours" Bought screen and its toast.</li>
+    <li>The "Watch this name" and "See similar" buttons.</li>
+    <li>The start of the terms sentence ("I understand this purchase is final once the transaction settles…"); only the Trails clause was added.</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h3>3. How the code actually works</h3>
+  <ul>
+    <li><b>"Trails fee: Shown in the next step"</b>: the fee is only known once the buyer picks a token inside the Trails box.</li>
+    <li><b>"Making sure it can still be bought before you pay"</b>: describes the phase 5 checks (still listed, seller still owns it, not ending, not your own).</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h3>4. Claude's own wording or assumptions (to confirm)</h3>
+  <ul>
+    <li><s><b>"Trails' conversion fees aren't refunded"</b></s>: <b>removed 11 Nov</b> (Mohit's review: Trails hasn't confirmed it). The refund lines now use the doc's wording: screen "The purchase couldn't complete, so Trails refunded X USDT to your wallet on Polygon. It's not converted back to your original token."; message "X USDT was refunded to your wallet on Polygon, not converted back to your original token." Approved by the user 11 Nov.</li>
+    <li><b>"This usually takes a minute or two"</b> and <b>"takes a few minutes"</b>: estimates. The doc only says our sale record appears about 30 to 60 seconds after the purchase. <b>Confirm with Mohit</b>, whose probe measured the real time.</li>
+    <li><b>"Contact support if it hasn't arrived within a few hours"</b>: a guess at a sensible window; the doc gives no refund time. <b>Confirm with Mohit.</b></li>
+    <li><b>"Pay with tokens on other chains. Powered by Trails"</b> and the payment screen's intro line ("Pick a token and network to pay X USDT for name. Trails shows the full cost, fees included, before you confirm."): purely Claude's wording.</li>
+  </ul>
+  <p>If Mohit's answers differ, each of these is a one line change.</p>
+</div>
+
+<h2 id="testing">Testing log</h2>
+<p class="muted">How every phase was tested, so reviewers can judge it. Two kinds of testing are used throughout: <b>automated checks</b> run by Claude on the code (TypeScript <code>tsc</code>, ESLint, the Vitest unit tests, and the CLAUDE.md §8 layering greps), and <b>manual checks</b> run by the user in the browser on <code>localhost:3002</code>. The local site talks to the uat backend (<code>apistage.endlessdomains.io</code>) and to Polygon mainnet, so wallet tests use real wallets and real money. Claude never runs <code>next build</code> or starts a server (it breaks the running dev server); the user runs <code>next build</code> once at the end (phase 12).</p>
+
+<div class="card">
+  <h3>At a glance</h3>
+  <div class="tablecard"><table>
+    <thead><tr><th>Phase</th><th>Automated (Claude)</th><th>Manual / live</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td>0 Prep</td><td>None (no code)</td><td>None</td><td>n/a</td></tr>
+      <tr><td>1 Keys and flags</td><td>tsc, ESLint, §8 greps, gate logic on 7 cases</td><td>None (nothing on screen)</td><td>Pass</td></tr>
+      <tr><td>2 Dependencies</td><td>tsc, ESLint, 8 Vitest tests, <code>npm ls</code>, lock file diff</td><td>User wallet regression: USDT buy, list, delist; console review</td><td>Pass</td></tr>
+      <tr><td>3 Widget spike</td><td>Fixture encoding in Node</td><td>User in browser: checks (a) (b) (c) (d)</td><td>Pass ((c) dark desktop only)</td></tr>
+      <tr><td>4 Builder</td><td>tsc, ESLint, 14 Vitest tests incl. the doc's fixture, §8 greps</td><td>None (nothing on screen)</td><td>Pass, first run</td></tr>
+      <tr><td>5 Live checks</td><td>tsc, ESLint, 34 more tests (56), §8 greps, <code>layer_audit.py</code></td><td>Live read only test against 5 real uat listings on Polygon</td><td>Pass</td></tr>
+      <tr><td>6 Pay with card</td><td>tsc, ESLint vs original files, 56 tests, §8 greps</td><td>User in browser</td><td>Pass</td></tr>
+      <tr><td>7 Widget step</td><td>tsc, ESLint, 56 tests, §8 greps, bundle isolation grep</td><td>User in browser; one padding bug found and fixed</td><td>Pass</td></tr>
+      <tr><td>8 Status and refunds</td><td>tsc, ESLint, 66 tests, §8 greps</td><td>Run 1 (10 Nov): bought OK, drawer stuck, fixed. Run 2 (10 Nov, POL): progress ▸ Done ▸ View Receipt ▸ receipt, all OK. Run 3 (10 Nov, ETH on Ethereum): bought, toast and receipt OK, drawer screens not seen (payment confirmed from a waiting MetaMask popup)</td><td>Normal path passed; refund, closed drawer, WalletConnect pending</td></tr>
+      <tr><td>9 Resume after reload</td><td>tsc, ESLint, 66 tests, §8 greps</td><td>Resume toast after reload (10 Nov): pass. /history banner, unpaid quote: pending</td><td>Partly passed</td></tr>
+      <tr><td>R Review fixes (11 Nov)</td><td>tsc, ESLint, 92 tests (tracker, earlier quotes, status rules), §8 greps, static import grep</td><td>11 Nov: A (no widget logs) pass, B (quiet stop 15 min after the newest quote) pass, D (paid POL purchase, weiwuxianlanwangji.og) pass, C (reload rule) pass (reported 12 Nov), E (Keep browsing, /history banner, toast, banner clears) pass 12 Nov, G (<code>next build</code> page size equal to dark-mode) pass 12 Nov. All A to G done., G (your <code>next build</code>). (Row corrected 12 Nov; it still said 76 tests and all manual pending.)</td><td>Pass</td></tr>
+      <tr><td>12 Nov checks</td><td>Public chain reads, Trails API and our backend to confirm every paid run</td><td>Check 1 (/history after the Trails purchases): pass. Check 2 (receipt, My Domains, emails): pass. Check 3 (test C, reload rule, run 11 Nov): pass. Check 4 (own listing screen): pass. Check 7 (cancelled signature): pass, from test B on 11 Nov. Check 11 (main run + test E, no POL buyer, USDC on Base): pass. Check 12 (lost race): refund pass on chain (0.05 USDT back in 29 s); the drawer showed "is yours" because the same wallet won the race, so the Refunded screen wasn't seen; user chose to move on (screen covered by automated tests only). Check 13 (WalletConnect purchase): pass; the re-quote after Pay didn't happen, so that fix is still automated tests only. Check 6 (not available, caught by the Trails order check): pass. Check 8 (look and feel): pass as reported. Check 9 (Trails switched off): pass. Check 10 (page size): pass. Check 5: automated tests only (can't be set up). <b>All 12 Nov checks done.</b> (5 is covered by automated tests only)</td><td>In progress</td></tr>
+    </tbody>
+  </table></div>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">1</span><h3>Keys and flags: testing</h3></div>
+  <ul>
+    <li><b>Automated:</b> <code>tsc</code> on the whole project clean; ESLint clean on the new files; CLAUDE.md §8 greps print nothing.</li>
+    <li><b>Logic:</b> the on/off rule (<code>isTrailsAvailable</code>) run by hand on 7 cases: switch off, no key, empty pilot list, mixed case address, wallet not on the list, no wallet with a list. All gave the expected answer. Turned into 8 Vitest tests in phase 2.</li>
+    <li><b>Not tested:</b> nothing renders in this phase, so no browser check.</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">2</span><h3>Dependencies and regression: testing</h3></div>
+  <ul>
+    <li><b>Automated:</b> <code>npm ls wagmi @wagmi/core viem</code> shows one shared wagmi 2.19.5 (the Trails adapter reuses ours); lock file compared before and after the install (only versions moved, no new copies); <code>npm test</code> 8 of 8; <code>tsc</code> clean on the whole project; ESLint clean on new files (<code>npx eslint .</code> shows 405 errors, all in generated or vendor files: <code>.next/</code>, <code>next-env.d.ts</code>, <code>owl.carousel.min.js</code>).</li>
+    <li><b>Manual regression (user, 5 Nov, real wallet, real money, uat):</b> after restarting the dev server, a direct USDT buy of a cheap listing all the way to the receipt page; listing a domain from My Domains; delisting it. All worked.</li>
+    <li><b>Console review (user + Claude, 5 Nov):</b> nothing new. Every line came from a package the install didn't touch, confirmed by comparing versions in the lock file before and after (AppKit 1.8.14, lit 3.3.0, lit-html 3.3.1, recharts 2.15.4, sass 1.94.2, next 15.5.7, wagmi 2.19.5, all unchanged). Nothing mentioned viem, wagmi or react-query.</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">3</span><h3>Widget spike: testing</h3></div>
+  <ul>
+    <li><b>Automated:</b> the doc's fixture order encoded in Node with viem: selector <code>0xe7acab24</code>, 1,444 bytes, keccak <code>0x81f1e320…7bd99</code>, approve calldata, all exact.</li>
+    <li><b>Manual (user, 5 Nov, local only test page, MetaMask, dark, desktop):</b>
+      <ul>
+        <li>Encoding lines in the browser: all four true.</li>
+        <li>(a) Pay mode accepts our two calls: <b>pass</b>. Quote 2.94153837 POL on Polygon, about $0.29 including $0.01 fees. Picking MetaMask in the Trails list reused the connected wallet with no new approval.</li>
+        <li>(b) The quote keeps our calls byte for byte with the buyer as recipient: <b>pass</b>. Destination 1,860 bytes to Trails' Polygon contract <code>0x0000…cD74b</code>, containing our approve and <code>fulfillAdvancedOrder</code> bytes unchanged, recipient = the user's wallet.</li>
+        <li>(c) Fits our drawer: <b>pass in dark on desktop</b>.</li>
+        <li>(d) The browser can ask Trails for a payment's status (CORS): <b>pass</b>. A made up id got "NotFound 8000 400", a real API answer.</li>
+      </ul>
+    </li>
+    <li><b>Dev overlay "3 Issues":</b> read 5 Nov, an old header hydration mismatch from commit a059160, not Trails (parked, see the header bug).</li>
+    <li><b>Not tested here:</b> light mode, phone width. Moved to phase 7 and checked there. The final Pay was never pressed (the test order is already sold).</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">4</span><h3>Types and the builder: testing</h3></div>
+  <ul>
+    <li><b>Automated:</b> 14 Vitest tests, 22 of 22 overall. The four values from the doc's real mainnet transaction (selector, 1,444 bytes, keccak, approve calldata) match exactly. Ten more protect the doc's rules: approve first, zero value, only <code>fulfillAdvancedOrder</code>, recipient = buyer (tested with the user's own address too), whole order, no resolvers, <code>counter</code> dropped, the 77 digit salt kept exact, price sum, non USDT and moving prices refused, error type behaviour.</li>
+    <li><code>tsc</code> clean, ESLint clean, §8 greps show only two old helper files already on the cleanup list.</li>
+    <li><b>Not tested:</b> nothing renders, so no browser check.</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">5</span><h3>Live checks and the seam: testing</h3></div>
+  <ul>
+    <li><b>Automated:</b> 34 new tests (12 order checks, 22 status rules), 56 of 56 overall: every row of the doc's pre-payment table, status mapping, poll timing, "failed is watched 20 min", the refund link rule from Mohit's probe E7, "Done only when the sale buyer is us", resume age.</li>
+    <li><b>Live read only test (Claude, 5 Nov):</b> a temporary test file (deleted after) ran the real services against the uat API and Polygon mainnet on the first 5 uat listings. As the user's wallet, the first listing correctly came back "your own listing" (it is the user's 4 USDT listing). As another buyer, all 5 (twertsdfgsdfg.og, songzuer.og, weiwuxianlanwangji.og, jayhk47.og, rajakiarani.og) came back buyable, with an approve of 68 bytes and a buy of 1,444 bytes. Nothing was bought.</li>
+    <li><code>tsc</code>, ESLint, §8 greps and <code>layer_audit.py</code>: nothing from Trails.</li>
+    <li><b>Not tested:</b> the localStorage note (needs a browser); it's exercised in phases 8 and 9.</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">6</span><h3>Pay with card and review: testing</h3></div>
+  <ul>
+    <li><b>Before code:</b> layout and copy shown to the user and approved (6 Nov).</li>
+    <li><b>Automated:</b> <code>tsc</code> clean; ESLint run on the changed files and on the original files (via <code>git stash</code>) to prove the 3 warnings were already there; 56 of 56 tests; §8 rule 6 grep clean.</li>
+    <li><b>Manual (user, 6 Nov):</b> the review step in the browser with the new card, both payment modes. Reported good. Stage was down earlier that day (503 on every endpoint, seen as a "Failed to fetch" from the session check); the check was done once it was back.</li>
+    <li><b>Not separately confirmed:</b> the drawer with Trails switched off (<code>NEXT_PUBLIC_TRAILS_ENABLED=false</code>). The code keeps today's drawer when off (all new props optional with today's defaults), and it will be checked again in phase 12.</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">7</span><h3>Widget step: testing</h3></div>
+  <ul>
+    <li><b>Before code:</b> all new screen copy shown to the user and approved (6 Nov).</li>
+    <li><b>Automated:</b> <code>tsc</code> clean; no new ESLint warnings; 56 of 56 tests; §8 greps (only the allowed drawer hook import); a grep proving nothing imports the widget file except the dynamic loader, so Trails stays out of the main bundle.</li>
+    <li><b>Manual (user, 6 Nov):</b> Any token ▸ Continue ▸ checking screen ▸ payment screen with the Trails box (seen on songzuer.og, 1.00 USDT); Back; own listing screen; light mode, phone width and the dev overlay (carried over from phase 3). The user found the intro text touching the drawer edge; padding fixed to match the review screen, then rechecked: good.</li>
+    <li><b>Investigated:</b> the new card "disappeared" once. <code>.env</code>, <code>.env.local</code> and the dev server's compiled config were all correct and the served page contained the card, so it was a stale browser copy; it came back after a refresh.</li>
+    <li><b>Not tested:</b> the final Pay was not pressed (phase 8).</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">8</span><h3>Status, Done and refunds: testing</h3></div>
+  <ul>
+    <li><b>Before code:</b> all new screen and toast copy shown to the user and approved (6 Nov).</li>
+    <li><b>Automated:</b> <code>tsc</code> clean; no new ESLint warnings; 59 of 59 tests (3 new for "when to stop checking"); §8 greps unchanged.</li>
+    <li><b>Manual, run 1 (user, 10 Nov, real money, BNB on BSC, MetaMask):</b> purchase succeeded on chain and the domain reached My Domains, but the drawer stayed on the payment screen. Root cause found from the saved entry, Trails' receipt and our sale record (details in the phase 8 entry), fixed the same day. Run 1 needs repeating to see progress, Done and View Receipt.</li>
+    <li><b>Manual, run 2 (user, 10 Nov, real money, POL, MetaMask):</b> tpenguofficial.og bought; backend sale record to the buyer and the receipt page both confirmed; no repeating 400s. The user confirmed the drawer went progress ▸ Done ▸ View Receipt, so run 1's bug is fixed. Widget console lines not captured.</li>
+    <li><b>Manual, run 3 (user, 10 Nov, real money, ETH on Ethereum mainnet, MetaMask):</b> westbengal.og bought for 0.10 USDT, paying 0.00007 ETH (about $0.15) to Trails deposit address <code>0x7cf7…2Ab8</code>. Our backend's sale record: order <code>0x207d8259…c9ff76</code>, <code>SALE</code> to the buyer, price <code>100000</code>, fee <code>2500</code>, seller <code>97500</code>, Polygon transaction <code>0x059dee1f…b33f97</code>, 07:37:42 UTC. The receipt page shows Completed with all four steps. The "Ownership transferred…" toast appeared. <b>Ethereum mainnet as the paying chain: pass.</b><br><b>How it ran:</b> the MetaMask payment popup appeared while the drawer showed the USDT review screen (USDT method selected, wrong network notice), so the drawer's progress screens were not seen in this run; the purchase was confirmed from that popup. The user confirmed the cause: they had opened the Trails widget and pressed Pay earlier, then gone back or closed the drawer, and MetaMask kept that request waiting. The background tracking still finished it, which also exercises the "drawer not on Trails screens" path.<br><b>Found:</b> the toast had no "westbengal.og is yours" title (user confirmed). Cause: the shared <code>ToastMessage</code> SUCCESS variant (<code>primitives/toast-message/success.tsx</code>) never draws a title, only the message. This is existing behaviour: the USDT path's "is yours" toast (in <code>BuyFlowModal</code> before Trails) and the "Link copied" toasts lose their titles the same way. Fix needs a decision (double check list).</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">9</span><h3>Resume after reload: testing</h3></div>
+  <ul>
+    <li><b>Before code:</b> the /history banner wording shown to the user and approved (6 Nov).</li>
+    <li><b>Automated:</b> <code>tsc</code> clean; no new ESLint warnings; 64 of 64 tests (5 new for the outcome rules and the unpaid quote); §8 greps unchanged.</li>
+    <li><b>Manual, resume after reload (user, 10 Nov, free):</b> the run 1 purchase's saved entry (theforceis.unstoppable, Trails status SUCCEEDED, our sale record showing the buyer) was put back in <code>localStorage</code> with a one line console snippet, marked paid, and the page reloaded. <b>Pass:</b> the success toast appeared with the "Ownership transferred…" text. (Correction 10 Nov: this entry first said the "theforceis.unstoppable is yours" title showed; the SUCCESS toast can't draw a title, see run 3.) (Removal of the entry afterwards not separately confirmed.)</li>
+    <li><b>Still to see:</b> the /history "Purchase in progress" banner during a running purchase, and an unpaid quote producing no banner or toast; both come with the paid rerun.</li>
+  </ul>
+</div>
+
+
+
+<div class="phase">
+  <div class="phase-head"><span class="num">12N</span><h3>12 Nov checks (trails-plan-12-nov.html)</h3></div>
+  <ul>
+    <li><b>Setup (user, 12 Nov):</b> Account 1 (<code>0x8FD5…4D0</code>, seller, about 10.13 POL) listed five domains on stage, all Polygon: twertsdfgsdfg.og, tawhidabdullah.og, thefo….unstoppable, weiwuxianlanwangji.og at 0.05 USDT, westbengal.og at 0.10. New MetaMask "Account 3" (<code>0x5b1c…A24E</code>) is the Trails buyer, empty at creation. Plan changed with the user: no separate Direct buyer; Account 3 does both sides of the lost race. One funding request to Account 3: 2 USDC and about $1 ETH on Base, 1 USDT on Polygon, no POL. <b>What arrived:</b> 5.58 USDT on BNB Smart Chain to Account 1, to swap ourselves. Swapped with MetaMask Bridge from Account 1 straight to Account 3 (recipient set to Account 3): 2.2 to USDC on Base (quote about 2.148), 0.7 to ETH on Base (about 0.000326 ETH, $0.67), 1.1 to USDT on Polygon (shown as "USDT0", same contract <code>0xc2132D…58e8F</code> our marketplace uses; about 1.083). About 1.58 USDT left on BNB Chain in Account 1 as a reserve. User reports all three done. <b>On chain (Claude, public RPC reads, 12 Nov):</b> Account 3 holds 2.148225 USDC on Base, 0.000326 ETH on Base, 1.082568 USDT on Polygon, <b>0 POL</b>; Account 1 has 1.581 USDT left on BNB Chain. MetaMask didn't list the Polygon USDT for Account 3 at first (display only; the token wasn't shown in its list).</li>
+    <li><b>Check 1, /history after the Trails purchases. Manual (user, 12 Nov, localhost:3002 on stage API, MetaMask extension, Account 1). Pass.</b> tpenguofficial.og, westbengal.og, tawhidabdullah.og, weiwuxianlanwangji.og (and theforceis.unstoppable from run 1) each show as a Purchase row, 0.10 USDT, at the expected times (shown in IST, equal to the UTC times in the plan). No "Purchase in progress" banner. The row's hash is the order hash by design; the user opened weiwuxianlanwangji.og's detail and its transaction link opened <code>0x51406a…d387</code> on Polygonscan. <b>Automated support (Claude):</b> each order hash on screen matched its transaction in our backend's sale records (<code>/marketplacev2/orders/transactions/recent</code>), buyer Account 1. <b>Gaps:</b> transaction links of the other three rows not opened; one desktop width, one theme (dark).</li>
+    <li><b>Check 2, receipt, My Domains, emails. Manual (user, 12 Nov, localhost:3002 on stage API, Account 1). Pass.</b> Receipt page of weiwuxianlanwangji.og: order <code>0xe84b…6451b</code>, 0.10 USDT, transaction <code>0x5140…9d387</code>, placed 11 Nov 16:16 IST (10:46 UTC), timeline all done; matches our backend's sale record. All four names in My Domains (Account 1). Buy and sell emails arrived (user). <b>Plan corrected:</b> it asked for the receipt to show the buyer, but the receipt page has no buyer field (its mapper, <code>helpers/marketplace/orderDetails.ts</code>, never reads it; predates Trails); the buyer is confirmed by /history and the sale record. <b>Gaps:</b> one receipt opened of four; which purchase and inboxes the emails were for not recorded (the seller on all four was the old wallet <code>0xeF51…5494</code>).</li>
+    <li><b>Seen on the receipt, not caused by Trails, no code changed:</b> (1) "Seller received 0.10 USDT" and "Marketplace fee, paid by seller 0.00 USDT" are 0.0975 and 0.0025 rounded to two decimals, beside the line saying 2.5% was taken; same on direct USDT buys. (2) "You paid 0.10 USDT" is the order price; this buyer paid about 1.29 POL through Trails. Our sale record has no payment method (Phase B adds <code>paymentMethod</code> on sales); noted in Mohit's status doc.</li>
+    <li><b>Check 3, test C, reload rule. Manual (user, 11 Nov, localhost:3002). Pass, as reported by the user on 12 Nov.</b> Unpaid quote, reload within 15 minutes: status checks (<code>GetIntent</code>) resume; reload after 15 minutes from the quote: none; no message either time. <b>Gaps:</b> run on 11 Nov, reported the next day; time of the quote, listing, token and wallet not recorded; not repeated on 12 Nov.</li>
+    <li><b>Check 11, main run + test E. Manual (user, 12 Nov, localhost:3002 on stage API, MetaMask extension, Account 3 with no POL, westbengal.og 0.10 USDT, USDC on Base). Pass.</b> Widget: pay 0.134575 USDC (≈ $0.13 incl. $0.03 fees), "Price impact 25.73%" in red (the fees against a $0.10 order), Relay bridge. <b>Q13:</b> the <code>QuoteIntent</code> payload has no <code>slippageTolerance</code> (options: bridgeProvider RELAY, intentProtocol v1.5, bridgeProviderFallback false, disablePassthrough true; tradeType EXACT_OUTPUT), and Transaction details has no "Max slippage" row. /history after Keep browsing: "Purchase in progress … westbengal.og is still being processed by Trails" banner shown, then the success toast "Ownership transferred in the same transaction as the payment. It will appear in your account within 10 to 15 minutes." Seller's "sold" email arrived. <b>Claude, checked:</b> Trails intent <code>0x3e1975f9…8901</code> SUCCEEDED, created 06:25:58 UTC, done 06:28:21, deposit 134575 (0.134575 USDC) on Base, fees 0.0347 USD, <b><code>quote.maxSlippage = 0.1</code></b> (Trails' Auto chose 10%; on an EXACT_OUTPUT quote fromAmountMin equals fromAmount, so it cost nothing here). Our sale record: order <code>0xca9757…6899</code>, tx <code>0x9180fb…53b9</code>, 06:28:22 UTC, buyer Account 3, seller Account 1, 0.10 USDT. Network: our sale record lookup answered 404 several times until the poller recorded the sale, then 200 (expected; red rows in DevTools). The widget's own <code>WaitIntentReceipt</code> was cancelled on leaving the page and its <code>GetIntentReceipt</code> answered 400 before payment (known widget noise, Q17). <b>Confirmed by the user afterwards:</b> the banner cleared on its own without a reload (test E pass); westbengal.og is in Account 3's My Domains; <b>only one wallet popup</b>, not an approval and a payment. <b>Why one (Claude, checked):</b> Trails' <code>depositTransaction</code> for this route is a plain USDC <code>transfer</code> of 0.134575 to its deposit address <code>0x58e1…6a98</code>, which needs no approval; Account 3's Base nonce is 1 (exactly one transaction), USDC 2.148225 ▸ 2.01365, ETH spent on gas about 0.00000044. So the plan's "approve, then pay" expectation was wrong, not the flow; "a token that needs approval" is not exercised by this route. <b>Gaps:</b> exact time of Pay not noted (the quote was 06:25:58 UTC); /history row and receipt for this purchase on Account 3 not separately reported; no buy email (Account 3 likely has no email on the site, not checked); one width, dark theme.</li>
+    <li><b>Check 12, lost race. Manual (user, 12 Nov, localhost:3002 on stage API, MetaMask extension, Account 3 in both tabs, tawhidabdullah.og 0.05 USDT). Refund on chain: pass. Refund screen: not reached (self race).</b> User sent Account 3 0.5 POL from Account 1 first. Both tabs ended on "tawhidabdullah.og is yours" ("You paid 0.05 USDT", transaction <code>0xe49a…dff89</code>). <b>Claude, checked:</b> tab B's direct buy filled the order at 06:40:33 UTC (tx <code>0xe49a84…dff89</code>, sent by Account 3 to Seaport, 0.04875 USDT to Account 1 and 0.00125 fee). Tab A's Trails intent <code>0x0d937952…3e01</code> (quote 06:40:12) took 0.08382 USDC on Base and ended <b>REFUNDED</b> at 06:41:02: 0.05 USDT came back to Account 3 on Polygon (tx <code>0xb71abc…4661</code>, from <code>0xd3b0…c0f9</code>), about 40 s after the sale. Account 3 afterwards: USDT unchanged at 1.082568 (paid 0.05 directly, got 0.05 back), USDC 1.93, POL 0.406 (two Polygon transactions: USDT approval and the fill). <b>Why tab A said "is yours":</b> <code>toCheckoutState</code> (<code>helpers/trails/intentStatus.ts:146</code>) counts a sale record that names this buyer as succeeded before looking at Trails' status (Mohit's rule 1). The winner was the same wallet, so our record named the Trails buyer and REFUNDED was never read. With a different direct buyer the record names someone else and the drawer would go to Refunded; the test setup, not a race with another person. <b>Real world edge:</b> a buyer who pays directly in one tab and through Trails in another gets "is yours" (true, the domain is theirs) with no word about the refund of their other payment; noted for Mohit, no code changed. <b>Not seen:</b> the "Payment refunded" screen, its wording and the "View refund" link. <b>Money in plain terms:</b> USDT 1.0826 before and after (−0.05 direct buy, +0.05 Trails refund); USDC 2.0137 ▸ 1.93 (0.0838 paid through Trails, 0.05 of it returned as USDT, about 0.034 Trails fees not refunded); POL 0.5 ▸ 0.406, all gas for the direct buy's two transactions (not refundable). <b>Decision (user, 12 Nov):</b> move on to check 13; not repeated with a third wallet as direct buyer, so the Refunded screen stays covered by automated tests only. To see it for real later: Trails buyer and direct buyer must be different wallets.</li>
+    <li><b>Check 13, second quote after Pay, over WalletConnect. Manual (user, 12 Nov, localhost:3002 on stage API, Account 3 in MetaMask mobile over WalletConnect, weiwuxianlanwangji.og 0.05 USDT, USDC on Base). Purchase: pass. Re-quote after Pay: not reproduced.</b> The widget's first <code>QuoteIntent</code> was for USDT0 on Polygon (<code>originChainId 137</code>, its default), then USDC on Base when the user picked it (0.084113 USDC, ≈ $0.08 incl. $0.03 fees). After Pay: no token switch and no new <code>QuoteIntent</code> (user). Drawer: "Buying weiwuxianlanwangji.og" (Payment in progress) ▸ "weiwuxianlanwangji.og is yours", "You paid 0.05 USDT", tx <code>0xff17…10b1d</code>. <b>Claude, checked:</b> Trails intent <code>0x23ca82ad…9f01</code> SUCCEEDED, quote 06:58:24 UTC, done 06:59:21, deposit 0.084113 USDC on Base, <code>maxSlippage 0.1</code> again; our sale record 06:59:22, order <code>0xc06462…1213</code>, buyer Account 3, seller Account 1. Network: our sale record lookups 404 until the poller recorded the sale, then 200 (expected); the widget's <code>GetIntentReceipt</code> 400 before payment and <code>WaitIntentReceipt</code> cancelled (widget noise, Q17). <b>Gap:</b> the paid quote was the newest one, so the earlier quote follow up (<code>earlierIntentIds</code>) wasn't needed; that fix is still covered by automated tests only. Not repeated, as the plan said.</li>
+    <li><b>Check 6, not available screen. Manual (user, 12 Nov, localhost:3002 on stage API; incognito window with Account 3 over WalletConnect, normal window with Account 1 on the extension; thefo….unstoppable 0.05). Pass.</b> Account 3 opened the listing ▸ Buy Now ▸ Any token; Account 1 delisted it in the other window; Account 3 pressed Continue. Drawer: "This listing is no longer available. It was sold, cancelled or changed by the seller. Nothing was charged to you." with Watch this name and See similar. That sentence (<code>BuyFlowModal.tsx:279</code>, reason <code>unavailable</code>) is set only when the Trails <code>prepare</code> order check throws <code>ORDER_NOT_FILLABLE</code>; the drawer's start up check would have said "bought by another wallet", so the Trails check caught it. Using two windows with different wallets avoided switching accounts. <b>Gaps:</b> delist transaction hash not recorded; one width, dark theme.</li>
+    <li><b>Check 9, Trails switched off. Manual (user, 12 Nov, local dev server with <code>NEXT_PUBLIC_TRAILS_ENABLED=false</code>, then set back to true). Pass, as reported.</b> Only the original payment cards. <b>Gap:</b> no screenshot recorded.</li>
+    <li><b>Check 10, test G, page size. Manual (user, 12 Nov, <code>npx next build</code> on <code>trails</code> and on <code>dark-mode</code>). Pass, as reported:</b> First Load JS of /login and /profile the same on both branches, so Mohit's point 1 (every page about 38 kB heavier) is confirmed fixed. <b>Gap:</b> the kB figures weren't recorded.</li>
+    <li><b>Check 8, look and feel. Manual (user, 12 Nov, localhost:3002, Account 3 over WalletConnect, twertsdfgsdfg.og, no payment). Pass, as reported ("everything is okay").</b> Asked to cover the payment options, preparing step, widget and Back, in light and dark, at desktop, tablet and phone widths. <b>Gaps:</b> which widths and themes were actually looked at wasn't itemised; the result screens (Payment in progress, is yours, No longer available) were seen in dark only, during checks 11, 13 and 6; the Refunded screen wasn't seen at all (check 12).</li>
+    <li><b>Check 7, cancelled signature: pass, from test B (user, 11 Nov).</b> Same steps and pass conditions; not repeated on 12 Nov. Whether we draw our own screen stays Q19.</li>
+    <li><b>Check 4, own listing screen. Manual (user, 12 Nov, localhost:3002 on stage API, Account 1, twertsdfgsdfg.og). Pass.</b> The marketplace list replaces Buy Now with Delist on the viewer's own listing (<code>pages/index.tsx</code> <code>isOwnListing</code>), so the drawer was opened from the domain's detail page (<code>DomainHeroCard</code> always shows Buy Now). The drawer showed "This is your own listing" at once, before the payment choice: the original start up check (<code>loadOrder</code>, predates Trails) blocks both methods. <b>Gap:</b> the Trails path's own backup check (<code>OWN_LISTING</code> from <code>prepare</code>, same screen and words) can't be reached this way; covered by <code>helpers/trails/orderChecks.test.ts</code> only. <b>Seen, predates Trails, no code changed:</b> the detail page and /watchlist offer Buy Now on your own listing while the marketplace list doesn't; the drawer catches it.</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h3>Not covered yet (planned)</h3>
+  <ul>
+    <li><code>next build</code> and the First Load JS size check: run by the user once, at the end (phase 12).</li>
+    <li>A WalletConnect mobile wallet: only MetaMask so far (phase 12).</li>
+    <li>Lost race (someone else buys first ▸ Refunded with link), cancelled signature, expiring listing screen seen for real, reload mid purchase (phase 9): all in the phase 12 QA matrix.</li>
+    <li>Trails switched off showing today's drawer exactly (phase 12).</li>
+  </ul>
+</div>
+
+<h2>Plan in plain words</h2>
+
+<div class="card">
+  <h3>Where Mohit's doc and our code differ</h3>
+  <p class="muted">Mohit wrote his doc without looking closely at our repo. These are the six places where it guessed differently, and what we do instead. None of them is a problem; they only change how a step is done. Plan §1.2.</p>
+  <ul>
+    <li><b>Env map.</b> The doc says register the Trails settings in <code>next.config.ts</code> as well as <code>.env</code>. Not needed: any setting named <code>NEXT_PUBLIC_</code> is available everywhere automatically, and we already rely on that for the Polygon RPC setting. One file to edit, not two.</li>
+    <li><b>Versions.</b> The doc is right about what is installed (viem 2.41.2, react query 5.90.12, wagmi 2.19.5). <code>package.json</code> still lists old minimums (<code>^2.7.10</code>, <code>^5.66.0</code>), so when we upgrade we also update those numbers to match what we actually need.</li>
+    <li><b>Vitest.</b> The doc asks for a Vitest test. Vitest is a tool that runs automatic checks on code, and the project has never had one installed. We install it first; our Trails test becomes the first automated test in the repo.</li>
+    <li><b><code>next build</code>.</b> The doc counts a passing build as part of done. Running a build while the dev server runs broke every page with 500 errors on 9 Oct, so Claude checks with TypeScript, ESLint, tests and the dev server, and at the very end the user stops the dev server and runs <code>next build</code> once.</li>
+    <li><b>Folders.</b> The doc puts its main Trails file inside the design system next to the drawer UI. Our rule (30 Oct) is that design system folders only draw, and that file fetches data and reads the blockchain. So the same code is sorted into the right folders: <code>types/trails</code>, <code>helpers/trails</code>, <code>core/services/trails</code>, <code>hooks/trails</code> and the design system <code>trails</code> folder. Every folder is named <code>trails</code>, so the doc's "only trails folders import Trails" rule still works.</li>
+    <li><b>Live checks.</b> The doc wants seven safety checks before buying. Our <code>loadOrder()</code> already does four (signature exists, not sold or cancelled, time window valid, not your own listing). For Trails we add the missing ones: at least 15 minutes left, seller still owns the domain, Seaport still allowed to move it, seller hasn't cancelled everything. Added only on the Trails path, so the normal USDT buy can't break.</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h3>Open questions, and what happens if nobody answers</h3>
+  <p class="muted">Every question has a default, so none of them stops the work. Plan §6.</p>
+  <ul>
+    <li><b>Q1, second doc.</b> Answered 5 Nov: not needed (Mohit). We write the screen text and the analytics event list ourselves; the user sees the text before it goes in.</li>
+    <li><b>Q2, branch.</b> Answered 5 Nov: <code>trails</code>, cut from <code>dark-mode</code>, the branch closest to uat.</li>
+    <li><b>Q3, designs.</b> Is there a Figma frame for the third payment card, the widget step and the refunded screen? Default: build from parts we already have (payment card, result screen, checklist) so it matches the drawer, then the designer reviews.</li>
+    <li><b>Q4, empty pilot list.</b> Switch on and list empty: everyone or nobody? Default: everyone. Fine on uat; for prod Mohit's doc says the list must hold staff wallets.</li>
+    <li><b>Q5, who owns the Trails logic.</b> The buy drawer already runs its own purchase logic (<code>useBuyFlowActions</code>), an allowed exception to the "components only draw" rule. Default: Trails follows the same exception instead of moving the logic into the 7 places that open the drawer.</li>
+    <li><b>Q6, Vitest.</b> OK to install the first testing tool in the repo? Default: yes, Mohit's doc needs a test.</li>
+    <li><b>Q7, Google Tag Manager.</b> Analytics events go to <code>window.dataLayer</code>, which is how GTM collects them, but nothing in the code uses it today. Default: send the events anyway; they go nowhere until GTM is added. Worth asking Mohit.</li>
+    <li><b>Q8, resume after reload.</b> The code that finds unfinished purchases after a reload and shows a toast must run on every page. Default: <code>_app.tsx</code>, where the toast system already lives.</li>
+    <li><b>Q9, History banner.</b> The History page shows a banner while a Trails purchase is still running; there is no design. Default: a small notice banner above the list using our existing banner.</li>
+    <li><b>Q10, which lists refresh.</b> After a purchase the doc refreshes <code>domain_listing</code> and <code>domain</code>. The marketplace also uses <code>all_domain_listing</code> and <code>recent_transactions</code>. Default: refresh all four so nothing shows a sold domain.</li>
+    <li><b>Q11, price range.</b> The doc names a <code>PRICE_OUT_OF_RANGE</code> error but no range. Default: skip that check until Mohit gives the numbers.</li>
+    <li><b>Q12, widget dark mode and mobile.</b> Unknown whether the Trails widget can match our dark theme and fit a phone. Default: the phase 3 experiment answers it.</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h3>Pushing the lock file, and what DevOps needs</h3>
+  <p class="muted">Decided 5 Nov 2026. Plan §7.</p>
+  <ul>
+    <li><b>Both files, one commit.</b> Phase 2 changed <code>package.json</code> and <code>package-lock.json</code>. The lock file records the exact version of every package, including the hundreds underneath ours. The deploy server installs from it with <code>npm ci</code>, which is strict: push <code>package.json</code> without the lock file and the two disagree, so the deploy fails. Push neither and the server builds without Trails. Push both together and it installs exactly what we tested.</li>
+    <li><b>Who it's for.</b> DevOps (the deploy pipeline). Not the backend team: the backend is a separate repo with its own packages.</li>
+    <li><b>What DevOps needs that isn't in git.</b> <code>.env</code> is gitignored, so uat needs <code>NEXT_PUBLIC_TRAILS_API_KEY</code> (the uat key), <code>NEXT_PUBLIC_TRAILS_ENABLED=true</code> and <code>NEXT_PUBLIC_TRAILS_PILOT_WALLETS</code> (empty on uat) in its AWS environment, like the Polygon RPC setting. They're baked in at build time, so the uat build must run after they're set. Prod only with Mohit's approval and staff wallets in the pilot list.</li>
+    <li><b>First commit holds:</b> <code>package.json</code>, <code>package-lock.json</code>, <code>vitest.config.ts</code>, <code>src/types/trails/</code>, <code>src/helpers/trails/</code>, <code>src/constants/trails.ts</code>. <b>Never committed:</b> <code>node_modules</code>, <code>.env</code>, <code>CLAUDE.md</code>, <code>dev-docs/</code>, the spike page.</li>
+    <li><b>When.</b> Not yet. We wait until the phase 2 wallet regression (buy, list, delist) passes, so the viem upgrade doesn't reach anyone untested. Then commit and push on <code>trails</code> when the user says so.</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h3>The API key</h3>
+  <p>The widget can't run on localhost without the key: Trails lists <code>apiKey</code> as required, and without it the widget can't fetch a quote, which is exactly what the phase 3 checks test. When asking Mohit for the uat key, also ask him to allow <code>http://localhost:3002</code> in the Trails dashboard (his doc mentions allowed origins), or the key may be refused on localhost.</p>
+  <p>Only phase 3 (and the Trails receipt call in phase 5) needs the key. Phases 1, 2 and 4 don't, so the order while waiting is 1, 2, 4, then 3 as soon as the key arrives. UI phases (6 onwards) wait until the spike passes.</p>
+</div>
+
+<footer>Updated 5 Nov 2026.</footer>
+</div>
+<script>
+  document.getElementById('toggle').addEventListener('click', function () {
+    var root = document.documentElement;
+    var current = root.getAttribute('data-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('dmplan-theme', next); } catch (e) {}
+  });
+</script>
+</body>
+</html>

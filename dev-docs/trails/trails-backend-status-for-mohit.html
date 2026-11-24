@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trails Backend Status for Mohit</title>
+<script>
+  try {
+    var saved = localStorage.getItem('dmplan-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  } catch (e) {}
+</script>
+<style>
+  :root {
+    --bg: #f9f9f9; --surface: #ffffff; --surface-soft: #f3f4fe;
+    --text: #111111; --text-muted: #5b5b66; --border: #e6e6e6;
+    --accent: #2639ED; --accent-soft: #e9ebfd;
+    --wait: #9457f6; --wait-soft: #f4eefe;
+    --ok: #12805c; --ok-soft: #e4f5ee;
+    --warn: #b4540a; --warn-soft: #fdf1e4;
+    --bad: #c4314b; --bad-soft: #fdecef;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+      --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+      --accent: #7f8cff; --accent-soft: #1d2150;
+      --wait: #b996fa; --wait-soft: #2c2142;
+      --ok: #4fd1a0; --ok-soft: #173229;
+      --warn: #f5a35c; --warn-soft: #3a2614;
+      --bad: #ff7d93; --bad-soft: #3a1c24;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+    --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+    --accent: #7f8cff; --accent-soft: #1d2150;
+    --wait: #b996fa; --wait-soft: #2c2142;
+    --ok: #4fd1a0; --ok-soft: #173229;
+    --warn: #f5a35c; --warn-soft: #3a2614;
+    --bad: #ff7d93; --bad-soft: #3a1c24;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: "Satoshi", system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.6; }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 48px 16px 80px; }
+  header.top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+  .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; }
+  h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.15; margin: 0 0 12px; }
+  .lede { color: var(--text-muted); margin: 0; max-width: 680px; }
+  .lede a { color: var(--accent); }
+  .toggle { flex-shrink: 0; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 14px; cursor: pointer; }
+  .toggle:hover { border-color: var(--accent); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 32px; }
+  nav.toc a { font-size: 14px; text-decoration: none; color: var(--accent); background: var(--accent-soft); padding: 6px 12px; border-radius: 999px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 0 0 16px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+  .stat b { display: block; font-size: 26px; line-height: 1.2; }
+  .stat span { font-size: 13px; color: var(--text-muted); }
+  h2 { font-size: 22px; margin: 52px 0 16px; }
+  h3 { font-size: 18px; margin: 0; }
+  h4 { font-size: 15px; margin: 22px 0 8px; color: var(--accent); }
+  p { margin: 0 0 12px; }
+  .muted { color: var(--text-muted); font-size: 15px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
+  .card p:last-child { margin-bottom: 0; }
+  .card ul, .card ol { margin: 8px 0 0; padding-left: 20px; }
+  .card li { margin-bottom: 6px; }
+  code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .86em; background: var(--surface-soft); border-radius: 6px; padding: 1px 6px; word-break: break-word; }
+  .findings { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .finding { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+  .finding h3 { font-size: 16px; margin-bottom: 6px; }
+  .finding p { font-size: 15px; margin: 0; color: var(--text-muted); }
+  .tablecard { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow-x: auto; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: 0; }
+  th { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+  td.grp { font-weight: 600; color: var(--accent); background: var(--surface-soft); font-size: 13px; }
+  .sw { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .chip { width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(128,128,128,.45); flex-shrink: 0; }
+  .callout { border-left: 4px solid var(--wait); background: var(--wait-soft); border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; }
+  .callout p { margin: 0; }
+  .callout.ok { border-color: var(--ok); background: var(--ok-soft); }
+  .callout.warn { border-color: var(--warn); background: var(--warn-soft); }
+  .issue { display: grid; grid-template-columns: 28px 1fr; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--bad); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+  .issue .n { font-weight: 700; color: var(--bad); }
+  .issue p { margin: 0; font-size: 15px; }
+  .issue .where { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+  .phase { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px 24px; margin-bottom: 14px; }
+  .phase-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  .num { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 15px; flex-shrink: 0; }
+  .tag { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+  .tag.now { background: var(--ok-soft); color: var(--ok); }
+  .tag.wait { background: var(--wait-soft); color: var(--wait); }
+  .tag.size { background: var(--surface-soft); color: var(--text-muted); }
+  .tag.new { background: var(--warn-soft); color: var(--warn); }
+  .rows { display: grid; grid-template-columns: 130px 1fr; gap: 6px 16px; font-size: 15px; }
+  .rows dt { color: var(--text-muted); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; padding-top: 2px; }
+  .rows dd { margin: 0; }
+  ol.qs { counter-reset: q; list-style: none; padding: 0; margin: 0; }
+  ol.qs li { counter-increment: q; position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px 14px 56px; margin-bottom: 10px; }
+  ol.qs li::before { content: counter(q); position: absolute; left: 16px; top: 14px; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  ol.qs.team li::before { background: var(--wait-soft); color: var(--wait); }
+  ol.qs b { display: block; margin-bottom: 2px; }
+  ol.qs span { color: var(--text-muted); font-size: 15px; }
+  footer { margin-top: 56px; font-size: 13px; color: var(--text-muted); }
+  @media (max-width: 700px) {
+    header.top { flex-direction: column; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .findings { grid-template-columns: 1fr; }
+    .card, .phase { padding: 18px; }
+    .rows { grid-template-columns: 1fr; }
+    .rows dt { padding-top: 8px; }
+    ol.qs li { padding-left: 50px; }
+  }
+</style>
+<style>
+  .tag.done { background: var(--ok-soft); color: var(--ok); }
+  .tag.todo { background: var(--surface-soft); color: var(--text-muted); }
+  .meta { font-size: 14px; color: var(--text-muted); margin: 0 0 14px; }
+  .phase ul { margin: 6px 0 0; padding-left: 20px; font-size: 15px; }
+  .phase li { margin-bottom: 6px; }
+</style>
+<style>pre{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;overflow-x:auto;font-size:13px}</style>
+<style>.q { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 4px 16px 10px; margin: 12px 0; } .q h3 { font-size: 16px; margin: 12px 0 6px; } .q p { margin: 6px 0; } .q p{margin:0 0 4px} .q .meta{margin:0}</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <div>
+    <p class="eyebrow">Trails checkout · status for Mohit sir · 17 Nov 2026</p>
+    <h1>Frontend on the new Trails backend APIs</h1>
+    <p class="lede">Where the frontend stands after switching to the backend team's Trails APIs (document v2, 16 Nov), what we found on the backend while testing on stage, and the questions that need your answer. Branch <code>trails</code>, from <code>1622027</code>; all of this is committed as <code>02cd1d9</code> and pushed to <code>origin/trails</code> (17 Nov). Full build log: <a href="trails-backend-progress.html">trails-backend-progress.html</a>; plan: <a href="trails-backend-integration-plan.md">trails-backend-integration-plan.md</a>.</p>
+  </div>
+  <button class="toggle" id="toggle" type="button">Toggle theme</button>
+</header>
+
+<div class="stats">
+  <div class="stat"><b>0 to 6</b><span>phases coded (0 to 3 checked in the browser, 4 main path checked)</span></div>
+  <div class="stat"><b>126</b><span>automated tests passing (tsc and lint clean)</span></div>
+  <div class="stat"><b>2</b><span>backend bugs found (F1, F9)</span></div>
+  <div class="stat"><b>12</b><span>questions for you below</span></div>
+</div>
+
+<div class="callout warn">
+  <p><b>In one line:</b> the frontend now runs on the server APIs by default (prepare, attach, status, list, config). It works for tokens on other chains. Two backend problems block a clean release: <b>USDT on Polygon is always refused</b> (F9) and <b>a refunded payment can be shown as a sale with no refund email</b> (F1). Five new buyer messages need your approval.</p>
+</div>
+
+<p class="meta">Jump to: <a href="#built">What's built</a> · <a href="#tested">Tested by hand</a> · <a href="#bugs">Backend bugs</a> · <a href="#doc-notes">Notes on the API document</a> · <a href="#wording">Wording to approve</a> · <a href="#questions">Questions</a> · <a href="#next">Next</a></p>
+
+<h2 id="built">What's built (frontend)</h2>
+<div class="tablecard"><table>
+  <thead><tr><th>Phase</th><th>What</th><th>State</th></tr></thead>
+  <tbody>
+    <tr><td>0</td><td>Checked all five routes on stage: <code>/config</code> public and no-store; list, status, prepare 401 without login; list 200 with login</td><td>Done</td></tr>
+    <tr><td>1</td><td>Contract updated: <code>attachIntent</code> returns <code>{ status, intentId }</code>; <code>ALREADY_ATTACHED</code> added; list and config types</td><td>Done</td></tr>
+    <tr><td>2</td><td><code>backendCheckoutSource</code> on <code>callBackend</code>, same <code>CheckoutSource</code> interface. Prepare refuses if the returned <code>buyer</code> isn't the connected wallet. 404 "Checkout not found" ends quietly; 401 and 429 never end a purchase. Backend codes map to the existing screens</td><td>Done</td></tr>
+    <tr><td>3</td><td>Option shown only when <code>/config</code> says <code>enabled</code> and <code>available</code> (read on every drawer open) <b>and</b> the price is within <code>minPriceUsdt</code> / <code>maxPriceUsdt</code>. Pilot wallet env no longer read; hidden until the server answers or if it fails</td><td>Done, checked</td></tr>
+    <tr><td>4</td><td><code>ensureWalletVerified</code> before prepare (signature only when the login isn't fresh for this wallet); one forced retry on <code>WALLET_NOT_VERIFIED</code>. Attach answer handled: <code>mismatch</code> stops, <code>expired</code> offers Start again, <code>ALREADY_ATTACHED</code> logged. New screens W1 to W4</td><td>Coded; main path checked</td></tr>
+    <tr><td>5</td><td>Status from <code>GET /checkouts/:id</code> every 5 s (15 s after 5 min); no browser calls to Trails. 401 pauses with message W5 and resumes after login</td><td>Coded; needs a paid run</td></tr>
+    <tr><td>6</td><td>Resume and the /history banner from <code>GET /checkouts</code> (any device). Banner lists <code>executing,failed</code> only. Finished results shown once per browser. <b>Server path is now the default</b>; <code>NEXT_PUBLIC_TRAILS_SOURCE=browser</code> rolls back</td><td>Coded; needs a paid run</td></tr>
+    <tr><td>7</td><td>Receipt network fee note (API 6)</td><td>Waits for the backend release</td></tr>
+    <tr><td>8</td><td>Refund wording and the same wallet case</td><td>Waits for F1</td></tr>
+    <tr><td>9, 10</td><td>Remove the browser path; real money QA</td><td>Later</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="tested">Tested by hand (17 Nov, localhost:3002 on the stage API)</h2>
+<ol>
+  <li><b>APIs live:</b> all five routes answer as documented. <code>/config</code> on stage: available to everyone, minimum 0.10 USDT, no maximum, route RELAY 0.005.</li>
+  <li><b>Who sees the option:</b> shown for a listing of 0.10 USDT or more, hidden below. Pass.</li>
+  <li><b>Prepare and attach:</b> prepare 200, widget quotes, attach <code>attached</code>, status polling follows. Pass with BNB on BSC and other cross chain tokens.</li>
+  <li><b>USDT on Polygon:</b> attach answers <code>mismatch</code> every time (F9 below).</li>
+  <li><b>Not tested yet:</b> a real payment on the server path (status, "is yours", resume after reload, another device, login expiry). Planned as one real money session; the full list is in the progress doc ("Tests still to do", T1 to T17).</li>
+</ol>
+
+<h2 id="bugs">Backend bugs found (need a fix on the backend)</h2>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">F9</span><h3>USDT on Polygon quotes are always refused (verifier check 3)</h3></div>
+  <ol>
+    <li><b>What happens:</b> when the buyer picks USDT on Polygon in the widget, attach returns 200 <code>{ status: "mismatch", intentId: null }</code>, the drawer shows "Couldn't start the payment", and the internal alert email goes out. Every time, every buyer. Nothing is paid.</li>
+    <li><b>Your alert emails</b> are from my tests with wallet <code>0x5b1c…A24E</code> on swaparena.og (0.10 USDT): checkouts <code>47685799-0645-4797-9960-8da4ad00d58c</code>, <code>e799e978-8119-463d-8bb8-4e0f45c2be58</code>, <code>a947238c-78a3-4db3-b169-1d9bf450204a</code>, 06:31 to 06:41 UTC.</li>
+    <li><b>Cause:</b> for a same chain, same token quote Trails sends <b>no <code>destinationCalls</code></b>; its 4 calls are in <code>originCalls</code> and <code>quote.routeProviders</code> is empty (checked with <code>GetIntent</code> on all three intents: <code>0x9c64…a001</code>, <code>0xd34e…5701</code>, <code>0xd06d…5b01</code>). <code>intent-verifier.ts</code> <code>parse</code> fails check 3 ("destinationCalls is not the three call shape"); check 8 ("quote.routeProviders is missing") would fail too.</li>
+    <li><b>Why it matters:</b> the widget often starts on USDT on Polygon for buyers who hold it, so they hit the error at once.</li>
+    <li><b>Fix, option A:</b> support the same chain shape in the verifier (verify <code>originCalls</code> with the same rules: one Seaport call with our <code>fulfillCalldataHash</code>, USDT approve before it, recipient and sweep to the buyer, <code>EXACT_OUTPUT</code>; empty provider list allowed only here).</li>
+    <li><b>Fix, option B:</b> refuse it up front with its own code (for example <code>SAME_CHAIN_NOT_SUPPORTED</code>), no alert email; the drawer then says to use "USDT from your wallet" (new wording).</li>
+  </ol>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">F1</span><h3>A refunded payment can be saved as succeeded, with no refund email</h3></div>
+  <ol>
+    <li><b>What happens:</b> the same wallet buys a listing directly and also pays for it through Trails (the 12 Nov check 12). Trails refunds the Trails payment, but the checkout is saved as <code>succeeded</code>: the buyer sees "is yours" and no refund, <b>no refund email is sent</b> (<code>onRefunded</code> is skipped), and admin stats count a sale.</li>
+    <li><b>Cause:</b> <code>toCheckoutState</code> (<code>trails-tracker.rules.ts:132</code>) and <code>toStateFromRow</code> (<code>trails-checkout-state.mapper.ts</code>) mark success whenever a sale of the listing to that wallet exists (our old frontend rule 1, copied).</li>
+    <li><b>Suggested fix:</b> succeeded only when the sale's transaction is this checkout's <code>destinationTxHash</code>; otherwise keep Trails' status (refunded).</li>
+  </ol>
+</div>
+
+<h2 id="doc-notes">Notes on the API document (no backend change needed unless you say so)</h2>
+<ol>
+  <li><b>Resume list:</b> the document suggests <code>status=attached,executing</code>. <code>attached</code> is an unpaid quote, so we use <code>executing,failed</code> for the banner and resume.</li>
+  <li><b><code>/config</code> timing:</b> section 3 says call it when the drawer opens, section 6 says once in <code>getCheckoutSource()</code>. We read it on every drawer open.</li>
+  <li><b>Price range:</b> we hide the option for listings outside <code>minPriceUsdt</code> / <code>maxPriceUsdt</code>, so buyers never meet <code>PRICE_OUT_OF_RANGE</code> after choosing it.</li>
+  <li><b>Slippage:</b> we pass <code>route.slippageTolerance</code> (0.005) as asked, but the widget ignores it (its <code>QuoteIntent</code> has no slippage field, seen 12 Nov), so Trails uses Auto.</li>
+  <li><b>CHECKOUT_IN_PROGRESS</b> only appears once another buyer has <b>paid</b> (within 2 minutes); two buyers who only have a price open both get their own checkout.</li>
+</ol>
+
+<h2 id="wording">New buyer wording to approve</h2>
+<p class="meta">Approved by the user (Akshat) on 17 Nov and already in the code. Please approve or change each line.</p>
+<div class="tablecard"><table>
+  <thead><tr><th>#</th><th>When it shows</th><th>Title</th><th>Heading</th><th>Text</th><th>Buttons</th></tr></thead>
+  <tbody>
+    <tr><td>W1</td><td>Before the payment step, only when a signature is needed (login not fresh for this wallet)</td><td>Review purchase</td><td>Verify your wallet</td><td>Your wallet is open. Sign the message to confirm you own this wallet. It's free and doesn't move any money.</td><td>None (waiting for the wallet)</td></tr>
+    <tr><td>W2</td><td>Prepare answers <code>CHECKOUT_IN_PROGRESS</code></td><td>Not available</td><td>Someone else is paying for this domain</td><td>Another buyer started paying for it a moment ago. Try again in a couple of minutes.</td><td>Back, Close</td></tr>
+    <tr><td>W3</td><td>The signing wallet isn't linked to the account, or still not verified after one retry</td><td>Wrong wallet</td><td>This wallet isn't linked to your account</td><td>Connect the wallet you use with your Endless Domains account, or buy with USDT from your wallet.</td><td>Back, Close</td></tr>
+    <tr><td>W4</td><td>Attach answers <code>expired</code> (15 minute hold passed)</td><td>Price expired</td><td>Your price hold ran out</td><td>Prices are held for 15 minutes. Start again to get a new price. Nothing was charged.</td><td>Start again, Back</td></tr>
+    <tr><td>W5</td><td>The login expires (401) while a payment runs: on "Payment in progress", or once as a notice if the drawer is closed</td><td>Payment in progress</td><td>Buying name.og</td><td>Log in again to see your purchase status. Your purchase keeps going in the meantime.</td><td>Keep browsing</td></tr>
+  </tbody>
+</table></div>
+<p class="meta">A refused quote (<code>mismatch</code>) reuses the already approved screen "Couldn't start the payment / Nothing was charged. Please try again in a moment."</p>
+
+<h2 id="questions">Questions for you</h2>
+<p class="meta">Each has the default we use until you answer.</p>
+
+<div class="q"><p><b>1. F9, which fix?</b> Option A (verifier supports same chain quotes) or option B (refuse up front with its own code, no alert email)?</p><p class="meta">Default: none; buyers must pick a token on another chain.</p></div>
+<div class="q"><p><b>2. F1, is the suggested rule right?</b> Succeeded only when the sale's transaction equals the checkout's <code>destinationTxHash</code>, otherwise keep Trails' status. And should the drawer then also say "You already own it" next to the refund?</p><p class="meta">Default: wait for the backend; our phase 8 waits on it.</p></div>
+<div class="q"><p><b>3. Release order.</b> The server path is now the frontend default. Deploy only after F9 is fixed, or deploy with <code>NEXT_PUBLIC_TRAILS_SOURCE=browser</code> until then?</p><p class="meta">Default: don't deploy the server path to buyers until F9 is fixed.</p></div>
+<div class="q"><p><b>4. Wording W1 to W5:</b> approve or change (table above)? Including the titles (Not available, Wrong wallet, Price expired) and the name "price hold" for the 15 minute window.</p><p class="meta">Default: as written.</p></div>
+<div class="q"><p><b>5. "A couple of minutes" in W2:</b> is 2 minutes the real <code>CHECKOUT_IN_PROGRESS</code> window, and should it count from payment (what we saw) or from the other buyer's quote?</p><p class="meta">Default: keep the wording.</p></div>
+<div class="q"><p><b>6. Alert emails:</b> should the "intent mismatch" alert skip cases the buyer causes (like F9), so the inbox only gets real problems?</p><p class="meta">Default: unchanged.</p></div>
+<div class="q"><p><b>7. Slippage:</b> the widget ignores <code>slippageTolerance</code>, so Trails uses Auto. Keep Auto and report it to Trails, or force 0.5% through the widget's <code>localStorage['trails-slippage-tolerance']</code>?</p><p class="meta">Default: keep Auto (Q13, open since 11 Nov).</p></div>
+<div class="q"><p><b>8. Results shown once:</b> we show a finished purchase's result once per browser (a small localStorage list, the list API has no "seen" flag). Enough, or should the backend keep a "seen" flag so it's once per account?</p><p class="meta">Default: once per browser.</p></div>
+<div class="q"><p><b>9. Resume list:</b> OK that we read <code>executing,failed</code> (paid) instead of the document's <code>attached,executing</code>? Anything else the list should return (for example the refund amount or the fill transaction)?</p><p class="meta">Default: <code>executing,failed</code>; nothing extra.</p></div>
+<div class="q"><p><b>10. API 6 (receipt note):</b> when does the support tooling branch reach uat?</p><p class="meta">Default: phase 7 waits.</p></div>
+<div class="q"><p><b>11. "You paid 0.10 USDT"</b> on the receipt of a Trails purchase paid in another token: will sales get a <code>paymentMethod</code> so the receipt can say "Paid through Trails"?</p><p class="meta">Default: wait for the backend (Q21).</p></div>
+<div class="q"><p><b>12. Rollback switch:</b> OK to keep the browser path behind <code>NEXT_PUBLIC_TRAILS_SOURCE=browser</code> until production is proven, then delete it (phase 9)?</p><p class="meta">Default: yes.</p></div>
+
+<h2 id="next">What's next</h2>
+<ol>
+  <li><b>Akshat:</b> one real money session on stage (0.10 to 0.30 USDT, a token on another chain): full purchase, login expiry, reload, another device, History banner, result shown once.</li>
+  <li><b>Backend:</b> F9 and F1 fixes; API 6 release.</li>
+  <li><b>You:</b> the 12 questions and the wording.</li>
+  <li><b>Then:</b> phase 7 and 8, commit, deploy (after question 3), phase 9 clean up once production is stable.</li>
+</ol>
+
+<footer>Prepared 17 Nov 2026. Earlier status (before the backend APIs): <a href="trails-status-for-mohit.html">trails-status-for-mohit.html</a>.</footer>
+</div>
+<script>
+  document.getElementById('toggle').addEventListener('click', function () {
+    var root = document.documentElement;
+    var current = root.getAttribute('data-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('dmplan-theme', next); } catch (e) {}
+  });
+</script>
+</body>
+</html>

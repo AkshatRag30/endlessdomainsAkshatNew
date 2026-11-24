@@ -1,0 +1,1440 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bulk Listing Progress</title>
+<script>
+  try {
+    var saved = localStorage.getItem('dmplan-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  } catch (e) {}
+</script>
+<style>
+  :root {
+    --bg: #f9f9f9; --surface: #ffffff; --surface-soft: #f3f4fe;
+    --text: #111111; --text-muted: #5b5b66; --border: #e6e6e6;
+    --accent: #2639ED; --accent-soft: #e9ebfd;
+    --wait: #9457f6; --wait-soft: #f4eefe;
+    --ok: #12805c; --ok-soft: #e4f5ee;
+    --warn: #b4540a; --warn-soft: #fdf1e4;
+    --bad: #c4314b; --bad-soft: #fdecef;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+      --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+      --accent: #7f8cff; --accent-soft: #1d2150;
+      --wait: #b996fa; --wait-soft: #2c2142;
+      --ok: #4fd1a0; --ok-soft: #173229;
+      --warn: #f5a35c; --warn-soft: #3a2614;
+      --bad: #ff7d93; --bad-soft: #3a1c24;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+    --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+    --accent: #7f8cff; --accent-soft: #1d2150;
+    --wait: #b996fa; --wait-soft: #2c2142;
+    --ok: #4fd1a0; --ok-soft: #173229;
+    --warn: #f5a35c; --warn-soft: #3a2614;
+    --bad: #ff7d93; --bad-soft: #3a1c24;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: "Satoshi", system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.6; }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 48px 16px 80px; }
+  header.top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+  .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; }
+  h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.15; margin: 0 0 12px; }
+  .lede { color: var(--text-muted); margin: 0; max-width: 680px; }
+  .lede a { color: var(--accent); }
+  .toggle { flex-shrink: 0; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 14px; cursor: pointer; }
+  .toggle:hover { border-color: var(--accent); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 32px; }
+  nav.toc a { font-size: 14px; text-decoration: none; color: var(--accent); background: var(--accent-soft); padding: 6px 12px; border-radius: 999px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 0 0 16px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+  .stat b { display: block; font-size: 26px; line-height: 1.2; }
+  .stat span { font-size: 13px; color: var(--text-muted); }
+  h2 { font-size: 22px; margin: 52px 0 16px; }
+  h3 { font-size: 18px; margin: 0; }
+  h4 { font-size: 15px; margin: 22px 0 8px; color: var(--accent); }
+  p { margin: 0 0 12px; }
+  .muted { color: var(--text-muted); font-size: 15px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
+  .card p:last-child { margin-bottom: 0; }
+  .card ul, .card ol { margin: 8px 0 0; padding-left: 20px; }
+  .card li { margin-bottom: 6px; }
+  code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .86em; background: var(--surface-soft); border-radius: 6px; padding: 1px 6px; word-break: break-word; }
+  .findings { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .finding { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+  .finding h3 { font-size: 16px; margin-bottom: 6px; }
+  .finding p { font-size: 15px; margin: 0; color: var(--text-muted); }
+  .tablecard { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow-x: auto; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: 0; }
+  th { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+  td.grp { font-weight: 600; color: var(--accent); background: var(--surface-soft); font-size: 13px; }
+  .sw { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .chip { width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(128,128,128,.45); flex-shrink: 0; }
+  .callout { border-left: 4px solid var(--wait); background: var(--wait-soft); border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; }
+  .callout p { margin: 0; }
+  .callout.ok { border-color: var(--ok); background: var(--ok-soft); }
+  .callout.warn { border-color: var(--warn); background: var(--warn-soft); }
+  .issue { display: grid; grid-template-columns: 28px 1fr; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--bad); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+  .issue .n { font-weight: 700; color: var(--bad); }
+  .issue p { margin: 0; font-size: 15px; }
+  .issue .where { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+  .phase { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px 24px; margin-bottom: 14px; }
+  .phase-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  .num { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 15px; flex-shrink: 0; }
+  .tag { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+  .tag.now { background: var(--ok-soft); color: var(--ok); }
+  .tag.wait { background: var(--wait-soft); color: var(--wait); }
+  .tag.size { background: var(--surface-soft); color: var(--text-muted); }
+  .tag.new { background: var(--warn-soft); color: var(--warn); }
+  .rows { display: grid; grid-template-columns: 130px 1fr; gap: 6px 16px; font-size: 15px; }
+  .rows dt { color: var(--text-muted); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; padding-top: 2px; }
+  .rows dd { margin: 0; }
+  ol.qs { counter-reset: q; list-style: none; padding: 0; margin: 0; }
+  ol.qs li { counter-increment: q; position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px 14px 56px; margin-bottom: 10px; }
+  ol.qs li::before { content: counter(q); position: absolute; left: 16px; top: 14px; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  ol.qs.team li::before { background: var(--wait-soft); color: var(--wait); }
+  ol.qs b { display: block; margin-bottom: 2px; }
+  ol.qs span { color: var(--text-muted); font-size: 15px; }
+  footer { margin-top: 56px; font-size: 13px; color: var(--text-muted); }
+  @media (max-width: 700px) {
+    header.top { flex-direction: column; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .findings { grid-template-columns: 1fr; }
+    .card, .phase { padding: 18px; }
+    .rows { grid-template-columns: 1fr; }
+    .rows dt { padding-top: 8px; }
+    ol.qs li { padding-left: 50px; }
+  }
+</style>
+<style>
+  .tag.done { background: var(--ok-soft); color: var(--ok); }
+  .tag.review { background: var(--warn-soft); color: var(--warn); }
+  .tag.todo { background: var(--surface-soft); color: var(--text-muted); }
+  .meta { font-size: 14px; color: var(--text-muted); margin: 0 0 14px; }
+  .phase h4:first-of-type { margin-top: 14px; }
+  .phase h5 { margin: 18px 0 6px; font-size: 14px; }
+  .phase ul, .phase ol { margin: 6px 0 0; padding-left: 20px; font-size: 15px; }
+  .phase li { margin-bottom: 6px; }
+  .preview { display: flex; gap: 12px; flex-wrap: wrap; margin: 8px 0 4px; }
+  .pill { position: relative; width: 108px; height: 44px; border-radius: 999px; border: 2.5px solid; }
+  .pill i { position: absolute; top: 3.5px; width: 32.5px; height: 32.5px; border-radius: 50%; border: 1.4px solid; }
+  .pill.l { background: #000; border-color: #000; } .pill.l i { left: 5px; background: #fff; border-color: #000; }
+  .pill.d { background: #fff; border-color: #fff; box-shadow: 0 0 0 1px var(--border); } .pill.d i { left: 63.5px; background: #000; border-color: #fff; }
+  .preview span { font-size: 13px; color: var(--text-muted); display: block; margin-top: 4px; }
+</style>
+<style>
+  .tag.done { background: var(--ok-soft); color: var(--ok); }
+  .tag.review { background: var(--warn-soft); color: var(--warn); }
+  .tag.todo { background: var(--surface-soft); color: var(--text-muted); }
+  .meta { font-size: 14px; color: var(--text-muted); margin: 0 0 14px; }
+  .phase h4:first-of-type { margin-top: 14px; }
+  .phase ul, .card ul { margin: 6px 0 0; padding-left: 20px; font-size: 15px; }
+  .phase li { margin-bottom: 6px; }
+  td code { white-space: normal; }
+  td.ph { white-space: nowrap; color: var(--text-muted); font-size: 13px; }
+  .folder { font-size: 15px; margin: 26px 0 8px; color: var(--text); }
+  .folder code { font-size: .92em; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">Bulk listing · progress log</p>
+      <h1>Bulk listing progress</h1>
+      <p class="lede">Pick many unlisted names on My Domains (<code>/seller-hub/my-domains</code>) and list them from one drawer (Figma section <code>172:16293</code>). Plan and phase prompts: <code>dev-docs/bulk-listing/bulk-listing-implementation-plan.md</code>. One signature per name until the backend accepts one signature for a whole batch (plan §8.2, phase 6).</p>
+    </div>
+    <button class="toggle" id="toggle" type="button">Toggle theme</button>
+  </header>
+
+  <nav class="toc"><a href="#v2">v2: one signature</a><a href="#v2review">Review fixes</a><a href="#v2optimise">Optimisations</a><a href="#v2safeguards">Safeguards</a><a href="#v2phase7">v2 Phase 7</a><a href="#v2phase6">v2 Phase 6</a><a href="#v2phase5">v2 Phase 5</a><a href="#v2editprice">Edit price</a><a href="#v2phase8">v2 Phase 8</a><a href="#v2phase4">v2 Phase 4</a><a href="#v2phase3">v2 Phase 3</a><a href="#walletmatrix">Wallet matrix</a><a href="#v2testing">v2 testing</a><a href="#status">Status</a><a href="#phase5">Phase 5</a><a href="#phase4">Phase 4</a><a href="#phase3">Phase 3</a><a href="#phase2">Phase 2</a><a href="#phase1">Phase 1</a><a href="#answers">Waiting on</a></nav>
+
+  <h2 id="v2">v2: one signature (Nov 2026)</h2>
+  <p class="meta">Mohit's requirements (10 Nov), Phase 1, tickets F1 to F9. Plan: <code>bulk-listing-v2-plan.md</code>. Review: <code>bulk-listing-v2-review.html</code>. Tickets explained simply: <code>bulk-listing-v2-tickets-explained.html</code>. Branch <code>bulk-list</code>. Newest phase first; the <a href="#v2testing">v2 testing log</a> is at the end of this section.</p>
+  <div class="tablecard"><table>
+    <tr><th>Phase</th><th>Scope</th><th>State</th></tr>
+    <tr><td>0</td><td>Review, decisions, messages (no code)</td><td><span class="tag review">Reviewed 19 Nov; messages not sent yet</span></td></tr>
+    <tr><td>1</td><td>F1: rebase onto uat</td><td><span class="tag done">Done and pushed 19 Nov (8209a6a)</span></td></tr>
+    <tr><td>2</td><td>F2 part 1: bulk signature helpers</td><td><span class="tag done">Built 19 Nov, committed 20 Nov (ce32655), pushed</span></td></tr>
+    <tr><td>3</td><td>F2 part 2, F6 item 4: sign once, post once (real B1 on uat)</td><td><span class="tag done">Built 20 Nov, MetaMask tested on uat, committed 7bda94f, pushed</span></td></tr>
+    <tr><td>4</td><td>F3, F9 decision 10: per name fallback, smart wallet notice, network check at List</td><td><span class="tag done">Built 20 Nov, MetaMask tested, committed 23 Nov (e456f1d), pushed 24 Nov</span></td></tr>
+    <tr><td>5</td><td>F4, F6 items 1 to 3, F8: drawer fixes (two pricing cards, signed dates, real Cancel, wording)</td><td><span class="tag done">Built 23 Nov, MetaMask tested (bulk), committed 23 Nov (e456f1d), pushed 24 Nov</span></td></tr>
+    <tr><td>6</td><td>F5: approvals per contract, real fee, wrong network fix</td><td><span class="tag done">Built 23 Nov, MetaMask tested (part A), committed 23 Nov (e456f1d), pushed 24 Nov</span></td></tr>
+    <tr><td>7</td><td>F9: 7 and 14 day rules, chain first, expiry on chain, <code>?bulk=1</code></td><td><span class="tag done">Built 24 Nov, automated checks pass, manual test not reported; committed a59939a, pushed 24 Nov</span></td></tr>
+    <tr><td>8</td><td>F7: on chain delist, single and bulk; row states on My Domains (option A); older listing prompt</td><td><span class="tag done">Built 23 Nov, MetaMask tested on uat, committed 23 Nov (e456f1d), pushed 24 Nov</span></td></tr>
+    <tr><td>8+</td><td>Edit price: free price cuts (V7 option B, decision 1)</td><td><span class="tag done">Built 23 Nov, MetaMask tested, committed 23 Nov (e456f1d), pushed 24 Nov</span></td></tr>
+    <tr><td>8o</td><td>Optimisations: one Multicall3 expiry read (the polling part went with the safeguards)</td><td><span class="tag done">Built 24 Nov, automated checks pass; committed a59939a, pushed 24 Nov</span></td></tr>
+    <tr><td>8s</td><td>Cancel safeguards (after the 24 Nov stage outage)</td><td><span class="tag todo">Removed 24 Nov after the code review, pending Mohit sir; clearer toast kept</span></td></tr>
+    <tr><td>R</td><td>Code review fixes: steps 2, 3, 4 and 6, login expired message, Escape on dropdowns, dark drawer text colours</td><td><span class="tag done">Built 24 Nov, tested on 3002, committed 8df9b76, 0a070bd, a59939a, pushed 24 Nov</span></td></tr>
+    <tr><td>8b</td><td>My Listings page</td><td><span class="tag todo">Dropped 23 Nov (your decision: option A covers it)</span></td></tr>
+    <tr><td>9 to 10</td><td>Backend cross checks, QA</td><td><span class="tag todo">Not started</span></td></tr>
+  </table></div>
+  <div class="callout ok"><p><b>19 Nov evening: the backend is live on uat.</b> Guru merged all bulk listing work (B1 to B7, BL-01 to BL-10) into uat (PR #1024) and the uat server runs it. The plan was updated the same evening: no mocks, phases 3 and 8 use the real endpoints, phase 9 shrinks to cross checks. Only B8 (a real Trails test buy) is left, in phase 10.</p></div>
+  <div class="callout"><p><b>20 Nov morning: two new things on uat.</b></p><ul><li><b>Backend fix, PR #1025 (19 Nov, 19:44).</b> After PR #1024 went live, every <code>POST /orders/bulk</code> failed with 503 <code>CHAIN_UNAVAILABLE</code>: the backend read Polygon through Multicall3 in a way ethers treated as a transaction. Guru switched it to a plain read (<code>staticCall</code>) and added a test so it can't come back. Nothing changes for us; it just means bulk posts work now.</li><li><b>Guru's Bulk Listing Testing page</b>, <code>/bulk-listing-testing</code> in this frontend repo (PRs #238 to #240, merged into uat). An internal page that lists in bulk with one signature, shows My Domains and My Listings, cancels on chain and off chain, relists, runs the estimator, and logs every request and answer. It shows on every host except <code>marketplace.endlessdomains.io</code>, with <code>noindex</code>. Its code is in <code>src/bulk-listing-testing/</code> plus <code>scripts/bulk-signing-check.ts</code>.</li><li><b>It confirms our phase 2 work.</b> His ethers 5 port (<code>src/bulk-listing-testing/bulkSigning.ts</code>) builds the same tree and computes the type hash from the full EIP712 type string, exactly like ours, so the type hash question is answered. One difference: he sends the 65 byte signature, we send the 64 byte short form (as Seaport.js and F2 do); the backend accepts both.</li><li><b>Also answered:</b> <code>GET /marketplacev2/orders/{hash}</code> returns the full order for any status and only blanks the signature once the order isn't active. Seaport's cancel doesn't need the signature, so orders delisted off chain earlier can still be cancelled on chain (phase 8).</li><li>Later the same morning: phase 2 was committed (<code>ce32655</code>) and uat was <b>merged</b> into bulk-list (<code>4da0b6c</code>, no conflicts, type check clean), so the page is now on our branch too. From now on uat is merged in rather than rebased; the phase 1 cleanup is done, so a rebase would only add a force push.</li></ul></div>
+
+  <h2 id="v2review">v2 Code review fixes · 24 Nov 2026</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">R</span><h3>Fixes from the overall code review (steps 2, 3, 4, 6)</h3><span class="tag done">Built, tested on 3002, committed a59939a and pushed 24 Nov</span></div>
+    <p class="meta">24 Nov 2026 · source: <code>bulk-list-code-review.html</code> §11 (0 critical, 5 high, 17 medium, 29 low) · wording approved first as a drawn page (<code>wording/review-fixes-wording.html</code>, A to H, plus I for the login message) · 8 new tests, 240 in total, all green · commits <code>8df9b76</code> (dark drawer colours), <code>0a070bd</code> (FilterDropdown Escape), <code>a59939a</code> (phase 7 and these fixes), pushed to origin/bulk-list</p>
+
+    <h4>1. Before starting</h4>
+    <ul>
+      <li>You asked for every step explained in plain words inside the review doc first (§11: what's wrong, what I'd change, the files, the new wording), and whether the changes were big enough to shake the codebase. They weren't: all are local to the bulk and single listing drawers, so you said "do it".</li>
+      <li><b>Step 1</b> (the cancel safeguards) was already closed by removing them, pending Mohit sir. That resolved H1, H2, H3, M6, M12, M13 and L18.</li>
+      <li><b>Step 6</b>, the project structure: you chose <b>option B</b>, record the violations now and refactor later with the other pages.</li>
+    </ul>
+
+    <h4>2. Step 2 · Cancel only while it can really cancel (H4, L4, L12)</h4>
+    <div class="tablecard"><table>
+      <tr><th>#</th><th>What you see now</th><th>Code</th></tr>
+      <tr><td>H4 single</td><td>After you sign, the drawer shows "Publishing your listing" with "Your signature is in. We're putting the listing on the marketplace; this takes a few seconds." and no Cancel button, so a Cancel can no longer claim "Nothing was listed" while the hide or post carries on (worst case before: Edit price hid the old listing, the new post failed, and you were told nothing changed)</td><td><code>listingOrder.ts</code> <code>signAndPostListingOrder(…, beforePost, onPublishing)</code>, called before the hide and again on the 401 re-proof path; <code>useListingFlowActions.ts</code> phase <code>'publishing'</code>; <code>ListingFlowModal.tsx</code> <code>PUBLISHING_HEADING</code>, footer hidden while publishing</td></tr>
+      <tr><td>H4 bulk</td><td>"Sign each name separately": Cancel is hidden while a name is being posted, so a name that goes live is never marked "Stopped before signing"</td><td><code>bulkSigning.ts</code> phase <code>{ kind: 'publishing' }</code> per name; <code>BulkListingFlowModal.tsx</code> hides Cancel on it</td></tr>
+      <tr><td>L4</td><td>Two names failing in a row with the same wallet error stop the loop; the rest read "Stopped after repeated wallet errors"</td><td><code>bulkSigning.ts</code> <code>STOPPED_REPEATED_ERRORS</code>, <code>lastError</code></td></tr>
+      <tr><td>L12</td><td>Single drawer: an old approval finishing after Cancel no longer re-enables the button during the new attempt</td><td><code>ListingFlowModal.tsx</code> <code>if (!cancelled()) setSubmitting(false)</code></td></tr>
+    </table></div>
+
+    <h4>3. Step 3 · Read the marketplace's answers correctly (M1 to M4, M14, L2, L7)</h4>
+    <div class="tablecard"><table>
+      <tr><th>#</th><th>What you see now</th><th>Code</th></tr>
+      <tr><td>M1</td><td>A retried batch answered "duplicate order" for a listing that was sold or delisted since reads "No longer active" and isn't offered in Try these again; only <code>status: 'listed'</code> counts as live</td><td><code>bulkBatch.ts</code> <code>DUPLICATE_ORDER</code>, <code>NOT_RETRYABLE</code></td></tr>
+      <tr><td>M2</td><td>An "OK" answer with an empty or broken body is a failed post with the normal Try again screen, instead of a stuck "Publishing"</td><td><code>bulkOrders.service.ts</code> checks <code>result.results</code></td></tr>
+      <tr><td>M3</td><td>Try again after switching wallet goes back to the form with the existing "This wallet is not linked…" message, instead of proving the new wallet; the backend's "signed by a different wallet" reads "Signed with a different wallet" and isn't retried</td><td><code>useBulkListingActions.ts</code> <code>postWithProof</code> checks the offerer first; <code>bulkBatch.ts</code> <code>OFFERER_NOT_CALLER</code></td></tr>
+      <tr><td>M4</td><td>Only network trouble, 5xx and 429 offer Try again. A refused batch (400, 403, 404, 409, 422) goes back to the form with "The marketplace couldn't accept this batch, so nothing was listed. Check the names and prices, then try again."; a wrong wallet and a rejected proof go back with their own messages</td><td><code>classifyBulkBatchError</code> (<code>'batch-refused'</code>); <code>BulkListingFlowModal.tsx</code> <code>NOT_SIGNED_TEXT</code>, <code>showOutcome</code></td></tr>
+      <tr><td>M14</td><td>Delisting an order already sold, expired or confirmed cancelled (say from another device) is reported as already gone before the wallet opens, so no fee is paid for nothing</td><td><code>cancelOrders.service.ts</code> <code>fetchSignedOrder</code> returns null for those; <code>onChainCancel.ts</code> <code>'already-gone'</code></td></tr>
+      <tr><td>L2</td><td>Switching wallet account between List and signing shows the wrong wallet message, not a useless "Sign each name separately" offer</td><td><code>useBulkListingActions.ts</code> <code>signTree</code> re-reads the address</td></tr>
+      <tr><td>L7</td><td>Try again can be cancelled while the wallet proof is open, and a post that hangs ends after 45 s in the normal Try again screen</td><td><code>withTimeout</code> (45 s); <code>retryBulkPost</code> with <code>isCancelled</code>; <code>handleCancelRetryCheck</code></td></tr>
+      <tr><td>I (added)</td><td>A 401 anywhere in listing, bulk listing or delist reads "Your login has expired. Please log in again." Added after your test hit a 401 on <code>wallet-nonce</code> (an expired login, not a code fault)</td><td><code>listingOrder.ts</code> <code>LOGIN_EXPIRED_TEXT</code>; <code>'login-expired'</code> in <code>classifyBulkBatchError</code>, <code>classifyCancelError</code> and the per name loop (stops it)</td></tr>
+    </table></div>
+
+    <h4>4. Step 4 · Drawer details (M5, M7 to M11, M13, L5, L6, L8)</h4>
+    <div class="tablecard"><table>
+      <tr><th>#</th><th>What you see now</th><th>Code</th></tr>
+      <tr><td>M5</td><td>Names skipped for expiring within 14 days no longer count in "applies to all N", the Domains row, the totals, the fee, "You receive", the title or the approval step</td><td><code>BulkListingFlowModal.tsx</code> <code>listableCount</code>, <code>listableTotals</code>; <code>listCount</code> prop on the form</td></tr>
+      <tr><td>M7</td><td>Escape on an open filter dropdown only closes the dropdown; bulk mode and the selection stay. This fixes every FilterDropdown in the app</td><td><code>FilterDropdown.tsx</code> document Escape listener while open, with <code>preventDefault</code>; the page checks <code>event.defaultPrevented</code></td></tr>
+      <tr><td>M8</td><td>Cancel on the approval screen while the approval is mining, then trying again, waits for that approval instead of sending a second paid one</td><td><code>useNftApprovals.ts</code> in flight <code>Map</code> per contract</td></tr>
+      <tr><td>M9</td><td>Cancel older listings: "Cancel sent. Waiting for the marketplace to confirm it, then you can list these names again." until it's confirmed, then Try these again</td><td><code>cheaperState</code> <code>'waiting'</code>; <code>BulkListingSuccessStep.tsx</code></td></tr>
+      <tr><td>M10</td><td>Switching account inside the wallet rechecks smart wallet and verify wallet at once</td><td>effects depend on <code>approvals.walletAddress</code></td></tr>
+      <tr><td>M11</td><td>Clicking outside on the approval step asks "Discard this bulk listing?" too</td><td><code>BulkListingFlowModal.tsx</code></td></tr>
+      <tr><td>M13</td><td>My Domains checks unconfirmed cancels only while one is really pending, and stops when the wallet proof isn't fresh</td><td><code>usePendingCancels.ts</code></td></tr>
+      <tr><td>L5</td><td>Result title follows the result: "Successfully Listed", "Partly listed" or "Not listed"</td><td><code>BulkListingSuccessStep.tsx</code></td></tr>
+      <tr><td>L6</td><td>"Set each one myself" starts every row from the same price; going back with typed prices asks "Use one price for every name?" (The prices you set for N names will be replaced. · Use one price / Keep my prices)</td><td><code>bulkListing.ts</code> <code>setBulkMode(draft, mode, ids)</code>, <code>typedPriceCount</code>; <code>useBulkListingDraft.ts</code>; ConfirmDrawer in the modal</td></tr>
+      <tr><td>L8</td><td>"Sign each name separately" numbers only the names that can be signed and counts done as really listed (no more "1 of 5 done" before anything listed)</td><td><code>bulkSigning.ts</code> <code>position</code>, <code>signableTotal</code>, <code>done</code>; <code>BulkListingSigningStep.tsx</code> <code>done</code> prop</td></tr>
+    </table></div>
+
+    <h4>5. Step 6 · Project structure (option B, your choice)</h4>
+    <ul>
+      <li><b>Recorded</b> as known violation 6 in CLAUDE.md §8 (local only) and rows M8 to M10 in <code>dev-docs/layering/layering-cleanup-plan.md</code> §3.5: <code>listingOrder.ts</code> calling the backend from a composite folder, <code>useBulkListingActions</code> importing from that folder, and the drawers calling data hooks. Refactor later with the other pages.</li>
+      <li><b>Done now, the cheap parts:</b> the shared phase types (<code>BulkBatchPhase</code>, <code>BulkSigningPhase</code>, <code>BulkRejectChoice</code>, <code>BulkFailureReason</code>, <code>CancelPhase</code>) moved to <code>types/my-domains/bulk.ts</code>, and <code>MAX_PRICE</code> to the new <code>data/my-domains/pricing.ts</code>. The old files re-export them, so no import broke. <code>helpers/my-domains</code> now passes the §8 rule 3 grep.</li>
+    </ul>
+
+    <h4>6. Also in these commits (24 Nov)</h4>
+    <ul>
+      <li><b>Dark drawer text colours</b> (<code>8df9b76</code>): compared with the Figma dark drawers (list, buy, bulk). Headings, labels, helper lines, the Total and "You receive" values are white in dark (they were grey or the blue accent). The divider line change was tried and reverted at your request ("it was good before"); no border changed. Files: <code>ListingFormStep</code>, <code>FeeBreakdownRow</code>, <code>DomainInsightsCard</code>, <code>WhatYouPaySection</code>, <code>AfterYouBuySection</code>, <code>BulkListingFormStep</code>, <code>SegmentedToggle</code>, <code>KeyValueRows</code>, <code>Modal</code> (close button and footer). Light mode unchanged.</li>
+    </ul>
+
+    <h4>7. Checks and test results</h4>
+    <ul>
+      <li><b>Automated:</b> 8 new Vitest tests: <code>bulkSigning.test.ts</code> (new, 3: stop after the same error twice, keep going when errors differ, L8 counting), <code>bulkBatch.test.ts</code> (1 new and 1 corrected for M1), <code>bulkPhase7.test.ts</code> (2 for L6), <code>onChainCancel.test.ts</code> (kept toast). Full suite 240 pass. <code>tsc</code> clean. ESLint only the old warning (an unused disable in <code>ListingFlowModal</code>). SCSS compile check ok. §8 rule 3 grep on <code>helpers</code> now prints nothing.</li>
+      <li><b>Manual (you, 3002, MetaMask, dark, 24 Nov):</b> step 2: Edit price and single listing show "Publishing your listing" with no Cancel, and the delist works. Step 3: a bulk list went through; the 401 on <code>wallet-nonce</code> led to adding message I, then it showed correctly. Step 4: Escape first still cleared the selection (the dropdown opened by mouse never got the key); fixed in <code>FilterDropdown</code> and retested, passing. Typed prices are kept when switching pricing.</li>
+      <li><b>Not tried by hand:</b> M2 broken body, M3 wallet switch before Try again, M8 approval while mining, M9 waiting line, L4 repeated wallet errors, L7 45 s time limit, the dark text colours in the buy drawer, light mode and phone width. Covered by tests where it's logic.</li>
+    </ul>
+
+    <h4>8. Not done yet</h4>
+    <ul>
+      <li><b>Step 5:</b> tests for the drawer's money maths in <code>bulkListing.ts</code> (price checks, exact USDT units, totals). No product change.</li>
+      <li><b>Step 7:</b> the small items (accessibility, a minimum price, the real approval fee, comments, tokens). Can go after the PR.</li>
+    </ul>
+  </div>
+
+  <h2 id="v2optimise">v2 Optimisations · 24 Nov 2026</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">8o</span><h3>Cheaper expiry reads, polling that stops (phase 7 and safeguards)</h3><span class="tag done">Built, automated checks pass; not checked in the browser; not committed</span></div>
+    <p class="meta">24 Nov 2026 · no wording changes, so no approval page · 1 new test, 238 in total, all green</p>
+
+    <h4>1. Why</h4>
+    <ul>
+      <li>You asked whether phase 7 and the safeguards were optimised and still needed once everything is built. All pieces stay needed (the record retry becomes a rarely used safety net); two spots were heavier than they had to be.</li>
+      <li>Both were checked against the documents first (your question, 24 Nov): the PDF's B3 asks the backend to "batch the chain reads through Multicall3", and the plan says Cancelling is "refreshed every 15 to 30 seconds <b>until it changes</b>".</li>
+    </ul>
+
+    <h4>2. What changed</h4>
+    <div class="tablecard"><table>
+      <tr><th>#</th><th>Before</th><th>After</th><th>Code</th></tr>
+      <tr><td>1</td><td>Drawer read each name's <code>expiryOf</code> separately on open, and again for every name at List: up to 100 RPC calls for 50 names</td><td><b>One Multicall3 call</b> for the whole batch (<code>aggregate3</code>, allowFailure per name). At List, a read under a minute old is reused; only names it missed are read again. A failed batch read falls back to the database dates (the backend still checks on chain)</td><td><code>useBulkListingActions.ts</code> <code>MULTICALL3_ADDRESS</code> (32), <code>readChainExpiries</code> (243); <code>BulkListingFlowModal.tsx</code> <code>EXPIRY_READ_FRESH_MS</code> (45), <code>chainExpiriesReadAt</code> (117), reuse at List (333)</td></tr>
+      <tr><td>2</td><td>After a cancel, My Domains kept polling every 20 s for up to 30 minutes, even after the row had changed</td><td>The page passes its live listings; a remembered cancel whose row is no longer for sale is dropped at once, and polling stops when nothing is left. Nothing is dropped while the page is loading</td><td><code>onChainCancel.ts</code> <code>settledSentCancels</code> (208); <code>usePendingCancels.ts</code> <code>liveSentHashes</code> (16), settle on change (81); page <code>activeListingHashes</code> (94)</td></tr>
+    </table></div>
+    <p class="muted">Multicall3 was confirmed on Polygon at its standard address (0xcA11…CA11) with one read only call batching two <code>expiryOf</code> reads.</p>
+
+    <h4>3. Checks</h4>
+    <ul>
+      <li><b>Automated:</b> 1 new test (<code>settledSentCancels</code>: drops changed rows, keeps all while loading, letter case) in <code>cancelSafeguards.test.ts</code>. Full suite 15 files, 238 tests, all pass. <code>tsc</code> clean. ESLint clean.</li>
+      <li><b>Browser:</b> not checked yet. To see it: one <code>eth_call</code> for expiries when the drawer opens, none extra at List within a minute; the repeating <code>my-listings?category=cancelled</code> requests stop once a delisted row shows List.</li>
+    </ul>
+  </div>
+
+  <h2 id="v2safeguards">v2 Cancel safeguards · 24 Nov 2026</h2>
+  <div class="callout warn"><p><b>Removed later on 24 Nov, pending Mohit sir.</b> The overall code review (<code>bulk-list-code-review.html</code>) found that most of its issues were in these safeguards (H1, H2, H3, M6, M12, M13, L18), and they aren't in Mohit sir's requirements. You decided to remove them and ask him first. <b>Kept:</b> safeguard 1, the clearer toast (with a test). <b>Removed:</b> the browser memory (<code>sentCancels.store.ts</code>), the local Cancelling label, the second cancel guard, the automatic retry, and the polling optimisation that depended on them (<code>usePendingCancels</code>, <code>useOnChainCancel</code>, <code>onChainCancel.ts</code>, the table, rows and cards are back to their committed versions). Tests: 232, all pass; tsc and ESLint clean. Message for Mohit sir and how to rebuild them properly: <code>incident-24nov-backend-500.html</code>, section 6. The entry below describes what was built, for the record.</p></div>
+  <div class="phase">
+    <div class="phase-head"><span class="num">8s</span><h3>Safeguards for a cancel the backend didn't record</h3><span class="tag done">Built, automated checks pass; manual test not reported yet; not committed</span></div>
+    <p class="meta">24 Nov 2026 · added to phase 8's on chain delist after the stage outage (<code>incident-24nov-backend-500.html</code>) · 2 new files, 7 changed · 6 new tests, 237 in total, all green · wording approved by you in chat, 24 Nov</p>
+
+    <h4>1. Why</h4>
+    <ul>
+      <li>On 24 Nov stage's <code>cancel-bulk</code> returned 500. The Seaport cancel had already gone through on chain, but the backend didn't record it: the row kept showing Edit price, the toast read like success, and pressing Delist again sent a <b>second paid cancel</b> for an order already cancelled.</li>
+      <li>The backend's chain watcher healed the record minutes later (email, row back to List), but the seller couldn't tell meanwhile. Short outages can recur while multi chain migrations land on stage.</li>
+    </ul>
+
+    <h4>2. The four safeguards</h4>
+    <div class="tablecard"><table>
+      <tr><th>#</th><th>What you see</th><th>Code</th></tr>
+      <tr><td>1</td><td>Clearer toast when the record fails: "Your listing is cancelled on the blockchain. The marketplace hasn't caught up yet, so it may still show as listed for a while. You don't need to delist it again."</td><td><code>onChainCancel.ts</code> <code>cancelOutcomeText</code> (122)</td></tr>
+      <tr><td>2</td><td>A listed row whose cancel was sent from this browser shows <b>Cancelling</b> at once, with no Edit price, until the backend catches up; survives a reload</td><td><code>core/services/my-domains/sentCancels.store.ts</code> (new, localStorage key <code>ed:sent-cancels</code>); saved in <code>useOnChainCancel.ts</code> (73); <code>usePendingCancels.ts</code> <code>sentHashes</code>; <code>MyDomainsTable.tsx</code> <code>cancelFor</code> (85); <code>MyDomainRow.tsx</code> (115), <code>MyDomainCard.tsx</code> (131); <code>PendingCancel.local</code></td></tr>
+      <tr><td>3</td><td>Any delist (single, bulk, Cancel older listings) skips orders already being cancelled; if none are left the wallet doesn't open: "A cancel for this listing is already on its way. The marketplace will update once it's confirmed."</td><td><code>unsentHashes</code> (188) checked in <code>useOnChainCancel.ts</code> (43); reason <code>'already-sent'</code> (136)</td></tr>
+      <tr><td>4</td><td>(nothing visible) unrecorded cancels are sent to <code>cancel-bulk</code> again with the original transaction hash, on page load and every 20 s, until accepted; a 409 "already known" counts as done</td><td><code>unrecordedByTx</code> (194), <code>retryUnrecorded</code> (<code>useOnChainCancel.ts</code> 97), run by <code>usePendingCancels.ts</code> <code>tick</code> (52)</td></tr>
+    </table></div>
+    <p class="muted">Memory: a recorded cancel counts for 30 minutes (then the backend's own state takes over), an unrecorded one is kept and retried for up to 24 hours (<code>liveSentCancels</code>, 184). Storage errors (private window, blocked storage) just mean no memory, never an error.</p>
+
+    <h4>3. Checks and test results</h4>
+    <ul>
+      <li><b>Automated:</b> 6 new Vitest tests in <code>src/helpers/my-domains/cancelSafeguards.test.ts</code> (memory lifetimes, skipping hashes already sent incl. letter case, expiry lets a cancel through again, retry grouping by transaction, both new texts). Full suite 15 files, 237 tests, all pass. <code>tsc</code> clean. ESLint clean. §8: the store is in <code>core/services</code>, the rules are pure helpers; rows still use only their own button hooks (allowed exception 1).</li>
+      <li><b>Manual:</b> not reported yet. To do: delist a listed name and see Cancelling at once with no Edit price; <code>ed:sent-cancels</code> in Local Storage.</li>
+      <li><b>Can't be shown on demand:</b> the failure path (clearer toast, retry), since stage is healthy again. Covered by the tests.</li>
+    </ul>
+  </div>
+
+  <h2 id="v2phase7">v2 Phase 7 · Product rules · 24 Nov 2026</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">7</span><h3>Product rules (F9: decisions 2 and 8, V10, W2)</h3><span class="tag done">Built, automated checks pass; manual test not reported yet; committed a59939a, pushed</span></div>
+    <p class="meta">24 Nov 2026 · committed a59939a, pushed 24 Nov · 1 new test file, 9 changed files · 7 new tests, 231 in total, all green · wording approved first as a drawn page (<code>wording/phase7-wording.html</code>, A to F, D1)</p>
+
+    <h4>1. Before starting</h4>
+    <ul>
+      <li><b>Checked against the PDF's own words</b> (flow step 1, F9, decision 8, C8, W2, the backend expiry rule). Part C was first drawn as "lock to the first name's chain"; the PDF says "the chain filter must be set before selecting", so it was corrected before approval.</li>
+      <li><b>The two numbers in decision 8 are two rules:</b> "Listings end 7 days before expiry; names with under 14 days left cannot be listed." Explained to you with an example (31 Dec expiry: listable on 1 Dec, ending 24 Dec; not selectable on 20 Dec).</li>
+      <li><b>V10 decided by you (24 Nov): expiry read on chain</b>, as the PDF says ("Read expiry on chain, not from the DB"; "expiryOf returns 0 for most names… UD is checked per name"). Confirmed with one read only call that <code>expiryOf</code> exists on the UD Polygon contract (it answered 0 for a dummy token id). Guru no longer needs to answer.</li>
+    </ul>
+
+    <h4>2. What changed, part by part</h4>
+    <div class="tablecard"><table>
+      <tr><th>Part</th><th>Source</th><th>What you see</th><th>Code</th></tr>
+      <tr><td>A 7 days</td><td>Decision 8, F9</td><td>Listings end 7 days before the domain expires (was 1 day); drawer line "Ends sooner, 7 days before the domain itself expires: …"</td><td><code>bulkListing.ts</code> <code>EXPIRY_MARGIN_SECONDS</code> (19), <code>bulkDurationSeconds</code> (189); <code>BulkListingFormStep.tsx</code></td></tr>
+      <tr><td>B 14 days</td><td>Decision 8, flow step 1</td><td>Disabled Select with "Expires within 14 days. Renew it to list it"; expired names keep "Expired. Renew it to list it"</td><td><code>MIN_LIFE_SECONDS</code> (20), <code>bulkIneligibleReason</code> (23); reason <code>'expiring-soon'</code> in <code>types/my-domains/bulk.ts</code>; tooltip in <code>BulkSelectButton.tsx</code> (22)</td></tr>
+      <tr><td>C Chain first</td><td>Decision 2, C8, flow step 1</td><td>C1 (today): select mode sets the chain filter to Polygon, leaving it puts the filter back. C2 (multi chain): "Pick a chain in the chain filter to start selecting. One batch lists on one chain." with every Select disabled until a chain is picked</td><td><code>bulkBatchChain</code> (46), <code>bulkReasonInBatch</code> (52); page <code>batchChain</code> (86), filter save and restore (157), <code>needsChain</code> on the banner (295); reason <code>'pick-chain'</code> (23); <code>BulkSelectBanner.tsx</code></td></tr>
+      <tr><td>D1 On chain check</td><td>V10 (our handling)</td><td>The drawer reads each name's real expiry; a name with under 14 days left shows "Skipped: alpha.og expires within 14 days."; List counts only the rest and the skipped name needs no price; the result screen says "Expires within 14 days"</td><td><code>useBulkListingActions.ts</code> <code>readChainExpiries</code> (239, <code>expiryOf</code>, 0 = never); <code>withChainExpiry</code> (237), <code>bulkSkipped</code> (242); drawer reads on open (215) and again at signing (318); <code>skippedIds</code> (498); <code>EXPIRES_TOO_SOON</code> now "Expires within 14 days" (<code>bulkSigning.ts</code> 34)</td></tr>
+      <tr><td>E <code>?bulk=1</code></td><td>W2</td><td>The link opens My Domains in select mode, then the parameter is removed</td><td>page effect (172)</td></tr>
+      <tr><td>F Esc</td><td>Flow step 1</td><td>Already worked; checked, no change</td><td>page Escape handler</td></tr>
+    </table></div>
+
+    <h4>3. Also fixed (24 Nov, dark mode)</h4>
+    <ul>
+      <li>You noticed a grey band behind the drawer buttons. In dark mode the shared drawer footer used <code>--color-bg-surface-active</code> (#1F1F21) while the body is <code>--color-bg-surface</code>. The Figma dark drawer (93:84978) draws the footer on the same colour as the body with only a divider above. Fixed once in <code>primitives/modal/Modal.module.scss</code> (dark block, 136), so all 6 drawers (buy, list, edit price, bulk list, bulk delist, confirm) are fixed; light keeps its #f6f6f6 footer. Logged in the dark mode progress log too.</li>
+    </ul>
+
+    <h4>4. Checks and test results</h4>
+    <ul>
+      <li><b>Automated:</b> 7 new Vitest tests in <code>src/helpers/my-domains/bulkPhase7.test.ts</code> (7 day margin, 14 day minimum incl. exactly 14, Select reasons, skipped names, chain date over database date, batch chain, pick a chain first). Two phase 5 tests moved from 10 to 20 days left to fit the new rules. Full suite 14 files, 231 tests, all pass. <code>tsc</code> clean. ESLint clean on the changed files.</li>
+      <li><b>Manual:</b> not reported yet. To do on 3002: Bulk List sets the chain filter to Polygon and close puts it back; <code>?bulk=1</code> opens select mode and cleans the URL; a 2 name bulk list still works; the footer in dark mode.</li>
+      <li><b>Can't be seen with your names:</b> the 14 day tooltip and the Skipped line (your names never expire) and C2 (needs multi chain). Covered by the tests.</li>
+    </ul>
+
+    <h4>5. Not done yet</h4>
+    <ul>
+      <li>The manual checks above (committed and pushed already, with the review fixes).</li>
+    </ul>
+  </div>
+
+  <h2 id="v2phase6">v2 Phase 6 · Approvals per contract · 23 Nov 2026</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">6</span><h3>Approvals per contract (F5)</h3><span class="tag done">Built, MetaMask tested (part A), not committed</span></div>
+    <p class="meta">23 Nov 2026 · not committed (on top of the uncommitted phases 4, 8 and 5) · 4 new files plus 1 test file, 6 changed · 8 new tests, 224 in total, all green · wording approved first as a drawn page (<code>wording/phase6-wording.html</code>, A to F)</p>
+
+    <h4>1. Before starting</h4>
+    <ul>
+      <li><b>Why it matters:</b> Seaport needs <code>setApprovalForAll</code> once per NFT contract per chain, not once for everything. Mohit sir's F5 asks to group the batch by (chain, contract), read <code>isApprovedForAll</code> for each, and ask only for the missing ones with a real gas estimate.</li>
+      <li><b>Today's reality:</b> every listable name is Unstoppable Domains on Polygon, which is one contract, and your wallet has approved it. So the many contracts part can't be seen yet. You asked to build it fully anyway (23 Nov), because multi chain is part of the plan and will reuse it.</li>
+      <li><b>The bug it also fixes</b> (noted 20 Nov in phase 4): with the wallet on Ethereum, the List button said "Approve, then list N". The old check skipped the read when the wallet wasn't on Polygon, so the answer stayed unknown, and unknown counts as "needs approval".</li>
+      <li><b>Domains carry no contract address</b>, so a small table maps a chain to its contract, label and gas token. Multi chain adds rows to it.</li>
+    </ul>
+
+    <h4>2. The files</h4>
+    <div class="tablecard"><table>
+      <tr><th>File</th><th>What it does</th></tr>
+      <tr><td><code>src/types/my-domains/approvals.ts</code> <span class="tag size">New</span></td><td><code>ApprovalContract</code>, <code>ApprovalGroup</code>, <code>ApprovalGroupState</code> (approved: true, false or null; fee text or null). Exported from <code>types/my-domains/index.ts</code></td></tr>
+      <tr><td><code>src/constants/nftContracts.ts</code> <span class="tag size">New</span></td><td><code>APPROVAL_CONTRACTS</code>: one row today, Unstoppable Domains · Polygon · POL · <code>DEFAULTS.domainNftAddress</code></td></tr>
+      <tr><td><code>src/helpers/my-domains/nftApprovals.ts</code> <span class="tag size">New</span></td><td>Pure: <code>groupByContract</code> (13), <code>missingApprovals</code> (27, unread counts as missing), <code>hasUnknownApproval</code> (30), <code>formatNativeFee</code> (36, "≈ 0.0021 POL", "&lt; 0.0001 POL", or null), <code>approvalCancelledText</code> (43, part D toast)</td></tr>
+      <tr><td><code>src/helpers/my-domains/nftApprovals.test.ts</code> <span class="tag size">New</span></td><td>8 tests: one group today, two groups in order, unknown chains left out, approved skipped, unknown counted and flagged, fee formats, cancel texts</td></tr>
+      <tr><td><code>src/hooks/my-domains/useNftApprovals.ts</code> <span class="tag size">New</span></td><td><code>readProviderFor</code> (17): each contract's own chain, never the wallet's (the part A fix). <code>readApproved</code> (21, two tries). <code>estimateApprovalFee</code> (40): <code>estimateGas.setApprovalForAll</code> × <code>maxFeePerGas</code> (or <code>gasPrice</code>). <code>refresh</code> (93). <code>approveOne</code> (105): switches the wallet to the contract's chain if needed, skips the transaction if a fresh read says approved, else sends it and waits</td></tr>
+      <tr><td><code>listing-flow/OneTimeApprovalStep.tsx</code> (+ scss, index)</td><td><code>ApprovalRow</code> type (7); the "Approval needed" rows (68) with count and fee; the "Contracts you've already approved aren't listed…" note for several; the fee row uses the single contract's real fee; footer "Approve N in wallet" (120)</td></tr>
+      <tr><td><code>bulk-listing/BulkListingFlowModal.tsx</code></td><td><code>useNftApprovals(domains)</code> (143); <code>handleSubmit</code> (389) reads again if anything is unknown, then signs or opens the approval step with only the missing contracts; <code>handleApprove</code> (414) approves them one by one, and on a rejection goes back with only the rest and the part D toast; "Confirm approval 1 of 2" waiting screen (536); <code>hasApproval</code> from the new hook (508)</td></tr>
+      <tr><td><code>listing-flow/ListingFlowModal.tsx</code></td><td>Part F: the single drawer's approval screen gets the real fee (102)</td></tr>
+    </table></div>
+
+    <h4>3. Checked against Mohit sir's F5 and the plan</h4>
+    <div class="tablecard"><table>
+      <tr><th>Asks</th><th>Ours</th></tr>
+      <tr><td>Group the batch by (chainId, contract)</td><td>Yes: <code>groupByContract</code></td></tr>
+      <tr><td>Read <code>isApprovedForAll(seller, Seaport)</code> for each</td><td>Yes, on each contract's own chain</td></tr>
+      <tr><td>Show only the missing ones, each with a real gas estimate</td><td>Yes; falls back to "A small network fee" if the estimate fails (part E)</td></tr>
+      <tr><td>One <code>setApprovalForAll(Seaport, true)</code> per missing contract</td><td>Yes, in order, switching network when needed</td></tr>
+      <tr><td>Replace the <code>useListingFlowActions(domains[0])</code> reuse</td><td>For approvals, yes. The network check and switch still come from it (they were never per contract)</td></tr>
+      <tr><td>Done when: an approved seller goes straight to signing; an unapproved one approves once</td><td>The first is tested by hand; the second by code and tests (see below)</td></tr>
+    </table></div>
+
+    <h4>4. Checks and test results</h4>
+    <ul>
+      <li><b>Automated:</b> 8 new Vitest tests; full suite 13 files, 224 tests, all pass. <code>tsc</code> clean. ESLint: only the old unused disable comment in <code>ListingFlowModal.tsx</code>. §8 greps: the helper imports only types; the approval step imports no data hooks.</li>
+      <li><b>Manual (you, 23 Nov, 3002, uat, MetaMask, dark, desktop):</b> <b>part A passed</b>: with MetaMask on Ethereum, Bulk list for 2 names showed the wrong network banner with Switch, and the button read <b>"List 2"</b>, not "Approve, then list 2". You reported the run as good ("yes its good").</li>
+      <li><b>Not tested by hand:</b> the approval screen itself with the real fee (parts B and F), because your wallet is already approved; seeing it needs the approval removed first (revoke.cash or Polygonscan). Parts C and D can't appear until a second contract exists; covered by the tests. Light mode and phone width not looked at.</li>
+    </ul>
+
+    <h4>5. Not done yet</h4>
+    <ul>
+      <li>Not committed.</li>
+      <li>Optional: remove the approval once to see parts B and F for real.</li>
+      <li>For multi chain: add rows to <code>APPROVAL_CONTRACTS</code> and a read provider per chain in <code>readProviderFor</code>.</li>
+    </ul>
+  </div>
+
+  <h2 id="v2phase5">v2 Phase 5 · Drawer fixes · 23 Nov 2026</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">5</span><h3>Drawer fixes and copy (F4, F6 items 1 to 3, F8 design issues)</h3><span class="tag done">Built, MetaMask tested (bulk), not committed</span></div>
+    <p class="meta">23 Nov 2026 · not committed (sits on top of the uncommitted phases 4 and 8) · 1 new test file, 11 new tests, 216 in total, all green · wording approved first as a drawn page (<code>wording/phase5-wording.html</code>, "A to G approved, E2")</p>
+
+    <h4>1. Before starting</h4>
+    <ul>
+      <li>All 18 points in Mohit sir's PDF that touch the drawer were checked against the code. Seven of the 11 design issues were already fixed (since October, or in phase 8). Issue 8 (mixed chains in one batch) belongs to phase 7.</li>
+      <li>The first wording page differed from the PDF on two points, and both were corrected before approval. <b>C:</b> the form must use block time and name the names that end sooner. <b>E:</b> the PDF says "it should be Cancel", so the recommendation became E2 (a real Cancel) instead of E1 (a line of text).</li>
+      <li>You approved A to G with E2 on 23 Nov.</li>
+    </ul>
+
+    <h4>2. What changed, part by part</h4>
+    <div class="tablecard"><table>
+      <tr><th>Part</th><th>Source</th><th>What you see now</th><th>Code</th></tr>
+      <tr><td>A Pricing</td><td>F4, decision 5</td><td>Two cards: Same price for every name, Set each one myself. No "Percentage of model estimate" card and no "No estimate" on rows. The drawer opens on Same price</td><td><code>BulkPricingOptions.tsx</code>, <code>BulkNamesList.tsx</code> (+ scss), <code>bulkListing.ts</code> <code>priceFor</code> (47), <code>initialBulkDraft</code> (71), <code>types/my-domains/bulk.ts</code> (<code>BulkPricingMode = 'same' | 'each'</code>), <code>useBulkListingDraft.ts</code></td></tr>
+      <tr><td>B Fee label</td><td>F6.1</td><td>No visible change: still "2.5%", but now worked out from the fee setting the orders are signed with</td><td><code>tokenFormat.ts</code> <code>feePercentLabel</code> (108), used with <code>DEFAULTS.feeBps</code> in <code>BulkListingFormStep</code>, <code>ConfirmToSignStep</code>, <code>FeeBreakdownRow</code></td></tr>
+      <tr><td>C Expiry</td><td>F6.2</td><td>The form's Expires date is block time minus 5 minutes plus the duration (5 minutes earlier than before). Names that end sooner are named with their date. The result screen shows the latest end time actually signed, plus one "Ends sooner" row per name where that applies</td><td><code>bulkListing.ts</code> <code>signedEndTime</code> (155), <code>bulkExpiry</code> (159), <code>bulkCutShort</code> (178), <code>signedExpiries</code> (200); <code>BulkListingResult.endTime</code>; <code>bulkBatch.ts</code> (122) and <code>bulkSigning.ts</code> record it; <code>useBulkListingActions.ts</code> <code>readChainNow</code> (222); drawer reads it on open (<code>BulkListingFlowModal.tsx</code> 192); <code>BulkListingSuccessStep.tsx</code> (73); <code>KeyValueRows</code> gained an optional <code>id</code> so two rows can share a label</td></tr>
+      <tr><td>D Skip count</td><td>F6.3</td><td>No visible change: "continue with the N names left?" counts only names that will really be signed, and isn't asked when none are left</td><td><code>bulkListing.ts</code> <code>bulkSignableCount</code> (193); <code>bulkSigning.ts</code> (82) passes <code>remaining</code> to <code>onRejected</code></td></tr>
+      <tr><td>E2 Cancel</td><td>Design issue 4</td><td>The greyed "Cancel in wallet" is now a working <b>Cancel</b> on the waiting screens of both drawers. It goes back to the form with "Cancelled. Nothing was listed." A signature approved in the wallet afterwards is thrown away and never posted</td><td>Run numbers in <code>BulkListingFlowModal.tsx</code> (135, 203, 211) and <code>ListingFlowModal.tsx</code> (96, 226); <code>isCancelled</code> checked in <code>bulkBatch.ts</code> (before signing, again before posting) and <code>bulkSigning.ts</code>; <code>FlowCancelledError</code> (<code>listingOrder.ts</code> 38) thrown from <code>beforePost</code> (single 251, per name hook 98)</td></tr>
+      <tr><td>F Approval</td><td>Design issue 5</td><td>"One approval per contract" (bulk) and "One approval for this contract" (single), with the approved lines</td><td><code>OneTimeApprovalStep.tsx</code> (21, 31, 45)</td></tr>
+      <tr><td>G Auction</td><td>Design issue 7</td><td>Auction · "Not available yet." · Coming Soon, in both drawers</td><td><code>BulkListingFormStep.tsx</code>, <code>ListingFormStep.tsx</code></td></tr>
+    </table></div>
+
+    <h4>3. How Cancel stays safe (E2)</h4>
+    <ol>
+      <li>Every wallet round trip gets a number. Pressing Cancel moves the number on, puts the drawer back on the form and shows the toast.</li>
+      <li><b>One signature path:</b> the batch checks "cancelled?" after the wallet check and again right after the signature comes back. If cancelled, it returns without posting, so a late approval in MetaMask lists nothing (you tested this).</li>
+      <li><b>Single drawer:</b> the check runs in <code>beforePost</code>, so in edit mode a late signature never hides the old listing either.</li>
+      <li><b>Sign each name separately:</b> names already listed stay listed. Pressing Cancel shows the result screen with the rest marked "Stopped before signing", or goes back to the form if nothing was listed yet.</li>
+      <li><b>Where Cancel isn't shown:</b> while the batch is being posted, or while a retry is renewing the wallet proof, since a post can't be called back once it's sent.</li>
+      <li><b>Approval screen:</b> Cancel stops the drawer, but an approval confirmed later in the wallet is still a real transaction (small fee). Nothing gets listed, so the toast stays true.</li>
+    </ol>
+
+    <h4>4. Mohit sir's design issues, all 11</h4>
+    <div class="tablecard"><table>
+      <tr><th>#</th><th>Issue</th><th>Status</th></tr>
+      <tr><td>1</td><td>Two different dates</td><td>One date since October; now the signed one (C)</td></tr>
+      <tr><td>2</td><td>Wrong fee math</td><td>Real per order totals since October; label from the setting (B)</td></tr>
+      <tr><td>3</td><td>Success numbers and buyer copy</td><td>Fixed since October</td></tr>
+      <tr><td>4</td><td>"Cancel in wallet" can't be clicked</td><td><b>Fixed in phase 5 (E2)</b></td></tr>
+      <tr><td>5</td><td>"Approve once, list forever"</td><td><b>Fixed in phase 5 (F)</b>; the real per contract fee estimate comes in phase 6</td></tr>
+      <tr><td>6</td><td>"Cancelling is free"</td><td>Fixed in phase 8</td></tr>
+      <tr><td>7</td><td>Auction copy</td><td><b>Fixed in phase 5 (G)</b></td></tr>
+      <tr><td>8</td><td>Mixed chains in one batch</td><td>Phase 7</td></tr>
+      <tr><td>9</td><td>No partial success state</td><td>"N of M are live" since October</td></tr>
+      <tr><td>10</td><td>Two Selected styles; List missing from the banner</td><td>Fixed since October</td></tr>
+      <tr><td>11</td><td>Mock data ("Sole 19")</td><td>Not in our code</td></tr>
+    </table></div>
+    <p class="muted">The plan's phase 5 item 4, the CTA ("Approve, then list N") already existed before phase 5.</p>
+
+    <h4>5. Checks and test results</h4>
+    <ul>
+      <li><b>Automated:</b> 11 new Vitest tests in <code>src/helpers/my-domains/bulkPhase5.test.ts</code>: pricing defaults; signed end time equals the order builder's own; form date; cut short names; success dates; end times recorded; signable count; reject prompt count; a late signature never posted; Cancel before signing; per name cancel keeps listed names. Full suite 12 files, 216 tests, all pass. <code>tsc</code> clean. ESLint: only the old unused disable comment in <code>ListingFlowModal.tsx</code>. §8 greps: only the old, known items (historyApi, CreateFileFromUrl, watchlist type, the October <code>MAX_PRICE</code> import).</li>
+      <li><b>Manual (you, 23 Nov, 3002, uat, MetaMask, dark, desktop):</b> two pricing cards and "Not available yet." shown; Expires read 23 Dec 2026, 15:17 at 15:22 (block time minus 5 minutes plus 30 days). Pressed <b>Cancel</b> while MetaMask's signature request was open: toast "Cancelled. Nothing was listed."; then confirmed in MetaMask: <b>nothing was listed</b>. A normal bulk list of 2 names at 300 USDT: one signature, "2 domains are live", All expire 23 Dec 2026, 15:18 (the signed time, a minute after the form was opened).</li>
+      <li><b>Not tested by hand:</b> Cancel in the single drawer, Cancel in the per name fallback, light mode, phone width, the "Ends sooner" lines (no name of yours expires within 90 days; covered by tests).</li>
+    </ul>
+
+    <h4>6. Not done yet</h4>
+    <ul>
+      <li>Not committed.</li>
+      <li><s>Two more test listings are live</s> Cleaned up 23 Nov: all 6 test listings cancelled with one bulk delist ("6 listings cancelled").</li>
+      <li><b>Fix found during that cleanup (phase 8 chip):</b> on a laptop wide table the "Cancelling" chip spilled out of the name cell over the Price column. <code>MyDomainRow.module.scss</code> <code>.domainMeta</code> now wraps, so the chip drops under the chain and chars line; <code>MyDomainCard.module.scss</code> <code>.headerTop</code> wraps too, with the views count kept on the right. CSS only; needs a look on 3002.</li>
+    </ul>
+  </div>
+
+  <h2 id="v2editprice">v2 Phase 8, part 2 · Edit price (option B) · 23 Nov 2026</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">8+</span><h3>Free price cuts with Edit price (V7 option B, decision 1)</h3><span class="tag done">Built, MetaMask tested, not committed</span></div>
+    <p class="meta">23 Nov 2026 · part of the uncommitted phase 8 work · 2 new tests (205 in total) · tested on uat with MetaMask: same and higher price blocked, 600 → 500 cut with one free signature</p>
+
+    <h4>1. Why</h4>
+    <ul>
+      <li>Phase 8 made every delist an on chain cancel. Before it, a seller could lower a price for free: delist (off chain hide), list again cheaper. After phase 8 that cost a cancel fee.</li>
+      <li>Mohit sir's <b>decision 1</b>: "On chain cancel for delists and price increases. <b>Price cuts stay off chain and free.</b>" F7: "A price cut may skip the cancel." B7: "Price cuts need no check." The backend guide's Flow C recommends on chain for every change, but keeps the free hide (<code>POST /orders/{hash}/cancel</code> with no body) available.</li>
+      <li><b>You chose option B</b> (23 Nov): free price cuts through an <b>Edit price</b> button. V7 is decided on our side; Mohit sir can still be told.</li>
+    </ul>
+
+    <h4>2. How it works</h4>
+    <ol>
+      <li>Listed rows and cards show <b>Edit price</b> (as Figma draws it) instead of Delist.</li>
+      <li>The listing drawer opens in its edit mode ("Edit listing"), price prefilled. A note: "Lowering the price is free. To raise it, delist first (small network fee), then list again."</li>
+      <li>The new price is compared with the live one in exact 6 decimal USDT units (<code>comparePrice</code>). Same: "That's the current price. Enter a lower one to change it." Higher: "Raising the price needs a delist first (small network fee). Delist this listing, then list it again at the new price." <b>Sign new price</b> stays disabled for both.</li>
+      <li>Lower: <b>Sign new price</b> → the new order is signed (free) and checked locally → <b>only then</b> the old listing is hidden for free (<code>hideListingOffChain</code>) → the new order is posted. A cancelled signature changes nothing.</li>
+      <li>Success: "<i>name</i> is live at the new price. The old price is off the marketplace."</li>
+      <li>Delisting is in the drawer: a red <b>Remove this listing</b> box under the note ("Cancels it on the blockchain so nobody can buy it. Small network fee." + <b>Delist</b>), which runs the phase 8 on chain cancel and closes the drawer.</li>
+    </ol>
+    <p><b>Why a cut is safe without a cancel:</b> the old order is dearer, so even though it stays valid on chain until it ends, nobody pays more while the cheaper one is live (and if they did, the seller gets more). A raise is not safe that way, which is why B7 refuses it while a cheaper order lives.</p>
+
+    <h4>3. Files</h4>
+    <ul>
+      <li><code>src/helpers/my-domains/onChainCancel.ts</code>: <b><code>comparePrice(newPrice, currentPriceUsd)</code></b> (line 154): 'lower' / 'same' / 'higher' / 'invalid', via <code>parseUnits</code>, never floating point. 2 new tests in <code>onChainCancel.test.ts</code> (line 159).</li>
+      <li><code>src/core/services/my-domains/cancelOrders.service.ts</code>: <b><code>hideListingOffChain(hash)</code></b> (line 39), the body less cancel, used for price cuts only.</li>
+      <li><code>src/hooks/my-domains/useOnChainCancel.ts</code>: <b><code>hideOffChain</code></b> (line 76).</li>
+      <li><code>listing-flow/listingOrder.ts</code>: <code>signAndPostListingOrder</code> takes an optional <b><code>beforePost</code></b> (line 39), run after signing and the local check, before posting (line 67). <code>useListingFlowActions.ts</code>: <code>signAndSubmit</code> passes it through (type line 28, call line 210).</li>
+      <li><code>ListingFlowModal.tsx</code>: <code>editingPrice</code> (175), <code>priceChange</code> and <code>priceError</code> (178), <code>handleDelistInstead</code> (185), the hide before post with <code>oldHidden</code> / <code>hideFailed</code> (230) and their two error toasts (260); "Sign new price" (411) and the edit texts on confirm and success (401, 457).</li>
+      <li><code>ListingFormStep.tsx</code> (+ styles): the price error (168), the note (173), the Remove this listing box (174), "Sign new price" (278) and the two gas notes (283, 288).</li>
+      <li><code>ConfirmToSignStep.tsx</code>: "…on the marketplace at the new price the moment you sign." and a <code>signLabel</code>. <code>ListingSuccessStep.tsx</code>: the edit heading and subtext; the old "Cancel any time, free and instant…" note replaced by "You can delist it any time. Delisting cancels the listing on the blockchain for a small network fee."</li>
+      <li><code>MyDomainRow.tsx</code> (118), <code>MyDomainCard.tsx</code> (134): <b>Edit price</b> on listed rows, opening the drawer through the page's existing <code>onEditPrice</code> (which had been unused).</li>
+    </ul>
+
+    <h4>4. Where Delist went (the decisions in order)</h4>
+    <ol>
+      <li>Wording page <code>wording/edit-price-wording.html</code>, approved: layout <b>A1</b> (row shows only Edit price, Delist inside the drawer) by the recommendation.</li>
+      <li>On screen the grey "Delist instead" link under Sign new price was easy to miss (your screenshot). Options page <code>wording/delist-placement-options.html</code>: two row buttons, a Remove box, an icon, a footer button.</li>
+      <li>Your laptop screenshot showed the Action column only fits one button, so two row buttons were ruled out; you chose <b>option 2</b> (the Remove this listing box).</li>
+      <li>You asked to move it right under the "Lowering the price is free" note; done.</li>
+    </ol>
+
+    <h4>5. Checked against the sources</h4>
+    <div class="tablecard"><table>
+      <tr><th>Source</th><th>Says</th><th>Ours</th></tr>
+      <tr><td>Mohit sir, decision 1 / F7 / B7</td><td>Price cuts stay off chain and free; may skip the cancel; no backend check</td><td>Yes: a cut is a free signature plus the free hide</td></tr>
+      <tr><td>Mohit sir, decision 1</td><td>Price increases need an on chain cancel</td><td>Yes: a raise is blocked and pointed at Delist</td></tr>
+      <tr><td>Backend B7</td><td>One active listing per name; raises refused while a cheaper order lives</td><td>The old one is hidden before the new is posted; raises never reach the backend from Edit price</td></tr>
+      <tr><td>Backend guide, Flow C</td><td>Lower = delist on chain then relist</td><td>Different on purpose (decision 1 and your choice); the guide's free hide is the documented way to do it</td></tr>
+    </table></div>
+
+    <h4>6. Checks and test results</h4>
+    <ul>
+      <li>2 new tests (cut / same / raise in 6 decimal units; empty, zero, too precise, unknown current price); full suite 11 files, 205 tests, all pass. <code>tsc</code> clean. ESLint: only old warnings (an unused disable comment in the listing drawer, <code>_counter</code>); the two old unused <code>onEditPrice</code> warnings are gone.</li>
+      <li><b>Manual (you, 23 Nov, uat, MetaMask, dark mode):</b> 600 (same) and 800 (higher) showed their messages with Sign new price disabled; 600 → 500 took one <b>signature</b> (MetaMask "Signature request", no fee) and showed "westbengal.og is live at the new price."; the Remove this listing box sits under the note.</li>
+      <li><b>Noticed while testing:</b> MetaMask's "Listing price" shows what the seller receives (after the 2.5% fee), e.g. 292.5 for a 300 listing. Not ours to change.</li>
+      <li><b>Not from this work:</b> a 1.598 POL "Sent POL" in MetaMask at 12:06 turned out to be your Trails test purchase (0.10 USDT paid in POL, about $0.12); POL is about $0.078.</li>
+    </ul>
+
+    <h4>7. Not done yet</h4>
+    <ul>
+      <li>Not committed (part of phase 8).</li>
+      <li>The Remove this listing box's Delist hasn't been clicked for real (it runs the same, tested on chain cancel).</li>
+      <li>Clean up: 4 test listings live (westbengal 500, three at 600 USDT).</li>
+      <li>Optional: tell Mohit sir V7 was decided as option B.</li>
+    </ul>
+  </div>
+
+  <h2 id="v2phase8">v2 Phase 8 · 23 Nov 2026</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">8</span><h3>On chain delist, single and bulk (F7, B5, B7)</h3><span class="tag done">Built, MetaMask tested, not committed</span></div>
+    <p class="meta">23 Nov 2026 · not committed (phase 4 is not committed either) · 7 new files, 19 changed · 10 new tests, 203 in total, all green · no real transaction tried yet</p>
+
+    <h4>Contents of this entry</h4>
+    <ol>
+      <li>Before starting: what was checked and decided</li>
+      <li>The files, one by one</li>
+      <li>How a delist travels through the code</li>
+      <li>Check 1: against Mohit sir's requirements (F7, decision 1, acceptance criterion 6)</li>
+      <li>Check 2: against our plan (phase 8 items 1 to 10)</li>
+      <li>Check 3: against the backend team's integration guide (Flow B, Flow C, section 7)</li>
+      <li>Decisions</li>
+      <li>Checks and test results</li>
+      <li>Where to look</li>
+      <li>In plain words</li>
+      <li>Not done yet</li>
+    </ol>
+
+    <h4>1. Before starting</h4>
+    <ul>
+      <li><b>Backend readiness, checked on uat:</b> <code>POST /orders/cancel-bulk</code> (1 to 50 hashes plus <code>cancelTxHash</code>, all or nothing), <code>GET /orders/{hash}</code> returns <code>rawOrder</code> (the exact signed order, wire form, with counter) for any status, <code>GET /orders/my-listings</code> returns <code>status: cancel_pending</code> and <code>cancelNotConfirmed</code>.</li>
+      <li><b>Gap found:</b> a cancel immediately marks the domain unlisted (<code>upsertUnlisted</code>), and <code>GET /orders/my-domains</code> carries no cancel state, so My Domains alone could never show "Cancelling" or "Cancel not confirmed". You chose <b>option A</b> (23 Nov): My Domains also reads <code>my-listings</code> and labels its rows. <b>A separate My Listings page is not needed</b> (your decision); plan phase 8b is dropped.</li>
+      <li><b>No Figma for delist mode or the cancel states.</b> Built from existing pieces (the bulk select banner, the bulk drawer, the success step). All wording was shown on a visual page, <code>wording/phase8-wording.html</code> (parts A to G), and approved 23 Nov, including the new "Bulk delist" Quick Action (part C, the only layout addition).</li>
+    </ul>
+
+    <h4>2. The files, one by one</h4>
+    <p>Line numbers as of 23 Nov. Where a file also has uncommitted phase 4 changes, the counts below are for phase 8's part only.</p>
+
+    <h5>New · <code>src/core/services/my-domains/cancelOrders.service.ts</code> · 49 lines</h5>
+    <ul>
+      <li><b><code>fetchSignedOrder(hash)</code></b> (15): <code>GET /orders/{hash}</code>, returns <code>result.rawOrder</code>.</li>
+      <li><b><code>recordCancel(hashes, txHash)</code></b> (28): <code>POST /orders/cancel-bulk</code>, used for one listing too.</li>
+      <li><b><code>notCancellableHashes(err)</code></b> (33): reads the hashes a 409 <code>ORDER_NOT_CANCELLABLE</code> names (needs <code>BackendError.body</code> from phase 3).</li>
+      <li><b><code>fetchRecentCancels()</code></b> (45): <code>GET /orders/my-listings?category=cancelled&amp;page=1&amp;limit=50</code>, for the row labels.</li>
+    </ul>
+
+    <h5>New · <code>src/helpers/my-domains/onChainCancel.ts</code> · 146 lines, pure</h5>
+    <ul>
+      <li><b><code>runOnChainCancel(hashes, deps)</code></b> (40): removes duplicates; prepare (wallet, network, proof); fetch every signed order; check each hashes to its order hash (<code>order-mismatch</code> otherwise) and belongs to the connected wallet (<code>not-yours</code> otherwise, because Seaport would revert and still charge gas); send <b>one</b> cancel transaction; record with its hash. On a 409 it drops the named hashes and records the rest with the <b>same</b> transaction hash (at most 5 rounds, <code>MAX_RECORD_ROUNDS</code>). Any other record failure returns "sent" with <code>recordFailed</code>, since the chain cancel already stands.</li>
+      <li><b><code>pendingCancelsByToken(rows)</code></b> (103): <code>cancel_pending</code> rows keyed by tokenId, newest first, with the not confirmed flag.</li>
+      <li><b><code>cancelOutcomeText(outcome, many)</code></b> (117): the approved messages (parts A and E).</li>
+      <li><b><code>CANCEL_SENT_EVENT</code></b> (145): fired after a cancel is sent so the row labels refresh.</li>
+    </ul>
+
+    <h5>New · <code>src/helpers/my-domains/onChainCancel.test.ts</code> · 10 tests</h5>
+    <ul><li>3 listings, one transaction, recorded with its hash; duplicates and letter case ignored; a 409 drops the named hash and resends with the same transaction; every hash already gone still counts as sent; another record failure sets <code>recordFailed</code>; another wallet's listing is refused before sending; an order that doesn't match its hash is refused; a closed popup, missing POL and a failed preparation send nothing; an empty selection does nothing; the pending map keeps only cancel pending rows, newest first.</li></ul>
+
+    <h5>New · <code>src/hooks/my-domains/useOnChainCancel.ts</code> · 78 lines</h5>
+    <ul>
+      <li><code>cancelListings(hashes, onPhase)</code> (39): <code>prepare</code> checks the chain is Polygon (<code>CancelPrecheckError</code>, line 14), renews the wallet proof (cancel-bulk is behind the verified wallet guard); <code>sendCancel</code> calls Seaport <code>cancel(orders)</code> (56) and returns as soon as the transaction hash exists, as the guide says; then refreshes the table and fires <code>CANCEL_SENT_EVENT</code> (68).</li>
+      <li><code>classifyCancelError</code> (21): wallet cancel, wrong network, wallet not linked, insufficient funds, other.</li>
+    </ul>
+
+    <h5>New · <code>src/hooks/my-domains/usePendingCancels.ts</code> · 60 lines</h5>
+    <ul><li>Reads the pending cancels only when the wallet proof is fresh (my-listings needs it; no wallet popup on page load), refreshes on <code>CANCEL_SENT_EVENT</code>, and polls every 20 seconds while anything is pending (the guide says 15 to 30).</li></ul>
+
+    <h5>New · <code>bulk-listing/BulkDelistModal/</code> (component, styles, index)</h5>
+    <ul><li>Steps confirm → working (preparing, verify wallet, confirm in wallet, saving) → result or failed (<code>start</code> line 41). Can't be closed while working. Reuses the bulk drawer's names box, icons and footer styles; role tokens only.</li></ul>
+
+    <h5>New · <code>bulk-listing/PendingCancelChip/</code> (component, styles, index)</h5>
+    <ul><li>"Cancelling" (with its tooltip) or "Cancel not confirmed" (warning colours, tooltip "This name can still be bought at the old price."). Used by rows and cards.</li></ul>
+
+    <h5>Changed · <code>src/hooks/my-domains/useDelistListing.ts</code> · rewritten (+22 / −71)</h5>
+    <ul><li>Same return shape (<code>delist</code>, <code>pendingOrderHash</code>), so My Domains rows, cards and <code>pages/index.tsx</code> keep working, but it now runs <code>useOnChainCancel</code>: the "Confirm the cancel in your wallet…" toast at the wallet step, then the outcome toast. The old off chain call is gone.</li></ul>
+
+    <h5>Changed · the My Domains page · <code>pages/seller-hub/my-domains/index.tsx</code> (+62 / −6)</h5>
+    <ul>
+      <li><code>delistSelection = useBulkSelection(domains, isDelistEligible)</code> (85), <code>usePendingCancels()</code> (88).</li>
+      <li>Quick Action <code>bulk-delist</code> (209): leaves bulk list mode, enters delist mode, switches to For sale. Bulk list leaves delist mode.</li>
+      <li>The delist select bar (269), the table's <code>reasonFor: delistIneligibleReason</code> and <code>pendingCancels</code>, Escape leaves either mode, and <code>BulkDelistModal</code> (313).</li>
+    </ul>
+
+    <h5>Changed · rows, cards, table, banner, select button</h5>
+    <ul>
+      <li><code>MyDomainRow</code> and <code>MyDomainCard</code> (+12 / −2 each): a <code>pendingCancel</code> prop shows <code>PendingCancelChip</code> (row: next to the chain badge; card: next to the status chip) and, when not confirmed, <b>Cancel again</b> in place of List.</li>
+      <li><code>MyDomainsTable</code> (+10 / −6): passes <code>pendingCancel</code> only to rows that are no longer for sale (a relisted name has a new live listing), and lets the page choose the select reason (<code>reasonFor</code>).</li>
+      <li><code>BulkSelectBanner</code> (+23 / −6): <code>mode="delist"</code> texts and "Delist N".</li>
+      <li><code>BulkSelectButton</code> (+2): tooltip "Not for sale, so there's nothing to delist".</li>
+    </ul>
+
+    <h5>Changed · the bulk listing drawer (the "older, cheaper listing" box)</h5>
+    <ul>
+      <li><code>BulkListingFlowModal</code>: <code>handleCancelOlder</code> (294) cancels every <code>olderOrderHashes</code> of the names refused with <code>CHEAPER_ORDER_STILL_VALID</code> (collected at line 467); once done those names join "Try these again".</li>
+      <li><code>BulkListingSuccessStep</code> (+27 / −5, styles +23): the box (part F) and the new note (part G).</li>
+      <li><code>BulkListingFormStep</code>: the new note under List (part G).</li>
+    </ul>
+
+    <h5>Changed · small</h5>
+    <ul>
+      <li><code>seaport-order-builder-v5.ts</code> (+5): Seaport <code>cancel(OrderComponents[])</code> added to <code>SEAPORT_MIN_ABI</code> (line 199), additive only (shared with the multi chain developer).</li>
+      <li><code>bulkListing.ts</code> (+10): <code>delistIneligibleReason</code> (43), <code>isDelistEligible</code>.</li>
+      <li><code>useBulkSelection.ts</code> (+4 / −4): takes an eligibility rule, default unchanged.</li>
+      <li><code>types/my-domains/bulk.ts</code>: <code>MyListingCancelRow</code>, <code>PendingCancel</code>, <code>CancelFailureReason</code>, <code>CancelOutcome</code>, reason <code>not-for-sale</code>. <code>actions.ts</code>: <code>bulk-delist</code>. <code>data/my-domains/actions.ts</code>: the new Quick Action. <code>QuickActionsPanel</code>: its icon. <code>composites/my-domains/index.ts</code>: exports the drawer.</li>
+    </ul>
+
+    <h4>3. How a delist travels through the code</h4>
+    <div class="tablecard"><table>
+      <tr><th>#</th><th>On screen</th><th>Code</th></tr>
+      <tr><td>1</td><td>Click Delist on a row (or Delist N in the drawer, or Cancel again, or Cancel older listings)</td><td><code>useDelistListing.delist</code> / <code>BulkDelistModal.start</code> / <code>handleCancelOlder</code> → <code>useOnChainCancel.cancelListings</code> → <code>runOnChainCancel</code></td></tr>
+      <tr><td>2</td><td>(nothing, or "Verify your wallet")</td><td><code>prepare</code>: wallet connected, chain 137, <code>ensureWalletVerified</code></td></tr>
+      <tr><td>3</td><td>"Preparing N listings" (drawer)</td><td><code>fetchSignedOrder</code> per hash; hash and offerer checks</td></tr>
+      <tr><td>4</td><td>"Confirm the cancel in your wallet…"; MetaMask shows a transaction with its fee</td><td>Seaport <code>cancel(orders)</code> → transaction hash</td></tr>
+      <tr><td>5</td><td>"Saving" (drawer)</td><td><code>recordCancel</code> → <code>POST /orders/cancel-bulk</code>; on 409 drop and resend with the same hash</td></tr>
+      <tr><td>6</td><td>"Listing cancelled" / "2 listings cancelled"; the row shows "Cancelling"</td><td><code>cancelOutcomeText</code>; table refetch; <code>CANCEL_SENT_EVENT</code> → <code>usePendingCancels.refresh</code></td></tr>
+      <tr><td>7</td><td>About a minute later the label goes away</td><td>backend sees Seaport's <code>OrderCancelled</code> event; the 20 second poll reads it</td></tr>
+      <tr><td>7b</td><td>Rare: "Cancel not confirmed" + Cancel again</td><td>backend sweep sets <code>cancelNotConfirmed</code> after 30 minutes or a failed transaction (and emails)</td></tr>
+    </table></div>
+
+    <h4>4. Check 1: against Mohit sir's requirements</h4>
+    <div class="tablecard"><table>
+      <tr><th>Requirement (PDF)</th><th>What we did</th><th>Verdict</th></tr>
+      <tr><td>F7: multi select delist using the same select mode</td><td>Delist mode reuses the bulk select bar and Select / Selected buttons</td><td>Yes</td></tr>
+      <tr><td>F7: move the single delist (<code>useDelistListing.ts</code>) to the same path</td><td>Rewritten on <code>useOnChainCancel</code>; same interface for its callers</td><td>Yes</td></tr>
+      <tr><td>F7: fetch each order's <code>rawOrder</code>, one Seaport <code>cancel(OrderComponents[])</code> transaction for all</td><td>Exactly</td><td>Yes</td></tr>
+      <tr><td>F7 / B5: then call cancel or cancel-bulk with the transaction hash</td><td>cancel-bulk for one or many (see Decisions)</td><td>Yes</td></tr>
+      <tr><td>Decision 1: price cuts may stay off chain (V7)</td><td>Always on chain (option A), which the backend guide also says; easy to change in one place (<code>useDelistListing</code>)</td><td>Default, V7 still open with Mohit sir</td></tr>
+      <tr><td>Acceptance criterion 6: bulk delist removes every selected listing with one on chain cancel transaction</td><td>Built; proven by tests (one <code>sendCancel</code> call for 3 listings)</td><td>Not tried by hand yet</td></tr>
+      <tr><td>Design issue: "cancelling is free" copy</td><td>Both notes changed (part G)</td><td>Yes</td></tr>
+    </table></div>
+
+    <h4>5. Check 2: against our plan (phase 8)</h4>
+    <div class="tablecard"><table>
+      <tr><th>Plan item</th><th>Done?</th><th>Notes</th></tr>
+      <tr><td>1. Multi select delist, single delist on the same path, rawOrder, one transaction, then cancel or cancel-bulk</td><td>Yes</td><td>cancel-bulk for one too</td></tr>
+      <tr><td>2. <code>cancelOrders.service.ts</code> on the real endpoints</td><td>Yes</td><td>Plus <code>fetchRecentCancels</code> for option A</td></tr>
+      <tr><td>3. Cancelling / Cancelled / Cancel not confirmed on My Domains</td><td>Yes (option A)</td><td>"Cancelled" is the normal Not listed row once confirmed</td></tr>
+      <tr><td>4. Cheaper order prompt with <code>olderOrderHashes</code></td><td>Yes, on the bulk result screen</td><td>The single listing drawer still shows the refusal as a toast; not changed in this phase</td></tr>
+      <tr><td>5. Wording shown first; light and dark, phone and desktop</td><td>Wording approved; themes and widths not checked by hand yet</td><td>Role tokens only, so dark should follow</td></tr>
+      <tr><td>6. Marketplace home page too</td><td>Yes</td><td>It uses <code>useDelistListing</code>, which is now on chain</td></tr>
+      <tr><td>7. Wallet states: no wallet, wrong network, not enough POL, closed popup; only the signer can cancel</td><td>Yes</td><td>Plus a hash check of every signed order</td></tr>
+      <tr><td>8. Seaport <code>cancel</code> in the ABI, adding only</td><td>Yes</td><td></td></tr>
+      <tr><td>9. Old off chain delists cancelled through rawOrder</td><td>Yes</td><td>Delist or the older listing box works for them too</td></tr>
+      <tr><td>10. V7 default always on chain, easy to change</td><td>Yes</td><td></td></tr>
+      <tr><td>Done when: on uat, one or many sends one transaction and shows the states</td><td>Pending</td><td>Needs your MetaMask run</td></tr>
+    </table></div>
+
+    <h4>6. Check 3: against the backend team's integration guide</h4>
+    <div class="tablecard"><table>
+      <tr><th>Guide</th><th>Ours</th></tr>
+      <tr><td>Flow B: always cancel on chain; rawOrder from <code>GET /orders/{hash}</code> (works on any device)</td><td>Same</td></tr>
+      <tr><td>Tell the backend as soon as the transaction hash exists</td><td>Same (no wait for the receipt)</td></tr>
+      <tr><td>409: drop <code>orderHashes</code>, resend with the same <code>cancelTxHash</code></td><td>Same, tested</td></tr>
+      <tr><td>Single cancel: <code>POST /{hash}/cancel</code> with the hash, or cancel-bulk; never the body less one</td><td>cancel-bulk for one; the body less call is no longer used anywhere</td></tr>
+      <tr><td>Flow C: lower price = delist on chain then list; higher = cancel first, else <code>CHEAPER_ORDER_STILL_VALID</code></td><td>Same; the older listing box handles the higher case</td></tr>
+      <tr><td>Section 7: Cancelling refreshed every 15 to 30 seconds; Cancel again for <code>cancelNotConfirmed</code></td><td>On My Domains (option A), every 20 seconds</td></tr>
+      <tr><td>Section 7: a <code>/profile/my-listings</code> page</td><td>Not built: your decision (option A covers the states); the email's link is the main website's (<code>WEB_CLIENT_URL</code>)</td></tr>
+    </table></div>
+
+    <h4>7. Decisions</h4>
+    <ul>
+      <li><b>Option A, no new page</b> (you, 23 Nov).</li>
+      <li><b>cancel-bulk for one listing too:</b> one code path; the guide allows either.</li>
+      <li><b>Check every signed order's hash and owner before sending:</b> a wrong order or wallet would waste gas or cancel the wrong thing.</li>
+      <li><b>Row labels need a fresh wallet proof:</b> my-listings is behind the verified wallet guard; without a fresh proof the labels stay hidden rather than popping a wallet prompt on page load. Right after a delist the proof is fresh.</li>
+      <li><b>Labels only on rows no longer for sale:</b> a relisted name has a new live listing; its old cancel is history.</li>
+      <li><b>"Bulk delist" as a Quick Action:</b> not in Figma; approved (part C).</li>
+    </ul>
+
+    <h4>8. Checks and test results</h4>
+    <ul>
+      <li>10 new tests, all pass. Full suite: 11 files, 203 tests, all pass. <code>tsc --noEmit</code> clean.</li>
+      <li>ESLint on every changed and new file: 3 warnings, all old (unused <code>onEditPrice</code> in row and card, <code>_counter</code> in the order builder).</li>
+      <li>CLAUDE.md §8: nothing new in helpers or data. <code>BulkDelistModal</code> and <code>BulkListingFlowModal</code> import <code>useOnChainCancel</code>, under the allowed exception "an action hook owned by one button", like <code>useDelistListing</code>.</li>
+      <li><b>Manual (you, 23 Nov, MetaMask on uat):</b> the older listing prompt works end to end: 2 names refused for older, cheaper listings, one cancel transaction for both, the box confirmed it, Try these 2 again listed both. A real Seaport cancel went through and cancel-bulk accepted it. Observation: the "Confirm the cancel in your wallet" toast stays up after the cancel is sent (normal toast timing). Single Delist passed (transaction under $0.01; "Listing cancelled…" toast; Cancelling label on the row). Bulk delist passed (one transaction for 2, "2 listings cancelled") — acceptance criterion 6 met. About 0.05 POL for 3 cancel transactions. Found: Bulk delist sits third in the Quick Actions panel, which scrolls inside itself, and a toast can cover it, so it's easy to miss. The Cancelling labels cleared on their own; seller emails arrived for both delists; dark mode and phone width look fine. Not tried by hand: closing the wallet popup (no live listing left; covered by tests).</li>
+    </ul>
+
+    <h4>9. Where to look</h4>
+    <ol>
+      <li><code>phase-explained/bulk-listing-v2-phase8-explained.html</code>: everything in the simplest words.</li>
+      <li><code>wording/phase8-wording.html</code>: every approved message, drawn.</li>
+      <li><code>bulk-listing-v2-flow-explained.html</code>, section 11.</li>
+      <li><code>onChainCancel.ts</code> line 40 (<code>runOnChainCancel</code>), then its tests.</li>
+      <li><code>useOnChainCancel.ts</code> line 39; <code>usePendingCancels.ts</code>.</li>
+      <li><code>BulkDelistModal.tsx</code>; the page lines 85, 209, 269, 313.</li>
+    </ol>
+
+    <h4>10. In plain words</h4>
+    <ul>
+      <li>Delist now really cancels a listing on the blockchain, so nobody can buy it afterwards. It costs a tiny fee in POL.</li>
+      <li>You can delist many at once with one transaction (Quick Actions → Bulk delist).</li>
+      <li>After a delist, the row says "Cancelling" for about a minute. If the cancel ever fails, it says "Cancel not confirmed" with a Cancel again button.</li>
+      <li>Names blocked by an older, cheaper listing now get a button to cancel that old listing, then list again.</li>
+    </ul>
+
+    <h4>11. Not done yet</h4>
+    <ul>
+      <li>Not committed (nor phase 4).</li>
+      <li>Manual on uat with MetaMask: single Delist (cancels one live 19.5 USDT test listing), bulk delist (the other), Cancel older listings with an old name, a closed popup; light and dark, phone and desktop.</li>
+      <li>The single listing drawer's "older, cheaper listing" refusal still shows only a toast.</li>
+      <li>V7 (price cuts) stays open with Mohit sir; built as always on chain.</li>
+    </ul>
+  </div>
+
+  <div class="callout warn"><p><b>20 Nov: test listings are real money.</b> The backend team's integration guide says every listing on stage and uat is live on Polygon mainnet. Today's 2 name test (phase 4) was listed at 19.5 USDT each for 30 days, and today's Delist only hides listings. They can be bought until cancelled on chain (phase 8) or until they expire. From now on: test with high prices (for example 999999 USDT) and the shortest duration, and cancel on chain afterwards.</p></div>
+  <h2 id="v2phase4">v2 Phase 4 · 20 Nov 2026</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">4</span><h3>Fallback, smart wallets, network check (F3, F9 decision 10)</h3><span class="tag done">Built, MetaMask tested, not committed</span></div>
+    <p class="meta">20 Nov 2026 · not committed · 8 files changed, +269 / −12 · 4 new tests, 193 in total, all green · no wallet test yet: Phantom, Rabby and Coinbase marked not tested (no test account in them); MetaMask runs still to do</p>
+
+    <h4>Contents of this entry</h4>
+    <ol>
+      <li>What phase 4 adds</li>
+      <li>The 8 files, one by one</li>
+      <li>How each new path travels through the code</li>
+      <li>Check 1: against Mohit sir's requirements (F3, F9, decision 10)</li>
+      <li>Check 2: against our plan (phase 4 items 1 to 3)</li>
+      <li>Check 3: against Guru's test page</li>
+      <li>Decisions</li>
+      <li>Found while building and testing</li>
+      <li>Checks and test results</li>
+      <li>Where to look</li>
+      <li>In plain words</li>
+      <li>Not done yet</li>
+    </ol>
+
+    <h4>1. What phase 4 adds</h4>
+    <ul>
+      <li><b>"Sign each name separately" (F3).</b> When the wallet fails on the one bulk signature for any reason other than the seller cancelling, the drawer offers the October path: one popup and one post per name. That code was kept untouched in phase 3 for exactly this.</li>
+      <li><b>Smart contract wallets (F9, decision 10).</b> If the connected address is a contract (a Safe, for example), the form says so and List is disabled. A normal wallet with an EIP 7702 delegation (code starting <code>0xef0100</code>) is still treated as normal.</li>
+      <li><b>Network check at List time.</b> Closes the gap found in phase 3's Check 3: the drawer checked the network only when it opened. Now the network is checked again right before the signature is requested.</li>
+    </ul>
+    <p>All new wording (sections A, B and C) was shown and approved before it went in.</p>
+
+    <h4>2. The 8 files, one by one</h4>
+    <p>Line numbers as of 20 Nov.</p>
+
+    <h5>File 1 · <code>src/helpers/my-domains/bulkBatch.ts</code> · +23 lines</h5>
+    <ul>
+      <li><code>EIP7702_DESIGNATOR = '0xef0100'</code> (line 91): the prefix an EIP 7702 delegated wallet's code starts with.</li>
+      <li><b><code>isSmartContractCode(code)</code></b> (line 94): true when the account has code that isn't an EIP 7702 delegation. Empty code (<code>0x</code>) is a normal wallet. Case doesn't matter.</li>
+      <li><b><code>offersPerNameFallback(outcome, lastPhase)</code></b> (line 106): offer the fallback only when the outcome is "not signed", the last screen was "signing" (so the wallet was really asked), and the reason is a wallet error or a failed local check. Never for a cancel, the wrong wallet, the wrong network or a smart wallet, which signing per name can't fix.</li>
+    </ul>
+
+    <h5>File 2 · <code>src/helpers/my-domains/bulkBatch.test.ts</code> · +43 / −1 lines, 4 new tests</h5>
+    <ul>
+      <li>Fallback offered when the wallet errors on the big message (a Ledger style "data too large").</li>
+      <li>Fallback offered when the wallet hashed the message differently (signature from another key, so the local check fails).</li>
+      <li>Fallback not offered after a cancel, when the wallet check failed before signing, for the wrong network, for a smart wallet, or when the batch was posted.</li>
+      <li>Smart wallet detection: empty code, missing code, real contract code, and an EIP 7702 delegation in lower and upper case.</li>
+    </ul>
+
+    <h5>File 3 · <code>src/hooks/my-domains/useBulkListingActions.ts</code> · +36 / −2 lines</h5>
+    <ul>
+      <li><b><code>BulkPrecheckError</code></b> (line 18): an error that carries the reason <code>wrong-network</code> or <code>smart-wallet</code>.</li>
+      <li><b><code>isSmartWalletAddress(address)</code></b> (line 29): reads the account's code on Polygon (<code>getCode</code>) and asks <code>isSmartContractCode</code>.</li>
+      <li><b><code>classifyBulkBatchError</code></b> (line 34) returns those two reasons first.</li>
+      <li><b><code>prepare</code></b> (lines 146 and 147): before the wallet proof, the counter and the signature, checks the wallet's chain is Polygon (<code>signer.getChainId()</code>) and that it isn't a smart wallet.</li>
+      <li><b><code>isSmartWallet()</code></b> (line 197): for the form's notice when the drawer opens. If the read fails, it answers "no" and the check at List time still protects.</li>
+    </ul>
+
+    <h5>File 4 · <code>BulkListingFlowModal.tsx</code> · +108 / −6 lines</h5>
+    <ul>
+      <li><b>Steps</b> (line 33): three more, <code>fallback-offer</code>, <code>signing-each</code>, <code>rejected</code>, all of which can't be closed by clicking outside (line 35).</li>
+      <li><b>Messages</b> (lines 47 and 48): the approved wrong network and smart wallet texts.</li>
+      <li><b>State:</b> <code>smartWallet</code> (124), <code>eachPhase</code> (126), <code>rejected</code> (127), and the <code>rejectAnswer</code> ref.</li>
+      <li><b>Smart wallet check on open</b> (effect around line 165).</li>
+      <li><b><code>showOutcome</code></b> (line 215): first asks <code>offersPerNameFallback</code>; if yes, shows the offer. A wrong network outcome also turns the network banner on, and a smart wallet outcome turns the notice on.</li>
+      <li><b><code>startPerNameSigning</code></b> (line 251) and <b><code>answerReject</code></b> (283): the October per name flow, restored as it was before phase 3, now only reachable through the offer.</li>
+      <li><b>Render</b> (lines 427 to 441): the offer, the "Signing 3 of 8" screen and the skip or stop prompt.</li>
+    </ul>
+
+    <h5>File 5 · <code>BulkListingSigningStep.tsx</code> · +26 lines</h5>
+    <ul>
+      <li><b><code>BulkFallbackOffer</code></b> (line 144): "Your wallet couldn't sign them all at once…".</li>
+      <li><b><code>BulkFallbackOfferFooter</code></b> (line 158): Sign each name separately, Back to the form.</li>
+    </ul>
+
+    <h5>File 6 · <code>BulkListingSigningStep/index.ts</code> · +11 / −1 lines</h5>
+    <ul><li>Exports the two new pieces and the footer's prop type.</li></ul>
+
+    <h5>File 7 · <code>BulkListingFormStep.tsx</code> · +21 / −1 lines</h5>
+    <ul>
+      <li>New props <code>isSmartWallet</code>, <code>onSwitchWallet</code> (line 42).</li>
+      <li>The notice (line 124): "Smart contract wallets can't bulk list yet…" with Switch wallet (opens the wallet picker). It ranks after log in, connect and wrong network, and before "Verify your wallet first".</li>
+      <li>List disabled for a smart wallet (line 289).</li>
+    </ul>
+
+    <h5>File 8 · <code>src/types/my-domains/bulk.ts</code> · +1 / −1 line</h5>
+    <ul><li><code>BulkBatchFailureReason</code> gains <code>wrong-network</code> and <code>smart-wallet</code>.</li></ul>
+
+    <h4>3. How each new path travels through the code</h4>
+    <div class="tablecard"><table>
+      <tr><th>Situation</th><th>What you see</th><th>Code path</th></tr>
+      <tr><td>The wallet fails on the bulk signature (not a cancel)</td><td>"Your wallet couldn't sign them all at once" → Sign each name separately → "Signing 1 of N" … → result screen</td><td><code>runBulkBatch</code> returns not signed → <code>showOutcome</code> → <code>offersPerNameFallback</code> yes → <code>fallback-offer</code> → <code>startPerNameSigning</code> → hook <code>signAndSubmitBulk</code> → <code>runBulkSigning</code> → <code>signAndPostListingOrder</code> per name → <code>POST /marketplacev2/orders</code></td></tr>
+      <tr><td>A cancel during the per name flow</td><td>"name.xyz was skipped … Continue with the rest / Stop here"</td><td><code>onRejected</code> → <code>rejected</code> step → <code>answerReject</code></td></tr>
+      <tr><td>Smart wallet connected when the drawer opens</td><td>"Smart contract wallets can't bulk list yet" + Switch wallet; List disabled</td><td>effect → hook <code>isSmartWallet</code> → <code>getCode</code> → <code>isSmartContractCode</code></td></tr>
+      <tr><td>Network switched while the drawer was open, then List</td><td>Back to the form: "Your wallet is on the wrong network. Switch to Polygon and try again. Nothing was listed." + the network banner</td><td><code>prepare</code> → <code>getChainId</code> ≠ 137 → <code>BulkPrecheckError('wrong-network')</code> → <code>showOutcome</code></td></tr>
+      <tr><td>Smart wallet found only at List time</td><td>Back to the form: "This is a smart contract wallet, which can't bulk list yet. Nothing was listed." + the notice</td><td><code>prepare</code> → <code>BulkPrecheckError('smart-wallet')</code></td></tr>
+    </table></div>
+
+    <h4>4. Check 1: against Mohit sir's requirements</h4>
+    <div class="tablecard"><table>
+      <tr><th>Requirement (PDF)</th><th>What we did</th><th>Verdict</th></tr>
+      <tr><td>F3: keep per name signing behind "Sign each name separately", shown when the bulk signature errors</td><td>Exactly that wording; shown only on a wallet error or a failed local check, not on a cancel</td><td>Yes</td></tr>
+      <tr><td>F3: ship a wallet test matrix with the PR (MetaMask, Rabby, Coinbase, Trust, Ledger through MetaMask, one WalletConnect phone wallet)</td><td>Matrix created below; only MetaMask has a test account</td><td>Partly: 5 of 6 wallets not tested</td></tr>
+      <tr><td>F9 / decision 10: show a clear message when the connected wallet is a smart contract wallet</td><td>Notice on the form, List disabled, checked again at List time</td><td>Yes</td></tr>
+      <tr><td>Acceptance criterion 1: one signature in MetaMask, Rabby and Coinbase for 50 names</td><td>MetaMask confirmed with 8 names in phase 3</td><td>Not met yet: Rabby, Coinbase not tested; 50 names not tried</td></tr>
+      <tr><td>Other F9 items (7 day expiry margin, under 14 days not eligible, one chain per batch)</td><td>Not in this phase</td><td>Phase 7, as planned</td></tr>
+    </table></div>
+
+    <h4>5. Check 2: against our plan (phase 4)</h4>
+    <div class="tablecard"><table>
+      <tr><th>Plan item</th><th>Done?</th><th>Notes</th></tr>
+      <tr><td>1. Offer "Sign each name separately" when the bulk signature fails for a reason other than a rejection; runs the per name path through the single order endpoint</td><td>Yes</td><td>Also offered when the local check fails, since that means the wallet hashed the message differently (Guru's page calls this <code>WALLET_HASH_MISMATCH</code>)</td></tr>
+      <tr><td>2. Smart contract wallet: don't start, clear message; EIP 7702 (<code>0xef0100</code>) is a normal wallet</td><td>Yes</td><td>Checked when the drawer opens and again at List</td></tr>
+      <tr><td>3. Wallet test matrix in the progress doc, filled with what we can test</td><td>Yes (table exists)</td><td>Phantom, Rabby, Coinbase marked not tested by your decision; Trust, Ledger, WalletConnect: no device</td></tr>
+      <tr><td>Extra: network check at List time (phase 3 Check 3 gap)</td><td>Yes</td><td>Not in the plan; added because the fallback would otherwise be offered for a wrong network</td></tr>
+      <tr><td>Done when: a wallet that fails can still list through the fallback; the matrix exists with every wallet we have</td><td>Partly</td><td>The fallback is proven by tests only: no wallet we have fails the bulk signature</td></tr>
+    </table></div>
+
+    <h4>6. Check 3: against Guru's test page</h4>
+    <div class="tablecard"><table>
+      <tr><th>Topic</th><th>Guru's page</th><th>Ours</th></tr>
+      <tr><td>Network before signing</td><td><code>assertPolygon</code> right before signing</td><td>Same now (<code>getChainId</code> in <code>prepare</code>)</td></tr>
+      <tr><td>Wallet that hashes the tree differently</td><td>Throws <code>WALLET_HASH_MISMATCH</code>, nothing submitted</td><td>Local check fails, nothing submitted, and the per name fallback is offered</td></tr>
+      <tr><td>Per name fallback</td><td>None (a test page)</td><td>Built</td></tr>
+      <tr><td>Smart wallet check</td><td>None</td><td>Built (decision 10)</td></tr>
+    </table></div>
+
+    <h4>7. Decisions</h4>
+    <ul>
+      <li><b>No fallback on a cancel.</b> A cancel is the seller's choice, not a wallet limit; offering more popups would be pushy.</li>
+      <li><b>Fallback on a failed local check too.</b> If a wallet signs but the signature doesn't lead back to the seller, the wallet hashed the big message differently. Per name signing uses the plain message every wallet supports.</li>
+      <li><b>The network and smart wallet checks come before the wallet proof and the signature</b>, so the fallback can never be offered for problems it can't fix.</li>
+      <li><b>A failed code read counts as "not a smart wallet" on open</b> (so a slow RPC doesn't block normal users); the check at List time is the real guard.</li>
+      <li><b>The per name flow is the October one, unchanged.</b> Its "remaining" count bug (F6 item 3) is fixed in phase 5 with the other drawer fixes.</li>
+      <li><b>Phantom, Rabby and Coinbase marked not tested</b> (your decision, 20 Nov): their test needs the domain owning account imported into each extension, and that key is not a throwaway test key.</li>
+    </ul>
+
+    <h4>8. Found while building and testing</h4>
+    <ul>
+      <li><b>"Should have a queue" error on 3002.</b> React's hot reload kept the drawer's old state while the new code added hooks. Not a code bug: every hook in the drawer runs unconditionally and in the same order. A page refresh fixes it; it can't happen on a deployed site. Refresh after each phase before testing.</li>
+      <li><b>Testing other wallets needs the same account.</b> Domains belong to an address, not an extension; a different Phantom address isn't linked to the account and owns nothing. The way to test is importing the owner account into each wallet, or a separate test wallet with a few cheap domains.</li>
+    </ul>
+
+    <h4>9. Checks and test results</h4>
+    <ul>
+      <li>4 new tests (listed under file 2), all pass on the first run. <code>bulkBatch.test.ts</code> now has 15.</li>
+      <li>Full suite: 10 files, 193 tests, all pass. <code>tsc --noEmit</code> clean. ESLint on every changed file: clean. CLAUDE.md §8 greps: nothing new.</li>
+      <li><b>Manual (you, 20 Nov, MetaMask):</b> cancelling the bulk signature returns to the form with prices kept and the "You cancelled the signature. Nothing was listed." toast; the fallback is correctly not offered. Switching the site's network to Ethereum in MetaMask shows the wrong network banner immediately and disables List; switching back clears it. So with MetaMask the List time check is never reached; it remains a guard for wallets that don't report a switch. 2 names: MetaMask shows one popup listing both names on Polygon via Seaport; after Confirm the result screen showed "2 domains are live".</li>
+      <li><b>Spotted:</b> while the site is on Ethereum the List button reads "Approve, then list 2": the approval check reads through the wallet's current network. Harmless (List is disabled by the network banner); phase 6's approval hook will read approvals on Polygon directly.</li>
+    </ul>
+
+    <h4>10. Where to look</h4>
+    <ol>
+      <li><code>phase-explained/bulk-listing-v2-phase4-explained.html</code>: the same in the simplest words.</li>
+      <li><code>bulk-listing-v2-flow-explained.html</code>, section 10.</li>
+      <li><code>bulkBatch.ts</code> lines 86 to 110; then the 4 tests at the end of <code>bulkBatch.test.ts</code>.</li>
+      <li><code>useBulkListingActions.ts</code> lines 18 to 40 and 140 to 150.</li>
+      <li><code>BulkListingFlowModal.tsx</code>: <code>showOutcome</code> (215), <code>startPerNameSigning</code> (251), render (427).</li>
+      <li>The wallet test matrix, just below the v2 testing log.</li>
+    </ol>
+
+    <h4>11. In plain words</h4>
+    <ul>
+      <li>If your wallet can't do the "one signature for all" trick, you're no longer stuck: you can sign each name on its own, like before.</li>
+      <li>A Safe style wallet gets a clear "not yet" instead of a confusing failure.</li>
+      <li>Switching network halfway gives a clear "switch to Polygon" message.</li>
+      <li>We couldn't try other wallets because your domains live in one MetaMask account; they're marked "not tested" honestly.</li>
+    </ul>
+
+    <h4>12. Not done yet</h4>
+    <ul>
+      <li>Not committed; waits for your go.</li>
+      <li>MetaMask runs: a normal 2 name listing, and the network switch.</li>
+      <li>The fallback has not run in a real wallet (none we have fails the bulk signature).</li>
+      <li>Wallet matrix: Rabby, Coinbase, Phantom, Trust, Ledger, WalletConnect not tested; acceptance criterion 1 stays open (phase 10 QA, or whoever has these wallets).</li>
+    </ul>
+  </div>
+
+  <h2 id="v2phase3">v2 Phase 3 · 20 Nov 2026</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">3</span><h3>Sign once, post once (F2 part 2, F6 item 4, V8)</h3><span class="tag done">Committed 20 Nov (7bda94f)</span></div>
+    <p class="meta">20 Nov 2026 · not committed · 10 files (3 new, 7 changed), +387 / −77 lines in the changed files, 436 lines in the new ones · 11 new tests, 189 in total, all green · tested on uat with MetaMask: 8 names, one signature, 5 listed, 3 refused for a real reason</p>
+
+    <h4>Contents of this entry</h4>
+    <ol>
+      <li>Before starting</li>
+      <li>The 10 files, one by one: what changed, where, why</li>
+      <li>How a click on List travels through the code</li>
+      <li>Check 1: against Mohit sir's requirements (F2, F6 item 4, acceptance criteria)</li>
+      <li>Check 2: against our own plan (phase 3 items 1 to 12)</li>
+      <li>Check 3: against Guru's test page (<code>/bulk-listing-testing</code>)</li>
+      <li>Decisions</li>
+      <li>Found while testing</li>
+      <li>Checks and test results</li>
+      <li>Where to look, in reading order</li>
+      <li>In plain words</li>
+      <li>Not done yet</li>
+    </ol>
+
+    <h4>1. Before starting</h4>
+    <ul>
+      <li>Phase 2 committed as <code>ce32655</code> ("Bulk listing v2: one signature bulk order helpers"), after rerunning its 28 tests.</li>
+      <li>uat <b>merged</b> into bulk-list (<code>git pull origin uat</code>, merge commit <code>4da0b6c</code>): no conflicts, whole project type check clean. This brought in Guru's test page (PRs #238 to #240). Decision: from now on uat is merged in, not rebased, because the phase 1 cleanup is done and a rebase would only add a force push. You checked My Domains and <code>/bulk-listing-testing</code> on 3002 afterwards: both fine.</li>
+      <li>Every new piece of on screen text was proposed (sections A to F) and approved before it went in. The open question in A (should List wait for the wallet check?) took the recommended answer: yes.</li>
+    </ul>
+
+    <h4>2. The 10 files, one by one</h4>
+    <p>Line numbers are as of 20 Nov and will move as the files change. Three files are new; seven are changed.</p>
+
+    <h5>File 1 (new) · <code>src/core/services/my-domains/bulkOrders.service.ts</code> · 28 lines</h5>
+    <ul>
+      <li><b>What it is:</b> the only place that calls the bulk endpoint. CLAUDE.md §8 rule 1 says only <code>core/services</code> talks to the backend; plan phase 3 item 1 names this exact path.</li>
+      <li><b><code>postBulkOrders(request)</code></b> (line 13): sends <code>POST /marketplacev2/orders/bulk</code> through the existing <code>callBackend</code> (same login cookie, same base URL as single listing) and returns <code>json.result</code>, the <code>{ batchId, results }</code> answer.</li>
+      <li><b><code>allRejectedAnswer(err)</code></b> (line 24): when every name is refused, the backend answers 400 <code>BATCH_ALL_REJECTED</code>, but the error body still holds the batch id and every name's reason. This function pulls them out, so <code>postBulkOrders</code> returns them like a normal answer. Every other error (401, 429, 503, a batch level 400, no network) is thrown on.</li>
+      <li><b>Why:</b> plan item 7 says "read them from the error body and show the per name reasons, never a generic error". Without this, the drawer would show "Something went wrong" when all names fail.</li>
+    </ul>
+
+    <h5>File 2 (new) · <code>src/helpers/my-domains/bulkBatch.ts</code> · 179 lines · the heart of the phase</h5>
+    <ul>
+      <li><b>What it is:</b> the rules of one batch, as pure functions. It never touches the wallet or the network itself: the hook hands those in (<code>BulkBatchDeps</code>, line 41: <code>prepare</code>, <code>buildOrder</code>, <code>signTree</code>, <code>post</code>, <code>classify</code>, <code>onPhase</code>, plus <code>chainId</code> and <code>seaport</code>). That's what lets the tests run it with a test wallet and a fake backend.</li>
+      <li><b><code>BulkBatchPhase</code></b> (line 32): the four screens the drawer can show while working: <code>verify-wallet</code>, <code>preparing</code>, <code>signing</code>, <code>publishing</code>.</li>
+      <li><b><code>BULK_REJECT_REASONS</code></b> (line 57) and <b><code>bulkRejectReason(code)</code></b> (line 76): the approved wording (section F) for each backend code. Signature and fee codes (<code>BUILDER_BUG_CODES</code>, line 68) all become "Couldn't be checked, try again". Unknown codes become "Couldn't be listed".</li>
+      <li><b><code>NOT_RETRYABLE</code></b> (line 74) and <b><code>isRetryableResult</code></b> (line 83): who goes into "Try these again". Left out: Already listed, Not owned, Name mismatch, An older cheaper listing is still live, and names expiring too soon, because a retry would fail the same way.</li>
+      <li><b><code>mapBulkAnswers(batch, answer)</code></b> (line 88): turns the backend's answer into one result per name. It matches by full name, lower cased, so the order of the answer and capital letters don't matter. <code>status: listed</code> or code <code>DUPLICATE_ORDER</code> (a retry whose first try already got through) count as listed. A rejected name keeps its <code>code</code> and, for <code>CHEAPER_ORDER_STILL_VALID</code>, the <code>olderOrderHashes</code> phase 8 needs. A name missing from the answer gets "No answer for this name, try again". Signature or fee codes are also written to the console as our bug. The names left out before signing come last.</li>
+      <li><b><code>postSignedBatch(batch, deps)</code></b> (line 112): only the sending part. Shows "Publishing", calls <code>post</code>, and returns either <code>posted</code> with the results or <code>post-failed</code> with the reason and the same batch. Used for the first send and for every retry, so a retry is exactly the same bytes.</li>
+      <li><b><code>runBulkBatch(items, durationDays, deps)</code></b> (line 125): the whole flow, in order:
+        <ol>
+          <li><code>prepare()</code>: wallet proof if stale, seller, counter, block time. A failure returns <code>not-signed</code>.</li>
+          <li>"Preparing": for each name, <code>bulkDurationSeconds</code> (the existing rule: the full duration, or shorter if the domain itself expires sooner, or null if too soon). Null means the name is left out with "Expires too soon to list"; otherwise <code>buildOrder</code> makes its order.</li>
+          <li>If every name was left out: nothing to sign, returns the results straight away.</li>
+          <li><code>buildBulkOrderTree</code> (phase 2), "Signing", <code>signTree</code> asks the wallet once, <code>bulkOrderSignatures</code> (phase 2) gives each order its own signature. A cancelled or failed signature returns <code>not-signed</code>.</li>
+          <li><code>findBadBulkSignatures</code> (phase 2): every signature must lead back to the seller. Any failure returns <code>not-signed</code> with reason <code>bad-signature</code>, and nothing is sent.</li>
+          <li>Builds the request <code>{ chainId, orders: [{ parameters: toWireParameters(order), signature, domainName }] }</code> and hands it to <code>postSignedBatch</code>.</li>
+        </ol>
+      </li>
+      <li><b>Imports:</b> only <code>@/lib/seaport-order-builder-v5</code> (pure), types, and other helpers. No network client: that was moved out on purpose (see Decisions).</li>
+    </ul>
+
+    <h5>File 3 (new) · <code>src/helpers/my-domains/bulkBatch.test.ts</code> · 229 lines · 11 tests</h5>
+    <ul>
+      <li>Two throwaway signers made from sentences (seller and stranger), so no key is stored. Orders built with the real <code>buildOrderComponents</code>. The wallet signature is real (<code>_signTypedData</code> on the tree); only the backend is fake.</li>
+      <li>Group "one signature, one post" (line 66): 10 names, a single name, rejected names with reasons and <code>olderOrderHashes</code>, duplicates and a missing answer, matching by name.</li>
+      <li>Group "nothing is posted when it should not be" (line 153): names expiring too soon, a cancelled signature, a cancelled wallet check, a signature from the wrong wallet.</li>
+      <li>Group "retrying a failed post" (line 190): 429 then retry sends identical bytes with one signature in total; skipped names survive a retry.</li>
+    </ul>
+
+    <h5>File 4 (changed) · <code>src/hooks/my-domains/useBulkListingActions.ts</code> · +111 / −5 lines</h5>
+    <ul>
+      <li><b>What it is:</b> where the pure rules meet the wallet and the backend. Composites can't call services directly (§8 rule 6), so the drawer goes through this hook, which the drawer already used.</li>
+      <li><b><code>classifyBulkBatchError(err)</code></b> (line 18): sorts a failure: wallet cancel, wallet not linked, 429, 503 or <code>CHAIN_UNAVAILABLE</code>, anything else. Passed into the helper as <code>classify</code>.</li>
+      <li><b><code>connectedSigner()</code></b>: the connected wallet's signer, or "Connect your wallet first."</li>
+      <li><b><code>postWithProof(request, onPhase)</code></b> (line 91): calls <code>postBulkOrders</code>; if the backend answers <code>WALLET_NOT_VERIFIED</code> (proof went stale), renews it once (its own "Verify your wallet" screen) and sends the same request again. Same rule as single listing's <code>listingOrder.ts</code>.</li>
+      <li><b><code>refreshAfter(outcome)</code></b> (line 102): if anything listed, refreshes the My Domains table (<code>DomainApi.util.invalidateTags(['domain'])</code>), as before.</li>
+      <li><b><code>signAndSubmitBulkOnce(items, durationDays, onPhase)</code></b> (line 117): fills in the deps for <code>runBulkBatch</code>: <code>prepare</code> (signer, <code>ensureWalletVerified</code>, Seaport <code>getCounter</code> and the latest block from the Polygon read provider), <code>buildOrder</code> (the same <code>buildOrderComponents</code> call and fee settings as single listing, price parsed from the text with <code>parseUnits</code>, never through <code>Number</code>), <code>signTree</code> (<code>signer._signTypedData(seaportDomain, tree.types, tree.value)</code>), <code>post</code> (<code>postWithProof</code>).</li>
+      <li><b><code>retryBulkPost(batch, onPhase)</code></b> (line 157): "Try again", via <code>postSignedBatch</code>.</li>
+      <li><b><code>isWalletProofFresh()</code></b> (line 164) and <b><code>verifyWallet()</code></b> (line 175): the form's "Verify your wallet first" notice (V8).</li>
+      <li><b>Kept unchanged:</b> <code>signAndSubmitBulk</code> (line 52), the one popup per name path, for phase 4's fallback (plan item 4, PDF F3).</li>
+    </ul>
+
+    <h5>File 5 (changed) · <code>BulkListingFlowModal.tsx</code> · +116 / −53 lines</h5>
+    <ul>
+      <li><b>Steps</b> (line 24): <code>'rejected'</code> (the old "skip or stop" prompt) is replaced by <code>'post-failed'</code>, which can't be closed by clicking outside (line 26), so you choose Try again or Close on purpose.</li>
+      <li><b>Approved messages</b> (lines 29 to 38): <code>WALLET_CHECK_CANCELLED</code>, <code>SOMETHING_WENT_WRONG</code>, and <code>NOT_SIGNED_TEXT</code> per failure reason (section E).</li>
+      <li><b>New state:</b> <code>failedPost</code> (the kept signed batch and why it failed), <code>retrying</code>, <code>needsWalletCheck</code>, <code>verifyingWallet</code>, and refs <code>pending</code> (what was submitted, for the result screen after a retry) and <code>lastPhase</code> (to tell a cancelled wallet check from a cancelled listing signature).</li>
+      <li><b>Wallet check on open</b> (effect at line 127): when the drawer is open and a wallet is connected, asks <code>isWalletProofFresh()</code>; if not fresh, the form shows the notice.</li>
+      <li><b><code>handleVerifyWallet</code></b> (line 141): the notice's button. Success hides the notice. A cancel shows "You cancelled the wallet check…"; other failures show the wallet not linked text or a friendly error.</li>
+      <li><b><code>showOutcome(outcome)</code></b> (line 182): <code>not-signed</code> goes back to the form with a toast; <code>post-failed</code> shows the new step; <code>posted</code> shows the result screen.</li>
+      <li><b><code>startSigning</code></b> (line 200): now one call, <code>signAndSubmitBulkOnce</code>, instead of the per name loop with its reject prompt.</li>
+      <li><b><code>handleRetryPost</code></b> (line 208): Try again. If the wallet proof needs renewing in between, the wallet check screen shows.</li>
+      <li><b>Render:</b> signing shows <code>BulkBatchStep</code> (or the wallet check screen); post failed shows <code>BulkPostFailedStep</code> with its footer; "Try these again" now uses <code>isRetryableResult</code>.</li>
+      <li><b>Unchanged:</b> login, connect, network gates, the approval steps, the discard confirmation, the result screen itself.</li>
+    </ul>
+
+    <h5>File 6 (changed) · <code>BulkListingSigningStep.tsx</code> · +58 lines</h5>
+    <ul>
+      <li><b><code>BulkBatchStep</code></b> (line 92): "Preparing N listings" and "Publishing N listings" (no "waiting for wallet" row, since the wallet isn't open), and "Sign once for all N names" with the note about the nested list of orders. Singular for one name.</li>
+      <li><b><code>BulkPostFailedStep</code></b> (line 122): "Signed, but not published yet", with one text for too many tries, one for Polygon unavailable, one for everything else.</li>
+      <li><b><code>BulkPostFailedFooter</code></b> (line 132): Try again (shows "Publishing…" and can't be pressed twice) and Close without listing.</li>
+      <li><b>Kept:</b> the per name screen and the reject prompt (lines 18 to 83), for phase 4.</li>
+    </ul>
+
+    <h5>File 7 (changed) · <code>BulkListingSigningStep/index.ts</code> · +9 / −2 lines</h5>
+    <ul><li>Exports the three new components and their prop types, so the drawer can import them.</li></ul>
+
+    <h5>File 8 (changed) · <code>BulkListingFormStep.tsx</code> · +32 / −12 lines</h5>
+    <ul>
+      <li>New props <code>needsWalletCheck</code>, <code>onVerifyWallet</code>, <code>verifyingWallet</code> (line 38).</li>
+      <li>The notice (line 120): "Verify your wallet first", shield icon, Verify wallet button. It comes after the login, connect and network notices, so only one notice shows at a time, the most urgent one.</li>
+      <li>The footer's List button is disabled while the notice shows (line 269), so List always opens exactly one signature popup.</li>
+      <li>The note (line 275): "One signature covers all N names, and cancelling is free." (was "One signature per name").</li>
+    </ul>
+
+    <h5>File 9 (changed) · <code>src/lib/marketplace-order-client.ts</code> · +8 / −5 lines, two small additions</h5>
+    <ul>
+      <li><code>BackendError</code> has a new optional <code>body</code> (line 139), filled by <code>callBackend</code> (line 161). Needed by file 1 to read the "every name refused" reasons. No existing code reads it, so nothing else changes.</li>
+      <li><code>isWalletVerificationFresh(address?)</code> (line 229) takes an optional address, so the drawer can ask "is the proof fresh <i>for this wallet</i>". Without the address it behaves exactly as before (delist uses it that way).</li>
+    </ul>
+
+    <h5>File 10 (changed) · <code>src/types/my-domains/bulk.ts</code> · +53 lines</h5>
+    <ul>
+      <li><code>BulkListingResult</code> (line 50) gets <code>code</code> and <code>olderOrderHashes</code>.</li>
+      <li>New shapes: <code>BulkOrderPayload</code> (96), <code>BulkOrdersRequest</code> (102), <code>BulkOrderItemResult</code> (108), <code>BulkOrdersResponse</code> (119), all copied from the backend's DTO on uat; <code>SignedBulkBatch</code> (125), the kept batch; <code>BulkBatchFailureReason</code> (134); <code>BulkBatchOutcome</code> (136), the three outcomes.</li>
+    </ul>
+
+    <h4>3. How a click on List travels through the code</h4>
+    <div class="tablecard"><table>
+      <tr><th>#</th><th>What you see</th><th>Code</th></tr>
+      <tr><td>1</td><td>Drawer opens; maybe "Verify your wallet first"</td><td>Modal effect line 127 → hook <code>isWalletProofFresh</code> → lib <code>isWalletVerificationFresh(address)</code></td></tr>
+      <tr><td>2</td><td>You click Verify wallet, sign a free message</td><td>Modal <code>handleVerifyWallet</code> → hook <code>verifyWallet</code> → lib <code>ensureWalletVerified</code></td></tr>
+      <tr><td>3</td><td>You click List (approval first if missing, unchanged)</td><td>Modal <code>handleSubmit</code> → <code>startSigning</code> → hook <code>signAndSubmitBulkOnce</code> → helper <code>runBulkBatch</code></td></tr>
+      <tr><td>4</td><td>"Preparing N listings"</td><td><code>prepare</code> (counter, block), <code>bulkDurationSeconds</code>, <code>buildOrderComponents</code> per name</td></tr>
+      <tr><td>5</td><td>"Sign once for all N names", one MetaMask popup</td><td><code>buildBulkOrderTree</code> → <code>signer._signTypedData</code> → <code>bulkOrderSignatures</code></td></tr>
+      <tr><td>6</td><td>(nothing visible)</td><td><code>findBadBulkSignatures</code>: every signature must lead back to you</td></tr>
+      <tr><td>7</td><td>"Publishing N listings"</td><td><code>postSignedBatch</code> → hook <code>postWithProof</code> → service <code>postBulkOrders</code> → <code>POST /marketplacev2/orders/bulk</code></td></tr>
+      <tr><td>8a</td><td>"5 of 8 domains are live" and the Not listed reasons</td><td><code>mapBulkAnswers</code> → modal <code>showOutcome</code> → <code>BulkListingSuccessStep</code>; table refresh in <code>refreshAfter</code></td></tr>
+      <tr><td>8b</td><td>"Signed, but not published yet" → Try again</td><td><code>showOutcome</code> → <code>BulkPostFailedStep</code>; <code>handleRetryPost</code> → <code>retryBulkPost</code> → <code>postSignedBatch</code> (same bytes)</td></tr>
+      <tr><td>8c</td><td>Back to the form with a message</td><td><code>showOutcome</code> with <code>not-signed</code> → <code>NOT_SIGNED_TEXT</code></td></tr>
+    </table></div>
+
+    <h4>4. Check 1: against Mohit sir's requirements</h4>
+    <p>Source: the PDF, section F2 (page 5), F6 item 4 (page 6), B1 (pages 6 and 7), acceptance criteria for phase 1 (page 18).</p>
+    <div class="tablecard"><table>
+      <tr><th>Requirement (PDF text)</th><th>What we did</th><th>Verdict</th></tr>
+      <tr><td>F2.1 Build every OrderComponents first; counter and block time read once per batch</td><td><code>prepare</code> reads both once; every order is built before the wallet is asked (helper lines 125 onward)</td><td>Yes</td></tr>
+      <tr><td>F2.2 Height <code>max(1, ceil(log2 n))</code>, pad to 2<sup>h</sup> with an empty order</td><td>Phase 2's <code>buildBulkOrderTree</code>, now used by the drawer</td><td>Yes (phase 2)</td></tr>
+      <tr><td>F2.3 Sign <code>BulkOrder(OrderComponents[2]...[2] tree)</code> against the chain's Seaport domain; port from Seaport.js, no hand written type strings</td><td><code>signTree</code> signs <code>tree.types</code> and <code>tree.value</code> from phase 2 with <code>seaportDomain(Seaport, 137)</code>; types built in code</td><td>Yes</td></tr>
+      <tr><td>F2.4 Per order signature: 64 byte compact, 3 byte index, h proof hashes</td><td><code>bulkOrderSignatures</code> (phase 2); the test checks each order's index and proof length</td><td>Yes</td></tr>
+      <tr><td>F2.5 Verify locally before posting: rebuild root, recover signer</td><td><code>findBadBulkSignatures</code> before the request is even built; a test proves a wrong signer posts nothing</td><td>Yes</td></tr>
+      <tr><td>F2.6 Post once to B1 and render each item's result</td><td>One <code>POST /orders/bulk</code>; results per name on the existing "N of M are live" screen</td><td>Yes</td></tr>
+      <tr><td>F6.4 Keep the signed orders in memory and retry only the POST</td><td><code>SignedBulkBatch</code> kept in drawer state; Try again calls <code>postSignedBatch</code> with the same request; a test compares the bytes</td><td>Yes</td></tr>
+      <tr><td>B1 body <code>{ chainId: 137, orders: [{ parameters, signature, domainName }] }</code>, response <code>{ batchId, results }</code></td><td>Exactly this shape (types copied from the backend DTO)</td><td>Yes</td></tr>
+      <tr><td>B4 DUPLICATE_ORDER on a retry counts as listed</td><td><code>mapBulkAnswers</code> counts it as listed (the backend also reports it as listed already)</td><td>Yes</td></tr>
+      <tr><td>Design issue 9: no partial success state in Figma; "design it"</td><td>The existing "N of M are live" screen with reasons per name; seen working in the real test (5 of 8)</td><td>Yes</td></tr>
+      <tr><td>Acceptance: 50 names, at most one approval and exactly one signature in MetaMask, Rabby, Coinbase</td><td>One signature confirmed in MetaMask with 8 names</td><td>Partly: 50 names, Rabby and Coinbase not tried (phase 4 and 10)</td></tr>
+      <tr><td>Acceptance: a batch with one already listed name lists the rest and reports ALREADY_LISTED</td><td>Logic covered by tests; the real test showed the same behaviour with a different code (CHEAPER_ORDER_STILL_VALID)</td><td>Partly: real ALREADY_LISTED case not tried yet (phase 10)</td></tr>
+      <tr><td>Acceptance: retrying after a network error asks for no new signature and creates no duplicates</td><td>Covered by tests; backend makes duplicates count as listed</td><td>Partly: not tried by hand yet</td></tr>
+      <tr><td>F3 fallback "Sign each name separately"</td><td>Old path kept in code, not offered yet</td><td>Phase 4, as planned</td></tr>
+    </table></div>
+    <p><b>One small difference from the PDF's wording:</b> F2 says "64 byte compact signature". We send exactly that. Guru's test page sends the 65 byte form; the backend accepts both (see Check 3).</p>
+
+    <h4>5. Check 2: against our own plan (phase 3 items)</h4>
+    <div class="tablecard"><table>
+      <tr><th>Plan item</th><th>Done?</th><th>Notes</th></tr>
+      <tr><td>1. Service at <code>src/core/services/my-domains/bulkOrders.service.ts</code>, real endpoint, tests with a fake post function</td><td>Yes</td><td>Exactly that path; tests pass a fake <code>post</code></td></tr>
+      <tr><td>2. Build every order, counter and block once, sign once, verify, keep in memory, then post; three progress labels</td><td>Yes</td><td>Labels are the approved "Preparing / Sign once / Publishing" instead of the plan's draft names</td></tr>
+      <tr><td>3. Results per name; DUPLICATE_ORDER counts as listed; retry the post only; CHEAPER_ORDER_STILL_VALID shown per name</td><td>Yes</td><td>Seen for real: "An older, cheaper listing is still live"</td></tr>
+      <tr><td>4. The per name loop stops being the main path, kept for phase 4</td><td>Yes</td><td><code>signAndSubmitBulk</code>, <code>runBulkSigning</code>, the per name screen and prompt are untouched</td></tr>
+      <tr><td>5. Tests for the batch rules</td><td>Yes</td><td>11 tests</td></tr>
+      <tr><td>6. Wallet proof when the drawer opens (V8)</td><td>Yes, slightly different</td><td>The plan said "run the check as the drawer opens". Popping a wallet window the moment the drawer opens felt pushy, so it's a notice with a button, and List waits for it. Approved in section A.</td></tr>
+      <tr><td>7. BATCH_ALL_REJECTED: read results from the error body</td><td>Yes</td><td>Service, <code>allRejectedAnswer</code></td></tr>
+      <tr><td>8. 429 friendly message; retry can't fire twice</td><td>Yes</td><td>"Too many tries in a minute…"; the button is disabled while sending</td></tr>
+      <tr><td>9. Several wallets (V9)</td><td>No</td><td>Waits on the team. Today such a name comes back as "Not owned by the connected wallet" and is left out of Try these again.</td></tr>
+      <tr><td>10. Real test on uat: 2 names, then 10</td><td>Partly</td><td>Tested with 8 names in one go. The 2 name and 10 name runs weren't done separately.</td></tr>
+      <tr><td>11. Bring in Guru's test page first</td><td>Yes</td><td>Merged (not rebased), <code>4da0b6c</code></td></tr>
+      <tr><td>12. Use his page as the reference, never import from it</td><td>Yes</td><td>No import from <code>src/bulk-listing-testing</code>; compared in Check 3</td></tr>
+      <tr><td>Done when: 2 and 10 names, one signature and one post, listed; a retry asks for no new signature; tests pass</td><td>Mostly</td><td>One signature and one post confirmed by hand; the retry is proven by tests only</td></tr>
+    </table></div>
+
+    <h4>6. Check 3: against Guru's test page</h4>
+    <p>Compared with <code>src/bulk-listing-testing/actions.ts</code> (<code>submitBulkListing</code>, <code>postBulkBody</code>, <code>retryBulkBody</code>) and <code>bulkSigning.ts</code> (<code>signBulkOrdersWithWallet</code>).</p>
+    <div class="tablecard"><table>
+      <tr><th>Step</th><th>Guru's page</th><th>Ours</th><th>Same?</th></tr>
+      <tr><td>Wallet proof</td><td><code>ensureWalletVerified</code> before signing, only if stale</td><td>Same call, done from the form's notice first, and again in <code>prepare</code> if it went stale</td><td>Same rule</td></tr>
+      <tr><td>Counter and block time</td><td>Read once (<code>readCounterAndBlock</code>)</td><td>Read once (<code>prepare</code>)</td><td>Same</td></tr>
+      <tr><td>Order building</td><td><code>buildOrderComponents</code> with <code>DEFAULTS</code> domain NFT, USDT, fee recipient, fee bps; price via <code>parseUnits(…, 6)</code></td><td>Identical arguments</td><td>Same</td></tr>
+      <tr><td>Duration</td><td>One duration for every name</td><td>Per name: full, or shorter if the domain expires sooner, or left out if too soon (the rule we already had)</td><td>Ours is stricter on purpose</td></tr>
+      <tr><td>Tree and type hash</td><td>Own ethers 5 port, full EIP712 type hash</td><td>Our phase 2 port, full EIP712 type hash</td><td>Same maths</td></tr>
+      <tr><td>Wallet signing</td><td><code>_signTypedData(seaportDomain, bulkOrderTypes(h), { tree })</code></td><td><code>_signTypedData(seaportDomain, tree.types, tree.value)</code></td><td>Same</td></tr>
+      <tr><td>Signature sent</td><td>65 bytes + index + proof</td><td>64 bytes (compact) + index + proof, as the PDF asks</td><td>Different, both accepted by the backend</td></tr>
+      <tr><td>Local check</td><td>Recovers the root's signer once, then every order with <code>recoverOrderSigner</code></td><td><code>findBadBulkSignatures</code> on every order</td><td>Same safety</td></tr>
+      <tr><td>Request body</td><td><code>{ chainId: 137, orders: [{ parameters: toWireParameters, signature, domainName }] }</code></td><td>Identical</td><td>Same</td></tr>
+      <tr><td>Stale proof answer</td><td>403 <code>WALLET_NOT_VERIFIED</code> → renew once → resend same body</td><td>Same, in <code>postWithProof</code></td><td>Same</td></tr>
+      <tr><td>Retry</td><td>Resends the last body byte for byte, no new signature</td><td>Same, <code>postSignedBatch</code></td><td>Same</td></tr>
+      <tr><td>All rejected</td><td>Reads <code>results</code> from the error body</td><td>Same, in the service</td><td>Same</td></tr>
+      <tr><td>Error hints</td><td><code>CODE_HINTS</code>, technical wording for testers</td><td>Approved seller wording; codes kept on each result</td><td>Same codes, friendlier text</td></tr>
+      <tr><td>Network check</td><td>Checks the wallet is on Polygon right before signing</td><td>The drawer's network banner disables List; not re-checked at the moment of signing</td><td>Small gap: if you switch networks while the drawer is open, the wallet refuses and you get "Something went wrong before signing"</td></tr>
+      <tr><td>Keeping signed orders</td><td>Saves them in the browser (localStorage) for its own on chain cancels</td><td>In memory only, for the retry; phase 8 will fetch them from the backend, so cancel works on any device</td><td>Different on purpose</td></tr>
+    </table></div>
+    <p><b>Conclusion:</b> the parts that decide whether a listing is valid (order fields, tree, type hash, signing call, local check, request body, retry, stale proof handling) match Guru's page. The differences are the 64 vs 65 byte signature (both accepted), our per name duration rule, and where signed orders are kept.</p>
+
+    <h4>7. Decisions</h4>
+    <ul>
+      <li><b>Layering.</b> The first draft of the helper imported <code>BackendError</code> from the network client to sort errors. That breaks §8 rule 3 (helpers are pure) and would pull fetch and cookie code into the tests. Fixed before anything ran: error sorting moved into the hook (<code>classifyBulkBatchError</code>), passed in as <code>classify</code>; the "all rejected" reading moved into the service.</li>
+      <li><b>"Try these again" skips names that would fail the same way:</b> Already listed, Not owned, Name mismatch, and an older cheaper listing still live.</li>
+      <li><b>Signature or fee codes</b> (<code>BAD_SIGNATURE</code>, <code>BAD_BULK_PROOF</code>, <code>FEE_MISMATCH</code> and similar) show one plain reason and are logged as our bug, as the single flow does.</li>
+      <li><b>Wallet check as a notice, not an automatic popup</b>, with List disabled until done (section A, approved).</li>
+      <li><b>Post failed can't be closed by clicking outside</b>: you choose Try again or Close without listing, so the kept signature isn't thrown away by accident.</li>
+      <li><b>Grammar:</b> with a single name the approved text reads "1 name" and "1 listing", not "all 1 names".</li>
+    </ul>
+
+    <h4>8. Found while testing</h4>
+    <p>On the real test, 3 of 8 names (<code>theforceis.unstoppable</code>, <code>mohitagarwal.lfg</code>, <code>ishasingh.og</code>) were refused with <code>CHEAPER_ORDER_STILL_VALID</code> ("An older, cheaper listing is still live"). Those names had been listed earlier and delisted with today's delist, which only hides the listing on our site; the old, cheaper signed order is still valid on Polygon until it expires. Relisting higher would let a buyer fill the old order instead, so Guru's B7 rule refuses it. This is the expected behaviour. The fix is phase 8: cancel the old orders on chain first (one transaction), with a prompt for exactly this case. Until then such a name can only be relisted at or below its old price. The success note "Cancel any of them any time, free and instant…" is what leads sellers into this, so phase 8 changes it too.</p>
+
+    <h4>9. Checks and test results</h4>
+    <ul>
+      <li><b>New tests (11), all pass on the first run:</b> 10 names give one signature and one post, and every order's signature decodes to its own position with a height 4 proof; a single name works; rejected names get their approved reasons and keep <code>olderOrderHashes</code>; "Try these again" includes only retryable names; <code>DUPLICATE_ORDER</code> counts as listed; a name missing from the answer is flagged; answers match by name in any order and letter case; names expiring too soon are left out, and nothing is signed when all do; a rejected signature or wallet check posts nothing; a signature from the wrong wallet posts nothing; a retry after 429 or a network error sends the same bytes and asks for no new signature, and keeps the skipped names.</li>
+      <li><b>Full suite:</b> 10 files, 189 tests, all pass.</li>
+      <li><b>Type check</b> (<code>tsc --noEmit</code>, whole project): clean.</li>
+      <li><b>ESLint</b> on every changed file: no new problems (one old <code>any</code> warning in <code>marketplace-order-client.ts</code> line 82, not ours).</li>
+      <li><b>CLAUDE.md §8 greps:</b> nothing new. The drawer's hook imports were already there and are the allowed "action hook owned by a button" exception.</li>
+      <li><b>Manual, uat, MetaMask (you, 20 Nov):</b> 8 names in one go, exactly one listing signature, "5 of 8 domains are live", the other 3 shown as "An older, cheaper listing is still live".</li>
+    </ul>
+
+    <h4>10. Where to look, in reading order</h4>
+    <ol>
+      <li><b>The story first:</b> <code>bulk-listing-v2-flow-explained.html</code>, section 8 "Phase 3 in detail", then the click trace in section 3 above.</li>
+      <li><b>The rules:</b> <code>src/helpers/my-domains/bulkBatch.ts</code>, read <code>runBulkBatch</code> (line 125) top to bottom, then <code>postSignedBatch</code> (112), then <code>mapBulkAnswers</code> (88).</li>
+      <li><b>The proof it works:</b> <code>src/helpers/my-domains/bulkBatch.test.ts</code>; each <code>it(...)</code> title is a sentence about one rule.</li>
+      <li><b>The real world wiring:</b> <code>src/hooks/my-domains/useBulkListingActions.ts</code>, <code>signAndSubmitBulkOnce</code> (117) and <code>postWithProof</code> (91).</li>
+      <li><b>The backend call:</b> <code>src/core/services/my-domains/bulkOrders.service.ts</code> (28 lines).</li>
+      <li><b>The screens:</b> <code>BulkListingFlowModal.tsx</code>, <code>showOutcome</code> (182), <code>startSigning</code> (200), <code>handleRetryPost</code> (208); then <code>BulkListingSigningStep.tsx</code> from line 85 and <code>BulkListingFormStep.tsx</code> line 120.</li>
+      <li><b>The shapes:</b> <code>src/types/my-domains/bulk.ts</code> from line 96.</li>
+      <li><b>To compare with Guru:</b> <code>src/bulk-listing-testing/actions.ts</code>, <code>submitBulkListing</code>, side by side with <code>runBulkBatch</code>.</li>
+      <li><b>To see the exact diff:</b> <code>git diff</code> for the 7 changed files; the 3 new files are untracked.</li>
+      <li><b>File by file in plain words:</b> <code>bulk-listing-v2-file-changes.html</code>, Phase 3.</li>
+    </ol>
+
+    <h4>11. In plain words</h4>
+    <ul>
+      <li><b>Before:</b> 8 names meant 8 MetaMask popups and 8 separate sends.</li>
+      <li><b>Now:</b> one popup and one send for all of them. The site checks the signature itself before sending, and if the send fails it can try again without asking you to sign again.</li>
+      <li><b>Checked three ways:</b> it does what Mohit sir's F2 and F6.4 ask, what our plan's phase 3 asks (two small, approved differences), and it builds the same listings Guru's test page builds.</li>
+      <li><b>The 3 refused names</b> weren't a bug: each still had an older, cheaper listing that can be bought on chain. Phase 8 adds the button to cancel those properly.</li>
+    </ul>
+
+    <h4>12. Not done yet</h4>
+    <ul>
+      <li>Not committed; waits for your go.</li>
+      <li>Not tried by hand: a cancelled signature, a real failed post and retry, a real ALREADY_LISTED name, Phantom, 50 names, separate 2 and 10 name runs.</li>
+      <li>Network re-check at the moment of signing (small gap found in Check 3); can be added in phase 4 with the wallet work.</li>
+      <li>Wallets that can't sign the big message, and the "Sign each name separately" fallback: phase 4.</li>
+      <li>Names held by a second wallet (V9) still waits on the team.</li>
+    </ul>
+  </div>
+
+  <h2 id="v2phase2">v2 Phase 2 · 19 Nov 2026</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">2</span><h3>Bulk signature helpers (F2 part 1)</h3><span class="tag done">Committed 20 Nov (ce32655)</span></div>
+    <p class="meta">19 Nov 2026 · not committed · 28 new tests green on the first run · nothing on screen changes</p>
+    <h4>Built</h4>
+    <ul>
+      <li><code>src/helpers/my-domains/bulkOrderTree.ts</code>, pure functions (no wallet, no network): <code>bulkTreeHeight</code>, <code>bulkOrderTypes</code>, <code>bulkOrderTypeHash</code>, <code>emptyOrderComponents</code>, <code>buildBulkOrderTree</code>, <code>bulkOrderProof</code>, <code>bulkOrderDigest</code>, <code>toCompactSignature</code>, <code>encodeBulkSignature</code>, <code>bulkOrderSignatures</code>, <code>decodeBulkSignature</code>, <code>rootFromProof</code>, <code>recoverBulkSigner</code>, <code>findBadBulkSignatures</code>, plus <code>BULK_ORDER_MAX_HEIGHT</code> (24, Seaport's limit).</li>
+      <li><code>src/helpers/my-domains/bulkOrderTree.test.ts</code>: 28 Vitest tests.</li>
+      <li><code>src/helpers/my-domains/__fixtures__/bulkOrderTree.fixtures.json</code> (120 KB): reference output from Seaport.js 4.4.1 for 1, 2, 3, 4 and 50 orders.</li>
+      <li><code>src/types/my-domains/bulk.ts</code>: three new types, <code>Eip712Types</code>, <code>BulkOrderTree</code>, <code>DecodedBulkSignature</code> (shared types live in <code>src/types</code>, CLAUDE.md §8 rule 5).</li>
+    </ul>
+    <h4>How it works, step by step (matches F2 steps 2 to 5)</h4>
+    <ol>
+      <li><b>Height.</b> <code>max(1, ceil(log2 n))</code>: 1 or 2 orders give height 1, 3 or 4 give 2, 50 gives 6 (64 leaves). Zero orders, or more than height 24 allows, throw.</li>
+      <li><b>Padding.</b> The batch is filled up to 2<sup>h</sup> with an empty order (every field zero, empty offer and consideration), built from the EIP712 types the same way Seaport.js's <code>DefaultGetter</code> does. An empty order can never be filled.</li>
+      <li><b>Type.</b> <code>BulkOrder { OrderComponents[2]...[2] tree }</code>, one <code>[2]</code> per level, built in code from our existing <code>EIP712_TYPES</code>. No type string is typed by hand.</li>
+      <li><b>Tree.</b> Each leaf is the order hash (<code>hashStruct(OrderComponents)</code>, our existing <code>computeOrderHash</code>); each parent is <code>keccak256(left ‖ right)</code>, unsorted, as Seaport.js builds it.</li>
+      <li><b>Message to sign.</b> The padded orders nested in pairs (<code>[[a, b], [c, d]]</code> and so on), which is what the wallet shows and signs once.</li>
+      <li><b>Each order's signature.</b> The wallet's 65 byte signature is shortened to 64 bytes (EIP 2098, as Seaport.js does), then the 3 byte leaf index, then one 32 byte proof hash per level. For 50 names that is 64 + 3 + 6 × 32 = 259 bytes per order.</li>
+      <li><b>Local check.</b> For each order: split the signature, rebuild the root from the order hash and the proof (the index bits say left or right at each level), compute <code>keccak256(0x1901 ‖ domainSeparator ‖ keccak256(typeHash ‖ root))</code>, recover the signer and compare it with the seller. <code>findBadBulkSignatures</code> returns the positions that fail, so an empty list means the whole batch is good. This mirrors the <code>verifyTypedData</code> check in <code>listingOrder.ts</code>.</li>
+    </ol>
+    <h4>Decisions</h4>
+    <ul>
+      <li><b>Ported, not installed.</b> Seaport.js needs ethers 6 and merkletreejs; this app is on ethers 5.7.2. The tree, type and padding code is ported from Seaport.js 4.4.1 (MIT, <code>src/utils/eip712</code>) to ethers 5, with a plain loop instead of merkletreejs. No new dependency. The file header says where every piece comes from.</li>
+      <li><b>The full type hash, not Seaport.js's helper.</b> Seaport.js's <code>getBulkOrderTypeHash</code> hashes only the field text <code>OrderComponents[2]...</code>, which does not match the signed message (Seaport.js never uses it when signing). Ours hashes the full EIP712 type string. For height 6 the real hash is <code>0x1c19f719…0b55</code>; the tests prove the digest built with it equals the digest the wallet signs. Explained in full under "Found while building" below.</li>
+      <li><b>64 byte signature by default, 65 also accepted.</b> We send 64 bytes as F2 asks and Seaport.js does. The decoder and the local check also accept the 65 byte form (Seaport and the backend's check 2 accept both), told apart by length.</li>
+      <li><b>Imports.</b> The helper imports <code>EIP712_TYPES</code>, <code>computeOrderHash</code> and <code>seaportDomain</code> from <code>src/lib/seaport-order-builder-v5.ts</code>, as <code>bulkListing.ts</code> already does; no hooks, services or components.</li>
+      <li><b>Fixtures (plan question V1).</b> The plan's default was the shared package's <code>signBulkOrders</code>, but the backend's packages aren't installed and that repo is private, so the fixtures come from Seaport.js itself, the reference the PDF names. A one off script, run from an isolated scratch folder with install scripts turned off, signed with a test only key derived from a phrase (<code>ethers id(...)</code>), so no raw key sits in the repo and the key was never funded. The script is kept in <code>dev-docs/bulk-listing/scripts/</code> with a README on how to rerun it (local only, like all of dev-docs).</li>
+    </ul>
+    <h4>Found while building: Seaport.js's type hash helper gives the wrong value</h4>
+    <p><b>Background.</b> What the wallet actually signs is one 32 byte number, the <b>digest</b>. Mohit's PDF (B2 step 3) writes the formula: <code>keccak256(0x1901 ‖ domainSeparator ‖ keccak256(bulkOrderTypehash(h) ‖ root))</code>. Three ingredients: the domain separator (which says "Seaport 1.6 on Polygon at this address"), the tree's root, and the <b>type hash</b>. The type hash is a fingerprint of the message's <i>shape</i>: under EIP712 it is <code>keccak256</code> of the full type text, which for a bulk order of height 1 is <code>BulkOrder(OrderComponents[2] tree)ConsiderationItem(uint8 itemType,address token,…)OfferItem(…)OrderComponents(address offerer,…)</code>, every struct spelled out. Wallets, Seaport's contract and the backend all compute it this way, so all of them arrive at the same digest.</p>
+    <p><b>What we found.</b> Seaport.js has a helper, <code>getBulkOrderTypeHash(height)</code>, that is supposed to give this value. It hashes only the short text <code>OrderComponents[2]</code> (just the field's type, for height 1), not the full type string. So its answer is a different number:</p>
+    <div class="tablecard"><table>
+      <tr><th>Height</th><th>Seaport.js helper</th><th>Correct (full EIP712 type)</th></tr>
+      <tr><td>1 (1 or 2 names)</td><td><code>0xe6ff1186…</code></td><td><code>0x3ca2711d…</code></td></tr>
+      <tr><td>2 (3 or 4 names)</td><td><code>0xe69f7b73…</code></td><td><code>0xbf8e29b8…</code></td></tr>
+      <tr><td>6 (33 to 64 names)</td><td><code>0xf8ec28c8…</code></td><td><code>0x1c19f719…</code></td></tr>
+    </table></div>
+    <p><b>How we know which one is right.</b></p>
+    <ol>
+      <li>Using the correct value in Mohit's formula gives exactly the digest that ethers' own EIP712 code hashes, and exactly the message the test wallet signed, for all five fixture batches. Using the helper's value gives a digest nobody signed.</li>
+      <li>Seaport.js contradicts itself: its own self check, <code>Eip712MerkleTree.getBulkOrderHash()</code>, uses the helper's method and then compares with the real EIP712 hash. Run on our fixtures it fails every time with "expected derived bulk order hash to match".</li>
+      <li>Signing with Seaport.js still works because its <code>signBulkOrder</code> never calls either of these two functions. It lets the wallet library hash the full type itself. The broken helper simply goes unused, which is how the bug has gone unnoticed.</li>
+    </ol>
+    <p><b>Why it matters to us.</b> Phase 2 had to build the digest by hand (Mohit's formula) to do the local check before posting (F2 step 5). If we had copied the helper, the local check would have rejected every valid signature, or, written the other way round, the check would compare against a value no wallet ever signs. We hash the full EIP712 type string instead (<code>bulkOrderTypeHash</code> in <code>bulkOrderTree.ts</code>), the fixture records the correct value, and a test pins it for every case.</p>
+    <p><b>Who else could be affected.</b> Anyone who ported Seaport.js's helper to check bulk signatures by hand. The backend's check 2 lives in the shared package <code>@endlessdomains/order-builder</code>, which we can't read. If it used the helper, it would reject every bulk listing; Guru's tests sign with the package's own <code>signBulkOrders</code>, so a matching mistake on both sides could pass his tests and still fail with real wallets. Worth asking him once he's free; it's in the review page's questions.</p>
+    <p><b>In plain words.</b> The wallet signs a fingerprint built from three parts. One part, the "shape fingerprint", must be made from the full description of the message. Seaport.js has a shortcut function that fingerprints only a short piece of that description, so it gets a different answer. Seaport.js itself never uses that function when signing, which is why nobody noticed. We use the full description, and we proved ours is right because it reproduces exactly what the wallet signed.</p>
+
+    <h4>Checks</h4>
+    <ul>
+      <li><b>Against Seaport.js, for 1, 2, 3, 4 and 50 orders:</b> same height, same <code>BulkOrder</code> type, same type hash, same root, same digest (from the formula and from ethers' own EIP712 hash), same 65 byte wallet signature (ECDSA in ethers is deterministic, so the same key and message give the same bytes), same 64 byte compact signature, and the same signature for every single order. All byte for byte.</li>
+      <li><b>Local check catches tampering</b> (50 orders): one changed proof byte, a wrong leaf index, an index past the end of the tree, two orders' signatures swapped, a price changed after signing, the wrong seller, the wrong chain. Each fails exactly the orders it should.</li>
+      <li><b>Smaller cases:</b> heights for 1 to 65 orders, empty batch refused, empty order is all zero, a plain 65 byte signature is not mistaken for a bulk one, no proof is given for a padding leaf, the 65 byte bulk form verifies.</li>
+      <li>Full suite <code>vitest run</code>: 9 files, 178 tests, all pass. <code>tsc --noEmit</code> clean. ESLint clean on the three changed files. CLAUDE.md §8 greps: nothing new (the two helper hits are the known old <code>historyApi.ts</code> and <code>CreateFileFromUrl .tsx</code>).</li>
+      <li>No browser check: nothing renders in this phase.</li>
+    </ul>
+    <h4>In plain words</h4>
+    <ul>
+      <li><b>What it is:</b> the maths behind "sign once for all names". Like building and bench testing an engine before it goes in the car; phase 3 puts it in the drawer.</li>
+      <li><b>The tree:</b> every listing is turned into a fingerprint, fingerprints are paired up and fingerprinted again until one fingerprint is left at the top. The wallet signs only that top one. Change any listing and the top changes, so one signature covers them all.</li>
+      <li><b>Each listing's own signature:</b> the one wallet signature plus a short "path" (the listing's position and its neighbours on the way up), so a buyer can buy any single name and Seaport can still check it.</li>
+      <li><b>Why we trust it:</b> the official Seaport.js produced the expected answers, and ours match them exactly, down to the last byte, for batches of 1 to 50 names.</li>
+    </ul>
+    <h4>Not done yet</h4>
+    <ul>
+      <li>No real wallet has signed a bulk message yet (phase 3, then the wallet matrix in phase 4).</li>
+      <li>The backend's own test signatures (B2, heights 1, 2 and 6) haven't been shared to compare with; listed under "questions to ask once he's free" in the review page.</li>
+      <li>Not committed; waits for your go.</li>
+    </ul>
+  </div>
+
+  <h2 id="v2phase1">v2 Phase 1 · 19 Nov 2026</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">1</span><h3>Rebase onto uat (F1)</h3><span class="tag done">Done and pushed</span></div>
+    <p class="meta">19 Nov 2026 · pushed to <code>origin/bulk-list</code> as <code>8209a6a</code> · user checked on 3002</p>
+    <h4>Before</h4>
+    <ul>
+      <li><code>bulk-list</code> was 4 commits ahead of uat and 14 behind. Ahead: <code>5968cbc</code> "Bulk listing on My Domains" (45 files), <code>502469e</code> (CLAUDE.md note only) and two "Merge dark-mode into bulk-list" commits. Behind: Trails (PR #237 and its fixes), the dark mode pull requests #232 to #235, the Security tab and Profile fixes.</li>
+      <li>No file was changed on both sides, so no code conflicts were expected.</li>
+    </ul>
+    <h4>Done</h4>
+    <ul>
+      <li>Backup branch <code>bulk-list-backup</code> made at the old tip <code>e1ba190</code> (local only).</li>
+      <li><code>git rebase origin/uat</code>: the bulk commit replayed cleanly as <code>8209a6a</code>; the two merge commits were dropped because uat already has everything they brought in.</li>
+      <li><code>502469e</code> stopped with a modify/delete conflict, because CLAUDE.md is no longer tracked on uat (<code>9128cb3</code>). Skipped with <code>git rebase --skip</code>.</li>
+      <li>Pushed with <code>git push --force-with-lease=bulk-list:e1ba190</code>, so the push would have been refused if anyone else had pushed to the branch meanwhile. <code>origin/bulk-list</code> now equals local.</li>
+    </ul>
+    <h4>Found while doing it</h4>
+    <ul>
+      <li><b>The conflict overwrote the local CLAUDE.md.</b> Git wrote the old 502469e copy over the ignored local file, so it briefly lost §8 (Layering) and the newer notes. The full current version was restored word for word from the copy loaded at the start of the session; the old copy was kept in the session scratchpad for comparison. Lesson for next time: back up ignored files that an old commit touches before rebasing.</li>
+    </ul>
+    <h4>Checks</h4>
+    <ul>
+      <li><b>Same work, unchanged:</b> <code>git patch-id</code> of <code>5968cbc</code> and <code>8209a6a</code> are identical (<code>4ffa96b1…</code>), so the replayed commit holds exactly the same changes. The listingOrder.ts refactor F1 asked to keep is part of it.</li>
+      <li><code>tsc --noEmit</code> clean; the earlier error in the local Trails spike page is gone because <code>src/constants/trails.ts</code> now comes with uat.</li>
+      <li><code>next lint</code>: no errors. On the files bulk listing touches, only two warnings, the unused <code>onEditPrice</code> props in <code>MyDomainRow</code> and <code>MyDomainCard</code>, which are already on uat (review gap 7).</li>
+      <li><b>Manual (user, dev server on 3002, 19 Nov):</b> Bulk list on My Domains works as before.</li>
+    </ul>
+    <h4>In plain words</h4>
+    <ul>
+      <li>Our bulk listing work was sitting on an old copy of the code from late October. It now sits on top of today's uat, so it includes Trails and every fix since, and later merges will be simple.</li>
+      <li>Nothing about bulk listing itself changed; git proves the moved commit is identical to the old one.</li>
+      <li>Undo, if ever needed: <code>git reset --hard bulk-list-backup</code>.</li>
+    </ul>
+  </div>
+
+  <h2 id="v2phase0">v2 Phase 0 · 19 Nov 2026</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">0</span><h3>Review, decisions, messages</h3><span class="tag review">Messages not sent yet</span></div>
+    <p class="meta">19 Nov 2026 · no code · review page <code>bulk-listing-v2-review.html</code></p>
+    <h4>Done</h4>
+    <ul>
+      <li>Read Mohit's PDF (10 Nov), the v2 plan, the first build's docs, the code on <code>bulk-list</code>, and the backend repo (read only).</li>
+      <li>Wrote the review page (<code>bulk-listing-v2-review.html</code>): the ideas behind v2, the backend status, 10 gaps in the plan, questions V1 to V10, next steps.</li>
+      <li>Wrote the tickets explainer (<code>bulk-listing-v2-tickets-explained.html</code>): F1 to F9 in simple words, with today's code, the change and the phase for each.</li>
+      <li>Updated the v2 plan with the user's approval: the real B1 shape, phase 3 items 6 to 9, phase 4 wallet notes, phase 8 items 6 to 10, phase 9 on uat, questions V7 to V10.</li>
+    </ul>
+    <h4>The 10 gaps the review found</h4>
+    <ol>
+      <li>Names held in several linked wallets versus the one maker rule (<code>BATCH_MIXED_MAKER</code>).</li>
+      <li>The wallet proof check adding a second popup.</li>
+      <li>Where expiry comes from (database <code>renewalTimestamp</code> or the chain's <code>expiryOf</code>).</li>
+      <li>Delist is also used on the marketplace home page; new wallet and gas states.</li>
+      <li><code>cancel</code> missing from <code>SEAPORT_MIN_ABI</code>, a file shared with the multi chain developer.</li>
+      <li>Orders delisted off chain earlier are still fillable, which triggers <code>CHEAPER_ORDER_STILL_VALID</code> and needs <code>rawOrder</code>.</li>
+      <li>Price cuts without an edit price button (decision 1); the unused <code>onEditPrice</code> props.</li>
+      <li>C8 and F9 overlap.</li>
+      <li>EIP 7702 wallets must not count as smart contract wallets.</li>
+      <li>Smaller: no tests on the branch then, stage versus uat, List more already exists, layering.</li>
+    </ol>
+    <h4>Answers and open questions</h4>
+    <ul>
+      <li>Test wallets: MetaMask and Phantom (V2). This doesn't meet the PDF's acceptance criterion 1 (MetaMask, Rabby, Coinbase); installing Rabby and Coinbase Wallet was suggested.</li>
+      <li>Wallet proof check moves to when the drawer opens (V8, agreed).</li>
+      <li>Defaults kept: V1 fixtures from a one off script, V3 <code>NEXT_PUBLIC_BULK_ORDERS_MOCK</code> (dropped the same evening: the backend went live on uat), V4 copy fixed in code with the user approving wording, V5 show the cancel gas estimate.</li>
+      <li>Waiting: V7 price cuts and always on chain delist (Mohit), V9 names in several wallets (team discussion), V10 expiry source (Guru).</li>
+    </ul>
+    <h4>Backend status (checked 19 Nov evening)</h4>
+    <ul>
+      <li>Guru's branches, newest <code>feature/bulk_listing_sprints-03_cancel_and_reprice-7-to-8</code>, none on uat yet: B1, B2, B3, B4 built; B5 mostly built (<code>POST /orders/cancel-bulk</code>, all or nothing; single cancel takes an optional <code>cancelTxHash</code>; My Domains shows <code>cancel_pending</code> and a <code>cancelNotConfirmed</code> flag).</li>
+      <li>Left: nothing sets "cancel not confirmed" yet (the 30/60 minute timer and the failed transaction check), B7 not built, B8 Trails test not done, B6's <code>.Eth</code> bug not fixed.</li>
+      <li><b>Update, same evening:</b> all of it (B1 to B7, plus BL-08 cancel sweep and cheaper order rule, BL-09 estimator fix, BL-10 fork test) was merged into uat (PR #1024) and is live on the uat server. Only B8 is left.</li>
+    </ul>
+    <h4>Messages</h4>
+    <ul>
+      <li>No message to Guru for now: he is still building, so the review page just notes what's left on his side and the questions to ask once he's free.</li>
+      <li>To the multi chain developer (shared files), Mohit (V7) and the team (V9): drafted, not sent yet. Reminder due before phase 3 and phase 8.</li>
+    </ul>
+  </div>
+
+  <h2 id="v2testing">v2 testing log</h2>
+  <p class="muted">How every v2 phase was tested, so reviewers can judge it. <b>Automated</b> checks are run by Claude on the code: TypeScript <code>tsc</code>, ESLint, the Vitest unit tests and the CLAUDE.md §8 layering greps. <b>Manual</b> checks are run by the user in the browser on <code>localhost:3002</code>, against the uat backend and Polygon with real wallets (MetaMask and Phantom so far). Claude never runs <code>next build</code> or starts a server.</p>
+  <div class="tablecard"><table>
+    <tr><th>Phase</th><th>Automated (Claude)</th><th>Manual / live</th><th>Result</th></tr>
+    <tr><td>0 Review</td><td>None (no code). Branch state read: tsc clean apart from the local Trails spike page, two old lint warnings</td><td>None</td><td>n/a</td></tr>
+    <tr><td>1 Rebase</td><td>patch-id identical, tsc, lint (no errors, two old warnings)</td><td>User, 3002, 19 Nov: Bulk list on My Domains works as before</td><td>Pass</td></tr>
+    <tr><td>2 Signature helpers</td><td>28 new Vitest tests, byte for byte against Seaport.js 4.4.1 for 1, 2, 3, 4 and 50 orders, plus 7 tamper cases; full suite 178 pass; tsc, ESLint, §8 greps clean</td><td>None (nothing on screen)</td><td>Pass, first run</td></tr>
+    <tr><td>Merge uat (20 Nov)</td><td>The 28 phase 2 tests rerun before the commit (pass); merge of uat with no conflicts; tsc on the whole project clean after the merge</td><td>User, 3002, 20 Nov: My Domains bulk select and drawer work as before; Guru's <code>/bulk-listing-testing</code> page loads</td><td>Pass</td></tr>
+    <tr><td>3 Sign once, post once</td><td>11 new Vitest tests (batch rules, retry with the same bytes, wrong signer, rejections); full suite 189 pass; tsc clean; ESLint no new problems; §8 greps clean</td><td>User, 3002 against uat, MetaMask, 20 Nov: 8 names, exactly one listing signature, 5 listed, 3 refused with CHEAPER_ORDER_STILL_VALID (old off chain delists, expected). Not yet: cancelled signature, real retry, Phantom, 50 names</td><td>Pass</td></tr>
+    <tr><td>4 Fallback, smart wallets, network</td><td>4 new Vitest tests (fallback offered and not offered, smart wallet detection incl. EIP 7702); full suite 193 pass; tsc clean; ESLint clean; §8 greps clean</td><td>User, 3002, MetaMask, 20 Nov: cancelling the bulk signature goes back to the form with prices kept and the "You cancelled the signature" toast (bottom left, the site's shared toast position); no fallback offered, as intended. Network switch: switching the site to Ethereum in MetaMask shows the wrong network banner at once and disables List; back on Polygon it clears. 2 names: one MetaMask popup listing both names ("You list" 2 items at 19.5 USDT, Polygon, Seaport); both listed after Confirm ("2 domains are live"). The List time network check can't be reached with MetaMask (the drawer notices the switch first). Phantom, Rabby, Coinbase marked not tested (user, 20 Nov: the domain owning account isn't in them). The fallback has not run in a real wallet</td><td>Pass (MetaMask); other wallets not tested</td></tr>
+      <tr><td>8 On chain delist</td><td>10 new Vitest tests (one transaction for many, 409 resend with the same hash, record failure, wrong wallet, mismatched order, closed popup, missing POL, pending map); full suite 203 pass; tsc clean; ESLint only 3 old warnings; §8 greps clean</td><td>User, 3002, uat, MetaMask, 23 Nov: <b>Cancel older listings passed</b>. Bulk listing 3 names at 300 USDT gave "1 of 3 domains are live"; westbengal.og and weiwuxianlanwangji.og were refused (older, cheaper listings from earlier tests, hidden by the old delist). The box appeared; one Seaport cancel transaction was confirmed in MetaMask; the box changed to "Older listings cancelled…" and Try these 2 again appeared; relisting gave "2 domains are live". <b>Single Delist passed</b> (westbengal.og: MetaMask transaction to Seaport on Polygon, fee under $0.01, "No changes" to balances as expected; toast "Listing cancelled…"; row shows the Cancelling label and List). <b>Bulk delist passed</b> (Quick Actions → Bulk delist → 2 picked → one transaction → "2 listings cancelled"). POL 9.738 → 9.689 for the 3 cancel transactions. The Cancelling labels cleared on their own within about a minute (backend confirmed from the chain event). Seller emails arrived for the single and the bulk delist. Dark mode and phone width checked: fine. Closed popup not tried (no live listing left; covered by tests)</td><td>Pass (MetaMask)</td></tr>
+      <tr><td>8+ Edit price (option B)</td><td>2 new Vitest tests (comparePrice: cut, same, raise, invalid); full suite 205 pass; tsc clean; ESLint only old warnings</td><td>User, 3002, uat, MetaMask, dark, 23 Nov: same (600) and higher (800) blocked with their messages; 600 → 500 by one free signature, "westbengal.og is live at the new price"; Remove this listing box placed under the note. Not clicked: Delist from the box</td><td>Pass</td></tr>
+        <tr><td>5 Drawer fixes</td><td>11 new Vitest tests (bulkPhase5.test.ts: pricing default, signed end time equals the builder, form date, cut short names, success dates, end times recorded, signable count, reject count, late signature never posted, cancel before signing, per name cancel); full suite 216 pass; tsc clean; ESLint only the old warning; §8 greps only old items</td><td>User, 3002, uat, MetaMask, dark, desktop, 23 Nov: two pricing cards, "Not available yet."; Expires 23 Dec 15:17 opened at 15:22; Cancel while the signature request was open gave "Cancelled. Nothing was listed.", then confirming in MetaMask listed nothing; 2 names at 300 USDT listed with one signature, All expire 23 Dec 15:18. Not tried: single drawer Cancel, per name Cancel, light, phone, Ends sooner lines (tests only)</td><td>Pass (bulk, MetaMask)</td></tr>
+        <tr><td>6 Approvals per contract</td><td>8 new Vitest tests (nftApprovals.test.ts: grouping today and with two contracts, unknown chains, approved skipped, unknown counted, fee formats, cancel texts); full suite 224 pass; tsc clean; ESLint only the old warning; §8 greps clean</td><td>User, 3002, uat, MetaMask, dark, desktop, 23 Nov: part A passed (wallet on Ethereum: wrong network banner and the button reads "List 2", not "Approve, then list 2"); run reported good. Not tried: the approval screen with the real fee (wallet already approved), two contracts (needs multi chain), light, phone</td><td>Pass (part A)</td></tr>
+        <tr><td>7 Product rules</td><td>7 new Vitest tests (bulkPhase7.test.ts: 7 day margin, 14 day minimum, reasons, skipped names, chain date over database date, batch chain, pick a chain); 2 phase 5 tests moved to the new margins; full suite 231 pass; tsc clean; ESLint clean. One read only call confirmed <code>expiryOf</code> on the UD Polygon contract</td><td>Not reported yet (to do: chain filter in select mode and back, <code>?bulk=1</code>, a 2 name bulk list, dark drawer footer). Not visible with your names: 14 day tooltip, Skipped line, C2</td><td>Automated pass; manual pending</td></tr>
+        <tr><td>8s Cancel safeguards</td><td>6 new Vitest tests (cancelSafeguards.test.ts); full suite 237 pass; tsc clean; ESLint clean; §8 clean</td><td>Not reported yet. Failure path can't be triggered while stage is healthy (tests only)</td><td>Automated pass; manual pending</td></tr>
+      <tr><td>24 Nov stage outage</td><td>n/a</td><td>User, 3002 against stage: bulk post 500 twice (2 names); cancel-bulk 500 at 06:37:31 GMT for westbengal.og, cancel sent on chain twice; healed by the backend's chain watcher (email, row back to List). Likely cause: multi chain migration timing (MC-06, MC-07), to confirm with Guru. See incident-24nov-backend-500.html</td><td>Backend issue, recovered</td></tr>
+        <tr><td>8o Optimisations</td><td>1 new Vitest test; full suite 238 pass; tsc clean; ESLint clean; one read only Multicall3 test call on Polygon</td><td>Not checked in the browser yet</td><td>Automated pass</td></tr>
+        <tr><td>R Review fixes</td><td>8 new Vitest tests (bulkSigning.test.ts new; bulkBatch, bulkPhase7, onChainCancel); full suite 240 pass; tsc clean; ESLint only the old warning; SCSS compile ok; §8 rule 3 grep clean after step 6</td><td>User, 3002, MetaMask, dark, 24 Nov: Publishing screen without Cancel (single and Edit price), delist, bulk list, login expired message after a real 401, Escape on a dropdown keeps bulk mode (failed first, fixed in FilterDropdown, retested), typed prices kept. Not tried: M2, M3, M8, M9, L4, L7 (tests), light, phone</td><td>Pass</td></tr>
+        <tr><td>8s removal</td><td>Safeguards 2 to 4 and the polling optimisation removed; 1 test for the kept toast; full suite 232 pass; tsc clean; ESLint clean</td><td>n/a</td><td>Removed pending Mohit sir</td></tr>
+  </table></div>
+  <h2 id="walletmatrix">v2 wallet test matrix (F3)</h2>
+  <p class="muted">Mohit sir's F3 asks for this table with the PR. Started in phase 4 (20 Nov). "Not tested" means no one has tried it yet, with the reason. Acceptance criterion 1 needs MetaMask, Rabby and Coinbase Wallet to show exactly one signature for 50 names.</p>
+  <div class="tablecard"><table>
+    <tr><th>Wallet</th><th>2 names</th><th>50 names</th><th>Fallback offered and works</th><th>Notes</th></tr>
+    <tr><td>MetaMask (browser)</td><td>8 names: one signature, 5 listed, 3 refused for a real reason (20 Nov, phase 3)</td><td>Not tested</td><td>Not needed (MetaMask signs the bulk message)</td><td>Phase 4 (20 Nov): cancel returns to the form, no fallback; network switch caught by the drawer banner at once; 2 names: one popup, both listed</td></tr>
+    <tr><td>Rabby (browser)</td><td colspan="3">Not tested</td><td>Needs the domain owning account imported; not done by the user's decision (20 Nov). Free extension</td></tr>
+    <tr><td>Coinbase Wallet (browser)</td><td colspan="3">Not tested</td><td>Same reason as Rabby. Free extension</td></tr>
+    <tr><td>Trust Wallet</td><td colspan="3">Not tested</td><td>Phone app; not set up</td></tr>
+    <tr><td>Ledger through MetaMask</td><td colspan="3">Not tested</td><td>No device. Most likely to need the fallback</td></tr>
+    <tr><td>WalletConnect phone wallet</td><td colspan="3">Not tested</td><td>Not set up</td></tr>
+    <tr><td>Phantom (not on Mohit sir's list)</td><td colspan="3">Not tested</td><td>The test account isn't in Phantom; same reason as Rabby (20 Nov)</td></tr>
+    <tr><td>Smart contract wallet (Safe)</td><td colspan="3">Not tested by hand</td><td>Should show the "can't bulk list yet" notice; covered by tests</td></tr>
+  </table></div>
+
+
+  <h2 id="status">Status (first build, Oct 2026)</h2>
+  <div class="tablecard"><table>
+    <tr><th>Phase</th><th>Scope</th><th>State</th></tr>
+    <tr><td>0</td><td>Backend and designer messages (no code)</td><td><span class="tag todo">Not sent</span></td></tr>
+    <tr><td>1</td><td>Types, pure helpers, selection and draft hooks</td><td><span class="tag done">Built and checked 28 Oct</span></td></tr>
+    <tr><td>2</td><td>Bulk mode on My Domains: entry points, banner, Select / Selected</td><td><span class="tag done">Built and checked 28 Oct</span></td></tr>
+    <tr><td>3</td><td>Bulk drawer form</td><td><span class="tag done">Built and checked 28 Oct</span></td></tr>
+    <tr><td>4</td><td>Approval, one signature per name, success and partial results</td><td><span class="tag done">Built 28 Oct, real wallet tested by the user</span></td></tr>
+    <tr><td>5</td><td>Discard confirm, keyboard and screen reader, tablet, cap, final QA</td><td><span class="tag done">Built and checked 28 Oct</span></td></tr>
+    <tr><td>6</td><td>One signature for all (bulk order tree)</td><td><span class="tag review">Waiting on the backend (Q1)</span></td></tr>
+  </table></div>
+  <p class="meta">Branch <code>bulk-list</code>, cut from <code>dark-mode</code> on 28 Oct. Nothing committed yet. No production build was run; every check used the dev server on 3002.</p>
+
+  <h2 id="phase5">Phase 5 · 28 Oct 2026</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">5</span><h3>Final QA</h3><span class="tag done">Built and checked</span></div>
+    <ul>
+      <li><b>Discard confirm.</b> Closing an edited form (close button, backdrop or Escape) asks "Discard this bulk listing?" with Keep editing / Discard, through the profile page's <code>ConfirmDrawer</code>. A form with nothing typed closes straight away.</li>
+      <li><b>Drawer focus, shared <code>Modal</code>.</b> Focus moves into the drawer when it opens, Tab and Shift+Tab stay inside it, focus returns to the button that opened it, and only the top drawer answers Escape when two are stacked. When a confirm and the drawer under it close together, focus goes back to the page button, not the closing drawer. Focus that has left for the wallet connect modal is left alone. This applies to every drawer in the app; the single listing drawer was rechecked.</li>
+      <li><b>Names list.</b> Removing a row moves focus to the next row's remove button.</li>
+      <li><b>Signing.</b> The "n of N done" line is a status region, so progress is announced.</li>
+      <li><b>Banner.</b> Its buttons wrap under the text when the main column is narrow (1040 to 1279px, where the table already shows cards).</li>
+      <li><b>Checked</b> with 55 mock names in both themes at 1440, 1100, 834 and 390: Select All stops at 50 and says so, Select All disables, the drawer takes focus, Tab wraps both ways, remove keeps focus in the list, Escape on a clean form closes, Escape on an edited form asks, Escape on the prompt closes only the prompt, Discard returns focus to List. tsc and eslint clean (three warnings in files this work did not change).</li>
+    </ul>
+  </div>
+
+  <h2 id="phase4">Phase 4 · 28 Oct 2026</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">4</span><h3>Approval, signing, success</h3><span class="tag done">Built, wallet tested</span></div>
+    <ul>
+      <li>The single flow's sign and post code moved into <code>listing-flow/listingOrder.ts</code>; both flows use it.</li>
+      <li><code>helpers/my-domains/bulkSigning.ts</code>: the pure per name loop (wallet proof once, Stop or Continue after a rejection, errors recorded, wrong wallet stops the rest). 8 Node checks.</li>
+      <li><code>useBulkListingActions</code>, <code>OneTimeApprovalStep</code> <code>count</code>, <code>BulkListingSigningStep</code>, <code>BulkRejectPrompt</code>, <code>BulkListingSuccessStep</code> (full, partial, nothing listed).</li>
+      <li>Listed with a real wallet on staging and reported working.</li>
+    </ul>
+  </div>
+
+  <h2 id="phase3">Phase 3 · 28 Oct 2026</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">3</span><h3>Bulk drawer form</h3><span class="tag done">Built and checked</span></div>
+    <ul>
+      <li><code>BulkListingFlowModal</code>, <code>BulkListingFormStep</code> and footer, <code>BulkPricingOptions</code>, <code>BulkNamesList</code>; <code>PriceInput</code> <code>size="sm"</code>, <code>ariaLabel</code>, <code>invalid</code>.</li>
+      <li>Real fee math, one expiry date, "You receive if all sell", "One signature per name".</li>
+    </ul>
+  </div>
+
+  <h2 id="phase2">Phase 2 · 28 Oct 2026</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">2</span><h3>Bulk mode on My Domains</h3><span class="tag done">Built and checked</span></div>
+    <ul>
+      <li><code>BulkSelectBanner</code>, <code>BulkSelectButton</code>; <code>MyDomainRow</code>, <code>MyDomainCard</code>, <code>MyDomainsTable</code> take an optional <code>bulk</code> prop; <code>PrimaryButton</code> <code>ariaPressed</code> / <code>ariaLabel</code>.</li>
+    </ul>
+  </div>
+
+  <h2 id="phase1">Phase 1 · 28 Oct 2026</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">1</span><h3>Foundations</h3><span class="tag done">Built and checked</span></div>
+    <ul>
+      <li><code>types/my-domains/bulk.ts</code>, <code>helpers/my-domains/bulkListing.ts</code>, <code>useBulkSelection</code>, <code>useBulkListingDraft</code>, <code>isListed</code> on <code>MyDomainListing</code>. 10 Node checks.</li>
+    </ul>
+  </div>
+
+  <h2 id="answers">Waiting on</h2>
+  <ol class="qs team">
+    <li><b>Backend: accept one signature for a batch (Q1)</b><span>Unlocks phase 6, one wallet prompt for the whole batch.</span></li>
+    <li><b>Backend: a per domain estimate (Q2)</b><span>Until then the percentage card stays disabled.</span></li>
+    <li><b>Designer: the Figma quirks in plan §2.8, light mobile frames (Q9)</b><span>Built with the plan's defaults meanwhile.</span></li>
+  </ol>
+
+  <footer>Started 28 October 2026 · branch <code>bulk-list</code> · dev-docs is local only.</footer>
+</div>
+<script>
+  document.getElementById('toggle').addEventListener('click', function () {
+    var root = document.documentElement;
+    var current = root.getAttribute('data-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('dmplan-theme', next); } catch (e) {}
+  });
+</script>
+</body>
+</html>

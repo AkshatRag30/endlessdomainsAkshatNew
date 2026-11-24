@@ -1,0 +1,677 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Domain Login SDK Plan</title>
+<script>
+  try {
+    var saved = localStorage.getItem('dmplan-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  } catch (e) {}
+</script>
+<style>
+  :root {
+    --bg: #f9f9f9; --surface: #ffffff; --surface-soft: #f3f4fe;
+    --text: #111111; --text-muted: #5b5b66; --border: #e6e6e6;
+    --accent: #2639ED; --accent-soft: #e9ebfd;
+    --wait: #9457f6; --wait-soft: #f4eefe;
+    --ok: #12805c; --ok-soft: #e4f5ee;
+    --warn: #b4540a; --warn-soft: #fdf1e4;
+    --bad: #c4314b; --bad-soft: #fdecef;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+      --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+      --accent: #7f8cff; --accent-soft: #1d2150;
+      --wait: #b996fa; --wait-soft: #2c2142;
+      --ok: #4fd1a0; --ok-soft: #173229;
+      --warn: #f5a35c; --warn-soft: #3a2614;
+      --bad: #ff7d93; --bad-soft: #3a1c24;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+    --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+    --accent: #7f8cff; --accent-soft: #1d2150;
+    --wait: #b996fa; --wait-soft: #2c2142;
+    --ok: #4fd1a0; --ok-soft: #173229;
+    --warn: #f5a35c; --warn-soft: #3a2614;
+    --bad: #ff7d93; --bad-soft: #3a1c24;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: "Satoshi", system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.6; }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 48px 16px 80px; }
+  header.top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+  .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; }
+  h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.15; margin: 0 0 12px; }
+  .lede { color: var(--text-muted); margin: 0; max-width: 680px; }
+  .lede a { color: var(--accent); }
+  .toggle { flex-shrink: 0; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 14px; cursor: pointer; }
+  .toggle:hover { border-color: var(--accent); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 32px; }
+  nav.toc a { font-size: 14px; text-decoration: none; color: var(--accent); background: var(--accent-soft); padding: 6px 12px; border-radius: 999px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 0 0 16px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+  .stat b { display: block; font-size: 26px; line-height: 1.2; }
+  .stat span { font-size: 13px; color: var(--text-muted); }
+  h2 { font-size: 22px; margin: 52px 0 16px; }
+  h3 { font-size: 18px; margin: 0; }
+  h4 { font-size: 15px; margin: 22px 0 8px; color: var(--accent); }
+  p { margin: 0 0 12px; }
+  .muted { color: var(--text-muted); font-size: 15px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
+  .card p:last-child { margin-bottom: 0; }
+  .card ul, .card ol { margin: 8px 0 0; padding-left: 20px; }
+  .card li { margin-bottom: 6px; }
+  code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .86em; background: var(--surface-soft); border-radius: 6px; padding: 1px 6px; word-break: break-word; }
+  .findings { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .finding { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+  .finding h3 { font-size: 16px; margin-bottom: 6px; }
+  .finding p { font-size: 15px; margin: 0; color: var(--text-muted); }
+  .tablecard { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow-x: auto; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: 0; }
+  th { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+  td.grp { font-weight: 600; color: var(--accent); background: var(--surface-soft); font-size: 13px; }
+  .sw { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .chip { width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(128,128,128,.45); flex-shrink: 0; }
+  .callout { border-left: 4px solid var(--wait); background: var(--wait-soft); border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; }
+  .callout p { margin: 0; }
+  .callout.ok { border-color: var(--ok); background: var(--ok-soft); }
+  .callout.warn { border-color: var(--warn); background: var(--warn-soft); }
+  .issue { display: grid; grid-template-columns: 28px 1fr; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--bad); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+  .issue .n { font-weight: 700; color: var(--bad); }
+  .issue p { margin: 0; font-size: 15px; }
+  .issue .where { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+  .phase { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px 24px; margin-bottom: 14px; }
+  .phase-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  .num { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 15px; flex-shrink: 0; }
+  .tag { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+  .tag.now { background: var(--ok-soft); color: var(--ok); }
+  .tag.wait { background: var(--wait-soft); color: var(--wait); }
+  .tag.size { background: var(--surface-soft); color: var(--text-muted); }
+  .tag.new { background: var(--warn-soft); color: var(--warn); }
+  .rows { display: grid; grid-template-columns: 130px 1fr; gap: 6px 16px; font-size: 15px; }
+  .rows dt { color: var(--text-muted); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; padding-top: 2px; }
+  .rows dd { margin: 0; }
+  ol.qs { counter-reset: q; list-style: none; padding: 0; margin: 0; }
+  ol.qs li { counter-increment: q; position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px 14px 56px; margin-bottom: 10px; }
+  ol.qs li::before { content: counter(q); position: absolute; left: 16px; top: 14px; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  ol.qs.team li::before { background: var(--wait-soft); color: var(--wait); }
+  ol.qs b { display: block; margin-bottom: 2px; }
+  ol.qs span { color: var(--text-muted); font-size: 15px; }
+  footer { margin-top: 56px; font-size: 13px; color: var(--text-muted); }
+  @media (max-width: 700px) {
+    header.top { flex-direction: column; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .findings { grid-template-columns: 1fr; }
+    .card, .phase { padding: 18px; }
+    .rows { grid-template-columns: 1fr; }
+    .rows dt { padding-top: 8px; }
+    ol.qs li { padding-left: 50px; }
+  }
+</style>
+<style>
+  .tag.done { background: var(--ok-soft); color: var(--ok); }
+  .tag.todo { background: var(--surface-soft); color: var(--text-muted); }
+  .meta { font-size: 14px; color: var(--text-muted); margin: 0 0 14px; }
+  .phase ul { margin: 6px 0 0; padding-left: 20px; font-size: 15px; }
+  .phase li { margin-bottom: 6px; }
+</style>
+<style>pre{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;overflow-x:auto;font-size:13px}</style>
+<style>
+  .flow { display: grid; gap: 8px; margin: 0 0 16px; }
+  .step { display: grid; grid-template-columns: 34px 1fr; gap: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 12px 16px; }
+  .step p { margin: 0; font-size: 15px; }
+  .who { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--accent); }
+  .lanes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 0 0 16px; }
+  .lane { background: var(--surface); border: 1px solid var(--border); border-top: 4px solid var(--accent); border-radius: 12px; padding: 12px 14px; font-size: 14px; }
+  .lane b { display: block; margin-bottom: 4px; }
+  .lane.b { border-top-color: var(--ok); } .lane.c { border-top-color: var(--wait); } .lane.d { border-top-color: var(--warn); }
+  .phase h4 { margin-top: 16px; }
+  .phase ul, .phase ol { font-size: 15px; }
+  pre { background: var(--surface-soft); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  .meta { font-size: 14px; color: var(--text-muted); margin: 0 0 14px; }
+  .tag.done { background: var(--ok-soft); color: var(--ok); }
+  @media (max-width: 700px) { .lanes { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <div>
+    <p class="eyebrow">Proposal and implementation plan · 18 Nov 2026 · draft for Mohit sir and the backend team</p>
+    <h1>Sign in with your domain: a login SDK for mini games</h1>
+    <p class="lede">A login that lets a player sign in to any mini game with a domain they own (for example <code>akshat.og</code>), proven with their wallet. Endless Domains becomes the login provider, like "Sign in with Google"; games add it with a small SDK and trust the result on their own servers. This page is the complete plan: how it works, every part to build, the APIs, the security rules, and the phases with tasks, tests and exit gates.</p>
+  </div>
+  <button class="toggle" id="toggle" type="button">Toggle theme</button>
+</header>
+
+<nav class="toc">
+  <a href="#summary">Summary</a><a href="#goals">Goals</a><a href="#how">How it works</a><a href="#arch">Architecture</a><a href="#reuse">What we reuse</a><a href="#decisions">Key decisions</a><a href="#api">API</a><a href="#tokens">Tokens</a><a href="#data">Data model</a><a href="#ownership">Domain checks</a><a href="#security">Security</a><a href="#sdk">SDK</a><a href="#phases">Phases</a><a href="#testing">Testing</a><a href="#rollout">Rollout</a><a href="#risks">Risks</a><a href="#questions">Questions</a><a href="#glossary">Glossary</a>
+</nav>
+
+<div class="stats">
+  <div class="stat"><b>11</b><span>phases, 0 to 10, each with an exit gate</span></div>
+  <div class="stat"><b>~7 to 9</b><span>weeks for one backend and one frontend developer (estimate, §14)</span></div>
+  <div class="stat"><b>0</b><span>smart contracts or on chain transactions needed; signing in is free</span></div>
+  <div class="stat"><b>OIDC</b><span>standard login protocol, so any game or engine can integrate</span></div>
+</div>
+
+<h2 id="summary">1. Summary</h2>
+<div class="card">
+  <p><b>The idea.</b> Many players already own domains through Endless Domains. A domain is a readable, unique, portable name. We let mini games use it as the player's login name: the player connects a wallet, signs a free message to prove the wallet is theirs, picks one of the domains that wallet owns, and the game receives a signed, verifiable identity such as <code>{ name: "akshat.og", wallet: "0x8FD5…Be4D0" }</code>.</p>
+  <p><b>The approach.</b> Endless Domains runs a standard <b>OpenID Connect (OIDC)</b> login service, using <b>Sign In With Ethereum (EIP 4361)</b> as the way the player proves who they are. On top sits a tiny JavaScript SDK (<code>EndlessLogin.signIn()</code>) and a server helper for games to verify the result. Because it's a standard, games can also use any existing OIDC library instead of ours.</p>
+  <p><b>Why it's good for us.</b> Every game that adds it shows our brand at login, gives domain owners a reason to use their names, and turns players without a domain into buyers ("Get your own name").</p>
+</div>
+
+<h2 id="goals">2. Goals and non goals</h2>
+<div class="findings">
+  <div class="finding"><h3>Goals</h3><p>1) A player signs in to a game with a domain they own, in under 30 seconds, with no password and no gas. 2) The game's server can check the login without trusting the browser. 3) Ownership is checked on chain at sign in and again on refresh, so a sold domain stops working. 4) Any web game can integrate in under an hour. 5) Works with MetaMask, WalletConnect phone wallets and the wallets we already support.</p></div>
+  <div class="finding"><h3>Non goals (first release)</h3><p>No payments or in game purchases. No on chain game state or achievements. No Solana or non EVM wallets. No smart contract wallets (EIP 1271) at first. No native mobile SDKs (web games first; native can use the OIDC standard directly). No social login fallback (Google, email) in the SDK itself.</p></div>
+</div>
+
+<h2 id="how">3. How it works, step by step</h2>
+<p class="meta">The player's view and what happens behind it. Names in <code>code</code> are defined in the API section.</p>
+<div class="flow">
+  <div class="step"><span class="num">1</span><div><p class="who">Game</p><p>The player clicks "Sign in with your domain". The SDK opens a popup to <code>login.endlessdomains.io/authorize</code> with the game's <code>client_id</code>, its redirect address, a random <code>state</code> and a PKCE <code>code_challenge</code>.</p></div></div>
+  <div class="step"><span class="num">2</span><div><p class="who">Login page</p><p>Shows the game's name and logo ("Space Runner wants you to sign in"). The player connects a wallet (AppKit: MetaMask, WalletConnect, Coinbase…). If they're already signed in to Endless Domains in this browser, steps 3 and 4 can be skipped (single sign on).</p></div></div>
+  <div class="step"><span class="num">3</span><div><p class="who">Login service</p><p>Hands out a one time <code>nonce</code>. The page builds a Sign In With Ethereum message (shows the site, the wallet, the game, the nonce, an expiry) and the wallet asks the player to sign it. Free, no transaction.</p></div></div>
+  <div class="step"><span class="num">4</span><div><p class="who">Login service</p><p>Checks the signature recovers to the wallet, the nonce is unused and unexpired, the message's domain and chain are ours. Marks the nonce used.</p></div></div>
+  <div class="step"><span class="num">5</span><div><p class="who">Login service</p><p>Lists the domains this wallet owns (from our discovery tables), then confirms each candidate <b>on chain</b> (owner and expiry). Shows them to the player, with the primary name first.</p></div></div>
+  <div class="step"><span class="num">6</span><div><p class="who">Login page</p><p>The player picks a domain and sees a consent screen: "Space Runner will see: your domain name, your wallet address, your avatar". Approve.</p></div></div>
+  <div class="step"><span class="num">7</span><div><p class="who">Login service</p><p>Stores the choice, creates a short lived authorization <code>code</code>, and sends the browser back to the game's redirect address with <code>code</code> and <code>state</code>. The popup closes.</p></div></div>
+  <div class="step"><span class="num">8</span><div><p class="who">Game / SDK</p><p>Exchanges the <code>code</code> plus the PKCE <code>code_verifier</code> at <code>/token</code> for an <b>ID token</b> (who the player is), an <b>access token</b> and a <b>refresh token</b>.</p></div></div>
+  <div class="step"><span class="num">9</span><div><p class="who">Game server</p><p>Verifies the ID token's signature with our public keys (<code>/.well-known/jwks.json</code>), checks <code>aud</code>, <code>iss</code>, <code>exp</code>, and creates its own game session for <code>sub</code>. Shows "Welcome, akshat.og".</p></div></div>
+  <div class="step"><span class="num">10</span><div><p class="who">Later</p><p>Every refresh re-checks on chain that the wallet still owns the domain. If it was sold, transferred or expired, the refresh returns the identity without that name (or fails, by the game's choice), so a sold name can't keep being used.</p></div></div>
+</div>
+
+<h2 id="arch">4. Architecture</h2>
+<div class="lanes">
+  <div class="lane"><b>Game (client)</b>Any web game. Loads <code>@endlessdomains/login</code>, calls <code>signIn()</code>, gets tokens.</div>
+  <div class="lane b"><b>Game server (optional)</b>Verifies ID tokens with <code>@endlessdomains/login-verify</code> or any JWT library and our JWKS.</div>
+  <div class="lane c"><b>Login page</b>Hosted by us at <code>login.endlessdomains.io</code>: connect, sign, pick, consent. Built with our design system.</div>
+  <div class="lane d"><b>Login service</b>New NestJS module in our backend: OIDC endpoints, SIWE, domain checks, tokens, client registry.</div>
+</div>
+<svg viewBox="0 0 900 230" width="100%" role="img" aria-label="Architecture: game, login page, login service, chain readers and database" style="max-width:100%;height:auto;color:var(--text)">
+  <g fill="none" stroke="currentColor" stroke-width="1.5">
+    <rect x="10" y="20" width="170" height="60" rx="10"/><rect x="10" y="140" width="170" height="60" rx="10"/>
+    <rect x="260" y="80" width="170" height="60" rx="10"/><rect x="510" y="80" width="170" height="60" rx="10"/>
+    <rect x="740" y="20" width="150" height="60" rx="10"/><rect x="740" y="140" width="150" height="60" rx="10"/>
+  </g>
+  <g fill="currentColor" font-size="14" text-anchor="middle" font-family="system-ui, sans-serif">
+    <text x="95" y="47">Game + SDK</text><text x="95" y="66" font-size="12">browser</text>
+    <text x="95" y="167">Game server</text><text x="95" y="186" font-size="12">verifies ID token</text>
+    <text x="345" y="107">Login page</text><text x="345" y="126" font-size="12">connect, sign, pick</text>
+    <text x="595" y="107">Login service</text><text x="595" y="126" font-size="12">OIDC + SIWE</text>
+    <text x="815" y="47">Chain readers</text><text x="815" y="66" font-size="12">owner, expiry</text>
+    <text x="815" y="167">Database</text><text x="815" y="186" font-size="12">clients, codes, keys</text>
+  </g>
+  <g stroke="currentColor" stroke-width="1.5" fill="none">
+    <path d="M180 55 L260 100"/><path d="M430 110 L510 110"/><path d="M680 100 L740 55"/><path d="M680 120 L740 165"/>
+    <path d="M180 165 L510 125" stroke-dasharray="5 4"/><path d="M95 80 L95 140" stroke-dasharray="5 4"/>
+  </g>
+  <g fill="currentColor" font-size="11" font-family="system-ui, sans-serif">
+    <text x="190" y="70">popup /authorize</text><text x="440" y="100">nonce, verify</text><text x="300" y="175">/token, /jwks (dashed: direct calls)</text>
+  </g>
+</svg>
+<div class="card">
+  <ul>
+    <li><b>Where the login service lives:</b> a new module <code>src/components/login-provider/</code> in the existing backend (NestJS), reusing its database, chain readers, AWS secrets and deploy. A separate service is possible later if load requires it.</li>
+    <li><b>Where the login page lives:</b> a new small Next.js app or a route group in an existing frontend, served on its own subdomain (<code>login.endlessdomains.io</code>) so its cookies and security headers are separate from the marketplace (decision D4).</li>
+    <li><b>Where the SDK lives:</b> a new repository <code>endlessdomains-login-sdk</code> publishing two npm packages (browser SDK, server verifier) and a CDN script build.</li>
+  </ul>
+</div>
+
+<h2 id="reuse">5. What we already have and reuse</h2>
+<p class="meta">Checked in backend <code>origin/uat</code> and the marketplace frontend on 18 Nov 2026. Each item is confirmed again in phase 0 before building on it.</p>
+<div class="tablecard"><table>
+  <thead><tr><th>Need</th><th>Existing piece</th><th>How we use it</th></tr></thead>
+  <tbody>
+    <tr><td>Wallet nonce and signature login</td><td><code>web3-auth</code>: <code>GET generate-nonce</code>, <code>GET login/:walletAddress</code>; marketplace <code>wallet-verification</code>: <code>GET wallet-nonce</code>, <code>POST prove-wallet</code></td><td>Same idea; we add the standard SIWE message format and bind it to the login domain and game. Reuse the nonce storage pattern.</td></tr>
+    <tr><td>Domains owned by a wallet</td><td><code>tbl_domain_detail_bc</code> (filled per provider at login), <code>GET domain-detail/user-nfts/:walletAddress</code></td><td>The candidate list for step 5; always confirmed on chain before use.</td></tr>
+    <tr><td>On chain owner reads</td><td><code>marketplacev2/order/chain/order-chain-reader.service.ts</code> (<code>ownerOf</code>, approvals), Alchemy services per chain</td><td>The ownership and expiry checks per provider (§9).</td></tr>
+    <tr><td>Token signing</td><td><code>@nestjs/jwt</code>, <code>passport-jwt</code>, ethers v6 in the backend</td><td>ID and access tokens (switch to asymmetric keys, ES256, with a JWKS endpoint).</td></tr>
+    <tr><td>Wallet connect UI</td><td>Reown AppKit and wagmi in the marketplace frontend, WalletConnect project id</td><td>The login page's wallet step.</td></tr>
+    <tr><td>Design system, dark mode</td><td><code>src/design-system</code>, role tokens, <code>ThemeContext</code></td><td>The login page looks like Endless Domains in light and dark.</td></tr>
+    <tr><td>Test games</td><td>Endless Arena, Endless Vault (endlessdomainsAkshatNew, GitHub Pages)</td><td>The pilot integrations in phase 9.</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="decisions">6. Key decisions (recommended answers)</h2>
+<div class="tablecard"><table>
+  <thead><tr><th>#</th><th>Decision</th><th>Recommendation</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td>D1</td><td>Protocol</td><td><b>OpenID Connect</b>, authorization code flow with <b>PKCE</b>; SIWE as the proof step inside it</td><td>Standard; every engine and backend has a library; secure for browser only games (no client secret needed)</td></tr>
+    <tr><td>D2</td><td>What the game's account is tied to (<code>sub</code>)</td><td><b>The wallet</b>, pairwise per game: <code>sub = hash(client_id, wallet)</code>. The domain is the display name (<code>name</code> claim) and can change</td><td>A domain can be sold: tying progress to the name would hand the buyer the seller's game account. Pairwise ids stop games tracking players across games</td></tr>
+    <tr><td>D3</td><td>Domain sold or expired after sign in</td><td>Tokens short lived (ID and access 1 hour, refresh 7 days, rotating). Every refresh re-checks ownership; if gone, the new ID token has <code>name</code> set to the short wallet (<code>0x8FD5…e4D0</code>) and <code>domain_status: "lost"</code></td><td>Keeps the player logged in to their progress, removes the name quickly</td></tr>
+    <tr><td>D4</td><td>Where the login page runs</td><td>Own subdomain <code>login.endlessdomains.io</code>, own small Next.js app</td><td>Separate cookies, strict headers (no framing), independent deploys</td></tr>
+    <tr><td>D5</td><td>Popup or redirect</td><td>Popup by default, redirect as fallback (mobile browsers, popup blockers)</td><td>Popup keeps the game state; redirect always works</td></tr>
+    <tr><td>D6</td><td>Single sign on across games</td><td>Yes: an Endless session cookie on the login subdomain (7 days); each new game still shows consent once</td><td>Second game login is one click</td></tr>
+    <tr><td>D7</td><td>Providers in the first release</td><td>UD on Polygon (incl. our TLDs such as .og), then ENS, SPACE ID, Freename</td><td>UD Polygon is already indexed and owner checked by the marketplace</td></tr>
+    <tr><td>D8</td><td>Players with no domain</td><td>Allowed as "wallet only" (name = short wallet) if the game allows it (<code>require_domain</code> per client), with a "Get your name" link</td><td>Doesn't lock out new players; sales funnel</td></tr>
+    <tr><td>D9</td><td>Which domain is shown first</td><td>The player's primary name (reverse record) when set and owned, else their last choice for this game, else alphabetical</td><td>Predictable</td></tr>
+    <tr><td>D10</td><td>Who can create game clients</td><td>Phase 1 to 9: our team only (admin endpoint). Self serve developer portal later (phase 10 extra)</td><td>Abuse control while we learn</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="api">7. API (login service)</h2>
+<p class="meta">Base <code>https://login.endlessdomains.io</code> (stage: <code>https://loginstage.endlessdomains.io</code>). OIDC endpoints follow the standard exactly; the <code>/api/…</code> ones are private to our login page.</p>
+<div class="tablecard"><table>
+  <thead><tr><th>Endpoint</th><th>Who calls it</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><code>GET /.well-known/openid-configuration</code></td><td>SDK, any OIDC library</td><td>Discovery: issuer, endpoints, supported scopes, claims, algorithms</td></tr>
+    <tr><td><code>GET /.well-known/jwks.json</code></td><td>Game servers</td><td>Public keys (ES256) to verify tokens; two keys during rotation</td></tr>
+    <tr><td><code>GET /authorize</code></td><td>Browser (popup or redirect)</td><td>Starts login. Params: <code>client_id</code>, <code>redirect_uri</code>, <code>response_type=code</code>, <code>scope</code> (<code>openid profile wallet</code>), <code>state</code>, <code>nonce</code>, <code>code_challenge</code>, <code>code_challenge_method=S256</code>, optional <code>prompt</code> (<code>login</code>, <code>select_account</code>, <code>none</code>), <code>login_hint</code> (a domain). Validates the client and exact redirect, then shows the login page</td></tr>
+    <tr><td><code>POST /token</code></td><td>SDK or game server</td><td><code>grant_type=authorization_code</code> (+ <code>code</code>, <code>code_verifier</code>, <code>redirect_uri</code>, <code>client_id</code>) or <code>grant_type=refresh_token</code>. Returns <code>id_token</code>, <code>access_token</code>, <code>refresh_token</code>, <code>expires_in</code></td></tr>
+    <tr><td><code>GET /userinfo</code></td><td>Game</td><td>Current claims for an access token (re-checks ownership, cached 60 s)</td></tr>
+    <tr><td><code>POST /revoke</code></td><td>SDK on sign out</td><td>Revokes a refresh token</td></tr>
+    <tr><td><code>GET /logout</code></td><td>SDK</td><td>Ends the Endless session cookie (optional <code>post_logout_redirect_uri</code>)</td></tr>
+    <tr><td><code>GET /api/login/nonce</code></td><td>Login page</td><td>One time nonce, bound to the login transaction id; 5 minute life</td></tr>
+    <tr><td><code>POST /api/login/verify</code></td><td>Login page</td><td>Body: the SIWE <code>message</code> and <code>signature</code>. Verifies, sets the Endless session cookie, returns the wallet</td></tr>
+    <tr><td><code>GET /api/login/domains</code></td><td>Login page</td><td>Domains the signed in wallet owns, each confirmed on chain: <code>{ name, provider, chainId, tokenId, expiresAt, isPrimary, avatar }</code></td></tr>
+    <tr><td><code>POST /api/login/consent</code></td><td>Login page</td><td>Body: chosen domain (or wallet only), approved scopes. Issues the code and returns the redirect address</td></tr>
+    <tr><td><code>POST /api/admin/clients</code> (and GET, PATCH)</td><td>Our admin</td><td>Create and edit game clients: name, logo, redirect URIs, allowed origins, <code>require_domain</code>, allowed providers, rate limit</td></tr>
+  </tbody>
+</table></div>
+<h4>Sign In With Ethereum message (EIP 4361), as the wallet shows it</h4>
+<pre>login.endlessdomains.io wants you to sign in with your Ethereum account:
+0x8FD5…Be4D0
+
+Sign in to Space Runner with Endless Domains. This is free and does not move any money.
+
+URI: https://login.endlessdomains.io
+Version: 1
+Chain ID: 137
+Nonce: 8f2c4a91e0b74d1a
+Issued At: 2026-11-18T11:20:05Z
+Expiration Time: 2026-11-18T11:25:05Z
+Request ID: lt_3fa85f64</pre>
+<p class="meta">The server checks every line: domain and URI are ours, the nonce is the one it issued for this login transaction (<code>Request ID</code>) and unused, the time window, the chain id, and that the signature recovers to the address. Wording of the statement line to be approved (Q5).</p>
+
+<h2 id="tokens">8. Tokens</h2>
+<div class="tablecard"><table>
+  <thead><tr><th>Token</th><th>Format and life</th><th>Contents</th></tr></thead>
+  <tbody>
+    <tr><td>ID token</td><td>JWT, ES256, 1 hour</td><td><code>iss</code>, <code>aud</code> (client id), <code>sub</code> (pairwise, D2), <code>iat</code>, <code>exp</code>, <code>auth_time</code>, <code>nonce</code>, <code>amr: ["siwe"]</code>, <code>name</code> (the chosen domain, or short wallet), <code>domain</code> (null when wallet only), <code>domain_provider</code>, <code>domain_chain_id</code>, <code>domain_status</code> (<code>owned</code> | <code>lost</code> | <code>none</code>), <code>wallet_address</code> (scope <code>wallet</code>), <code>picture</code> (avatar URL when set)</td></tr>
+    <tr><td>Access token</td><td>JWT, ES256, 1 hour</td><td><code>sub</code>, <code>aud</code>, <code>scope</code>, <code>exp</code>; for <code>/userinfo</code> and future game APIs</td></tr>
+    <tr><td>Refresh token</td><td>Opaque random, 7 days, <b>rotated on every use</b>, stored hashed</td><td>Reuse of an old one revokes the whole family (theft detection)</td></tr>
+    <tr><td>Authorization code</td><td>Opaque, 60 seconds, single use, tied to PKCE challenge and redirect</td><td>—</td></tr>
+    <tr><td>Endless session cookie</td><td>HttpOnly, Secure, SameSite=Lax, on the login subdomain only, 7 days</td><td>The verified wallet, for single sign on (D6)</td></tr>
+  </tbody>
+</table></div>
+<pre>{
+  "iss": "https://login.endlessdomains.io",
+  "aud": "space-runner",
+  "sub": "pw_9c1f…",
+  "name": "akshat.og",
+  "domain": "akshat.og",
+  "domain_provider": "ud",
+  "domain_chain_id": 137,
+  "domain_status": "owned",
+  "wallet_address": "0x8FD5…Be4D0",
+  "picture": "https://…/avatar.png",
+  "amr": ["siwe"],
+  "nonce": "n-0S6_WzA2Mj",
+  "auth_time": 1763464805, "iat": 1763464810, "exp": 1763468410
+}</pre>
+
+<h2 id="data">9. Data model (new tables)</h2>
+<div class="tablecard"><table>
+  <thead><tr><th>Table</th><th>Columns</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td><code>tbl_login_clients</code></td><td>client_id, name, logo_url, redirect_uris[], allowed_origins[], require_domain, allowed_providers[], status, rate_limit_per_min, created_by, created_at</td><td>One row per game. No client secret in phase 1 (public PKCE clients); optional confidential clients later</td></tr>
+    <tr><td><code>tbl_login_transactions</code></td><td>id, client_id, redirect_uri, state, oidc_nonce, code_challenge, scope, wallet, nonce, nonce_used_at, expires_at</td><td>One per <code>/authorize</code>; 10 minute life; purged daily</td></tr>
+    <tr><td><code>tbl_login_codes</code></td><td>code_hash, transaction_id, sub, domain, expires_at, used_at</td><td>60 second, single use</td></tr>
+    <tr><td><code>tbl_login_refresh_tokens</code></td><td>token_hash, family_id, client_id, sub, wallet, domain, expires_at, revoked_at, replaced_by</td><td>Rotation and family revocation</td></tr>
+    <tr><td><code>tbl_login_consents</code></td><td>wallet, client_id, scopes[], chosen_domain, granted_at, revoked_at</td><td>Remembers consent and the last chosen domain per game</td></tr>
+    <tr><td><code>tbl_login_signing_keys</code></td><td>kid, public_jwk, private_key_ref (AWS KMS or Secrets Manager), status (active, next, retired), created_at</td><td>Private keys never in the database</td></tr>
+    <tr><td><code>tbl_login_audit</code></td><td>event, client_id, wallet, domain, ip_hash, user_agent_hash, result, at</td><td>Sign ins, failures, refreshes, revocations; for abuse and support</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="ownership">10. Domain ownership checks per provider</h2>
+<p class="meta">Done on chain at consent and at every refresh. Contracts as in Mohit's bulk listing requirements (10 Nov 2026). Results cached 60 seconds per (wallet, domain).</p>
+<div class="tablecard"><table>
+  <thead><tr><th>Provider</th><th>Chain</th><th>Owner check</th><th>Expiry check</th><th>Primary name</th><th>Phase</th></tr></thead>
+  <tbody>
+    <tr><td>UD (incl. our TLDs, e.g. .og)</td><td>Polygon 137</td><td><code>ownerOf(namehash(name))</code> on <code>0xa9a6…9e9f</code></td><td><code>expiryOf(tokenId)</code>; 0 means never</td><td>UD reverse resolution (<code>reverseNameOf</code>) to confirm in phase 0</td><td>2</td></tr>
+    <tr><td>ENS v1 unwrapped</td><td>Ethereum 1</td><td><code>ownerOf(labelhash)</code> on BaseRegistrar</td><td><code>nameExpires</code></td><td>ENS reverse record (<code>name(node)</code> on the reverse resolver), then forward check</td><td>8</td></tr>
+    <tr><td>ENS wrapped</td><td>Ethereum 1</td><td><code>ownerOf(namehash)</code> on NameWrapper</td><td>wrapper expiry</td><td>as above</td><td>8</td></tr>
+    <tr><td>SPACE ID .arb / .bnb</td><td>42161 / 56</td><td><code>ownerOf(labelhash)</code></td><td><code>nameExpires</code> (90 day grace counts as expired for login)</td><td>SPACE ID reverse</td><td>8</td></tr>
+    <tr><td>Freename</td><td>Polygon, Base, BNB</td><td><code>ownerOf(tokenId)</code>, token id from discovery (not derivable from the name)</td><td>none</td><td>none</td><td>8</td></tr>
+  </tbody>
+</table></div>
+<ul>
+  <li><b>Normalisation:</b> names lowercased and normalised (ENSIP 15 for ENS, UD rules for UD) before hashing and display; reject mixed script lookalikes for display (confusable check) or show them with a warning.</li>
+  <li><b>Avatars:</b> ENS <code>avatar</code> text record, UD avatar record when set; served through our image proxy so games don't hit IPFS directly.</li>
+  <li><b>RPC failure:</b> at consent, fail closed ("Couldn't confirm your domain, try again"); at refresh, keep the last known status for up to 10 minutes, then mark <code>domain_status: "lost"</code>.</li>
+</ul>
+
+<h2 id="security">11. Security rules</h2>
+<div class="tablecard"><table>
+  <thead><tr><th>Threat</th><th>Rule</th></tr></thead>
+  <tbody>
+    <tr><td>Replayed signature</td><td>Nonce single use, tied to the login transaction, 5 minute window; SIWE <code>Expiration Time</code> enforced</td></tr>
+    <tr><td>Phishing site asking for the same signature</td><td>SIWE <code>domain</code> and <code>URI</code> must equal our login host; wallets warn when they don't match the page</td></tr>
+    <tr><td>Stolen authorization code</td><td>PKCE S256 required for every client; exact <code>redirect_uri</code> match; codes single use, 60 s</td></tr>
+    <tr><td>CSRF on the redirect</td><td><code>state</code> required and checked by the SDK; OIDC <code>nonce</code> checked in the ID token</td></tr>
+    <tr><td>Open redirect</td><td>Redirect URIs from the client row only, exact string match, https only (localhost allowed for development clients)</td></tr>
+    <tr><td>Clickjacking</td><td>Login page sends <code>Content-Security-Policy: frame-ancestors 'none'</code>; never shown in an iframe</td></tr>
+    <tr><td>Token theft in the browser</td><td>SDK keeps tokens in memory by default; optional storage only by the game's choice; refresh rotation with family revocation</td></tr>
+    <tr><td>Sold domain still used</td><td>1 hour ID tokens, ownership re-check on refresh and <code>/userinfo</code> (D3)</td></tr>
+    <tr><td>Key leak</td><td>ES256 keys in AWS KMS or Secrets Manager, rotated every 90 days with overlap in JWKS; emergency rotation runbook</td></tr>
+    <tr><td>Abuse and spam</td><td>Rate limits per IP and per client on nonce, verify and token; bot checks on repeated failures; audit log</td></tr>
+    <tr><td>Address confusion</td><td>Addresses compared checksummed or lowercased consistently; chain id checked in the message</td></tr>
+    <tr><td>Smart contract wallets</td><td>Not supported in phase 1 (clear message, like bulk listing decision 10); EIP 1271 later</td></tr>
+    <tr><td>Privacy</td><td>Pairwise <code>sub</code> per game; wallet address only with the <code>wallet</code> scope and consent; no email or profile data shared</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="sdk">12. The SDK</h2>
+<h4>Browser package: <code>@endlessdomains/login</code></h4>
+<pre>import { EndlessLogin } from '@endlessdomains/login'
+
+const login = new EndlessLogin({
+  clientId: 'space-runner',
+  redirectUri: 'https://spacerunner.game/auth/callback',
+  scope: 'openid profile wallet',     // wallet: include the address
+  mode: 'popup',                      // or 'redirect'
+  environment: 'production',          // or 'stage'
+})
+
+const user = await login.signIn()     // { name, domain, walletAddress, picture, idToken }
+login.onChange((user) => render(user))  // sign in, refresh, name lost, sign out
+const token = await login.getIdToken()  // fresh, refreshed when needed
+await login.signOut()</pre>
+<ul>
+  <li><b>Also:</b> <code>handleRedirectCallback()</code> for redirect mode; <code>signIn({ prompt: 'select_account' })</code> to switch domain; a ready made button <code>login.renderButton(element, { theme })</code> using our brand.</li>
+  <li><b>Builds:</b> ESM and CommonJS for npm, a UMD file on our CDN (<code>&lt;script src="…/endless-login.min.js"&gt;</code>) for plain HTML games; TypeScript types; target under 15 KB gzip; no wallet libraries inside (the wallet lives on our login page).</li>
+  <li><b>Engines:</b> works in any browser game (Phaser, PixiJS, Three.js, plain canvas); Unity WebGL through a small JS bridge example; native apps use the standard OIDC flow (documented, no SDK in phase 1).</li>
+</ul>
+<h4>Server package: <code>@endlessdomains/login-verify</code></h4>
+<pre>import { verifyIdToken } from '@endlessdomains/login-verify'
+
+const claims = await verifyIdToken(idToken, { audience: 'space-runner' })
+// throws if signature, issuer, audience or expiry is wrong; caches our JWKS
+// claims.sub = stable player id for this game; claims.name = display name</pre>
+<p class="meta">Any JWT library works too (jose, PyJWT, Go jwt): it's standard ES256 with our JWKS.</p>
+
+<h2 id="phases">13. Phases</h2>
+<p class="meta">Sizes are for one backend developer (BE) and one frontend developer (FE). Each phase ends with its exit gate; nothing moves on until it passes. Rules from CLAUDE.md apply to all frontend work (layering, dark mode, no builds by Claude, wording approved first, commits only when asked).</p>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">0</span><h3>Decisions and design (no code)</h3><span class="tag size">3 to 4 days · Mohit, BE, FE, designer</span></div>
+  <p><b>In plain words:</b> agree what we build before building it.</p>
+  <h4>Tasks</h4>
+  <ol>
+    <li>Mohit approves the decisions in §6 (D1 to D10) and the open questions in §18.</li>
+    <li>Confirm the reuse list in §5 line by line in the backend code: <code>web3-auth</code> nonce storage, <code>wallet-verification</code>, <code>user-nfts</code>, chain readers; note what to copy and what to leave.</li>
+    <li>Confirm UD reverse resolution (primary name) on Polygon for our TLDs with one live call.</li>
+    <li>Pick hosting for the login page and the subdomains (prod and stage), DNS and TLS with DevOps.</li>
+    <li>Designer: 6 screens (game intro and connect, sign, pick domain, consent, no domain, errors) in light and dark, desktop and phone, plus the "Sign in with your domain" button in 3 sizes.</li>
+    <li>Write the brand and wording list (statement line in the SIWE message, consent text, errors) for approval.</li>
+  </ol>
+  <h4>Exit gate</h4>
+  <ul><li>Decisions signed off; designs approved; subdomains booked; this plan updated with the answers.</li></ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">1</span><h3>Backend foundation: module, clients, keys</h3><span class="tag size">4 to 5 days · BE</span></div>
+  <p><b>In plain words:</b> the empty login service, the list of games allowed to use it, and the keys that sign tokens.</p>
+  <h4>Tasks</h4>
+  <ol>
+    <li>New NestJS module <code>login-provider</code> with config from AWS secrets: issuer URL, token lifetimes, allowed chains, rate limits.</li>
+    <li>Migrations for the tables in §9.</li>
+    <li>Client registry: <code>tbl_login_clients</code> service, admin endpoints (create, list, edit, disable) behind the existing admin guard; validation of redirect URIs (https, exact) and origins.</li>
+    <li>Signing keys: ES256 key pair in KMS (or Secrets Manager), <code>kid</code> handling, <code>/.well-known/jwks.json</code> with active and next keys, rotation command.</li>
+    <li><code>/.well-known/openid-configuration</code> with every supported value.</li>
+    <li>Audit log writer and rate limit guard (per IP, per client).</li>
+  </ol>
+  <h4>Tests</h4>
+  <ul><li>Unit: redirect URI validation, JWKS output, discovery document against the OIDC spec fields. Integration: create a client, read it back, disable it.</li></ul>
+  <h4>Exit gate</h4>
+  <ul><li>On stage, the discovery document and JWKS validate with an OIDC checker; a test client exists.</li></ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">2</span><h3>Wallet proof (SIWE) and domain service</h3><span class="tag size">5 to 6 days · BE</span></div>
+  <p><b>In plain words:</b> prove the wallet is the player's, then find and confirm the domains it owns.</p>
+  <h4>Tasks</h4>
+  <ol>
+    <li><code>/authorize</code> creates a login transaction (validates client, redirect, PKCE, scope) and redirects to the login page with the transaction id.</li>
+    <li><code>GET /api/login/nonce</code> (bound to the transaction) and <code>POST /api/login/verify</code>: parse the EIP 4361 message, check every field (§7), recover the signer (ethers v6), mark the nonce used, set the Endless session cookie.</li>
+    <li>Domain service, provider adapters behind one interface <code>{ listCandidates(wallet), confirm(wallet, domain) }</code>; UD Polygon first: candidates from <code>tbl_domain_detail_bc</code>, confirmation with <code>ownerOf</code> and <code>expiryOf</code>, primary name via reverse resolution; 60 s cache.</li>
+    <li><code>GET /api/login/domains</code>: confirmed list, primary first, then last chosen for this game, then alphabetical; includes wallet only option when the client allows it.</li>
+    <li>Name normalisation and confusable check helpers (shared with the SDK verifier later).</li>
+  </ol>
+  <h4>Tests</h4>
+  <ul><li>SIWE: valid; wrong domain; wrong chain; expired; reused nonce; nonce from another transaction; tampered message; wrong signer. Domains: owned, transferred away, expired, RPC down (fail closed), cache hit.</li></ul>
+  <h4>Exit gate</h4>
+  <ul><li>On stage, a test wallet signs a SIWE message (script) and gets its confirmed UD domains; every negative test rejects.</li></ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">3</span><h3>Tokens: consent, code, token, refresh, userinfo</h3><span class="tag size">5 days · BE</span></div>
+  <p><b>In plain words:</b> turn a confirmed choice into tokens a game can trust, and keep them fresh.</p>
+  <h4>Tasks</h4>
+  <ol>
+    <li><code>POST /api/login/consent</code>: re-confirm ownership of the chosen domain, store consent and last choice, issue the code, return the redirect with <code>code</code> and <code>state</code>.</li>
+    <li><code>POST /token</code> for <code>authorization_code</code> (PKCE check, redirect match, single use) and <code>refresh_token</code> (rotation, family revocation on reuse, ownership re-check, D3 behaviour).</li>
+    <li>ID and access token builders with the claims in §8; pairwise <code>sub</code> (HMAC of client id and wallet with a server secret).</li>
+    <li><code>/userinfo</code>, <code>/revoke</code>, <code>/logout</code>; <code>prompt=none</code> silent login using the session cookie.</li>
+    <li>CORS for <code>/token</code>, <code>/userinfo</code>, <code>/revoke</code> limited to each client's allowed origins.</li>
+  </ol>
+  <h4>Tests</h4>
+  <ul><li>Full code flow with a script client; PKCE wrong verifier; code reuse; redirect mismatch; refresh rotation; refresh reuse revokes family; domain sold between refreshes gives <code>domain_status: "lost"</code>; tokens verify with a standard library (jose) against JWKS; OIDC conformance basic profile where it applies.</li></ul>
+  <h4>Exit gate</h4>
+  <ul><li>A script plays the whole OIDC flow on stage end to end, and a standard library verifies the ID token.</li></ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">4</span><h3>Hosted login page</h3><span class="tag size">6 to 7 days · FE (can start in parallel with phases 2 and 3 against mocks)</span></div>
+  <p><b>In plain words:</b> the screens the player sees: connect, sign, pick, approve.</p>
+  <h4>Tasks</h4>
+  <ol>
+    <li>New Next.js app <code>endlessdomains-login-web</code> (or a route group, per D4) with our design system tokens, fonts, dark mode (same <code>data-theme</code> rules as CLAUDE.md §7), and strict security headers (frame-ancestors none, CSP, HSTS).</li>
+    <li>Screen 1, intro: game logo and name from the transaction, "Sign in with your domain", connect wallet (AppKit with MetaMask, WalletConnect, Coinbase; one <code>createAppKit</code>).</li>
+    <li>Screen 2, sign: shows what the wallet will ask, then the SIWE signature; states for waiting, rejected ("Nothing was signed"), wrong network not required (signing works on any network, chain id in the message is informational), smart contract wallet message.</li>
+    <li>Screen 3, pick: confirmed domains with avatar, provider badge, "Primary" tag; wallet only option if allowed; "Get your own name" link to the main site when none.</li>
+    <li>Screen 4, consent: what the game will see, Approve and Cancel; skipped when consent already exists and the domain is unchanged.</li>
+    <li>Errors: unknown game, bad redirect (never redirect, show the error), expired login transaction, RPC failure, rate limited.</li>
+    <li>Single sign on: existing session shows "Continue as akshat.og" with "Use another wallet".</li>
+    <li>Accessibility: keyboard, focus, screen reader labels, 4.5:1 contrast both themes; phone layout for wallet apps' in app browsers.</li>
+  </ol>
+  <h4>Tests</h4>
+  <ul><li>Unit for the flow state machine; manual matrix: MetaMask desktop, MetaMask mobile in app browser, WalletConnect with a phone wallet, Coinbase Wallet; light and dark; phone, tablet, desktop; popup and redirect.</li></ul>
+  <h4>Exit gate</h4>
+  <ul><li>A real wallet signs in on stage through the page and the script client receives valid tokens; design review passed.</li></ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">5</span><h3>Browser SDK</h3><span class="tag size">5 days · FE</span></div>
+  <p><b>In plain words:</b> the small library a game adds to get "Sign in with your domain" in a few lines.</p>
+  <h4>Tasks</h4>
+  <ol>
+    <li>Repository <code>endlessdomains-login-sdk</code> (monorepo: <code>login</code>, <code>login-verify</code>, examples), TypeScript, tests with Vitest, builds with tsup (ESM, CJS, UMD).</li>
+    <li>PKCE and <code>state</code>/<code>nonce</code> generation with Web Crypto; popup flow with <code>postMessage</code> (origin checked) and redirect flow with <code>handleRedirectCallback()</code>; popup blocked falls back to redirect.</li>
+    <li>Token handling: in memory by default, optional <code>storage: 'session' | 'local'</code>; automatic refresh before expiry; <code>onChange</code> events (signed in, refreshed, name lost, signed out).</li>
+    <li>ID token checks in the browser (issuer, audience, nonce, expiry, signature via JWKS) so client only games get a trustworthy name too.</li>
+    <li><code>renderButton()</code> with our brand in light and dark, three sizes.</li>
+    <li>Environment switch (stage, production) and clear errors (<code>LoginCancelled</code>, <code>PopupBlocked</code>, <code>InvalidState</code>, <code>NetworkError</code>).</li>
+  </ol>
+  <h4>Tests</h4>
+  <ul><li>Unit: PKCE, state mismatch, nonce mismatch, expired token, refresh timing, popup closed by the player. Browser tests (Playwright) against stage: popup and redirect in Chrome, Firefox, Safari.</li></ul>
+  <h4>Exit gate</h4>
+  <ul><li>A plain HTML example page signs in with the CDN script on stage in three browsers; bundle under 15 KB gzip.</li></ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">6</span><h3>Server verifier and developer docs</h3><span class="tag size">3 to 4 days · BE + FE</span></div>
+  <p><b>In plain words:</b> make it easy for game servers to trust the login, and write the guide.</p>
+  <h4>Tasks</h4>
+  <ol>
+    <li><code>@endlessdomains/login-verify</code>: <code>verifyIdToken</code>, <code>verifyAccessToken</code>, JWKS cache with key rotation, clock skew option.</li>
+    <li>Examples: Express, Next.js API route, Cloudflare Worker, Python (PyJWT) and Go snippets using plain JWT libraries.</li>
+    <li>Developer guide: quick start (10 lines), popup vs redirect, claims reference, handling <code>domain_status: "lost"</code>, sign out, errors, security checklist for games (always verify on the server, never trust a name from the client alone), brand rules for the button.</li>
+    <li>Changelog and versioning policy (semver; claims are additive only).</li>
+  </ol>
+  <h4>Exit gate</h4>
+  <ul><li>Someone outside the project follows the quick start and signs in to a sample game in under an hour.</li></ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">7</span><h3>Keeping names honest after sign in</h3><span class="tag size">3 days · BE</span></div>
+  <p><b>In plain words:</b> when a domain is sold, transferred or expires, games learn it quickly.</p>
+  <h4>Tasks</h4>
+  <ol>
+    <li>Listen to transfer events already seen by our pollers (marketplace poller, Alchemy) for domains with active refresh tokens; mark them for re-check.</li>
+    <li>On a confirmed loss, revoke the refresh family's domain (next refresh returns <code>domain_status: "lost"</code>), and drop the cached consent choice.</li>
+    <li>Optional webhook per client (<code>domain.lost</code>, signed with our key) for games that want instant updates.</li>
+    <li>Daily job: purge expired transactions, codes, nonces; report counts.</li>
+  </ol>
+  <h4>Tests</h4>
+  <ul><li>Transfer a test domain to another wallet: within one refresh (or one webhook) the old player no longer shows the name; the new owner can sign in with it.</li></ul>
+  <h4>Exit gate</h4>
+  <ul><li>The transfer test passes on stage.</li></ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">8</span><h3>More providers: ENS, SPACE ID, Freename</h3><span class="tag size">5 to 7 days · BE (+1 day FE for badges)</span></div>
+  <p><b>In plain words:</b> players can use names from the other providers we support.</p>
+  <h4>Tasks</h4>
+  <ol>
+    <li>Adapters per provider (§10): ENS unwrapped and wrapped (ERC1155) with ENSIP 15 normalisation and reverse records; SPACE ID .arb and .bnb with grace handling; Freename with token ids from discovery.</li>
+    <li>RPC per chain with fallbacks; cost and rate checks (Ethereum reads are the slowest).</li>
+    <li>Coordinate with the multi chain marketplace work (Mohit's 10 Nov requirements, M5b discovery: NameWrapper and Freename on chain discovery); reuse its discovery instead of building a second one.</li>
+    <li>Provider badges and avatars on the pick screen.</li>
+  </ol>
+  <h4>Exit gate</h4>
+  <ul><li>One real name per provider signs in on stage; a wrapped ENS name and an expired SPACE ID name behave correctly.</li></ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">9</span><h3>Pilot: our own mini games</h3><span class="tag size">3 to 4 days · FE</span></div>
+  <p><b>In plain words:</b> prove it in real games before anyone else uses it.</p>
+  <h4>Tasks</h4>
+  <ol>
+    <li>Register clients for Endless Arena and Endless Vault (GitHub Pages redirect URIs, stage).</li>
+    <li>Add the button and SDK: the player's domain becomes the name shown in the game and on the score board; Vault's multiplayer rooms show the domain instead of <code>guest42.og</code>.</li>
+    <li>A tiny score board backend (Cloudflare Worker or our backend) that verifies ID tokens before saving a score, to prove the server side path.</li>
+    <li>Collect feedback: time to sign in, drop off per screen, wallet problems.</li>
+  </ol>
+  <h4>Exit gate</h4>
+  <ul><li>Five people sign in to both games with their own domains, on desktop and phone; median sign in under 30 seconds; no security finding open.</li></ul>
+</div>
+
+<div class="phase">
+  <div class="phase-head"><span class="num">10</span><h3>Hardening, security review, launch</h3><span class="tag size">5 days · BE + FE + DevOps</span></div>
+  <p><b>In plain words:</b> make it safe and observable, then open it to partner games.</p>
+  <h4>Tasks</h4>
+  <ol>
+    <li>Security review (internal or external): OIDC flow, SIWE parsing, token handling, headers, rate limits; fix findings.</li>
+    <li>Load test: 50 sign ins per second for 10 minutes on stage; RPC and database limits.</li>
+    <li>Monitoring: dashboards for sign ins, failures by reason, refresh rate, RPC latency, domain lost events; alerts for error spikes and key expiry.</li>
+    <li>Runbooks: key rotation, disabling a client, revoking all tokens for a wallet, RPC outage.</li>
+    <li>Production deploy, DNS, CDN for the SDK script; terms and privacy text for the consent screen.</li>
+    <li>Later (not in this plan's estimate): self serve developer portal, EIP 1271 smart wallets, native SDKs, Solana names.</li>
+  </ol>
+  <h4>Exit gate</h4>
+  <ul><li>No high or medium security finding open; dashboards and alerts live; first partner game signed up.</li></ul>
+</div>
+
+<h2 id="timeline">14. Timeline and estimate</h2>
+<div class="tablecard"><table>
+  <thead><tr><th>Week</th><th>Backend</th><th>Frontend</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Phase 0, then phase 1</td><td>Phase 0 (designs, wording), login page skeleton</td></tr>
+    <tr><td>2</td><td>Phase 2</td><td>Phase 4 against mocks</td></tr>
+    <tr><td>3</td><td>Phase 3</td><td>Phase 4 finished on stage</td></tr>
+    <tr><td>4</td><td>Phase 6 (verifier), phase 7</td><td>Phase 5 (SDK)</td></tr>
+    <tr><td>5</td><td>Phase 8 (providers)</td><td>Phase 6 (docs, examples), phase 9 starts</td></tr>
+    <tr><td>6 to 7</td><td>Phase 10</td><td>Phase 9 pilot, fixes, phase 10</td></tr>
+  </tbody>
+</table></div>
+<p class="meta">About 7 weeks with two developers in parallel; up to 9 with review cycles and design changes. UD only (skip phase 8) saves about one week.</p>
+
+<h2 id="testing">15. Testing plan</h2>
+<div class="tablecard"><table>
+  <thead><tr><th>Level</th><th>What</th><th>Where</th></tr></thead>
+  <tbody>
+    <tr><td>Unit</td><td>SIWE parsing and checks, PKCE, token builders, pairwise sub, ownership adapters (mocked RPC), SDK state handling</td><td>Backend Jest, SDK Vitest</td></tr>
+    <tr><td>Integration</td><td>Full OIDC flow by script; refresh rotation; transfer and expiry cases on a Polygon fork</td><td>Stage, fork</td></tr>
+    <tr><td>Conformance</td><td>OpenID Foundation conformance suite, basic profile with PKCE, where it applies</td><td>Stage</td></tr>
+    <tr><td>Browser</td><td>Playwright: popup, redirect, popup blocked, cancel, three browsers</td><td>CI against stage</td></tr>
+    <tr><td>Wallets</td><td>MetaMask (desktop, mobile in app browser), WalletConnect phone wallet, Coinbase Wallet, Rabby; light and dark; phone and desktop</td><td>Manual, logged</td></tr>
+    <tr><td>Security</td><td>Replay, phishing domain, redirect tampering, code reuse, token reuse, rate limits, headers</td><td>Manual and scripted</td></tr>
+    <tr><td>Pilot</td><td>Real players in Endless Arena and Vault</td><td>Phase 9</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="rollout">16. Rollout</h2>
+<ol class="qs">
+  <li><b>Stage only</b><span>Phases 1 to 8 run on stage with test clients.</span></li>
+  <li><b>Pilot</b><span>Our two games on production, invite only, feature flag per client.</span></li>
+  <li><b>Partners</b><span>Up to 5 partner games, clients created by us, weekly review of metrics.</span></li>
+  <li><b>General</b><span>Docs public, button on our site, developer portal (later).</span></li>
+</ol>
+
+<h2 id="risks">17. Risks</h2>
+<div class="tablecard"><table>
+  <thead><tr><th>Risk</th><th>Impact</th><th>Mitigation</th></tr></thead>
+  <tbody>
+    <tr><td>Players don't have a wallet with a domain</td><td>Low adoption</td><td>Wallet only mode (D8), "Get your name" link, onboarding copy</td></tr>
+    <tr><td>Wallet in app browsers block popups</td><td>Failed sign ins on phones</td><td>Automatic redirect fallback; tested in phase 4 and 5</td></tr>
+    <tr><td>RPC outages or rate limits</td><td>Sign in fails</td><td>Fallback RPCs, short cache, fail closed at consent only</td></tr>
+    <tr><td>Domain resale abuse (buy, sign in, sell)</td><td>Name shown by the wrong person</td><td>1 hour tokens, transfer events (phase 7), webhooks</td></tr>
+    <tr><td>Lookalike names (homoglyphs)</td><td>Impersonation in games</td><td>Normalisation and confusable checks; show provider badge</td></tr>
+    <tr><td>Key compromise</td><td>Forged identities</td><td>KMS, rotation, runbook, short token life</td></tr>
+    <tr><td>Scope creep (payments, achievements)</td><td>Delay</td><td>Non goals in §2; separate proposals later</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="questions">18. Open questions for Mohit sir</h2>
+<ol class="qs">
+  <li><b>Q1. Go ahead and priority?</b><span>This is a new product line next to the marketplace; when should it start relative to bulk listing and multi chain?</span></li>
+  <li><b>Q2. Decisions D1 to D10</b><span>Especially D2 (account tied to the wallet, domain as display name) and D8 (wallet only players allowed).</span></li>
+  <li><b>Q3. Hosting</b><span>New subdomain and app (recommended), or a route inside the main website?</span></li>
+  <li><b>Q4. Providers at launch</b><span>UD Polygon only first (faster), or all providers like the marketplace's phase 3?</span></li>
+  <li><b>Q5. Brand and wording</b><span>Product name ("Sign in with your domain", "Endless ID"…), SIWE statement line, consent text.</span></li>
+  <li><b>Q6. Partner games</b><span>Who are the first outside games, and do they need a self serve portal at launch?</span></li>
+  <li><b>Q7. Pricing</b><span>Free for games, or limits and paid tiers later?</span></li>
+  <li><b>Q8. Security review</b><span>Internal review enough for the pilot, external before partners?</span></li>
+</ol>
+
+<h2 id="glossary">19. Glossary</h2>
+<div class="card">
+<dl class="rows">
+  <dt>OIDC</dt><dd>OpenID Connect: the standard "Sign in with…" protocol used by Google, Apple and others.</dd>
+  <dt>SIWE</dt><dd>Sign In With Ethereum (EIP 4361): a standard, readable message a wallet signs to prove it owns an address. Free, no transaction.</dd>
+  <dt>PKCE</dt><dd>A one time secret the game creates so a stolen login code is useless to anyone else.</dd>
+  <dt>ID token</dt><dd>A signed note from us saying who the player is (their domain and a stable id for this game).</dd>
+  <dt>JWKS</dt><dd>Our public keys, published so anyone can check our signatures.</dd>
+  <dt>Pairwise id</dt><dd>A player id that is different for every game, so games can't track players across each other.</dd>
+  <dt>Primary name</dt><dd>The domain a wallet has chosen to be known by (reverse record).</dd>
+  <dt>Single sign on</dt><dd>Signing in once to Endless Domains and then entering other games with one click.</dd>
+</dl>
+</div>
+
+<footer>Draft by Akshat with Claude, 18 Nov 2026. Backend facts checked against backend <code>origin/uat</code> (<code>abe9657c</code>); to be re-checked in phase 0.</footer>
+</div>
+<script>
+  document.getElementById('toggle').addEventListener('click', function () {
+    var root = document.documentElement;
+    var current = root.getAttribute('data-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('dmplan-theme', next); } catch (e) {}
+  });
+</script>
+</body>
+</html>

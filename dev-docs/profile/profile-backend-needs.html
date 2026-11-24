@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Profile Backend Needs</title>
+<style>
+  :root {
+    --bg: #f9f9f9; --surface: #ffffff; --surface-soft: #f3f4fe;
+    --text: #111111; --text-muted: #5b5b66; --border: #e6e6e6;
+    --accent: #2639ED; --accent-soft: #e9ebfd;
+    --ok: #12805c; --ok-soft: #e4f5ee;
+    --warn: #a35a00; --warn-soft: #fdf1e2;
+    --bad: #c4282d; --bad-soft: #fde8e8;
+    --code-bg: #f1f1f4;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+      --text: #f2f2f3; --text-muted: #a3a3ad; --border: #2a2a2d;
+      --accent: #8f9bff; --accent-soft: #1c1f3d;
+      --ok: #4cc79a; --ok-soft: #10261d;
+      --warn: #f0a94b; --warn-soft: #2b1e0c;
+      --bad: #ff7b80; --bad-soft: #2d1213;
+      --code-bg: #1d1d1f;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+    --text: #f2f2f3; --text-muted: #a3a3ad; --border: #2a2a2d;
+    --accent: #8f9bff; --accent-soft: #1c1f3d;
+    --ok: #4cc79a; --ok-soft: #10261d;
+    --warn: #f0a94b; --warn-soft: #2b1e0c;
+    --bad: #ff7b80; --bad-soft: #2d1213;
+    --code-bg: #1d1d1f;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 980px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1 { font-size: 28px; line-height: 1.25; margin: 0 0 6px; }
+  h2 { font-size: 20px; margin: 40px 0 12px; }
+  h3 { font-size: 16px; margin: 24px 0 8px; }
+  p { margin: 0 0 12px; }
+  .meta { color: var(--text-muted); font-size: 13px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; margin: 16px 0; }
+  .card h3 { margin-top: 0; }
+  .verdict { border-left: 4px solid var(--accent); background: var(--accent-soft); }
+  .alert { border-left: 4px solid var(--bad); background: var(--bad-soft); }
+  .note { border-left: 4px solid var(--warn); background: var(--warn-soft); }
+  .label { font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--text-muted); margin: 14px 0 4px; }
+  code { font-family: ui-monospace, Consolas, monospace; font-size: 13px; background: var(--code-bg); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+  .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); margin: 12px 0; }
+  table { border-collapse: collapse; width: 100%; min-width: 680px; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+  th { background: var(--surface-soft); font-weight: 600; }
+  tr:last-child td { border-bottom: 0; }
+  .pill { display: inline-block; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+  .high { color: var(--bad); background: var(--bad-soft); }
+  .medium { color: var(--warn); background: var(--warn-soft); }
+  .low { color: var(--ok); background: var(--ok-soft); }
+  .none { color: var(--text-muted); background: var(--code-bg); }
+  .head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-bottom: 4px; }
+  .head h3 { margin: 0; }
+  ol, ul { padding-left: 22px; margin: 0 0 12px; }
+  li { margin: 6px 0; }
+  nav ol { columns: 2; column-gap: 32px; }
+  @media (max-width: 640px) { nav ol { columns: 1; } h1 { font-size: 24px; } .card { padding: 16px; } }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Profile page: what we still need from the backend</h1>
+  <p class="meta">27 Oct 2026 · Frontend branch <code>dark-mode</code> · Checked against backend <code>uat</code> at <code>ebcc85b9</code> (PR #994, the profile APIs)</p>
+
+  <div class="card verdict">
+    <p><strong>Where we are.</strong> The Profile and Settings page is built with all five tabs (Profile, Security, Wallets, Notifications, Preferences) and the right rail, in light and dark, on mobile, tablet and desktop. Most of it already runs on real APIs: profile fields, username, photo, verification email, change and forgot password, EVM and Solana wallet linking, the five alert switches, the account summary, and export and deletion requests.</p>
+    <p>The parts below still show sample data or are missing behaviour, because the backend has no API for them yet. For each one this report explains what it is, why users need it, what happens today, and exactly what we would need from the backend.</p>
+  </div>
+
+  <nav class="card">
+    <strong>Contents</strong>
+    <ol>
+      <li><a href="#glance">At a glance</a></li>
+      <li><a href="#wallet-disconnect">Disconnect a wallet</a></li>
+      <li><a href="#privacy">Privacy settings and the public portfolio</a></li>
+      <li><a href="#channels">Notification channels</a></li>
+      <li><a href="#sessions">Active sessions</a></li>
+      <li><a href="#signin">Sign in methods</a></li>
+      <li><a href="#settlement">Default settlement network</a></li>
+      <li><a href="#requests">Data requests</a></li>
+      <li><a href="#summary">Account summary by period</a></li>
+      <li><a href="#display">Display preferences</a></li>
+      <li><a href="#clarify">Questions to confirm</a></li>
+      <li><a href="#housekeeping">Housekeeping before release</a></li>
+    </ol>
+  </nav>
+
+  <h2 id="glance">1. At a glance</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Need</th><th>Tab</th><th>Priority</th><th>Backend ask</th></tr></thead>
+      <tbody>
+        <tr><td>2</td><td>Disconnect a wallet</td><td>Wallets</td><td><span class="pill none">Not supported</span></td><td>Nothing for now: hidden on the page (27 Oct)</td></tr>
+        <tr><td>3</td><td>Privacy settings</td><td>Preferences</td><td><span class="pill high">Asked 27 Oct</span></td><td><code>GET, PATCH /users/privacy</code>, enforced by the public portfolio API</td></tr>
+        <tr><td>4</td><td>Notification channels</td><td>Notifications</td><td><span class="pill none">Not supported</span></td><td>Nothing for now: hidden on the page (27 Oct)</td></tr>
+        <tr><td>5</td><td>Active sessions</td><td>Security</td><td><span class="pill none">Not supported</span></td><td>Nothing for now: hidden on the page (27 Oct)</td></tr>
+        <tr><td>6</td><td>Sign in methods</td><td>Security</td><td><span class="pill none">Not needed</span></td><td>Nothing: Google and wallet accounts are password free by design</td></tr>
+        <tr><td>7</td><td>Default settlement network</td><td>Wallets</td><td><span class="pill none">Not supported</span></td><td>Nothing for now: hidden on the page (27 Oct)</td></tr>
+        <tr><td>8</td><td>Data requests</td><td>Right rail</td><td><span class="pill none">Not happening</span></td><td>Nothing: no cancel (27 Oct)</td></tr>
+        <tr><td>9</td><td>Account summary by period</td><td>History</td><td><span class="pill none">Not happening</span></td><td>Nothing: lifetime totals only (27 Oct)</td></tr>
+        <tr><td>10</td><td>Display preferences</td><td>Preferences</td><td><span class="pill low">Optional</span></td><td><code>GET, PATCH /users/preferences</code>, only if they should follow the user across devices</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="meta">Paths are suggestions; any shape that carries the same data works for us. Field shapes follow our view model in <code>src/types/profile-settings/index.ts</code>.</p>
+
+  <h2 id="wallet-disconnect">2. Disconnect a wallet</h2>
+  <div class="card note">
+    <div class="head"><h3>Remove a linked EVM or Solana wallet</h3><span class="pill none">Not supported</span></div>
+    <p><strong>Product decision, 27 Oct 2026: not supported for now.</strong> The Disconnect button is commented out; each wallet only has Copy. Nothing is needed from the backend. The notes below are kept for if it ever comes back.</p>
+    <p class="label">What it is</p>
+    <p>A Disconnect action on each wallet in the Connected Wallets card.</p>
+    <p class="label">Why we need it</p>
+    <p>A user can link a wallet but can never remove one. Because the rule is one EVM wallet plus one Solana wallet per account, a user who loses a wallet, has it compromised, or simply moves to a new one is stuck: the old wallet stays on the account and there is no slot for the new one. That is a real security and support problem, not just a missing nicety.</p>
+    <p class="label">Today</p>
+    <p>The Disconnect button is sample only. Linking is real (EVM nonce and verify, Solana signed nonce).</p>
+    <p class="label">What we need from the backend</p>
+    <ul>
+      <li><code>DELETE /users/wallets/:id</code> (or by address and network) that removes the wallet from the user.</li>
+      <li>A rule for the last sign in method: if the wallet is how the user signs in and they have no email password or Google, refuse the request so nobody locks themselves out (Google and wallet accounts have no password to fall back on).</li>
+      <li>An answer on what happens to listings and pending orders tied to that wallet when it is removed.</li>
+    </ul>
+  </div>
+
+  <h2 id="privacy">3. Privacy settings and the public portfolio</h2>
+  <div class="card">
+    <div class="head"><h3>Public portfolio and Show my sales history</h3><span class="pill high">Asked 27 Oct</span></div>
+    <p><strong>Status, 27 Oct 2026:</strong> asked of the backend, waiting on the answer. This stays in the plan.</p>
+    <p class="label">What it is</p>
+    <p>Two switches on the Preferences tab. Public portfolio: anyone with the link can see the user's names. Show my sales history: completed sales appear on the public profile.</p>
+    <p class="label">Why we need it</p>
+    <p>These switches control what other people can see, so they only mean something if the backend stores them and the public portfolio API obeys them. A switch that only lives in the browser would tell the user their sales are hidden while anyone can still see them, which is worse than having no switch at all. The public portfolio is being built now, so this is the right moment to build the privacy rules into it from the start rather than add them later.</p>
+    <p class="label">Today</p>
+    <p>No public portfolio endpoint and nowhere to store these settings. The switches are sample data. Until both pieces exist we suggest showing the card with the switches disabled and a "Coming soon" note.</p>
+    <p class="label">What we need from the backend</p>
+    <ul>
+      <li><strong>Storage:</strong> <code>GET, PATCH /users/privacy</code> returning <code>{ publicPortfolio: boolean, showSalesHistory: boolean }</code>, or the same two fields on the user response and <code>PUT /users</code>.</li>
+      <li><strong>Defaults</strong> for new users (a product decision; our suggestion is portfolio public, sales history hidden).</li>
+      <li><strong>Enforcement inside the public portfolio API:</strong> when the portfolio is off, everyone except the owner gets "private" or not found; when sales history is off, sales are left out of the response entirely. Hiding them only in the frontend is not enough, since anyone can call the API directly.</li>
+      <li><strong>The public link:</strong> confirm it is based on the username (for example <code>/u/username</code>) and what happens to old links when a username changes.</li>
+      <li><strong>The exact list of what the public page shows</strong> (listed names, unlisted names, prices, sales) so the switch descriptions match reality. Ownership on chain is public anyway, so "private" can hide our page but cannot stop a block explorer lookup; the copy should not promise more than that.</li>
+    </ul>
+  </div>
+
+  <h2 id="channels">4. Notification channels</h2>
+  <div class="card note">
+    <div class="head"><h3>Email and Telegram switches</h3><span class="pill none">Not supported</span></div>
+    <p><strong>Product decision, 27 Oct 2026: not supported for now.</strong> The Telegram row is commented out; the card shows Email only. Nothing is needed from the backend. The notes below are kept for if it ever comes back.</p>
+    <p class="label">What it is</p>
+    <p>The five alert switches decide <em>what</em> the user hears about and already save through <code>PATCH /users/notifications</code>. The channel switches decide <em>where</em> those alerts go: email, Telegram, or both.</p>
+    <p class="label">Why we need it</p>
+    <p>If a user turns email off, they expect to stop getting emails. Without a saved channel choice the backend never learns about it and keeps sending, which is annoying at best and a trust problem at worst.</p>
+    <p class="label">Today</p>
+    <p>The channel switches live only in the page's memory. Turn email off, reload, and it is back on.</p>
+    <p class="label">What we need from the backend</p>
+    <ul>
+      <li>Add <code>channels: { email: boolean, telegram: boolean }</code> to <code>GET</code> and <code>PATCH /users/notifications</code>.</li>
+      <li>The notification sender respects it.</li>
+      <li>Confirm Telegram delivery uses the Telegram handle already saved on the profile, and what happens when that is empty.</li>
+    </ul>
+  </div>
+
+  <h2 id="sessions">5. Active sessions</h2>
+  <div class="card note">
+    <div class="head"><h3>Session list, sign out one session, real sign out of others</h3><span class="pill none">Not supported</span></div>
+    <p><strong>Product decision, 27 Oct 2026: not supported for now.</strong> The Active Sessions card is commented out, and its Sign out everywhere else button with it. Nothing is needed from the backend. The notes below are kept for if it ever comes back.</p>
+    <p class="label">What it is</p>
+    <p>A list on the Security tab of every device signed in to the account (device, location, last active, which one is this device), with a Sign out button per row.</p>
+    <p class="label">Why we need it</p>
+    <p>It is how a user notices a login they do not recognise and shuts it down. Accounts here hold domains and linked wallets with real money behind them, so this is a meaningful security feature.</p>
+    <p class="label">Today</p>
+    <p>The list is sample data. "Sign out other devices" is real (<code>POST /auth/logout/others</code>), but because there is one refresh token per user, other devices are only blocked at their next refresh. Their current access token keeps working until it expires, so an attacker keeps access for that window.</p>
+    <p class="label">What we need from the backend</p>
+    <ul>
+      <li><code>GET /auth/sessions</code> returning <code>[{ id, device, location, lastActive, current }]</code>.</li>
+      <li><code>DELETE /auth/sessions/:id</code> that ends that one session immediately.</li>
+      <li><code>POST /auth/logout/others</code> revoking other access tokens immediately, not at expiry.</li>
+    </ul>
+  </div>
+
+  <h2 id="signin">6. Sign in methods</h2>
+  <div class="card note">
+    <div class="head"><h3>Nothing needed: Google and wallet accounts are password free</h3><span class="pill none">Not needed</span></div>
+    <p class="label">What it is</p>
+    <p>The How You Sign In card on the Security tab lists email and password, Google and wallet sign in. It is real, read from <code>GET /users/user-multiple-wallet</code>.</p>
+    <p class="label">Product decision (27 Oct 2026)</p>
+    <p>A user who signs in with Google or a wallet cannot use a password. We do not offer setting one, so no "set a password" API is needed. For the same reason Disconnect Google is dropped: with no password to fall back on, disconnecting Google would lock the user out.</p>
+    <p class="label">What the page does</p>
+    <p>Email and password accounts get the Change Password form (real, <code>PUT /auth/change-password</code>). Google and wallet accounts see a note instead: "You sign in with Google or a wallet, so this account has no password. Keep using that method to sign in." The Google row has no Disconnect button.</p>
+  </div>
+
+  <h2 id="settlement">7. Default settlement network</h2>
+  <div class="card note">
+    <div class="head"><h3>Which chain payouts land on</h3><span class="pill none">Not supported</span></div>
+    <p><strong>Product decision, 27 Oct 2026: not supported for now.</strong> The whole Default Network card (settlement network and hide other wallets) is commented out. Nothing is needed from the backend. The notes below are kept for if it ever comes back.</p>
+    <p class="label">What it is</p>
+    <p>The Default Network card on the Wallets tab lets the user choose the network their sale proceeds and payments settle on.</p>
+    <p class="label">Why we need it</p>
+    <p>Without it the user has no say in where their money arrives, and has to find out after the fact.</p>
+    <p class="label">Today</p>
+    <p>Sample only. The card also has a "Hide domains from other wallets" switch. Its Figma text says "Only show names held in the primary wallet above", but the design has no way to choose a primary wallet, so the backend and design need to agree on what this switch should hide before we wire it.</p>
+    <p class="label">What we need from the backend</p>
+    <ul>
+      <li><code>GET, PATCH /users/wallet-settings</code> with <code>{ settlementChainId }</code>, and the list of chains a user may pick.</li>
+      <li>Confirmation that payouts actually use it, otherwise the card should not exist.</li>
+    </ul>
+  </div>
+
+  <h2 id="requests">8. Data requests</h2>
+  <div class="card note">
+    <div class="head"><h3>Cancel an open request</h3><span class="pill none">Not happening</span></div>
+    <p><strong>Product decision, 27 Oct 2026: no cancel.</strong> A sent export or deletion request cannot be withdrawn from the page, and nothing is needed from the backend. The notes below are kept for context.</p>
+    <p class="label">What it is</p>
+    <p>Export my data and Request account deletion in the Your Data card each send a request to the support team (<code>POST /users/requests</code>). The card now shows each request's status from <code>GET /users/requests</code> ("Requested · our team will contact you" or "Completed").</p>
+    <p class="label">Why we need it</p>
+    <p>Once a request is sent the user cannot take it back. That matters for deletion: someone taps it by mistake, or changes their mind the next day, and today the only option is to contact support and hope the team sees it in time. For export it hardly matters.</p>
+    <p class="label">What we need from the backend</p>
+    <ul>
+      <li>One answer first: does support wait or check anything before deleting an account? If they act straight away, a cancel option becomes much more important.</li>
+      <li>Optional: <code>DELETE /users/requests/:id</code> to withdraw a request while it is <code>open</code>. If not, we will show "Changed your mind? Contact support to cancel." with the support contact under an open deletion request.</li>
+      <li>Confirm <code>open</code> and <code>done</code> are the only statuses, and whether support emails the user when a request is done.</li>
+    </ul>
+  </div>
+
+  <h2 id="summary">9. Account summary by period</h2>
+  <div class="card note">
+    <div class="head"><h3>Totals for a chosen period</h3><span class="pill none">Not happening</span></div>
+    <p><strong>Product decision, 27 Oct 2026: no period filter.</strong> The summary stays lifetime totals, and nothing is needed from the backend. The notes below are kept for context.</p>
+    <p class="label">What it is</p>
+    <p>The account summary (<code>GET /marketplacev2/orders/summary</code>) already powers the Profile rail. The History page has a Summary card with a period choice (this month, this year).</p>
+    <p class="label">Why we need it</p>
+    <p>Without a period the History summary can only show lifetime totals, whatever period the user picks.</p>
+    <p class="label">What we need from the backend</p>
+    <ul>
+      <li>Optional <code>from</code> and <code>to</code> (or <code>period</code>) on the summary, plus a total spent alongside volume sold.</li>
+    </ul>
+  </div>
+
+  <h2 id="display">10. Display preferences</h2>
+  <div class="card">
+    <div class="head"><h3>Theme, currency, language, date and time format</h3><span class="pill low">Optional</span></div>
+    <p class="label">What it is</p>
+    <p>The Display card on the Preferences tab.</p>
+    <p class="label">Why we need it</p>
+    <p>These only affect how the page looks to the user themselves, so they work fine saved in the browser, and the theme already does. The only gain from storing them on the account is that they follow the user to another device. Nice to have, not essential.</p>
+    <p class="label">What we need from the backend</p>
+    <ul>
+      <li>Nothing, unless we decide they should follow the user. Then <code>GET, PATCH /users/preferences</code> with <code>{ theme, currency, language, dateFormat, timeFormat }</code>.</li>
+    </ul>
+  </div>
+
+  <h2 id="clarify">11. Questions to confirm</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Question</th><th>Why we ask</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Is <code>avatarUrl</code> permanent and public, or does it expire?</td><td>An expiring link would break profile photos later.</td></tr>
+        <tr><td>2</td><td>Which <code>source</code> values does <code>POST /marketplace/redirectauth/redirect</code> accept?</td><td>We send <code>marketplace</code> and others; we need the documented list.</td></tr>
+        <tr><td>3</td><td>How long does an access token last: 1 hour (Postman collection) or 3 days (<code>env.sample</code>)?</td><td>It decides how long a stolen or old session token stays usable.</td></tr>
+        <tr><td>4</td><td>Is it fine to move the calls in <code>profile-settings.service.ts</code> into RTK Query later?</td><td>The rest of the page uses RTK Query; one cache means saves refresh every screen.</td></tr>
+        <tr><td>5</td><td>Please correct the API guide: the photo limit is 2 MB, not 3 MB, and the summary has no "domain statuses".</td><td>Keeps the doc in line with the code.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="housekeeping">12. Housekeeping before release</h2>
+  <div class="card alert">
+    <ul>
+      <li><strong>Frontend <code>uat</code> build:</strong> as of 26 Oct, commit <code>c6cda71</code> left stash conflict markers in <code>api-endpoint.enum.ts</code> and <code>userProfile.ts</code> and lost four lines in <code>userProfile.ts</code>, so <code>uat</code> does not build and staging still serves an older build. The fix is in our <code>dark-mode</code> merge (<code>39dc0f5</code>).</li>
+      <li><strong>Test page:</strong> commit <code>f92a37e</code> removed the environment switch, so <code>/dev/sprint1-test</code> now ships in every build. It needs to be removed or gated before production.</li>
+    </ul>
+  </div>
+
+  <p class="meta">Related local docs: <code>profile-settings-implementation-plan.md</code> (§15), <code>profile-api-guide-analysis.html</code>, <code>profile-settings-progress.html</code>.</p>
+</main>
+</body>
+</html>

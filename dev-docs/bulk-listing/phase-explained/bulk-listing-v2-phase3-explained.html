@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phase 3 Explained</title>
+<script>
+  try {
+    var saved = localStorage.getItem('dmplan-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  } catch (e) {}
+</script>
+<style>
+  :root {
+    --bg: #f9f9f9; --surface: #ffffff; --surface-soft: #f3f4fe;
+    --text: #111111; --text-muted: #5b5b66; --border: #e6e6e6;
+    --accent: #2639ED; --accent-soft: #e9ebfd;
+    --wait: #9457f6; --wait-soft: #f4eefe;
+    --ok: #12805c; --ok-soft: #e4f5ee;
+    --warn: #b4540a; --warn-soft: #fdf1e4;
+    --bad: #c4314b; --bad-soft: #fdecef;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+      --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+      --accent: #7f8cff; --accent-soft: #1d2150;
+      --wait: #b996fa; --wait-soft: #2c2142;
+      --ok: #4fd1a0; --ok-soft: #173229;
+      --warn: #f5a35c; --warn-soft: #3a2614;
+      --bad: #ff7d93; --bad-soft: #3a1c24;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+    --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+    --accent: #7f8cff; --accent-soft: #1d2150;
+    --wait: #b996fa; --wait-soft: #2c2142;
+    --ok: #4fd1a0; --ok-soft: #173229;
+    --warn: #f5a35c; --warn-soft: #3a2614;
+    --bad: #ff7d93; --bad-soft: #3a1c24;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: "Satoshi", system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.6; }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 48px 16px 80px; }
+  header.top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+  .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; }
+  h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.15; margin: 0 0 12px; }
+  .lede { color: var(--text-muted); margin: 0; max-width: 680px; }
+  .lede a { color: var(--accent); }
+  .toggle { flex-shrink: 0; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 14px; cursor: pointer; }
+  .toggle:hover { border-color: var(--accent); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 32px; }
+  nav.toc a { font-size: 14px; text-decoration: none; color: var(--accent); background: var(--accent-soft); padding: 6px 12px; border-radius: 999px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 0 0 16px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+  .stat b { display: block; font-size: 26px; line-height: 1.2; }
+  .stat span { font-size: 13px; color: var(--text-muted); }
+  h2 { font-size: 22px; margin: 52px 0 16px; }
+  h3 { font-size: 18px; margin: 0; }
+  h4 { font-size: 15px; margin: 22px 0 8px; color: var(--accent); }
+  p { margin: 0 0 12px; }
+  .muted { color: var(--text-muted); font-size: 15px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
+  .card p:last-child { margin-bottom: 0; }
+  .card ul, .card ol { margin: 8px 0 0; padding-left: 20px; }
+  .card li { margin-bottom: 6px; }
+  code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .86em; background: var(--surface-soft); border-radius: 6px; padding: 1px 6px; word-break: break-word; }
+  .findings { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .finding { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+  .finding h3 { font-size: 16px; margin-bottom: 6px; }
+  .finding p { font-size: 15px; margin: 0; color: var(--text-muted); }
+  .tablecard { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow-x: auto; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: 0; }
+  th { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+  td.grp { font-weight: 600; color: var(--accent); background: var(--surface-soft); font-size: 13px; }
+  .sw { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .chip { width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(128,128,128,.45); flex-shrink: 0; }
+  .callout { border-left: 4px solid var(--wait); background: var(--wait-soft); border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; }
+  .callout p { margin: 0; }
+  .callout.ok { border-color: var(--ok); background: var(--ok-soft); }
+  .callout.warn { border-color: var(--warn); background: var(--warn-soft); }
+  .issue { display: grid; grid-template-columns: 28px 1fr; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--bad); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+  .issue .n { font-weight: 700; color: var(--bad); }
+  .issue p { margin: 0; font-size: 15px; }
+  .issue .where { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+  .phase { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px 24px; margin-bottom: 14px; }
+  .phase-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  .num { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 15px; flex-shrink: 0; }
+  .tag { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+  .tag.now { background: var(--ok-soft); color: var(--ok); }
+  .tag.wait { background: var(--wait-soft); color: var(--wait); }
+  .tag.size { background: var(--surface-soft); color: var(--text-muted); }
+  .tag.new { background: var(--warn-soft); color: var(--warn); }
+  .rows { display: grid; grid-template-columns: 130px 1fr; gap: 6px 16px; font-size: 15px; }
+  .rows dt { color: var(--text-muted); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; padding-top: 2px; }
+  .rows dd { margin: 0; }
+  ol.qs { counter-reset: q; list-style: none; padding: 0; margin: 0; }
+  ol.qs li { counter-increment: q; position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px 14px 56px; margin-bottom: 10px; }
+  ol.qs li::before { content: counter(q); position: absolute; left: 16px; top: 14px; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  ol.qs.team li::before { background: var(--wait-soft); color: var(--wait); }
+  ol.qs b { display: block; margin-bottom: 2px; }
+  ol.qs span { color: var(--text-muted); font-size: 15px; }
+  footer { margin-top: 56px; font-size: 13px; color: var(--text-muted); }
+  @media (max-width: 700px) {
+    header.top { flex-direction: column; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .findings { grid-template-columns: 1fr; }
+    .card, .phase { padding: 18px; }
+    .rows { grid-template-columns: 1fr; }
+    .rows dt { padding-top: 8px; }
+    ol.qs li { padding-left: 50px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">Bulk listing v2 · phase 3 explained</p>
+      <h1>Phase 3 in simple words: the 10 files</h1>
+      <p class="lede">One page to understand everything phase 3 changed: what each of the 10 files is, why it exists, what is inside it, and how they work together when you list names. No prior knowledge needed. Written 20 Nov 2026; line numbers are as of that day.</p>
+    </div>
+    <button class="toggle" id="toggle" type="button">Toggle theme</button>
+  </header>
+
+  <nav class="toc">
+    <a href="#story">The story</a><a href="#words">Words to know</a><a href="#map">The map</a><a href="#f1">1 Service</a><a href="#f2">2 Rules</a><a href="#f3">3 Tests</a><a href="#f4">4 Hook</a><a href="#f5">5 Drawer</a><a href="#f6">6 Screens</a><a href="#f7">7 Index</a><a href="#f8">8 Form</a><a href="#f9">9 Client</a><a href="#f10">10 Shapes</a><a href="#walk">Walk through</a><a href="#faq">Questions</a><a href="#next">Not done yet</a>
+  </nav>
+
+  <div class="stats">
+    <div class="stat"><b>10</b><span>files: 3 new, 7 changed</span></div>
+    <div class="stat"><b>8 → 1</b><span>MetaMask popups to list 8 names</span></div>
+    <div class="stat"><b>11</b><span>new automatic tests, all passing</span></div>
+    <div class="stat"><b>5 of 8</b><span>listed in your real test; 3 refused for a real reason</span></div>
+  </div>
+
+  <h2 id="story">1. The story in six sentences</h2>
+  <div class="card">
+    <ol>
+      <li>Before phase 3, listing 8 names meant 8 MetaMask popups, one per name, and 8 separate messages to our backend.</li>
+      <li>Phase 2 built the maths that lets one signature cover many listings (a "tree" of listings, where the wallet signs only the top).</li>
+      <li>Phase 3 plugged that maths into the bulk listing drawer, and connected it to Guru's new backend address that accepts many listings in one message.</li>
+      <li>Now: you click List, MetaMask opens <b>once</b>, and all names are sent together in <b>one</b> message.</li>
+      <li>If sending fails (bad internet, busy server), you can press Try again <b>without signing again</b>, because we keep the signed listings in memory.</li>
+      <li>The backend answers name by name, so you see exactly which names went live and why the others didn't.</li>
+    </ol>
+  </div>
+
+  <h2 id="words">2. Words to know first</h2>
+  <div class="tablecard"><table>
+    <tr><th>Word</th><th>In simple words</th></tr>
+    <tr><td><b>Listing / order</b></td><td>"I sell this domain for this price until this date", written in Seaport's format. Signed by you, so nobody can change it.</td></tr>
+    <tr><td><b>Signature</b></td><td>Your wallet's stamp on a message. Free, no gas. Proves you agreed to exactly that message.</td></tr>
+    <tr><td><b>Transaction</b></td><td>Something written on the blockchain. Costs gas. (Listing needs none; approval and on chain cancel do.)</td></tr>
+    <tr><td><b>Bulk tree</b></td><td>All your listings arranged so that one signature on "the top" covers every one of them. Each listing then carries a short "path" to the top, so it can still be bought on its own.</td></tr>
+    <tr><td><b>Wallet proof</b></td><td>A free signed text message that proves to our backend that the connected wallet is yours. It stays valid for about an hour.</td></tr>
+    <tr><td><b>Backend</b></td><td>Guru's server. It checks every listing and stores the good ones so buyers can see them.</td></tr>
+    <tr><td><b>Endpoint</b></td><td>An address on the backend you send a message to, like <code>POST /marketplacev2/orders/bulk</code> ("here are many listings").</td></tr>
+    <tr><td><b>Service</b> (<code>src/core/services</code>)</td><td>Our code that talks to the backend. Our rule: only services may do that.</td></tr>
+    <tr><td><b>Helper</b> (<code>src/helpers</code>)</td><td>Pure logic: data in, data out. No wallet, no internet, no screen. Easy to test.</td></tr>
+    <tr><td><b>Hook</b> (<code>src/hooks</code>)</td><td>The glue between the screen and the real world (wallet, services).</td></tr>
+    <tr><td><b>Composite</b> (<code>src/design-system/composites</code>)</td><td>A piece of screen, like the drawer or one of its steps. It only draws things and reports clicks.</td></tr>
+    <tr><td><b>Types</b> (<code>src/types</code>)</td><td>Descriptions of the shape of data ("a result has a name, ok yes/no, an error text"). They don't do anything; they stop mistakes.</td></tr>
+  </table></div>
+
+  <h2 id="map">3. The map: where each file sits</h2>
+  <p>Think of a restaurant. The <b>screens</b> are the dining room, the <b>hook</b> is the waiter, the <b>rules</b> are the recipe, the <b>service</b> is the delivery van to the supplier (the backend), and the <b>types</b> are the order forms everyone fills in the same way.</p>
+  <div class="tablecard"><table>
+    <tr><th>Layer</th><th>File</th><th>Role</th><th>New or changed</th></tr>
+    <tr><td class="grp" colspan="4">What you see</td></tr>
+    <tr><td>Screen</td><td>5 · <code>BulkListingFlowModal.tsx</code></td><td>The drawer: decides which step to show</td><td>Changed</td></tr>
+    <tr><td>Screen</td><td>6 · <code>BulkListingSigningStep.tsx</code></td><td>The "working" and "send failed" screens</td><td>Changed</td></tr>
+    <tr><td>Screen</td><td>7 · <code>BulkListingSigningStep/index.ts</code></td><td>Makes those screens available to the drawer</td><td>Changed</td></tr>
+    <tr><td>Screen</td><td>8 · <code>BulkListingFormStep.tsx</code></td><td>The form, with the new "Verify your wallet first" notice</td><td>Changed</td></tr>
+    <tr><td class="grp" colspan="4">The glue</td></tr>
+    <tr><td>Hook</td><td>4 · <code>useBulkListingActions.ts</code></td><td>Connects the drawer to the wallet, the rules and the backend</td><td>Changed</td></tr>
+    <tr><td class="grp" colspan="4">The logic</td></tr>
+    <tr><td>Helper</td><td>2 · <code>bulkBatch.ts</code></td><td>The rules of one batch</td><td>New</td></tr>
+    <tr><td>Test</td><td>3 · <code>bulkBatch.test.ts</code></td><td>Proves the rules work</td><td>New</td></tr>
+    <tr><td class="grp" colspan="4">Talking to the backend</td></tr>
+    <tr><td>Service</td><td>1 · <code>bulkOrders.service.ts</code></td><td>Sends the batch to the backend</td><td>New</td></tr>
+    <tr><td>Library</td><td>9 · <code>marketplace-order-client.ts</code></td><td>The existing "talk to backend" toolbox; two small additions</td><td>Changed</td></tr>
+    <tr><td class="grp" colspan="4">Shared descriptions</td></tr>
+    <tr><td>Types</td><td>10 · <code>bulk.ts</code></td><td>Shapes of the data passed between all of the above</td><td>Changed</td></tr>
+  </table></div>
+
+  <!-- FILE 1 -->
+  <h2 id="f1">4. File 1 · the service · <code>src/core/services/my-domains/bulkOrders.service.ts</code></h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">1</span><h3>Sends the batch to the backend</h3><span class="tag new">New · 28 lines</span></div>
+    <dl class="rows">
+      <dt>In one line</dt><dd>The one and only place that sends "here are my listings" to Guru's bulk endpoint.</dd>
+      <dt>Like</dt><dd>The post office counter. You hand over one envelope with all your listings; it hands back the reply.</dd>
+      <dt>Why needed</dt><dd>Our rule (CLAUDE.md §8) says only <code>core/services</code> may talk to the backend. The plan named this exact file.</dd>
+    </dl>
+    <h4>What's inside</h4>
+    <ol class="qs">
+      <li><b><code>postBulkOrders(request)</code> · line 13</b><span>Sends the listings to <code>POST /marketplacev2/orders/bulk</code> using the same login as everything else on the site. Returns the backend's reply: a batch id plus one answer per name ("listed", or "rejected" with a reason code).</span></li>
+      <li><b><code>allRejectedAnswer(err)</code> · line 24</b><span>The tricky case. When the backend refuses <i>every</i> name, it replies with an error instead of a normal answer. But inside that error it still lists each name's reason. This function digs those reasons out, so the drawer can say "theforceis.unstoppable: An older, cheaper listing is still live" instead of a useless "Something went wrong".</span></li>
+    </ol>
+    <h4>Example</h4>
+    <p>You send 3 names. All 3 are already listed. The backend replies "error 400, BATCH_ALL_REJECTED", and inside: name1 ALREADY_LISTED, name2 ALREADY_LISTED, name3 ALREADY_LISTED. This file turns that into a normal answer with those 3 reasons, and the drawer shows "Nothing was listed" with "Already listed" next to each name.</p>
+    <h4>Who uses it</h4>
+    <p>Only the hook (file 4), through its <code>postWithProof</code>.</p>
+  </div>
+
+  <!-- FILE 2 -->
+  <h2 id="f2">5. File 2 · the rules · <code>src/helpers/my-domains/bulkBatch.ts</code></h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">2</span><h3>The rules of one batch</h3><span class="tag new">New · 179 lines · the heart of phase 3</span></div>
+    <dl class="rows">
+      <dt>In one line</dt><dd>The step by step recipe: build every listing, sign once, check, send once, read the answers.</dd>
+      <dt>Like</dt><dd>A recipe card. It says what to do and in what order, but it doesn't own the oven or the shop. Whoever uses the recipe hands those in.</dd>
+      <dt>Why "pure"</dt><dd>It never touches the wallet or the internet itself. The hook hands in "here's how to sign" and "here's how to send". That's why the tests can run it with a test wallet and a pretend backend, in one second, without MetaMask.</dd>
+    </dl>
+    <h4>What's inside, in the order it runs</h4>
+    <ol class="qs">
+      <li><b><code>runBulkBatch(items, days, deps)</code> · line 125 · the main recipe</b><span>
+        Step 1, prepare: ask for the wallet proof if it's old, read your Seaport counter and the blockchain's current time (once for all names).<br>
+        Step 2, build: for each name, work out how long it can stay listed (the days you chose, or less if the domain itself expires sooner; if it expires within a day it's left out with "Expires too soon to list"), then build its listing.<br>
+        Step 3, if every name was left out, stop here: nothing to sign.<br>
+        Step 4, sign: put all listings in the tree (phase 2), ask the wallet once, give each listing its own signature.<br>
+        Step 5, check: make sure every signature really comes back to your wallet. If even one doesn't, send nothing.<br>
+        Step 6, send: pack everything into one message and hand it to <code>postSignedBatch</code>.</span></li>
+      <li><b><code>postSignedBatch(batch, deps)</code> · line 112 · only the sending</b><span>Shows "Publishing", sends, and returns either the results or "send failed" together with the signed batch. Because the batch is returned, Try again can send <i>exactly the same thing</i> again, with no new signature.</span></li>
+      <li><b><code>mapBulkAnswers(batch, answer)</code> · line 88 · reading the reply</b><span>Matches each answer to your names <i>by name</i> (not by position, and ignoring capital letters), so a reply in a different order still lands on the right name. "listed" means live. "DUPLICATE_ORDER" also means live: it happens when a retry arrives after the first try already got through. A name the backend forgot to answer gets "No answer for this name, try again". The names left out in step 2 are added at the end.</span></li>
+      <li><b><code>BULK_REJECT_REASONS</code> and <code>bulkRejectReason(code)</code> · lines 57 to 82 · the reasons you read</b><span>Turn the backend's codes into the wording you approved, for example <code>ALREADY_LISTED</code> becomes "Already listed", <code>CHEAPER_ORDER_STILL_VALID</code> becomes "An older, cheaper listing is still live". Codes that mean <i>our</i> listing or signature was wrong all become "Couldn't be checked, try again" and are written to the console as our bug.</span></li>
+      <li><b><code>isRetryableResult(result)</code> · line 83 · who gets a second chance</b><span>Decides who appears in "Try these again". Names that would fail the same way again are left out: Already listed, Not owned, Name doesn't match, An older cheaper listing is still live, Expires too soon.</span></li>
+      <li><b><code>BulkBatchPhase</code> · line 32 · the four working screens</b><span>verify wallet, preparing, signing, publishing. The recipe announces each one so the drawer can show the right screen.</span></li>
+    </ol>
+    <h4>What it gives back: always one of three outcomes</h4>
+    <div class="tablecard"><table>
+      <tr><th>Outcome</th><th>Means</th><th>The drawer then</th></tr>
+      <tr><td><code>not-signed</code></td><td>Stopped before anything was signed (you cancelled, wallet problem, check failed)</td><td>Goes back to the form with a message. Prices are kept.</td></tr>
+      <tr><td><code>post-failed</code></td><td>Signed, but the send didn't arrive</td><td>Shows "Signed, but not published yet" with Try again</td></tr>
+      <tr><td><code>posted</code></td><td>The backend answered for every name</td><td>Shows the result screen ("5 of 8 domains are live")</td></tr>
+    </table></div>
+  </div>
+
+  <!-- FILE 3 -->
+  <h2 id="f3">6. File 3 · the tests · <code>src/helpers/my-domains/bulkBatch.test.ts</code></h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">3</span><h3>Proves the rules work</h3><span class="tag new">New · 229 lines · 11 tests</span></div>
+    <dl class="rows">
+      <dt>In one line</dt><dd>Automatic checks that run the recipe with a test wallet and a pretend backend.</dd>
+      <dt>Like</dt><dd>A driving test course: we drive the recipe through every tricky situation and check it does the right thing each time.</dd>
+      <dt>Run it</dt><dd><code>npm test</code> (about a second, no MetaMask needed).</dd>
+    </dl>
+    <h4>What's real and what's pretend</h4>
+    <ul>
+      <li><b>Real:</b> the listings (built with the same builder the site uses), the tree, and the signature (a real wallet signs, but it's a throwaway test wallet made from a sentence, so no secret key is stored anywhere).</li>
+      <li><b>Pretend:</b> the backend. Each test decides what the "backend" answers, so we can try situations that are hard to cause for real (everything refused, server too busy).</li>
+    </ul>
+    <h4>The 11 tests, in plain words</h4>
+    <div class="tablecard"><table>
+      <tr><th>#</th><th>The test checks that…</th></tr>
+      <tr><td>1</td><td>10 names give exactly one signature and one send, and every listing carries its own correct position and path</td></tr>
+      <tr><td>2</td><td>A single name also works</td></tr>
+      <tr><td>3</td><td>Refused names get the right reason; the "older cheaper listing" case keeps the old listings' ids (needed in phase 8); only names that could succeed go into "Try these again"</td></tr>
+      <tr><td>4</td><td>A duplicate counts as listed, and a name with no answer is flagged</td></tr>
+      <tr><td>5</td><td>Answers in a different order or with different capital letters still land on the right name</td></tr>
+      <tr><td>6</td><td>Names expiring too soon are left out, and if all of them are, MetaMask is never even opened</td></tr>
+      <tr><td>7</td><td>If you cancel the signature, nothing is sent</td></tr>
+      <tr><td>8</td><td>If you cancel the wallet check, nothing is signed or sent</td></tr>
+      <tr><td>9</td><td>If the signature comes from a different wallet, nothing is sent</td></tr>
+      <tr><td>10</td><td>After "too many requests", Try again sends exactly the same bytes and asks for no new signature</td></tr>
+      <tr><td>11</td><td>After a failed send, the names left out earlier are still shown in the final result</td></tr>
+    </table></div>
+  </div>
+
+  <!-- FILE 4 -->
+  <h2 id="f4">7. File 4 · the hook · <code>src/hooks/my-domains/useBulkListingActions.ts</code></h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">4</span><h3>Connects the drawer to the wallet, the rules and the backend</h3><span class="tag size">Changed · +111 / −5 lines</span></div>
+    <dl class="rows">
+      <dt>In one line</dt><dd>Takes the recipe (file 2) and hands it the real tools: your MetaMask, the real listing builder, the real backend (file 1).</dd>
+      <dt>Like</dt><dd>The waiter: takes your order from the dining room (drawer), gets it cooked by the recipe, and brings the result back.</dd>
+      <dt>Why here</dt><dd>Screens may not talk to the backend directly (our rule), and the drawer already used this hook, so the new path went in here too.</dd>
+    </dl>
+    <h4>What was added</h4>
+    <ol class="qs">
+      <li><b><code>signAndSubmitBulkOnce</code> · line 117 · "List" with one signature</b><span>Fills in the recipe's tools: how to prepare (find your wallet, check the wallet proof, read the counter and time from Polygon), how to build a listing (exactly the same settings as single listing: your NFT, USDT to you, 2.5% fee to the marketplace, price read from the text you typed, never rounded), how to sign (MetaMask's typed data signature on the tree) and how to send (file 1). Then runs the recipe.</span></li>
+      <li><b><code>retryBulkPost</code> · line 157 · Try again</b><span>Sends the kept, already signed batch again. No MetaMask popup.</span></li>
+      <li><b><code>postWithProof</code> · line 91 · send, with one safety net</b><span>Sends the batch. If the backend says "your wallet proof is too old" (it lasts about an hour), it asks for a fresh proof once and sends the very same batch again. Single listing already does the same.</span></li>
+      <li><b><code>classifyBulkBatchError</code> · line 18 · what went wrong?</b><span>Sorts a failure into: you cancelled in the wallet; this wallet isn't linked to your account; too many tries (429); Polygon unavailable (503); anything else. The drawer uses that to pick the right message.</span></li>
+      <li><b><code>refreshAfter</code> · line 102</b><span>If anything got listed, refreshes the My Domains table so the names show as listed.</span></li>
+      <li><b><code>isWalletProofFresh</code> (line 164) and <code>verifyWallet</code> (line 175)</b><span>For the form's notice: "is the proof still fresh for this exact wallet?" and the Verify wallet button.</span></li>
+    </ol>
+    <h4>What was kept on purpose</h4>
+    <p><code>signAndSubmitBulk</code> (line 52), the old "one popup per name" way. Not used by the drawer any more, but phase 4 brings it back as a backup button ("Sign each name separately") for wallets that can't sign the big message, like some hardware and phone wallets. Mohit sir's F3 asks for this.</p>
+  </div>
+
+  <!-- FILE 5 -->
+  <h2 id="f5">8. File 5 · the drawer · <code>BulkListingFlowModal.tsx</code></h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">5</span><h3>Decides which step you see</h3><span class="tag size">Changed · +116 / −53 lines</span></div>
+    <p class="muted">Full path: <code>src/design-system/composites/my-domains/bulk-listing/BulkListingFlowModal/BulkListingFlowModal.tsx</code></p>
+    <dl class="rows">
+      <dt>In one line</dt><dd>The bulk listing drawer itself. It switches between steps (form, approval, working, send failed, result) and calls the hook.</dd>
+      <dt>Like</dt><dd>A stage manager: decides which scene is on stage and when to change it.</dd>
+    </dl>
+    <h4>What changed</h4>
+    <ol class="qs">
+      <li><b>The steps · line 24</b><span>The old "you rejected one name: skip or stop?" step is gone from this drawer (it only made sense with one popup per name). A new step "post failed" took its place. That step can't be closed by clicking outside, so the kept signature is never thrown away by accident; you choose Try again or Close without listing.</span></li>
+      <li><b>The approved messages · lines 29 to 38</b><span>The texts you approved for "nothing was signed" situations: cancelled signature, cancelled wallet check, check failed, wallet not linked, anything else.</span></li>
+      <li><b>Wallet check when the drawer opens · line 127</b><span>As soon as the drawer opens with a wallet connected, it asks the hook "is the wallet proof fresh?". If not, the form shows "Verify your wallet first".</span></li>
+      <li><b><code>handleVerifyWallet</code> · line 141</b><span>What the Verify wallet button does: asks for the free proof, hides the notice on success, or shows the right message if you cancel or something fails.</span></li>
+      <li><b><code>startSigning</code> · line 200</b><span>What List does now: one call to the hook's <code>signAndSubmitBulkOnce</code>. It remembers what was submitted, so the result screen can show it even after a retry.</span></li>
+      <li><b><code>showOutcome</code> · line 182</b><span>Reads the recipe's outcome. "Not signed": back to the form with a message. "Send failed": the new step. "Posted": the result screen. It also remembers the last working screen, so a cancel during the wallet check says "You cancelled the wallet check" and a cancel during listing says "You cancelled the signature".</span></li>
+      <li><b><code>handleRetryPost</code> · line 208</b><span>Try again. If the wallet proof went stale in between, the "Verify your wallet" screen shows for that one popup.</span></li>
+      <li><b>"Try these again" on the result screen</b><span>Now only offers names that could succeed (uses <code>isRetryableResult</code> from file 2).</span></li>
+    </ol>
+    <h4>What didn't change</h4>
+    <p>Log in, connect wallet, switch network, the approval step, the "discard your prices?" question, and the look of the result screen.</p>
+  </div>
+
+  <!-- FILE 6 -->
+  <h2 id="f6">9. File 6 · the new screens · <code>BulkListingSigningStep.tsx</code></h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">6</span><h3>The working and "send failed" screens</h3><span class="tag size">Changed · +58 lines</span></div>
+    <p class="muted">Full path: <code>src/design-system/composites/my-domains/bulk-listing/BulkListingSigningStep/BulkListingSigningStep.tsx</code></p>
+    <dl class="rows">
+      <dt>In one line</dt><dd>Three new pieces of screen, with your approved wording. They only draw; they don't do anything themselves.</dd>
+    </dl>
+    <h4>What was added</h4>
+    <ol class="qs">
+      <li><b><code>BulkBatchStep</code> · line 92</b><span>Three versions: "Preparing 8 listings" (getting things ready, no wallet yet), "Sign once for all 8 names" (MetaMask is open; with the note that MetaMask shows a nested list of orders, which is expected), and "Publishing 8 listings" (sending). With one name it says "1 listing" and "1 name".</span></li>
+      <li><b><code>BulkPostFailedStep</code> · line 122</b><span>"Signed, but not published yet", with three possible explanations: too many tries in a minute; Polygon couldn't be reached; the marketplace couldn't be reached. Each ends with "You won't need to sign again."</span></li>
+      <li><b><code>BulkPostFailedFooter</code> · line 132</b><span>The buttons under it: Try again (shows "Publishing…" and can't be pressed twice) and Close without listing.</span></li>
+    </ol>
+    <h4>Kept on purpose</h4>
+    <p>The old "Signing 3 of 8" screen with its progress bar and the "skip or stop" prompt (lines 18 to 83), for phase 4's backup button.</p>
+  </div>
+
+  <!-- FILE 7 -->
+  <h2 id="f7">10. File 7 · <code>BulkListingSigningStep/index.ts</code></h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">7</span><h3>Makes the new screens available</h3><span class="tag size">Changed · +9 / −2 lines</span></div>
+    <p>Every screen folder has a small <code>index.ts</code> that lists what other files may use from it, like a shop window. The three new screens from file 6 (and their descriptions) were added to the window, so the drawer (file 5) can use them. Nothing else.</p>
+  </div>
+
+  <!-- FILE 8 -->
+  <h2 id="f8">11. File 8 · the form · <code>BulkListingFormStep.tsx</code></h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">8</span><h3>"Verify your wallet first" and the new note</h3><span class="tag size">Changed · +32 / −12 lines</span></div>
+    <p class="muted">Full path: <code>src/design-system/composites/my-domains/bulk-listing/BulkListingFormStep/BulkListingFormStep.tsx</code></p>
+    <h4>What changed</h4>
+    <ol class="qs">
+      <li><b>The notice · line 120</b><span>"Verify your wallet first. One quick signature proves this wallet is yours. It's free. After that, listing every name takes just one more signature." with a shield icon and a Verify wallet button. It sits in the same spot as the other notices (log in, connect, wrong network) and only shows when none of those is showing, so you only ever see the most urgent one.</span></li>
+      <li><b>List waits · line 269</b><span>While the notice is showing, List is disabled. Why: Mohit sir's acceptance test says listing must need <i>exactly one</i> signature. Doing the proof first means List always opens exactly one popup.</span></li>
+      <li><b>The note under List · line 275</b><span>Was "One signature per name, and cancelling is free." Now "One signature covers all 8 names, and cancelling is free." (The "cancelling is free" part changes in phase 8, because a real on chain cancel costs a little gas.)</span></li>
+    </ol>
+  </div>
+
+  <!-- FILE 9 -->
+  <h2 id="f9">12. File 9 · the toolbox · <code>src/lib/marketplace-order-client.ts</code></h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">9</span><h3>Two small additions</h3><span class="tag size">Changed · +8 / −5 lines</span></div>
+    <dl class="rows">
+      <dt>What it is</dt><dd>An existing file used by single listing, delist and Trails: it sends messages to our backend and handles the wallet proof.</dd>
+    </dl>
+    <h4>What changed</h4>
+    <ol class="qs">
+      <li><b>Errors keep the backend's full reply · lines 139 to 161</b><span>Before, when the backend replied with an error, we kept only its code and message and threw away the rest. Now the rest is kept too (as <code>body</code>). File 1 needs it to read each name's reason when every name is refused. Nothing else reads it, so nothing else changes.</span></li>
+      <li><b>The freshness check can name a wallet · line 229</b><span><code>isWalletVerificationFresh</code> used to answer "is there a fresh wallet proof?". Now you can also ask "is there a fresh proof <i>for this wallet</i>?". The drawer asks the second, because a proof for another wallet doesn't help. Without a wallet it answers exactly as before (delist uses it that way).</span></li>
+    </ol>
+  </div>
+
+  <!-- FILE 10 -->
+  <h2 id="f10">13. File 10 · the shapes · <code>src/types/my-domains/bulk.ts</code></h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">10</span><h3>Descriptions of the data</h3><span class="tag size">Changed · +53 lines</span></div>
+    <p>Like blank forms: everyone fills them in the same way, and TypeScript complains if a box is missing or wrong. Shared types live here by our rule (§8 rule 5).</p>
+    <div class="tablecard"><table>
+      <tr><th>Shape</th><th>What it describes</th></tr>
+      <tr><td><code>BulkListingResult</code> (line 50, extended)</td><td>One name's result on the result screen. Two new boxes: <code>code</code> (the backend's reason code) and <code>olderOrderHashes</code> (the old cheaper listings, kept for phase 8's cancel button)</td></tr>
+      <tr><td><code>BulkOrderPayload</code> (96)</td><td>One listing in the message: its details, its signature, its full name</td></tr>
+      <tr><td><code>BulkOrdersRequest</code> (102)</td><td>The whole message: the chain (137, Polygon) and the list of listings</td></tr>
+      <tr><td><code>BulkOrderItemResult</code> (108)</td><td>The backend's answer for one name: listed or rejected, the code, the message, the batch id</td></tr>
+      <tr><td><code>BulkOrdersResponse</code> (119)</td><td>The backend's whole answer: batch id plus all the per name answers</td></tr>
+      <tr><td><code>SignedBulkBatch</code> (125)</td><td>The signed batch we keep in memory for Try again</td></tr>
+      <tr><td><code>BulkBatchFailureReason</code> (134)</td><td>The kinds of failure: you cancelled, wallet not linked, our check failed, too many tries, Polygon unavailable, other</td></tr>
+      <tr><td><code>BulkBatchOutcome</code> (136)</td><td>The three outcomes: not signed, send failed, posted</td></tr>
+    </table></div>
+    <p>The request and answer shapes were copied from Guru's backend code on uat, so both sides agree.</p>
+  </div>
+
+  <h2 id="walk">14. Walk through: you list 3 names</h2>
+  <p>Say you pick <code>alpha.xyz</code>, <code>beta.xyz</code> and <code>gamma.xyz</code>, and <code>gamma.xyz</code> is already listed somewhere.</p>
+  <div class="tablecard"><table>
+    <tr><th>#</th><th>You see</th><th>Files at work</th></tr>
+    <tr><td>1</td><td>The drawer opens. Your proof is older than an hour, so "Verify your wallet first" shows and List is grey.</td><td>5 asks 4, which asks 9: "fresh for this wallet?" No. 8 shows the notice.</td></tr>
+    <tr><td>2</td><td>You click Verify wallet and sign a short text in MetaMask (free). The notice goes away.</td><td>5 → 4 → 9 (the existing proof flow)</td></tr>
+    <tr><td>3</td><td>You set a price and click List.</td><td>5 calls 4's <code>signAndSubmitBulkOnce</code>, which runs 2's <code>runBulkBatch</code></td></tr>
+    <tr><td>4</td><td>"Preparing 3 listings"</td><td>2 asks 4 to read the counter and time, then builds 3 listings</td></tr>
+    <tr><td>5</td><td>"Sign once for all 3 names", and <b>one</b> MetaMask popup</td><td>2 builds the tree (phase 2 maths); 4 asks MetaMask to sign once</td></tr>
+    <tr><td>6</td><td>(nothing visible)</td><td>2 checks all 3 signatures come back to you</td></tr>
+    <tr><td>7</td><td>"Publishing 3 listings"</td><td>2 → 4 → 1 sends one message to the backend</td></tr>
+    <tr><td>8</td><td>"2 of 3 domains are live", and under Not listed: gamma.xyz, Already listed</td><td>2's <code>mapBulkAnswers</code> reads the reply; 5 shows the result screen; 4 refreshes the My Domains table</td></tr>
+    <tr><td>8b</td><td>(If the internet had dropped at step 7) "Signed, but not published yet" → Try again → straight to step 8, no new popup</td><td>6 shows the screen; 5's <code>handleRetryPost</code> → 4's <code>retryBulkPost</code> → 2's <code>postSignedBatch</code> with the same message</td></tr>
+  </table></div>
+
+  <h2 id="faq">15. Questions you might have</h2>
+  <ol class="qs">
+    <li><b>Why did 3 of my 8 names say "An older, cheaper listing is still live"?</b><span>They were listed before and then delisted with today's delist button. That only hides the listing on our site; the old signed listing can still be bought directly on the blockchain until it expires. Listing them again at a higher price would let a buyer pick the cheaper old one, so the backend refuses. Phase 8 adds a proper cancel on the blockchain. Until then, those names can only be listed at or below the old price.</span></li>
+    <li><b>Why is the old "one popup per name" code still there?</b><span>Some wallets can't sign the one big message. Phase 4 offers the old way as a backup button. Mohit sir asked for that (F3).</span></li>
+    <li><b>If I close "Signed, but not published yet", is my signature out there somewhere?</b><span>No. It only lived in your browser's memory and was never sent, so nobody can use it.</span></li>
+    <li><b>Can Try again create the same listing twice?</b><span>No. It sends the exact same listings. If the first try had actually arrived, the backend answers "duplicate", which we count as listed.</span></li>
+    <li><b>Is this the same as Guru's test page?</b><span>For everything that matters to whether a listing is valid, yes: same listing details, same tree maths, same signing, same check, same message, same retry. Differences on purpose: we send the 64 byte short signature (Mohit sir's PDF asks for it; he sends 65; the backend takes both), we shorten a listing when the domain expires sooner, and we keep signed listings in memory instead of the browser. One small gap: his page checks you're on Polygon right before signing; ours relies on the drawer's network warning.</span></li>
+    <li><b>Does it follow Mohit sir's plan?</b><span>Yes for F2 steps 1 to 6, F6 item 4 and the B1 message shape. Some acceptance tests are still to do by hand (50 names, Rabby, Coinbase, a real retry). Full table: <code>bulk-listing-progress.html</code>, v2 Phase 3, section 4.</span></li>
+  </ol>
+
+  <h2 id="next">16. Not done yet</h2>
+  <div class="card"><ul>
+    <li>Committed as <code>7bda94f</code> on 20 Nov, not pushed yet.</li>
+    <li>Not tried by hand: cancelling the signature, a real failed send and Try again, a real "Already listed" name, Phantom, 50 names.</li>
+    <li>The backup "Sign each name separately" button and the wallet test list: phase 4.</li>
+    <li>Cancelling old listings on the blockchain (fixes the "older, cheaper listing" case): phase 8.</li>
+    <li>Names held by a second wallet: waits on the team (V9).</li>
+  </ul></div>
+
+  <h2>Where to go next</h2>
+  <div class="tablecard"><table>
+    <tr><th>If you want…</th><th>Open</th></tr>
+    <tr><td>The whole journey with every failure case</td><td><code>bulk-listing-v2-flow-explained.html</code>, sections 8 and 9</td></tr>
+    <tr><td>The checks against Mohit sir's PDF, our plan and Guru's page, row by row</td><td><code>bulk-listing-progress.html</code>, v2 Phase 3, sections 4 to 6</td></tr>
+    <tr><td>Every file of every phase</td><td><code>bulk-listing-v2-file-changes.html</code></td></tr>
+    <tr><td>The code, start here</td><td><code>src/helpers/my-domains/bulkBatch.ts</code>, <code>runBulkBatch</code> at line 125</td></tr>
+  </table></div>
+
+  <footer>Bulk listing v2 · phase 3 explained · 20 Nov 2026 · dev-docs is local only.</footer>
+</div>
+<script>
+  document.getElementById('toggle').addEventListener('click', function () {
+    var root = document.documentElement;
+    var current = root.getAttribute('data-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('dmplan-theme', next); } catch (e) {}
+  });
+</script>
+</body>
+</html>

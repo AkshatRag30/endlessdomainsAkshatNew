@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bulk Listing Tickets Explained</title>
+<script>
+  try {
+    var saved = localStorage.getItem('dmplan-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  } catch (e) {}
+</script>
+<style>
+  :root {
+    --bg: #f9f9f9; --surface: #ffffff; --surface-soft: #f3f4fe;
+    --text: #111111; --text-muted: #5b5b66; --border: #e6e6e6;
+    --accent: #2639ED; --accent-soft: #e9ebfd;
+    --wait: #9457f6; --wait-soft: #f4eefe;
+    --ok: #12805c; --ok-soft: #e4f5ee;
+    --warn: #b4540a; --warn-soft: #fdf1e4;
+    --bad: #c4314b; --bad-soft: #fdecef;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+      --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+      --accent: #7f8cff; --accent-soft: #1d2150;
+      --wait: #b996fa; --wait-soft: #2c2142;
+      --ok: #4fd1a0; --ok-soft: #173229;
+      --warn: #f5a35c; --warn-soft: #3a2614;
+      --bad: #ff7d93; --bad-soft: #3a1c24;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+    --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+    --accent: #7f8cff; --accent-soft: #1d2150;
+    --wait: #b996fa; --wait-soft: #2c2142;
+    --ok: #4fd1a0; --ok-soft: #173229;
+    --warn: #f5a35c; --warn-soft: #3a2614;
+    --bad: #ff7d93; --bad-soft: #3a1c24;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: "Satoshi", system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.6; }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 48px 16px 80px; }
+  header.top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+  .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; }
+  h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.15; margin: 0 0 12px; }
+  .lede { color: var(--text-muted); margin: 0; max-width: 680px; }
+  .lede a { color: var(--accent); }
+  .toggle { flex-shrink: 0; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 14px; cursor: pointer; }
+  .toggle:hover { border-color: var(--accent); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 32px; }
+  nav.toc a { font-size: 14px; text-decoration: none; color: var(--accent); background: var(--accent-soft); padding: 6px 12px; border-radius: 999px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 0 0 16px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+  .stat b { display: block; font-size: 26px; line-height: 1.2; }
+  .stat span { font-size: 13px; color: var(--text-muted); }
+  h2 { font-size: 22px; margin: 52px 0 16px; }
+  h3 { font-size: 18px; margin: 0; }
+  h4 { font-size: 15px; margin: 22px 0 8px; color: var(--accent); }
+  p { margin: 0 0 12px; }
+  .muted { color: var(--text-muted); font-size: 15px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
+  .card p:last-child { margin-bottom: 0; }
+  .card ul, .card ol { margin: 8px 0 0; padding-left: 20px; }
+  .card li { margin-bottom: 6px; }
+  code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .86em; background: var(--surface-soft); border-radius: 6px; padding: 1px 6px; word-break: break-word; }
+  .findings { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .finding { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+  .finding h3 { font-size: 16px; margin-bottom: 6px; }
+  .finding p { font-size: 15px; margin: 0; color: var(--text-muted); }
+  .tablecard { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow-x: auto; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: 0; }
+  th { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+  td.grp { font-weight: 600; color: var(--accent); background: var(--surface-soft); font-size: 13px; }
+  .sw { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .chip { width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(128,128,128,.45); flex-shrink: 0; }
+  .callout { border-left: 4px solid var(--wait); background: var(--wait-soft); border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; }
+  .callout p { margin: 0; }
+  .callout.ok { border-color: var(--ok); background: var(--ok-soft); }
+  .callout.warn { border-color: var(--warn); background: var(--warn-soft); }
+  .issue { display: grid; grid-template-columns: 28px 1fr; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--bad); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+  .issue .n { font-weight: 700; color: var(--bad); }
+  .issue p { margin: 0; font-size: 15px; }
+  .issue .where { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+  .phase { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px 24px; margin-bottom: 14px; }
+  .phase-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  .num { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 15px; flex-shrink: 0; }
+  .tag { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+  .tag.now { background: var(--ok-soft); color: var(--ok); }
+  .tag.wait { background: var(--wait-soft); color: var(--wait); }
+  .tag.size { background: var(--surface-soft); color: var(--text-muted); }
+  .tag.new { background: var(--warn-soft); color: var(--warn); }
+  .rows { display: grid; grid-template-columns: 130px 1fr; gap: 6px 16px; font-size: 15px; }
+  .rows dt { color: var(--text-muted); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; padding-top: 2px; }
+  .rows dd { margin: 0; }
+  ol.qs { counter-reset: q; list-style: none; padding: 0; margin: 0; }
+  ol.qs li { counter-increment: q; position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px 14px 56px; margin-bottom: 10px; }
+  ol.qs li::before { content: counter(q); position: absolute; left: 16px; top: 14px; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  ol.qs.team li::before { background: var(--wait-soft); color: var(--wait); }
+  ol.qs b { display: block; margin-bottom: 2px; }
+  ol.qs span { color: var(--text-muted); font-size: 15px; }
+  footer { margin-top: 56px; font-size: 13px; color: var(--text-muted); }
+  @media (max-width: 700px) {
+    header.top { flex-direction: column; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .findings { grid-template-columns: 1fr; }
+    .card, .phase { padding: 18px; }
+    .rows { grid-template-columns: 1fr; }
+    .rows dt { padding-top: 8px; }
+    ol.qs li { padding-left: 50px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">Bulk listing v2 · F1 to F9 explained</p>
+      <h1>Mohit's tickets F1 to F9, in simple words</h1>
+      <p class="lede">Written 19 Nov 2026. This page takes the frontend part of Mohit's requirements PDF (tickets F1 to F9) and explains each one: what it means, what our code does today, what will change, and which phase of <code>bulk-listing-v2-plan.md</code> does it. Read section 1 first; everything after it builds on those few ideas.</p>
+    </div>
+    <button class="toggle" id="toggle" type="button">Toggle theme</button>
+  </header>
+
+  <nav class="toc">
+    <a href="#basics">1. The basics</a><a href="#f1">F1</a><a href="#f2">F2</a><a href="#f3">F3</a><a href="#f4">F4</a><a href="#f5">F5</a><a href="#f6">F6</a><a href="#f7">F7</a><a href="#f8">F8</a><a href="#f9">F9</a><a href="#map">Ticket to phase map</a>
+  </nav>
+
+  <div class="stats">
+    <div class="stat"><b>9</b><span>tickets, F1 to F9</span></div>
+    <div class="stat"><b>1</b><span>done (F1, the rebase)</span></div>
+    <div class="stat"><b>50 → 1</b><span>wallet popups for 50 names, the main goal</span></div>
+    <div class="stat"><b>10</b><span>phases in our plan</span></div>
+  </div>
+
+  <h2 id="basics">1. The basics you need first</h2>
+
+  <div class="card">
+    <h3>What a listing actually is</h3>
+    <p>When you list a domain for sale on our marketplace, nothing is sent to the blockchain. Instead your wallet signs a message that says, in effect, "I agree to sell this NFT for this price until this date". That signed message is called an <b>order</b>, and the format comes from <b>Seaport</b>, the open marketplace contract (made by OpenSea) that our marketplace uses. The order's details are a structure called <code>OrderComponents</code>: seller, NFT, price, fee split, start time, end time and a few counters.</p>
+    <p>Our backend stores the order and its signature. When a buyer clicks Buy, the buyer sends the order plus your signature to the Seaport contract. Seaport checks the signature really came from you, moves the NFT to the buyer and the money to you. Listing is free because signing costs no gas; only buying costs gas.</p>
+  </div>
+
+  <div class="card">
+    <h3>Why bulk listing needs a change</h3>
+    <p>Today, bulk listing 50 names means 50 orders, and our code asks the wallet to sign each one: <b>50 popups</b>, one after the other (<code>runBulkSigning</code> in <code>src/helpers/my-domains/bulkSigning.ts</code>). That works but is painful. Seaport has a built in feature for exactly this: sign <b>one</b> message that covers all 50 orders. That is the heart of v2.</p>
+  </div>
+
+  <div class="card">
+    <h3>Three other words you'll keep seeing</h3>
+    <dl class="rows">
+      <dt>Approval</dt><dd>Before Seaport can move your NFT on a sale, you must give it permission once, by sending a real transaction called <code>setApprovalForAll</code> (it costs a little gas). The permission is per NFT contract and per chain, so one approval covers every name from that contract.</dd>
+      <dt>Off chain</dt><dd>Only our backend knows. Free, instant, but the blockchain doesn't know about it.</dd>
+      <dt>On chain</dt><dd>Written to the blockchain by a transaction. Costs gas and takes a few seconds, but it is final and everyone has to respect it.</dd>
+    </dl>
+  </div>
+
+  <h2 id="f1">F1. Rebase the branch</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">F1</span><h3>Bring our branch up to date</h3><span class="tag now">Done 19 Nov, pushed</span></div>
+    <p><b>In plain words.</b> Our bulk listing work was built on an old copy of the code (late October). Since then uat gained Trails, dark mode fixes and Profile fixes. F1 says: move our work on top of today's uat, and keep the cleanup we did to <code>listingOrder.ts</code> (the file that builds and signs a single listing).</p>
+    <p><b>Status.</b> Already done: bulk list is now uat plus one commit (8209a6a), you checked it on 3002, and it is pushed. Plan phase 1.</p>
+  </div>
+
+  <h2 id="f2">F2. One signature for the whole batch</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">F2</span><h3>Sign once instead of 50 times</h3><span class="tag size">Plan phases 2 and 3 · the biggest ticket</span></div>
+    <p><b>The idea.</b> Seaport lets you put many orders into a <b>tree</b> and sign only the top of the tree. Think of a family tree turned upside down. At the bottom are the orders (the "leaves"). Every two leaves are combined into one fingerprint (a hash), every two of those are combined again, and so on, until one single fingerprint is left at the top, called the <b>root</b>. Change any order even slightly and the root changes. So signing the root is the same as signing every order under it.</p>
+
+    <div class="tablecard"><table>
+      <tr><th>Level</th><th>What is there (example with 4 orders)</th></tr>
+      <tr><td>Top</td><td>Root = hash(AB, CD) · <b>this is what the wallet signs, once</b></td></tr>
+      <tr><td>Middle</td><td>AB = hash(A, B) · CD = hash(C, D)</td></tr>
+      <tr><td>Bottom (leaves)</td><td>Order A · Order B · Order C · Order D</td></tr>
+    </table></div>
+
+    <p><b>The six steps from the ticket, one by one.</b></p>
+    <ol class="qs">
+      <li><b>Build every order first.</b><span>Make all 50 <code>OrderComponents</code> before asking the wallet anything. Two values every order needs (your Seaport "counter" and the current blockchain time) are read once for the whole batch. Our branch already does this.</span></li>
+      <li><b>Pick the tree size and pad it.</b><span>A tree like this needs a power of two leaves: 2, 4, 8, 16, 32, 64. The height h is how many levels it has, h = max(1, ceil(log2 n)). For 50 names, 2 to the power 6 is 64, so h = 6 and there are 64 leaves. The 14 spare spots are filled with empty orders that can never be used. Since we cap a batch at 50, h is at most 6.</span></li>
+      <li><b>Sign it in the format Seaport expects.</b><span>The wallet signs "typed data" (EIP712), which is why MetaMask shows readable fields instead of gibberish. For bulk orders the type is <code>BulkOrder(OrderComponents[2][2][2][2][2][2] tree)</code>, one <code>[2]</code> per level. The ticket says: don't type these long type strings by hand; copy the proven helper from Seaport's own JavaScript library (<code>Eip712MerkleTree</code> in Seaport.js), because one wrong character makes every signature invalid.</span></li>
+      <li><b>Give each order its own signature.</b><span>After the one wallet signature, we build a separate signature for each order by gluing together: the shared 64 byte signature, then the order's position in the tree (3 bytes, the "leaf index"), then 6 hashes (32 bytes each) called the <b>proof</b>. The proof is the list of neighbours on the way up, which lets Seaport rebuild the root from just this one order. So each order can be bought on its own, and Seaport checks it on every buy, whether direct or through Trails.</span></li>
+      <li><b>Check it ourselves before sending.</b><span>For every order, rebuild the root from its proof and confirm the signature comes back to your wallet address. Our single listing flow already does this kind of check (<code>verifyTypedData</code>); this is the same safety net for bulk. If something is wrong, we find out before the backend or a buyer does.</span></li>
+      <li><b>Send them all in one request.</b><span>Post all 50 orders in one call to the new backend endpoint B1 (<code>POST /marketplacev2/orders/bulk</code>, built by Guru, live on uat since 19 Nov (PR #1024)), then show each name's result: listed, or rejected with a reason (for example <code>ALREADY_LISTED</code>). Some can succeed while others fail; that's normal.</span></li>
+    </ol>
+    <p style="margin-top:12px"><b>How we split it.</b> Phase 2 builds the tree, padding, proofs and the local check as pure functions in a new file (<code>bulkOrderTree.ts</code>), with no wallet and no screen. Phase 3 plugs them into the drawer: one popup, one post, results per name. Guru's endpoint is live on uat since 19 Nov (PR #1024), so phase 3 talks to it directly, no mock.</p>
+  </div>
+
+  <h2 id="f3">F3. Keep the old way as a backup</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">F3</span><h3>"Sign each name separately"</h3><span class="tag size">Built in phase 4 (20 Nov); wallets beyond MetaMask not tested</span></div>
+    <p><b>In plain words.</b> A 64 leaf typed data message is big. Some wallets can't show or sign it: hardware wallets like Ledger, some phone wallets connected through WalletConnect, and smart contract wallets. If the one big signature fails, we show a button "Sign each name separately" that runs today's one popup per name loop. So our current code isn't thrown away; it becomes the fallback.</p>
+    <p><b>The test list.</b> The ticket asks us to test on MetaMask, Rabby, Coinbase Wallet, Trust, Ledger through MetaMask and one WalletConnect phone wallet, and attach the results to the pull request.</p>
+    <div class="callout warn"><p>You only have MetaMask and Phantom. Rabby and Coinbase Wallet are free browser extensions, so installing them would close most of the gap; Ledger and Trust need a device or phone. We record honestly in the test matrix which ones were not tested.</p></div>
+  </div>
+
+  <h2 id="f4">F4. Remove the "percentage of estimate" pricing</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">F4</span><h3>Two pricing modes instead of three</h3><span class="tag size">Built and tested in phase 5 (23 Nov)</span></div>
+    <p><b>In plain words.</b> The drawer currently offers three ways to price: one price for every name, set each name's price yourself, or a percentage of an estimated value. We have no real estimate for domains (the value is hardcoded to 0), so the third option makes no sense. F4 removes it from <code>BulkPricingOptions</code> and removes the "estimate" column from <code>BulkNamesList</code>. Mohit's decision 5 confirms: keep only the first two.</p>
+  </div>
+
+  <h2 id="f5">F5. The approval step, done properly</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">F5</span><h3>Ask only for the approvals you're missing</h3><span class="tag size">Built in phase 6 (23 Nov), wrong network fix tested</span></div>
+    <p><b>In plain words.</b> Remember an approval is per contract and per chain. A batch of 50 names might come from two contracts, so it may need two approvals, or none if you approved before. F5 says: group the selected names by (chain, contract), ask the blockchain for each group "is Seaport already approved?" (<code>isApprovedForAll</code>), and show only the missing ones, each with a real gas cost estimate.</p>
+    <p><b>Today.</b> The bulk drawer borrows the single listing's hook with just the first name (<code>useListingFlowActions(domains[0])</code>), so it only checks one contract, and the gas number shown is fake. We replace that with a new hook (<code>useNftApprovals</code>) that takes a contract and chain.</p>
+  </div>
+
+  <h2 id="f6">F6. Four bugs Mohit found in our branch</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">F6</span><h3>Correctness fixes</h3><span class="tag size">Items 1 to 3 built in phase 5 (23 Nov); item 4 in phase 3</span></div>
+    <div class="issue"><span class="n">1</span><div><p><b>The fee says "2.5%" no matter what.</b> It's typed into the text (<code>BulkListingFormStep.tsx</code> line 193). If the marketplace fee changes, the screen would lie. Fix: calculate it from the fee setting (in basis points, where 250 bps = 2.5%).</p></div></div>
+    <div class="issue"><span class="n">2</span><div><p><b>The end date shown isn't the one signed.</b> The screen calculates the end date from your computer's clock (<code>Date.now()</code>), but the real orders use the blockchain's time minus 300 seconds. They can differ. Also, some names get a shorter end date because the domain expires sooner. Fix: show the real end time that was signed, and list the names whose listing was cut short.</p></div></div>
+    <div class="issue"><span class="n">3</span><div><p><b>A wrong count when you reject.</b> If you reject a signature, a prompt says how many names are "remaining". That count wrongly includes names that would be skipped anyway because their domain expires too soon. Fix: count only names that will really be listed.</p></div></div>
+    <div class="issue"><span class="n">4</span><div><p><b>Retry asks you to sign again.</b> If sending to the backend fails (network blip), today's retry starts over and asks the wallet again. With one bulk signature that's wasteful: the signature is still valid. Fix: keep the signed orders in memory and retry only the sending.</p></div></div>
+  </div>
+
+  <h2 id="f7">F7. Delist on chain, one name or many</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">F7</span><h3>Make "delist" truly final</h3><span class="tag size">Built and tested in phase 8 (23 Nov); price cuts stay free via Edit price (option B)</span><span class="tag wait">B5 and B7 live on uat; price cut rule waits on Mohit (V7)</span></div>
+    <p><b>The problem today.</b> Our Delist button (<code>useDelistListing.ts</code>) only tells our backend "hide this order". It's off chain. But your signed order still exists, and Seaport still considers it valid until its end date. Anyone who kept a copy could still buy your domain at the old price directly through Seaport. So "delisted" isn't really delisted.</p>
+    <p><b>What F7 asks for.</b></p>
+    <ol class="qs">
+      <li><b>Cancel on the blockchain.</b><span>Fetch each order's original details (<code>rawOrder</code>, the exact signed <code>OrderComponents</code>) and send one transaction to Seaport's <code>cancel</code> function with all of them. After that Seaport refuses those orders forever. It costs gas, but one transaction covers any number of orders.</span></li>
+      <li><b>Bulk delist too.</b><span>Use the same Select mode as bulk listing to pick several listed names and cancel them all in that one transaction. The single Delist button moves to the same on chain path.</span></li>
+      <li><b>Tell the backend.</b><span>After sending, call the backend's cancel endpoint (B5) with the transaction hash, so it can watch the blockchain and confirm.</span></li>
+      <li><b>Show three states on My Domains.</b><span><b>Cancelling</b> (sent, waiting for the blockchain), <b>Cancelled</b> (confirmed), and <b>Cancel not confirmed</b> (the transaction never confirmed), which shows a warning that the listing can still be bought plus a "Cancel again" button.</span></li>
+      <li><b>Handle "a cheaper order is still alive".</b><span>Say you listed a name at $100, delisted it off chain, and now list it at $150. The $100 order is still valid on Seaport, so a buyer could grab it cheaper. The backend will refuse the new listing with <code>CHEAPER_ORDER_STILL_VALID</code> (B7). We then offer: "cancel the old orders on chain first".</span></li>
+      <li><b>Price cuts may skip the cancel.</b><span>If the new price is lower, the old higher order doesn't hurt you (nobody pays more when a cheaper one exists), so Mohit's decision 1 says the cancel may be skipped. Whether we skip it or always cancel is question V7, waiting on Mohit.</span></li>
+    </ol>
+    <p style="margin-top:12px"><b>Extra work the review found.</b> Our Seaport function list (<code>SEAPORT_MIN_ABI</code>) has no <code>cancel</code> yet, the marketplace home page also uses Delist, and the screens need states for "wallet not connected" and "not enough gas".</p>
+  </div>
+
+  <h2 id="f8">F8. Wording fixes</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">F8</span><h3>Text that the designs got wrong</h3><span class="tag size">Done in phase 5 (23 Nov), issue 8 in phase 7</span></div>
+    <p><b>In plain words.</b> Some sentences in the Figma designs are now untrue. Examples in our drawer: "Approve once, list forever" (approvals are per contract and per chain), "cancelling is free" (with F7, cancelling costs gas), and auction text like "Timed bidding" (we only do fixed prices). Mohit listed these under his open questions. Our plan fixes them in code, and you approve every new sentence before it lands (V4).</p>
+  </div>
+
+  <h2 id="f9">F9. Product rules from Mohit's decisions</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">F9</span><h3>Four rules to apply</h3><span class="tag size">Built in phase 7 (24 Nov); smart wallet part in phase 4</span></div>
+    <div class="issue"><span class="n">1</span><div><p><b>Listings end 7 days before the domain expires</b>, not 1 day. A buyer shouldn't buy a name that dies the next day. In code this is the safety margin in <code>bulkListing.ts</code> (lines 173 to 178).</p></div></div>
+    <div class="issue"><span class="n">2</span><div><p><b>Names with less than 14 days left can't be listed.</b> They show as not eligible in Select mode (decision 8).</p></div></div>
+    <div class="issue"><span class="n">3</span><div><p><b>One chain per batch.</b> Once you select a name on one chain, names on other chains can't be added. One signature can only cover one chain's Seaport (decision 2).</p></div></div>
+    <div class="issue"><span class="n">4</span><div><p><b>A clear message for smart contract wallets.</b> These wallets (Safe, for example) sign differently and often can't do this kind of order, so we explain that instead of failing silently (decision 10). Careful: newer MetaMask accounts upgraded with EIP 7702 look like smart contracts on chain (their code starts with <code>0xef0100</code>) but sign normally, so they must not get this message.</p></div></div>
+  </div>
+
+  <h2 id="map">Ticket to phase map</h2>
+  <div class="tablecard"><table>
+    <tr><th>Ticket</th><th>Short meaning</th><th>Plan phase</th><th>Waits on</th></tr>
+    <tr><td>F1</td><td>Rebase onto uat</td><td>1</td><td>Done</td></tr>
+    <tr><td>F2</td><td>One signature for all names</td><td>2 (helpers), 3 (drawer)</td><td>Nothing (B1 live on uat)</td></tr>
+    <tr><td>F3</td><td>Per name fallback, wallet tests</td><td>4</td><td>Rabby, Coinbase installed</td></tr>
+    <tr><td>F4</td><td>Drop percentage pricing</td><td>5</td><td>Nothing</td></tr>
+    <tr><td>F5</td><td>Approvals per contract and chain</td><td>6</td><td>Nothing</td></tr>
+    <tr><td>F6</td><td>Four bug fixes</td><td>5 and 3</td><td>Nothing</td></tr>
+    <tr><td>F7</td><td>On chain delist, single and bulk</td><td>8</td><td>V7 from Mohit (B5, B7 live on uat)</td></tr>
+    <tr><td>F8</td><td>Wording fixes</td><td>5</td><td>Your approval of each sentence</td></tr>
+    <tr><td>F9</td><td>7 day / 14 day rules, one chain, smart wallets</td><td>7 (and 4)</td><td>V9 team discussion for names in several wallets</td></tr>
+  </table></div>
+  <p class="muted">After phase 8: phase 9 is a small set of cross checks with the backend (it was "switch from mocks" until the backend went live on uat on 19 Nov), and phase 10 is the final QA against the PDF's acceptance criteria, including one real Trails test buy (B8).</p>
+
+  <footer>Explainer for <code>bulk-listing-v2-plan.md</code>. Related: <code>bulk-listing-v2-review.html</code> (gaps and questions), <code>bulk-listing-progress.html</code> (what's done).</footer>
+</div>
+<script>
+  document.getElementById('toggle').addEventListener('click', function () {
+    var root = document.documentElement;
+    var current = root.getAttribute('data-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('dmplan-theme', next); } catch (e) {}
+  });
+</script>
+</body>
+</html>

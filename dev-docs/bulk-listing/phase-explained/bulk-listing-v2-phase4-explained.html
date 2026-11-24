@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phase 4 Explained</title>
+<script>
+  try {
+    var saved = localStorage.getItem('dmplan-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  } catch (e) {}
+</script>
+<style>
+  :root {
+    --bg: #f9f9f9; --surface: #ffffff; --surface-soft: #f3f4fe;
+    --text: #111111; --text-muted: #5b5b66; --border: #e6e6e6;
+    --accent: #2639ED; --accent-soft: #e9ebfd;
+    --wait: #9457f6; --wait-soft: #f4eefe;
+    --ok: #12805c; --ok-soft: #e4f5ee;
+    --warn: #b4540a; --warn-soft: #fdf1e4;
+    --bad: #c4314b; --bad-soft: #fdecef;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+      --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+      --accent: #7f8cff; --accent-soft: #1d2150;
+      --wait: #b996fa; --wait-soft: #2c2142;
+      --ok: #4fd1a0; --ok-soft: #173229;
+      --warn: #f5a35c; --warn-soft: #3a2614;
+      --bad: #ff7d93; --bad-soft: #3a1c24;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+    --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+    --accent: #7f8cff; --accent-soft: #1d2150;
+    --wait: #b996fa; --wait-soft: #2c2142;
+    --ok: #4fd1a0; --ok-soft: #173229;
+    --warn: #f5a35c; --warn-soft: #3a2614;
+    --bad: #ff7d93; --bad-soft: #3a1c24;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: "Satoshi", system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.6; }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 48px 16px 80px; }
+  header.top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+  .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; }
+  h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.15; margin: 0 0 12px; }
+  .lede { color: var(--text-muted); margin: 0; max-width: 680px; }
+  .lede a { color: var(--accent); }
+  .toggle { flex-shrink: 0; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 14px; cursor: pointer; }
+  .toggle:hover { border-color: var(--accent); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 32px; }
+  nav.toc a { font-size: 14px; text-decoration: none; color: var(--accent); background: var(--accent-soft); padding: 6px 12px; border-radius: 999px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 0 0 16px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+  .stat b { display: block; font-size: 26px; line-height: 1.2; }
+  .stat span { font-size: 13px; color: var(--text-muted); }
+  h2 { font-size: 22px; margin: 52px 0 16px; }
+  h3 { font-size: 18px; margin: 0; }
+  h4 { font-size: 15px; margin: 22px 0 8px; color: var(--accent); }
+  p { margin: 0 0 12px; }
+  .muted { color: var(--text-muted); font-size: 15px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
+  .card p:last-child { margin-bottom: 0; }
+  .card ul, .card ol { margin: 8px 0 0; padding-left: 20px; }
+  .card li { margin-bottom: 6px; }
+  code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .86em; background: var(--surface-soft); border-radius: 6px; padding: 1px 6px; word-break: break-word; }
+  .findings { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .finding { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+  .finding h3 { font-size: 16px; margin-bottom: 6px; }
+  .finding p { font-size: 15px; margin: 0; color: var(--text-muted); }
+  .tablecard { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow-x: auto; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: 0; }
+  th { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+  td.grp { font-weight: 600; color: var(--accent); background: var(--surface-soft); font-size: 13px; }
+  .sw { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .chip { width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(128,128,128,.45); flex-shrink: 0; }
+  .callout { border-left: 4px solid var(--wait); background: var(--wait-soft); border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; }
+  .callout p { margin: 0; }
+  .callout.ok { border-color: var(--ok); background: var(--ok-soft); }
+  .callout.warn { border-color: var(--warn); background: var(--warn-soft); }
+  .issue { display: grid; grid-template-columns: 28px 1fr; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--bad); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+  .issue .n { font-weight: 700; color: var(--bad); }
+  .issue p { margin: 0; font-size: 15px; }
+  .issue .where { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+  .phase { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px 24px; margin-bottom: 14px; }
+  .phase-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  .num { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 15px; flex-shrink: 0; }
+  .tag { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+  .tag.now { background: var(--ok-soft); color: var(--ok); }
+  .tag.wait { background: var(--wait-soft); color: var(--wait); }
+  .tag.size { background: var(--surface-soft); color: var(--text-muted); }
+  .tag.new { background: var(--warn-soft); color: var(--warn); }
+  .rows { display: grid; grid-template-columns: 130px 1fr; gap: 6px 16px; font-size: 15px; }
+  .rows dt { color: var(--text-muted); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; padding-top: 2px; }
+  .rows dd { margin: 0; }
+  ol.qs { counter-reset: q; list-style: none; padding: 0; margin: 0; }
+  ol.qs li { counter-increment: q; position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px 14px 56px; margin-bottom: 10px; }
+  ol.qs li::before { content: counter(q); position: absolute; left: 16px; top: 14px; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  ol.qs.team li::before { background: var(--wait-soft); color: var(--wait); }
+  ol.qs b { display: block; margin-bottom: 2px; }
+  ol.qs span { color: var(--text-muted); font-size: 15px; }
+  footer { margin-top: 56px; font-size: 13px; color: var(--text-muted); }
+  @media (max-width: 700px) {
+    header.top { flex-direction: column; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .findings { grid-template-columns: 1fr; }
+    .card, .phase { padding: 18px; }
+    .rows { grid-template-columns: 1fr; }
+    .rows dt { padding-top: 8px; }
+    ol.qs li { padding-left: 50px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">Bulk listing v2 · phase 4 explained</p>
+      <h1>Phase 4 in simple words: the safety nets</h1>
+      <p class="lede">Phase 3 made "one signature for all names" work. Phase 4 adds three safety nets for when it can't: a backup way to sign, a clear message for smart contract wallets, and a last moment network check. What each of the 8 changed files does, why, and how to try it. Written 20 Nov 2026; line numbers as of that day.</p>
+    </div>
+    <button class="toggle" id="toggle" type="button">Toggle theme</button>
+  </header>
+
+  <nav class="toc">
+    <a href="#story">The story</a><a href="#words">Words to know</a><a href="#nets">The three nets</a><a href="#map">The map</a><a href="#f1">1 Rules</a><a href="#f2">2 Tests</a><a href="#f3">3 Hook</a><a href="#f4">4 Drawer</a><a href="#f5">5 Screens</a><a href="#f6">6 Index</a><a href="#f7">7 Form</a><a href="#f8">8 Shapes</a><a href="#wallets">Wallets</a><a href="#faq">Questions</a><a href="#next">Not done yet</a>
+  </nav>
+
+  <div class="stats">
+    <div class="stat"><b>8</b><span>files changed, none new</span></div>
+    <div class="stat"><b>3</b><span>safety nets added</span></div>
+    <div class="stat"><b>4</b><span>new tests (193 in total, all passing)</span></div>
+    <div class="stat"><b>1 of 7</b><span>wallets tested (MetaMask)</span></div>
+  </div>
+
+  <h2 id="story">1. The story in five sentences</h2>
+  <div class="card">
+    <ol>
+      <li>Phase 3 made the drawer ask for one signature that covers every name.</li>
+      <li>That message is big and unusual (orders nested inside pairs), and some wallets can't sign it: hardware wallets like Ledger, some phone wallets, and smart contract wallets like Safe. Mohit sir's F3 says to keep the old "one popup per name" way as a backup.</li>
+      <li>Phase 4 offers that backup only when the wallet really fails, never when you just cancel.</li>
+      <li>Smart contract wallets aren't supported yet (Mohit sir's decision 10), so they now get a clear message instead of a confusing failure.</li>
+      <li>And if you switch your wallet off Polygon while the drawer is open, you now get "switch to Polygon" instead of "something went wrong".</li>
+    </ol>
+  </div>
+
+  <h2 id="words">2. Words to know first</h2>
+  <div class="tablecard"><table>
+    <tr><th>Word</th><th>In simple words</th></tr>
+    <tr><td><b>Bulk signature</b></td><td>The one signature that covers every name (phase 3).</td></tr>
+    <tr><td><b>Fallback</b></td><td>The backup plan: sign each name separately, one popup each, like the October version.</td></tr>
+    <tr><td><b>Smart contract wallet</b></td><td>A wallet that is a program on the blockchain (like Safe, often shared by a team), not a key in your browser. It signs in a completely different way.</td></tr>
+    <tr><td><b>Account code</b></td><td>What the blockchain stores at an address. A normal wallet has none; a smart contract wallet has its program there. That's how we tell them apart.</td></tr>
+    <tr><td><b>EIP 7702</b></td><td>A newer feature that lets a normal wallet (even MetaMask) attach extra code. Its code starts with <code>0xef0100</code>. It still signs like a normal wallet, so we treat it as normal.</td></tr>
+    <tr><td><b>Chain / network</b></td><td>Which blockchain your wallet is on. Listings are on Polygon (chain 137).</td></tr>
+    <tr><td><b>Wallet test matrix</b></td><td>A table of wallets and whether bulk listing works in each. Mohit sir wants it with the pull request.</td></tr>
+  </table></div>
+
+  <h2 id="nets">3. The three safety nets</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">A</span><h3>Backup: "Sign each name separately"</h3><span class="tag size">F3</span></div>
+    <p><b>When:</b> you click List, the wallet is asked for the one big signature, and it fails (an error), or it signs but the signature doesn't check out (the wallet read the big message differently).</p>
+    <p><b>You see:</b> "Your wallet couldn't sign them all at once. Some wallets, like hardware and some phone wallets, can't sign one big message. You can sign each name separately instead: one popup per name. Nothing has been listed yet." Buttons: <b>Sign each name separately</b> and <b>Back to the form</b>.</p>
+    <p><b>If you choose it:</b> "Signing 1 of 8", one popup per name, each name sent on its own. Cancel one and you're asked "Continue with the rest / Stop here". Then the usual result screen.</p>
+    <p><b>Never offered when:</b> you cancelled, the wallet is on the wrong network, it's a smart wallet, the wallet isn't linked to your account, or something failed before the wallet was even asked. Signing per name wouldn't help in any of those.</p>
+  </div>
+  <div class="phase">
+    <div class="phase-head"><span class="num">B</span><h3>Smart contract wallets: a clear "not yet"</h3><span class="tag size">F9, decision 10</span></div>
+    <p><b>When:</b> the drawer opens and the connected wallet is a smart contract wallet.</p>
+    <p><b>You see:</b> "Smart contract wallets can't bulk list yet. This wallet is a smart contract wallet (like a Safe). For now, bulk listing needs a regular wallet such as MetaMask. Connect a regular wallet to list these names." with a <b>Switch wallet</b> button. List is disabled.</p>
+    <p><b>Checked twice:</b> when the drawer opens, and again the moment you click List. If it's only caught at List: "This is a smart contract wallet, which can't bulk list yet. Nothing was listed."</p>
+  </div>
+  <div class="phase">
+    <div class="phase-head"><span class="num">C</span><h3>Network check at the last moment</h3><span class="tag size">Gap from phase 3</span></div>
+    <p><b>When:</b> you opened the drawer on Polygon, then switched your wallet to another network, then clicked List.</p>
+    <p><b>Before:</b> the wallet refused and you saw "Something went wrong before signing". With the new backup, it would even have offered "Sign each name separately", which can't help.</p>
+    <p><b>Now:</b> "Your wallet is on the wrong network. Switch to Polygon and try again. Nothing was listed." and the wrong network banner with its Switch button.</p>
+  </div>
+
+  <h2 id="map">4. The map: the 8 files</h2>
+  <div class="tablecard"><table>
+    <tr><th>#</th><th>File</th><th>Part</th><th>Lines</th></tr>
+    <tr><td>1</td><td><code>src/helpers/my-domains/bulkBatch.ts</code></td><td>The rules: is it a smart wallet? should we offer the backup?</td><td>+23</td></tr>
+    <tr><td>2</td><td><code>src/helpers/my-domains/bulkBatch.test.ts</code></td><td>4 new tests</td><td>+43 / −1</td></tr>
+    <tr><td>3</td><td><code>src/hooks/my-domains/useBulkListingActions.ts</code></td><td>The glue: reads the wallet's network and code</td><td>+36 / −2</td></tr>
+    <tr><td>4</td><td><code>BulkListingFlowModal.tsx</code></td><td>The drawer: new steps and the backup flow</td><td>+108 / −6</td></tr>
+    <tr><td>5</td><td><code>BulkListingSigningStep.tsx</code></td><td>The new "couldn't sign them all" screen</td><td>+26</td></tr>
+    <tr><td>6</td><td><code>BulkListingSigningStep/index.ts</code></td><td>Makes that screen available</td><td>+11 / −1</td></tr>
+    <tr><td>7</td><td><code>BulkListingFormStep.tsx</code></td><td>The smart wallet notice on the form</td><td>+21 / −1</td></tr>
+    <tr><td>8</td><td><code>src/types/my-domains/bulk.ts</code></td><td>Two new failure reasons</td><td>+1 / −1</td></tr>
+  </table></div>
+
+  <h2 id="f1">5. File 1 · the rules · <code>bulkBatch.ts</code></h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">1</span><h3>Two small rules</h3><span class="tag size">+23 lines</span></div>
+    <ol class="qs">
+      <li><b><code>isSmartContractCode(code)</code> · line 94</b><span>Given an address's code: empty means a normal wallet; starting with <code>0xef0100</code> means a normal wallet using EIP 7702; anything else means a smart contract wallet. Example: <code>0x</code> → normal; <code>0x6080…</code> → smart; <code>0xef0100…</code> → normal.</span></li>
+      <li><b><code>offersPerNameFallback(outcome, lastScreen)</code> · line 106</b><span>Says yes only if (1) nothing was signed, (2) the last screen was "Sign once for all N names", so the wallet really was asked, and (3) the reason is a wallet error or a signature that didn't check out. Everything else: no.</span></li>
+    </ol>
+  </div>
+
+  <h2 id="f2">6. File 2 · the tests · <code>bulkBatch.test.ts</code></h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">2</span><h3>4 new tests</h3><span class="tag size">15 in this file, 193 in total</span></div>
+    <div class="tablecard"><table>
+      <tr><th>#</th><th>The test checks that…</th></tr>
+      <tr><td>1</td><td>A wallet error during the one signature (like a Ledger saying "data too large") offers the backup, and nothing is sent</td></tr>
+      <tr><td>2</td><td>A signature that doesn't lead back to you (the wallet read the message differently) offers the backup</td></tr>
+      <tr><td>3</td><td>No backup after a cancel, after a failure before the wallet was asked, for the wrong network, for a smart wallet, or after the batch was sent</td></tr>
+      <tr><td>4</td><td>Smart wallet detection: no code, missing code, real contract code, and EIP 7702 code in small and capital letters</td></tr>
+    </table></div>
+  </div>
+
+  <h2 id="f3">7. File 3 · the glue · <code>useBulkListingActions.ts</code></h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">3</span><h3>Reads the wallet's network and code</h3><span class="tag size">+36 / −2 lines</span></div>
+    <ol class="qs">
+      <li><b><code>BulkPrecheckError</code> · line 18</b><span>A special error that means "a check before signing failed", carrying which one: wrong network or smart wallet. The drawer uses it to pick the right message.</span></li>
+      <li><b><code>isSmartWalletAddress(address)</code> · line 29</b><span>Asks Polygon "what code is at this address?" and passes the answer to rule 1.</span></li>
+      <li><b>The checks in <code>prepare</code> · lines 146 and 147</b><span>The very first thing after you click List, before the wallet proof and the signature: is the wallet on Polygon? is it a smart wallet? If either fails, stop with that reason.</span></li>
+      <li><b><code>isSmartWallet()</code> · line 197</b><span>Used when the drawer opens, to show the notice early. If Polygon can't be reached it says "no" rather than blocking you; the check at List time still protects.</span></li>
+    </ol>
+  </div>
+
+  <h2 id="f4">8. File 4 · the drawer · <code>BulkListingFlowModal.tsx</code></h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">4</span><h3>New steps and the backup flow</h3><span class="tag size">+108 / −6 lines</span></div>
+    <ol class="qs">
+      <li><b>Three new steps · line 33</b><span>"couldn't sign them all" (the offer), "signing each" (one popup per name) and "skipped" (the continue or stop question). None of them closes when you click outside, so you always choose on purpose.</span></li>
+      <li><b>Two new messages · lines 47 and 48</b><span>The approved wrong network and smart wallet texts.</span></li>
+      <li><b>Smart wallet check when the drawer opens</b><span>Like the wallet proof check from phase 3: runs when the drawer opens with a wallet connected.</span></li>
+      <li><b><code>showOutcome</code> · line 215</b><span>First question now: should we offer the backup? If yes, show the offer. If the outcome was "wrong network", the network banner turns on; if "smart wallet", the notice turns on.</span></li>
+      <li><b><code>startPerNameSigning</code> · line 251</b><span>The October flow, exactly as it was before phase 3, now behind the backup button. It uses the same names, prices and duration you set.</span></li>
+      <li><b><code>answerReject</code> · line 283</b><span>Your answer to "Continue with the rest / Stop here" during the backup flow.</span></li>
+    </ol>
+  </div>
+
+  <h2 id="f5">9. File 5 · the new screen · <code>BulkListingSigningStep.tsx</code></h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">5</span><h3>"Your wallet couldn't sign them all at once"</h3><span class="tag size">+26 lines</span></div>
+    <p><code>BulkFallbackOffer</code> (line 144) draws the message with the warning icon; <code>BulkFallbackOfferFooter</code> (line 158) draws the two buttons. They only draw; the drawer decides what the buttons do.</p>
+  </div>
+
+  <h2 id="f6">10. File 6 · <code>BulkListingSigningStep/index.ts</code></h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">6</span><h3>Makes the new screen available</h3><span class="tag size">+11 / −1 lines</span></div>
+    <p>Adds the two new pieces to the folder's "shop window" so the drawer can import them.</p>
+  </div>
+
+  <h2 id="f7">11. File 7 · the form · <code>BulkListingFormStep.tsx</code></h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">7</span><h3>The smart wallet notice</h3><span class="tag size">+21 / −1 lines</span></div>
+    <p>The notice (line 124) with Switch wallet, which opens the same wallet picker as Connect. Only one notice shows at a time, most urgent first: log in, connect wallet, wrong network, <b>smart wallet</b>, verify your wallet. List is disabled while it shows (line 289).</p>
+  </div>
+
+  <h2 id="f8">12. File 8 · the shapes · <code>bulk.ts</code></h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">8</span><h3>Two new failure reasons</h3><span class="tag size">1 line</span></div>
+    <p>The list of "why did it stop" reasons gains <code>wrong-network</code> and <code>smart-wallet</code>. TypeScript then made sure the drawer has a message for each.</p>
+  </div>
+
+  <h2 id="wallets">13. Which wallets were tested</h2>
+  <div class="tablecard"><table>
+    <tr><th>Wallet</th><th>Status</th><th>Why</th></tr>
+    <tr><td>MetaMask</td><td>Tested in phase 3 (8 names, one popup)</td><td>Phase 4 checked 20 Nov: cancel, network switch, 2 names listed in one popup</td></tr>
+    <tr><td>Phantom, Rabby, Coinbase Wallet</td><td>Not tested</td><td>Your domains belong to the MetaMask account's address. Testing another wallet means importing that account into it, which you decided not to do (20 Nov)</td></tr>
+    <tr><td>Trust, a WalletConnect phone wallet</td><td>Not tested</td><td>Not set up</td></tr>
+    <tr><td>Ledger</td><td>Not tested</td><td>No device</td></tr>
+  </table></div>
+  <p>So the backup has been proven by automatic tests, but not yet in a real wallet: no wallet we have fails the one big signature.</p>
+
+  <h2 id="faq">14. Questions you might have</h2>
+  <ol class="qs">
+    <li><b>Why not just offer the backup every time something fails?</b><span>Because for a cancel, a wrong network or a smart wallet it can't help, and it would mean up to 50 more popups for nothing.</span></li>
+    <li><b>Does the backup cost gas?</b><span>No. Each name is a free signature, the same as before.</span></li>
+    <li><b>Is the backup as good as the main path?</b><span>The listings are the same and just as valid. The difference is popups: one per name instead of one in total, and each name is sent separately.</span></li>
+    <li><b>Why does "Should have a queue" appear on my dev server?</b><span>The dev server's hot reload keeps old state when new hooks are added. Refresh the page; it can't happen on the live site.</span></li>
+    <li><b>Why can't I test with Phantom without my domains in it?</b><span>A listing must be signed by the address that owns the domain. A different address owns nothing and isn't linked to your account.</span></li>
+    <li><b>Did Guru's test page have these nets?</b><span>It checks the network before signing (we now do too). It has no backup and no smart wallet check; it's a test tool.</span></li>
+  </ol>
+
+  <h2 id="next">15. Not done yet</h2>
+  <div class="card"><ul>
+    <li>Not committed; waits for your go.</li>
+    <li>MetaMask checked 20 Nov: cancel, network switch, 2 names in one popup (both listed).</li>
+    <li>The backup hasn't run in a real wallet.</li>
+    <li>Rabby and Coinbase not tested, so acceptance criterion 1 stays open (phase 10 or whoever has those wallets).</li>
+  </ul></div>
+
+  <h2>Where to go next</h2>
+  <div class="tablecard"><table>
+    <tr><th>If you want…</th><th>Open</th></tr>
+    <tr><td>Every file and the checks against the PDF, our plan and Guru's page</td><td><code>bulk-listing-progress.html</code>, v2 Phase 4</td></tr>
+    <tr><td>The side roads drawn next to the main journey</td><td><code>bulk-listing-v2-flow-explained.html</code>, section 10</td></tr>
+    <tr><td>The full wallet table</td><td><code>bulk-listing-progress.html</code>, "v2 wallet test matrix"</td></tr>
+    <tr><td>Phase 3 (the main path) in simple words</td><td><code>bulk-listing-v2-phase3-explained.html</code></td></tr>
+  </table></div>
+
+  <footer>Bulk listing v2 · phase 4 explained · 20 Nov 2026 · dev-docs is local only.</footer>
+</div>
+<script>
+  document.getElementById('toggle').addEventListener('click', function () {
+    var root = document.documentElement;
+    var current = root.getAttribute('data-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('dmplan-theme', next); } catch (e) {}
+  });
+</script>
+</body>
+</html>

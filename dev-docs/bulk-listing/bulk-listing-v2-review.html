@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bulk Listing v2 Review</title>
+<script>
+  try {
+    var saved = localStorage.getItem('dmplan-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  } catch (e) {}
+</script>
+<style>
+  :root {
+    --bg: #f9f9f9; --surface: #ffffff; --surface-soft: #f3f4fe;
+    --text: #111111; --text-muted: #5b5b66; --border: #e6e6e6;
+    --accent: #2639ED; --accent-soft: #e9ebfd;
+    --wait: #9457f6; --wait-soft: #f4eefe;
+    --ok: #12805c; --ok-soft: #e4f5ee;
+    --warn: #b4540a; --warn-soft: #fdf1e4;
+    --bad: #c4314b; --bad-soft: #fdecef;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+      --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+      --accent: #7f8cff; --accent-soft: #1d2150;
+      --wait: #b996fa; --wait-soft: #2c2142;
+      --ok: #4fd1a0; --ok-soft: #173229;
+      --warn: #f5a35c; --warn-soft: #3a2614;
+      --bad: #ff7d93; --bad-soft: #3a1c24;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+    --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+    --accent: #7f8cff; --accent-soft: #1d2150;
+    --wait: #b996fa; --wait-soft: #2c2142;
+    --ok: #4fd1a0; --ok-soft: #173229;
+    --warn: #f5a35c; --warn-soft: #3a2614;
+    --bad: #ff7d93; --bad-soft: #3a1c24;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: "Satoshi", system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.6; }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 48px 16px 80px; }
+  header.top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+  .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; }
+  h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.15; margin: 0 0 12px; }
+  .lede { color: var(--text-muted); margin: 0; max-width: 680px; }
+  .lede a { color: var(--accent); }
+  .toggle { flex-shrink: 0; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 14px; cursor: pointer; }
+  .toggle:hover { border-color: var(--accent); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 32px; }
+  nav.toc a { font-size: 14px; text-decoration: none; color: var(--accent); background: var(--accent-soft); padding: 6px 12px; border-radius: 999px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 0 0 16px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+  .stat b { display: block; font-size: 26px; line-height: 1.2; }
+  .stat span { font-size: 13px; color: var(--text-muted); }
+  h2 { font-size: 22px; margin: 52px 0 16px; }
+  h3 { font-size: 18px; margin: 0; }
+  h4 { font-size: 15px; margin: 22px 0 8px; color: var(--accent); }
+  p { margin: 0 0 12px; }
+  .muted { color: var(--text-muted); font-size: 15px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
+  .card p:last-child { margin-bottom: 0; }
+  .card ul, .card ol { margin: 8px 0 0; padding-left: 20px; }
+  .card li { margin-bottom: 6px; }
+  code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .86em; background: var(--surface-soft); border-radius: 6px; padding: 1px 6px; word-break: break-word; }
+  .findings { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .finding { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+  .finding h3 { font-size: 16px; margin-bottom: 6px; }
+  .finding p { font-size: 15px; margin: 0; color: var(--text-muted); }
+  .tablecard { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow-x: auto; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: 0; }
+  th { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+  td.grp { font-weight: 600; color: var(--accent); background: var(--surface-soft); font-size: 13px; }
+  .sw { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .chip { width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(128,128,128,.45); flex-shrink: 0; }
+  .callout { border-left: 4px solid var(--wait); background: var(--wait-soft); border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; }
+  .callout p { margin: 0; }
+  .callout.ok { border-color: var(--ok); background: var(--ok-soft); }
+  .callout.warn { border-color: var(--warn); background: var(--warn-soft); }
+  .issue { display: grid; grid-template-columns: 28px 1fr; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--bad); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+  .issue .n { font-weight: 700; color: var(--bad); }
+  .issue p { margin: 0; font-size: 15px; }
+  .issue .where { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+  .phase { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px 24px; margin-bottom: 14px; }
+  .phase-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  .num { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 15px; flex-shrink: 0; }
+  .tag { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+  .tag.now { background: var(--ok-soft); color: var(--ok); }
+  .tag.wait { background: var(--wait-soft); color: var(--wait); }
+  .tag.size { background: var(--surface-soft); color: var(--text-muted); }
+  .tag.new { background: var(--warn-soft); color: var(--warn); }
+  .rows { display: grid; grid-template-columns: 130px 1fr; gap: 6px 16px; font-size: 15px; }
+  .rows dt { color: var(--text-muted); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; padding-top: 2px; }
+  .rows dd { margin: 0; }
+  ol.qs { counter-reset: q; list-style: none; padding: 0; margin: 0; }
+  ol.qs li { counter-increment: q; position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px 14px 56px; margin-bottom: 10px; }
+  ol.qs li::before { content: counter(q); position: absolute; left: 16px; top: 14px; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  ol.qs.team li::before { background: var(--wait-soft); color: var(--wait); }
+  ol.qs b { display: block; margin-bottom: 2px; }
+  ol.qs span { color: var(--text-muted); font-size: 15px; }
+  footer { margin-top: 56px; font-size: 13px; color: var(--text-muted); }
+  @media (max-width: 700px) {
+    header.top { flex-direction: column; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .findings { grid-template-columns: 1fr; }
+    .card, .phase { padding: 18px; }
+    .rows { grid-template-columns: 1fr; }
+    .rows dt { padding-top: 8px; }
+    ol.qs li { padding-left: 50px; }
+  }
+</style>
+<style>
+  .extra { display: grid; grid-template-columns: 150px 1fr; gap: 6px 16px; font-size: 15px; margin-top: 10px; }
+  .extra dt { color: var(--text-muted); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; padding-top: 2px; }
+  .extra dd { margin: 0; }
+  blockquote { margin: 0; background: var(--surface-soft); border-radius: 12px; padding: 16px 20px; font-size: 15px; }
+  blockquote ol { margin: 8px 0; padding-left: 20px; }
+  .who { font-weight: 600; color: var(--warn); }
+  @media (max-width: 700px) { .extra { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">Bulk listing v2 · plan review</p>
+      <h1>Bulk listing v2: review in simple words</h1>
+      <p class="lede">Written 19 Nov 2026, before any v2 code. It checks <code>bulk-listing-v2-plan.md</code> against Mohit's requirements PDF (10 Nov, Phase 1, tickets F1 to F9), the code on the bulk list branch, and the backend repo (read only). Nothing in the code or the plan has been changed yet.</p>
+    </div>
+    <button class="toggle" id="toggle" type="button">Toggle theme</button>
+  </header>
+
+  <nav class="toc"><a href="#ideas">1. The ideas</a><a href="#backend">2. Backend news</a><a href="#gaps">3. What the plan misses</a><a href="#questions">4. Open questions</a><a href="#messages">5. Backend left, message</a><a href="#next">6. Next steps</a></nav>
+
+  <div class="stats">
+    <div class="stat"><b>7 of 8</b><span>backend tickets live on uat (19 Nov evening); only B8, a manual test, left</span></div>
+    <div class="stat"><b>10</b><span>gaps found in the plan</span></div>
+    <div class="stat"><b>4</b><span>new open questions (V7 to V10)</span></div>
+    <div class="stat"><b>4</b><span>answers needed from you</span></div>
+  </div>
+
+  <h2 id="ideas">1. The ideas behind v2, explained simply</h2>
+  <div class="findings">
+    <div class="finding"><h3>What a listing is</h3><p>Listing puts nothing on the blockchain. Your wallet signs a message (a Seaport "order") saying "anyone may buy this name for this price until this date", and we store it on our server. A buyer later sends it to the Seaport contract, which checks your signature and swaps the name for the money.</p></div>
+    <div class="finding"><h3>Why today's drawer is annoying</h3><p>The current branch signs one order per name. Fifty names means fifty wallet popups.</p></div>
+    <div class="finding"><h3>What a bulk signature is</h3><p>All orders go into a small tree: every pair joins into a parent until one top is left (the root). The wallet signs only the root, once. Each order carries a short "proof" showing how it links up to the root. Fifty names, one popup. With 50 names the tree has 6 levels (64 spots, the empty ones filled with blank orders).</p></div>
+    <div class="finding"><h3>Off chain versus on chain cancel</h3><p>Today "Delist" only tells our server to hide the order. The signed order still exists and can still be bought until it expires. An on chain cancel is a real transaction telling Seaport "this order is dead". It costs a little POL but is final. v2 switches Delist to on chain.</p></div>
+    <div class="finding"><h3>Approval</h3><p>Before Seaport can move your names, your wallet must allow it once ("setApprovalForAll"). This is per NFT contract per chain. Today every name is UD on Polygon, so it is one approval.</p></div>
+    <div class="finding"><h3>The verified wallet</h3><p>Our backend only accepts orders after your wallet proved it belongs to your account (a separate small signature, done now and then). The backend treats that verified wallet as the seller (the "maker") of every order.</p></div>
+  </div>
+
+  <h2 id="backend">2. The big news: the backend is already partly built</h2>
+  <div class="callout ok"><p>Guru (backend) has bulk listing branches pushed. The newest, <code>sprints-03_cancel_and_reprice</code>, got the on chain cancel on 19 Nov. None of it is on uat yet, but we can copy the real shapes into our mocks instead of guessing.</p></div>
+  <div class="callout"><p><b>Update, 19 Nov evening:</b> everything below is now merged into uat (PR #1024) and live on the uat server, including B7 and the "cancel not confirmed" sweep. No mocks are needed any more; see section 5 for the current status. The table below is kept as it was at the time of the review.</p></div>
+  <div class="tablecard"><table>
+    <tr><th>Ticket</th><th>On Guru's branch</th><th>What it means for us</th></tr>
+    <tr><td>B1 bulk endpoint</td><td><span class="tag now">Built</span> <code>POST /marketplacev2/orders/bulk</code></td><td>Mock the real shape</td></tr>
+    <tr><td>B2 bulk signature check</td><td><span class="tag now">Built</span> new error code <code>BAD_BULK_PROOF</code></td><td>Our signing must match theirs exactly</td></tr>
+    <tr><td>B3 batched chain reads</td><td><span class="tag now">Built</span> Multicall3</td><td>Nothing for us</td></tr>
+    <tr><td>B4 partial success</td><td><span class="tag now">Built</span></td><td>A bad name doesn't block the others</td></tr>
+    <tr><td>B5 batch id, one email per batch, bulk cancel</td><td><span class="tag now">Mostly built</span> <code>POST /marketplacev2/orders/cancel-bulk</code> (19 Nov). Nothing marks a cancel "not confirmed" yet</td><td>Mock the real shape; the third state can't appear until Guru adds the timer</td></tr>
+    <tr><td>B6 no estimates</td><td>Nothing needed; the <code>.Eth</code> estimator bug isn't fixed</td><td>Nothing for us</td></tr>
+    <tr><td>B7 cheaper order check</td><td><span class="tag wait">Not built</span> probably next on the same branch</td><td>We still need the error shape</td></tr>
+    <tr><td>B8 Trails test buy</td><td><span class="tag wait">Not done</span> a manual test before launch</td><td>We join it in phase 10</td></tr>
+  </table></div>
+
+  <h4>How the real B1 differs from the plan's first guess</h4>
+  <div class="card"><ol>
+    <li><b>Each result also has a <code>batchId</code>.</b> When a name is listed, <code>code</code> and <code>message</code> are <code>null</code> (present but empty), not missing.</li>
+    <li><b>Whole batch errors are HTTP 400 with a code:</b> <code>CHAIN_NOT_SUPPORTED</code>, <code>BATCH_EMPTY</code>, <code>BATCH_TOO_LARGE</code>, <code>BATCH_MIXED_MAKER</code> (orders from more than one wallet), <code>BATCH_DUPLICATE_ITEM</code>, and <code>CHAIN_UNAVAILABLE</code> (a 503: the blockchain node isn't answering).</li>
+    <li><b>The tricky one, <code>BATCH_ALL_REJECTED</code>.</b> If every name is rejected, the server answers with an error, but the body still holds <code>batchId</code> and the full <code>results</code>. If we treat every error as "something went wrong", the seller sees a vague error instead of each name's reason. The success screen must read results out of the error body.</li>
+    <li><b>A speed limit:</b> 10 bulk calls per minute per user. Hammering "Try again" gets a 429 (too many requests), which needs a friendly message.</li>
+  </ol></div>
+
+  <h4>How "Cancelling" is stored</h4>
+  <div class="card"><p>The backend has no <code>cancel_pending</code> status. It stores the order as <code>cancelled</code> plus extra fields saying it was on chain and not confirmed yet. That's fine for us: the My Domains listings endpoint turns this into <code>status: "cancel_pending"</code>, and adds a yes/no field <code>cancelNotConfirmed</code>. Those two decide which of the three states a row shows. The catch: no code sets "not confirmed" yet. Mohit's 30 minute timer (60 on Ethereum) and the check for a failed cancel transaction aren't built.</p></div>
+
+  <h4>The real B5 shape</h4>
+  <div class="card"><ul>
+    <li><b>Bulk cancel.</b> <code>POST /marketplacev2/orders/cancel-bulk</code> with <code>{ orderHashes (1 to 50, no repeats), cancelTxHash }</code>. It answers <code>{ results: [{ orderHash, status: "cancel_pending" }] }</code>.</li>
+    <li><b>All or nothing</b>, unlike bulk listing. One bad order fails the whole request: 403 if an order isn't yours, 400 <code>CANCEL_MIXED_CHAIN</code> if the orders are on different chains, 409 <code>ORDER_NOT_CANCELLABLE</code> with the problem hashes.</li>
+    <li><b>Single cancel.</b> The same old route, <code>POST /orders/{hash}/cancel</code>, now takes an optional <code>{ cancelTxHash }</code>. With it, the cancel is on chain. Without it, it's still the old off chain cancel.</li>
+    <li><b>Good news.</b> Orders already cancelled off chain can still be cancelled on chain (gap 6).</li>
+    <li><b>Speed limit.</b> The same as listing: 10 calls a minute.</li>
+  </ul></div>
+
+  <h4>The shared signing code</h4>
+  <div class="card"><p>The backend uses the shared package <code>@endlessdomains/order-builder</code> (now at <code>c89fe52</code>), which has a <code>signBulkOrders</code> function. The backend's tests sign with it. We can't import it (it uses ethers v6; our site uses ethers 5.7.2), but it is the perfect reference: if our signatures equal what it produces, the backend accepts them.</p></div>
+
+  <h2 id="gaps">3. What the plan misses or gets wrong</h2>
+
+  <div class="issue"><span class="n">1</span><div><p><b>Names held in more than one wallet</b> <span class="tag new">important</span></p>
+    <dl class="extra">
+      <dt>What it means</dt><dd>One account can have several linked wallets. My Domains shows names from all of them, and rows don't say which wallet holds each name.</dd>
+      <dt>Why it matters</dt><dd>The backend makes the verified wallet the seller of every order and rejects mixed sellers (<code>BATCH_MIXED_MAKER</code>). Selecting names from two wallets fails the whole batch with no clear reason. Same for delist: only the wallet that signed an order can cancel it, otherwise the transaction fails and still costs gas.</dd>
+      <dt>What I suggest</dt><dd>Before signing, read <code>ownerOf</code> on chain for the selected names (one quick read) and mark names held by another wallet: "held by another wallet, switch wallets to list it". Or ask the backend to add the owner wallet to each row. Same check before a delist.</dd>
+    </dl></div></div>
+
+  <div class="issue"><span class="n">2</span><div><p><b>"Exactly one signature" versus the wallet proof</b></p>
+    <dl class="extra">
+      <dt>What it means</dt><dd>The PDF's acceptance test says 50 names need exactly one signature. But our flow also checks the wallet proof (<code>ensureWalletVerified</code>), and if it is old, the wallet asks for a second signature first.</dd>
+      <dt>Why it matters</dt><dd>A tester sees two popups and fails the test, though nothing is broken.</dd>
+      <dt>What I suggest</dt><dd>Check the wallet proof when the drawer opens, not on the List click. Then List only ever asks for the one bulk signature.</dd>
+    </dl></div></div>
+
+  <div class="issue"><span class="n">3</span><div><p><b>Where the expiry date comes from</b></p>
+    <dl class="extra">
+      <dt>What it means</dt><dd>Our 7 and 14 day rules (orders end 7 days before the name expires; under 14 days left can't be listed) use <code>renewalTimestamp</code> from our database. The PDF says the backend reads expiry from the chain (UD <code>expiryOf</code>, where 0 means never expires).</dd>
+      <dt>Why it matters</dt><dd>If the two dates disagree, the drawer says a name is fine and the backend rejects it, or the other way round.</dd>
+      <dt>What I suggest</dt><dd>Ask Guru whether they always match for UD. If unsure, read <code>expiryOf</code> on chain for the batch, like the owner check.</dd>
+    </dl></div></div>
+
+  <div class="issue"><span class="n">4</span><div><p><b>Delist is also used on the marketplace home page</b></p>
+    <dl class="extra">
+      <dt>What it means</dt><dd><code>useDelistListing</code> is used by My Domains rows and cards and also by <code>pages/index.tsx</code>. Today a delist can work with no wallet connected, since it only talks to our server.</dd>
+      <dt>Why it matters</dt><dd>An on chain cancel needs a connected wallet, on Polygon, with POL for gas. New states: no wallet, wrong network, not enough POL, popup closed. Phase 8 only mentions My Domains.</dd>
+      <dt>What I suggest</dt><dd>Add <code>pages/index.tsx</code> and those wallet states to phase 8.</dd>
+    </dl></div></div>
+
+  <div class="issue"><span class="n">5</span><div><p><b>The cancel function isn't in our contract list</b></p>
+    <dl class="extra">
+      <dt>What it means</dt><dd>We talk to Seaport through a short function list (<code>SEAPORT_MIN_ABI</code> in <code>seaport-order-builder-v5.ts</code>). <code>cancel</code> isn't in it.</dd>
+      <dt>Why it matters</dt><dd>Adding it edits a file the multi chain developer also edits (C3).</dd>
+      <dt>What I suggest</dt><dd>Only add, never change what's there, and tell the other developer (in their message).</dd>
+    </dl></div></div>
+
+  <div class="issue"><span class="n">6</span><div><p><b>Old "delisted" orders are still alive on chain</b></p>
+    <dl class="extra">
+      <dt>What it means</dt><dd>Every delist so far was off chain, so each of those old orders can still be bought at its old price until it expires.</dd>
+      <dt>Why it matters</dt><dd>With B7, relisting such a name at a higher price is refused with <code>CHEAPER_ORDER_STILL_VALID</code> (your older, cheaper order is still out there). This is the most likely way sellers will see the "cancel the old one first" prompt. Cancelling those needs their full signed data (<code>rawOrder</code>), so the backend must still return it for orders it marked cancelled.</dd>
+      <dt>What I suggest</dt><dd>Ask Guru once he's free (section 5) and design the prompt with this case in mind.</dd>
+    </dl></div></div>
+
+  <div class="issue"><span class="n">7</span><div><p><b>"Price cuts are free" has nowhere to live</b></p>
+    <dl class="extra">
+      <dt>What it means</dt><dd>Decision 1: price increases need an on chain cancel, price cuts stay off chain and free. But sellers have no "Edit price" button; to change a price, they delist and list again. (Checked on the branch 19 Nov: <code>ListingFlowModal</code> has a dormant <code>'edit'</code> mode titled "Edit listing", and the My Domains page passes <code>onEditPrice</code> down, but <code>MyDomainRow</code> and <code>MyDomainCard</code> never use it, so no button shows. If Mohit wants Edit price, this is the starting point.)</dd>
+      <dt>Why it matters</dt><dd>With Delist always on chain, a seller who only wants a lower price pays gas. That goes against decision 1, and the plan doesn't say what to do.</dd>
+      <dt>What I suggest</dt><dd>Phase 1: Delist always on chain (simplest and safest). Raise "Edit price" with Mohit as separate work (V7).</dd>
+    </dl></div></div>
+
+  <div class="issue"><span class="n">8</span><div><p><b>One chain per batch is in two tickets</b></p>
+    <dl class="extra">
+      <dt>What it means</dt><dd>The PDF lists it both as C8 (multi chain developer) and inside F9 (you).</dd>
+      <dt>Why it matters</dt><dd>Without agreement you could both build it.</dd>
+      <dt>What I suggest</dt><dd>You build the select mode part (chain filter required, Select All counts only that chain). They keep "switch the wallet to that chain" (C4). It's in the message.</dd>
+    </dl></div></div>
+
+  <div class="issue"><span class="n">9</span><div><p><b>Smart wallet detection</b></p>
+    <dl class="extra">
+      <dt>What it means</dt><dd>Decision 10 wants a clear message for smart contract wallets. The usual check is "does this address have code on chain".</dd>
+      <dt>Why it matters</dt><dd>Newer normal wallets using EIP 7702 also have code (starting <code>0xef0100</code>) yet sign normally. A plain check would wrongly block them.</dd>
+      <dt>What I suggest</dt><dd>Treat code starting with <code>0xef0100</code> as a normal wallet.</dd>
+    </dl></div></div>
+
+  <div class="issue"><span class="n">10</span><div><p><b>Smaller points</b></p>
+    <ol>
+      <li>The bulk list branch has no unit tests. vitest only arrives through the rebase (Trails brought it into uat), so phase 1's "tests pass" means uat's tests; our own start in phase 2.</li>
+      <li>Phase 9 says stage, the PDF says uat. I suggest uat.</li>
+      <li>The PDF's final screen wants Done and List more buttons. I haven't checked whether List more exists yet; a phase 5 check.</li>
+      <li>Layering (CLAUDE.md §8): <code>useBulkListingActions</code> imports from a design system folder, and <code>listingOrder.ts</code> calls the backend from inside the design system (known rule breaks). The new bulk post goes through the new service file; <code>listingOrder.ts</code> stays for the fallback because the multi chain developer edits it too.</li>
+    </ol></div></div>
+
+  <h2 id="questions">4. Open questions, with my recommendations</h2>
+  <div class="tablecard"><table>
+    <tr><th>#</th><th>Question</th><th>What it means</th><th>My recommendation</th><th>Who decides</th></tr>
+    <tr><td>V1</td><td>Test data for the signing code</td><td>Known good signatures to compare ours against</td><td>One off script outside the repo using the shared package's <code>signBulkOrders</code>; ask Guru if it was also checked against Seaport.js. No new dependency</td><td>You (default fine)</td></tr>
+    <tr><td>V2</td><td>Which wallets can we test?</td><td>PDF wants MetaMask, Rabby, Coinbase Wallet, Trust, Ledger through MetaMask, one phone wallet</td><td>Test what you have, list the rest as gaps</td><td><span class="tag now">Answered 19 Nov</span> MetaMask and Phantom (Phantom supports Polygon). Rabby, Coinbase Wallet, Trust, Ledger and a WalletConnect phone wallet are gaps</td></tr>
+    <tr><td>V3</td><td>Mock switch name</td><td>One setting for fake answers until the backend is on uat</td><td><code>NEXT_PUBLIC_BULK_ORDERS_MOCK</code>, off by default, never set on uat or stage</td><td><span class="tag now">Not needed</span> backend live on uat 19 Nov</td></tr>
+    <tr><td>V4</td><td>Who fixes the design issues?</td><td>The PDF lists 11 Figma mistakes</td><td>We fix them in code, you approve every wording; designers get the list after. Issue 11 (fake Figma data) isn't ours</td><td>You (Mohit away)</td></tr>
+    <tr><td>V5</td><td>Show gas before delisting?</td><td>On chain cancel costs a little POL</td><td>Yes, like the approval step</td><td>You (default fine)</td></tr>
+    <tr><td>V6</td><td>Trails merging during the week</td><td></td><td>Resolved: merged into uat 18 Nov</td><td><span class="tag now">Done</span></td></tr>
+    <tr><td>V7 <span class="tag new">new</span></td><td>Price cuts (gap 7) <span class="tag now">Decided 23 Nov: option B (Edit price), built</span></td><td>Listing stays free; only delist becomes a gas transaction in phase 8. With no Edit price, a price cut is Delist then List, so it pays the cancel gas although a cut is safe off chain. Option A: always on chain. Option B: a free Edit price (off chain hide, list lower)</td><td>Delist always on chain in phase 1; Edit price raised with Mohit later</td><td><span class="tag wait">Waiting on Mohit</span> Default used meanwhile; it only matters in phase 8</td></tr>
+    <tr><td>V8 <span class="tag new">new</span></td><td>Wallet proof popup (gap 2)</td><td>Could cause a second signature</td><td>Check the proof when the drawer opens</td><td><span class="tag now">Agreed 19 Nov</span></td></tr>
+    <tr><td>V9 <span class="tag new">new</span></td><td>Several wallets (gap 1)</td><td>Mixed wallets fail the batch</td><td>Read <code>ownerOf</code> on chain; mark names held by another wallet</td><td><span class="tag now">Answered 20 Nov</span> Team chat: one Solana and one EVM wallet at most; only EVM names list, Solana names are not selectable. Nothing to build</td></tr>
+    <tr><td>V10 <span class="tag new">new</span></td><td>Expiry source (gap 3)</td><td>Database date versus chain date</td><td><b>Decided 24 Nov by the user: on chain</b>, per the PDF; <code>expiryOf</code> confirmed on the UD Polygon contract; built in phase 7</td><td>Nothing (Guru no longer needs to answer)</td></tr>
+  </table></div>
+
+  <h2 id="messages">5. What's left on the backend, and the message to the multi chain developer</h2>
+  <h4>Backend: status (updated 20 Nov, morning)</h4>
+  <div class="callout"><p><b>Update, 20 Nov morning:</b> one more backend fix is on uat, PR #1025: bulk posts were all failing with 503 <code>CHAIN_UNAVAILABLE</code> after the evening release (a Multicall3 read sent the wrong way), now fixed. Guru also added a <b>Bulk Listing Testing page</b> to this frontend repo, <code>/bulk-listing-testing</code> (PRs #238 to #240, on uat, hidden only on the production marketplace host). Its signing code uses the full type hash like ours, and the order detail route keeps the full order for cancelled ones, so two of the questions below are answered.</p></div>
+  <div class="callout ok"><p><b>All of Guru's bulk listing work is merged into uat (PR #1024) and running on the uat server</b> (checked 19 Nov: <code>POST /marketplacev2/orders/bulk</code> and <code>/orders/cancel-bulk</code> answer 401 without login, an unknown route answers 404). New since the morning: <b>BL-08</b> (the cancel confirmation sweep, 30 minutes on Polygon, flags "cancel not confirmed", checks the cancel transaction's receipt, emails the seller; and the <code>CHEAPER_ORDER_STILL_VALID</code> relist rule, which returns <code>olderOrderHashes</code> per item), <b>BL-09</b> (the <code>.Eth</code> estimator fix, B6) and <b>BL-10</b> (a Polygon fork test of bulk signed fills and bulk cancel).</p></div>
+  <div class="card">
+    <p><b>Left on the backend side:</b> only B8, one real Trails test buy of a bulk signed order before launch (a manual check, our phase 10).</p>
+    <p><b>Answered on 20 Nov (from his test page and the backend code):</b> the bulk type hash is built from the full EIP712 type string, the same as ours; and <code>GET orders/{hash}</code> returns the full order for any status, only blanking the signature, which Seaport's cancel doesn't need.</p>
+    <p><b>Questions still worth asking Guru:</b> is bulk cancel meant to be all or nothing; should single cancel without a tx hash stay off chain (ties to V7); does <code>renewalTimestamp</code> match the chain's <code>expiryOf</code> (V10); does the test page stay on stage after launch or get removed; and can he share the order builder's test signatures for heights 1, 2 and 6.</p>
+  </div>
+  <div class="callout ok"><p><b>20 Nov afternoon: the backend team shared <code>FRONTEND_INTEGRATION_GUIDE 1.docx</code></b> (in this folder). It answers Q1 and Q2 below, backs option A for V7, confirms every request and answer shape we use, and adds a required My Listings page (Q7). It also says every listing on stage and uat is real money.</p></div>
+  <h4 id="guruqs">Questions for Guru, explained (noted 20 Nov)</h4>
+  <p class="muted">Not sent yet. Each has a default we use until he answers, so none blocks the next phase.</p>
+  <div class="tablecard"><table>
+    <tr><th>#</th><th>Question</th><th>What it means</th><th>Why we ask</th><th>Default if no answer</th><th>Matters for</th></tr>
+    <tr><td>1</td><td>Is bulk cancel meant to be all or nothing?</td><td>In phase 8 the wallet sends one Seaport transaction cancelling several listings, then we tell the backend (<code>POST /orders/cancel-bulk</code>). If even one hash can't be cancelled (already sold, already cancelled, not yours), the backend refuses the whole request (409 <code>ORDER_NOT_CANCELLABLE</code>) and records none.</td><td>The chain has already cancelled them all; only the backend's record is refused. E.g. 10 cancelled where 1 sold a minute earlier: 9 are cancelled on chain but show as active on our site until the 30 minute sweep.</td><td><span class="tag now">Answered 20 Nov (guide)</span> Yes, on purpose. On 409 drop the hashes in <code>orderHashes</code> and resend with the same <code>cancelTxHash</code>; safe to resend. The chain cancel already happened; the backend confirms within about a minute.</td><td>Phase 8</td></tr>
+    <tr><td>2</td><td>Should a single cancel without a transaction stay off chain?</td><td>Today's Delist only tells the backend "hide this": free, but the old order can still be bought on Seaport (why 3 names were refused on 20 Nov). Guru kept that free path next to the new on chain one.</td><td>Mohit sir's decision 1 allows free off chain price cuts; V7 asks whether sellers keep that option. If the answer is "always on chain", the free backend path should be closed so nothing uses it by accident.</td><td><span class="tag now">Answered 20 Nov (guide)</span> The free path stays on the backend, but new screens must always cancel on chain. Our drawer will.</td><td>Phase 8, depends on V7</td></tr>
+    <tr><td>3</td><td><s>Can My Domains return the owner wallet per name?</s></td><td>Which wallet owns each name, for users with two EVM wallets.</td><td colspan="3"><b>Not needed:</b> V9 answered 20 Nov in the team chat (one Solana and one EVM wallet at most; only EVM names list). Removed from the list.</td><td>None</td></tr>
+    <tr><td>4</td><td>Does <code>renewalTimestamp</code> match the chain's <code>expiryOf</code>? (V10)</td><td>Each domain's expiry is in our database (<code>renewalTimestamp</code>) and in the UD contract (<code>expiryOf</code>). Phase 7's rules use it: a listing ends 7 days before expiry, and names with under 14 days left can't be listed.</td><td>A stale database date could allow a listing that runs past the real expiry, or block a name that was just renewed. Mohit sir's PDF says to read the chain.</td><td>Phase 7 reads <code>expiryOf</code> on chain for the selected names.</td><td>Phase 7 (most useful answer)</td></tr>
+    <tr><td>5</td><td><s>Will <code>/bulk-listing-testing</code> stay on stage after launch?</s></td><td>His test page is in our repo and our branch; it's hidden only on the production marketplace host.</td><td>It can list, cancel on chain and shows raw backend replies; it should be removed, kept or put behind a login on purpose, not forgotten.</td><td><span class="tag now">Answered 20 Nov: no.</span> It won't stay on stage after launch. Nothing in our code imports from it, so its removal can't break bulk listing; only our docs mention it as a reference.</td><td>Launch (housekeeping)</td></tr>
+    <tr><td>6</td><td>Can he share the shared package's test signatures for heights 1, 2 and 6?</td><td>The backend checks bulk signatures with <code>@endlessdomains/order-builder</code>; Mohit sir's B2 asked for tests at heights 1, 2 and 6.</td><td>A cross check from the backend's side that both agree byte for byte.</td><td>Not needed to ship: real MetaMask bulk listings were accepted on 20 Nov, and our tests match Seaport.js.</td><td>Phase 9 (nice to have)</td></tr>
+    <tr><td>7 <span class="tag new">new</span></td><td>Which site hosts <code>/profile/my-listings</code>?</td><td>The guide says the page is required because the "cancel not confirmed" email links to it. The link is <code>WEB_CLIENT_URL</code> + <code>/profile/my-listings</code>.</td><td>The backend's email preview uses <code>https://endlessdomains.io</code>, the main website, not <code>marketplace.endlessdomains.io</code>. Neither site has the page today.</td><td><span class="tag now">Settled 23 Nov by our decision</span> No separate page: My Domains shows Cancelling / Cancel not confirmed with Cancel again (option A). Asking Guru is optional; the email link points at the main website anyway.</td><td>None</td></tr>
+  </table></div>
+
+  <h4>To the multi chain developer <span class="tag new">updated 19 Nov after reading C1 to C9</span></h4>
+  <div class="callout"><p><b>19 Nov:</b> she has not started the multi chain work yet, so nothing overlaps today. Best sent before she begins, as a heads up on which files bulk is changing. Also point her at <code>bulkOrderTree.test.ts</code>: if her C3 change to the order builder breaks bulk signing, <code>npm test</code> says so.</p></div>
+  <div class="tablecard"><table>
+    <tr><th>Shared file or thing</th><th>Bulk (you)</th><th>Multi chain</th></tr>
+    <tr><td><code>seaport-order-builder-v5.ts</code></td><td>Add <code>cancel</code> (phase 8); <code>bulkOrderTree.ts</code> uses its types and hashes</td><td>C3: chain, item type, currency, decimals</td></tr>
+    <tr><td><code>DEFAULTS</code> (<code>marketplace-order-client.ts</code>)</td><td><code>listingOrder.ts</code>, <code>useBulkListingActions</code> read it</td><td>C1: replaced by backend config</td></tr>
+    <tr><td><code>getPolygonReadProvider</code></td><td>Bulk prepare (counter, block time)</td><td>C2: <code>getReadProvider(chainId)</code></td></tr>
+    <tr><td>My Domains row id</td><td><code>useBulkSelection</code> keys on it</td><td>C6: <code>chainId:contract:tokenId</code></td></tr>
+    <tr><td>My Domains rows and cards</td><td>Cancel states (phase 8)</td><td>C5 amounts, C6 ids</td></tr>
+    <tr><td>Select mode, one chain per batch</td><td>F9 (phase 7)</td><td>C8, plus switching chain (C4)</td></tr>
+    <tr><td>Approvals</td><td><code>useNftApprovals</code> (phase 6)</td><td>C4 can reuse it</td></tr>
+  </table></div>
+  <blockquote>Hi, I'm doing bulk listing (F1 to F9) this week on the <code>bulk-list</code> branch, now rebased onto uat. A few of our files overlap, so let's agree an order:
+    <ol>
+      <li><b>seaport-order-builder-v5.ts (your C3):</b> I only add to it (<code>cancel</code> in <code>SEAPORT_MIN_ABI</code>). My bulk signature code is in a new helper that uses <code>EIP712_TYPES</code>, <code>computeOrderHash</code> and <code>seaportDomain</code>, with tests that compare against Seaport.js. If C3 changes <code>buildOrderComponents</code>, could you keep today's Polygon defaults working? I'll adapt to yours.</li>
+      <li><b>DEFAULTS and getPolygonReadProvider (your C1, C2):</b> bulk reads the Seaport address, fee and USDT from <code>DEFAULTS</code> and the counter and block time from <code>getPolygonReadProvider</code>. When those become the config and <code>getReadProvider(chainId)</code>, the bulk files are <code>useBulkListingActions.ts</code> and <code>listingOrder.ts</code>.</li>
+      <li><b>Row ids (your C6):</b> bulk selection keys on the row id (<code>useBulkSelection.ts</code>). If the id becomes <code>chainId:contract:tokenId</code>, selection should just work, but tell me when it lands.</li>
+      <li><b>Select mode (F9 and your C8):</b> I'll build the one chain per batch rule in select mode (chain filter, Select All counts only that chain). Switching the wallet to that chain (C4) stays yours.</li>
+      <li><b>Approvals:</b> I'm adding <code>useNftApprovals.ts</code> (per chain and contract, <code>isApprovedForAll</code>, gas estimate). I'm writing it so C4 can reuse it.</li>
+      <li><b>Delist</b> becomes an on chain Seaport cancel (F7), touching <code>useDelistListing.ts</code>, the marketplace home page, and the My Domains rows and cards (new cancel states).</li>
+    </ol>
+    Could bulk merge first, with you leaving <code>listingOrder.ts</code>, <code>useMyDomainsData.ts</code> and the My Domains rows and cards to the end of your work? If anything of yours needs these sooner, let's talk.</blockquote>
+
+  <h2 id="next">6. What happens next</h2>
+  <ol class="qs">
+    <li><b>You answer V2, V7, V8, V9</b><span>And confirm or change the defaults for the rest.</span></li>
+    <li><b>You send the multi chain message</b><span>Edited as you like. <span class="tag wait">Not sent yet (19 Nov)</span> Held for later, together with the V7 question for Mohit and the V9 question for the team. No message for Guru about shapes: the backend went live on uat on 19 Nov. His remaining small questions are in section 5.</span></li>
+    <li><b>I show you the wording for the plan updates and the phase 0 log entry</b><span>Real B1 shape, new questions, bigger phase 8, and the new "v2: one signature (Nov 2026)" section in <code>bulk-listing-progress.html</code>. Nothing lands until you approve. <span class="tag now">Done 19 Nov</span></span></li>
+    <li><b>Phase 1: the rebase onto uat</b><span>When you say go. <span class="tag now">Done and pushed 19 Nov</span></span></li>
+  </ol>
+
+  <footer>Written 19 November 2026 · plan <code>bulk-listing-v2-plan.md</code> · dev-docs is local only.</footer>
+</div>
+<script>
+  document.getElementById('toggle').addEventListener('click', function () {
+    var root = document.documentElement;
+    var current = root.getAttribute('data-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('dmplan-theme', next); } catch (e) {}
+  });
+</script>
+</body>
+</html>

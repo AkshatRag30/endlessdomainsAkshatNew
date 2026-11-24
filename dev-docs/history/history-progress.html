@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>History Progress</title>
+<script>
+  try {
+    var saved = localStorage.getItem('dmplan-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  } catch (e) {}
+</script>
+<style>
+  :root {
+    --bg: #f9f9f9; --surface: #ffffff; --surface-soft: #f3f4fe;
+    --text: #111111; --text-muted: #5b5b66; --border: #e6e6e6;
+    --accent: #2639ED; --accent-soft: #e9ebfd;
+    --wait: #9457f6; --wait-soft: #f4eefe;
+    --ok: #12805c; --ok-soft: #e4f5ee;
+    --warn: #b4540a; --warn-soft: #fdf1e4;
+    --bad: #c4314b; --bad-soft: #fdecef;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+      --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+      --accent: #7f8cff; --accent-soft: #1d2150;
+      --wait: #b996fa; --wait-soft: #2c2142;
+      --ok: #4fd1a0; --ok-soft: #173229;
+      --warn: #f5a35c; --warn-soft: #3a2614;
+      --bad: #ff7d93; --bad-soft: #3a1c24;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+    --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+    --accent: #7f8cff; --accent-soft: #1d2150;
+    --wait: #b996fa; --wait-soft: #2c2142;
+    --ok: #4fd1a0; --ok-soft: #173229;
+    --warn: #f5a35c; --warn-soft: #3a2614;
+    --bad: #ff7d93; --bad-soft: #3a1c24;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: "Satoshi", system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.6; }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 48px 16px 80px; }
+  header.top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+  .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; }
+  h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.15; margin: 0 0 12px; }
+  .lede { color: var(--text-muted); margin: 0; max-width: 680px; }
+  .lede a { color: var(--accent); }
+  .toggle { flex-shrink: 0; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 14px; cursor: pointer; }
+  .toggle:hover { border-color: var(--accent); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 32px; }
+  nav.toc a { font-size: 14px; text-decoration: none; color: var(--accent); background: var(--accent-soft); padding: 6px 12px; border-radius: 999px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 0 0 16px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+  .stat b { display: block; font-size: 26px; line-height: 1.2; }
+  .stat span { font-size: 13px; color: var(--text-muted); }
+  h2 { font-size: 22px; margin: 52px 0 16px; }
+  h3 { font-size: 18px; margin: 0; }
+  h4 { font-size: 15px; margin: 22px 0 8px; color: var(--accent); }
+  p { margin: 0 0 12px; }
+  .muted { color: var(--text-muted); font-size: 15px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
+  .card p:last-child { margin-bottom: 0; }
+  .card ul, .card ol { margin: 8px 0 0; padding-left: 20px; }
+  .card li { margin-bottom: 6px; }
+  code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .86em; background: var(--surface-soft); border-radius: 6px; padding: 1px 6px; word-break: break-word; }
+  .findings { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .finding { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+  .finding h3 { font-size: 16px; margin-bottom: 6px; }
+  .finding p { font-size: 15px; margin: 0; color: var(--text-muted); }
+  .tablecard { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow-x: auto; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: 0; }
+  th { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+  td.grp { font-weight: 600; color: var(--accent); background: var(--surface-soft); font-size: 13px; }
+  .sw { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .chip { width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(128,128,128,.45); flex-shrink: 0; }
+  .callout { border-left: 4px solid var(--wait); background: var(--wait-soft); border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; }
+  .callout p { margin: 0; }
+  .callout.ok { border-color: var(--ok); background: var(--ok-soft); }
+  .callout.warn { border-color: var(--warn); background: var(--warn-soft); }
+  .issue { display: grid; grid-template-columns: 28px 1fr; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--bad); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+  .issue .n { font-weight: 700; color: var(--bad); }
+  .issue p { margin: 0; font-size: 15px; }
+  .issue .where { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+  .phase { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px 24px; margin-bottom: 14px; }
+  .phase-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  .num { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 15px; flex-shrink: 0; }
+  .tag { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+  .tag.now { background: var(--ok-soft); color: var(--ok); }
+  .tag.wait { background: var(--wait-soft); color: var(--wait); }
+  .tag.size { background: var(--surface-soft); color: var(--text-muted); }
+  .tag.new { background: var(--warn-soft); color: var(--warn); }
+  .rows { display: grid; grid-template-columns: 130px 1fr; gap: 6px 16px; font-size: 15px; }
+  .rows dt { color: var(--text-muted); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; padding-top: 2px; }
+  .rows dd { margin: 0; }
+  ol.qs { counter-reset: q; list-style: none; padding: 0; margin: 0; }
+  ol.qs li { counter-increment: q; position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px 14px 56px; margin-bottom: 10px; }
+  ol.qs li::before { content: counter(q); position: absolute; left: 16px; top: 14px; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  ol.qs.team li::before { background: var(--wait-soft); color: var(--wait); }
+  ol.qs b { display: block; margin-bottom: 2px; }
+  ol.qs span { color: var(--text-muted); font-size: 15px; }
+  footer { margin-top: 56px; font-size: 13px; color: var(--text-muted); }
+  @media (max-width: 700px) {
+    header.top { flex-direction: column; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .findings { grid-template-columns: 1fr; }
+    .card, .phase { padding: 18px; }
+    .rows { grid-template-columns: 1fr; }
+    .rows dt { padding-top: 8px; }
+    ol.qs li { padding-left: 50px; }
+  }
+</style>
+<style>
+  .tag.done { background: var(--ok-soft); color: var(--ok); }
+  .tag.review { background: var(--warn-soft); color: var(--warn); }
+  .tag.todo { background: var(--surface-soft); color: var(--text-muted); }
+  .meta { font-size: 14px; color: var(--text-muted); margin: 0 0 14px; }
+  .phase h4:first-of-type { margin-top: 14px; }
+  .phase ul { margin: 6px 0 0; padding-left: 20px; font-size: 15px; }
+  .phase li { margin-bottom: 6px; }
+  .preview { display: flex; gap: 12px; flex-wrap: wrap; margin: 8px 0 4px; }
+  .pill { position: relative; width: 108px; height: 44px; border-radius: 999px; border: 2.5px solid; }
+  .pill i { position: absolute; top: 3.5px; width: 32.5px; height: 32.5px; border-radius: 50%; border: 1.4px solid; }
+  .pill.l { background: #000; border-color: #000; } .pill.l i { left: 5px; background: #fff; border-color: #000; }
+  .pill.d { background: #fff; border-color: #fff; box-shadow: 0 0 0 1px var(--border); } .pill.d i { left: 63.5px; background: #000; border-color: #fff; }
+  .preview span { font-size: 13px; color: var(--text-muted); display: block; margin-top: 4px; }
+</style>
+<style>
+  .tag.done { background: var(--ok-soft); color: var(--ok); }
+  .tag.review { background: var(--warn-soft); color: var(--warn); }
+  .tag.todo { background: var(--surface-soft); color: var(--text-muted); }
+  .meta { font-size: 14px; color: var(--text-muted); margin: 0 0 14px; }
+  .phase h4:first-of-type { margin-top: 14px; }
+  .phase ul, .card ul { margin: 6px 0 0; padding-left: 20px; font-size: 15px; }
+  .phase li { margin-bottom: 6px; }
+  td code { white-space: normal; }
+  td.ph { white-space: nowrap; color: var(--text-muted); font-size: 13px; }
+  .folder { font-size: 15px; margin: 26px 0 8px; color: var(--text); }
+  .folder code { font-size: .92em; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">History page · progress log</p>
+      <h1>History progress</h1>
+      <p class="lede">The signed in user's activity log at <code>/history</code> (Figma section <code>140:16047</code>). Plan and paste ready phase prompts: <code>dev-docs/history/history-implementation-plan.md</code>. Demo data first behind one hook; purchases, sales, listings and renewals go live in phase 6 (plan §1.1, §8.3).</p>
+    </div>
+    <button class="toggle" id="toggle" type="button">Toggle theme</button>
+  </header>
+
+  <nav class="toc"><a href="#status">Status</a><a href="#phase2">Phases 2 to 7</a><a href="#phase1">Phase 1</a><a href="#phase0">Phase 0</a><a href="#backend">Backend message</a><a href="#designer">Designer message</a><a href="#answers">Waiting on</a></nav>
+
+  <h2 id="status">Status</h2>
+  <div class="tablecard"><table>
+    <tr><th>Phase</th><th>Scope</th><th>State</th></tr>
+    <tr><td>0</td><td>Backend and designer messages (no code)</td><td><span class="tag review">Drafted 19 Oct, to send</span></td></tr>
+    <tr><td>1</td><td>Route, navigation, shell, header, tabs, types, sample data, hook scaffold</td><td><span class="tag done">Built and checked 19 Oct</span></td></tr>
+    <tr><td>2</td><td>Toolbar, legend, desktop table and rows</td><td><span class="tag done">Built and checked 19 Oct</span></td></tr>
+    <tr><td>3</td><td>Mobile cards, tablet layout, filter sheet</td><td><span class="tag done">Built and checked 19 Oct</span></td></tr>
+    <tr><td>4</td><td>Right rail: Summary, Filters, Need help</td><td><span class="tag done">Built and checked 19 Oct</span></td></tr>
+    <tr><td>5</td><td>Behaviour: filters, sort, search, show more, copy, export, row links</td><td><span class="tag done">Built and checked 19 Oct</span></td></tr>
+    <tr><td>6</td><td>Live data: the history API in the table (rail stays demo)</td><td><span class="tag done">Built 21 Oct, see plan §12.2</span></td></tr>
+    <tr><td>7</td><td>Final QA</td><td><span class="tag done">Done 19 Oct (see below)</span></td></tr>
+  </table></div>
+
+  <h2 id="phase2">Phases 2 to 5 and 7 · 19 Oct 2026</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">2</span><h3>The whole page, all demo data</h3><span class="tag done">Built and checked</span></div>
+    <p class="meta">Figma read node by node: row 140:16281 and the seven type pills, header 140:16268, toolbar 140:16245, legend 140:16259, Show more 140:17177, Summary 140:16088, Filters 140:16175, Need help 140:16220, mobile card 140:17497, filter sheet 140:17398, dark desktop 140:18073.</p>
+    <h4>New: <code>src/design-system/composites/history/</code> (barrel <code>index.ts</code>)</h4>
+    <ul>
+      <li><code>listings/</code>: <code>HistoryToolbar</code> (search applies on Enter or the button, sort pill, Export, Filter button below desktop), <code>HistoryStatusLegend</code>, <code>HistoryActivityRow</code> (status strip, the five columns on a shared grid in <code>_historyTable.scss</code>), <code>HistoryActivityCard</code>, <code>HistoryActivityTable</code> (table from 1280px, two card columns 768 to 1279, one on mobile; loading skeletons, error with Retry, per tab and filtered empty states, Show N more).</li>
+      <li><code>right-rail/</code>: <code>HistoryRailCard</code> (the framed card), <code>HistorySummaryCard</code> (period select, total, "N pending" shortcut, six tiles incl. Withdrawals), <code>HistoryFiltersCard</code> (draft, Clear All, Apply disabled until something changes), <code>HistoryHelpCard</code>.</li>
+      <li><code>shared/</code>: <code>HistoryPills</code> (type pill and status chip; Badge's rounded tint shape didn't fit, so not Badge variants), <code>HistoryActivityParts</code> (identity, copyable reference, amount, date link), <code>HistoryFilterFields</code> (the four selects, used by card and sheet), <code>HistoryFilterSheet</code> (on the shared Modal).</li>
+      <li><code>primitives/icons/history-icons</code>: copy, calendar, chevron, export and the six tile icons from Figma, as currentColor components.</li>
+      <li><code>src/helpers/history/format.ts</code> (date, amount, meta line, row link) and <code>toCsv.ts</code>; <code>src/hooks/history/useHistoryExport.ts</code>; <code>useHistoryFilters</code> rewritten (applied vs draft, tab shared with Activity type, search on submit, Clear All, pending shortcut).</li>
+    </ul>
+    <h4>Changed shared code (all additive, existing callers unchanged)</h4>
+    <ul>
+      <li><code>SearchInput</code>: optional <code>onSubmit</code> (Enter and the search button) and <code>ariaLabel</code>.</li>
+      <li><code>FilterDropdown</code>: <code>fieldSize="sm"</code>, the 30px select of the Summary card.</li>
+      <li><code>DefaultButton</code>: <code>variant="gradient"</code>, the filter pill's dark gradient, for Export and Filter.</li>
+      <li><code>WatchlistDomainIdentity</code>: <code>item</code> typed as just facts and addedAt; optional <code>metaText</code> and <code>showCrown</code>.</li>
+      <li><code>routes.ts</code>: <code>receiptHref</code> (the real <code>/receipt/[orderHash]</code> page) and <code>HELP_CENTER_HREF</code> (the footer's support site, plan Q8).</li>
+    </ul>
+    <h4>Decisions made while building</h4>
+    <ul>
+      <li>Figma's purple badge after the crown has no stated meaning; left out as on the watchlist (its Q12).</li>
+      <li>The dark Listing pill is a lifted grey, read from the dark render, since black vanishes on the black rows.</li>
+      <li>The search box is widened to 243 × 48 but keeps the site's 27px clear and submit buttons.</li>
+      <li>Details takes 20px from Item so the full reference fits at a 1440px window.</li>
+      <li>Withdrawals and account events have no domain: a neutral avatar with their description.</li>
+      <li>"Show N more" counts up to the page size (8), like My Domains; Figma's frame says "Show 14 more".</li>
+    </ul>
+    <h4>Verified</h4>
+    <ul>
+      <li><code>npx tsc --noEmit -p .</code> clean; <code>eslint</code> on every new and changed file, no warnings.</li>
+      <li>Node checks: <code>filterHistory</code> 21 passed, <code>toCsv</code> 14 passed (quoting, formula guard, file name).</li>
+      <li>Screenshots through the dev server on 3002 (headless Chrome, a dummy session, backend calls blocked): light and dark at 1440, 1024, 834 and 390. Checked the "9 pending" shortcut, the Bids tab plus a search with no results (filtered empty state and Clear filters), and the mobile filter sheet in both themes. Fixed from them: the dark Listing pill, the truncated reference, the sheet's missing padding.</li>
+      <li>Profile at 1440 in both themes after the ProfileTabs change: unchanged.</li>
+    </ul>
+    <h4>Not verified</h4>
+    <ul>
+      <li>Keyboard and screen reader pass by hand, and the CSV opened in a spreadsheet.</li>
+      <li>A real signed in session (the screenshots used a dummy one).</li>
+      <li>The Watchlist page after the identity block change (type checked only).</li>
+    </ul>
+    <h4>Found, not fixed (outside History)</h4>
+    <ul>
+      <li><code>orderReceiptHref</code> and <code>domainOverviewHref</code> in <code>routes.ts</code> build <code>//orders/…</code> and <code>//name</code> (<code>MARKETPLACE_HREF</code> is <code>/</code>), which a browser reads as another host. History uses the new <code>receiptHref</code> instead.</li>
+      <li><code>useWatchlistCount</code> throws an unhandled "Failed to fetch" when the backend can't be reached (seen as the Next dev overlay).</li>
+    </ul>
+  </div>
+
+  <h2 id="phase1">Phase 1 · 19 Oct 2026</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">1</span><h3>Foundations, all demo data</h3><span class="tag review">Built, browser check pending</span></div>
+    <p class="meta">The user asked for demo data everywhere for now; live sources stay for phase 6. Figma checked: 140:16068 (light header + tabs), 140:18344 (dark), 140:19499 (mobile dark active pill), sidebar row 140:17342.</p>
+    <h4>New</h4>
+    <ul>
+      <li><code>pages/history/index.tsx</code> + <code>history.module.scss</code>: MainLayout + MarketplacePageShell (<code>after-main-tablet</code>), header card, tabs in <code>?tab=</code>, a placeholder list card and three placeholder rail cards (hidden on mobile, as Figma's mobile frame has no rail).</li>
+      <li><code>src/types/history/index.ts</code>: the §6.1 view model. Change from the plan: <code>domain</code> is <code>DomainNameFacts</code> plus <code>isPremium</code>/<code>isVerified</code>, so phase 2 can reuse the Watchlist identity block's facts shape.</li>
+      <li><code>src/data/history/activities.ts</code> (22 rows; the first 8 follow the Figma table's type and status order, so "Show 14 more" matches) and <code>summary.ts</code> (Figma's "This month" numbers, other periods scaled).</li>
+      <li><code>src/helpers/history/labels.ts</code> (tab, type pill, Details and empty labels; tab → types map) and <code>filterHistory.ts</code> (tab, search over name, reference, description and labels, date range, status, asset type, four sorts).</li>
+      <li><code>src/hooks/history/</code>: <code>useHistoryFilters</code> (tab in the URL, the rest local), <code>useHistoryActivities</code> (8 per page, <code>showMore</code>, <code>needsWalletVerification</code> always false on demo), <code>useHistorySummary</code>.</li>
+    </ul>
+    <h4>Changed</h4>
+    <ul>
+      <li><code>ProfileTabs</code>: additive props <code>tabs</code> (icon optional), <code>ariaLabel</code>, <code>tabId</code>, <code>panelId</code> and <code>mobileDarkActive="accent"</code> (blue active pill in dark on mobile only, Figma 140:19499). Profile passes none of them and renders as before; new type <code>PillTab</code> exported from the profile barrel.</li>
+      <li><code>routes.ts</code>: <code>HISTORY_HREF</code>, <code>historyHref(tab)</code>. <code>navigation.ts</code>: History in Seller Hub before Promotions, Lucide <code>LuHistory</code> (the Figma glyph). Main layout: <code>/history</code> selects the Account bottom nav tab.</li>
+      <li><code>CLAUDE.md</code> §2: the sidebar now listed under <code>layouts/</code>, plus <code>main-layout</code> and <code>footer-stripe</code>.</li>
+    </ul>
+    <h4>Verified</h4>
+    <ul>
+      <li><code>npx tsc --noEmit -p .</code> clean.</li>
+      <li><code>eslint</code> on every changed file: no new warnings (the two <code>no-css-tags</code> warnings in main-layout were there before).</li>
+      <li><code>filterHistory</code>: 21 checks passed in Node (sorts, every tab, search fields, date ranges, status, asset type).</li>
+    </ul>
+    <h4>Not verified yet</h4>
+    <ul>
+      <li>No dev server was running on 3002, so no screenshots: light and dark at 390, 834, 1024 and 1440, the sidebar active row, the bottom nav, and the mobile dark blue pill all still need a look in the browser.</li>
+    </ul>
+  </div>
+
+  <h2 id="phase0">Phase 0 · 19 Oct 2026</h2>
+  <div class="phase">
+    <div class="phase-head"><span class="num">0</span><h3>Backend and designer messages</h3><span class="tag review">Drafted, to send</span></div>
+    <p class="meta">No code changed. Backend rechecked against fetched <code>origin/uat</code> b205dfc7.</p>
+    <h4>Findings that shaped the messages</h4>
+    <ul>
+      <li>None of the history list endpoints are called by the frontend today. <code>/history/get-all</code> is wired as <code>GetUserHistory</code> but only the archived <code>src/_archive/transaction-history</code> uses it. The single receipt lookup (<code>useTransactionReceipt</code>) is the only related live call.</li>
+      <li><code>transactions/mine</code> and <code>listing-history</code> need a wallet verified in the last hour; <code>transactions/mine</code> is scoped by the verified wallet address, so a login only version needs the user's linked wallets on the backend side.</li>
+      <li>Both renewal history endpoints are login only (<code>AccessTokenGuard</code>), so renewals can go live without the wallet gate.</li>
+      <li>The wallet verification flow already exists in <code>src/lib/marketplace-order-client.ts</code> (nonce, sign, prove wallet); the §7 item 12 state can trigger it.</li>
+    </ul>
+  </div>
+
+  <h2 id="backend">Backend message</h2>
+  <div class="card"><pre style="white-space:pre-wrap;margin:0;font-size:14px">Hi team, we&#x27;re starting the new History page: the signed in user&#x27;s activity log (Figma section 140:16047). We&#x27;re building it on demo data first, so none of this blocks us. Here&#x27;s what would let us switch sections to real data, most valuable first.
+
+**Quick wins on existing endpoints**
+
+1. Allow `GET /marketplacev2/orders/transactions/mine` and `GET /marketplacev2/orders/listing-history` with login only (`AccessTokenGuard`), without `RequireVerifiedWalletGuard`. Both are read only and scoped to the caller, and History is already a login protected page. Today a user who hasn&#x27;t verified a wallet in the last hour gets an error instead of their history. Since `transactions/mine` looks up by the verified wallet address, a login only version would need to use the user&#x27;s linked wallets. A separate login based variant works for us too. (Renewal history is already login only, thank you.)
+2. Add `priceUsdt` and `chainId` to each `listing-history` row. Right now we need one receipt call per sold row just to show its price.
+3. Add a seller side to `transactions/mine`, for example `?side=buyer|seller|all`, so purchases and sales come from one place.
+
+**New endpoints, when there&#x27;s room**
+
+4. `GET /history/activities?tab&amp;type&amp;status&amp;assetType&amp;from&amp;to&amp;search&amp;sort&amp;page&amp;limit` returning `{ data: HistoryActivity[], total, hasNext }`, merging purchases, sales, listing events and renewals now, and offers, bids, transfers, withdrawals and account events if those get built.
+5. `GET /history/summary?period=` returning `HistorySummary`, the totals for the Summary card.
+6. Optional: `GET /history/export.csv` with the same filters as point 4.
+
+```ts
+type HistoryActivityType = &#x27;purchase&#x27; | &#x27;sale&#x27; | &#x27;listing&#x27; | &#x27;delisting&#x27; | &#x27;renewal&#x27; | &#x27;offer&#x27; | &#x27;bid&#x27; | &#x27;transfer&#x27; | &#x27;withdrawal&#x27; | &#x27;account&#x27;
+type HistoryStatus = &#x27;pending&#x27; | &#x27;completed&#x27; | &#x27;failed&#x27;
+
+interface HistoryActivity {
+  id: string
+  type: HistoryActivityType
+  status: HistoryStatus
+  occurredAt: string            // ISO
+  reference: string             // user facing reference, copyable
+  domain?: { name: string; tld: string; chain: string }
+  amount?: { value: number; token: string; usd: number }
+  orderId?: string              // order hash, links to the receipt page
+  txHash?: string
+  chainId?: string
+  description?: string          // account events, e.g. &quot;Signed in with Google&quot;
+}
+
+interface HistorySummary {
+  period: &#x27;all&#x27; | &#x27;7d&#x27; | &#x27;30d&#x27; | &#x27;this-month&#x27; | &#x27;90d&#x27; | &#x27;this-year&#x27;
+  spentUsd: number
+  earnedUsd: number
+  pendingCount: number
+  purchases: number
+  domainsSold: number
+  auctionsWon: number
+  offersAccepted: number
+  transfers: number
+  withdrawals: number
+}
+```
+
+**Questions**
+
+a. Can the wallet guard be relaxed as in point 1, or should we plan around it?
+b. Do renewal history rows include an amount and a pending or failed status?
+c. Are offers, bids, transfers, withdrawals or account events (sign ins) planned anywhere? Until they exist, those tabs stay on demo data.
+d. Is there a user facing reference ID like the &quot;#ED 2026 1013 00148&quot; style in Figma? If not, we&#x27;ll show a short order or tx hash.</pre></div>
+
+  <h2 id="designer">Designer message</h2>
+  <div class="card"><pre style="white-space:pre-wrap;margin:0;font-size:14px">Hi, I&#x27;m building the History page from section 140:16047. A few things to confirm. None of them block me, so I&#x27;ll go with the proposal unless you say otherwise.
+
+1. In the light Summary card, the Withdrawals tile is hidden behind Transfers, while the dark frame shows all six tiles in a 2 × 3 grid. I&#x27;ll build all six.
+2. Every row&#x27;s Details says &quot;Domain purchased&quot;, whatever its type. I&#x27;ll take the label from the type: Domain listed, Domain renewed, Domain sold, Listing cancelled, and so on.
+3. The tab says &quot;Account&quot; but the pill says &quot;Accounts&quot;, and the &quot;Bids&quot; pill sits on a single bid. I&#x27;d use singular pills: Account, Bid.
+4. The Activity type filter repeats the tabs. I&#x27;ll keep them in sync, so picking one updates the other.
+5. The mobile filter frame has no sheet chrome (no handle, close button or backdrop). I&#x27;ll use our existing slide in drawer unless you&#x27;d like a bottom sheet.
+6. What should the Asset type options be? I&#x27;ve assumed All assets, Domains, Tokens.
+7. Should the Withdrawals tile stay, given there&#x27;s no payouts page yet? I&#x27;ll keep it with sample numbers.
+8. With real data: the reference will be a short order or tx hash, since the ED style ID doesn&#x27;t exist in the backend. Pending and the orange strip will rarely appear, because sales are recorded after confirmation. Listing events have no amount, so that cell shows a dash. Does that work for you?
+9. These states aren&#x27;t in Figma: empty tab, no results after filtering, loading, error, and &quot;Verify your wallet to see your history&quot;. I&#x27;ll follow the My Domains and Watchlist patterns unless you&#x27;d like to design them.
+10. Where should &quot;Go to Help Center&quot; link to?</pre></div>
+
+  <h2 id="answers">Waiting on</h2>
+  <ol class="qs team">
+    <li><b>Backend: wallet guard on the read only endpoints (Q2)</b><span>Decides whether live tabs need the verify wallet state.</span></li>
+    <li><b>Backend: price on listing history rows (Q11)</b><span>Until then, one cached receipt call per sold row.</span></li>
+    <li><b>Backend: renewal row fields and pending state</b><span>Checked in phase 6 either way.</span></li>
+    <li><b>Designer: Q4, Q5, Q7, Q9, Q10, live row reference, missing states</b><span>Phase 1 starts with the plan's proposals and swaps if answers differ.</span></li>
+  </ol>
+
+  <footer>Started 19 October 2026 · branch <code>dark-mode</code> · dev-docs is local only.</footer>
+</div>
+<script>
+  document.getElementById('toggle').addEventListener('click', function () {
+    var root = document.documentElement;
+    var current = root.getAttribute('data-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('dmplan-theme', next); } catch (e) {}
+  });
+</script>
+</body>
+</html>

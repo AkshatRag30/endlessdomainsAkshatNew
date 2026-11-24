@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trails Flow Explained</title>
+<script>
+  try {
+    var saved = localStorage.getItem('dmplan-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  } catch (e) {}
+</script>
+<style>
+  :root {
+    --bg: #f9f9f9; --surface: #ffffff; --surface-soft: #f3f4fe;
+    --text: #111111; --text-muted: #5b5b66; --border: #e6e6e6;
+    --accent: #2639ED; --accent-soft: #e9ebfd;
+    --wait: #9457f6; --wait-soft: #f4eefe;
+    --ok: #12805c; --ok-soft: #e4f5ee;
+    --warn: #b4540a; --warn-soft: #fdf1e4;
+    --bad: #c4314b; --bad-soft: #fdecef;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+      --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+      --accent: #7f8cff; --accent-soft: #1d2150;
+      --wait: #b996fa; --wait-soft: #2c2142;
+      --ok: #4fd1a0; --ok-soft: #173229;
+      --warn: #f5a35c; --warn-soft: #3a2614;
+      --bad: #ff7d93; --bad-soft: #3a1c24;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+    --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+    --accent: #7f8cff; --accent-soft: #1d2150;
+    --wait: #b996fa; --wait-soft: #2c2142;
+    --ok: #4fd1a0; --ok-soft: #173229;
+    --warn: #f5a35c; --warn-soft: #3a2614;
+    --bad: #ff7d93; --bad-soft: #3a1c24;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: "Satoshi", system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.6; }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 48px 16px 80px; }
+  header.top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+  .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; }
+  h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.15; margin: 0 0 12px; }
+  .lede { color: var(--text-muted); margin: 0; max-width: 680px; }
+  .lede a { color: var(--accent); }
+  .toggle { flex-shrink: 0; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 14px; cursor: pointer; }
+  .toggle:hover { border-color: var(--accent); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 32px; }
+  nav.toc a { font-size: 14px; text-decoration: none; color: var(--accent); background: var(--accent-soft); padding: 6px 12px; border-radius: 999px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 0 0 16px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+  .stat b { display: block; font-size: 26px; line-height: 1.2; }
+  .stat span { font-size: 13px; color: var(--text-muted); }
+  h2 { font-size: 22px; margin: 52px 0 16px; }
+  h3 { font-size: 18px; margin: 0; }
+  h4 { font-size: 15px; margin: 22px 0 8px; color: var(--accent); }
+  p { margin: 0 0 12px; }
+  .muted { color: var(--text-muted); font-size: 15px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
+  .card p:last-child { margin-bottom: 0; }
+  .card ul, .card ol { margin: 8px 0 0; padding-left: 20px; }
+  .card li { margin-bottom: 6px; }
+  code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .86em; background: var(--surface-soft); border-radius: 6px; padding: 1px 6px; word-break: break-word; }
+  .findings { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .finding { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+  .finding h3 { font-size: 16px; margin-bottom: 6px; }
+  .finding p { font-size: 15px; margin: 0; color: var(--text-muted); }
+  .tablecard { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow-x: auto; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: 0; }
+  th { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+  td.grp { font-weight: 600; color: var(--accent); background: var(--surface-soft); font-size: 13px; }
+  .sw { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .chip { width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(128,128,128,.45); flex-shrink: 0; }
+  .callout { border-left: 4px solid var(--wait); background: var(--wait-soft); border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; }
+  .callout p { margin: 0; }
+  .callout.ok { border-color: var(--ok); background: var(--ok-soft); }
+  .callout.warn { border-color: var(--warn); background: var(--warn-soft); }
+  .issue { display: grid; grid-template-columns: 28px 1fr; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--bad); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+  .issue .n { font-weight: 700; color: var(--bad); }
+  .issue p { margin: 0; font-size: 15px; }
+  .issue .where { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+  .phase { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px 24px; margin-bottom: 14px; }
+  .phase-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  .num { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 15px; flex-shrink: 0; }
+  .tag { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+  .tag.now { background: var(--ok-soft); color: var(--ok); }
+  .tag.wait { background: var(--wait-soft); color: var(--wait); }
+  .tag.size { background: var(--surface-soft); color: var(--text-muted); }
+  .tag.new { background: var(--warn-soft); color: var(--warn); }
+  .rows { display: grid; grid-template-columns: 130px 1fr; gap: 6px 16px; font-size: 15px; }
+  .rows dt { color: var(--text-muted); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; padding-top: 2px; }
+  .rows dd { margin: 0; }
+  ol.qs { counter-reset: q; list-style: none; padding: 0; margin: 0; }
+  ol.qs li { counter-increment: q; position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px 14px 56px; margin-bottom: 10px; }
+  ol.qs li::before { content: counter(q); position: absolute; left: 16px; top: 14px; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  ol.qs.team li::before { background: var(--wait-soft); color: var(--wait); }
+  ol.qs b { display: block; margin-bottom: 2px; }
+  ol.qs span { color: var(--text-muted); font-size: 15px; }
+  footer { margin-top: 56px; font-size: 13px; color: var(--text-muted); }
+  @media (max-width: 700px) {
+    header.top { flex-direction: column; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .findings { grid-template-columns: 1fr; }
+    .card, .phase { padding: 18px; }
+    .rows { grid-template-columns: 1fr; }
+    .rows dt { padding-top: 8px; }
+    ol.qs li { padding-left: 50px; }
+  }
+</style>
+<style>
+  .tag.done { background: var(--ok-soft); color: var(--ok); }
+  .tag.todo { background: var(--surface-soft); color: var(--text-muted); }
+  .meta { font-size: 14px; color: var(--text-muted); margin: 0 0 14px; }
+  .phase ul { margin: 6px 0 0; padding-left: 20px; font-size: 15px; }
+  .phase li { margin-bottom: 6px; }
+</style>
+<style>pre{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;overflow-x:auto;font-size:13px}</style>
+<style>
+  .flow { display: grid; gap: 10px; margin: 0 0 16px; }
+  .step { display: grid; grid-template-columns: 34px 1fr; gap: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px; }
+  .step .num { margin-top: 2px; }
+  .step p { margin: 0 0 6px; font-size: 15px; }
+  .step p:last-child { margin-bottom: 0; }
+  .step .who { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); }
+  .who.fe { color: var(--accent); } .who.tr { color: var(--wait); } .who.be { color: var(--ok); } .who.ch { color: var(--warn); }
+  .lanes { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 0 0 16px; }
+  .lane { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px; font-size: 14px; }
+  .lane b { display: block; margin-bottom: 4px; }
+  .lane.fe { border-top: 4px solid var(--accent); } .lane.tr { border-top: 4px solid var(--wait); } .lane.be { border-top: 4px solid var(--ok); } .lane.ch { border-top: 4px solid var(--warn); } .lane.bu { border-top: 4px solid var(--text-muted); }
+  dl.terms { display: grid; grid-template-columns: 170px 1fr; gap: 10px 18px; margin: 0; font-size: 15px; }
+  dl.terms dt { font-weight: 700; }
+  dl.terms dd { margin: 0; color: var(--text-muted); }
+  @media (max-width: 700px) { .lanes { grid-template-columns: 1fr 1fr; } dl.terms { grid-template-columns: 1fr; } dl.terms dd { margin-bottom: 8px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <div>
+    <p class="eyebrow">Trails checkout · how it all works</p>
+    <h1>Pay with any token, end to end</h1>
+    <p class="lede">One place that explains the whole "Any token, any chain" purchase: who takes part, what a checkout, quote and intent are, where the money goes, how it worked when the browser did everything (commit <code>1622027</code>), and how it works now that our backend does the checking and tracking (<code>02cd1d9</code> plus the 18 Nov review fixes). Build history: <a href="trails-backend-progress.html">trails-backend-progress.html</a>. Plan: <a href="trails-backend-integration-plan.md">trails-backend-integration-plan.md</a>.</p>
+  </div>
+  <button class="toggle" id="toggle" type="button">Toggle theme</button>
+</header>
+
+<nav class="toc">
+  <a href="#idea">The idea</a>
+  <a href="#cast">Who takes part</a>
+  <a href="#words">Words</a>
+  <a href="#money">Where the money goes</a>
+  <a href="#before">Before: browser path</a>
+  <a href="#now">Now: server path</a>
+  <a href="#compare">Before vs now</a>
+  <a href="#status">Statuses</a>
+  <a href="#after">After the drawer</a>
+  <a href="#safety">Safety rules</a>
+  <a href="#wrong">When things go wrong</a>
+  <a href="#files">Where the code is</a>
+  <a href="#review">Mohit's review</a>
+  <a href="#open">Still open</a>
+</nav>
+
+<h2 id="idea">1. The idea in one paragraph</h2>
+<div class="card">
+  <p>Every listing on our marketplace is a signed <b>Seaport order</b> that can only be paid in <b>USDT on Polygon</b>. Many buyers don't have that. "Any token, any chain" lets them pay with whatever they hold (USDC on Base, BNB on BNB Chain, ETH, and so on). <b>Trails</b> takes their token, converts and moves it to USDT on Polygon, and then, on the buyer's behalf, runs the two Polygon transactions that buy the domain: <i>approve USDT</i> and <i>fill the Seaport order</i>, with the domain sent to the buyer's wallet. If the purchase can't happen (someone bought it first, the listing was cancelled), Trails sends the USDT back to the buyer on Polygon instead. That's a <b>refund</b>.</p>
+  <p>Our job is to: decide who may use it, prepare exactly those two transactions, show Trails' payment widget, follow the purchase until it ends, and tell the buyer the result, even if they closed the drawer, changed page, reloaded or opened another device.</p>
+</div>
+
+<h2 id="cast">2. Who takes part</h2>
+<div class="lanes">
+  <div class="lane bu"><b>Buyer</b>Their wallet (MetaMask, or a phone wallet over WalletConnect) holds some token on some chain.</div>
+  <div class="lane fe"><b>Our frontend</b>The buy drawer (<code>BuyFlowModal</code>), the Trails widget inside it, and an app wide tracker that follows purchases.</div>
+  <div class="lane tr"><b>Trails</b>A payment service. Gives a price (quote), takes the payment, converts and bridges it (through Relay), runs our calls on Polygon.</div>
+  <div class="lane be"><b>Our backend</b>Since phases 1 to 6: checks the listing, builds the calls, verifies Trails' quote, stores and tracks every checkout, sends emails.</div>
+  <div class="lane ch"><b>Polygon</b>Where the listing lives: Seaport (the order contract), USDT, and the domain NFT contract.</div>
+</div>
+
+<h2 id="words">3. The words, in plain language</h2>
+<div class="card">
+<dl class="terms">
+  <dt>Listing / order</dt><dd>The seller's signed Seaport order: "I give this domain for X USDT". Identified by its <code>orderHash</code> (0x plus 64 hex characters).</dd>
+  <dt>Checkout</dt><dd><b>Our</b> record of one attempt to buy one listing through Trails. Has a <code>checkoutId</code>. Lives about 15 minutes if never paid. Before: invented in the browser (<code>crypto.randomUUID()</code>) and kept in localStorage. Now: created and stored by our backend (a database row).</dd>
+  <dt>Prepared checkout</dt><dd>What "prepare" returns: checkout id, buyer, price (<code>destination</code>: chain 137, USDT, amount in minor units), <code>expiresAt</code>, the two <b>calls</b>, and the <b>route</b> settings for the widget.</dd>
+  <dt>Calls (destination calls)</dt><dd>The two Polygon transactions Trails must run for us: 1) USDT <code>approve</code> to Seaport, 2) Seaport <code>fulfillAdvancedOrder</code> with the recipient set to the buyer. We hand them to the widget unchanged.</dd>
+  <dt>Quote</dt><dd>Trails' price for "pay with <i>this</i> token on <i>this</i> chain": how much of the buyer's token, fees included. Each time the buyer picks another token, or after a while, the widget makes a new quote.</dd>
+  <dt>Intent (<code>intentId</code>)</dt><dd>Trails' own record of one quote and, once paid, of the whole payment: deposit, bridge, our calls, refund. One checkout can see several intents (one per quote); only the paid one matters. The widget tells us each new one through <code>onQuote</code>.</dd>
+  <dt>Attach</dt><dd>Linking an intent to our checkout ("this quote belongs to that purchase"). Before: saved in localStorage. Now: sent to the backend (API 3), which first checks the intent really pays this listing to this buyer.</dd>
+  <dt>Deposit / origin chain</dt><dd>The buyer's payment on their own chain (for example Base). That's the moment money leaves their wallet.</dd>
+  <dt>Destination chain</dt><dd>Always Polygon here: where the USDT arrives and our two calls run.</dd>
+  <dt>Origin calls vs destination calls</dt><dd>Where Trails puts our calls inside the intent. Normally under <code>destinationCalls</code> (run on Polygon after the bridge). When the buyer already pays with USDT on Polygon, there's nothing to bridge, and Trails puts them under <code>originCalls</code>. That difference is bug F9.</dd>
+  <dt>Route</dt><dd>Widget settings: bridge provider <code>RELAY</code>, no fallback, slippage 0.005. Now sent by the backend. (The widget currently ignores slippage, F3.)</dd>
+  <dt>Sale record</dt><dd>Our marketplace's own record that the order was filled, written by our indexer after it sees the Polygon transaction. "Done" means our sale record shows <b>this buyer</b> bought it.</dd>
+  <dt>Refund</dt><dd>When our calls can't run, Trails sends the USDT (not the original token) back to the buyer's wallet on Polygon.</dd>
+  <dt>Verified wallet</dt><dd>The buyer signed a free message proving they own the wallet; the login token then carries that wallet. The backend needs it before prepare and attach. Valid 60 minutes (we refresh at 55).</dd>
+  <dt>USDT minor units</dt><dd>USDT has 6 decimals, so amounts are strings like <code>"100000"</code> = 0.10 USDT.</dd>
+</dl>
+</div>
+
+<h2 id="money">4. Where the money actually goes</h2>
+<p class="muted">The same in both versions. This is Trails' part; we only prepare it and watch it.</p>
+<div class="flow">
+  <div class="step"><span class="num">1</span><div><p class="who bu">Buyer</p><p>Presses Pay in the widget. Their wallet asks to approve and send, for example, 0.14 USDC on Base (price plus Trails' fee). Sometimes it asks twice (allow the token, then send). The first "yes" can already move the money.</p></div></div>
+  <div class="step"><span class="num">2</span><div><p class="who tr">Trails</p><p>Receives the deposit on Base, converts and bridges it through Relay, and ends with exactly the listing price in USDT on Polygon, in a wallet Trails controls for this intent.</p></div></div>
+  <div class="step"><span class="num">3</span><div><p class="who ch">Polygon</p><p>Trails runs our two calls from that wallet: approve USDT to Seaport, then fill the order. Seaport pays the seller and sends the domain NFT straight to the buyer. One transaction: the <code>destinationTxHash</code>.</p></div></div>
+  <div class="step"><span class="num">4a</span><div><p class="who ch">Success</p><p>Our indexer sees the sale and writes the sale record (30 to 60 seconds later). The domain shows in My Domains within 10 to 15 minutes.</p></div></div>
+  <div class="step"><span class="num">4b</span><div><p class="who tr">Or a refund</p><p>If the fill fails (sold, cancelled, expired, changed), the USDT goes back to the buyer on Polygon: the <code>refundTxHash</code>. Not converted back to USDC.</p></div></div>
+</div>
+
+<h2 id="before">5. Before: the browser did everything (up to <code>1622027</code>)</h2>
+<p class="muted">Still in the code as a rollback: <code>NEXT_PUBLIC_TRAILS_SOURCE=browser</code>. Removed in phase 9 once production is stable.</p>
+<div class="flow">
+  <div class="step"><span class="num">1</span><div><p class="who fe">Show the option</p><p>"Any token" appeared when our env switch was on, the key was set, and the buyer's wallet was in the <b>pilot wallet list</b> in <code>.env</code> (<code>NEXT_PUBLIC_TRAILS_PILOT_WALLETS</code>).</p></div></div>
+  <div class="step"><span class="num">2</span><div><p class="who fe">Prepare, in the browser</p><p>On Continue, the browser loaded the order from our API, then read Polygon directly (<code>orderChecks.service.ts</code>): not cancelled or filled, seller still owns the domain and approved Seaport, counter unchanged, not expiring soon. Then it built the two calls itself (<code>buildDestinationCalls.ts</code>) and invented a checkout id.</p></div></div>
+  <div class="step"><span class="num">3</span><div><p class="who tr">Widget</p><p>Opened with the calls and a hardcoded slippage. Each quote (<code>onQuote</code>) was saved to <b>localStorage</b> with the domain name and price (<code>checkoutStore.service.ts</code>), keeping the last 3 earlier intents in case an older quote was the one paid.</p></div></div>
+  <div class="step"><span class="num">4</span><div><p class="who fe">Follow it</p><p>Every 3 seconds the browser asked <b>Trails</b> directly (<code>GetIntent</code>, then <code>GetIntentReceipt</code> once paid, in <code>trailsReceipt.service.ts</code>) and <b>our sale record</b> (<code>GET /marketplacev2/orders/transactions/:orderHash</code>), and mixed them into one status (<code>intentStatus.ts</code>). Rule 1: if our sale record shows this buyer, it's done.</p></div></div>
+  <div class="step"><span class="num">5</span><div><p class="who fe">After a reload</p><p>The tracker read localStorage and resumed anything paid in the last 24 hours. Another device or another browser knew nothing.</p></div></div>
+</div>
+<div class="callout warn"><p><b>Why that wasn't enough for production.</b> Anyone could edit the browser code and send different calls (the server never checked them). The pilot list was in the frontend bundle. If the buyer closed the tab, nobody followed the purchase, so no refund email. Every buyer's browser polled Trails (rate limits, our key in every browser's requests). Only the browser that paid knew the purchase existed.</p></div>
+
+<h2 id="now">6. Now: our backend checks and tracks (<code>02cd1d9</code> + review fixes)</h2>
+<p class="muted">The default. Six backend APIs under <code>/api/v1/marketplacev2/trails</code>; numbers below match the backend team's document. All go through <code>callBackend</code> in <code>trailsBackend.service.ts</code>, the only file that calls them.</p>
+<div class="flow">
+  <div class="step"><span class="num">1</span><div><p class="who be">API 1 · GET /config, when the drawer opens</p><p>The server answers <code>enabled</code>, <code>available</code> (may <i>this</i> user use Trails), <code>minPriceUsdt</code> (0.10), <code>maxPriceUsdt</code> and the <code>route</code>. "Any token" shows only if our env switch and key are on, the server says available, and the price is in range (<code>checkoutGate.ts</code>). Until it answers, or if it fails, the option stays hidden.</p></div></div>
+  <div class="step"><span class="num">2</span><div><p class="who fe">Verify the wallet</p><p>On Continue, <code>ensureWalletVerified</code> runs. If the login has no fresh verification for this wallet, the drawer shows "Verify your wallet" and the buyer signs a free message. Rejecting it returns to the payment options.</p></div></div>
+  <div class="step"><span class="num">3</span><div><p class="who be">API 2 · POST /checkouts (prepare)</p><p>We send only the <code>orderHash</code>. The server takes the buyer from the login, does all the live listing checks, builds the two calls, creates the checkout row (15 minute window) and returns the prepared checkout. It also holds the listing for 2 minutes against other Trails buyers (<code>CHECKOUT_IN_PROGRESS</code>). We double check the server's buyer is the connected wallet, otherwise we stop with the "wrong wallet" screen. Errors map to screens (own listing, expiring soon, price, unavailable, someone else paying...).</p></div></div>
+  <div class="step"><span class="num">4</span><div><p class="who tr">Widget</p><p>Opens with the server's calls and route. The buyer picks a token; Trails makes a quote and tells us its <code>intentId</code> (<code>onQuote</code>).</p></div></div>
+  <div class="step"><span class="num">5</span><div><p class="who be">API 3 · POST /checkouts/:id/intent (attach), on every quote</p><p>The server fetches that intent from Trails and checks it (about eight checks: still in time, right chain and amount, exactly our three calls under <code>destinationCalls</code>, buyer and leftover go to the buyer, a real route...). It answers <b>HTTP 200</b> with a status: <code>attached</code> (fine, carry on), <code>mismatch</code> (refused: we close the widget, "Couldn't start the payment, nothing was charged"), or <code>expired</code> (the 15 minutes passed: "Your price hold ran out", Start again). A refused later quote doesn't spoil an earlier good one. <code>ALREADY_ATTACHED</code> (409) means the current quote is already paid: we just log it.</p></div></div>
+  <div class="step"><span class="num">6</span><div><p class="who bu">Pay</p><p>The widget's <code>onSign</code> fires. From now on the drawer remembers "Pay was pressed" and <b>ignores</b> any late refusal from step 5, because money may be moving (review R1). The tracker starts following the checkout if it isn't already.</p></div></div>
+  <div class="step"><span class="num">7</span><div><p class="who be">API 4 · GET /checkouts/:id, every 5 s (15 s after 5 minutes)</p><p>The server refreshes from Trails when its data is older than 5 seconds and from our sale record, and answers one combined state: <code>status</code>, <code>intentStatus</code>, <code>destinationTxHash</code>, <code>refundTxHash</code>, <code>sale</code>, <code>refund</code>. Once paid, the drawer swaps the widget for "Payment in progress". When it ends: "X is yours", "Payment refunded" or "Payment didn't go through". The browser no longer calls Trails for status at all.</p></div></div>
+  <div class="step"><span class="num">8</span><div><p class="who be">In the background, without us</p><p>The server keeps tracking every paid checkout even if every tab is closed (backend Sprint 12) and sends the buyer the purchase or refund email (Sprint 14).</p></div></div>
+  <div class="step"><span class="num">9</span><div><p class="who be">API 5 · GET /checkouts?status=&amp;limit=</p><p>The buyer's own checkouts, newest first. Used after a load or a login to pick up running purchases and refunds (section 9), and every 15 s by the /history "Purchase in progress" banner (<code>executing</code> and <code>failed</code>).</p></div></div>
+  <div class="step"><span class="num">10</span><div><p class="who be">API 6 · sale receipt (later)</p><p>For a Trails sale the receipt will say "Network fee: included in the Trails fee" instead of gas figures. Ships after the backend's production release (our phase 7).</p></div></div>
+</div>
+
+<h2 id="compare">7. Before vs now, side by side</h2>
+<div class="tablecard"><table>
+  <thead><tr><th>Job</th><th>Before (browser)</th><th>Now (server)</th></tr></thead>
+  <tbody>
+    <tr><td>Who may use it</td><td>Pilot wallet list in <code>.env</code></td><td>Server decides (<code>/config</code> → <code>available</code>), plus price range</td></tr>
+    <tr><td>Wallet proof</td><td>None needed</td><td>Verified wallet before prepare and attach</td></tr>
+    <tr><td>Listing checks</td><td>Browser reads Polygon</td><td>Server reads Polygon</td></tr>
+    <tr><td>Building the two calls</td><td>Browser</td><td>Server</td></tr>
+    <tr><td>Checkout id</td><td>Browser invents it</td><td>Server database row</td></tr>
+    <tr><td>Two buyers at once</td><td>Nothing stopped it</td><td>Server holds the listing 2 minutes (<code>CHECKOUT_IN_PROGRESS</code>)</td></tr>
+    <tr><td>Checking the quote</td><td>Nobody</td><td>Server verifier on every attach (mismatch if wrong)</td></tr>
+    <tr><td>Where quotes are kept</td><td>localStorage</td><td>Server</td></tr>
+    <tr><td>Status</td><td>Browser polls Trails + our sale record every 3 s</td><td>Browser polls our server every 5 s; server talks to Trails</td></tr>
+    <tr><td>Tab closed</td><td>Nobody follows it</td><td>Server follows it and emails</td></tr>
+    <tr><td>Reload / other device</td><td>Same browser only (localStorage)</td><td>Any device, from the list API</td></tr>
+    <tr><td>Slippage and route</td><td>Hardcoded</td><td>From the server</td></tr>
+    <tr><td>Login expires mid purchase</td><td>Not relevant</td><td>"Log in again to see your purchase status", keeps tracking</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="status">8. Statuses and what the buyer sees</h2>
+<div class="tablecard"><table>
+  <thead><tr><th>Our status</th><th>Means</th><th>Trails intent status behind it</th><th>Drawer / toast</th></tr></thead>
+  <tbody>
+    <tr><td><code>prepared</code></td><td>Checkout made, no quote yet</td><td>none</td><td>Widget open</td></tr>
+    <tr><td><code>attached</code></td><td>A quote is attached, not paid</td><td>QUOTED, or COMMITTED (agreed but nothing landed)</td><td>Widget open. Unpaid after 15 minutes: ends quietly, nothing shown</td></tr>
+    <tr><td><code>executing</code></td><td>Paid, Trails is working</td><td>EXECUTING (with a real deposit)</td><td>"Payment in progress"; /history banner</td></tr>
+    <tr><td><code>succeeded</code></td><td>Purchase done</td><td>SUCCEEDED</td><td>"X is yours" once our sale record shows the buyer (fallback after 20 minutes, Q18)</td></tr>
+    <tr><td><code>refunded</code></td><td>USDT sent back on Polygon</td><td>REFUNDED</td><td>"Payment refunded", with the refund transaction</td></tr>
+    <tr><td><code>failed</code></td><td>Trails failed after payment; can still become refunded</td><td>FAILED</td><td>Keeps watching 20 minutes, then "Payment didn't go through… If money left your wallet, Trails refunds it" (Q28)</td></tr>
+    <tr><td><code>expired</code></td><td>Never paid in time</td><td>none, or quoted only</td><td>Quiet</td></tr>
+    <tr><td><code>mismatch</code></td><td>The server refused the quote</td><td>any</td><td>Before Pay: "Couldn't start the payment, nothing was charged". After Pay: the widget stays until money visibly moves, then "Payment in progress" and the real result: "is yours" or "Payment refunded"; "Payment didn't go through" only if no result shows in time (R1). The same for <code>expired</code> after Pay, unless Trails says it was never paid</td></tr>
+  </tbody>
+</table></div>
+<p class="muted">The rules live in one pure helper, <code>helpers/trails/intentStatus.ts</code>: <code>isFinal</code> (when to stop watching) and <code>checkoutOutcome</code> (done, refunded, failed or abandoned, where abandoned means show nothing).</p>
+
+<h2 id="after">9. After the drawer: the app wide tracker</h2>
+<div class="card">
+  <p>The drawer doesn't own the watching. One tracker for the whole tab (<code>core/services/trails/checkoutTracker.ts</code>, polling in <code>watchCheckout.ts</code>) follows every purchase; the drawer only listens to it. So:</p>
+  <ul>
+    <li><b>Drawer closed, Back pressed, or another page:</b> the watch carries on. When it ends and nothing on screen shows it, a toast appears ("X is yours", "Payment refunded", "Payment didn't go through"). The toast is drawn by <code>TrailsPurchaseWatcher</code> in <code>pages/_app.tsx</code>.</li>
+    <li><b>Reload:</b> the watcher asks the list API for the buyer's running purchases and refunds of the last day and watches them again. A result is shown once per browser (a small "seen" list in localStorage).</li>
+    <li><b>Another device:</b> same list API, so a running purchase or a refund shows there too. A finished success doesn't pop up again on a new device (R2), and a failed one only while it can still turn into a refund.</li>
+    <li><b>Logging in later:</b> the list is read again on every login, not only on load (R3).</li>
+    <li><b>Login expired during a purchase:</b> the status call gets 401. We never treat that as an end: the drawer says "Log in again to see your purchase status. Your purchase keeps going in the meantime." (or one toast if closed), we retry every 15 s, and carry on after the login.</li>
+    <li><b>Server busy:</b> a rate limit (429) waits 30 s, 60 s, then 2 minutes; other dropped requests just retry.</li>
+  </ul>
+</div>
+
+<h2 id="safety">10. Safety rules and why they exist</h2>
+<div class="findings">
+  <div class="finding"><h3>The server builds the calls</h3><p>So nobody can change the browser code to buy something else or send the domain elsewhere. The verifier then checks Trails' intent contains exactly those calls.</p></div>
+  <div class="finding"><h3>Buyer from the login</h3><p>The server ignores any buyer we send. We additionally stop if the login's wallet isn't the connected one, so the domain can't go to a different wallet than the one paying.</p></div>
+  <div class="finding"><h3>Pay pressed is never undone</h3><p>Once Pay is pressed we never say "nothing was charged", even if the buyer rejects a second wallet request: the first one may already have moved the money (seen in T5).</p></div>
+  <div class="finding"><h3>Unpaid quotes stay quiet</h3><p>A buyer who looks at a price and leaves never gets a scary message, and never sees a "purchase in progress" banner.</p></div>
+  <div class="finding"><h3>Success needs our sale record</h3><p>"X is yours" waits until our own sale record shows this buyer, not just Trails saying succeeded.</p></div>
+  <div class="finding"><h3>Fail closed</h3><p>If <code>/config</code> fails or hasn't answered, the option is hidden. Our env switch can turn it off whatever the server says.</p></div>
+</div>
+
+<h2 id="wrong">11. When things go wrong</h2>
+<div class="tablecard"><table>
+  <thead><tr><th>Situation</th><th>What happens</th><th>What the buyer sees</th></tr></thead>
+  <tbody>
+    <tr><td>Their own listing</td><td>Prepare refuses (<code>OWN_LISTING</code>)</td><td>"This is your own listing"</td></tr>
+    <tr><td>Another Trails buyer started in the last 2 minutes</td><td>Prepare refuses (<code>CHECKOUT_IN_PROGRESS</code>)</td><td>"Someone else is paying for this domain"</td></tr>
+    <tr><td>Listing sold, cancelled or changed before Continue</td><td><code>ORDER_NOT_FILLABLE</code></td><td>"This listing is no longer available"</td></tr>
+    <tr><td>Price hold over 15 minutes</td><td>Attach answers <code>expired</code></td><td>"Your price hold ran out", Start again</td></tr>
+    <tr><td>Server refuses the quote, before Pay</td><td>Attach answers <code>mismatch</code></td><td>"Couldn't start the payment. Nothing was charged"</td></tr>
+    <tr><td>Paying USDT on Polygon (F9)</td><td>Our calls sit in <code>originCalls</code>; the verifier only reads <code>destinationCalls</code>, so always <code>mismatch</code></td><td>"Couldn't start the payment" every time, until fixed (options in plan §3, Q27)</td></tr>
+    <tr><td>Listing bought by someone else while the money is on its way</td><td>The fill fails on Polygon; Trails refunds USDT</td><td>"Payment refunded" plus email</td></tr>
+    <tr><td>Same wallet buys it directly while its Trails payment runs (F1)</td><td>The server sees a sale to that buyer and calls it succeeded</td><td>Wrongly "is yours", no refund email, until the backend fixes F1</td></tr>
+    <tr><td>Widget asks the wallet twice and the second is rejected</td><td>The first already paid; Trails finishes</td><td>The widget's own "Try again" (P14), then our "X is yours"</td></tr>
+    <tr><td>Attach call itself fails (server busy, network)</td><td>Only logged today; the quote may never be stored</td><td>Nothing yet: fix A1 pending</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="files">12. Where the code is</h2>
+<div class="tablecard"><table>
+  <thead><tr><th>Layer</th><th>File</th><th>Job</th></tr></thead>
+  <tbody>
+    <tr><td class="grp" colspan="3">Talks to the backend (core)</td></tr>
+    <tr><td></td><td><code>core/services/trails/trailsBackend.service.ts</code></td><td>APIs 1 to 5, the only caller</td></tr>
+    <tr><td></td><td><code>core/services/trails/backendCheckoutSource.ts</code></td><td>prepare, attach, status on the server path; maps errors; wallet double check</td></tr>
+    <tr><td></td><td><code>core/services/trails/browserCheckoutSource.ts</code></td><td>The old browser path (rollback only)</td></tr>
+    <tr><td></td><td><code>core/services/trails/index.ts</code></td><td>Picks which of the two runs</td></tr>
+    <tr><td></td><td><code>core/services/trails/checkoutTracker.ts</code>, <code>watchCheckout.ts</code></td><td>App wide watching and polling</td></tr>
+    <tr><td></td><td><code>core/services/trails/checkoutStore.service.ts</code></td><td>localStorage: "seen" results, names, old browser path entries</td></tr>
+    <tr><td class="grp" colspan="3">Pure rules (helpers)</td></tr>
+    <tr><td></td><td><code>helpers/trails/intentStatus.ts</code></td><td>Statuses, when to stop, outcomes, poll timing, what to resume</td></tr>
+    <tr><td></td><td><code>helpers/trails/checkoutGate.ts</code></td><td>Show the option or not</td></tr>
+    <tr><td></td><td><code>helpers/trails/checkoutError.ts</code></td><td>Backend error codes to our errors</td></tr>
+    <tr><td class="grp" colspan="3">Hooks</td></tr>
+    <tr><td></td><td><code>hooks/trails/useTrailsCheckout.ts</code></td><td>The drawer's checkout: config, prepare, attach, Pay pressed, listen</td></tr>
+    <tr><td></td><td><code>hooks/trails/useTrailsTracker.ts</code></td><td>Resume on load and login, end toasts</td></tr>
+    <tr><td></td><td><code>hooks/trails/useTrailsPendingCheckouts.ts</code></td><td>/history banner</td></tr>
+    <tr><td class="grp" colspan="3">Screens</td></tr>
+    <tr><td></td><td><code>buying-flow/BuyFlowModal/BuyFlowModal.tsx</code></td><td>All Trails steps and screens</td></tr>
+    <tr><td></td><td><code>buying-flow/trails/TrailsWidgetLoader/TrailsWidget.tsx</code></td><td>The only file that imports the Trails widget</td></tr>
+    <tr><td></td><td><code>pages/_app.tsx</code> (<code>TrailsPurchaseWatcher</code>)</td><td>Mounts the tracker inside the login provider</td></tr>
+    <tr><td class="grp" colspan="3">Types, settings, wording</td></tr>
+    <tr><td></td><td><code>types/trails/checkout.ts</code>, <code>config.ts</code></td><td>Every shape above</td></tr>
+    <tr><td></td><td><code>constants/trails.ts</code></td><td>Env switch, key, which path runs</td></tr>
+    <tr><td></td><td><code>data/trails/copy.ts</code></td><td>Shared wording for drawer and toasts</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="review">13. What Mohit's code review found (18 Nov) and what changed</h2>
+<p class="muted">Review of <code>02cd1d9</code>. All three are fixed on the frontend (uncommitted). Details: <a href="trails-backend-progress.html#code-review">progress doc, "Code review by Mohit"</a>.</p>
+<div class="issue"><span class="n">R1</span><div><p><b>The drawer could say "Nothing was charged" after the buyer had paid.</b> On every quote we ask the server (attach) whether the quote is fine. If the answer was "mismatch" or "expired", the drawer closed the widget and said nothing was charged. But that answer can arrive a second or two <i>after</i> the buyer pressed Pay, so the buyer would read "nothing was charged" while their money was moving. Second half: a checkout that ended as mismatch was always closed silently, even if paid. Third half (backend): when the first quote fails the check, the server marks the checkout mismatch and doesn't save that intent, so a paid one is never tracked and gets no refund email.</p><p><b>Why it matters to us:</b> it needs the server to wrongly refuse a good quote, which is exactly what F9 does today with Polygon USDT.</p><p><b>Fix:</b> once Pay is pressed (widget <code>onSign</code>) the drawer ignores late refusals and keeps following the purchase. A refused checkout is silent only if nothing was paid; if a payment shows, we keep watching until the real result (success or refund), as the backend developer asked on 18 Nov. Pay pressed with no payment showing yet is watched 15 minutes, then "Payment didn't go through… Trails refunds it". The Pay flag is never undone by a rejected wallet request. Backend half: being fixed in their Sprint 21 (keep tracking a paid refused intent and send the normal emails).</p></div></div>
+<div class="card">
+  <h4 style="margin-top:0">R1 in easy words</h4>
+  <p>Think of it as two messages that can arrive in the wrong order.</p>
+  <p><b>How it works:</b> the widget shows a price (say 0.14 USDC). In the background, the drawer asks our server "is this price okay?". The server answers "okay" or "doesn't match". On "doesn't match" the drawer closes the widget and says <b>"Couldn't start the payment. Nothing was charged."</b> That's correct, if the buyer hasn't paid yet.</p>
+  <p><b>The problem is timing.</b> The server's answer takes a second or two. A fast buyer may already have pressed Pay and approved in their wallet:</p>
+  <div class="tablecard"><table>
+    <thead><tr><th>Time</th><th>What happens</th></tr></thead>
+    <tbody>
+      <tr><td>0 s</td><td>The widget shows the price; the drawer asks the server "is this okay?"</td></tr>
+      <tr><td>1 s</td><td>The buyer presses <b>Pay</b> and approves. <b>Money leaves their wallet.</b></td></tr>
+      <tr><td>2 s</td><td>The server's answer arrives: "doesn't match"</td></tr>
+      <tr><td>2 s</td><td>The drawer says <b>"Nothing was charged"</b>. Wrong: they just paid.</td></tr>
+    </tbody>
+  </table></div>
+  <p><b>Then it gets worse.</b> Our frontend closed that purchase silently, so no "payment failed" message ever came. Our server never saved that refused price, so it doesn't follow the payment either, and if Trails refunds it, no refund email goes out. The buyer paid, was told they didn't, and nobody follows up.</p>
+  <p><b>Can it really happen?</b> Only if the server wrongly refuses a good price. Mohit says that should never happen, but F9 shows it does: today the server refuses every good Polygon USDT price.</p>
+  <p><b>What we changed (frontend):</b></p>
+  <ol>
+    <li>Once Pay is pressed, the drawer ignores a late "doesn't match": the widget stays and we keep following the purchase.</li>
+    <li>"Doesn't match" is silent only if nothing was paid. If money moved, we keep watching until the real result and show it: "is yours" or "Payment refunded" (backend developer's request, 18 Nov). Only if no result shows in time does the buyer see <b>"Payment didn't go through. If money left your wallet, Trails refunds it."</b></li>
+    <li>Cancelling a second wallet popup doesn't undo it: in T5 the first approval had already sent the money, so once Pay is pressed we always assume money may have moved.</li>
+  </ol>
+  <p><b>What Mohit's team must change (backend):</b> if Trails reports money arrived for a price the server refused, keep following it and raise an alert, so the buyer still gets the refund email. The backend developer confirmed on 18 Nov this is being done in Sprint 21, after which both sides agree on the final status.</p>
+</div>
+<div class="issue"><span class="n">R2</span><div><p><b>A new device showed old results again.</b> After a load we toasted every finished purchase of the last 24 hours that <i>this browser</i> hadn't shown. "Already shown" is remembered per browser, so logging in on a new phone popped up "X is yours" for purchases the buyer had already seen on the laptop.</p><p><b>Fix:</b> after a load we only pick up running purchases and refunds (his suggestion). A failed one only while it can still become a refund (20 minutes). A refund can still show once per device, on purpose: it's money they must know about.</p></div></div>
+<div class="issue"><span class="n">R3</span><div><p><b>Logging in later didn't pick up running purchases.</b> We read the purchase list once, when the app first loaded, and only if the buyer was already logged in. Logging in afterwards (same session, no reload) missed them.</p><p><b>Fix:</b> the list is read on load and again on every login, using the same login signal the rest of the app uses. The code moved into <code>TrailsPurchaseWatcher</code> in <code>pages/_app.tsx</code>, inside the login provider, so it can see logins.</p></div></div>
+<p class="muted">Earlier, on 11 Nov, Mohit reviewed the browser path and raised six points, all fixed then (commit <code>1622027</code>): the Trails code loaded on every page (now loaded only when needed), tracking tied to the drawer (now the app wide tracker), refund wording, slippage, unpaid "agreed" quotes polled forever (now 15 minutes), and widget console logs. Write up: <a href="trails-mohit-review.html">trails-mohit-review.html</a>.</p>
+
+<h2 id="open">14. Still open</h2>
+<div class="card">
+  <ul>
+    <li><b>F9</b> Polygon USDT refused: option 1 (backend reads <code>originCalls</code>) or option 2 (keep Polygon USDT out of Trails), Q27; test T18 first.</li>
+    <li><b>F1</b> same wallet race shown as success, no refund email: backend fix.</li>
+    <li><b>R1 backend half</b>: keep tracking a paid intent the backend refused, and alert.</li>
+    <li><b>A1</b>: retry a failed attach, and stop the buyer before Pay if it still fails.</li>
+    <li>Mohit's answers: Q18, Q27, Q28, wording W1 to W5. Phase 7 (receipt note), phase 8 (refund wording), phase 9 (remove the browser path).</li>
+    <li>Tests: T6 (with R3), T7, T11, T15, T18, and the no money ones. T5, T8, T9 and T17 passed on 18 Nov.</li>
+  </ul>
+</div>
+
+<footer>Written 18 Nov 2026, after the code review fixes R1 to R3 (uncommitted).</footer>
+</div>
+<script>
+  document.getElementById('toggle').addEventListener('click', function () {
+    var root = document.documentElement;
+    var current = root.getAttribute('data-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('dmplan-theme', next); } catch (e) {}
+  });
+</script>
+</body>
+</html>

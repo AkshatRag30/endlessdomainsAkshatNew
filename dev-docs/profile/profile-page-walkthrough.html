@@ -1,0 +1,590 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Profile Page Walkthrough</title>
+<script>
+  try {
+    var saved = localStorage.getItem('dmplan-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  } catch (e) {}
+</script>
+<style>
+  :root {
+    --bg: #f9f9f9; --surface: #ffffff; --surface-soft: #f3f4fe; --band: #f5f6fa;
+    --text: #111111; --text-muted: #5b5b66; --border: #e6e6e6;
+    --accent: #2639ED; --accent-soft: #e9ebfd;
+    --wait: #8a3ff0; --wait-soft: #f4eefe;
+    --ok: #12805c; --ok-soft: #e4f5ee;
+    --warn: #b4540a; --warn-soft: #fdf1e4;
+    --bad: #c4314b; --bad-soft: #fdecef;
+    --code-bg: #f4f5f8;
+    --k-page: #2639ED; --k-panel: #8a3ff0; --k-composite: #5b5fd6; --k-primitive: #0f7f86;
+    --k-hook: #c2410c; --k-helper: #15803d; --k-data: #a16207; --k-context: #be185d;
+    --k-type: #6b7280; --k-redux: #b91c1c; --k-service: #7c4a1e; --k-external: #475569;
+    --k-endpoint: #111827; --k-planned: #8b8b95;
+    --edge-uses: #2639ED; --edge-usedby: #8a3ff0; --edge-tour: #12805c; --edge-all: rgba(17,17,17,0.18);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f; --band: #0b0b0c;
+      --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+      --accent: #7f8cff; --accent-soft: #1d2150;
+      --wait: #b996fa; --wait-soft: #2c2142;
+      --ok: #4fd1a0; --ok-soft: #173229;
+      --warn: #f5a35c; --warn-soft: #3a2614;
+      --bad: #ff7d93; --bad-soft: #3a1c24;
+      --code-bg: #0b0b0c;
+      --k-page: #7f8cff; --k-panel: #b996fa; --k-composite: #a5a8ff; --k-primitive: #4fd1c5;
+      --k-hook: #fb923c; --k-helper: #4ade80; --k-data: #facc15; --k-context: #f472b6;
+      --k-type: #9ca3af; --k-redux: #f87171; --k-service: #d6a77a; --k-external: #94a3b8;
+      --k-endpoint: #e5e7eb; --k-planned: #8b8b95;
+      --edge-uses: #7f8cff; --edge-usedby: #b996fa; --edge-tour: #4fd1a0; --edge-all: rgba(255,255,255,0.16);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f; --band: #0b0b0c;
+    --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+    --accent: #7f8cff; --accent-soft: #1d2150;
+    --wait: #b996fa; --wait-soft: #2c2142;
+    --ok: #4fd1a0; --ok-soft: #173229;
+    --warn: #f5a35c; --warn-soft: #3a2614;
+    --bad: #ff7d93; --bad-soft: #3a1c24;
+    --code-bg: #0b0b0c;
+    --k-page: #7f8cff; --k-panel: #b996fa; --k-composite: #a5a8ff; --k-primitive: #4fd1c5;
+    --k-hook: #fb923c; --k-helper: #4ade80; --k-data: #facc15; --k-context: #f472b6;
+    --k-type: #9ca3af; --k-redux: #f87171; --k-service: #d6a77a; --k-external: #94a3b8;
+    --k-endpoint: #e5e7eb; --k-planned: #8b8b95;
+    --edge-uses: #7f8cff; --edge-usedby: #b996fa; --edge-tour: #4fd1a0; --edge-all: rgba(255,255,255,0.16);
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: "Satoshi", system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.6; }
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 48px 16px 80px; }
+  .prose { max-width: 900px; }
+  header.top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+  .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; }
+  h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.15; margin: 0 0 12px; }
+  .lede { color: var(--text-muted); margin: 0; max-width: 720px; }
+  .toggle, .btn { flex-shrink: 0; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 14px; cursor: pointer; }
+  .toggle:hover, .btn:hover { border-color: var(--accent); }
+  .btn[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+  .btn:focus-visible, .node:focus-visible, .toggle:focus-visible, .chip:focus-visible, .linkbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 32px; }
+  nav.toc a { font-size: 14px; text-decoration: none; color: var(--accent); background: var(--accent-soft); padding: 6px 12px; border-radius: 999px; }
+  h2 { font-size: 24px; margin: 52px 0 14px; }
+  h3 { font-size: 18px; margin: 24px 0 8px; }
+  p { margin: 0 0 14px; }
+  .muted { color: var(--text-muted); }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px 24px; margin-bottom: 16px; }
+  .card p:last-child { margin-bottom: 0; }
+  ul, ol { padding-left: 22px; margin: 0 0 14px; }
+  li { margin-bottom: 8px; }
+  code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .86em; background: var(--surface-soft); border-radius: 6px; padding: 1px 6px; overflow-wrap: anywhere; }
+  .quote { border-left: 4px solid var(--accent); background: var(--accent-soft); border-radius: 10px; padding: 16px 20px; margin: 0 0 16px; font-size: 17px; }
+  .callout { border-left: 4px solid var(--wait); background: var(--wait-soft); border-radius: 10px; padding: 14px 18px; margin: 0 0 16px; }
+  .callout p { margin: 0; }
+  .callout.ok { border-color: var(--ok); background: var(--ok-soft); }
+  .callout.warn { border-color: var(--warn); background: var(--warn-soft); }
+  .callout b.lbl { display: block; font-size: 13px; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+  ol.steps { counter-reset: s; list-style: none; padding: 0; }
+  ol.steps > li { counter-increment: s; position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px 18px 16px 60px; margin-bottom: 10px; }
+  ol.steps > li::before { content: counter(s); position: absolute; left: 16px; top: 16px; width: 30px; height: 30px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  ol.steps > li b.t { display: block; margin-bottom: 4px; }
+  .tablecard { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow-x: auto; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: 0; }
+  th { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+  .qa { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; margin-bottom: 10px; }
+  .qa summary { cursor: pointer; padding: 14px 18px; font-weight: 600; }
+  .qa div { padding: 0 18px 14px; }
+
+  /* ── The map ─────────────────────────────────────────────────────────── */
+  .controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0 0 10px; }
+  .controls label.search { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--border); background: var(--surface); border-radius: 999px; padding: 6px 12px; font-size: 14px; }
+  .controls input { border: 0; background: transparent; color: var(--text); font: inherit; font-size: 14px; width: 170px; outline: none; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 14px; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 4px 10px; font: inherit; font-size: 13px; cursor: pointer; }
+  .chip i { width: 10px; height: 10px; border-radius: 3px; background: var(--c); flex-shrink: 0; }
+  .chip[aria-pressed="false"] { opacity: .45; text-decoration: line-through; }
+  .chip small { color: var(--text-muted); }
+  .tours { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+  .tourbox { display: none; border: 1px solid var(--ok); background: var(--ok-soft); border-radius: 14px; padding: 14px 16px; margin: 0 0 12px; }
+  .tourbox.on { display: block; }
+  .tourbox .head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+  .tourbox .head b { font-size: 15px; }
+  .tourbox p { margin: 0 0 10px; }
+  .tourbox .nav { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .tourbox .count { font-size: 13px; color: var(--text-muted); }
+
+  .mapgrid { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; align-items: start; }
+  .map { position: relative; }
+  .map svg.edges { position: absolute; left: 0; top: 0; pointer-events: none; z-index: 1; overflow: visible; }
+  .band { background: var(--band); border: 1px solid var(--border); border-radius: 14px; padding: 10px 12px 12px; margin-bottom: 26px; }
+  .band h4 { margin: 0 0 8px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); }
+  .band .nodes { display: flex; flex-wrap: wrap; gap: 6px; }
+  .sides { display: grid; grid-template-columns: 1fr 1fr; gap: 0 18px; }
+  .side > h3 { margin: 0 0 8px; font-size: 14px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em; }
+  .node { position: relative; z-index: 2; border: 1px solid var(--border); border-left: 4px solid var(--c); background: var(--surface); color: var(--text); border-radius: 8px; padding: 4px 9px; font: inherit; font-size: 12.5px; line-height: 1.3; cursor: pointer; text-align: left; transition: opacity .15s, box-shadow .15s; }
+  .node:hover { box-shadow: 0 0 0 1px var(--c); }
+  .node.planned { border-style: dashed; border-left-style: dashed; }
+  .node.dim { opacity: .22; }
+  .node.sel { box-shadow: 0 0 0 2px var(--c); font-weight: 700; }
+  .node.match { box-shadow: 0 0 0 2px var(--warn); }
+  .node.hidden { display: none; }
+  .node .badge { display: none; margin-left: 6px; min-width: 18px; height: 18px; border-radius: 9px; background: var(--edge-tour); color: var(--bg); font-size: 11px; font-weight: 700; align-items: center; justify-content: center; padding: 0 5px; }
+  .node.tour .badge { display: inline-flex; }
+  .node.tour { box-shadow: 0 0 0 2px var(--edge-tour); font-weight: 700; }
+  path.e { fill: none; stroke-width: 1.6; }
+  path.e.uses { stroke: var(--edge-uses); }
+  path.e.usedby { stroke: var(--edge-usedby); }
+  path.e.tour { stroke: var(--edge-tour); stroke-width: 2.4; }
+  path.e.all { stroke: var(--edge-all); stroke-width: 1; }
+  path.e.dash { stroke-dasharray: 5 4; }
+
+  .details { position: sticky; top: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; font-size: 14px; max-height: calc(100vh - 24px); overflow: auto; }
+  .details h4 { margin: 0 0 6px; font-size: 17px; }
+  .details .kind { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; }
+  .details .kind i { width: 10px; height: 10px; border-radius: 3px; background: var(--c); }
+  .details p { margin: 0 0 10px; }
+  .details h5 { margin: 12px 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); }
+  .details .list { display: flex; flex-wrap: wrap; gap: 4px; }
+  .linkbtn { border: 1px solid var(--border); background: var(--surface-soft); color: var(--text); border-radius: 6px; padding: 2px 7px; font: inherit; font-size: 12px; cursor: pointer; }
+  .linkbtn:hover { border-color: var(--accent); }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; color: var(--text-muted); margin: 4px 0 18px; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend i { width: 22px; height: 0; border-top: 2px solid var(--c); }
+  .legend i.dash { border-top-style: dashed; }
+
+  footer { margin-top: 56px; font-size: 13px; color: var(--text-muted); }
+  @media (max-width: 1000px) {
+    .mapgrid { grid-template-columns: 1fr; }
+    .details { position: static; max-height: none; }
+  }
+  @media (max-width: 700px) {
+    header.top { flex-direction: column; }
+    .sides { grid-template-columns: 1fr; }
+    .card { padding: 18px; }
+    ol.steps > li { padding-left: 54px; }
+    .controls input { width: 130px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">Marketplace V2 · Profile and Settings · Walkthrough</p>
+      <h1>How the Profile page was built, start to finish</h1>
+      <p class="lede">For explaining the page to a senior: the short version, the full story in order, an interactive map of every primitive, composite, hook, Redux endpoint, service, mapper, helper and data file and how they connect, guided tours of four real flows, and the questions you'll likely get. Built from the code's real imports on the <code>profile-settings</code> branch, 15 October 2026.</p>
+    </div>
+    <button class="toggle" id="themeToggle" type="button">Toggle theme</button>
+  </header>
+
+  <nav class="toc">
+    <a href="#short">30 second version</a>
+    <a href="#story">The full story</a>
+    <a href="#map">Interactive map</a>
+    <a href="#layers">The layers</a>
+    <a href="#questions">Likely questions</a>
+    <a href="#demo">Showing it live</a>
+  </nav>
+
+  <div class="prose">
+  <h2 id="short">The 30 second version</h2>
+  <div class="quote">"I built the Profile and Settings page at <code>/profile</code> from the Figma section, with five tabs and a right rail, in light and dark. I first built it on sample data so the design could be reviewed, then restructured it to match how My Domains and Watchlist are built, and then connected it to the same APIs the main site's profile page uses. Everything the backend supports is real now. Everything else is clearly marked as sample data, with a list of what the backend still needs to add."</div>
+
+  <h2 id="story">The full story, in order</h2>
+  <ol class="steps">
+    <li><b class="t">Planning (14 Oct)</b>Started from the Figma frames, light and dark. Wrote a plan: a map of every frame, what already existed to reuse, the data each tab needs, which APIs existed and which didn't, and phases. Decided the route (<code>/profile?tab=…</code>), that a first visit follows the device theme, and that missing data would be sample data for now.</li>
+    <li><b class="t">Foundations</b>The route, one "My Profile" item in the sidebar and bottom nav, the header card, the five tabs with keyboard support, and the shell placement (the rail sits under the content on tablet).</li>
+    <li><b class="t">Form pieces</b>Built the inputs the design needed: text field, password field with a strength meter, phone field with country codes, switch, settings row, avatar upload. Where something already existed, extended it instead of duplicating: the dropdown got a form "field" variant, the button got a new size, the segmented toggle got a pill variant. Every extension is additive, so existing pages didn't change.</li>
+    <li><b class="t">The tabs, one phase each</b>Profile form with live preview, save, discard and the unsaved changes guard; the right rail; Security (sign in methods, change password, sessions); Wallets; Notifications; Preferences with System / Light / Dark following the device.</li>
+    <li><b class="t">QA</b>Checked all five tabs in light and dark at phone, tablet and desktop (40 screenshots), error states, keyboard and focus, and code rules (no <code>!important</code>, no inline styles). Fixed what came up, like the keyboard Tab order reaching the rail before the content.</li>
+    <li><b class="t">Restructure (15 Oct)</b>Noticed the first version had its own "service layer" folder no other page uses. Restructured to match My Domains and Watchlist: real data through the existing Redux endpoints, sample data in <code>src/data/profile</code>, one hook per file on the shared <code>useMockQuery</code> / <code>QueryResult</code>, mapping in <code>src/helpers/profile</code>, errors through the existing error helper.</li>
+    <li><b class="t">Real APIs (15 Oct)</b>Studied the main site's profile page and used the same endpoints: load and save the profile, email verification, change password (signs you out after, like the main site), the wallet list. Wallet linking follows the seniors' rule: one EVM and one Solana wallet; Add Another Wallet links whichever is missing. Copied the main site's rules, like locking the email for Google accounts and verified addresses.</li>
+    <li><b class="t">Right rail check (15 Oct)</b>Checked whether the rail can be real: domains owned and listed can come from the call My Domains uses; sales need the backend to confirm one endpoint on stage; member since needs one field added to the user response; export and delete have no endpoint. Recorded in the plan (§14.6); not built yet.</li>
+  </ol>
+  </div>
+
+  <h2 id="map">Interactive map</h2>
+  <p class="muted prose">Every box is a real file or folder the profile page uses, and every line is a real import (plus the backend calls). <b>Click a box</b> to see what it uses (blue) and what uses it (purple), with a description on the right. Or start a <b>tour</b> to walk through a real flow step by step. The filters hide whole kinds; the search highlights matches.</p>
+
+  <div class="tours" role="group" aria-label="Guided tours">
+    <button class="btn" type="button" data-tour="save">Tour: load and save your name</button>
+    <button class="btn" type="button" data-tour="switch">Tour: flip a notification switch</button>
+    <button class="btn" type="button" data-tour="wallet">Tour: link a Solana wallet</button>
+    <button class="btn" type="button" data-tour="password">Tour: change your password</button>
+    <button class="btn" type="button" data-tour="rail">Planned: real rail stats</button>
+  </div>
+  <div class="tourbox" id="tourbox" aria-live="polite">
+    <div class="head"><b id="tourTitle"></b><span class="count" id="tourCount"></span></div>
+    <p id="tourText"></p>
+    <div class="nav">
+      <button class="btn" type="button" id="tourPrev">Previous</button>
+      <button class="btn" type="button" id="tourNext">Next</button>
+      <button class="btn" type="button" id="tourEnd">End tour</button>
+    </div>
+  </div>
+
+  <div class="controls">
+    <label class="search">Search <input id="search" type="search" placeholder="e.g. useLinkWallet" autocomplete="off"></label>
+    <button class="btn" type="button" id="chainBtn" aria-pressed="false">Follow the whole chain</button>
+    <button class="btn" type="button" id="allBtn" aria-pressed="false">Show every connection</button>
+    <button class="btn" type="button" id="typesBtn" aria-pressed="false">Include type imports</button>
+    <button class="btn" type="button" id="clearBtn">Clear</button>
+  </div>
+  <div class="chips" id="chips" role="group" aria-label="Show or hide kinds"></div>
+  <div class="legend">
+    <span><i style="--c: var(--edge-uses)"></i>uses</span>
+    <span><i style="--c: var(--edge-usedby)"></i>used by</span>
+    <span><i style="--c: var(--edge-tour)"></i>tour step</span>
+    <span><i class="dash" style="--c: var(--k-planned)"></i>planned / backend call</span>
+  </div>
+
+  <div class="mapgrid">
+    <div class="map" id="flowmap">
+      <svg class="edges" id="edges" aria-hidden="true"></svg>
+      <div class="band" data-band="top"><h4>Page and layout</h4><div class="nodes"></div></div>
+      <div class="band" data-band="panel"><h4>Tab panels and rail (they call the hooks)</h4><div class="nodes"></div></div>
+      <div class="sides">
+        <div class="side">
+          <h3>UI side</h3>
+          <div class="band" data-band="composite"><h4>Composites (cards)</h4><div class="nodes"></div></div>
+          <div class="band" data-band="primitive"><h4>Primitives</h4><div class="nodes"></div></div>
+        </div>
+        <div class="side">
+          <h3>Data side</h3>
+          <div class="band" data-band="hook"><h4>Hooks</h4><div class="nodes"></div></div>
+          <div class="band" data-band="support"><h4>Helpers, mappers, data, context, types</h4><div class="nodes"></div></div>
+          <div class="band" data-band="redux"><h4>Redux (RTK Query), services, libraries</h4><div class="nodes"></div></div>
+          <div class="band" data-band="endpoint"><h4>Backend endpoints</h4><div class="nodes"></div></div>
+        </div>
+      </div>
+    </div>
+    <aside class="details" id="details" aria-live="polite">
+      <h4>Pick a box</h4>
+      <p class="muted">Click any box in the map, or start a tour. You'll see what the piece does, its file, what it uses and what uses it.</p>
+    </aside>
+  </div>
+
+  <div class="prose">
+  <h2 id="layers">The layers, in plain words</h2>
+  <div class="tablecard"><table>
+    <thead><tr><th>Layer</th><th>What it is</th><th>Where</th></tr></thead>
+    <tbody id="layerRows"></tbody>
+  </table></div>
+  <div class="callout ok"><p><b class="lbl">The one sentence</b>Components draw; tab panels call hooks; hooks get data either from Redux (real, the main site's APIs) or from <code>src/data/profile</code> (sample); mappers translate the backend's shape into the page's. The same structure as My Domains and Watchlist.</p></div>
+
+  <h2 id="questions">Questions you'll likely get</h2>
+  <details class="qa"><summary>Why Redux?</summary><div>The app already uses RTK Query, and the profile endpoints were already there. Reusing them means one shared, cached request with the header and wallet connect, and the login token is handled automatically. Only two endpoints were added (verification email, change password); nothing existing changed.</div></details>
+  <details class="qa"><summary>What's still fake?</summary><div>Username, bio, location, website and photo (no backend column; kept until reload, with a note); account stats; sessions; wallet network settings; notifications; preferences (the theme itself is real, on the device); export and delete. Each such card shows a "Sample data" chip. The list for the backend team is in the plan, §8.2.</div></details>
+  <details class="qa"><summary>Can the right rail be real?</summary><div>Domains owned and listed, yes, today, from <code>GET /marketplacev2/orders/my-domains</code> (the My Domains call). Completed sales and volume sold probably, once the backend confirms <code>status=SOLD</code> works on stage. Member since needs <code>createdDateTime</code> added to the user response. Export and delete have no endpoint. Plan §14.6.</div></details>
+  <details class="qa"><summary>Did you test it?</summary><div>Type check, lint and helper tests are clean. Browser tests with the APIs simulated: load, save (the exact body sent was checked), verify email, wrong password, change password to the login page, Telegram disconnect, the Google email lock, all three wallet states, and Add opening the wallet pop up; all five tabs in light and dark at phone and desktop. Not yet: a real login on stage, and a real wallet signature.</div></details>
+  <details class="qa"><summary>Anything you'd do differently?</summary><div>Check how the sibling pages are built before designing the data layer; the first version had its own service layer and had to be restructured. Also, the cached profile doesn't refresh on its own after a save (no cache tag), so the hooks refetch it.</div></details>
+  <details class="qa"><summary>Did anything else in the app change?</summary><div>Only small additive changes to shared pieces: the page shell, dropdown, buttons, info card, segmented toggle, the theme context, the endpoints enum, two Redux endpoints and the navigation item. Other pages were rechecked. The backend and main site repos are untouched.</div></details>
+
+  <h2 id="demo">Showing it live</h2>
+  <div class="card">
+    <ol>
+      <li>Open <code>/profile</code> and click through the five tabs; switch the theme in the Preferences tab.</li>
+      <li>On this page, run the "load and save your name" tour to show how data flows.</li>
+      <li>For the details, keep these open: <code>dev-docs/profile/profile-data-layer-guide.html</code> (beginner guide, the "Real or sample?" table), <code>dev-docs/profile/profile-settings-implementation-plan.md</code> (decisions and next steps, start at §14), <code>dev-docs/profile/profile-settings-progress.html</code> (every file).</li>
+    </ol>
+  </div>
+  </div>
+
+  <footer>Generated 15 October 2026 from the import graph of <code>pages/profile/index.tsx</code> on <code>profile-settings</code>. Local only, like the rest of <code>dev-docs</code>.</footer>
+</div>
+
+<script>
+var DATA = {"nodes":[{"id":"profile","label":"/profile route","file":"pages/profile/index.tsx","desc":"The page itself. Reads ?tab= from the URL, puts the header and tabs in the hero, renders the active tab panel and the rail inside the marketplace shell, and guards unsaved edits (a drawer on tab switch, a browser prompt when leaving). Shows the wallet count on the Wallets tab.","kind":"page"},{"id":"wagmi","label":"wagmi config","file":"src/config/wagmi.ts","desc":"Existing wagmi adapter and project id for Reown AppKit. Unchanged.","kind":"service"},{"id":"Api","label":"constants/Api","file":"src/constants/Api.ts","desc":"Existing URL constants; got ChangePasswordApi and ResendVerificationEmailApi.","kind":"redux"},{"id":"AuthContext","label":"AuthContext","file":"src/context/AuthContext.tsx","desc":"Existing auth context: logout() after a password change or a real delete.","kind":"context"},{"id":"ThemeContext","label":"ThemeContext","file":"src/context/ThemeContext.tsx","desc":"Existing theme context; got the System / Light / Dark preference that follows the device.","kind":"context"},{"id":"api-endpoint","label":"API_ENDPOINT enum","file":"src/core/enum/api-endpoint.enum.ts","desc":"Existing endpoint paths; got ADD_SOLANA_WALLET_USER_API.","kind":"redux"},{"id":"api","label":"myApi (RTK instance)","file":"src/core/redux/api.ts","desc":"Existing RTK Query instance: base URL and the login token on every request. Unchanged.","kind":"redux"},{"id":"userProfile","label":"userProfile.ts (RTK Query)","file":"src/core/redux/userProfile.ts","desc":"Existing RTK Query endpoints: getUserProfile, setProfile; added resendVerificationEmail and changePassword.","kind":"redux"},{"id":"api.service","label":"api.service","file":"src/core/services/api.service.ts","desc":"Existing axios/fetch helpers (postApi). Unchanged.","kind":"service"},{"id":"wallet.service","label":"wallet.service","file":"src/core/services/wallet.service.ts","desc":"Existing wallet helpers: getNonce, buildWalletSignMessage, connectWallet. Unchanged.","kind":"service"},{"id":"countries","label":"countries","file":"src/data/countries.ts","desc":"Every country from libphonenumber-js with its dial code and emoji flag, plus the search the phone field uses (copied from the main site).","kind":"data"},{"id":"domains","label":"marketplace domains data","file":"src/data/marketplace/domains.ts","desc":"Existing chain constants and logos (settlement network select).","kind":"data"},{"id":"fixtures","label":"fixtures","file":"src/data/profile/fixtures.ts","desc":"SAMPLE DATA. Values from the Figma frames for the areas with no backend.","kind":"data"},{"id":"store","label":"sample store","file":"src/data/profile/store.ts","desc":"SAMPLE DATA. One shared store (useSyncExternalStore), like the watchlist's sample store; resets on reload.","kind":"data"},{"id":"supportedTlds","label":"supportedTlds","file":"src/data/supportedTlds.ts","desc":"Existing: EVM_NETWORK constant used when linking an EVM wallet.","kind":"data"},{"id":"MarketplacePageShell","label":"MarketplacePageShell","file":"src/design-system/composites/marketplace/shared/MarketplacePageShell","desc":"Existing page grid (hero, main, rail). Got an additive \"after-main-tablet\" rail placement so the rail sits under the tabs on tablet.","kind":"layout"},{"id":"NotificationChannels","label":"NotificationChannels","file":"composites/profile/notifications/NotificationChannels","desc":"Email (Primary) and Telegram (Set up or Disconnect).","kind":"composite"},{"id":"NotificationSwitches","label":"NotificationSwitches","file":"composites/profile/notifications/NotificationSwitches","desc":"The five alert switch rows.","kind":"composite"},{"id":"NotificationsTabPanel","label":"NotificationsTabPanel","file":"composites/profile/notifications/NotificationsTabPanel","desc":"Notifications tab container: five alert switches (sample, optimistic with rollback) and the Telegram channel (real, saved through PUT /users).","kind":"panel"},{"id":"DisplayPreferencesCard","label":"DisplayPreferencesCard","file":"composites/profile/preferences/DisplayPreferencesCard","desc":"Theme pill and the currency, language, date and time selects.","kind":"composite"},{"id":"PreferencesTabPanel","label":"PreferencesTabPanel","file":"composites/profile/preferences/PreferencesTabPanel","desc":"Preferences tab container: the theme (real, saved on the device through ThemeContext) and the other preferences (sample).","kind":"panel"},{"id":"PrivacyPreferencesCard","label":"PrivacyPreferencesCard","file":"composites/profile/preferences/PrivacyPreferencesCard","desc":"Public portfolio and sales history switches.","kind":"composite"},{"id":"ProfileInformationForm","label":"ProfileInformationForm","file":"composites/profile/profile/ProfileInformationForm","desc":"All profile fields: photo, name, username, email (locked for Google and verified addresses), phone, Telegram, bio, location, website, and the note about fields kept until reload.","kind":"composite"},{"id":"ProfileTabPanel","label":"ProfileTabPanel","file":"composites/profile/profile/ProfileTabPanel","desc":"Profile tab container: loading skeleton, error with Retry, the form and preview, Save changes and Discard, verification toasts.","kind":"panel"},{"id":"PublicPreviewCard","label":"PublicPreviewCard","file":"composites/profile/profile/PublicPreviewCard","desc":"Live preview of the unsaved draft plus the stats.","kind":"composite"},{"id":"AccountSummaryCard","label":"AccountSummaryCard","file":"composites/profile/rail/AccountSummaryCard","desc":"Account rail card: member since, domains owned, volume sold, completed sales.","kind":"composite"},{"id":"ProfileRail","label":"ProfileRail","file":"composites/profile/rail/ProfileRail","desc":"Right rail container: Account summary and Your Data (both sample today; see plan §14.6).","kind":"panel"},{"id":"YourDataCard","label":"YourDataCard","file":"composites/profile/rail/YourDataCard","desc":"Export my data and Delete account (typed confirmation).","kind":"composite"},{"id":"ActiveSessionsList","label":"ActiveSessionsList","file":"composites/profile/security/ActiveSessionsList","desc":"Signed in devices, Sign Out and Sign Out Everywhere Else.","kind":"composite"},{"id":"ChangePasswordForm","label":"ChangePasswordForm","file":"composites/profile/security/ChangePasswordForm","desc":"Current, new (with strength meter) and confirm password; the 401 shows under Current password.","kind":"composite"},{"id":"SecurityTabPanel","label":"SecurityTabPanel","file":"composites/profile/security/SecurityTabPanel","desc":"Security tab container: sign in methods, change password (signs out after, like the main site), active sessions.","kind":"panel"},{"id":"SignInMethodsCard","label":"SignInMethodsCard","file":"composites/profile/security/SignInMethodsCard","desc":"One card per sign in method; Disconnect Google shows \"Coming soon\".","kind":"composite"},{"id":"ConfirmDrawer","label":"ConfirmDrawer","file":"composites/profile/shared/ConfirmDrawer","desc":"The shared confirm step on the existing Modal drawer (discard edits, sign out, delete, disconnect Telegram).","kind":"composite"},{"id":"NoteBox","label":"NoteBox","file":"composites/profile/shared/NoteBox","desc":"The tinted note box (no KYC, EVM, local fields notes).","kind":"composite"},{"id":"ProfileSettingsHeader","label":"ProfileSettingsHeader","file":"composites/profile/shared/ProfileSettingsHeader","desc":"The \"Profile And Settings\" title card.","kind":"pagepart"},{"id":"ProfileTabs","label":"ProfileTabs","file":"composites/profile/shared/ProfileTabs","desc":"The five tabs: a real tablist with arrow, Home and End keys, the wallet count badge, sideways scroll on mobile.","kind":"pagepart"},{"id":"SettingsCard","label":"SettingsCard","file":"composites/profile/shared/SettingsCard","desc":"The section card every tab uses: title, subtitle, action, Sample data chip.","kind":"composite"},{"id":"SettingsCardSkeleton","label":"SettingsCardSkeleton","file":"composites/profile/shared/SettingsCardSkeleton","desc":"The loading placeholder card.","kind":"composite"},{"id":"SuccessChip","label":"SuccessChip","file":"composites/profile/shared/SuccessChip","desc":"Green status chip: Active, Connected, Primary.","kind":"composite"},{"id":"ConnectedWalletsCard","label":"ConnectedWalletsCard","file":"composites/profile/wallets/ConnectedWalletsCard","desc":"Wallet cards and the Add buttons by the seniors' rule (one EVM, one Solana); Disconnect shows \"Coming soon\".","kind":"composite"},{"id":"DefaultNetworkCard","label":"DefaultNetworkCard","file":"composites/profile/wallets/DefaultNetworkCard","desc":"Settlement network select and Hide domains from other wallets.","kind":"composite"},{"id":"WalletsTabPanel","label":"WalletsTabPanel","file":"composites/profile/wallets/WalletsTabPanel","desc":"Wallets tab container: the real wallet list, linking the missing EVM or Solana wallet, the default network settings.","kind":"panel"},{"id":"main-layout","label":"MainLayout","file":"src/design-system/layouts/main-layout","desc":"Existing site layout: header, sidebar, mobile drawer and bottom nav. Changed only to highlight Account on /profile.","kind":"layout"},{"id":"avatar-upload","label":"AvatarUpload","file":"primitives/avatars/avatar-upload","desc":"New primitive: avatar with camera badge, Upload/Remove, PNG/JPG up to 2 MB, initials fallback.","kind":"primitive"},{"id":"sample-data-chip","label":"SampleDataChip","file":"primitives/badges/sample-data-chip","desc":"New primitive: the \"Sample data\" marker on cards whose hook returns isMock.","kind":"primitive"},{"id":"info-note","label":"InfoNote","file":"primitives/banners/info-note","desc":"Existing primitive, reused for notes.","kind":"primitive"},{"id":"notice-banner","label":"NoticeBanner","file":"primitives/banners/notice-banner","desc":"Existing primitive, reused for per card errors with Retry.","kind":"primitive"},{"id":"default-buttons","label":"DefaultButton","file":"primitives/buttons/default-buttons","desc":"Existing primitive; got an additive size=\"lg\" (Upload/Remove, Retry).","kind":"primitive"},{"id":"primary-button","label":"PrimaryButton","file":"primitives/buttons/primary-button","desc":"Existing primitive, reused for every main action.","kind":"primitive"},{"id":"info-list-card","label":"InfoListCard","file":"primitives/cards/info-list-card","desc":"Existing rail card (My Domains, Watchlist); got additive tone=\"danger\" and fitContent.","kind":"primitive"},{"id":"settings-row","label":"SettingsRow","file":"primitives/cards/settings-row","desc":"New primitive: the bevelled settings row; the control is named by the row for screen readers.","kind":"primitive"},{"id":"overview-icons","label":"overview icons","file":"primitives/icons/overview-icons","desc":"Existing icons used by InfoNote.","kind":"primitive"},{"id":"profile-icons","label":"ProfileIcons","file":"primitives/icons/profile-icons","desc":"New: the five tab icons as currentColor components.","kind":"primitive"},{"id":"filter-dropdown","label":"FilterDropdown","file":"primitives/inputs/filter-dropdown","desc":"Existing dropdown; got an additive variant=\"field\" (form select) and keyboard support, instead of a new SelectField.","kind":"primitive"},{"id":"password-field","label":"PasswordField","file":"primitives/inputs/password-field","desc":"New primitive: TextField plus the eye, and the strength meter.","kind":"primitive"},{"id":"phone-field","label":"PhoneField","file":"primitives/inputs/phone-field","desc":"New primitive: a searchable country list inside FilterDropdown (the main site's design) plus the number (TextField).","kind":"primitive"},{"id":"text-field","label":"TextField","file":"primitives/inputs/text-field","desc":"New primitive: label, helper or error, counter, multiline (folded in instead of a separate TextArea).","kind":"primitive"},{"id":"fade-scroll-list","label":"FadeScrollList","file":"primitives/lists/fade-scroll-list","desc":"Existing list with the scroll fade, used by InfoListCard.","kind":"primitive"},{"id":"modal","label":"Modal","file":"primitives/modal","desc":"Existing right side drawer, under ConfirmDrawer.","kind":"primitive"},{"id":"toast-message","label":"ToastMessage","file":"primitives/toast-message","desc":"Existing toasts for success and error messages.","kind":"primitive"},{"id":"segmented-toggle","label":"SegmentedToggle","file":"primitives/toggles/segmented-toggle","desc":"Existing toggle; got an additive variant=\"pill\" for System / Light / Dark.","kind":"primitive"},{"id":"switch","label":"Switch","file":"primitives/toggles/switch","desc":"New primitive: role=\"switch\" toggle.","kind":"primitive"},{"id":"chaincurrency","label":"chaincurrency","file":"src/helpers/chaincurrency/chaincurrency.ts","desc":"Existing chain and currency helpers (currency icon).","kind":"helper"},{"id":"displayFormat","label":"displayFormat","file":"src/helpers/displayFormat.ts","desc":"Date and time format previews for Preferences.","kind":"helper"},{"id":"error-messages","label":"error-messages","file":"src/helpers/error-messages","desc":"Existing helper: turns any API error into a readable sentence (getUserFriendlyToastMessage).","kind":"helper"},{"id":"routes","label":"routes","file":"src/helpers/marketplace/routes.ts","desc":"Existing route helpers; got PROFILE_HREF and profileHref(tab).","kind":"helper"},{"id":"passwordStrength","label":"passwordStrength","file":"src/helpers/passwordStrength.ts","desc":"The backend's password rule and the strength meter levels.","kind":"helper"},{"id":"phone","label":"phone","file":"src/helpers/phone.ts","desc":"Phone number cleanup, the main site's 7 to 15 digit rule, and splitting \"+<dial><number>\".","kind":"helper"},{"id":"mapUser","label":"mapUser","file":"src/helpers/profile/mapUser.ts","desc":"Mapper: backend User to the page's shapes (details, sign in methods, wallets), the PUT /users body, and which wallet is missing.","kind":"helper"},{"id":"validation","label":"validation","file":"src/helpers/profile/validation.ts","desc":"Field rules for the Profile form and change password; the changed fields diff.","kind":"helper"},{"id":"queryResult","label":"useMockQuery / QueryResult","file":"src/hooks/marketplace/domain-overview/queryResult.ts","desc":"Existing, shared with the domain overview and watchlist hooks: the QueryResult shape and the sample loading helper.","kind":"hook"},{"id":"useAccountSummary","label":"useAccountSummary","file":"src/hooks/profile/useAccountSummary.ts","desc":"SAMPLE. Account stats from the store (plan §14.6: domains owned and listed can go real).","kind":"hook"},{"id":"useActiveSessions","label":"useActiveSessions","file":"src/hooks/profile/useActiveSessions.ts","desc":"SAMPLE. Sessions, Sign Out, Sign Out Everywhere Else.","kind":"hook"},{"id":"useChangePassword","label":"useChangePassword","file":"src/hooks/profile/useChangePassword.ts","desc":"REAL. PUT /auth/change-password; a 401 becomes \"Your current password is incorrect.\"","kind":"hook"},{"id":"useConnectedWallets","label":"useConnectedWallets","file":"src/hooks/profile/useConnectedWallets.ts","desc":"REAL. The wallet list from the GET, which networks are missing, the user id; also useWalletCount for the tab badge.","kind":"hook"},{"id":"useLinkWallet","label":"useLinkWallet","file":"src/hooks/profile/useLinkWallet.ts","desc":"REAL. Links the missing wallet through Reown AppKit: EVM via nonce, signature and /web3-auth/verify; Solana via /web3-auth/solana-add-wallet.","kind":"hook"},{"id":"useNotificationSettings","label":"useNotificationSettings","file":"src/hooks/profile/useNotificationSettings.ts","desc":"SAMPLE. The five alert switches.","kind":"hook"},{"id":"useProfileAction","label":"useProfileAction","file":"src/hooks/profile/useProfileAction.ts","desc":"Helper hook: wraps a save with an isSaving flag.","kind":"hook"},{"id":"useProfileDetails","label":"useProfileDetails","file":"src/hooks/profile/useProfileDetails.ts","desc":"REAL. Reads the user (GET /users/user-multiple-wallet), saves name, email, phone and Telegram (PUT /users) then refetches, sends verification. Username, bio, location, website and photo come from the sample store.","kind":"hook"},{"id":"useProfileDraft","label":"useProfileDraft","file":"src/hooks/profile/useProfileDraft.ts","desc":"The Profile form's draft: errors on blur and submit, dirty tracking, sends only changed fields through useProfileDetails.","kind":"hook"},{"id":"useProfileMockArea","label":"useProfileMockArea","file":"src/hooks/profile/useProfileMockArea.ts","desc":"Helper hook: a short first load through useMockQuery, then the live value from the store.","kind":"hook"},{"id":"useProfilePreferences","label":"useProfilePreferences","file":"src/hooks/profile/useProfilePreferences.ts","desc":"SAMPLE. Currency, language, formats, privacy.","kind":"hook"},{"id":"useSignInMethods","label":"useSignInMethods","file":"src/hooks/profile/useSignInMethods.ts","desc":"REAL. Email, Google and wallet methods from the same cached GET.","kind":"hook"},{"id":"useWalletSettings","label":"useWalletSettings","file":"src/hooks/profile/useWalletSettings.ts","desc":"SAMPLE. Settlement network and hide other wallets.","kind":"hook"},{"id":"useYourData","label":"useYourData","file":"src/hooks/profile/useYourData.ts","desc":"SAMPLE. Export and delete only wait and succeed.","kind":"hook"},{"id":"Profile","label":"Profile type","file":"src/types/Profile.ts","desc":"Existing backend User type; got an optional telegram.","kind":"type"},{"id":"profile-settings","label":"profile-settings types","file":"src/types/profile-settings/index.ts","desc":"The page's data shapes (the \"recipe card\").","kind":"type"},{"id":"appkit","label":"Reown AppKit + wagmi (npm)","file":"@reown/appkit, @reown/appkit-adapter-solana, wagmi","desc":"Existing wallet libraries: the connect pop up, the EVM adapter and the installed (previously unused) Solana adapter, plus signing.","kind":"external"},{"id":"ep-get-user","label":"GET /users/user-multiple-wallet","file":"backend: user.controller","desc":"Reads the signed in user: name, email, phone, Telegram, verification, Google and wallet flags, wallets.","kind":"endpoint"},{"id":"ep-put-user","label":"PUT /users","file":"backend: user.controller (UpdateUserDto)","desc":"Saves name, email, phoneNumber, telegram, isVerified (all optional).","kind":"endpoint"},{"id":"ep-verify-email","label":"POST /auth/verification-email","file":"backend: auth","desc":"Sends the verification link: body { email }.","kind":"endpoint"},{"id":"ep-change-password","label":"PUT /auth/change-password","file":"backend: auth (ChangePasswordDto)","desc":"Body { oldPassword, newPassword }; 401 for a wrong current password.","kind":"endpoint"},{"id":"ep-nonce","label":"GET /web3-auth/generate-nonce","file":"backend: web3-auth","desc":"One time code for the EVM wallet to sign.","kind":"endpoint"},{"id":"ep-verify-wallet","label":"POST /web3-auth/verify","file":"backend: web3-auth","desc":"Checks the signature and adds the EVM wallet to the signed in account.","kind":"endpoint"},{"id":"ep-solana","label":"POST /web3-auth/solana-add-wallet","file":"backend: web3-auth","desc":"Adds a Solana wallet: { walletAddress, network, userId }.","kind":"endpoint"},{"id":"ep-my-domains","label":"GET /marketplacev2/orders/my-domains","file":"backend: marketplacev2 order controller","desc":"PLANNED for the rail (plan §14.6): domains owned and listed now; SOLD for sales once stage is confirmed. Already used by My Domains.","kind":"planned"},{"id":"useMyDomainsData","label":"useMyDomainsData","file":"src/hooks/my-domains/useMyDomainsData.ts","desc":"PLANNED reuse (plan §14.6 step 1): the My Domains hook, for domains owned and listed in the rail.","kind":"planned"}],"edges":[{"from":"profile","to":"main-layout","kind":"import"},{"from":"profile","to":"MarketplacePageShell","kind":"import"},{"from":"profile","to":"useConnectedWallets","kind":"import"},{"from":"profile","to":"profile-settings","kind":"type"},{"from":"profile","to":"routes","kind":"import"},{"from":"profile","to":"validation","kind":"import"},{"from":"validation","to":"countries","kind":"import"},{"from":"validation","to":"phone","kind":"import"},{"from":"validation","to":"passwordStrength","kind":"import"},{"from":"validation","to":"profile-settings","kind":"type"},{"from":"phone","to":"countries","kind":"import"},{"from":"routes","to":"profile-settings","kind":"type"},{"from":"useConnectedWallets","to":"userProfile","kind":"import"},{"from":"useConnectedWallets","to":"mapUser","kind":"import"},{"from":"useConnectedWallets","to":"queryResult","kind":"import"},{"from":"useConnectedWallets","to":"profile-settings","kind":"type"},{"from":"mapUser","to":"Profile","kind":"type"},{"from":"mapUser","to":"profile-settings","kind":"type"},{"from":"mapUser","to":"countries","kind":"import"},{"from":"mapUser","to":"phone","kind":"import"},{"from":"userProfile","to":"Profile","kind":"type"},{"from":"userProfile","to":"Api","kind":"import"},{"from":"userProfile","to":"api","kind":"import"},{"from":"PreferencesTabPanel","to":"notice-banner","kind":"import"},{"from":"PreferencesTabPanel","to":"default-buttons","kind":"import"},{"from":"PreferencesTabPanel","to":"toast-message","kind":"import"},{"from":"PreferencesTabPanel","to":"ThemeContext","kind":"import"},{"from":"PreferencesTabPanel","to":"error-messages","kind":"import"},{"from":"PreferencesTabPanel","to":"useProfilePreferences","kind":"import"},{"from":"PreferencesTabPanel","to":"profile-settings","kind":"type"},{"from":"PreferencesTabPanel","to":"DisplayPreferencesCard","kind":"import"},{"from":"PreferencesTabPanel","to":"PrivacyPreferencesCard","kind":"import"},{"from":"PreferencesTabPanel","to":"SettingsCardSkeleton","kind":"import"},{"from":"PrivacyPreferencesCard","to":"settings-row","kind":"import"},{"from":"PrivacyPreferencesCard","to":"switch","kind":"import"},{"from":"PrivacyPreferencesCard","to":"SettingsCard","kind":"import"},{"from":"PrivacyPreferencesCard","to":"profile-settings","kind":"type"},{"from":"SettingsCard","to":"sample-data-chip","kind":"import"},{"from":"DisplayPreferencesCard","to":"settings-row","kind":"import"},{"from":"DisplayPreferencesCard","to":"filter-dropdown","kind":"import"},{"from":"DisplayPreferencesCard","to":"segmented-toggle","kind":"import"},{"from":"DisplayPreferencesCard","to":"SettingsCard","kind":"import"},{"from":"DisplayPreferencesCard","to":"chaincurrency","kind":"import"},{"from":"DisplayPreferencesCard","to":"displayFormat","kind":"import"},{"from":"DisplayPreferencesCard","to":"ThemeContext","kind":"import"},{"from":"DisplayPreferencesCard","to":"profile-settings","kind":"type"},{"from":"useProfilePreferences","to":"store","kind":"import"},{"from":"useProfilePreferences","to":"profile-settings","kind":"type"},{"from":"useProfilePreferences","to":"useProfileAction","kind":"import"},{"from":"useProfilePreferences","to":"useProfileMockArea","kind":"import"},{"from":"useProfileMockArea","to":"store","kind":"import"},{"from":"useProfileMockArea","to":"queryResult","kind":"import"},{"from":"store","to":"profile-settings","kind":"type"},{"from":"store","to":"fixtures","kind":"import"},{"from":"fixtures","to":"profile-settings","kind":"type"},{"from":"NotificationsTabPanel","to":"notice-banner","kind":"import"},{"from":"NotificationsTabPanel","to":"default-buttons","kind":"import"},{"from":"NotificationsTabPanel","to":"toast-message","kind":"import"},{"from":"NotificationsTabPanel","to":"error-messages","kind":"import"},{"from":"NotificationsTabPanel","to":"useNotificationSettings","kind":"import"},{"from":"NotificationsTabPanel","to":"useProfileDetails","kind":"import"},{"from":"NotificationsTabPanel","to":"profile-settings","kind":"type"},{"from":"NotificationsTabPanel","to":"NotificationSwitches","kind":"import"},{"from":"NotificationsTabPanel","to":"NotificationChannels","kind":"import"},{"from":"NotificationsTabPanel","to":"SettingsCardSkeleton","kind":"import"},{"from":"NotificationsTabPanel","to":"ConfirmDrawer","kind":"import"},{"from":"ConfirmDrawer","to":"modal","kind":"import"},{"from":"ConfirmDrawer","to":"primary-button","kind":"import"},{"from":"ConfirmDrawer","to":"default-buttons","kind":"import"},{"from":"NotificationChannels","to":"settings-row","kind":"import"},{"from":"NotificationChannels","to":"primary-button","kind":"import"},{"from":"NotificationChannels","to":"SettingsCard","kind":"import"},{"from":"NotificationChannels","to":"SuccessChip","kind":"import"},{"from":"NotificationSwitches","to":"settings-row","kind":"import"},{"from":"NotificationSwitches","to":"switch","kind":"import"},{"from":"NotificationSwitches","to":"SettingsCard","kind":"import"},{"from":"NotificationSwitches","to":"profile-settings","kind":"type"},{"from":"useProfileDetails","to":"userProfile","kind":"import"},{"from":"useProfileDetails","to":"store","kind":"import"},{"from":"useProfileDetails","to":"mapUser","kind":"import"},{"from":"useProfileDetails","to":"queryResult","kind":"import"},{"from":"useProfileDetails","to":"profile-settings","kind":"type"},{"from":"useProfileDetails","to":"useProfileAction","kind":"import"},{"from":"useNotificationSettings","to":"store","kind":"import"},{"from":"useNotificationSettings","to":"profile-settings","kind":"type"},{"from":"useNotificationSettings","to":"useProfileAction","kind":"import"},{"from":"useNotificationSettings","to":"useProfileMockArea","kind":"import"},{"from":"WalletsTabPanel","to":"notice-banner","kind":"import"},{"from":"WalletsTabPanel","to":"default-buttons","kind":"import"},{"from":"WalletsTabPanel","to":"toast-message","kind":"import"},{"from":"WalletsTabPanel","to":"error-messages","kind":"import"},{"from":"WalletsTabPanel","to":"useConnectedWallets","kind":"import"},{"from":"WalletsTabPanel","to":"useLinkWallet","kind":"import"},{"from":"WalletsTabPanel","to":"useWalletSettings","kind":"import"},{"from":"WalletsTabPanel","to":"profile-settings","kind":"type"},{"from":"WalletsTabPanel","to":"ConnectedWalletsCard","kind":"import"},{"from":"WalletsTabPanel","to":"DefaultNetworkCard","kind":"import"},{"from":"WalletsTabPanel","to":"SettingsCardSkeleton","kind":"import"},{"from":"DefaultNetworkCard","to":"settings-row","kind":"import"},{"from":"DefaultNetworkCard","to":"filter-dropdown","kind":"import"},{"from":"DefaultNetworkCard","to":"switch","kind":"import"},{"from":"DefaultNetworkCard","to":"SettingsCard","kind":"import"},{"from":"DefaultNetworkCard","to":"domains","kind":"import"},{"from":"DefaultNetworkCard","to":"profile-settings","kind":"type"},{"from":"ConnectedWalletsCard","to":"settings-row","kind":"import"},{"from":"ConnectedWalletsCard","to":"primary-button","kind":"import"},{"from":"ConnectedWalletsCard","to":"NoteBox","kind":"import"},{"from":"ConnectedWalletsCard","to":"SettingsCard","kind":"import"},{"from":"ConnectedWalletsCard","to":"SignInMethodsCard","kind":"import"},{"from":"ConnectedWalletsCard","to":"profile-settings","kind":"type"},{"from":"ConnectedWalletsCard","to":"SuccessChip","kind":"import"},{"from":"SignInMethodsCard","to":"settings-row","kind":"import"},{"from":"SignInMethodsCard","to":"primary-button","kind":"import"},{"from":"SignInMethodsCard","to":"NoteBox","kind":"import"},{"from":"SignInMethodsCard","to":"SettingsCard","kind":"import"},{"from":"SignInMethodsCard","to":"profile-settings","kind":"type"},{"from":"SignInMethodsCard","to":"SuccessChip","kind":"import"},{"from":"NoteBox","to":"info-note","kind":"import"},{"from":"info-note","to":"overview-icons","kind":"import"},{"from":"useWalletSettings","to":"store","kind":"import"},{"from":"useWalletSettings","to":"profile-settings","kind":"type"},{"from":"useWalletSettings","to":"useProfileAction","kind":"import"},{"from":"useWalletSettings","to":"useProfileMockArea","kind":"import"},{"from":"useLinkWallet","to":"wagmi","kind":"import"},{"from":"useLinkWallet","to":"api-endpoint","kind":"import"},{"from":"useLinkWallet","to":"api.service","kind":"import"},{"from":"useLinkWallet","to":"wallet.service","kind":"import"},{"from":"useLinkWallet","to":"supportedTlds","kind":"import"},{"from":"useLinkWallet","to":"error-messages","kind":"import"},{"from":"useLinkWallet","to":"mapUser","kind":"import"},{"from":"SecurityTabPanel","to":"notice-banner","kind":"import"},{"from":"SecurityTabPanel","to":"default-buttons","kind":"import"},{"from":"SecurityTabPanel","to":"toast-message","kind":"import"},{"from":"SecurityTabPanel","to":"AuthContext","kind":"import"},{"from":"SecurityTabPanel","to":"error-messages","kind":"import"},{"from":"SecurityTabPanel","to":"useActiveSessions","kind":"import"},{"from":"SecurityTabPanel","to":"useChangePassword","kind":"import"},{"from":"SecurityTabPanel","to":"useSignInMethods","kind":"import"},{"from":"SecurityTabPanel","to":"profile-settings","kind":"type"},{"from":"SecurityTabPanel","to":"SignInMethodsCard","kind":"import"},{"from":"SecurityTabPanel","to":"ChangePasswordForm","kind":"import"},{"from":"SecurityTabPanel","to":"ActiveSessionsList","kind":"import"},{"from":"SecurityTabPanel","to":"SettingsCardSkeleton","kind":"import"},{"from":"SecurityTabPanel","to":"ConfirmDrawer","kind":"import"},{"from":"ActiveSessionsList","to":"settings-row","kind":"import"},{"from":"ActiveSessionsList","to":"primary-button","kind":"import"},{"from":"ActiveSessionsList","to":"SettingsCard","kind":"import"},{"from":"ActiveSessionsList","to":"profile-settings","kind":"type"},{"from":"ChangePasswordForm","to":"password-field","kind":"import"},{"from":"ChangePasswordForm","to":"primary-button","kind":"import"},{"from":"ChangePasswordForm","to":"SettingsCard","kind":"import"},{"from":"ChangePasswordForm","to":"passwordStrength","kind":"import"},{"from":"ChangePasswordForm","to":"validation","kind":"import"},{"from":"password-field","to":"passwordStrength","kind":"import"},{"from":"password-field","to":"text-field","kind":"import"},{"from":"useSignInMethods","to":"userProfile","kind":"import"},{"from":"useSignInMethods","to":"mapUser","kind":"import"},{"from":"useSignInMethods","to":"queryResult","kind":"import"},{"from":"useSignInMethods","to":"profile-settings","kind":"type"},{"from":"useChangePassword","to":"userProfile","kind":"import"},{"from":"useChangePassword","to":"error-messages","kind":"import"},{"from":"useActiveSessions","to":"store","kind":"import"},{"from":"useActiveSessions","to":"useProfileAction","kind":"import"},{"from":"useActiveSessions","to":"useProfileMockArea","kind":"import"},{"from":"ProfileRail","to":"toast-message","kind":"import"},{"from":"ProfileRail","to":"AuthContext","kind":"import"},{"from":"ProfileRail","to":"error-messages","kind":"import"},{"from":"ProfileRail","to":"useAccountSummary","kind":"import"},{"from":"ProfileRail","to":"useProfileDetails","kind":"import"},{"from":"ProfileRail","to":"useYourData","kind":"import"},{"from":"ProfileRail","to":"AccountSummaryCard","kind":"import"},{"from":"ProfileRail","to":"YourDataCard","kind":"import"},{"from":"YourDataCard","to":"info-list-card","kind":"import"},{"from":"YourDataCard","to":"sample-data-chip","kind":"import"},{"from":"YourDataCard","to":"text-field","kind":"import"},{"from":"YourDataCard","to":"ConfirmDrawer","kind":"import"},{"from":"info-list-card","to":"fade-scroll-list","kind":"import"},{"from":"AccountSummaryCard","to":"info-list-card","kind":"import"},{"from":"AccountSummaryCard","to":"sample-data-chip","kind":"import"},{"from":"AccountSummaryCard","to":"routes","kind":"import"},{"from":"AccountSummaryCard","to":"profile-settings","kind":"type"},{"from":"useYourData","to":"store","kind":"import"},{"from":"useYourData","to":"useProfileAction","kind":"import"},{"from":"useAccountSummary","to":"useProfileMockArea","kind":"import"},{"from":"ProfileTabPanel","to":"primary-button","kind":"import"},{"from":"ProfileTabPanel","to":"default-buttons","kind":"import"},{"from":"ProfileTabPanel","to":"notice-banner","kind":"import"},{"from":"ProfileTabPanel","to":"toast-message","kind":"import"},{"from":"ProfileTabPanel","to":"error-messages","kind":"import"},{"from":"ProfileTabPanel","to":"useAccountSummary","kind":"import"},{"from":"ProfileTabPanel","to":"useProfileDraft","kind":"import"},{"from":"ProfileTabPanel","to":"ProfileInformationForm","kind":"import"},{"from":"ProfileTabPanel","to":"PublicPreviewCard","kind":"import"},{"from":"ProfileTabPanel","to":"SettingsCardSkeleton","kind":"import"},{"from":"ProfileTabPanel","to":"validation","kind":"import"},{"from":"PublicPreviewCard","to":"avatar-upload","kind":"import"},{"from":"PublicPreviewCard","to":"info-note","kind":"import"},{"from":"PublicPreviewCard","to":"SettingsCard","kind":"import"},{"from":"PublicPreviewCard","to":"profile-settings","kind":"type"},{"from":"avatar-upload","to":"default-buttons","kind":"import"},{"from":"ProfileInformationForm","to":"avatar-upload","kind":"import"},{"from":"ProfileInformationForm","to":"text-field","kind":"import"},{"from":"ProfileInformationForm","to":"phone-field","kind":"import"},{"from":"ProfileInformationForm","to":"SettingsCard","kind":"import"},{"from":"ProfileInformationForm","to":"NoteBox","kind":"import"},{"from":"ProfileInformationForm","to":"countries","kind":"import"},{"from":"ProfileInformationForm","to":"validation","kind":"import"},{"from":"ProfileInformationForm","to":"profile-settings","kind":"type"},{"from":"phone-field","to":"filter-dropdown","kind":"import"},{"from":"phone-field","to":"text-field","kind":"import"},{"from":"phone-field","to":"countries","kind":"import"},{"from":"phone-field","to":"phone","kind":"import"},{"from":"useProfileDraft","to":"validation","kind":"import"},{"from":"useProfileDraft","to":"profile-settings","kind":"type"},{"from":"useProfileDraft","to":"useProfileDetails","kind":"import"},{"from":"ProfileTabs","to":"profile-settings","kind":"type"},{"from":"ProfileTabs","to":"profile-icons","kind":"import"},{"from":"profile","to":"ConfirmDrawer","kind":"import"},{"from":"profile","to":"ProfileRail","kind":"import"},{"from":"profile","to":"ProfileSettingsHeader","kind":"import"},{"from":"profile","to":"ProfileTabPanel","kind":"import"},{"from":"profile","to":"SecurityTabPanel","kind":"import"},{"from":"profile","to":"WalletsTabPanel","kind":"import"},{"from":"profile","to":"NotificationsTabPanel","kind":"import"},{"from":"profile","to":"PreferencesTabPanel","kind":"import"},{"from":"profile","to":"ProfileTabs","kind":"import"},{"from":"useLinkWallet","to":"appkit","kind":"import"},{"from":"wallet.service","to":"api.service","kind":"import"},{"from":"userProfile","to":"ep-get-user","kind":"http"},{"from":"userProfile","to":"ep-put-user","kind":"http"},{"from":"userProfile","to":"ep-verify-email","kind":"http"},{"from":"userProfile","to":"ep-change-password","kind":"http"},{"from":"wallet.service","to":"ep-nonce","kind":"http"},{"from":"wallet.service","to":"ep-verify-wallet","kind":"http"},{"from":"api.service","to":"ep-solana","kind":"http"},{"from":"useAccountSummary","to":"useMyDomainsData","kind":"planned"},{"from":"useMyDomainsData","to":"ep-my-domains","kind":"planned"}]};
+
+var KINDS = {
+  page: ['Page', 'top', '--k-page', 'The route file. Reads the URL, lays out the page.', 'pages/profile/'],
+  layout: ['Layout (existing)', 'top', '--k-page', 'The site layout and the marketplace page grid, reused.', 'layouts/, composites/marketplace/shared/'],
+  pagepart: ['Page parts', 'top', '--k-page', 'The header card and the tabs, rendered by the page.', 'composites/profile/shared/'],
+  panel: ['Tab panels and rail', 'panel', '--k-panel', 'One container per tab plus the rail. They call the hooks and pass data down to cards.', 'composites/profile/*/…TabPanel, rail/ProfileRail'],
+  composite: ['Composites', 'composite', '--k-composite', 'Cards made of primitives. They only receive values and callbacks.', 'src/design-system/composites/profile/'],
+  primitive: ['Primitives', 'primitive', '--k-primitive', 'The smallest building blocks: inputs, buttons, switch, rows. New ones plus additive extensions of existing ones.', 'src/design-system/primitives/'],
+  hook: ['Hooks', 'hook', '--k-hook', 'One per file. Real hooks call Redux; sample hooks read the sample store. All return the same QueryResult shape.', 'src/hooks/profile/'],
+  helper: ['Helpers and mappers', 'support', '--k-helper', 'Pure functions: the mapper (backend ⇄ page shapes), validation, phone, password rules, error text.', 'src/helpers/'],
+  data: ['Data', 'support', '--k-data', 'Sample data and its shared store, plus static lists (countries, chains).', 'src/data/'],
+  context: ['Context', 'support', '--k-context', 'App wide state: the theme and auth (logout).', 'src/context/'],
+  type: ['Types', 'support', '--k-type', 'The page\'s data shapes and the backend User type.', 'src/types/'],
+  redux: ['Redux (RTK Query)', 'redux', '--k-redux', 'The app\'s existing way to call the backend: endpoints, the RTK instance, URL constants.', 'src/core/redux/, constants/, core/enum/'],
+  service: ['Services', 'redux', '--k-service', 'Existing helpers for calls RTK doesn\'t cover (wallet signing and linking).', 'src/core/services/, src/config/'],
+  external: ['Libraries', 'redux', '--k-external', 'npm packages already in the app (Reown AppKit, wagmi).', 'node_modules'],
+  endpoint: ['Backend endpoints', 'endpoint', '--k-endpoint', 'The real backend calls, the same ones the main site\'s profile page uses.', 'backend'],
+  planned: ['Planned', 'hook', '--k-planned', 'Not built yet: the real rail stats (plan §14.6).', 'plan §14.6']
+};
+var PLANNED_BAND = { 'useMyDomainsData': 'hook', 'ep-my-domains': 'endpoint' };
+
+var TOURS = {
+  save: { title: 'Load and save your name (real data)', steps: [
+    [['profile', 'ProfileTabPanel'], 'You open /profile. The page renders the Profile tab container, ProfileTabPanel.'],
+    [['ProfileTabPanel', 'useProfileDraft', 'useProfileDetails'], 'The panel asks useProfileDraft for the form state; the draft reads the saved details from useProfileDetails.'],
+    [['useProfileDetails', 'userProfile', 'api', 'ep-get-user'], 'useProfileDetails calls the existing RTK Query endpoint getUserProfile, which sends GET /users/user-multiple-wallet through the app\'s RTK instance (myApi adds the login token). If the header already loaded it, the cached answer is reused.'],
+    [['useProfileDetails', 'mapUser', 'store', 'queryResult'], 'mapUser turns the backend User into the page\'s shape (the phone string becomes country and number, the email lock is worked out). Username, bio, location, website and photo come from the sample store. The hook returns the shared QueryResult shape.'],
+    [['ProfileTabPanel', 'ProfileInformationForm', 'text-field', 'phone-field', 'avatar-upload'], 'The panel passes the draft to ProfileInformationForm, which draws the fields with the new primitives.'],
+    [['useProfileDraft', 'validation'], 'You change your name and press Save. The draft is checked with the field rules; only the changed fields go on.'],
+    [['useProfileDetails', 'mapUser', 'userProfile', 'ep-put-user'], 'toUpdateUserBody builds the same body the main site sends, and setProfile sends PUT /users.'],
+    [['useProfileDetails', 'userProfile', 'ep-get-user', 'ProfileTabPanel', 'toast-message'], 'getUserProfile has no cache tag, so the hook refetches. The fresh profile flows to the form, the header and anywhere else, and a toast says it\'s saved.']
+  ]},
+  switch: { title: 'Flip a notification switch (sample data)', steps: [
+    [['profile', 'NotificationsTabPanel'], 'You open the Notifications tab; the page renders NotificationsTabPanel.'],
+    [['NotificationsTabPanel', 'useNotificationSettings', 'useProfileMockArea', 'queryResult'], 'The panel calls useNotificationSettings. Its first load goes through useMockQuery (the same helper the domain overview uses), so a skeleton shows briefly.'],
+    [['useProfileMockArea', 'store', 'fixtures'], 'The values come from the shared sample store, filled from the Figma fixtures.'],
+    [['NotificationsTabPanel', 'NotificationSwitches', 'settings-row', 'switch', 'SettingsCard', 'sample-data-chip'], 'NotificationSwitches draws one settings row and switch per alert; SettingsCard shows the Sample data chip because the hook returns isMock.'],
+    [['NotificationsTabPanel', 'useNotificationSettings', 'useProfileAction', 'store'], 'You flip a switch. The panel shows it at once (optimistic), then update() waits briefly and replaces that area in the store; every component reading it re-renders.'],
+    [['NotificationsTabPanel', 'toast-message', 'error-messages'], 'If the save failed, the panel would put the switch back and show a readable error toast.']
+  ]},
+  wallet: { title: 'Link a Solana wallet (real data)', steps: [
+    [['profile', 'WalletsTabPanel', 'useConnectedWallets', 'userProfile', 'ep-get-user', 'mapUser'], 'The Wallets tab reads the wallet list from the same cached GET; mapUser lists the wallets and works out which network is missing (one EVM, one Solana).'],
+    [['WalletsTabPanel', 'ConnectedWalletsCard', 'primary-button'], 'With only an EVM wallet linked, the card shows Add Another Wallet ("Links your Solana wallet").'],
+    [['WalletsTabPanel', 'useLinkWallet', 'appkit', 'wagmi'], 'Clicking it calls useLinkWallet, which opens Reown AppKit with the EVM (wagmi) and Solana adapters, on the Solana tab.'],
+    [['useLinkWallet', 'api-endpoint', 'api.service', 'ep-solana'], 'Once the Solana wallet is connected, it posts { walletAddress, network, userId } to POST /web3-auth/solana-add-wallet, the main site\'s endpoint.'],
+    [['useLinkWallet', 'wallet.service', 'ep-nonce', 'ep-verify-wallet'], 'For an EVM wallet instead: a one time code from GET /web3-auth/generate-nonce, signed in the wallet, then POST /web3-auth/verify adds it to your account (not the sign in flow, which could switch accounts).'],
+    [['WalletsTabPanel', 'useConnectedWallets', 'userProfile', 'ep-get-user', 'profile', 'ProfileTabs'], 'After linking, the tab refetches the profile; the new wallet appears and the Wallets tab badge counts it.']
+  ]},
+  password: { title: 'Change your password (real data)', steps: [
+    [['profile', 'SecurityTabPanel', 'useSignInMethods', 'userProfile', 'ep-get-user'], 'The Security tab reads your sign in methods from the cached GET, to know whether your account has a password.'],
+    [['SecurityTabPanel', 'ChangePasswordForm', 'password-field', 'text-field', 'passwordStrength', 'validation'], 'You type in ChangePasswordForm; the strength meter and rules use the backend\'s password policy.'],
+    [['SecurityTabPanel', 'useChangePassword', 'userProfile', 'ep-change-password'], 'Update Password calls useChangePassword, which sends PUT /auth/change-password with { oldPassword, newPassword }.'],
+    [['useChangePassword', 'error-messages', 'ChangePasswordForm'], 'A wrong current password comes back as 401 and shows under the Current password field.'],
+    [['SecurityTabPanel', 'AuthContext', 'toast-message'], 'On success, like the main site: a toast, then logout() and the login page, to sign in with the new password.']
+  ]},
+  rail: { title: 'Planned: real rail stats (plan §14.6, not built)', steps: [
+    [['ProfileRail', 'useAccountSummary', 'AccountSummaryCard'], 'Today the rail\'s Account card reads sample stats through useAccountSummary.'],
+    [['useAccountSummary', 'useProfileMockArea', 'store'], 'useAccountSummary currently reads the sample store.'],
+    [['useAccountSummary', 'useMyDomainsData', 'ep-my-domains'], 'The plan: reuse the My Domains hook, which calls GET /marketplacev2/orders/my-domains, for domains owned and listed; sales after the backend confirms status=SOLD on stage.']
+  ]}
+};
+
+(function () {
+  var map = document.getElementById('flowmap');
+  var svg = document.getElementById('edges');
+  var details = document.getElementById('details');
+  var nodesById = {};
+  var out = {}, inn = {};
+  var state = { sel: null, chain: false, all: false, types: false, hiddenKinds: {}, search: '', tour: null, step: 0 };
+
+  DATA.nodes.forEach(function (n) { nodesById[n.id] = n; out[n.id] = []; inn[n.id] = [] });
+  DATA.edges.forEach(function (e) { out[e.from].push(e); inn[e.to].push(e) });
+
+  function bandOf(n) { return PLANNED_BAND[n.id] || KINDS[n.kind][1] }
+  function color(kind) { return 'var(' + KINDS[kind][2] + ')' }
+
+  // Build the boxes, grouped by band, ordered by kind then label.
+  var order = Object.keys(KINDS);
+  DATA.nodes.slice().sort(function (a, b) { return order.indexOf(a.kind) - order.indexOf(b.kind) || a.label.localeCompare(b.label) }).forEach(function (n) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'node' + (n.kind === 'planned' ? ' planned' : '');
+    b.id = 'n-' + n.id; b.dataset.id = n.id;
+    b.style.setProperty('--c', color(n.kind));
+    b.setAttribute('aria-pressed', 'false');
+    b.title = n.file;
+    b.innerHTML = '<span></span><span class="badge"></span>';
+    b.firstChild.textContent = n.label;
+    b.addEventListener('click', function () { if (state.tour) endTour(); select(state.sel === n.id ? null : n.id) });
+    map.querySelector('[data-band="' + bandOf(n) + '"] .nodes').appendChild(b);
+  });
+
+  // Kind filter chips and the layers table.
+  var chips = document.getElementById('chips');
+  var rows = document.getElementById('layerRows');
+  order.forEach(function (k) {
+    var count = DATA.nodes.filter(function (n) { return n.kind === k }).length;
+    if (!count) return;
+    var c = document.createElement('button');
+    c.type = 'button'; c.className = 'chip'; c.setAttribute('aria-pressed', 'true');
+    c.style.setProperty('--c', color(k));
+    c.innerHTML = '<i></i><span></span> <small>' + count + '</small>';
+    c.children[1].textContent = KINDS[k][0];
+    c.addEventListener('click', function () {
+      state.hiddenKinds[k] = !state.hiddenKinds[k];
+      c.setAttribute('aria-pressed', String(!state.hiddenKinds[k]));
+      render();
+    });
+    chips.appendChild(c);
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td><span class="chip" style="--c:' + color(k) + ';cursor:default"><i></i><span></span></span></td><td></td><td><code></code> <span class="muted">(' + count + ')</span></td>';
+    tr.querySelector('.chip span').textContent = KINDS[k][0];
+    tr.children[1].textContent = KINDS[k][3];
+    tr.querySelector('code').textContent = KINDS[k][4];
+    rows.appendChild(tr);
+  });
+
+  function visible(id) { return !state.hiddenKinds[nodesById[id].kind] }
+  function edgeVisible(e) { return visible(e.from) && visible(e.to) && (state.types || e.kind !== 'type') }
+
+  function closure(id, dir) {
+    var seen = {}; var stack = [id];
+    while (stack.length) {
+      var cur = stack.pop();
+      (dir === 'out' ? out[cur] : inn[cur]).forEach(function (e) {
+        if (!edgeVisible(e)) return;
+        var nxt = dir === 'out' ? e.to : e.from;
+        if (!seen[nxt]) { seen[nxt] = true; stack.push(nxt) }
+      });
+    }
+    return seen;
+  }
+
+  function select(id) { state.sel = id; render(); showDetails(id) }
+
+  function showDetails(id) {
+    if (!id) {
+      details.innerHTML = '<h4>Pick a box</h4><p class="muted">Click any box in the map, or start a tour. You\'ll see what the piece does, its file, what it uses and what uses it.</p>';
+      return;
+    }
+    var n = nodesById[id];
+    var uses = out[id].filter(edgeVisible).map(function (e) { return e.to });
+    var usedBy = inn[id].filter(edgeVisible).map(function (e) { return e.from });
+    details.innerHTML = '<div class="kind" style="--c:' + color(n.kind) + '"><i></i><span></span></div><h4></h4><p><code></code></p><p class="desc"></p>' +
+      '<h5>Uses (' + uses.length + ')</h5><div class="list" data-l="uses"></div><h5>Used by (' + usedBy.length + ')</h5><div class="list" data-l="by"></div>';
+    details.querySelector('.kind span').textContent = KINDS[n.kind][0];
+    details.querySelector('h4').textContent = n.label;
+    details.querySelector('code').textContent = n.file;
+    details.querySelector('.desc').textContent = n.desc;
+    [['uses', uses], ['by', usedBy]].forEach(function (pair) {
+      var box = details.querySelector('[data-l="' + pair[0] + '"]');
+      if (!pair[1].length) { box.innerHTML = '<span class="muted">none</span>'; return }
+      pair[1].forEach(function (oid) {
+        var l = document.createElement('button'); l.type = 'button'; l.className = 'linkbtn';
+        l.textContent = nodesById[oid].label;
+        l.addEventListener('click', function () { select(oid); document.getElementById('n-' + oid).scrollIntoView({ block: 'nearest', behavior: 'smooth' }) });
+        box.appendChild(l);
+      });
+    });
+  }
+
+  function render() {
+    var lit = null, edgesToDraw = [];
+    var tourStep = state.tour ? TOURS[state.tour].steps[state.step] : null;
+    if (tourStep) {
+      lit = {}; tourStep[0].forEach(function (id) { lit[id] = true });
+      DATA.edges.forEach(function (e) { if (lit[e.from] && lit[e.to] && edgeVisible(e)) edgesToDraw.push([e, 'tour']) });
+    } else if (state.sel) {
+      lit = {}; lit[state.sel] = true;
+      if (state.chain) {
+        var down = closure(state.sel, 'out'), up = closure(state.sel, 'in');
+        Object.keys(down).forEach(function (k) { lit[k] = true }); Object.keys(up).forEach(function (k) { lit[k] = true });
+        DATA.edges.forEach(function (e) {
+          if (!edgeVisible(e)) return;
+          if ((e.from === state.sel || down[e.from]) && down[e.to]) edgesToDraw.push([e, 'uses']);
+          else if ((e.to === state.sel || up[e.to]) && up[e.from]) edgesToDraw.push([e, 'usedby']);
+        });
+      } else {
+        out[state.sel].forEach(function (e) { if (edgeVisible(e)) { lit[e.to] = true; edgesToDraw.push([e, 'uses']) } });
+        inn[state.sel].forEach(function (e) { if (edgeVisible(e)) { lit[e.from] = true; edgesToDraw.push([e, 'usedby']) } });
+      }
+    } else if (state.all) {
+      DATA.edges.forEach(function (e) { if (edgeVisible(e)) edgesToDraw.push([e, 'all']) });
+    }
+    var q = state.search.trim().toLowerCase();
+    DATA.nodes.forEach(function (n) {
+      var el = document.getElementById('n-' + n.id);
+      el.classList.toggle('hidden', !visible(n.id));
+      el.classList.toggle('dim', !!lit && !lit[n.id]);
+      el.classList.toggle('sel', state.sel === n.id && !tourStep);
+      el.setAttribute('aria-pressed', String(state.sel === n.id && !tourStep));
+      el.classList.toggle('match', !!q && (n.label.toLowerCase().indexOf(q) >= 0 || n.file.toLowerCase().indexOf(q) >= 0 || n.id.toLowerCase().indexOf(q) >= 0));
+      var inTour = tourStep && tourStep[0].indexOf(n.id) >= 0;
+      el.classList.toggle('tour', !!inTour);
+      el.querySelector('.badge').textContent = inTour ? String(tourStep[0].indexOf(n.id) + 1) : '';
+    });
+    draw(edgesToDraw);
+  }
+
+  function rectOf(id) {
+    var el = document.getElementById('n-' + id), m = map.getBoundingClientRect(), r = el.getBoundingClientRect();
+    return { l: r.left - m.left, r: r.right - m.left, t: r.top - m.top, b: r.bottom - m.top, cx: r.left - m.left + r.width / 2, cy: r.top - m.top + r.height / 2 };
+  }
+
+  function draw(list) {
+    svg.setAttribute('width', map.scrollWidth); svg.setAttribute('height', map.scrollHeight);
+    var defs = '<defs>' + ['uses', 'usedby', 'tour', 'all'].map(function (k) {
+      var v = { uses: '--edge-uses', usedby: '--edge-usedby', tour: '--edge-tour', all: '--edge-all' }[k];
+      return '<marker id="ar-' + k + '" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill: var(' + v + ')"/></marker>';
+    }).join('') + '</defs>';
+    var paths = list.map(function (pair) {
+      var e = pair[0], cls = pair[1];
+      var a = rectOf(e.from), b = rectOf(e.to), d;
+      if (b.t >= a.b - 2) { var dy = Math.max(24, (b.t - a.b) / 2); d = 'M' + a.cx + ',' + a.b + ' C' + a.cx + ',' + (a.b + dy) + ' ' + b.cx + ',' + (b.t - dy) + ' ' + b.cx + ',' + b.t }
+      else if (b.b <= a.t + 2) { var dy2 = Math.max(24, (a.t - b.b) / 2); d = 'M' + a.cx + ',' + a.t + ' C' + a.cx + ',' + (a.t - dy2) + ' ' + b.cx + ',' + (b.b + dy2) + ' ' + b.cx + ',' + b.b }
+      else { var right = b.cx >= a.cx, x1 = right ? a.r : a.l, x2 = right ? b.l : b.r, dx = Math.max(20, Math.abs(x2 - x1) / 2) * (right ? 1 : -1); d = 'M' + x1 + ',' + a.cy + ' C' + (x1 + dx) + ',' + a.cy + ' ' + (x2 - dx) + ',' + b.cy + ' ' + x2 + ',' + b.cy }
+      var dash = e.kind === 'http' || e.kind === 'planned' ? ' dash' : '';
+      return '<path class="e ' + cls + dash + '" d="' + d + '" marker-end="url(#ar-' + cls + ')"/>';
+    }).join('');
+    svg.innerHTML = defs + paths;
+  }
+
+  // Tours
+  var box = document.getElementById('tourbox');
+  function showStep() {
+    var t = TOURS[state.tour], s = t.steps[state.step];
+    document.getElementById('tourTitle').textContent = t.title;
+    document.getElementById('tourCount').textContent = 'Step ' + (state.step + 1) + ' of ' + t.steps.length;
+    document.getElementById('tourText').textContent = s[1];
+    document.getElementById('tourPrev').disabled = state.step === 0;
+    document.getElementById('tourNext').textContent = state.step === t.steps.length - 1 ? 'Finish' : 'Next';
+    render(); showDetails(s[0][s[0].length - 1]);
+    document.getElementById('n-' + s[0][0]).scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+  function endTour() {
+    state.tour = null; box.classList.remove('on');
+    document.querySelectorAll('[data-tour]').forEach(function (b) { b.setAttribute('aria-pressed', 'false') });
+    render();
+  }
+  document.querySelectorAll('[data-tour]').forEach(function (b) {
+    b.setAttribute('aria-pressed', 'false');
+    b.addEventListener('click', function () {
+      document.querySelectorAll('[data-tour]').forEach(function (x) { x.setAttribute('aria-pressed', 'false') });
+      b.setAttribute('aria-pressed', 'true');
+      state.tour = b.dataset.tour; state.step = 0; state.sel = null;
+      // A tour needs every kind on screen.
+      state.hiddenKinds = {}; chips.querySelectorAll('.chip').forEach(function (c) { c.setAttribute('aria-pressed', 'true') });
+      box.classList.add('on'); showStep();
+    });
+  });
+  document.getElementById('tourPrev').addEventListener('click', function () { if (state.tour && state.step > 0) { state.step--; showStep() } });
+  document.getElementById('tourNext').addEventListener('click', function () {
+    if (!state.tour) return;
+    if (state.step < TOURS[state.tour].steps.length - 1) { state.step++; showStep() } else endTour();
+  });
+  document.getElementById('tourEnd').addEventListener('click', endTour);
+
+  // Controls
+  function toggle(id, key) {
+    var b = document.getElementById(id);
+    b.addEventListener('click', function () { state[key] = !state[key]; b.setAttribute('aria-pressed', String(state[key])); render(); if (state.sel) showDetails(state.sel) });
+  }
+  toggle('chainBtn', 'chain'); toggle('allBtn', 'all'); toggle('typesBtn', 'types');
+  document.getElementById('search').addEventListener('input', function (e) { state.search = e.target.value; render() });
+  document.getElementById('clearBtn').addEventListener('click', function () {
+    endTour(); state.search = ''; document.getElementById('search').value = ''; select(null);
+  });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { if (state.tour) endTour(); else select(null) } });
+
+  var raf = 0;
+  function redraw() { cancelAnimationFrame(raf); raf = requestAnimationFrame(render) }
+  if (window.ResizeObserver) new ResizeObserver(redraw).observe(map); else window.addEventListener('resize', redraw);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(redraw);
+  render();
+})();
+
+document.getElementById('themeToggle').addEventListener('click', function () {
+  var root = document.documentElement;
+  var current = root.getAttribute('data-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  var next = current === 'dark' ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  try { localStorage.setItem('dmplan-theme', next); } catch (e) {}
+});
+</script>
+</body>
+</html>

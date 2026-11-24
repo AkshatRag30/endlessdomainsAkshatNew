@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Multi Chain Review</title>
+<script>
+  try {
+    var saved = localStorage.getItem('dmplan-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  } catch (e) {}
+</script>
+<style>
+  :root {
+    --bg: #f9f9f9; --surface: #ffffff; --surface-soft: #f3f4fe;
+    --text: #111111; --text-muted: #5b5b66; --border: #e6e6e6;
+    --accent: #2639ED; --accent-soft: #e9ebfd;
+    --wait: #9457f6; --wait-soft: #f4eefe;
+    --ok: #12805c; --ok-soft: #e4f5ee;
+    --warn: #b4540a; --warn-soft: #fdf1e4;
+    --bad: #c4314b; --bad-soft: #fdecef;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+      --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+      --accent: #7f8cff; --accent-soft: #1d2150;
+      --wait: #b996fa; --wait-soft: #2c2142;
+      --ok: #4fd1a0; --ok-soft: #173229;
+      --warn: #f5a35c; --warn-soft: #3a2614;
+      --bad: #ff7d93; --bad-soft: #3a1c24;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+    --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+    --accent: #7f8cff; --accent-soft: #1d2150;
+    --wait: #b996fa; --wait-soft: #2c2142;
+    --ok: #4fd1a0; --ok-soft: #173229;
+    --warn: #f5a35c; --warn-soft: #3a2614;
+    --bad: #ff7d93; --bad-soft: #3a1c24;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: "Satoshi", system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.6; }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 48px 16px 80px; }
+  header.top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+  .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; }
+  h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.15; margin: 0 0 12px; }
+  .lede { color: var(--text-muted); margin: 0; max-width: 700px; }
+  .toggle { flex-shrink: 0; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 14px; cursor: pointer; }
+  .toggle:hover { border-color: var(--accent); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 32px; }
+  nav.toc a { font-size: 14px; text-decoration: none; color: var(--accent); background: var(--accent-soft); padding: 6px 12px; border-radius: 999px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 0 0 16px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+  .stat b { display: block; font-size: 26px; line-height: 1.2; }
+  .stat span { font-size: 13px; color: var(--text-muted); }
+  h2 { font-size: 22px; margin: 52px 0 16px; }
+  h3 { font-size: 18px; margin: 0; }
+  h4 { font-size: 15px; margin: 22px 0 8px; color: var(--accent); }
+  p { margin: 0 0 12px; }
+  .muted { color: var(--text-muted); font-size: 15px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
+  .card p:last-child { margin-bottom: 0; }
+  .card ul, .card ol { margin: 8px 0 0; padding-left: 20px; }
+  .card li { margin-bottom: 6px; }
+  code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .86em; background: var(--surface-soft); border-radius: 6px; padding: 1px 6px; word-break: break-word; }
+  .findings { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .finding { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+  .finding h3 { font-size: 16px; margin-bottom: 6px; }
+  .finding p { font-size: 15px; margin: 0; color: var(--text-muted); }
+  .tablecard { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow-x: auto; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: 0; }
+  th { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+  td.grp { font-weight: 600; color: var(--accent); background: var(--surface-soft); font-size: 13px; }
+  .callout { border-left: 4px solid var(--wait); background: var(--wait-soft); border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; }
+  .callout p { margin: 0; }
+  .callout.ok { border-color: var(--ok); background: var(--ok-soft); }
+  .callout.warn { border-color: var(--warn); background: var(--warn-soft); }
+  .issue { display: grid; grid-template-columns: 28px 1fr; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--bad); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+  .issue .n { font-weight: 700; color: var(--bad); }
+  .issue p { margin: 0; font-size: 15px; }
+  .issue .where { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+  .ticket { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px 24px; margin-bottom: 14px; }
+  .ticket-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+  .num { min-width: 44px; height: 34px; padding: 0 10px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 14px; flex-shrink: 0; }
+  .tag { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; white-space: nowrap; }
+  .tag.now { background: var(--ok-soft); color: var(--ok); }
+  .tag.wait { background: var(--wait-soft); color: var(--wait); }
+  .tag.size { background: var(--surface-soft); color: var(--text-muted); }
+  .tag.new { background: var(--warn-soft); color: var(--warn); }
+  .tag.bad { background: var(--bad-soft); color: var(--bad); }
+  .rows { display: grid; grid-template-columns: 150px 1fr; gap: 8px 16px; font-size: 15px; margin: 0; }
+  .rows dt { color: var(--text-muted); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; padding-top: 2px; }
+  .rows dd { margin: 0; }
+  .rows dd p { margin: 0 0 8px; }
+  pre.snip { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: 13px; line-height: 1.5; background: var(--surface-soft); border-radius: 10px; padding: 12px 14px; margin: 0 0 10px; overflow-x: auto; white-space: pre; }
+  ol.qs { counter-reset: q; list-style: none; padding: 0; margin: 0; }
+  ol.qs li { counter-increment: q; position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px 14px 56px; margin-bottom: 10px; }
+  ol.qs li::before { content: counter(q); position: absolute; left: 16px; top: 14px; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  ol.qs b { display: block; margin-bottom: 2px; }
+  ol.qs span { color: var(--text-muted); font-size: 15px; }
+  footer { margin-top: 56px; font-size: 13px; color: var(--text-muted); }
+  @media (max-width: 700px) {
+    header.top { flex-direction: column; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .findings { grid-template-columns: 1fr; }
+    .card, .ticket { padding: 18px; }
+    .rows { grid-template-columns: 1fr; gap: 2px 0; }
+    .rows dt { padding-top: 10px; }
+    ol.qs li { padding-left: 50px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">Multi chain marketplace · planning review</p>
+      <h1>Multi chain: what Mohit sir asks of the frontend, in simple words</h1>
+      <p class="lede">Written 24 Nov 2026, before any multi chain code. It reads the multi chain part of Mohit sir's requirements PDF (10 Nov, pages 8 to 21) against the code on <code>bulk-list</code> (<code>a59939a</code>) and Guru's backend branch <code>feature/multichain_sprints</code> (read only). Decided today: you build all of the frontend yourself, on a branch cut from <code>bulk-list</code>.</p>
+    </div>
+    <button class="toggle" id="toggle" type="button">Toggle theme</button>
+  </header>
+
+  <nav class="toc"><a href="#ideas">1. The ideas</a><a href="#collections">2. The 8 collections</a><a href="#tickets">3. Every frontend ticket</a><a href="#backend">4. Backend status</a><a href="#gaps">5. What the PDF misses</a><a href="#questions">6. Open questions</a><a href="#notours">7. Not ours</a><a href="#next">8. Next steps</a></nav>
+
+  <div class="stats">
+    <div class="stat"><b>11</b><span>frontend tickets (C1 to C9, ENS, test rigs) plus 2 test gates</span></div>
+    <div class="stat"><b>10</b><span>backend tickets on Guru's sprint branch; 0 on uat or stage</span></div>
+    <div class="stat"><b>21</b><span>files read the Polygon only <code>DEFAULTS</code> today (PDF says 7)</span></div>
+    <div class="stat"><b>16</b><span>files assume 6 decimals (PDF lists 10)</span></div>
+  </div>
+
+  <div class="callout warn"><p><b>Checked live today:</b> <code>GET /marketplacev2/config</code> answers 404 on stage, so stage is not running the multi chain backend. Everything that needs the backend starts against a local mock of the agreed shapes.</p></div>
+
+  <h2 id="ideas">1. The ideas behind multi chain, explained simply</h2>
+  <div class="findings">
+    <div class="finding"><h3>What changes in one sentence</h3><p>Today every name on our marketplace is a UD name on Polygon, paid in USDT0. After this work a name can come from 4 providers on 5 chains, paid in the stablecoin of its own chain. Nothing new is invented: the same Seaport contract already sits at the same address on all five chains.</p></div>
+    <div class="finding"><h3>Chain</h3><p>A separate blockchain: Polygon (137), Ethereum (1), Base (8453), Arbitrum (42161), BNB (56). A wallet is connected to one chain at a time, so before listing or buying we must ask the wallet to switch to the name's chain.</p></div>
+    <div class="finding"><h3>Collection (NFT contract)</h3><p>The contract that holds the names. A provider can have several (ENS has three) and one contract can live on several chains (Freename uses the same address on Polygon, Base and BNB). So a name is identified by three things together: chain, contract and token id. Today we use token id alone.</p></div>
+    <div class="finding"><h3>A signature only works on its own chain</h3><p>Each chain stamps its own id into the message the seller signs. An order signed for Base can never be filled on Polygon. So the order builder must be told the chain every time.</p></div>
+    <div class="finding"><h3>Currency and decimals</h3><p>Prices are stored as whole numbers of the token's smallest unit. USDT0, USDC and Arbitrum's USD₮0 use 6 decimals (1 dollar = 1,000,000 units). BNB's USDT uses 18 (1 dollar = 1 followed by 18 zeros). Every place that divides by 1,000,000 today would show a BNB price a trillion times too big. Mohit sir decided all prices are shown as USD.</p></div>
+    <div class="finding"><h3>Approval is per contract per chain</h3><p>Seaport needs permission (<code>setApprovalForAll</code>) once per NFT contract on each chain. A seller with UD Polygon, Freename Polygon and ENS names approves three times. On Polygon that costs cents; on Ethereum a few dollars. Bulk listing already built approvals this way, with one row today.</p></div>
+    <div class="finding"><h3>ERC721 versus ERC1155</h3><p>Two kinds of NFT. ERC721 is "one token, one owner", used by UD, Freename, SPACE ID and unwrapped ENS. ERC1155 is "a balance of a token", used by wrapped ENS and ENSv2. Seaport writes them differently in the order (item type 2 versus 3), so the builder must know which one.</p></div>
+    <div class="finding"><h3>Token id from a name</h3><p>Each provider turns a name into a token id differently: namehash (UD, wrapped ENS), labelhash (SPACE ID, unwrapped ENS), a changing id (ENSv2), or no rule at all (Freename, read from chain). The frontend mostly gets ids from the backend; it just has to stop assuming one scheme.</p></div>
+    <div class="finding"><h3>Expiry</h3><p>UD names mostly never expire, SPACE ID and ENS names do. Decision 8: a listing must end 7 days before the name expires, and a name with under 14 days left can't be listed. Bulk listing already does this for UD on Polygon by reading <code>expiryOf</code>; each provider has a different expiry function.</p></div>
+    <div class="finding"><h3>Claim control</h3><p>When an ENS v1 or SPACE ID name is sold, the buyer gets the NFT but the old owner still controls its records until the buyer presses "reclaim". So these receipts must tell the buyer to claim control. UD and Freename wipe records on transfer, so they need nothing.</p></div>
+    <div class="finding"><h3>Trails</h3><p>Trails lets a buyer pay with any token from any chain. Today we always tell Trails to deliver USDT0 on Polygon. After this work, the delivery chain and token become those of the listing.</p></div>
+  </div>
+
+  <h4 id="trails-vs">Trails versus multi chain: what's the difference?</h4>
+  <div class="card">
+    <p>They solve two different sides of a sale. <b>Trails is about the buyer's money. Multi chain is about where the name lives.</b></p>
+    <div class="findings">
+      <div class="finding"><h3>Trails (built, merged 18 Nov)</h3><p>Answers "how can the buyer pay?" Every listing today is a UD name on Polygon priced in USDT0. Without Trails the buyer must already hold USDT0 on Polygon. With Trails they can pay with ETH on Base or USDC on Arbitrum; Trails swaps and bridges behind the scenes and delivers exact USDT0 on Polygon, where Seaport completes the sale. The name never leaves Polygon. Trails only changes where the buyer's money comes from.</p></div>
+      <div class="finding"><h3>Multi chain (this plan)</h3><p>Answers "where can the name be?" Today the marketplace knows one shop: UD names on Polygon. Multi chain opens more: UD on Base, Freename on three chains, SPACE ID on Arbitrum and BNB, ENS on Ethereum. Each name is listed, signed, approved and sold on its own chain, in that chain's stablecoin. It is about the seller's side.</p></div>
+    </div>
+    <p style="margin-top:14px"><b>Where they meet: ticket C4.</b> Trails always delivers to one place today, Polygon USDT0, which is why <code>browserCheckoutSource.ts:84</code> hardcodes <code>chainId: 137</code>. Once a name can sit on BNB, Trails must deliver USDT on BNB instead, so its delivery point follows the listing's chain.</p>
+    <p><b>A simple picture:</b> multi chain decides which city the shop is in. Trails lets the customer pay in any currency from anywhere and converts it into the local currency at the shop's door. Today there is one shop, in Polygon. After this work there are shops in five cities, and Trails needs to know which city to deliver to.</p>
+    <p class="muted">That is why gap 2 matters: Trails is locked to Polygon on our side and on Guru's (MC-09 added a Polygon only guard). Both locks must open together, and only Polygon has had a real Trails buy, so Mohit sir wants one real test buy per chain.</p>
+  </div>
+
+  <h2 id="collections">2. The 8 collections Mohit sir wants live</h2>
+  <p class="muted">All checked on chain by Mohit sir on 10 Nov. Full addresses come from the backend config endpoint, never typed by us.</p>
+  <div class="tablecard"><table>
+    <tr><th>Provider</th><th>Chain</th><th>Kind</th><th>Paid in</th><th>Expires</th><th>Buyer must claim control</th><th>Special trap</th></tr>
+    <tr><td>UD <span class="tag now">live today</span></td><td>Polygon</td><td>ERC721</td><td>USDT0 (6)</td><td>Some names</td><td>No</td><td>None, this is today's marketplace</td></tr>
+    <tr><td>UD Base</td><td>Base</td><td>ERC721</td><td>USDC (6)</td><td>Some names</td><td>No</td><td>None</td></tr>
+    <tr><td>Freename</td><td>Polygon, Base, BNB</td><td>ERC721</td><td>Chain's stable</td><td>Never</td><td>No</td><td>Token ids can't be worked out from names; the backend doesn't find them yet (M5b)</td></tr>
+    <tr><td>SPACE ID .arb</td><td>Arbitrum</td><td>ERC721</td><td>USD₮0 (6)</td><td>Yes, 90 day grace</td><td>Yes</td><td>Expiry buffer</td></tr>
+    <tr><td>SPACE ID .bnb</td><td>BNB</td><td>ERC721</td><td>USDT (<b>18</b>)</td><td>Yes, 90 day grace</td><td>Yes</td><td>18 decimals</td></tr>
+    <tr><td>ENS unwrapped</td><td>Ethereum</td><td>ERC721</td><td>USDC (6)</td><td>Yes</td><td>Yes</td><td>Mainnet gas</td></tr>
+    <tr><td>ENS wrapped</td><td>Ethereum</td><td>ERC1155</td><td>USDC (6)</td><td>Yes</td><td>No (wrapper moves control)</td><td>Names with <code>CANNOT_TRANSFER</code> burned can never be sold</td></tr>
+    <tr><td>ENSv2</td><td>Ethereum</td><td>ERC1155</td><td>USDC (6)</td><td>Yes, 28 day grace</td><td>To confirm</td><td>Token id can change, which kills open orders</td></tr>
+  </table></div>
+  <p class="muted">Freename on three chains makes 8 collections across 10 chain and contract pairs. The PDF calls them "8 collections".</p>
+
+  <h2 id="tickets">3. Every frontend ticket Mohit sir asks for, explained</h2>
+  <p class="muted">Mohit sir's order: <b>phase 2 (foundation)</b> makes everything multi chain ready while users see no change at all, closed by a Polygon regression test. <b>Phase 3 (providers)</b> then switches on the 7 new collections and ENS in one release, closed by a full test on every collection. "Mock first" means we build against the agreed shape and switch to the real endpoint when it reaches uat.</p>
+
+  <h4>Phase 2: the foundation (nothing visible changes)</h4>
+
+  <div class="ticket">
+    <div class="ticket-head"><span class="num">C1</span><h3>Read the chain setup from the backend</h3><span class="tag wait">Mock first</span><span class="tag size">Medium</span></div>
+    <dl class="rows">
+      <dt>In plain words</dt><dd>Today the frontend has its own hardcoded copy of the marketplace setup (<code>DEFAULTS</code> in <code>src/lib/marketplace-order-client.ts</code>): one chain id 137, one Seaport, one USDT, one NFT contract, the fee 250 bps and its recipient. Mohit sir wants it read from <code>GET /marketplacev2/config</code> instead, so the fee shown and the fee charged can never disagree again.</dd>
+      <dt>The problem today</dt><dd><p>Whenever someone lists or buys, 21 files reach into this one object to answer "which chain, which coin, which contract, what fee". That only works because there is exactly one of each today:</p>
+<pre class="snip">export const DEFAULTS = {
+  chainId: 137,                      // Polygon
+  seaportAddress: '0x0000...eB395',
+  usdtAddress: '0xc213...8e8F',      // the one currency
+  domainNftAddress: '0xa9a6...9e9f', // the one NFT contract (UD)
+  feeRecipient: '0xeF51...5494',
+  feeBps: 250,                       // 2.5%
+}</pre>
+<p>The backend keeps its own copy of the same settings and checks every order against it. Two copies must always agree: if the backend changes the fee and nobody edits our file, we show and sign the old fee and the backend rejects the order. Mohit sir notes this drift has already happened once.</p></dd>
+      <dt>Why multi chain breaks it</dt><dd>A seller lists a UD name on Base. Our code grabs <code>DEFAULTS.usdtAddress</code>, which is Polygon's USDT, and puts it in a Base order. That is simply wrong: on Base the price must be in USDC, at a different address. With 8 collections on 5 chains, one hardcoded object can't hold the answers.</dd>
+      <dt>What the config returns</dt><dd><p>Guru's endpoint returns the backend's own settings as lists:</p>
+<pre class="snip">chains:      Polygon 137 → Seaport, USDT0 (6 decimals), fee 2.5%
+             Base 8453   → Seaport, USDC (6 decimals), fee 2.5%
+             BNB 56      → Seaport, USDT (18 decimals), fee 2.5%  ...
+collections: UD on Polygon, ERC721, expires sometimes, no claim needed
+             SPACE ID .bnb on BNB, ERC721, 90 day grace, claim needed  ...
+listing:     14 day minimum, 7 day buffer, 7/30/90 day durations, max 50</pre>
+<p>The frontend fetches this once when the page loads. Instead of reading <code>DEFAULTS.usdtAddress</code>, the listing flow asks "this name is on chain 8453, what is its currency?" and gets USDC with 6 decimals.</p></dd>
+      <dt>What we gain</dt><dd>One source of truth: the fee we show is always the fee the backend checks. Switching a chain or provider on becomes a backend setting, not a frontend release (that is how Freename stays off until its token ids exist). The listing rules (14 days, 50 names) come from the same reply instead of also being typed into <code>bulkListing.ts</code>.</dd>
+      <dt>Why "mock first"</dt><dd>The endpoint exists on Guru's branch but answered 404 on stage today. We build against a small local JSON with the same shape, holding only today's row (UD on Polygon), so users see no difference. When the endpoint reaches uat we point at it and delete the JSON.</dd>
+      <dt>In one line</dt><dd>C1 swaps "the frontend's own hardcoded settings" for "ask the backend what its settings are". Every other ticket stands on it, because each needs to look up its name's chain details.</dd>
+      <dt>Today</dt><dd>21 files import <code>DEFAULTS</code> (not 7 as listed): the buy flow, single and bulk listing, approvals, on chain cancel, watchlist, history mapping, token formatting, Trails, and two type files.</dd>
+      <dt>What we build</dt><dd>A typed config (types in <code>src/types/</code>), an RTK Query endpoint in <code>src/core/redux</code>, a hook that serves it, and small pure helpers like "find the collection for this chain and contract". Then every <code>DEFAULTS</code> reader moves to it. Until the endpoint exists, the same shape is served from a local JSON with only the UD Polygon row, so nothing changes for users.</dd>
+      <dt>Backend</dt><dd>MC-05 built the endpoint on Guru's branch; the shape is known (section 4). Not on stage yet (404 today).</dd>
+    </dl>
+  </div>
+
+  <div class="ticket">
+    <div class="ticket-head"><span class="num">C2</span><h3>Read from any chain, and one wallet setup</h3><span class="tag now">Independent</span><span class="tag size">Medium</span></div>
+    <dl class="rows">
+      <dt>In plain words</dt><dd>To read anything on chain (who owns a name, is Seaport approved, when does the name expire) we use <code>getPolygonReadProvider</code>, which only talks to Polygon, with a smart list of backup servers. It becomes <code>getReadProvider(chainId)</code> with the same backup logic per chain. Separately, the wallet popup library (AppKit) is set up seven times in seven files; it should be set up once.</dd>
+      <dt>Today</dt><dd><code>createAppKit</code> runs in 7 live places (PDF says 6): <code>component/wallet-connect</code>, <code>component/wallet-signup</code>, <code>BuyFlowModal</code>, <code>ListingFlowModal</code>, <code>BulkListingFlowModal</code>, <code>useHistoryActivities</code>, <code>useLinkWallet</code>, plus <code>src/config/wagmi.ts</code>. <b>Good news:</b> all of them already list Ethereum, Base, Arbitrum, BNB and Polygon, so no network needs adding. They also list dead test networks (Goerli, Mumbai, Arbitrum Goerli) that can go.</dd>
+      <dt>What we build</dt><dd>One read provider per chain with an RPC list per chain (a dedicated RPC env per chain plus public backups), and one shared AppKit setup that the seven places import. Two of the seven live in <code>src/component</code>, which we no longer add code to; we only change their import.</dd>
+      <dt>Backend</dt><dd>None. Needs RPC URLs per chain (question 7).</dd>
+    </dl>
+  </div>
+
+  <div class="ticket">
+    <div class="ticket-head"><span class="num">C3</span><h3>Order builder takes chain, NFT kind and currency</h3><span class="tag now">Independent</span><span class="tag size">Medium</span></div>
+    <dl class="rows">
+      <dt>In plain words</dt><dd>The code that writes a Seaport order (<code>src/lib/seaport-order-builder-v5.ts</code>) always writes "an ERC721 token for USDT with 6 decimals on Polygon". It must take the chain id, the item type (ERC721 or ERC1155), the currency token and its decimals as inputs. The bulk signature (the tree) also has to use the chain's id.</dd>
+      <dt>Today</dt><dd><code>ItemType.ERC721</code> is fixed at line 133; the bulk tree in <code>listingOrder.ts</code> and the Trails order checks also assume Polygon.</dd>
+      <dt>What we build</dt><dd>Parameters with safe defaults, then tests that sign a Base order, a BNB 18 decimal order and an ERC1155 order and compare with the backend's own package (<code>@endlessdomains/order-builder</code> 0.3.0, MC-04), the same trick that proved bulk signatures.</dd>
+      <dt>Backend</dt><dd>None for building; the backend's 0.3.0 package is our reference.</dd>
+    </dl>
+  </div>
+
+  <div class="ticket">
+    <div class="ticket-head"><span class="num">C5</span><h3>Money amounts use each currency's decimals</h3><span class="tag wait">Mock first</span><span class="tag size">Large</span></div>
+    <dl class="rows">
+      <dt>In plain words</dt><dd>Everywhere we turn a stored amount into dollars we divide by 1,000,000 (<code>1e6</code> or <code>USDT_DECIMALS</code>). For BNB's 18 decimal USDT that is wrong by a factor of a trillion. Every one of these must use the order's own decimals, and for 18 decimals we must use exact big number maths, because ordinary JavaScript numbers lose precision there.</dd>
+      <dt>Today</dt><dd>16 files: <code>useMyDomainsData</code>, <code>useLiveListings</code>, <code>orderDetails</code>, <code>watchlist</code>, <code>mapApiActivity</code>, <code>summarizeHistory</code>, <code>watchlistItems</code>, <code>profile-settings.service</code>, <code>useBuyFlowActions</code>, and seven the PDF doesn't name: <code>PriceInput</code>, <code>priceFilter</code>, <code>bulkListing</code>, <code>tokenFormat</code>, <code>checkoutGate</code>, <code>trails/usdtAmount</code>, <code>TrailsWidget</code>.</dd>
+      <dt>What we build</dt><dd>One pair of helpers, "units to dollars" and "dollars to units", that take decimals, tested with 6 and 18. Every file above calls them. Labels say USD (decision 3), with the token named where a wallet asks for it.</dd>
+      <dt>Backend</dt><dd>MC-06 added <code>priceAmount</code>, <code>feeAmount</code>, <code>sellerAmount</code> and <code>priceUsd</code>, and keeps the old <code>priceUsdt</code> names until MC-23. Where <code>currencyDecimals</code> appears in the replies has to be confirmed with Guru.</dd>
+    </dl>
+  </div>
+
+  <div class="ticket">
+    <div class="ticket-head"><span class="num">C6</span><h3>Every row knows its chain and contract</h3><span class="tag wait">Mock first</span><span class="tag size">Medium</span></div>
+    <dl class="rows">
+      <dt>In plain words</dt><dd>Rows in My Domains, the marketplace, watchlist and history are keyed by token id alone, and several places simply write "Polygon" as the chain. Two names on different chains could share a token id, so the key becomes <code>chainId:contract:tokenId</code> and the chain comes from the data.</dd>
+      <dt>Today</dt><dd><code>useMyDomainsData.ts:133</code> uses <code>id: row.tokenId</code>; <code>useWatchlist</code> keys by the Polygon UD contract plus token id; Polygon is forced in <code>mapApiActivity</code>, <code>useLiveListings</code>, <code>orderDetails</code>, <code>watchlist</code>, <code>useWatchlist</code>.</dd>
+      <dt>What we build</dt><dd><code>chainId</code> and <code>tokenContract</code> on <code>MyDomainsOrderRow</code> and <code>MarketplaceOrderRow</code>, one key helper used everywhere, and the chain read from each reply (falling back to 137 while the backend doesn't send it, which is what MC-07 does on its side too).</dd>
+      <dt>Backend</dt><dd>MC-07 added chainId to listing status, history and watchlist. The order list replies (M5) aren't built yet.</dd>
+    </dl>
+  </div>
+
+  <div class="ticket">
+    <div class="ticket-head"><span class="num">QA</span><h3>Gate: Polygon regression</h3><span class="tag bad">Blocked</span></div>
+    <dl class="rows">
+      <dt>In plain words</dt><dd>Before any new chain is switched on, everything that works today must still work exactly the same with the new plumbing: single list, bulk list, buy directly, buy through Trails, delist, history, watchlist. Needs the backend's phase 2 (M1, M2) on uat.</dd>
+    </dl>
+  </div>
+
+  <h4>Phase 3: the new collections, all in one release</h4>
+
+  <div class="ticket">
+    <div class="ticket-head"><span class="num">C4</span><h3>List and buy on the name's own chain</h3><span class="tag wait">Mock first</span><span class="tag size">Large</span></div>
+    <dl class="rows">
+      <dt>In plain words</dt><dd>Before approving or signing, ask the wallet to switch to the name's chain. When buying, check the buyer's allowance and fill on that chain's Seaport. For Trails, the delivery becomes the listing's chain and stablecoin instead of always Polygon USDT0.</dd>
+      <dt>Today</dt><dd>Network switching and a wrong network banner already exist in the single, bulk and buy flows, but always to Polygon. Trails' destination is hardcoded: <code>browserCheckoutSource.ts:84</code> sends <code>chainId: 137</code>, and Guru's MC-09 added a "Polygon only" guard for Trails on the backend.</dd>
+      <dt>What we build</dt><dd>The flows take the chain from the row and config. On chain reads for ownership, approval and expiry use C2's provider for that chain. Trails gets the listing's chain and token.</dd>
+      <dt>Backend</dt><dd>A listing on a new chain is only accepted once M3 (per collection checks) exists. Not built yet.</dd>
+    </dl>
+  </div>
+
+  <div class="ticket">
+    <div class="ticket-head"><span class="num">ENS</span><h3>ENS: wrapped, unwrapped and v2</h3><span class="tag wait">Mock first</span><span class="tag size">Large</span></div>
+    <dl class="rows">
+      <dt>In plain words</dt><dd>Decision 4 puts all of ENS in the first release. That means ERC1155 orders for wrapped and v2 names, clear messages when a wrapped name can't be sold (<code>CANNOT_TRANSFER</code> burned) or when an ENSv2 id changed and the listing ended, and honest gas copy for Ethereum, where approving and cancelling cost a few dollars instead of cents.</dd>
+      <dt>Today</dt><dd>Nothing ERC1155 anywhere. The bulk drawer's copy says "≈ 0.02 POL" style amounts tied to Polygon.</dd>
+      <dt>What we build</dt><dd>ERC1155 order building (on top of C3), ownership read as <code>balanceOf</code> instead of <code>ownerOf</code>, the new error messages (wording shown as a mockup page for approval first), and gas estimates per chain.</dd>
+      <dt>Backend</dt><dd>The refusals come from M3, the "listing ended because the id changed" from M4, and wrapped names only appear in My Domains once M5b adds the NameWrapper to discovery.</dd>
+    </dl>
+  </div>
+
+  <div class="ticket">
+    <div class="ticket-head"><span class="num">C7</span><h3>Providers and chain filters from the config</h3><span class="tag wait">Mock first</span><span class="tag size">Small</span></div>
+    <dl class="rows">
+      <dt>In plain words</dt><dd>Add SPACE ID and Freename to the provider lists in <code>helpers/chaincurrency/chaincurrency.ts</code>. Treat Freename as a provider, not a chain: today <code>data/marketplace/domains.ts</code> defines a <code>FREENAME</code> "chain" object. Chain filters in the marketplace and My Domains are built from the config, not fixed lists.</dd>
+      <dt>Today</dt><dd>Chain logos for Ethereum, Base, Arbitrum, BNB and Polygon already exist in <code>public/assets/img/chain-logos</code>, and the <code>ChainBadge</code> primitive exists.</dd>
+      <dt>Backend</dt><dd>M1 config shape (known).</dd>
+    </dl>
+  </div>
+
+  <div class="ticket">
+    <div class="ticket-head"><span class="num">C8</span><h3>One chain per bulk batch</h3><span class="tag now">Already built</span></div>
+    <dl class="rows">
+      <dt>In plain words</dt><dd>A bulk batch can only hold names from one chain, because the one signature only works on one chain (decision 2). Select mode needs a chain filter first.</dd>
+      <dt>Today</dt><dd>Built in bulk listing v2 phase 7: <code>bulkBatchChain</code>, <code>bulkReasonInBatch</code>, the "pick a chain" banner and the saved chain filter. Multi chain only has to check it with real second chains, and switch the wallet to the batch's chain.</dd>
+    </dl>
+  </div>
+
+  <div class="ticket">
+    <div class="ticket-head"><span class="num">C9</span><h3>Tell ENS v1 and SPACE ID buyers to claim control</h3><span class="tag now">Independent</span><span class="tag size">Small</span></div>
+    <dl class="rows">
+      <dt>In plain words</dt><dd>After buying one of these names, the receipt says something like "Claim control to manage this name's records" with a link to the main website's manage page, which does the reclaim (webui ticket W5, not ours).</dd>
+      <dt>What we build</dt><dd>Copy and link on the buy receipt, driven by the config's <code>needsClaimControl</code> flag. Wording goes through a mockup page first. The link target depends on W5, which isn't scheduled.</dd>
+    </dl>
+  </div>
+
+  <div class="ticket">
+    <div class="ticket-head"><span class="num">Rigs</span><h3>Test setups for every collection</h3><span class="tag now">Independent</span><span class="tag size">Medium</span></div>
+    <dl class="rows">
+      <dt>In plain words</dt><dd>A "fork" is a private copy of a real chain on your computer, with real contracts and fake money, where you can list and buy for free. Mohit sir wants every flow run on a fork first, then once for real with a cheap name per collection.</dd>
+      <dt>What we build</dt><dd>Fork scripts (for example with Anvil) per chain, and a list of the real test names and wallets needed, for Mohit sir to approve and pay for. You have none today (answered 24 Nov).</dd>
+    </dl>
+  </div>
+
+  <div class="ticket">
+    <div class="ticket-head"><span class="num">QA</span><h3>Gate: every flow on every collection</h3><span class="tag bad">Blocked</span></div>
+    <dl class="rows">
+      <dt>In plain words</dt><dd>List, buy directly, buy through Trails, delist, and "listing ends when the name is moved away", on all 8 collections, plus one real Trails buy per chain (only Polygon has ever been tried). A BNB listing must round trip with 18 decimals; a SPACE ID name inside the expiry buffer must be refused; ENS wrapped, unwrapped and v2 must list and fill. Needs M3 to M6 on uat.</dd>
+    </dl>
+  </div>
+
+  <h2 id="backend">4. Backend status (read only, checked 24 Nov)</h2>
+  <div class="tablecard"><table>
+    <tr><th>PDF ticket</th><th>Guru's work</th><th>State</th><th>What it means for us</th></tr>
+    <tr><td>M1 registries</td><td>MC-02 registries, MC-03 providers per chain, MC-05 config endpoint</td><td><span class="tag now">On sprint branch</span></td><td>C1 shape is known; endpoint 404 on stage</td></tr>
+    <tr><td>Order builder</td><td>MC-04, <code>@endlessdomains/order-builder</code> 0.3.0</td><td><span class="tag now">On sprint branch</span></td><td>Reference for C3 tests</td></tr>
+    <tr><td>M2 order schema</td><td>MC-06 amount columns and <code>priceUsd</code>, MC-07 chainId on side tables</td><td><span class="tag now">On sprint branch</span></td><td>Field names for C5, C6; old names kept until MC-23</td></tr>
+    <tr><td>Order path</td><td>MC-08 cutover to the registry</td><td><span class="tag new">Marked WIP, not reviewed</span></td><td>Risky until reviewed</td></tr>
+    <tr><td>Emails, Trails, admin</td><td>MC-09</td><td><span class="tag now">On sprint branch</span></td><td>Trails is guarded to Polygon on the backend too</td></tr>
+    <tr><td>M4 poller</td><td>MC-10 cursor and lock per chain</td><td><span class="tag now">Part done</span></td><td>ERC1155 events and ENSv2 regeneration not yet</td></tr>
+    <tr><td>M3 validation per collection</td><td>none yet</td><td><span class="tag wait">Not started</span></td><td>Blocks any real listing on a new chain</td></tr>
+    <tr><td>M5 reads and stats</td><td>none yet</td><td><span class="tag wait">Not started</span></td><td>Blocks chain and provider filters on real data</td></tr>
+    <tr><td>M5b discovery</td><td>none yet</td><td><span class="tag wait">Not started</span></td><td>Wrapped ENS and on chain Freename names won't appear in My Domains</td></tr>
+    <tr><td>M6 fees per chain</td><td>probably inside MC-02</td><td><span class="tag wait">To confirm</span></td><td>Same 2.5% everywhere (decision 7)</td></tr>
+  </table></div>
+  <p class="muted">None of the MC work is on backend uat (uat has 24 commits the sprint branch doesn't). Ticket numbers seem to run to about MC-23; no written list exists in the repo, so you'll ask Guru.</p>
+
+  <h2 id="gaps">5. What the PDF misses or gets slightly wrong</h2>
+  <div class="issue"><span class="n">1</span><div><p><b>The hotspot lists are short.</b> <code>DEFAULTS</code> is read in 21 files, not 7. Six decimal maths sits in 16 files, not 10. <code>createAppKit</code> runs 7 times, not 6. The plan will use the full lists.</p><p class="where">Grep on <code>bulk-list</code>, 24 Nov, excluding <code>_archive</code> and Guru's test page</p></div></div>
+  <div class="issue"><span class="n">2</span><div><p><b>Trails is Polygon only on both sides.</b> The PDF says "the destination becomes the listing's chain", but the frontend hardcodes 137 and the backend's MC-09 added a Polygon guard. Both have to open together, and only Polygon has ever been tested with a real buy.</p><p class="where"><code>core/services/trails/browserCheckoutSource.ts:84</code></p></div></div>
+  <div class="issue"><span class="n">3</span><div><p><b>The deep link refuses non Polygon names.</b> The PDF notes this for webui's List action (W1), but it lives in our page: <code>pages/seller-hub/my-domains/index.tsx:146</code> shows "Only Polygon domains can be listed". It must read the chain from <code>?chainId=</code> and the config.</p></div></div>
+  <div class="issue"><span class="n">4</span><div><p><b>Expiry reads are per provider.</b> Bulk listing reads UD's <code>expiryOf</code> on Polygon through Multicall3. SPACE ID and ENS use other functions (with grace periods), Freename has none, and ENSv2 differs again. This sits between C4 and the ENS ticket and isn't named anywhere.</p><p class="where"><code>hooks/my-domains/useBulkListingActions.ts</code> <code>readChainExpiries</code></p></div></div>
+  <div class="issue"><span class="n">5</span><div><p><b>On chain cancel is Polygon only.</b> Delist (single and bulk) sends Seaport <code>cancel</code> on Polygon. It must go to the order's chain, and on Ethereum the cost is real, so the copy must say so.</p><p class="where"><code>useOnChainCancel.ts</code>, <code>onChainCancel.ts</code></p></div></div>
+  <div class="issue"><span class="n">6</span><div><p><b>Price filter and sort across currencies.</b> <code>helpers/marketplace/priceFilter.ts</code> filters on 6 decimal units. Mixed currencies have to filter and sort on <code>priceUsd</code>, which the backend added in MC-06.</p></div></div>
+  <div class="issue"><span class="n">7</span><div><p><b>Listing rules are still hardcoded.</b> 14 days, 7 days, the 7, 30, 90 durations and the cap of 50 are constants in <code>bulkListing.ts</code>; the config endpoint carries them now, so C1 should read them.</p></div></div>
+  <div class="issue"><span class="n">8</span><div><p><b>The files we must touch break the layering rules today.</b> <code>listingOrder.ts</code> and <code>useListingFlowActions.ts</code> sign and post orders from inside a composite folder (CLAUDE.md §8, plan rows M8 to M10). Multi chain rewrites both, so fixing their place at the same time is cheap. Fixing them is your call (question 6).</p></div></div>
+  <div class="issue"><span class="n">9</span><div><p><b>Old modals still switch to Polygon.</b> <code>src/component/modals/BuyNowModal</code>, <code>DomainListingModal</code> and <code>DomainBulkListingModal</code> still have Polygon network code and are imported from a few places. If any path still opens them, they'd bypass the multi chain flow.</p></div></div>
+  <div class="issue"><span class="n">10</span><div><p><b>Freename can't be listed until M5b ships.</b> Its token ids are stored as null today, and our flows need a token id. Freename should stay switched off in the config until discovery fills ids.</p></div></div>
+  <div class="issue"><span class="n">11</span><div><p><b>Approval copy.</b> The designs' "Approve once, list forever" was already flagged by Mohit sir (design issue 5). With several contracts per seller, the approval step must list each contract with its chain and a real gas estimate. Bulk v2's approval step does that for one row; it needs testing with several.</p></div></div>
+
+  <h2 id="questions">6. Open questions, with my recommendations</h2>
+  <div class="tablecard"><table>
+    <tr><th>#</th><th>Question</th><th>My recommendation</th><th>State</th></tr>
+    <tr><td>Q1</td><td>Who builds the frontend?</td><td></td><td><span class="tag now">Answered 24 Nov</span> You, all of it</td></tr>
+    <tr><td>Q2</td><td>Base branch</td><td>Cut from <code>bulk-list</code>, rebase onto uat after bulk-list merges</td><td><span class="tag now">Answered 24 Nov</span> As recommended</td></tr>
+    <tr><td>Q3</td><td>Guru's sprint list past MC-10, and when MC work reaches uat and stage</td><td>Ask Guru; meanwhile treat M3, M5, M5b as not started</td><td><span class="tag wait">You'll ask Guru</span></td></tr>
+    <tr><td>Q4</td><td>Real test names and wallets per collection</td><td>Forks first; send Mohit sir a costed list (one cheap name per collection, gas money per chain)</td><td><span class="tag wait">None yet; list to draft</span></td></tr>
+    <tr><td>Q5</td><td>Is there Figma for chain badges, the chain filter, claim control and ENS gas notes?</td><td>I check the Figma file before assuming there is none</td><td><span class="tag new">I'll check</span></td></tr>
+    <tr><td>Q6</td><td>Move <code>listingOrder</code> and <code>useListingFlowActions</code> out of the composite folder while rewriting them?</td><td>Yes, since we rewrite them anyway (gap 8)</td><td><span class="tag wait">Your call</span></td></tr>
+    <tr><td>Q7</td><td>RPC per chain: do we have dedicated RPC URLs for Ethereum, Base, Arbitrum, BNB like <code>NEXT_PUBLIC_POLYGON_RPC_URL</code>?</td><td>One env per chain, public backups behind it</td><td><span class="tag wait">Ask the team</span></td></tr>
+    <tr><td>Q8</td><td>Price display: "$12.00" alone, or "$12.00" with the token beside it?</td><td>USD everywhere (decision 3), token named only in the wallet step and the receipt</td><td><span class="tag wait">Wording mockup later</span></td></tr>
+    <tr><td>Q9</td><td>Does ENSv2 need claim control, and does a wrapped name?</td><td>PDF names only ENS v1 and SPACE ID; confirm with Mohit sir</td><td><span class="tag wait">For Mohit sir</span></td></tr>
+    <tr><td>Q10</td><td>Can Trails open per chain on the backend at the same time as ours?</td><td>Yes, one switch each side, released together</td><td><span class="tag wait">For Guru</span></td></tr>
+    <tr><td>Q11</td><td>Are the old <code>src/component</code> modals still reachable (gap 9)?</td><td>I check every import before the plan; if reachable, route them to the new flows</td><td><span class="tag new">I'll check</span></td></tr>
+  </table></div>
+
+  <h2 id="notours">7. What Mohit sir asks of others (not this repo)</h2>
+  <div class="card">
+    <p><b>Webui (main website), needs a webui developer:</b> W1 a "List for sale" action per domain that opens <code>/seller-hub/my-domains?list=&lt;name&gt;&amp;chainId=&lt;id&gt;</code> (our side must accept it, gap 3). W2 "List several" opens our select mode with <code>?bulk=1</code>, which we already support. W3 listing status as its own field (needs backend first). W4 map token id, contract and chain. W5 the claim control action that our C9 links to. W6 was dropped (decision 11).</p>
+    <p><b>Backend (Guru):</b> M1 to M6 and M5b in section 4.</p>
+  </div>
+
+  <h2 id="next">8. What happens next</h2>
+  <ol class="qs">
+    <li><b>You read this page and answer Q6</b><span>Correct anything I explained wrongly.</span></li>
+    <li><b>I check Figma and the old modals (Q5, Q11)</b><span>Then update this page.</span></li>
+    <li><b>I draft the messages</b><span>To Guru (Q3, Q7, Q10, the stage 404 and the 24 Nov 500s), and to Mohit sir (Q4 test names with costs, Q9).</span></li>
+    <li><b>I write the plan and the tickets explainer</b><span><code>multichain-plan.md</code> with a paste ready prompt per phase, ordered so the work that needs no backend (C2, C3, C9, rigs, C1 on a mock) comes first.</span></li>
+  </ol>
+
+  <footer>Sources: Mohit sir's PDF (10 Nov, pages 8 to 21) in <code>mohit-requirements-10nov.txt</code>; <code>multichain-session-context.md</code>; grep of <code>src/</code> on <code>bulk-list</code> <code>a59939a</code>; backend <code>origin/feature/multichain_sprints</code> <code>ce9ccabf</code>; stage config probe, 24 Nov 2026.</footer>
+</div>
+<script>
+  document.getElementById('toggle').addEventListener('click', function () {
+    var root = document.documentElement;
+    var current = root.getAttribute('data-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('dmplan-theme', next); } catch (e) {}
+  });
+</script>
+</body>
+</html>

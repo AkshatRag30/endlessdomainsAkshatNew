@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trails code review</title>
+<script>
+  // Apply the saved theme before first paint (same key as the progress doc, so they stay in step).
+  try {
+    var saved = localStorage.getItem('dmplan-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  } catch (e) {}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* Same look as the other Trails explainers: sticky contents rail, one reading column. */
+:root {
+  --bg: #f6f6f9; --surface: #ffffff; --sunk: #eeedf4; --fg: #1b1a24; --muted: #5c5a6b; --line: #dddbe7;
+  --accent: #6a3fd6; --accent-soft: #ece6fb; --warn: #9a5b00; --warn-soft: #fff3df; --ok: #1d7a4c; --ok-soft: #e3f4ea;
+  --bad: #b3261e; --bad-soft: #fdeceb;
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f0e14; --surface: #18171f; --sunk: #211f2a; --fg: #ecebf2; --muted: #a3a1b3; --line: #2e2c3a;
+    --accent: #ac90ff; --accent-soft: #2a2240; --warn: #f0b45a; --warn-soft: #332611; --ok: #6fd39d; --ok-soft: #142a1e;
+    --bad: #ff8a80; --bad-soft: #351817; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f0e14; --surface: #18171f; --sunk: #211f2a; --fg: #ecebf2; --muted: #a3a1b3; --line: #2e2c3a;
+  --accent: #ac90ff; --accent-soft: #2a2240; --warn: #f0b45a; --warn-soft: #332611; --ok: #6fd39d; --ok-soft: #142a1e;
+  --bad: #ff8a80; --bad-soft: #351817; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0; background: var(--bg); color: var(--fg);
+  font-family: var(--font-body); font-size: 16px; line-height: 1.65;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 64px;
+}
+.wrap { max-width: 1120px; margin: 0 auto; display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 48px; }
+header.top { max-width: 1120px; margin: 0 auto; padding-block: 48px 32px; border-bottom: 1px solid var(--line); margin-bottom: 40px; }
+.eyebrow { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin: 0; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; line-height: 1.2; margin: 0; }
+h1 { font-size: clamp(30px, 5vw, 46px); margin-top: 8px; }
+.lede { font-size: 18px; color: var(--muted); max-width: 66ch; margin: 14px 0 0; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.chip { font-size: 13px; padding: 3px 10px; border-radius: 99px; background: var(--sunk); color: var(--muted); }
+nav.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 24px); align-self: start; font-size: 14px; max-height: calc(100vh - 48px); overflow-y: auto; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+nav.toc a { display: block; padding: 5px 10px; border-radius: 6px; color: var(--muted); text-decoration: none; }
+nav.toc a:hover, nav.toc a:focus-visible { background: var(--sunk); color: var(--fg); outline: none; }
+nav.toc .label { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; font-weight: 600; color: var(--muted); padding: 10px 10px 6px; }
+main { min-width: 0; display: flex; flex-direction: column; gap: 56px; }
+section { scroll-margin-top: 24px; display: flex; flex-direction: column; gap: 16px; }
+section > p, section > ul, section > ol { max-width: 70ch; margin: 0; }
+h2 { font-size: 28px; }
+h3 { font-size: 19px; margin-top: 8px; }
+.num { font-family: var(--font-mono); font-size: 13px; color: var(--accent); font-weight: 500; display: block; margin-bottom: 4px; }
+.oneline { background: var(--accent-soft); border-radius: 10px; padding: 14px 18px; max-width: 70ch; }
+.oneline b { display: block; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-bottom: 2px; }
+.callout { border-radius: 10px; padding: 14px 18px; max-width: 70ch; }
+.callout p { margin: 0; }
+.callout p + p { margin-top: 8px; }
+.callout.ok { background: var(--ok-soft); }
+.callout.ok b:first-child { color: var(--ok); }
+.callout.bad { background: var(--bad-soft); }
+.callout.bad b:first-child { color: var(--bad); }
+.callout.warn { background: var(--warn-soft); }
+.callout.warn b:first-child { color: var(--warn); }
+code { font-family: var(--font-mono); font-size: .86em; background: var(--sunk); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+pre { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; overflow-x: auto; font-family: var(--font-mono); font-size: 12.5px; line-height: 1.6; max-width: 76ch; }
+pre code { background: none; padding: 0; font-size: inherit; overflow-wrap: normal; }
+.tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; background: var(--sunk); }
+tr:last-child td { border-bottom: none; }
+.flow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.step { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; position: relative; font-size: 14px; }
+.step strong { display: block; font-family: var(--font-display); font-size: 15px; margin-bottom: 2px; }
+.step .where { font-size: 12px; color: var(--accent); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+.step.broken { border-color: var(--bad); }
+.step.broken .where { color: var(--bad); }
+.step:not(:last-child)::after { content: "→"; position: absolute; right: -11px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 14px; }
+.pill { display: inline-block; font-size: 12px; font-weight: 600; padding: 1px 8px; border-radius: 99px; }
+.pill.ok { background: var(--ok-soft); color: var(--ok); }
+.pill.bad { background: var(--bad-soft); color: var(--bad); }
+.pill.warn { background: var(--warn-soft); color: var(--warn); }
+.toggle { flex-shrink: 0; border: 1px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 14px; cursor: pointer; }
+.toggle:hover { border-color: var(--accent); }
+.toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.headrow { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.refs { font-size: 14px; color: var(--muted); max-width: 72ch; }
+.refs code { font-size: .9em; }
+@media (max-width: 860px) {
+  .wrap { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  nav.toc { position: static; max-height: none; border: 1px solid var(--line); border-radius: 10px; padding: 6px; background: var(--surface); }
+  nav.toc ol { display: grid; grid-template-columns: 1fr 1fr; }
+  .flow { grid-template-columns: minmax(0, 1fr); }
+  .step:not(:last-child)::after { content: "↓"; right: auto; left: 50%; top: auto; bottom: -15px; transform: translateX(-50%); }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="headrow">
+    <p class="eyebrow">Trails checkout · code review · 11 Nov 2026</p>
+    <button class="toggle" id="toggle" type="button" aria-label="Switch between light and dark theme">Toggle theme</button>
+  </div>
+  <h1>Mohit's review of the Trails code, checked against the real code</h1>
+  <p class="lede">Mohit reviewed the pushed Trails branch and raised six points. Each one is checked here against the actual files: what he said, what the code really does (with file and line), why it matters in plain words, how to fix it, and what needs a decision first.</p>
+  <div class="callout ok" style="margin-top:18px"><p><b>Update, 11 Nov: all six are fixed in the code (not committed yet).</b> Your decisions: refund wording approved as drafted, unpaid cut off 30 minutes, only the widget logging removed. Tests: 76 pass, type check clean. Still to do: a free run, a paid run with a page change, and your <code>next build</code>. Details in the progress doc, "Review fixes". The sections below describe the code as it was when reviewed.</p></div>
+  <div class="meta">
+    <span class="chip">Branch trails, commit 10e06fc (pushed 10 Nov)</span>
+    <span class="chip">Reviewer: Mohit · Checked against the code: Claude</span>
+    <span class="chip">Result: all six points are correct · fixed 11 Nov</span>
+  </div>
+</header>
+
+<div class="wrap">
+<nav class="toc" aria-label="Contents">
+  <ol>
+    <li class="label">Overview</li>
+    <li><a href="#summary">1. Summary</a></li>
+    <li class="label">The six points</li>
+    <li><a href="#p1">2. Every page got heavier</a></li>
+    <li><a href="#p2">3. Tracking stops on navigation</a></li>
+    <li><a href="#p3">4. Refund screen wording</a></li>
+    <li><a href="#p4">5. Slippage 5% vs 0.5%</a></li>
+    <li><a href="#p5">6. Unpaid intent polled forever</a></li>
+    <li><a href="#p6">7. Console logging</a></li>
+    <li class="label">Next</li>
+    <li><a href="#plan">8. Order of work and testing</a></li>
+    <li><a href="#tests">9. Testing the fixes</a></li>
+    <li><a href="#decide">10. Decisions needed</a></li>
+    <li><a href="#words">11. Words used</a></li>
+  </ol>
+</nav>
+
+<main>
+
+<section id="summary">
+  <div><span class="num">Section 1</span><h2>Summary</h2></div>
+  <div class="oneline"><b>In one line</b>All six points are real. Two are about how the code is built (page weight and where tracking lives) and should be fixed together; the other four are small.</div>
+  <div class="tbl"><table>
+    <thead><tr><th>#</th><th>Mohit's point</th><th>True?</th><th>How serious</th><th>Fix size</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Every page about 38 kB heavier, because the resume code in <code>_app</code> pulls in the whole checkout code</td><td><span class="pill ok">Yes</span></td><td><span class="pill bad">High</span> breaks the doc's "no page got heavier" rule</td><td>Medium, done together with 2</td></tr>
+      <tr><td>2</td><td>Tracking stops when the buyer goes to another page or starts a second purchase</td><td><span class="pill ok">Yes</span></td><td><span class="pill bad">High</span> no result message, History banner stuck</td><td>Medium (about a day with 1)</td></tr>
+      <tr><td>3</td><td>Refund wording states an unconfirmed fact and misleads people who paid in another token</td><td><span class="pill ok">Yes</span></td><td><span class="pill warn">Medium</span> it's about the buyer's money</td><td>Small, needs wording approval</td></tr>
+      <tr><td>4</td><td>Slippage is 5%, the probe used 0.5%</td><td><span class="pill ok">Yes</span></td><td><span class="pill warn">Medium</span></td><td>One line</td></tr>
+      <tr><td>5</td><td>An intent the buyer agreed to but never paid is polled forever, and again after every reload for 24 hours</td><td><span class="pill ok">Yes</span></td><td><span class="pill warn">Medium</span> wasted requests, no harm to money</td><td>Small, plus tests</td></tr>
+      <tr><td>6</td><td>Every widget event is printed to the browser console</td><td><span class="pill ok">Yes</span></td><td><span class="pill warn">Low to medium</span> also prints wallet data</td><td>A few lines</td></tr>
+    </tbody>
+  </table></div>
+  <p>The only thing I couldn't check myself is the exact <b>38 kB</b> figure: measuring it needs a production build, which only you run. The cause he describes is confirmed in the code (section 2).</p>
+</section>
+
+<section id="p1">
+  <div><span class="num">Section 2 · Point 1</span><h2>Every page got heavier, by about 38 kB</h2></div>
+  <h3>What Mohit said</h3>
+  <p>The resume hook in <code>_app</code> pulls the entire checkout code (Seaport encoder, order checks) into every page, including login and profile. That breaks the doc's "no page's First Load JS grew" rule. Fix: load it lazily, only when a purchase is actually pending.</p>
+  <h3>What the code does</h3>
+  <p><code>pages/_app.tsx</code> wraps every page on the site. On lines 36 to 39 it imports the resume hook, and line 78 runs it. Following the imports from there:</p>
+<pre><code>pages/_app.tsx                                  (every page)
+ └ hooks/trails/useTrailsResume.ts
+    └ core/services/trails/watchCheckout.ts
+       └ core/services/trails/index.ts           getCheckoutSource()
+          └ core/services/trails/browserCheckoutSource.ts
+             ├ helpers/trails/buildDestinationCalls.ts   viem encoder, Seaport ABI
+             ├ core/services/trails/orderChecks.service.ts   ethers, seaport-order-builder-v5
+             ├ helpers/trails/orderChecks.ts
+             └ lib/marketplace-order-client.ts</code></pre>
+  <p>So the code that <b>builds a purchase</b> (encoding the Seaport call, checking the order on chain) is loaded on every page, even though the resume hook only needs the code that <b>reads a purchase's status</b>. And it's loaded for everyone, even when nothing is pending, which is almost always.</p>
+  <h3>Why it matters, in plain words</h3>
+  <p>Every visitor downloads extra code on every page, including pages that have nothing to do with buying. Mohit's doc set a rule that the Trails work must not make any page's first download bigger. Only the buy drawer's own Trails widget was loaded lazily (that part is fine: <code>TrailsWidget.tsx</code> is loaded with <code>next/dynamic</code>).</p>
+  <h3>The fix</h3>
+  <ol>
+    <li>On app load, do only a <b>tiny check</b>: read <code>localStorage</code> and see if any purchase is pending. That code is a few lines with no libraries.</li>
+    <li>Only if something is pending, load the watching code with <code>import()</code>, which makes it a separate file the browser fetches on demand.</li>
+    <li>Split the "read the status" part (Trails API call plus our sale receipt) away from the "prepare a purchase" part (encoder, order checks), so even the on demand file stays small.</li>
+  </ol>
+  <p>This is best done together with point 2, because both change where tracking lives.</p>
+  <div class="callout warn"><p><b>To confirm after the fix:</b> you run <code>next build</code> once (dev server stopped) and compare First Load JS for a page like /login with the <code>dark-mode</code> branch. It should match again.</p></div>
+</section>
+
+<section id="p2">
+  <div><span class="num">Section 3 · Point 2</span><h2>Purchase tracking stops if the buyer navigates away</h2></div>
+  <h3>What Mohit said</h3>
+  <p>Tracking lives inside the drawer, which belongs to each page. If the buyer closes it mid purchase and clicks to another page, or starts a second purchase, polling stops: no result toast, and the History banner says "in progress" until a full reload. Fix: move tracking to app level.</p>
+  <h3>What the code does</h3>
+  <ul>
+    <li>The polling for an open purchase lives in <code>hooks/trails/useTrailsCheckout.ts</code>, which the buy drawer uses. The drawer is placed by each page separately: <code>pages/index.tsx</code>, <code>pages/details/[orderId].tsx</code> and <code>pages/watchlist/index.tsx</code>.</li>
+    <li>Line 41 of <code>useTrailsCheckout.ts</code> stops polling when the drawer goes away. Moving to another page removes the old page and its drawer, so polling stops.</li>
+    <li>Lines 44 to 53: starting a new purchase calls <code>stop()</code> first, so the previous purchase stops being watched. The comment on lines 24 to 26 even says so.</li>
+    <li>The app level resume (<code>useTrailsResume.ts</code>, lines 22 to 34) runs <b>once</b>, when the app first loads. Moving between pages doesn't reload the app, so nobody picks the purchase back up until a full reload.</li>
+    <li>The History banner (<code>useTrailsPendingCheckouts.ts</code>) just reads the saved list every 15 seconds. The entry is only removed by a watcher when the purchase ends, and no watcher is running, so the banner keeps saying "in progress".</li>
+  </ul>
+  <h3>Why it matters, in plain words</h3>
+  <p>The purchase itself still completes on chain, money and domain are safe. But the buyer is left without the "is yours" (or refund) message, and History tells them it's still running when it's long finished. Your 10 Nov tests didn't hit this because the buyer stayed on the same page each time.</p>
+  <h3>The fix</h3>
+  <ol>
+    <li>One <b>app level tracker</b>, started from <code>_app</code>, that owns every running purchase and polls it, whatever page the buyer is on. It shows the end message itself.</li>
+    <li>The drawer stops owning the polling. When the widget quotes, the drawer <b>hands the purchase to the tracker</b> and only listens to it for its own screens (progress, done, refunded).</li>
+    <li>The tracker watches several purchases at once, so starting a second one no longer stops the first.</li>
+    <li>When a purchase ends, the tracker removes it from the saved list straight away, so the History banner clears without a reload.</li>
+    <li>The tracker's polling code is loaded only when it has something to watch (point 1).</li>
+  </ol>
+  <p>Fits the layering rules (CLAUDE.md §8): the list of running purchases and the polling stay in <code>core/services</code>, the hook in <code>hooks/trails</code>, the end message is drawn in <code>_app</code> like today.</p>
+  <div class="callout warn"><p><b>Testing it needs a paid run:</b> start a Trails purchase, press "Keep browsing", go to another page, and check the "is yours" message appears and the History banner clears. That's the same run as the "closed drawer" test already on the list, so no extra cost.</p></div>
+</section>
+
+<section id="p3">
+  <div><span class="num">Section 4 · Point 3</span><h2>The refund screen wording</h2></div>
+  <h3>What Mohit said</h3>
+  <p>It states "Trails' conversion fees aren't refunded" as fact, which Trails hasn't confirmed. It also says the USDT was "sent back", which misleads someone who paid in, say, BNB on BSC. The doc's wording, "not converted back to your original token", needs to go in.</p>
+  <h3>What the code says today</h3>
+  <ul>
+    <li>Refund screen in the drawer, <code>BuyFlowModal.tsx</code> line 840: <i>"The purchase couldn't complete, so X USDT was sent back to your wallet on Polygon. Trails' conversion fees aren't refunded."</i></li>
+    <li>Refund message (toast) when the drawer isn't showing it, <code>data/trails/copy.ts</code> line 14: <i>"X USDT was sent back to your wallet on Polygon."</i></li>
+  </ul>
+  <p>This was already flagged: the progress doc's "Double check before this ships" box lists "Trails' conversion fees aren't refunded" as a claim to confirm with Mohit. His answer is: don't claim it.</p>
+  <h3>Why it matters, in plain words</h3>
+  <p>"Sent back" sounds like the buyer gets back what they paid. If they paid in BNB on BSC, they actually get USDT on Polygon, a different token on a different network. They might look in the wrong wallet or think money is missing. And the fees sentence is a promise about money that nobody confirmed.</p>
+  <h3>Proposed new wording (needs your approval before it goes in)</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Where</th><th>Today</th><th>Proposed</th></tr></thead>
+    <tbody>
+      <tr><td>Refund screen</td><td>…so X USDT was sent back to your wallet on Polygon. Trails' conversion fees aren't refunded.</td><td>The purchase couldn't complete, so Trails refunded X USDT to your wallet on Polygon. It's not converted back to your original token.</td></tr>
+      <tr><td>Refund message</td><td>X USDT was sent back to your wallet on Polygon.</td><td>X USDT was refunded to your wallet on Polygon, not converted back to your original token.</td></tr>
+    </tbody>
+  </table></div>
+  <p>The fees sentence is simply dropped. Both lines keep "USDT" and "on Polygon" so the buyer knows exactly what to look for and where.</p>
+</section>
+
+<section id="p4">
+  <div><span class="num">Section 5 · Point 4</span><h2>Slippage tolerance: 5% vs 0.5%</h2></div>
+  <h3>What Mohit said</h3>
+  <p>Slippage tolerance is set to 5%; the probe used 0.5%.</p>
+  <h3>What the code does</h3>
+  <p><code>core/services/trails/browserCheckoutSource.ts</code> line 19: <code>SLIPPAGE_TOLERANCE = 0.05</code> (5%). The comment says it's Trails' own widget default and waits on Mohit (plan question Q13). That part is true: the 0xtrails package uses <code>0.05</code> when no value is passed. But Mohit's doc gave no value, and the spike page (<code>pages/trails-spike.tsx</code>, local only) used <code>'0.005'</code> (0.5%), which matches the probe he means.</p>
+  <h3>Why it matters, in plain words</h3>
+  <p>Slippage tolerance is how far the price may move between the quote and the moment Trails swaps the buyer's token. At 5%, Trails may use up to 5% more of the buyer's token than the price looked like; at 0.5%, the buyer is much better protected. The trade off: with a token whose price jumps a lot, a tight 0.5% can make the swap fail more often, which then ends in a refund.</p>
+  <h3>The fix</h3>
+  <p>Change the one line to <code>0.005</code>, mark Q13 answered by Mohit, and do the next paid run at 0.5% to check quotes still go through. All three real purchases so far ran at 5%.</p>
+</section>
+
+<section id="p5">
+  <div><span class="num">Section 6 · Point 5</span><h2>A committed but unpaid intent is polled forever</h2></div>
+  <h3>What Mohit said</h3>
+  <p>An intent the buyer committed to but never paid is polled forever, and again after every reload within 24 hours.</p>
+  <h3>What the code does</h3>
+  <p>The rules that decide when to stop polling are in <code>helpers/trails/intentStatus.ts</code>:</p>
+  <ul>
+    <li>Lines 24 and 25: Trails' <code>QUOTED</code> and <code>COMMITTED</code> both become our status <code>attached</code>.</li>
+    <li>Line 103 (<code>isFinal</code>): only <code>QUOTED</code> has a cut off ("stop once the quote is 15 minutes old").</li>
+    <li>A <code>COMMITTED</code> intent falls through to <code>isTerminal</code> (line 53), which says "not finished" for <code>attached</code>. So it never stops: every 3 seconds for 5 minutes, then every 15 seconds for as long as the tab is open.</li>
+    <li>The saved entry stays for 24 hours (<code>isResumable</code>, line 121), and <code>useTrailsResume</code> starts polling it again on every reload in that time.</li>
+  </ul>
+  <p>Same gap, smaller: line 35 treats any status Trails might add in future as "still running", which also never ends.</p>
+  <h3>Why it matters, in plain words</h3>
+  <p>A buyer who signed in the widget but never actually paid leaves the site asking Trails about it every 15 seconds, all day, in every tab and after every reload. No money is at risk, but it's wasted requests against our Trails key, and it could keep a History banner or later message alive for a purchase that never happened.</p>
+  <h3>The fix</h3>
+  <ol>
+    <li>Treat <code>COMMITTED</code> like <code>QUOTED</code>: if the payment hasn't landed after a cut off, stop, and end it quietly as "abandoned" (no message, same as an unpaid quote today).</li>
+    <li>On reload, skip entries that were never paid and are past that cut off, instead of polling them for 24 hours. The saved entry already records whether the payment landed (<code>paid</code>).</li>
+    <li>Give unknown statuses the same overall time limit as failures (20 minutes).</li>
+    <li>Add tests for each case next to the existing 66.</li>
+  </ol>
+  <div class="callout warn"><p><b>One choice:</b> the cut off. 15 minutes matches the quote's life today. A payment from Ethereum mainnet on a busy day can take longer to land, so 30 minutes is the safer choice. Once the payment lands Trails moves to <code>EXECUTING</code>, so the cut off never affects a real paid purchase.</p></div>
+</section>
+
+<section id="p6">
+  <div><span class="num">Section 7 · Point 6</span><h2>Every widget event is written to the browser console</h2></div>
+  <h3>What Mohit said</h3>
+  <p>Every widget event is written to the browser console; earlier reviews made us strip that kind of logging.</p>
+  <h3>What the code does</h3>
+  <ul>
+    <li><code>buying-flow/trails/TrailsWidgetLoader/TrailsWidget.tsx</code> line 41: <code>logEvent</code> prints a <code>[trails] widget …</code> line for all seven widget events (quote, sign, sign rejected, origin confirmed, destination confirmed, success, error). It was added on 10 Nov to find out which events fire, after the first purchase got stuck.</li>
+    <li>Six of the seven print the <b>whole event data</b>, which can include the buyer's wallet address and transaction details. That's more than noise.</li>
+    <li>Error lines also exist: <code>[trails] status check failed</code> (<code>watchCheckout.ts</code> line 38), <code>[trails] order chain reads failed</code> (<code>orderChecks.service.ts</code> line 43), and three <code>[buying-flow] trails …</code> lines in <code>BuyFlowModal.tsx</code> (498, 798, 803). The drawer already printed errors this way before Trails (five <code>console.error</code> lines in the old file).</li>
+  </ul>
+  <h3>The fix</h3>
+  <p>Remove <code>logEvent</code> and its seven calls; the widget callbacks themselves stay. It has done its job: we know <code>onOriginConfirmation</code> doesn't always fire, and that's handled.</p>
+  <p>For the error lines: they follow the drawer's existing style, so I'd keep them, unless Mohit wants those gone too. Worth one line in your reply to him.</p>
+</section>
+
+<section id="plan">
+  <div><span class="num">Section 8</span><h2>Order of work and testing</h2></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Step</th><th>What</th><th>Waits on</th><th>Test</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Remove widget console logging (point 6)</td><td>Nothing</td><td>Console stays quiet in a free run (open widget, go back)</td></tr>
+      <tr><td>2</td><td>Slippage to 0.5% (point 4)</td><td>Nothing, Mohit has answered</td><td>Next paid run</td></tr>
+      <tr><td>3</td><td>Stop polling unpaid committed intents (point 5)</td><td>Cut off choice (15 or 30 min)</td><td>New unit tests; a free run where you sign but don't pay</td></tr>
+      <tr><td>4</td><td>Refund wording (point 3)</td><td>Your approval of the wording</td><td>Unit check only; a real refund is hard to cause</td></tr>
+      <tr><td>5</td><td>App level tracker, loaded only when needed (points 1 and 2)</td><td>Nothing</td><td>Paid run: Keep browsing, change page, message and banner clear. Then your <code>next build</code> for page size</td></tr>
+    </tbody>
+  </table></div>
+  <p>Steps 1 to 4 are small and could be one commit. Step 5 is the real work (about a day) and is better as its own commit, so it can be reviewed on its own. Everything gets logged in the progress doc's Testing log as usual.</p>
+</section>
+
+<section id="tests">
+  <div><span class="num">Section 9</span><h2>Testing the fixes</h2></div>
+  <div class="oneline"><b>Where it stands (11 Nov)</b>Automated checks pass. Of the manual tests, A has passed; B to G are still to do.</div>
+
+  <h3>Automated checks (Claude, 11 Nov)</h3>
+  <ul>
+    <li>Type check (<code>tsc</code>): clean.</li>
+    <li>ESLint on every changed file: clean (two warnings remain, both in drawer code from before Trails).</li>
+    <li>Vitest: <b>76 pass</b>. 69 helper tests (including new ones for the 30 minute cut off, unknown statuses, and the unpaid reload window; one old test that asserted the bug was replaced) and 7 new tracker tests: keeps watching after the drawer stops listening; no toast when the drawer showed the result; a toast when it didn't; one watch per purchase and a second purchase doesn't stop the first; a late listener gets the latest state; paid marked once; watched again after an abandoned quote.</li>
+    <li>CLAUDE.md §8 layering greps: only the known old violations. A grep confirms nothing imports the checkout code statically except inside its own on demand chunk.</li>
+  </ul>
+
+  <h3>Manual tests (the user)</h3>
+  <p>Setup: dev server on 3002 restarted with the new code; DevTools open on Console and Network. Because of the MetaMask problem below, the wallet is connected over <b>WalletConnect</b> with MetaMask on the phone; "reject" and "approve" happen on the phone.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>#</th><th>Test</th><th>Point</th><th>Cost</th><th>How</th><th>Expect</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td><b>A</b></td><td>Console is quiet</td><td>6</td><td>Free, 2 min</td><td>Buy on any listing ▸ "Any token, any chain" ▸ tick ▸ Continue to payment ▸ pick a token so a price shows ▸ Back.</td><td>No <code>[trails] widget …</code> lines in the Console.</td><td><span class="pill ok">Passed 11 Nov</span><br>tawhidabdullah.og, USDT0 then POL on Polygon, over WalletConnect. Other lines seen are the widget's own (see "What the console showed").</td></tr>
+      <tr><td><b>B</b></td><td>An unpaid payment stops</td><td>5</td><td>Free, about 35 min (mostly waiting)</td><td>Open the widget, pick a token, press Pay, reject on the phone. Network tab, filter <code>GetIntent</code>.</td><td>A request every 3 s, every 15 s after 5 min, none after 15 min. No message on screen. The entry leaves <code>trails-checkouts</code> in Local Storage.</td><td><span class="pill ok">Passed 11 Nov</span><br>Unpaid quote 0xdf10…6801, requests stopped at its 15 minute mark (about 11:22 UTC), no message, MetaMask extension.</td></tr>
+      <tr><td><b>C</b></td><td>Reload rule</td><td>5</td><td>Free, during and after B</td><td>Reload while B is under 15 min old, then again after 15 min.</td><td>Under 15 min: <code>GetIntent</code> requests start again. After 15 min: none.</td><td><span class="pill warn">To do</span></td></tr>
+      <tr><td><b>D</b></td><td>Drawer path still works</td><td>2, 4</td><td>Paid, about 0.10 USDT</td><td>A normal Trails purchase, staying on the drawer.</td><td>Payment in progress ▸ "name is yours" ▸ View Receipt ▸ receipt page. The quote goes through at 0.5% slippage (first run at 0.5%).</td><td><span class="pill ok">Passed 11 Nov</span><br>weiwuxianlanwangji.og, 1.2896 POL on Polygon at 0.5%, MetaMask extension; "is yours" shown, sale recorded 10:46:01 UTC. The progress screen is at most brief on Polygon (expected).</td></tr>
+      <tr><td><b>E</b></td><td>Change page during a purchase</td><td>1, 2</td><td>Paid, about 0.10 USDT</td><td>Start a purchase; at "Payment in progress" press Keep browsing ▸ open /history.</td><td>"Purchase in progress" banner, then the "is yours" message (still no title, known), then the banner disappears without a reload. Also the old "closed drawer" test.</td><td><span class="pill warn">To do</span></td></tr>
+      <tr><td><b>F</b></td><td>Back, then confirm later</td><td>2</td><td>Optional, paid</td><td>Press Pay, press Back in the drawer before approving on the phone, then approve.</td><td>The "is yours" message still appears (before the fix, nothing tracked it).</td><td><span class="pill warn">Optional</span></td></tr>
+      <tr><td><b>G</b></td><td>Page size</td><td>1</td><td>Yours, about 5 min</td><td>Stop the dev server, run <code>npx next build</code>, note First Load JS for /login and /profile; start the dev server again.</td><td>Same as the <code>dark-mode</code> branch, no extra 38 kB.</td><td><span class="pill warn">To do</span></td></tr>
+    </tbody>
+  </table></div>
+  <p>The new refund wording (point 3) only shows on a real refund, which needs the "someone else buys first" run (still pending, below). The text itself is checked in the code.</p>
+
+  <h3>What the console showed during test A (none of it from our code)</h3>
+  <ul>
+    <li><b>Red <code>GetIntentReceipt 400</code>:</b> the Trails widget's own calls. Checked with Trails directly for <code>0xc3ad3afa…3f01</code>: status QUOTED the whole time, receipt not found, expired after 15 minutes. Our code only asks for a receipt after the payment lands. Full write up: incident report, section 13.</li>
+    <li><b>Yellow <code>[trails-sdk] Quote disabled …</code></b> and <b>red <code>Maximum update depth exceeded … at wM</code></b>: from the widget's own Pay screen inside <code>0xtrails</code>. It kept working. To show Mohit or Trails.</li>
+    <li>Chart size and Reown font warnings: not Trails.</li>
+  </ul>
+
+  <h3>Found while testing</h3>
+  <ul>
+    <li><b>Drawer jumped back to Review after Pay (fixed 11 Nov).</b> The drawer restarted on any wallet network change, and pressing Pay makes the widget switch network. Now a network change during the Trails steps doesn't restart it (<code>BuyFlowModal.tsx</code>, <code>TRAILS_STEPS</code>); the USDT purchase is unchanged; Back re-checks the network.</li>
+    <li><b>Cancelled payment treated as paid, red 404s on our sale record (fixed 11 Nov).</b> Trails says "executing" as soon as Pay is pressed. Executing with the deposit not done and Trails' origin transaction on hold with no hash now counts as not paid (<code>effectiveIntentStatus</code> in <code>helpers/trails/intentStatus.ts</code>). And when Trails later ends such a payment (INVALID, "deposit FAILED", seen at 08:31 UTC for the cancelled one), it now ends quietly instead of showing "Payment didn't go through" (<code>checkoutStatusFor</code>). 83 tests pass.</li>
+    <li><b>Paid, but the drawer stayed on the widget (fixed 11 Nov, test D).</b> The widget made a second quote five seconds after Pay; our code followed the new, unpaid quote and lost the paid one. A checkout now keeps its last 3 earlier quotes and follows whichever one was paid (<code>browserCheckoutSource.ts</code>, <code>earlierIntentIds</code>). 87 tests pass. The widget's own "Transaction Status" also stayed on Swap: widget side, to show Trails.</li>
+    <li><b>Trails rate limit (429) on our status checks (handled 11 Nov).</b> The watch now backs off (30 s, 60 s, 2 min) and logs a warning. Open question: the rate limit on our key, since every buyer's browser polls with the same public key.</li>
+    <li><b>Unpaid cut off now 15 minutes (user, 11 Nov).</b> Point 5's cut off was first set to 30 minutes; the user changed it to 15, the life of a Trails quote (<code>UNPAID_WATCH_MS</code>). Mentions of 30 above describe the first decision.</li>
+    <li><b>End to end check (11 Nov):</b> all six points hold in the code. One gap fixed: an unpaid purchase's 15 minutes now count from the newest quote, not the first (<code>watchWindowStart</code>). 92 tests pass, tsc clean. Point 4: Trails' API doesn't return our slippage; check it in the widget's "Transaction details". Details: progress doc, "Results so far".</li>
+    <li><b>Point 4 not in effect: the widget ignores our slippage (found 11 Nov).</b> The <code>QuoteIntent</code> request carries no <code>slippageTolerance</code>: in <code>0xtrails</code> 0.20.0 (newest) the Pay widget doesn't pass its <code>slippageTolerance</code> prop to the quote, so Trails uses Auto. True for every purchase so far, at 5% and at 0.5%. Options: keep Auto and tell Trails, or set the widget's own <code>trails-slippage-tolerance</code> (localStorage, <code>0.005</code>) before it opens. Decision for Mohit.</li>
+    <li><b>MetaMask extension 13.55 can't connect to any site.</b> It adds Tron (<code>tron:728126428</code>) to every connect request, then rejects it. A Polygon only request from the console failed the same way, Uniswap failed too, and a colleague on 13.52 is fine. Not our code; real buyers on 13.55 may hit it. Workaround: WalletConnect. In the progress doc's double check list.</li>
+  </ul>
+
+  <h3>Why the status requests continue after a cancel</h3>
+  <p>After a cancel the widget offers "Try again" on the same quote, so our tracker keeps checking: <code>GetIntent</code> (status) and, while Trails says "executing", <code>GetIntentReceipt</code> (did money move?). Both 200; every 3 s, then every 15 s after 5 minutes; they stop for good 15 minutes after Pay (30 until changed later on 11 Nov), with no message. It's needed because a cancel doesn't guarantee no money moves: the buyer can press Try again, a wallet request can still be waiting and get approved later (run 3), or a deposit can be slow to land. Without watching, the buyer could pay and see nothing, not even a refund message. Full plain words story: progress doc, "Review fixes".</p>
+
+  <h3>Other Trails tests still open (from before the review)</h3>
+  <ul>
+    <li><b>Refund:</b> someone else buys the name first, so Trails refunds. Shows the new refund wording.</li>
+    <li><b>Paying with a token that needs approval</b> (like USDC): every real run so far paid with a network's own coin or USDT0.</li>
+    <li><b>WalletConnect phone run:</b> covered by tests D and E, since they run over WalletConnect.</li>
+    <li><b>Trails switched off:</b> <code>NEXT_PUBLIC_TRAILS_ENABLED=false</code>, restart, the drawer shows only the two original cards.</li>
+    <li><b>Look and feel:</b> confirm the earlier light, dark, phone and tablet checks of the Trails screens.</li>
+  </ul>
+  <p class="refs">Step by step and the running results: progress doc, "Review fixes" (Testing, Results so far); plan, "Phase R".</p>
+</section>
+
+<section id="decide">
+  <div><span class="num">Section 10</span><h2>Decisions needed</h2></div>
+  <div class="callout ok"><p><b>Answered 11 Nov:</b> refund wording approved as drafted; cut off 30 minutes; only the widget logging removed; small fixes first, then the tracker. All done.</p></div>
+  <ol>
+    <li><b>You:</b> approve the two refund lines in section 4, or change them.</li>
+    <li><b>You:</b> the cut off for unpaid intents, 15 or 30 minutes (section 6). I'd pick 30.</li>
+    <li><b>Mohit:</b> should the <code>console.error</code> lines go as well, or only the widget event logging? (section 7)</li>
+    <li><b>You:</b> go ahead with steps 1 to 4 now, and step 5 after?</li>
+  </ol>
+</section>
+
+<section id="words">
+  <div><span class="num">Section 11</span><h2>Words used</h2></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Word</th><th>Meaning here</th></tr></thead>
+    <tbody>
+      <tr><td>First Load JS</td><td>How much code the browser downloads before a page works. <code>next build</code> prints it per page.</td></tr>
+      <tr><td><code>_app.tsx</code></td><td>The wrapper around every page. Anything it imports is downloaded on every page.</td></tr>
+      <tr><td>Lazy loading / <code>import()</code></td><td>Splitting code into a separate file that is downloaded only when it's needed.</td></tr>
+      <tr><td>Polling</td><td>Asking Trails "how is this payment going?" again and again, every 3 or 15 seconds.</td></tr>
+      <tr><td>App level tracker</td><td>One piece of code that lives as long as the site is open, rather than inside one page's drawer.</td></tr>
+      <tr><td>Intent, QUOTED, COMMITTED</td><td>Trails' name for one payment; priced but not agreed; agreed but not paid yet.</td></tr>
+      <tr><td>Slippage tolerance</td><td>How far the price may move before Trails gives up on the swap.</td></tr>
+      <tr><td>Probe / spike</td><td>The early test page and runs used to prove Trails works, before the real screens were built.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+</main>
+</div>
+<script>
+  document.getElementById('toggle').addEventListener('click', function () {
+    var root = document.documentElement;
+    var current = root.getAttribute('data-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('dmplan-theme', next); } catch (e) {}
+  });
+</script>
+</body>
+</html>

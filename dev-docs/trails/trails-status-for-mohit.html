@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trails status, 12 Nov</title>
+<style>
+:root {
+  --bg: #f6f6f9; --surface: #ffffff; --fg: #1b1a24; --muted: #5c5a6b; --line: #dddbe7;
+  --ok: #17803d; --ok-bg: #e3f5e9; --warn: #9a5b00; --warn-bg: #fdf1dc; --no: #b42318; --no-bg: #fde8e6; --code: #eeedf4;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0d0d10; --surface: #17171b; --fg: #ecebf2; --muted: #a3a1b3; --line: #2b2a33;
+    --ok: #6fdc95; --ok-bg: #12301d; --warn: #f3c26b; --warn-bg: #33270f; --no: #ff9a8f; --no-bg: #3a1714; --code: #23222a;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 860px; margin: 0 auto; padding: 32px 16px 64px; }
+h1 { font-size: 26px; margin: 0 0 4px; }
+h2 { font-size: 18px; margin: 32px 0 10px; padding-top: 12px; border-top: 1px solid var(--line); }
+.sub { color: var(--muted); margin: 0 0 20px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--line); }
+th { font-size: 13px; color: var(--muted); font-weight: 600; }
+tr:last-child td { border-bottom: 0; }
+.tbl { overflow-x: auto; }
+code { font: 13px ui-monospace, Consolas, monospace; background: var(--code); padding: 1px 5px; border-radius: 4px; }
+.pill { display: inline-block; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+.ok { color: var(--ok); background: var(--ok-bg); }
+.warn { color: var(--warn); background: var(--warn-bg); }
+.no { color: var(--no); background: var(--no-bg); }
+ol, ul { padding-left: 22px; margin: 6px 0; }
+li { margin: 4px 0; }
+.q { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 4px 16px 10px; margin: 12px 0; }
+.q h3 { font-size: 16px; margin: 12px 0 6px; }
+.q p { margin: 6px 0; }
+</style>
+</head>
+<body>
+<main>
+<h1>Trails checkout: status after your review</h1>
+<p class="sub">Branch <code>trails</code> · updated 12 Nov 2026 after a full day of testing · code unchanged since <code>1622027</code> (on top of <code>10e06fc</code>), committed and pushed</p>
+
+<div class="card">
+  <p><b>12 Nov in one line:</b> every planned check is done. Three real purchases on today's code worked, including your main run (a wallet with no POL buying with USDC on Base) and one over WalletConnect; a lost race was refunded by Trails within 29 seconds; page size, kill switch and look and feel all pass. Two things weren't seen for real: the Refunded screen (our test used the same wallet on both sides of the race, details below) and the widget quoting again after Pay. Two new questions for you (8 and 9 below), and new evidence on slippage (question 1).</p>
+  <ol>
+    <li>All six review points are fixed in code. Point 4 (slippage) has no effect yet because the widget ignores it; needs your call.</li>
+    <li>Testing found four more bugs; all fixed.</li>
+    <li>A real paid purchase on the new code worked end to end (POL on Polygon).</li>
+    <li>Automated: 92 tests pass, <code>tsc</code> clean, ESLint clean apart from two warnings that predate Trails.</li>
+  </ol>
+</div>
+
+<p><b>Newer (17 Nov 2026):</b> the frontend on the new backend APIs, the two backend bugs found and 12 questions: <a href="trails-backend-status-for-mohit.html">trails-backend-status-for-mohit.html</a>.</p>
+
+<h2>Your six points</h2>
+<div class="tbl"><table>
+  <thead><tr><th>#</th><th>Point</th><th>Now</th><th>Status</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Every page 38 kB heavier</td><td><code>_app</code> loads only a small tracker; the polling code, checkout source, Seaport encoder and order checks load with <code>import()</code> when a purchase is pending or "Any token" is picked.</td><td><span class="pill ok">Done</span><br>build check passed 12 Nov</td></tr>
+    <tr><td>2</td><td>Tracking stops on page change or second purchase</td><td>One app wide tracker (<code>core/services/trails/checkoutTracker.ts</code>) watches every purchase; the drawer only listens. Closing the drawer, Back, a page change or a second purchase doesn't stop it. The toast comes from <code>_app</code> when the drawer didn't show the result.</td><td><span class="pill ok">Done</span><br>page change test pending</td></tr>
+    <tr><td>3</td><td>Refund wording</td><td>"Trails refunded X USDT to your wallet on Polygon. It's not converted back to your original token." Fees sentence removed.</td><td><span class="pill ok">Done</span><br>no real refund seen yet</td></tr>
+    <tr><td>4</td><td>Slippage 5% vs 0.5%</td><td>We now pass <code>0.005</code>, but <b>0xtrails 0.20.0 (latest) doesn't send the Pay widget's <code>slippageTolerance</code> prop with the quote</b>: the <code>QuoteIntent</code> payload has no <code>slippageTolerance</code>, so Trails uses Auto. True for every purchase so far, at 5% and 0.5% alike.</td><td><span class="pill no">Not in effect</span><br>needs your decision</td></tr>
+    <tr><td>5</td><td>Unpaid intent polled forever</td><td>An unpaid purchase stops being checked 15 minutes after its newest quote, quietly. After a reload, unpaid entries are picked up only while under 15 minutes old (paid: 24 h). Unknown statuses stop after 20 minutes.</td><td><span class="pill ok">Done</span></td></tr>
+    <tr><td>6</td><td>Widget events logged</td><td>Removed. Real errors still use <code>console.error</code>; a Trails rate limit is a warning.</td><td><span class="pill ok">Done</span></td></tr>
+  </tbody>
+</table></div>
+
+<h2>Bugs found while testing, all fixed</h2>
+<ol>
+  <li><b>Drawer jumped back to Review after Pay.</b> A wallet network change restarted the drawer. Now it doesn't during the Trails steps; the USDT path is unchanged.</li>
+  <li><b>A cancelled payment was treated as paid.</b> Trails says EXECUTING as soon as Pay is pressed. We now count it as paid only when the deposit succeeded or the origin transaction has a hash; a never paid intent that later ends INVALID or ABORTED ends quietly, not as "failed".</li>
+  <li><b>Paid, but the drawer never showed the result.</b> The widget made a second quote 5 seconds after Pay and we followed it, losing the paid one. A checkout now keeps its last 3 quotes and follows whichever gets paid. Covered by automated tests; not yet seen in a real purchase (the later paid run had only one quote).</li>
+  <li><b>Trails rate limit (429)</b> on status checks. The watch now backs off 30 s, 60 s, then 2 min.</li>
+</ol>
+
+<h2>Found 12 Nov, not fixed (needs your call)</h2>
+<ol>
+  <li><b>Refunded, but the drawer said "is yours".</b> Trails refunded the payment (intent <code>0x0d937952…3e01</code> REFUNDED, 0.05 USDT back on Polygon) while the drawer showed "tawhidabdullah.og is yours" and never "Payment refunded". Our status check reads our sale record first: if it names this buyer, it's done and Trails' REFUNDED is ignored. It happened because the same wallet had bought the domain directly in another tab. The buyer does own the domain, but is never told their Trails payment was refunded (as USDT, minus about 0.03 USD fees). Details and the choice: question 8 below.</li>
+</ol>
+
+<h2>Tested by hand (11 Nov)</h2>
+<div class="tbl"><table>
+  <thead><tr><th>Test</th><th>Result</th></tr></thead>
+  <tbody>
+    <tr><td>No widget logging in the console</td><td><span class="pill ok">Pass</span></td></tr>
+    <tr><td>Paid purchase stays in the drawer to "is yours" (weiwuxianlanwangji.og, 1.29 POL on Polygon, MetaMask extension)</td><td><span class="pill ok">Pass</span> sale recorded, Trails SUCCEEDED</td></tr>
+    <tr><td>Pay then cancel in the wallet: widget offers "Try again", no message, no red errors</td><td><span class="pill ok">Pass</span> checks stopped quietly 15 min after the quote</td></tr>
+    <tr><td>Reload while an unpaid purchase is under / over 15 min</td><td><span class="pill ok">Pass</span><br>checks resume under 15 min, none after, no message</td></tr>
+    <tr><td>Keep browsing during a payment, then /history banner and toast</td><td><span class="pill ok">Pass</span><br>12 Nov, banner cleared without a reload</td></tr>
+    <tr><td>12 Nov: your main run. A fresh wallet with <b>no POL</b> (USDC and a little ETH on Base only) bought westbengal.og (0.10 USDT) with 0.134575 USDC on Base. Trails intent <code>0x3e1975f9…8901</code> SUCCEEDED, our sale record names that wallet as buyer, it's in its My Domains, seller's email arrived. One wallet popup: Trails' deposit here is a plain USDC transfer, so no approval was needed</td><td><span class="pill ok">Pass</span></td></tr>
+    <tr><td>12 Nov: lost race. A Trails payment (0.08382 USDC on Base) lost to a direct USDT buy of the same listing; Trails intent <code>0x0d937952…3e01</code> went REFUNDED and sent 0.05 USDT back on Polygon 29 s later; about 0.034 USD of Trails fees kept. <b>The drawer showed "is yours", not "Payment refunded"</b>, because our test used the same wallet for both buys: rule 1 (a sale record naming this buyer means done) wins over Trails' REFUNDED. Against another buyer the drawer goes to Refunded; that screen is covered by automated tests, not seen yet. Question for you: a buyer who pays directly and through Trails at once gets "is yours" with no mention of the refund; OK?</td><td><span class="pill ok">Refund pass</span><br>screen not seen</td></tr>
+    <tr><td>12 Nov: purchase over WalletConnect (MetaMask mobile), weiwuxianlanwangji.og with USDC on Base: "Payment in progress" ▸ "is yours", Trails intent <code>0x23ca82ad…9f01</code> SUCCEEDED, sale recorded. The widget did <b>not</b> quote again after Pay this time, so the "follow whichever of the last 3 quotes gets paid" fix still has only automated tests behind it</td><td><span class="pill ok">Pass</span><br>re-quote not reproduced</td></tr>
+    <tr><td>12 Nov: not available screen. Buyer had the drawer open on Any token; the seller delisted in another window; on Continue our Trails order check caught it: "This listing is no longer available. It was sold, cancelled or changed by the seller. Nothing was charged to you."</td><td><span class="pill ok">Pass</span></td></tr>
+    <tr><td><code>next build</code>: First Load JS of /login and /profile equal to the <code>dark-mode</code> branch</td><td><span class="pill ok">Pass</span><br>12 Nov</td></tr>
+    <tr><td>12 Nov: Trails switched off (<code>NEXT_PUBLIC_TRAILS_ENABLED=false</code>): only the original payment cards</td><td><span class="pill ok">Pass</span></td></tr>
+    <tr><td>12 Nov: light, dark, desktop, tablet and phone pass over the Trails screens</td><td><span class="pill ok">Pass</span></td></tr>
+    <tr><td>12 Nov: <code>/history</code> after the Trails purchases (tpenguofficial.og, westbengal.og, tawhidabdullah.og, weiwuxianlanwangji.og): a Purchase row each, 0.10 USDT, right time and transaction, no leftover "Purchase in progress" banner</td><td><span class="pill ok">Pass</span></td></tr>
+    <tr><td>12 Nov: receipt page (weiwuxianlanwangji.og: right order, price, transaction), the names in the buyer's My Domains, buy and sell emails. Note: the receipt says "You paid 0.10 USDT" though this buyer paid about 1.29 POL through Trails, because our sale record has no payment method (the <code>paymentMethod</code> on sales in your backend plan would fix it)</td><td><span class="pill ok">Pass</span></td></tr>
+    <tr><td>12 Nov: own listing screen. The seller opening their own listing gets "This is your own listing" as soon as the drawer opens, before any payment choice (the original check blocks USDT and Any token alike). The Trails path's own backup check shows the same screen; it can't be reached by hand and is covered by automated tests</td><td><span class="pill ok">Pass</span></td></tr>
+  </tbody>
+</table></div>
+
+<h2>Not done yet</h2>
+<ol>
+  <li>The "Payment refunded" screen seen for real. The refund itself is proven (below); the screen needs a race against a different wallet. (The USDC run is done; it needed no approval, see above.)</li>
+  <li>Phase 10, shared fixes for both payment methods (refresh listings and domain data after any purchase; real text on the reject screen): on hold.</li>
+  <li>The backend checkout source from your doc (status checks and order checks on our backend instead of the browser): not started on the backend, nothing in its <code>uat</code> branch yet. Our side is ready to switch: <code>getCheckoutSource()</code> in <code>core/services/trails/index.ts</code> is the one place to change.</li>
+  <li>Phase 11, analytics events: waiting on GTM.</li>
+  <li>Env vars for stage and prod (<code>NEXT_PUBLIC_TRAILS_ENABLED</code>, key, pilot wallets) with DevOps.</li>
+  </ol>
+
+<h2>Questions for you</h2>
+<p class="sub">Each one: what we saw, why it's a problem, and what we need from you.</p>
+
+<div class="q">
+  <h3>1. Slippage: keep Trails' Auto, or force 0.5%?</h3>
+  <p><b>What we saw.</b> We pass <code>slippageTolerance={0.005}</code> to the Pay widget, but the <code>QuoteIntent</code> request it sends to Trails has no <code>slippageTolerance</code> at all, and its "Transaction details" shows no "Max slippage" row. In <code>0xtrails</code> 0.20.0 (the latest), the Pay screen's quote call passes every option except this one. Without it the widget reads its own saved setting (<code>localStorage['trails-slippage-tolerance']</code>), which is empty for every buyer, so Trails falls back to <b>Auto</b>.</p>
+  <p><b>Why it matters.</b> Your point 4 asked for 0.5% so buyers aren't charged more than expected when the price moves. Right now that limit isn't applied: every purchase so far, the "5%" ones and today's "0.5%" one, ran on Trails' Auto, and we don't control or know the limit Auto picks. <b>Seen 12 Nov:</b> on the Base USDC purchase, Trails' own record of the intent shows Auto chose <code>maxSlippage 0.1</code>, i.e. 10%, against the 0.5% you asked for (it cost nothing on that quote, which fixed the exact amount paid, but it is the limit in force). The widget also shows a red "Price impact 25.73%" on a $0.10 order: that's the $0.03 fees against the price, not a price move, but it can alarm a buyer on cheap listings.</p>
+  <p><b>We need you to choose.</b> (a) Keep Auto and report the ignored prop to Trails: no code change. (b) Force 0.5% by writing <code>'0.005'</code> into that localStorage key just before the widget opens; it works today, but depends on the widget's internals (a future update could silently undo it) and overrides a buyer's own slippage choice if the widget lets them set one.</p>
+</div>
+
+<div class="q">
+  <h3>2. Is the Trails rate limit per key?</h3>
+  <p><b>What we saw.</b> During testing Trails answered our status checks with <code>429 Quota rate limit exceeded</code>. One tester, a couple of open purchases, and the widget's own calls were enough to hit it.</p>
+  <p><b>Why it matters.</b> Status checks run in each buyer's browser, and every browser uses the same public key. If the limit is per key, a busy day with many buyers at once could hit it in production: checks would slow down and "is yours" would arrive late. We added a back off (30 s, 60 s, 2 min), so nothing breaks, but it would be slow.</p>
+  <p><b>We need to know</b> the limit on our key and whether it's per key or per browser. If per key, moving status checks to the backend checkout source or asking Trails for a higher limit becomes more urgent.</p>
+</div>
+
+<div class="q">
+  <h3>3. Start checking status at the first quote, or when the buyer presses Pay?</h3>
+  <p><b>What we saw.</b> As soon as the widget shows a price it creates a quote, and we start checking that quote's status with Trails (<code>GetIntent</code>, every 3 s, then 15 s). If the buyer only looks at the price and presses Back, we keep checking for up to 15 minutes for a purchase that never happens.</p>
+  <p><b>Why we do it this way.</b> Your doc saves the purchase at <code>onQuote</code> but doesn't say which event starts the checks. We first started at <code>onOriginConfirmation</code> ("payment landed"), but on the first real purchase (10 Nov) that event never fired, because Trails recorded the deposit with a placeholder hash. The buyer paid and the site would have said nothing. Starting at the quote removes any dependence on widget events.</p>
+  <p><b>Why it's a problem.</b> Wasted requests on our shared key (see question 2) for buyers who never pay, which is most widget opens.</p>
+  <p><b>Proposal.</b> Start at <code>onSign</code> (the buyer pressed Pay), keeping "payment landed" and "success" as backups. Opening the widget and going Back would then cost nothing. The risk: we haven't confirmed that <code>onSign</code> fires for every wallet; if it and both backups failed, a paid purchase would go unwatched. <b>We need your OK</b> to switch (we'd verify on one paid run), or to keep today's safer behaviour.</p>
+</div>
+
+<div class="q">
+  <h3>4. Widget problems to raise with Trails</h3>
+  <p>None of these come from our code and we can't fix them on our side; they're from inside the <code>0xtrails</code> package.</p>
+  <ol>
+    <li><b>Quoted again in USDT right after Pay</b> (seen over WalletConnect). The widget switched the token to USDT and made a new quote 5 seconds after the buyer pressed Pay with POL. <i>Problem:</i> it confused tracking (we fixed our side) and could confuse a buyer who sees a different token. Didn't happen on the MetaMask extension.</li>
+    <li><b>Its status screen stayed on "Swap"</b> ("taking longer than expected") after the purchase had already succeeded. <i>Problem:</i> the buyer thinks it's stuck; our drawer now covers this by moving on, but only once our own check sees the result.</li>
+    <li><b>Console errors and warnings</b>: <code>Maximum update depth exceeded</code> in its Pay screen, <code>Quote disabled … malformed "0.1"</code>, and its own <code>GetIntentReceipt</code> 400s before the buyer pays. <i>Problem:</i> no visible breakage, but noise in every buyer's console and a possible performance cost.</li>
+  </ol>
+  <p><b>We need you to</b> pass these to Trails, or tell us who should.</p>
+</div>
+
+<div class="q">
+  <h3>5. Can an ABORTED intent ever have taken the buyer's money?</h3>
+  <p><b>What we saw.</b> A payment cancelled in the wallet ended at Trails as INVALID ("deposit transaction FAILED", origin ABORTED). We now treat FAILED, ABORTED or INVALID as "never paid" when the deposit didn't succeed and there's no origin transaction hash, and end it quietly with no message.</p>
+  <p><b>Why it matters.</b> If Trails can mark an intent ABORTED after the buyer's money already moved, our rule would hide a real problem: the buyer would see nothing, not even "payment didn't go through".</p>
+  <p><b>We need to know</b> whether that case exists. If it does, we'll show a message for ABORTED instead of ending quietly.</p>
+</div>
+
+<div class="q">
+  <h3>6. "Is yours" when our sale record never arrives</h3>
+  <p><b>What the code does.</b> Your rule 1: only our own sale record (the poller's SALE row with this buyer) may show "is yours"; until then the drawer says "Purchase confirmed. Preparing your receipt...". We follow that. But we added a fallback: if Trails says SUCCEEDED and our record still hasn't shown the buyer <b>after 20 minutes</b> (for example the poller is down or far behind), the drawer or the toast shows "is yours" anyway, based on Trails alone.</p>
+  <p><b>Why we added it.</b> Otherwise the buyer waits 20 minutes on "Preparing your receipt..." and then gets no answer at all, though our calls always name the buyer as recipient, so a succeeded Trails transaction means the domain went to them.</p>
+  <p><b>Why it's a problem.</b> It breaks rule 1, and that screen's View Receipt opens <code>/receipt/:orderHash</code>, which reads the same missing record, so the buyer would see an empty receipt.</p>
+  <p><b>We need you to choose.</b> (a) Keep it. (b) Our recommendation: after 20 minutes show "Purchase confirmed. Your receipt is taking longer than usual; the domain will appear in your account shortly." with a Polygonscan link instead of View Receipt. Small change.</p>
+</div>
+
+<div class="q">
+  <h3>7. A screen for a cancelled signature?</h3>
+  <p><b>What we saw.</b> Your definition of done lists a "cancelled signature" screen. When the buyer rejects in the wallet, the widget itself shows "Try again" on the same quote, and we draw nothing of our own (<code>onSignReject</code> is wired through but the drawer doesn't use it).</p>
+  <p><b>Why it matters.</b> Only whether the checklist item counts as done; the buyer isn't stuck, since "Try again" and Back both work.</p>
+  <p><b>We need to know</b> whether the widget's own "Try again" is enough, or you want our own screen (for example "Payment cancelled in your wallet. Nothing was charged." with Try again and Back).</p>
+</div>
+
+<div class="q">
+  <h3>8. Paying directly and through Trails at the same time (new, 12 Nov)</h3>
+  <p><b>What we saw.</b> In the lost race test the same wallet bought directly with USDT in one tab and paid through Trails in another. The direct buy won; Trails refunded 0.05 USDT on Polygon (intent <code>0x0d937952…3e01</code>, REFUNDED). The Trails tab showed "is yours", not "Payment refunded", because your rule 1 (a sale record naming this buyer means done) is checked before Trails' status, and the record named this same buyer.</p>
+  <p><b>Why it matters.</b> "Is yours" is true (the domain is theirs), but the buyer is never told that their second payment was refunded, as USDT, minus Trails' fees (about 0.03 USD here). Rare, and nothing is lost. Against a different buyer the drawer goes to Refunded as designed.</p>
+  <p><b>We need to know</b> whether this is fine as is, or whether "is yours" should add a line when Trails also says REFUNDED for this purchase.</p>
+</div>
+
+<div class="q">
+  <h3>9. The receipt says "You paid 0.10 USDT" for a Trails purchase (new, 12 Nov)</h3>
+  <p><b>What we saw.</b> The receipt page for weiwuxianlanwangji.og (bought through Trails with about 1.29 POL) says "You paid 0.10 USDT". The receipt reads our sale record, which only knows the order price, not how the buyer paid. Same on the drawer's "is yours" screen. Separately, and older than Trails: "Seller received" and "Marketplace fee" are rounded to two decimals, so a 0.10 sale shows 0.10 received and a 0.00 fee next to "2.5% was deducted".</p>
+  <p><b>Why it matters.</b> A Trails buyer sees a different amount and token from what left their wallet.</p>
+  <p><b>We need to know</b> whether to leave it until the backend's <code>paymentMethod</code> on sales (your backend checkout source), or change the label now (for example "Price 0.10 USDT").</p>
+</div>
+</main>
+</body>
+</html>

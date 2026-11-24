@@ -1,0 +1,353 @@
+<meta charset="utf-8">
+<title>Inside Endless Arena</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one reading column, light only (chosen by the user); each chapter is a "level", plain words first, then the real code, then a try it box. */
+:root{
+  --bg:#FAF8FE; --paper:#FFFFFF; --ink:#1B1730; --ink2:#5A5470; --line:#E4DDF1;
+  --purple:#5F22D0; --yellow:#FDC651; --red:#C8342A; --code-bg:#1E1A33; --code-fg:#EEEAFB; --code-dim:#A49DC4; --code-key:#FDC651; --code-str:#9FE3B4;
+  --display:"Space Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16.5px;line-height:1.7;margin:0;-webkit-font-smoothing:antialiased;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:32px 64px}
+main{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:56px}
+h1,h2,h3{font-family:var(--display);line-height:1.1;text-wrap:balance;margin:0}
+h1{font-size:clamp(36px,8vw,60px);font-weight:700;letter-spacing:-.03em}
+h1 span{color:var(--purple)}
+h2{font-size:clamp(24px,4.8vw,32px);font-weight:700;letter-spacing:-.015em}
+h3{font-size:18px;font-weight:700;margin-top:8px}
+p,ul,ol{margin:0;max-width:66ch}
+ul,ol{padding-left:22px;display:flex;flex-direction:column;gap:6px}
+a{color:var(--purple)}
+code{font-family:var(--mono);font-size:.88em;background:var(--line);padding:1px 6px;border-radius:6px;overflow-wrap:anywhere}
+.lede{font-size:19px;color:var(--ink2)}
+.eyebrow{font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--purple);font-weight:700}
+header{display:flex;flex-direction:column;gap:16px}
+.toc{display:flex;flex-wrap:wrap;gap:8px;padding:0;list-style:none}
+.toc a{display:inline-block;font-family:var(--mono);font-size:14px;text-decoration:none;color:var(--ink);background:var(--paper);border:1.5px solid var(--line);border-radius:99px;padding:4px 12px}
+.toc a:hover,.toc a:focus-visible{border-color:var(--purple)}
+section{display:flex;flex-direction:column;gap:14px;scroll-margin-top:16px}
+.lvl{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--ink);background:var(--yellow);border-radius:99px;padding:2px 10px;align-self:flex-start}
+.plain{background:#FFF9EA;border:1.5px solid #F3E2B3;border-left:5px solid var(--yellow);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.plain.warn{background:#FFF3F1;border-color:#F4CFCA;border-left-color:var(--red)}
+.plain b.k{font-family:var(--mono);font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2)}
+.warn{border-left-color:var(--red)}
+pre{margin:0;background:var(--code-bg);color:var(--code-fg);font-family:var(--mono);font-size:14px;line-height:1.55;border-radius:12px;padding:14px 16px;overflow-x:auto;max-width:100%}
+pre .c{color:var(--code-dim)} pre .k{color:var(--code-key)} pre .s{color:var(--code-str)}
+.cap{font-size:14px;color:var(--ink2);margin-top:-6px}
+.tbl{overflow-x:auto;max-width:100%}
+table{border-collapse:collapse;width:100%;font-size:15.5px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);font-weight:700}
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.flow span{background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:8px 12px;font-weight:600;font-size:15px}
+.flow i{font-style:normal;color:var(--purple);font-weight:700}
+.try{background:var(--paper);border:2px solid var(--purple);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.try .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.try input{font-family:var(--mono);font-size:16px;min-height:44px;width:150px;border:2px solid var(--ink);border-radius:10px;background:var(--bg);color:var(--ink);padding:0 10px}
+button{font:inherit;font-weight:700;min-height:44px;padding:0 16px;border-radius:10px;border:0;cursor:pointer;background:var(--purple);color:#fff}
+button.alt{background:transparent;color:var(--ink);border:2px solid var(--line)}
+button:focus-visible,input:focus-visible,.toc a:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+.out{font-family:var(--mono);font-size:15px;background:var(--bg);border-radius:10px;padding:10px 12px;min-height:44px;overflow-wrap:anywhere}
+.ideas{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:12px}
+.idea{background:var(--paper);border:1.5px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.idea b{font-size:16.5px}
+.tag{font-family:var(--mono);font-size:12px;font-weight:700;border-radius:99px;padding:1px 8px;align-self:flex-start}
+.t1{background:#D9F2E0;color:#1C5F31}.t2{background:#FFF0C9;color:#7A5200}.t3{background:#F9DAD6;color:#8A2219}
+dl{margin:0;display:grid;grid-template-columns:minmax(0,max-content) minmax(0,1fr);gap:8px 16px}
+dt{font-family:var(--mono);font-weight:700;font-size:15px}
+dd{margin:0;color:var(--ink2)}
+@media (max-width:520px){dl{grid-template-columns:1fr}dd{margin-bottom:6px}}
+footer{font-size:14px;color:var(--ink2)}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style>
+
+<main>
+<header>
+  <span class="eyebrow">A beginner's guide to one HTML file</span>
+  <h1>Inside Endless <span>Arena</span></h1>
+  <p class="lede">Your senior built a full 3D game in a single file of 667 lines: <code>endless-arena.html</code>. This guide walks through it from the very start, in plain words first and then the real code, so you understand every part, including how it remembers your best score after you close it, and what you could add yourself.</p>
+  <ul class="toc">
+    <li><a href="#file">1 The file</a></li>
+    <li><a href="#start">2 Start up</a></li>
+    <li><a href="#loop">3 The loop</a></li>
+    <li><a href="#memory">4 Your high score</a></li>
+    <li><a href="#draw">5 3D drawing</a></li>
+    <li><a href="#rules">6 Game rules</a></li>
+    <li><a href="#identity">7 Identities</a></li>
+    <li><a href="#sound">8 Sound</a></li>
+    <li><a href="#score">9 Scoring</a></li>
+    <li><a href="#better">10 Make it better</a></li>
+    <li><a href="#words">Glossary</a></li>
+  </ul>
+</header>
+
+<section id="file">
+  <span class="lvl">Level 1</span>
+  <h2>One file holds three languages</h2>
+  <p>Every web page is made of three things. The game puts all three in one file, which is why you can open it by double clicking.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Part</th><th>Language</th><th>Its job</th><th>Lines in the file</th></tr></thead>
+    <tbody>
+      <tr><td>Structure</td><td>HTML</td><td>The boxes on screen: menu, buttons, score card, the canvas the 3D world is drawn on</td><td>142 to 236</td></tr>
+      <tr><td>Looks</td><td>CSS, inside <code>&lt;style&gt;</code></td><td>Colours, fonts, sizes, the pulsing Burst button, the red flash when you get hit</td><td>11 to 140</td></tr>
+      <tr><td>Behaviour</td><td>JavaScript, inside <code>&lt;script&gt;</code></td><td>Everything that moves, thinks, scores and saves</td><td>239 to 664</td></tr>
+    </tbody>
+  </table></div>
+  <div class="plain"><b class="k">In plain words</b><p>HTML is the skeleton, CSS is the clothes, JavaScript is the brain. About 40 of the 115 KB are just the Endless logo drawing, pasted in three times.</p></div>
+  <p>It also borrows three things from the internet, which is why the game needs a connection the first time:</p>
+  <ul>
+    <li><b>Three.js</b> (version r128) from cdnjs: a library that does the hard maths of drawing 3D shapes.</li>
+    <li><b>qrcode-generator</b> from jsDelivr: turns the website address into the QR code on the result card.</li>
+    <li><b>Google Fonts</b>: the fonts Unbounded (titles) and Atkinson Hyperlegible (text), chosen for easy reading on small screens.</li>
+  </ul>
+</section>
+
+<section id="start">
+  <span class="lvl">Level 2</span>
+  <h2>What happens when you open it</h2>
+  <p>A browser reads the file from top to bottom. When it reaches the script at the end, it runs these lines once (line 654 onward):</p>
+<pre><span class="k">initGL</span>();        <span class="c">// set up the 3D renderer, lights and the shiny reflections</span>
+<span class="k">resize</span>();        <span class="c">// match the canvas to your screen size</span>
+<span class="k">makeQR</span>();        <span class="c">// draw the QR code for the result card</span>
+<span class="k">refreshMenu</span>();   <span class="c">// fill in "Best run", your identity, today's Daily score</span>
+<span class="k">showUI</span>(<span class="s">"menu"</span>);  <span class="c">// show the menu, hide the game screens</span>
+<span class="k">requestAnimationFrame</span>(frame); <span class="c">// start the loop (next level)</span></pre>
+  <p>Then it wires up the buttons. For example <code>$("goRun").onclick = () =&gt; start("run")</code> means "when someone clicks Play, start the Campaign". The little <code>$</code> is a shortcut the author wrote on line 241 for <code>document.getElementById</code>.</p>
+  <p>Pressing a mode calls <code>start()</code>. It counts the play, saves your profile (more on that in Level 4), switches the screen to the game view and creates a new game with <code>Arena(mode, identity, guest)</code>. Everything about one run lives inside that <code>Arena</code> function, and it is thrown away when the run ends.</p>
+</section>
+
+<section id="loop">
+  <span class="lvl">Level 3</span>
+  <h2>The game loop: 60 tiny photos a second</h2>
+  <p>A game is a flip book. About 60 times every second the browser calls <code>frame()</code>, which does two things: <b>update</b> the world a tiny bit, then <b>draw</b> it.</p>
+  <div class="flow"><span>Read input</span><i>→</i><span>Move you</span><i>→</i><span>Spawn enemies</span><i>→</i><span>Shoot</span><i>→</i><span>Check hits</span><i>→</i><span>Draw</span><i>→</i><span>Repeat</span></div>
+<pre><span class="k">function</span> frame(now){
+  <span class="k">const</span> dt = Math.min(<span class="s">.05</span>, (now - last) / <span class="s">1000</span>); <span class="c">// seconds since the last photo</span>
+  last = now;
+  <span class="k">if</span> (game) game.update(dt, now/<span class="s">1000</span>); <span class="k">else</span> idle(now/<span class="s">1000</span>); <span class="c">// play, or wave the menu robot</span>
+  R.render(scene, cam);                 <span class="c">// draw the picture</span>
+  requestAnimationFrame(frame);         <span class="c">// ask for the next one</span>
+}</pre>
+  <div class="plain"><b class="k">Why dt matters</b><p><code>dt</code> is "how much time passed". Every speed is multiplied by it, so the robot moves the same distance per second on a fast laptop and a slow phone. The <code>Math.min(.05, …)</code> part caps it, so if your phone freezes for a second the game doesn't jump forward wildly.</p></div>
+  <p>Some fun tricks live in <code>update</code>: <code>freeze</code> stops time for a split second when you kill a big enemy (that "hit stop" feeling), and <code>slow</code> runs time at 30% speed for dramatic moments like the boss dying.</p>
+</section>
+
+<section id="memory">
+  <span class="lvl">Level 4</span>
+  <h2>How it remembers your high score</h2>
+  <p>This is the part you asked about. The game has no server and no account. It uses something every browser has, called <b>localStorage</b>.</p>
+  <div class="plain"><b class="k">In plain words</b><p>localStorage is a small notebook that the browser keeps <b>on your computer's disk</b>, one notebook per website. A page can write a line into it, like <code>eplay:arcade = {...}</code>, and read it back later. Because it's on disk, it is still there after you close the tab, close the browser, or restart the computer.</p></div>
+  <h3>The two helper functions (line 246 and 247)</h3>
+<pre><span class="k">function</span> load(k, d){             <span class="c">// k = the name, d = the default if nothing is saved</span>
+  <span class="k">try</span> {
+    <span class="k">const</span> v = localStorage.getItem(<span class="s">"eplay:"</span> + k); <span class="c">// read the line</span>
+    <span class="k">return</span> v ? JSON.parse(v) : d;              <span class="c">// text back into an object</span>
+  } <span class="k">catch</span>(e){ <span class="k">return</span> d; }                     <span class="c">// storage blocked? use the default</span>
+}
+<span class="k">function</span> save(k, v){
+  <span class="k">try</span> { localStorage.setItem(<span class="s">"eplay:"</span> + k, JSON.stringify(v)); } <span class="c">// object into text, write it</span>
+  <span class="k">catch</span>(e){}
+}</pre>
+  <p class="cap">Simplified slightly: the real version also keeps a copy in a variable called <code>mem</code>, so the game still works for the current visit if the browser refuses storage.</p>
+  <p>localStorage can only hold <b>text</b>. That's why the game uses <code>JSON.stringify</code> to turn its profile object into text before saving, and <code>JSON.parse</code> to turn it back when loading.</p>
+  <h3>What exactly is saved</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Key in the notebook</th><th>What's inside</th><th>When it's written</th></tr></thead>
+    <tbody>
+      <tr><td><code>eplay:arcade</code></td><td>Your profile: number of plays, your identity, best score for Campaign, Score Attack and Boss Rush, and today's Daily score with the date</td><td>When a run starts (<code>start()</code>, line 643), when a run ends (<code>finish()</code>, line 644), and when you change identity</td></tr>
+      <tr><td><code>eplay:sound</code></td><td><code>true</code> or <code>false</code></td><td>When you press "Sound on" or "Sound off"</td></tr>
+    </tbody>
+  </table></div>
+  <p>A saved profile looks like this:</p>
+<pre>eplay:arcade = {<span class="s">"plays"</span>:12, <span class="s">"ident"</span>:<span class="s">"akshat.og"</span>, <span class="s">"run"</span>:48210, <span class="s">"attack"</span>:15300,
+                <span class="s">"rush"</span>:9020, <span class="s">"daily"</span>:{<span class="s">"day"</span>:<span class="s">"2026-11-12"</span>, <span class="s">"score"</span>:22140}}</pre>
+  <p class="cap">Example values, not read from your browser.</p>
+  <h3>How a new best is decided (line 644)</h3>
+<pre><span class="k">if</span> (o.score &gt; (prof[o.mode] || <span class="s">0</span>)) {  <span class="c">// beat the saved best for this mode?</span>
+  prof[o.mode] = o.score;               <span class="c">// replace it</span>
+  best = <span class="k">true</span>;                          <span class="c">// show "New best" on the card</span>
+}
+save(<span class="s">"arcade"</span>, prof);                   <span class="c">// write the notebook</span></pre>
+  <p>Daily works a little differently: it keeps the score together with the date. If the saved date isn't today, any score counts as today's best. The date is taken in UTC, so for you in India the Daily resets at 5:30 in the morning.</p>
+  <h3>When your score would disappear</h3>
+  <div class="plain warn"><b class="k">The notebook belongs to one browser on one device</b>
+    <ul>
+      <li>Clearing browsing data or "site data" wipes it.</li>
+      <li>Incognito or private windows throw it away when you close them.</li>
+      <li>Another browser, another computer or your phone each have their own empty notebook.</li>
+      <li>For a file opened from your disk, browsers handle the notebook in their own ways. Moving the file to a different folder can start a fresh one.</li>
+      <li>Anyone can open DevTools and type a fake score. It's a personal record, not proof.</li>
+    </ul></div>
+  <h3>See it yourself</h3>
+  <ol>
+    <li>Open the game in Chrome, press <b>F12</b>, go to the <b>Application</b> tab, then <b>Local storage</b> on the left. You'll see the <code>eplay:</code> lines.</li>
+    <li>Or in the <b>Console</b> tab type <code>localStorage.getItem("eplay:arcade")</code> and press Enter.</li>
+  </ol>
+  <div class="try" id="tryBox">
+    <b>Try it right here</b>
+    <p>This box uses the same idea. Type a score, save it, then reload this page (or close and reopen it). It will still be there.</p>
+    <div class="row">
+      <input id="tryScore" type="number" inputmode="numeric" placeholder="12500" aria-label="Score to save">
+      <button type="button" id="trySave">Save as my best</button>
+      <button type="button" class="alt" id="tryClear">Forget it</button>
+    </div>
+    <div class="out" id="tryOut" aria-live="polite">Nothing saved yet.</div>
+  </div>
+</section>
+
+<section id="draw">
+  <span class="lvl">Level 5</span>
+  <h2>How the 3D world is drawn</h2>
+  <p>Three.js works like a film set. You need four things:</p>
+  <dl>
+    <dt>Scene</dt><dd>The stage that holds every object.</dd>
+    <dt>Camera</dt><dd>Where we look from. Here it floats above and behind your robot and follows it (line 617). On a tall phone screen it goes higher so you see more.</dd>
+    <dt>Lights</dt><dd>A soft sky light, one sun like light, and a coloured point light that travels with you.</dd>
+    <dt>Renderer</dt><dd>The camera operator that turns it all into pixels on the <code>&lt;canvas id="gl"&gt;</code>.</dd>
+  </dl>
+  <p><b>Nothing is a downloaded model.</b> Every shape is made in code. The mascot robot (<code>buildMascot</code>, line 277) is spheres, cones and rounded boxes stacked together, with the Endless logo painted onto a small disc on its chest. The floor tiles, the skyline around the arena and the glows are drawn with code too.</p>
+  <div class="plain"><b class="k">The speed trick: instancing</b><p>Drawing 300 enemies one by one would make a phone stutter. Instead the game uses <code>InstancedMesh</code>: it tells the graphics chip "here is one shape, now draw it 90 times at these 90 positions" in a single go. Every frame it only updates the list of positions and colours. That's why so many things can be on screen at once.</p></div>
+  <p>Text that floats over enemies (the addresses, the fake names, your identity) is not 3D. It is normal HTML placed on top of the canvas. The function <code>proj()</code> converts a 3D position into screen pixels so the label sits exactly above the right enemy.</p>
+</section>
+
+<section id="rules">
+  <span class="lvl">Level 6</span>
+  <h2>The rules of the game, in code</h2>
+  <h3>Moving</h3>
+  <p>On a phone, your first finger becomes a joystick wherever you touch (<code>pointerdown</code>), and a second tap dashes. On a laptop the arrow keys or WASD set the direction. The robot can't leave the circle: if it goes past the edge, it is pushed back to the edge.</p>
+  <h3>Shooting by itself</h3>
+  <p>Every frame the game finds the closest enemy within range, turns you toward it, and fires when the fire timer runs out. Powers change the numbers: Rapid Fire shortens the timer, Twin Shot adds bolts, Piercing lets a bolt go through enemies.</p>
+  <h3>Hitting things</h3>
+  <p>There are no physics engines here. A hit is just a distance check: if the distance between a bolt and an enemy is smaller than the enemy's radius, it's a hit.</p>
+<pre><span class="k">const</span> dx = e.x - b.x, dz = e.z - b.z;
+<span class="k">if</span> (dx*dx + dz*dz &lt; r*r) { <span class="c">/* hit! */</span> }  <span class="c">// skip the square root, it's faster</span></pre>
+  <h3>Spawning: a money budget</h3>
+  <p>Each round gets a "budget" that grows every second. Each enemy has a price equal to its health. When the budget can afford the next enemy, it buys it and places it in a ring around you, not too close. Later rounds earn budget faster, so more and tougher enemies arrive. Once per round, a big elite enemy appears that always drops an identity.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Enemy</th><th>Health</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td>Dust</td><td>1</td><td>Small and fast, walks at you</td></tr>
+      <tr><td>Drone</td><td>3</td><td>Steady walker</td></tr>
+      <tr><td>Splitter</td><td>5</td><td>Breaks into two dust when killed</td></tr>
+      <tr><td>Brute</td><td>16</td><td>Big and slow, sometimes drops a heart</td></tr>
+      <tr><td>Shooter</td><td>4</td><td>Keeps about 7 steps away and fires red balls</td></tr>
+      <tr><td>Charger</td><td>8</td><td>Shows a red line for 0.8 s, then rushes along it</td></tr>
+      <tr><td>Impostor</td><td>6</td><td>Steals a crew member (Level 7)</td></tr>
+    </tbody>
+  </table></div>
+  <p>Health is multiplied a little each round (<code>hpx</code>: 1, 1.15, 1.3, 1.5).</p>
+  <h3>The boss, The Nameless</h3>
+  <p>It walks toward you, every few seconds fires a ring of 11 bullets, charges in a straight line after a warning, and summons small enemies. At half health it enters phase two: faster, 16 bullets per ring, and it scatters your crew around the arena. Its health is calculated from how strong your build is (<code>estDps() × 30</code>, kept between 240 and 1,700), so the fight takes about the same time for everyone.</p>
+  <h3>Levelling up</h3>
+  <p>Killed enemies drop shards that give experience. When the bar fills, the game pauses and offers three cards. You can hold at most 4 weapon powers and 2 helper powers, each up to level 3. When nothing is left to offer, you get Repair, Reinforce, Full Burst or Bounty instead.</p>
+</section>
+
+<section id="identity">
+  <span class="lvl">Level 7</span>
+  <h2>The identity idea</h2>
+  <p>This is the part that ties the game to Endless Domains.</p>
+  <ul>
+    <li><b>Enemies are addresses.</b> Each one gets a random label like <code>0x3f…a91c</code> (<code>hexA()</code>).</li>
+    <li><b>Some drop a golden token.</b> When you pick it up, the address label scrambles into a name like <code>maya.garden</code> and that little robot joins your crew. Names are made from two lists in the file: first names (maya, theo, zara…) and endings (garden, orbit, harbor…).</li>
+    <li><b>Your crew helps.</b> Each member circles you, bumps enemies, and adds a damage bonus: 4% each for the first five, 2% each up to ten.</li>
+    <li><b>Impostors steal.</b> An impostor wears a fake copy of a crew name, with letters swapped for look alike numbers (a becomes 4, o becomes 0, e becomes 3). If it touches you it grabs a crew member and runs. You have 7 seconds to shoot it and bring them back.</li>
+    <li><b>Your own identity.</b> Type one on the menu and the game makes your robot's colour and ear style from the letters of that name (<code>idLook</code>), so the same name always gives the same robot. It's only text; nothing checks that you own the name.</li>
+  </ul>
+</section>
+
+<section id="sound">
+  <span class="lvl">Level 8</span>
+  <h2>Sound without a single audio file</h2>
+  <p>Every beep, explosion and the music itself is made live by the browser's <b>Web Audio</b> system. An oscillator is a tone generator: you choose the pitch and the wave shape (smooth sine, buzzy square, sharp sawtooth) and how fast it fades.</p>
+<pre>tone(<span class="s">660</span>, <span class="s">.2</span>, <span class="s">"sine"</span>, <span class="s">.09</span>); <span class="c">// pitch 660, lasts 0.2 s, smooth sound, quiet volume</span></pre>
+  <p>The music (<code>Music</code>, line 360) is a small step sequencer: it plays a drum on every beat and notes from a pattern, and adds layers as rounds go up (hi hats, a second melody, pads). Each round it gets a bit faster and moves to a higher key. When you're on 2 hearts or fewer, a filter muffles it and a heartbeat plays.</p>
+  <div class="plain"><b class="k">Why sound needs a tap first</b><p>Browsers don't allow a page to make noise until you interact with it. The game listens for your first tap or key press and starts audio then. For iPhones on silent it also plays a silent looping sound file in the background, because iOS mutes web audio otherwise. That's the odd looking "RIFF WAVE" code on line 323.</p></div>
+</section>
+
+<section id="score">
+  <span class="lvl">Level 9</span>
+  <h2>How the score is counted</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Action</th><th>Points</th></tr></thead>
+    <tbody>
+      <tr><td>Kill an enemy</td><td>Its value × 10 × combo multiplier (elite: × 3)</td></tr>
+      <tr><td>Combo multiplier</td><td>Goes up by 1 for every 10 kills in a row, up to × 5. Resets 1.5 s after your last kill, or when you get hit</td></tr>
+      <tr><td>Pick up an identity</td><td>100</td></tr>
+      <tr><td>Round with no hits</td><td>500 × round number</td></tr>
+      <tr><td>Bounty card</td><td>500</td></tr>
+      <tr><td>Kill the boss</td><td>3,000 + 300 per heart left</td></tr>
+      <tr><td>Win the run</td><td>1,500 (not in Score Attack)</td></tr>
+    </tbody>
+  </table></div>
+  <p>The result card then picks one title, checking in this order: Untouchable (won with no hits), Named the Nameless, Impostor hunter (4 or more fakes caught), Crew captain (8 or more crew), Clean hands, Chain breaker, Identity giver, First steps.</p>
+</section>
+
+<section id="better">
+  <span class="lvl">Level 10</span>
+  <h2>How you can make it better</h2>
+  <p>It's already well made: smooth on phones, careful with sound, accessible fonts, and it respects "reduce motion". These are ideas you could try, starting with the easiest. Show them to your senior first, since it's their game.</p>
+  <div class="ideas">
+    <div class="idea"><span class="tag t1">Easy</span><b>Tune the numbers</b><p>All the balance lives in a few lists: <code>ROUNDS</code>, <code>ET</code> (enemies), <code>POW</code> (powers), <code>NEED</code> (experience per level). Change one number, reload, feel the difference. The best way to learn how it works.</p></div>
+    <div class="idea"><span class="tag t1">Easy</span><b>Make Daily truly the same for everyone</b><p>Daily uses a seeded random for which enemies come, but spawn positions, drops and fake names still use <code>Math.random()</code>. Passing the seeded <code>rnd</code> to those too would make every player's Daily identical, which is fairer for comparing scores.</p></div>
+    <div class="idea"><span class="tag t1">Easy</span><b>A run history</b><p>Save the last 10 runs (date, mode, score, title) in localStorage and show them on the menu. You'd reuse the same <code>save</code> and <code>load</code> helpers from Level 4.</p></div>
+    <div class="idea"><span class="tag t1">Easy</span><b>Tidy the leftovers</b><p><code>stats.jar</code>, <code>TUNE</code> (gravity, bounce) and <code>MiniKit</code> "jar pieces" come from another game sharing this code and aren't used here. Also <code>!c.stolen || true</code> on line 525 is always true, so that filter does nothing.</p></div>
+    <div class="idea"><span class="tag t2">Medium</span><b>Share the result card as an image</b><p>Turn the card into a PNG with a canvas and offer it through the phone's share sheet (<code>navigator.share</code>). People share images far more than links.</p></div>
+    <div class="idea"><span class="tag t2">Medium</span><b>Work offline</b><p>Download Three.js, the QR library and the fonts next to the file instead of loading them from the internet, or add a service worker. Then the game opens without a connection and doesn't break if a CDN is down.</p></div>
+    <div class="idea"><span class="tag t2">Medium</span><b>More settings</b><p>Separate music and effects volume, a vibration switch, and a colour blind option (impostors and enemy bullets are both red).</p></div>
+    <div class="idea"><span class="tag t3">Bigger</span><b>An online leaderboard</b><p>The localStorage score only lives on one device. A real leaderboard needs a small backend: an endpoint that receives a score and one that lists the top 50. A nice project for your own NestJS practice, and you'd also need some check against fake scores.</p></div>
+    <div class="idea"><span class="tag t3">Bigger</span><b>Use a real Endless domain as identity</b><p>Connect a wallet and look up the domains it owns, then let the player pick one as their identity. That turns the game's story into the product itself. It needs the team's API and a decision from your senior.</p></div>
+    <div class="idea"><span class="tag t3">Bigger</span><b>Split into files</b><p>One file is great for sharing, but hard to work on as it grows. Splitting into modules (renderer, music, enemies, menu) with a small build step would make changes safer.</p></div>
+  </div>
+</section>
+
+<section id="words">
+  <span class="lvl">Glossary</span>
+  <h2>Words used in this guide</h2>
+  <dl>
+    <dt>localStorage</dt><dd>A small per website notebook the browser keeps on disk. Survives closing the browser.</dd>
+    <dt>JSON</dt><dd>A text format for objects, like <code>{"run":48210}</code>. <code>stringify</code> turns an object into JSON text, <code>parse</code> turns it back.</dd>
+    <dt>CDN</dt><dd>A fast public server that hosts libraries like Three.js so pages can load them.</dd>
+    <dt>Canvas</dt><dd>An HTML element you can draw pixels on. The 3D world lives in one.</dd>
+    <dt>dt</dt><dd>Delta time: seconds since the last frame. Keeps speed the same on any device.</dd>
+    <dt>requestAnimationFrame</dt><dd>Asks the browser to call your function just before the next screen refresh.</dd>
+    <dt>Mesh</dt><dd>A 3D shape plus its material (colour, shininess).</dd>
+    <dt>InstancedMesh</dt><dd>One shape drawn many times in one go. The game's performance trick.</dd>
+    <dt>Seed</dt><dd>A starting value for a random number generator. Same seed, same "random" numbers.</dd>
+    <dt>Oscillator</dt><dd>A tone generator in Web Audio. All the game's sound comes from these.</dd>
+    <dt>try / catch</dt><dd>"Try this; if it fails, do that instead of crashing." Used around every storage read and write.</dd>
+  </dl>
+</section>
+
+<footer>Written 12 Nov 2026 from a full read of endless-arena.html (667 lines). Line numbers refer to that file.</footer>
+</main>
+
+<script>
+(function(){
+  var KEY="guide:best", inp=document.getElementById("tryScore"), out=document.getElementById("tryOut");
+  function show(){
+    var v=null;
+    try{v=localStorage.getItem(KEY);}catch(e){out.textContent="This browser is blocking storage here (for example a private window), so nothing can be remembered.";return;}
+    out.textContent=v?("Remembered from before: localStorage[\""+KEY+"\"] = "+v):"Nothing saved yet.";
+  }
+  document.getElementById("trySave").addEventListener("click",function(){
+    var n=parseInt(inp.value,10);
+    if(isNaN(n)){out.textContent="Type a number first, for example 12500.";inp.focus();return;}
+    try{
+      var old=parseInt(localStorage.getItem(KEY)||"0",10);
+      if(n>old){localStorage.setItem(KEY,String(n));out.textContent="New best saved: "+n+". Now reload the page and look here again.";}
+      else{out.textContent="Not saved: "+n+" isn't higher than your best of "+old+". That's the same check the game does.";}
+    }catch(e){out.textContent="Couldn't save: this browser is blocking storage here.";}
+  });
+  document.getElementById("tryClear").addEventListener("click",function(){
+    try{localStorage.removeItem(KEY);}catch(e){}
+    show();
+  });
+  show();
+})();
+</script>

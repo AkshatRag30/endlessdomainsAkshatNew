@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bulk Listing Status</title>
+<style>
+  :root {
+    --bg: #f7f7f8; --surface: #ffffff; --text: #17171a; --muted: #5c5f66; --border: #e3e4e8;
+    --accent: #2639ed; --accent-soft: #eceefd; --ok: #137a3f; --ok-soft: #e6f4ec; --warn: #8a5a00; --warn-soft: #fdf3dc; --todo: #6b6f78; --todo-soft: #eef0f3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #000000; --surface: #141415; --text: #f4f4f5; --muted: #a3a6ad; --border: #2a2a2e;
+      --accent: #8c98ff; --accent-soft: #1b1e3a; --ok: #5fd08f; --ok-soft: #10261a; --warn: #f2c260; --warn-soft: #2b2310; --todo: #b2b5bc; --todo-soft: #1f1f22;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #000000; --surface: #141415; --text: #f4f4f5; --muted: #a3a6ad; --border: #2a2a2e;
+    --accent: #8c98ff; --accent-soft: #1b1e3a; --ok: #5fd08f; --ok-soft: #10261a; --warn: #f2c260; --warn-soft: #2b2310; --todo: #b2b5bc; --todo-soft: #1f1f22;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 40px 16px 80px; }
+  header { margin-bottom: 28px; }
+  h1 { font-size: 32px; line-height: 1.2; margin: 0 0 8px; }
+  h2 { font-size: 22px; margin: 48px 0 12px; padding-top: 8px; border-top: 1px solid var(--border); }
+  h3 { font-size: 17px; margin: 24px 0 8px; }
+  p { margin: 0 0 12px; }
+  .sub { color: var(--muted); margin: 0; }
+  .toggle { float: right; background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 999px; padding: 6px 14px; font: inherit; font-size: 13px; cursor: pointer; }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 8px; }
+  nav.toc a { font-size: 14px; text-decoration: none; color: var(--accent); background: var(--accent-soft); padding: 6px 12px; border-radius: 999px; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin: 20px 0; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+  .stat b { display: block; font-size: 26px; line-height: 1.2; }
+  .stat span { color: var(--muted); font-size: 14px; }
+  .callout { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 10px; padding: 14px 18px; margin: 16px 0; }
+  .callout.ok { border-left-color: var(--ok); }
+  .callout.warn { border-left-color: var(--warn); }
+  .tablecard { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow-x: auto; margin: 12px 0 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: 0; }
+  th { font-size: 13px; color: var(--muted); font-weight: 600; white-space: nowrap; }
+  code { font-family: ui-monospace, Consolas, monospace; font-size: 0.88em; background: var(--accent-soft); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+  .tag { display: inline-block; font-size: 12px; font-weight: 600; padding: 2px 9px; border-radius: 999px; white-space: nowrap; }
+  .tag.done { color: var(--ok); background: var(--ok-soft); }
+  .tag.wait { color: var(--warn); background: var(--warn-soft); }
+  .tag.todo { color: var(--todo); background: var(--todo-soft); }
+  ul, ol { margin: 0 0 12px; padding-left: 22px; }
+  li { margin-bottom: 6px; }
+  .muted { color: var(--muted); font-size: 14px; }
+  footer { margin-top: 56px; color: var(--muted); font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <button class="toggle" id="toggle" type="button">Toggle theme</button>
+    <h1>Bulk Listing: status update</h1>
+    <p class="sub">For Mohit sir · from Akshat · 24 Nov 2026 · covers everything from the first build (28 Oct) to today</p>
+  </header>
+
+  <nav class="toc">
+    <a href="#summary">Summary</a><a href="#timeline">Timeline</a><a href="#v1">First build</a><a href="#review">Reading your requirements</a><a href="#tickets">F1 to F9</a><a href="#extra">Beyond the PDF</a><a href="#review2">Code review</a><a href="#testing">Testing</a><a href="#incidents">Incidents</a><a href="#decisions">Decisions to confirm</a><a href="#questions">Questions for you</a><a href="#left">What's left</a><a href="#docs">Documents</a>
+  </nav>
+
+  <h2 id="summary">1. Summary</h2>
+  <p>Sir, while you were away I built bulk listing v2 on My Domains on my own, following your requirements PDF (Bulk Listing and Multi Chain Marketplace, 10 Nov). Every frontend ticket in it, F1 to F9, is built. The main goal is met: a seller picks up to 50 names, sets prices, and lists them all with <b>one wallet signature</b> that is posted to the backend once. Delist now happens on the blockchain, for one name or many in a single transaction.</p>
+  <p>All of it is committed and pushed to the bulk list branch on Bitbucket. What remains is mostly checking, not building: a final QA pass against your acceptance criteria (50 names, more wallets, a Trails test buy), a few answers from you, and then the pull request into uat.</p>
+  <div class="stats">
+    <div class="stat"><b>9 of 9</b><span>frontend tickets (F1 to F9) built</span></div>
+    <div class="stat"><b>240</b><span>automated tests, all passing</span></div>
+    <div class="stat"><b>~7,700</b><span>lines added across ~98 files (test fixtures excluded)</span></div>
+    <div class="stat"><b>8 commits</b><span>all pushed to the bulk list branch</span></div>
+  </div>
+
+  <h2 id="timeline">2. Timeline</h2>
+  <div class="tablecard"><table>
+    <tr><th>Date</th><th>What happened</th><th>Commit</th></tr>
+    <tr><td>28 Oct</td><td>First build of bulk listing on My Domains: select mode, the bulk drawer, approval, one signature per name, results screen, keyboard and screen reader support</td><td><code>8209a6a</code></td></tr>
+    <tr><td>10 Nov</td><td>Your requirements PDF arrives: one signature for the whole batch, on chain delist, product rules, wallet matrix</td><td></td></tr>
+    <tr><td>19 Nov</td><td>Read the PDF, the backend code and our branch; wrote the review (10 gaps, questions V1 to V10) and the plan. Moved the branch onto the latest uat (F1). Same evening the backend team put all bulk endpoints live on uat</td><td>(rebase)</td></tr>
+    <tr><td>20 Nov</td><td>The signature maths for one signature over many orders, tested byte for byte against Seaport.js. Merged uat. Then the real flow: sign once, post once, tested with MetaMask on uat</td><td><code>ce32655</code>, <code>4da0b6c</code>, <code>7bda94f</code></td></tr>
+    <tr><td>20 to 23 Nov</td><td>Fallback to one signature per name, smart wallet notice, network checks; on chain delist (single and bulk); Edit price; drawer fixes; approvals per contract</td><td><code>e456f1d</code></td></tr>
+    <tr><td>24 Nov</td><td>Product rules (7 and 14 days, chain first, expiry read on chain), a full code review of my own work and its fixes, dark mode drawer fixes, investigation of a stage backend outage</td><td><code>8df9b76</code>, <code>0a070bd</code>, <code>a59939a</code></td></tr>
+  </table></div>
+
+  <h2 id="v1">3. The first build (28 Oct)</h2>
+  <p>Before your PDF, bulk listing already worked with one signature per name. This is the base v2 was built on, and all of it is still in use:</p>
+  <ul>
+    <li><b>Select mode on My Domains:</b> a Bulk List button and Quick Action, a banner with the count and Select All (capped at 50), and a Select button on every row and card. Names that can't be listed (already listed, sold, expired) have a disabled Select with the reason.</li>
+    <li><b>The bulk drawer:</b> the list of picked names (each removable), pricing, duration, the real fee breakdown and "You receive if all sell".</li>
+    <li><b>Approval, signing and results:</b> the one time marketplace approval, progress while signing, and a results screen for all listed, partly listed and nothing listed.</li>
+    <li><b>Care for every user:</b> a "Discard this bulk listing?" question before losing typed prices, focus kept inside the drawer, Escape handling, screen reader announcements, and layouts checked at desktop, tablet and phone widths in both light and dark.</li>
+  </ul>
+
+  <h2 id="review">4. Reading your requirements first (19 Nov)</h2>
+  <p>Before writing any v2 code I read your PDF line by line, the backend repository (read only) and our branch, and wrote a review page. It found <b>10 gaps</b> between the PDF and reality. A few examples:</p>
+  <ul>
+    <li>Names held across several linked wallets clash with the backend's one seller per batch rule.</li>
+    <li>The Seaport ABI we share with the multi chain work had no cancel function.</li>
+    <li>Listings that were delisted off chain earlier are still valid on the blockchain, so the backend refuses a new, more expensive listing for the same name (<code>CHEAPER_ORDER_STILL_VALID</code>). This later became the "Cancel older listings" feature.</li>
+    <li>Wallets upgraded with EIP 7702 must not be treated as smart contract wallets.</li>
+  </ul>
+  <p>I also wrote a plain words explainer of tickets F1 to F9 and a phase by phase plan, so the work could be followed by anyone on the team.</p>
+
+  <h2 id="tickets">5. Your tickets, F1 to F9</h2>
+  <div class="tablecard"><table>
+    <tr><th>Ticket</th><th>What I built</th><th>State</th></tr>
+    <tr><td><b>F1</b> Rebase</td><td>Moved the branch onto the latest uat (now including Trails and every fix since). Git confirmed the moved work was identical. Later updates come in as merges</td><td><span class="tag done">Done</span></td></tr>
+    <tr><td><b>F2</b> One signature</td><td>The seller signs <b>once</b> for the whole batch (Seaport 1.6 bulk order: a tree of all orders, one signature, each order gets its own proof). The batch is sent once to the bulk orders endpoint. If posting fails, Try again resends the <b>same signed batch</b> without asking for a new signature. The maths has 28 tests checked byte for byte against Seaport.js for 1, 2, 3, 4 and 50 orders. Tested on uat: 8 names, exactly one signature</td><td><span class="tag done">Done, tested</span></td></tr>
+    <tr><td><b>F3</b> Old way as backup</td><td>If a wallet can't produce the bulk signature, the seller is offered "Sign each name separately" (one signature per name, with Stop or Continue after a rejection). Smart contract wallets (like Safe) see a clear notice instead. A wrong network shows a banner and disables List, and is checked again at List</td><td><span class="tag done">Done, tested with MetaMask</span></td></tr>
+    <tr><td><b>F4</b> Remove percentage pricing</td><td>The "percentage of estimate" option is gone. Two pricing cards: one price for every name, or set each one myself</td><td><span class="tag done">Done, tested</span></td></tr>
+    <tr><td><b>F5</b> Approval done properly</td><td>Approval is checked per NFT contract, each on its own chain, with one approval transaction per contract still missing, the real network fee shown, and no second approval sent while one is still in progress. Ready for multi chain</td><td><span class="tag done">Done, partly tested (our wallet was already approved)</span></td></tr>
+    <tr><td><b>F6</b> The four bugs you found</td><td>All four fixed: the end date shown is the one actually signed, the signed dates are shown on the results screen, Cancel really cancels (a signature that arrives after Cancel is never posted), and the batch is posted once</td><td><span class="tag done">Done, tested</span></td></tr>
+    <tr><td><b>F7</b> Delist on chain</td><td>Delist sends a real Seaport cancel transaction, then tells the backend with its transaction hash. One name or many (new "Bulk delist" Quick Action: many listings, one transaction). Rows show a "Cancelling" label until the backend confirms from the chain. Checks before the wallet opens: right wallet, right network, enough POL, order not already sold or cancelled</td><td><span class="tag done">Done, tested on uat</span></td></tr>
+    <tr><td><b>F8</b> Wording</td><td>All new and changed text was first drawn as a visual mockup page and approved before building (8 wording pages in total)</td><td><span class="tag done">Done</span></td></tr>
+    <tr><td><b>F9</b> Product rules</td><td><b>Decision 8:</b> a listing ends 7 days before the domain expires, and names with under 14 days left can't be selected. <b>Expiry</b> is read on chain (<code>expiryOf</code>, 0 means never expires), as the PDF says, in one Multicall3 call for the whole batch. <b>Decision 2:</b> one chain per batch, and the chain is picked first: today select mode sets the chain filter to Polygon; once more chains are listable, the seller is asked to pick one. <b>W2:</b> a <code>?bulk=1</code> link opens select mode directly. <b>Decision 10:</b> network checked at List</td><td><span class="tag done">Done, automated tests pass</span></td></tr>
+  </table></div>
+
+  <h2 id="extra">6. Work beyond the PDF</h2>
+  <div class="tablecard"><table>
+    <tr><th>Item</th><th>Why and what</th><th>State</th></tr>
+    <tr><td><b>Cancel older listings</b></td><td>Listings delisted the old (off chain) way are still valid on the blockchain, so the backend refuses new listings for those names. The results screen now explains this and offers one transaction to cancel the old listings, then "Try these again"</td><td><span class="tag done">Done, tested on uat</span></td></tr>
+    <tr><td><b>Edit price</b></td><td>Your decision 1 asks for price cuts. Lowering a price is now <b>free</b>: one new signature at the lower price, and the old listing is hidden. This is safe because the old listing can only ever sell for <i>more</i>. Raising a price is blocked with a message, because the old cheaper listing would stay valid on chain; the seller delists (on chain) and lists again</td><td><span class="tag done">Done, tested on uat</span></td></tr>
+    <tr><td><b>Faster expiry reads</b></td><td>Instead of one blockchain read per name (up to 100 for 50 names), one Multicall3 call reads the whole batch, and it is reused at List if under a minute old</td><td><span class="tag done">Done</span></td></tr>
+    <tr><td><b>Login expired message</b></td><td>When a login expires during listing or delisting, the seller now sees "Your login has expired. Please log in again." instead of a vague error</td><td><span class="tag done">Done, tested</span></td></tr>
+    <tr><td><b>Dark mode drawers</b></td><td>Compared the list, buy and bulk drawers with the dark Figma: removed a grey band behind the drawer buttons and made text and prices white as designed (all drawers in the app benefit)</td><td><span class="tag done">Done</span></td></tr>
+    <tr><td><b>Filter dropdowns and Escape</b></td><td>Pressing Escape to close a filter dropdown used to also leave bulk mode and clear the selection. Fixed in the shared dropdown, so every filter dropdown in the app behaves correctly now</td><td><span class="tag done">Done, tested</span></td></tr>
+    <tr><td><b>Cancel safeguards</b></td><td>Built after the 24 Nov outage (see section 9), then <b>removed</b> because they aren't in your requirements and my review found holes in them. Only a clearer message was kept. Waiting for your call (question 1)</td><td><span class="tag wait">Removed, your decision</span></td></tr>
+  </table></div>
+
+  <h2 id="review2">7. A full code review of my own work (24 Nov)</h2>
+  <p>Since I worked alone, nobody else had reviewed the code, so I did a full review of the whole bulk listing feature before calling it done. It found <b>0 critical, 5 high, 17 medium and 29 low</b> issues. I wrote every fix in plain words first, then fixed them in steps:</p>
+  <ul>
+    <li><b>Cancel only while it can really cancel.</b> After signing, the drawer shows "Publishing your listing" and hides Cancel, so it can never say "Nothing was listed" while the listing is actually being posted. "Sign each name separately" stops after two identical wallet errors in a row.</li>
+    <li><b>Reading the backend's answers correctly.</b> Only network trouble, server errors and rate limits offer Try again; a refused batch, a wrong wallet or an expired login go back to the form with a clear message. A broken answer no longer leaves the drawer stuck. Before Try again, the wallet that signed is checked. Posts give up after 45 seconds instead of hanging.</li>
+    <li><b>Drawer details.</b> Totals and counts include only names that will really be listed; no second paid approval after a Cancel; typed prices are kept when switching pricing (and the seller is asked before they are replaced); the results title matches the result.</li>
+    <li><b>Project structure.</b> A few files break our team's folder rules (code that talks to the backend sitting in a component folder). The cheap parts were fixed now; the rest is recorded in our layering cleanup plan to be done with the other pages, so this release stays low risk.</li>
+    <li>The high issues that sat in the safeguards were resolved by removing them.</li>
+  </ul>
+
+  <h2 id="testing">8. Testing</h2>
+  <p><b>Automated:</b> 240 unit tests, all passing (the branch had none for bulk listing before v2), plus TypeScript and lint checks clean after every phase. <b>Manual:</b> I tested every phase myself in the browser on localhost, against the uat and stage backends on Polygon, with real MetaMask transactions. Everything below was seen working:</p>
+  <div class="tablecard"><table>
+    <tr><th>Area</th><th>Tested by hand</th><th>Result</th></tr>
+    <tr><td>One signature</td><td>8 names, exactly one signature: 5 listed, 3 refused for a real reason (old off chain listings). Later 2 and 3 name batches</td><td><span class="tag done">Pass</span></td></tr>
+    <tr><td>Cancel during signing</td><td>Cancel while the wallet popup was open, then confirming in MetaMask: nothing was listed, prices kept</td><td><span class="tag done">Pass</span></td></tr>
+    <tr><td>Network</td><td>Switching to Ethereum shows the wrong network banner at once and disables List; back on Polygon it clears</td><td><span class="tag done">Pass</span></td></tr>
+    <tr><td>On chain delist</td><td>Single delist, bulk delist of 2 in one transaction, and Cancel older listings, all confirmed on Polygon (fee under $0.01 each). "Cancelling" cleared within about a minute; seller emails arrived</td><td><span class="tag done">Pass</span></td></tr>
+    <tr><td>Edit price</td><td>Same and higher price blocked with their messages; 600 to 500 USDT by one free signature</td><td><span class="tag done">Pass</span></td></tr>
+    <tr><td>Review fixes</td><td>Publishing screen without Cancel, login expired message after a real expired login, Escape on a dropdown keeps the selection, typed prices kept</td><td><span class="tag done">Pass</span></td></tr>
+    <tr><td>Dark mode, phone width</td><td>Delist screens checked in dark and at phone width</td><td><span class="tag done">Pass</span></td></tr>
+  </table></div>
+  <h3>Wallet matrix (F3 asks for this with the PR)</h3>
+  <div class="tablecard"><table>
+    <tr><th>Wallet</th><th>State</th></tr>
+    <tr><td>MetaMask</td><td><span class="tag done">Tested</span> one signature for the batch, cancel, network switch, delist</td></tr>
+    <tr><td>Rabby, Coinbase Wallet</td><td><span class="tag todo">Not tested</span> the account that owns our test domains isn't imported in them yet</td></tr>
+    <tr><td>Phantom, Trust, WalletConnect, Ledger</td><td><span class="tag todo">Not tested</span> not set up (no Ledger device)</td></tr>
+    <tr><td>Safe (smart contract wallet)</td><td><span class="tag todo">Tests only</span> shows the "can't bulk list yet" notice</td></tr>
+  </table></div>
+
+  <h2 id="incidents">9. Incidents and investigations</h2>
+  <div class="callout warn">
+    <p><b>24 Nov, stage backend outage.</b> For a short while stage returned errors (500) on both the bulk listing post and the delist record. In one case the cancel had already gone through on the blockchain, but the backend couldn't record it: the row still showed the listing, and pressing Delist again sent a second paid cancel. The backend healed itself a few minutes later from the chain (email sent, row back to List). I ruled out our side (same requests worked before and after) and the timing points to the multi chain migrations landing on stage; I've prepared a question for Guru to confirm. Full write up: <code>incident-24nov-backend-500.html</code>.</p>
+  </div>
+  <ul>
+    <li><b>An expired login</b> showed up as a 401 during testing. Not a bug, but it led to the clearer "login expired" message.</li>
+    <li><b>Old off chain listings</b> blocking new ones (see Cancel older listings in section 6): found on uat, understood, and solved in the product.</li>
+  </ul>
+
+  <h2 id="decisions">10. Decisions I took while you were away (please confirm)</h2>
+  <div class="tablecard"><table>
+    <tr><th>#</th><th>Decision</th><th>Reason</th></tr>
+    <tr><td>1</td><td>Expiry is read on chain (V10)</td><td>The PDF says "read expiry on chain, not from the DB"</td></tr>
+    <tr><td>2</td><td>Edit price: lowering is a free signature, raising needs delist and list again</td><td>Lowering is always safe off chain; raising isn't, because the cheaper listing stays valid on chain</td></tr>
+    <tr><td>3</td><td>Cancel states shown on My Domains rows instead of a separate My Listings page</td><td>The backend's My Domains data has no cancel state, so rows read it from my listings. Saves a new page</td></tr>
+    <tr><td>4</td><td>Chain is picked first (today: automatically Polygon)</td><td>The PDF says "the chain filter must be set before selecting"</td></tr>
+    <tr><td>5</td><td>7 days and 14 days are two separate rules</td><td>Decision 8: listings end 7 days before expiry; names with under 14 days left can't be listed</td></tr>
+    <tr><td>6</td><td>Cancel safeguards removed until you decide</td><td>Not in the PDF, and they had holes</td></tr>
+    <tr><td>7</td><td>Folder rule fixes postponed (recorded in the cleanup plan)</td><td>Low risk for this release; to be done with the other pages</td></tr>
+  </table></div>
+
+  <h2 id="questions">11. Questions for you</h2>
+  <ol>
+    <li><b>Cancel safeguards.</b> If the backend fails to record a delist that already went through on chain, should the frontend remember it, show "Cancelling" at once, block a second paid cancel and retry the record? I've written how to rebuild it properly if you say yes.</li>
+    <li><b>Wallet matrix.</b> Acceptance criterion 1 names MetaMask, Rabby and Coinbase for 50 names. Should I set up Rabby and Coinbase with the test account, or mark them "not tested" in the PR?</li>
+    <li><b>Edit price.</b> Are you happy with decision 2 above (free cuts, raises go through delist)?</li>
+    <li><b>Trails slippage</b> (related, buying side). The Trails widget ignores the slippage we pass, so it uses Auto, which chose up to 10% on a real purchase. Keep Auto and report it to Trails, or force a fixed value?</li>
+  </ol>
+
+  <h2 id="left">12. What's left before the pull request</h2>
+  <div class="tablecard"><table>
+    <tr><th>Item</th><th>State</th></tr>
+    <tr><td>50 names with one signature (acceptance criterion 1)</td><td><span class="tag todo">To test</span></td></tr>
+    <tr><td>A real Trails test buy of a bulk listed name (B8)</td><td><span class="tag todo">To test</span></td></tr>
+    <tr><td>Wallet matrix (Rabby, Coinbase), light mode and phone width pass over the bulk screens</td><td><span class="tag wait">Waiting on question 2</span></td></tr>
+    <tr><td>A few manual checks of the newest product rules (chain filter in select mode, <code>?bulk=1</code>)</td><td><span class="tag todo">To test</span></td></tr>
+    <tr><td>Extra tests for the drawer's money maths; small polish items from the review</td><td><span class="tag todo">Small</span></td></tr>
+    <tr><td>Backend cross checks (every backend answer handled)</td><td><span class="tag todo">Mostly covered by the review fixes</span></td></tr>
+    <tr><td>Merge the latest uat, then open the PR with the wallet matrix and testing log</td><td><span class="tag todo">Last step</span></td></tr>
+  </table></div>
+
+  <h2 id="docs">13. Where the details are</h2>
+  <p class="muted">Every phase was logged as it happened (in <code>dev-docs/bulk-listing</code>), with what was built, the decisions, and how it was tested:</p>
+  <ul class="muted">
+    <li><code>bulk-listing-progress.html</code>: the full log, phase by phase, with the testing log and wallet matrix.</li>
+    <li><code>bulk-listing-v2-review.html</code> and <code>bulk-listing-v2-plan.md</code>: the 19 Nov review of your PDF and the plan.</li>
+    <li><code>bulk-listing-v2-tickets-explained.html</code>, <code>phase-explained/</code>: each ticket and phase in simple words.</li>
+    <li><code>bulk-listing-v2-flow-explained.html</code>, <code>bulk-listing-v2-file-changes.html</code>: how the flow works and every file changed.</li>
+    <li><code>bulk-list-code-review.html</code>: the full code review and its fixes.</li>
+    <li><code>incident-24nov-backend-500.html</code>: the stage outage.</li>
+    <li><code>wording/</code>: the approved wording mockups.</li>
+  </ul>
+
+  <footer>Bulk listing v2 · status update for Mohit sir · 24 Nov 2026</footer>
+</div>
+<script>
+  document.getElementById('toggle').addEventListener('click', function () {
+    var root = document.documentElement;
+    var current = root.getAttribute('data-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    root.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+  });
+</script>
+</body>
+</html>

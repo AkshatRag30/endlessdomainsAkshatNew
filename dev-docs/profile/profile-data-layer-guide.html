@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Profile Data Guide</title>
+<script>
+  try {
+    var saved = localStorage.getItem('dmplan-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  } catch (e) {}
+</script>
+<style>
+  :root {
+    --bg: #f9f9f9; --surface: #ffffff; --surface-soft: #f3f4fe;
+    --text: #111111; --text-muted: #5b5b66; --border: #e6e6e6;
+    --accent: #2639ED; --accent-soft: #e9ebfd;
+    --wait: #9457f6; --wait-soft: #f4eefe;
+    --ok: #12805c; --ok-soft: #e4f5ee;
+    --warn: #b4540a; --warn-soft: #fdf1e4;
+    --bad: #c4314b; --bad-soft: #fdecef;
+    --code-bg: #f4f5f8;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+      --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+      --accent: #7f8cff; --accent-soft: #1d2150;
+      --wait: #b996fa; --wait-soft: #2c2142;
+      --ok: #4fd1a0; --ok-soft: #173229;
+      --warn: #f5a35c; --warn-soft: #3a2614;
+      --bad: #ff7d93; --bad-soft: #3a1c24;
+      --code-bg: #0b0b0c;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #000000; --surface: #141415; --surface-soft: #1d1d1f;
+    --text: #ffffff; --text-muted: rgba(255,255,255,0.7); --border: rgba(255,255,255,0.13);
+    --accent: #7f8cff; --accent-soft: #1d2150;
+    --wait: #b996fa; --wait-soft: #2c2142;
+    --ok: #4fd1a0; --ok-soft: #173229;
+    --warn: #f5a35c; --warn-soft: #3a2614;
+    --bad: #ff7d93; --bad-soft: #3a1c24;
+    --code-bg: #0b0b0c;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: "Satoshi", system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.65; }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 48px 16px 80px; }
+  header.top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+  .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; }
+  h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.15; margin: 0 0 12px; }
+  .lede { color: var(--text-muted); margin: 0; max-width: 680px; }
+  .toggle { flex-shrink: 0; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 14px; cursor: pointer; }
+  .toggle:hover { border-color: var(--accent); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 32px; }
+  nav.toc a { font-size: 14px; text-decoration: none; color: var(--accent); background: var(--accent-soft); padding: 6px 12px; border-radius: 999px; }
+  h2 { font-size: 24px; margin: 56px 0 14px; display: flex; align-items: center; gap: 12px; }
+  h2 .step { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 15px; flex-shrink: 0; }
+  h3 { font-size: 18px; margin: 28px 0 8px; }
+  p { margin: 0 0 14px; }
+  .muted { color: var(--text-muted); }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px 24px; margin-bottom: 16px; }
+  .card p:last-child { margin-bottom: 0; }
+  ul, ol { padding-left: 22px; margin: 0 0 14px; }
+  li { margin-bottom: 8px; }
+  code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .86em; background: var(--surface-soft); border-radius: 6px; padding: 1px 6px; word-break: break-word; }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; overflow-x: auto; margin: 0 0 16px; font-size: 13.5px; line-height: 1.55; }
+  pre code { background: none; padding: 0; font-size: inherit; word-break: normal; }
+  .file { font-size: 13px; color: var(--text-muted); margin: 0 0 6px; font-family: ui-monospace, Consolas, monospace; overflow-wrap: anywhere; }
+  .callout { border-left: 4px solid var(--wait); background: var(--wait-soft); border-radius: 10px; padding: 14px 18px; margin: 0 0 16px; }
+  .callout p { margin: 0; }
+  .callout.ok { border-color: var(--ok); background: var(--ok-soft); }
+  .callout.warn { border-color: var(--warn); background: var(--warn-soft); }
+  .callout b.lbl { display: block; font-size: 13px; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+  .tablecard { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow-x: auto; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: 0; }
+  th { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+
+  /* The layer diagram: a vertical stack of boxes with arrows, pure HTML/CSS */
+  .flow { display: flex; flex-direction: column; align-items: stretch; gap: 0; margin: 8px 0 20px; }
+  .layer { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px; display: grid; grid-template-columns: 170px 1fr; gap: 12px; align-items: center; }
+  .layer .name { font-weight: 700; }
+  .layer .name small { display: block; font-weight: 400; font-size: 12px; color: var(--text-muted); font-family: ui-monospace, Consolas, monospace; overflow-wrap: anywhere; }
+  .layer .what { font-size: 15px; color: var(--text-muted); }
+  .layer.c1 { border-left: 5px solid var(--accent); }
+  .layer.c2 { border-left: 5px solid var(--wait); }
+  .layer.c3 { border-left: 5px solid var(--warn); }
+  .layer.c4 { border-left: 5px solid var(--ok); }
+  .arrow { text-align: center; color: var(--text-muted); font-size: 13px; padding: 4px 0; }
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .split .layer { grid-template-columns: 1fr; gap: 4px; }
+
+  .analogy { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 0 0 16px; }
+  .analogy div { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; font-size: 15px; }
+  .analogy b { display: block; color: var(--accent); }
+
+  ol.journey { counter-reset: j; list-style: none; padding: 0; }
+  ol.journey li { counter-increment: j; position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px 12px 54px; margin-bottom: 8px; }
+  ol.journey li::before { content: counter(j); position: absolute; left: 14px; top: 12px; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  footer { margin-top: 56px; font-size: 13px; color: var(--text-muted); }
+
+  @media (max-width: 700px) {
+    header.top { flex-direction: column; }
+    .layer { grid-template-columns: 1fr; gap: 4px; }
+    .split, .analogy { grid-template-columns: 1fr; }
+    .card { padding: 18px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">Marketplace V2 · Profile and Settings · Beginner guide</p>
+      <h1>How the Profile page gets its data</h1>
+      <p class="lede">A friendly, step by step walk through how <code>/profile</code> talks to the backend, where its sample data lives, what the hooks do, how wallet linking works, and how it all links up to the screen. No prior knowledge of the code needed. Every example is copied from the real files on the <code>profile-settings</code> branch, as of 15 October 2026.</p>
+    </div>
+    <button class="toggle" id="toggle" type="button">Toggle theme</button>
+  </header>
+
+  <nav class="toc">
+    <a href="#why">Why it's built this way</a>
+    <a href="#picture">The big picture</a>
+    <a href="#words">Words you'll see</a>
+    <a href="#folders">Folder map</a>
+    <a href="#s1">1 · Types</a>
+    <a href="#s2">2 · Redux endpoints</a>
+    <a href="#s3">3 · The mapper</a>
+    <a href="#s4">4 · Sample data</a>
+    <a href="#s5">5 · Hooks</a>
+    <a href="#s6">6 · Wallet linking</a>
+    <a href="#s7">7 · Components</a>
+    <a href="#journey">Two journeys</a>
+    <a href="#real">Real or sample?</a>
+    <a href="#siblings">Same as the other pages</a>
+    <a href="#recipes">Recipes</a>
+    <a href="#faq">FAQ</a>
+  </nav>
+
+  <h2 id="why">Why it's built this way</h2>
+  <div class="card">
+    <p>The Figma design for the Profile page shows a lot: your name and email, a username and bio, how you sign in, your wallets, active sessions, five notification switches, display preferences and account stats. The backend can serve <b>some</b> of that today, and the main Endless Domains site already uses those APIs on its own profile page. The rest doesn't exist on the backend yet.</p>
+    <p>So the page does two things at once:</p>
+    <ul>
+      <li>Where the backend has an API, the page uses <b>the same API as the main site</b>: loading and saving your details, email verification, changing your password, your wallets, and linking a missing wallet.</li>
+      <li>Where it doesn't, the page shows <b>sample data</b> (also called mock data), clearly marked with a "Sample data" chip, so the design can be reviewed now and switched to real data later.</li>
+    </ul>
+    <p>And it does this <b>the same way My Domains and Watchlist do</b>, so anyone who knows those pages already knows this one. (An earlier version had its own extra "service layer" folder; it was removed on 15 October because no other page works like that.)</p>
+  </div>
+
+  <h2 id="picture">The big picture</h2>
+  <p>Think of the page like a restaurant.</p>
+  <div class="analogy">
+    <div><b>Component (the customer)</b>A card, a form or a switch on screen. It just wants data and doesn't care where it comes from.</div>
+    <div><b>Hook (the waiter)</b>Takes the order, brings the data back, and says "still cooking" (loading) or "sorry" (error). Every card gets its data from a hook.</div>
+    <div><b>RTK Query in Redux (the real kitchen)</b>The app's existing way of calling the backend. It also remembers answers (a cache), so the same dish isn't cooked twice.</div>
+    <div><b>Sample data store (the practice kitchen)</b>Cooks pretend dishes for the parts the backend can't make yet. It lives in <code>src/data/profile/</code>.</div>
+    <div><b>Mapper (the translator)</b>The backend speaks its own shape; the page wants a tidy one. <code>src/helpers/profile/mapUser.ts</code> translates both ways.</div>
+    <div><b>Types (the recipe card)</b>Describes exactly what each dish looks like, so both kitchens serve the same plate.</div>
+  </div>
+
+  <p>Here's the same thing as layers. Requests go down, data comes back up.</p>
+  <div class="flow">
+    <div class="layer c1"><div class="name">Components<small>composites/profile/…</small></div><div class="what">Tab panels and cards. They call hooks and draw what they get back.</div></div>
+    <div class="arrow">↓ call a hook, like <code>useProfileDetails()</code> or <code>useNotificationSettings()</code></div>
+    <div class="layer c2"><div class="name">Hooks<small>src/hooks/profile/</small></div><div class="what">One file per hook. They handle loading, errors, saving, and turning backend data into the page's shape.</div></div>
+    <div class="arrow">↓ each hook uses one of two sources</div>
+    <div class="split">
+      <div class="layer c4"><div class="name">Real: RTK Query<small>src/core/redux/userProfile.ts</small></div><div class="what">The main site's profile APIs, shared with the rest of the app. Reshaped by <code>src/helpers/profile/mapUser.ts</code>.</div></div>
+      <div class="layer c3"><div class="name">Sample: data store<small>src/data/profile/</small></div><div class="what">Pretend values from the Figma frames for the parts the backend doesn't have yet.</div></div>
+    </div>
+  </div>
+  <div class="callout ok"><p><b class="lbl">The one sentence to remember</b>Components → hooks → either Redux (real) or <code>src/data/profile</code> (sample). The component never knows which.</p></div>
+
+  <h2 id="words">Words you'll see</h2>
+  <div class="tablecard"><table>
+    <thead><tr><th>Word</th><th>Plain meaning</th></tr></thead>
+    <tbody>
+      <tr><td><b>Component</b></td><td>A piece of the screen written in React, like a card or a button.</td></tr>
+      <tr><td><b>Hook</b></td><td>A React function whose name starts with <code>use</code>. It lets a component remember things (like "is it loading?") and react when they change.</td></tr>
+      <tr><td><b>Type / interface</b></td><td>A TypeScript description of what an object looks like. Break it and the editor shows a red error before you run anything.</td></tr>
+      <tr><td><b>Redux / RTK Query</b></td><td>Redux Toolkit is the app's state library; RTK Query is its part for calling the backend. Endpoints are declared once in <code>src/core/redux/</code> and become hooks like <code>useGetUserProfileQuery</code>.</td></tr>
+      <tr><td><b>Endpoint</b></td><td>One backend address, like <code>PUT /users</code>.</td></tr>
+      <tr><td><b>Cache</b></td><td>A memory of answers already loaded, so the same request isn't sent twice.</td></tr>
+      <tr><td><b>Mapper</b></td><td>A small function that turns the backend's data shape into the page's shape (and back).</td></tr>
+      <tr><td><b>Sample data / mock</b></td><td>Pretend data, used until the backend has the real thing. Marked on screen with a "Sample data" chip.</td></tr>
+      <tr><td><b>QueryResult</b></td><td>The shape every data hook returns on these pages: <code>data</code>, <code>isLoading</code>, <code>isError</code>, <code>refetch</code>.</td></tr>
+      <tr><td><b>Promise / async</b></td><td>A value that arrives later. Network calls take time, so saves are <code>async</code>.</td></tr>
+      <tr><td><b>Optimistic update</b></td><td>Showing a change straight away, before the save finishes, and undoing it if the save fails.</td></tr>
+      <tr><td><b>AppKit</b></td><td>Reown AppKit: the wallet connection pop up the app already uses for buying and listing.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="folders">Folder map</h2>
+  <pre><code>src/
+├── types/profile-settings/index.ts    ← Step 1: what the page's data looks like
+├── core/redux/userProfile.ts          ← Step 2: the backend endpoints (RTK Query)
+├── helpers/profile/
+│   ├── mapUser.ts                     ← Step 3: backend shape ⇄ page shape
+│   └── validation.ts                  ← the form's field rules
+├── data/profile/
+│   ├── fixtures.ts                    ← Step 4: the sample values
+│   └── store.ts                       ← Step 4: shared sample data store
+├── hooks/profile/                     ← Step 5 and 6: one hook per file
+│   ├── useProfileDetails.ts      (real)    useAccountSummary.ts       (sample)
+│   ├── useProfileDraft.ts        (real)    useActiveSessions.ts       (sample)
+│   ├── useSignInMethods.ts       (real)    useWalletSettings.ts       (sample)
+│   ├── useChangePassword.ts      (real)    useNotificationSettings.ts (sample)
+│   ├── useConnectedWallets.ts    (real)    useProfilePreferences.ts   (sample)
+│   ├── useLinkWallet.ts          (real)    useYourData.ts             (sample)
+│   └── useProfileMockArea.ts, useProfileAction.ts   (small shared helpers)
+└── design-system/composites/profile/  ← Step 7: the screens that use the hooks</code></pre>
+
+  <!-- STEP 1 -->
+  <h2 id="s1"><span class="step">1</span>Decide what the data looks like (types)</h2>
+  <p>First, the shape the page needs, read from the Figma frames field by field. This is the "recipe card", in <code>src/types/profile-settings/index.ts</code>.</p>
+  <p class="file">src/types/profile-settings/index.ts</p>
+  <pre><code>export interface ProfileDetails {
+  fullName: string
+  username: string            // no backend field yet
+  email: string
+  isEmailVerified: boolean
+  canChangeEmail: boolean     // false for Google accounts and verified addresses
+  verificationSent: boolean   // "Resend verification" instead of "Verify email"
+  phone: { countryCode: string; number: string } | null
+  telegram: string
+  bio: string
+  location: string
+  website: string
+  avatarUrl: string | null
+}</code></pre>
+  <p>Why start here? Because the real data and the sample data must both arrive in <b>exactly this shape</b>. The backend sends a phone number as one string (<code>"+919876543210"</code>); the page always gets the tidy version (<code>{ countryCode: 'IN', number: '9876543210' }</code>). Step 3 does that tidying.</p>
+  <div class="callout"><p><b class="lbl">Small detail</b>The folder is called <code>profile-settings</code>, not <code>profile</code>, because <code>src/types/Profile.ts</code> already exists and Windows treats <code>profile</code> and <code>Profile</code> as the same name.</p></div>
+
+  <!-- STEP 2 -->
+  <h2 id="s2"><span class="step">2</span>The backend endpoints (Redux, already in the app)</h2>
+  <p>The app already calls the backend through RTK Query. The profile endpoints were mostly there already; this page reuses them and adds only two, next to the others.</p>
+  <div class="tablecard"><table>
+    <thead><tr><th>What</th><th>Endpoint</th><th>RTK hook</th></tr></thead>
+    <tbody>
+      <tr><td>Read the user</td><td>GET <code>/users/user-multiple-wallet</code></td><td><code>useGetUserProfileQuery</code> (existing)</td></tr>
+      <tr><td>Save the profile</td><td>PUT <code>/users</code></td><td><code>useSetProfileMutation</code> (existing)</td></tr>
+      <tr><td>Verify / resend email</td><td>POST <code>/auth/verification-email</code></td><td><code>useResendVerificationEmailMutation</code> (added)</td></tr>
+      <tr><td>Change password</td><td>PUT <code>/auth/change-password</code></td><td><code>useChangePasswordMutation</code> (added)</td></tr>
+    </tbody>
+  </table></div>
+  <p class="file">src/core/redux/userProfile.ts (one of the two added endpoints)</p>
+  <pre><code>changePassword: builder.mutation&lt;unknown, { oldPassword: string; newPassword: string }&gt;({
+  query: (body) =&gt; ({ url: ChangePasswordApi, method: "PUT", body }),
+}),</code></pre>
+  <p>Using Redux instead of a new way of calling the server buys three things: the login token is attached automatically, the profile request is <b>shared</b> with the header and the wallet connect flow (one request, not three), and everything lives where other developers expect it.</p>
+  <div class="callout warn"><p><b class="lbl">One gotcha</b><code>getUserProfile</code> has no cache "tag", so saving with <code>setProfile</code> doesn't refresh it on its own. That's why the profile hooks call <code>refetch()</code> after every save. Because the cache is shared, the refetch also updates every other screen showing your name.</p></div>
+
+  <!-- STEP 3 -->
+  <h2 id="s3"><span class="step">3</span>Translate between the backend and the page (the mapper)</h2>
+  <p><code>src/helpers/profile/mapUser.ts</code> holds small pure functions (no React, easy to test), the same idea as <code>src/helpers/marketplace/watchlist.ts</code> for the watchlist.</p>
+  <p class="file">src/helpers/profile/mapUser.ts (reading)</p>
+  <pre><code>export function mapUserToDetails(user: User): ProfileDetails {
+  return {
+    fullName: user.name ?? '',
+    username: '',                       // no backend column yet
+    email: user.email ?? '',
+    isEmailVerified: user.isEmailVerified,
+    // The main site's rule: Google accounts and verified addresses can't change their email.
+    canChangeEmail: !user.isRegisteredWithGoogle &amp;&amp; !(user.email &amp;&amp; user.isEmailVerified),
+    verificationSent: (user.sentEmailCount ?? 0) &gt; 0,
+    // "+919876543210" → { countryCode: 'IN', number: '9876543210' }
+    phone: user.phoneNumber ? parsePhoneString(user.phoneNumber, COUNTRIES, DEFAULT_COUNTRY_CODE) : null,
+    telegram: user.telegram ?? '',
+    bio: '', location: '', website: '', avatarUrl: null,
+  }
+}</code></pre>
+  <p class="file">src/helpers/profile/mapUser.ts (saving: the same body the main site sends)</p>
+  <pre><code>export function toUpdateUserBody(saved: ProfileDetails, next: ProfileDetails) {
+  const body = {
+    name: next.fullName,
+    phoneNumber: next.phone?.number ? toPhoneString(findCountry(next.phone.countryCode).dial, next.phone.number) : '',
+    telegram: next.telegram,
+    isVerified: saved.isEmailVerified &amp;&amp; saved.email !== next.email ? 'false' : 'true',
+  }
+  if (next.email) body.email = next.email   // the backend rejects an empty email
+  return body
+}</code></pre>
+  <p>The same file also turns the user into sign in methods and wallets, and works out which wallet the account can still link:</p>
+  <pre><code>// One EVM and one Solana wallet per account (the seniors' rule).
+export function missingWalletNetworks(wallets) {
+  const missing = []
+  if (!wallets.some((w) =&gt; w.network === 'evm_network')) missing.push('evm')
+  if (!wallets.some((w) =&gt; w.network === 'solana')) missing.push('solana')
+  return missing
+}</code></pre>
+
+  <!-- STEP 4 -->
+  <h2 id="s4"><span class="step">4</span>Sample data for what the backend doesn't have</h2>
+  <h3>4a. <code>fixtures.ts</code>: the pretend values</h3>
+  <p>Values copied from the Figma frames, typed with the step 1 types, for the areas with no backend: account stats, sessions, wallet network settings, notifications and preferences.</p>
+  <p class="file">src/data/profile/fixtures.ts</p>
+  <pre><code>export const mockNotificationSettings: NotificationSettings = {
+  watchedDomainSold: true,
+  watchlistPriceDrop: true,
+  listingSold: true,
+  expiringSoon: true,
+  productNews: true,
+  channels: { email: true, telegram: false },
+}</code></pre>
+
+  <h3>4b. <code>store.ts</code>: one shared memory for the sample data</h3>
+  <p>If two parts of the page show the same sample data, they must agree. So the sample data lives in <b>one shared store</b> that every hook reads, built exactly like the watchlist's sample store in <code>src/data/marketplace/watchlist.ts</code>. React's <code>useSyncExternalStore</code> re-renders every component that reads an area when that area changes.</p>
+  <p class="file">src/data/profile/store.ts</p>
+  <pre><code>let state: ProfileMockState = {
+  extras: { username: '', bio: '', location: '', website: '', avatarUrl: null },
+  summary: mockAccountSummary,
+  sessions: mockSessions,
+  walletSettings: mockWalletSettings,
+  notifications: mockNotificationSettings,
+  preferences: mockPreferences,
+}
+
+// Replace one area (never change it in place), then tell every listener.
+export function setProfileMock(key, next) {
+  state = { ...state, [key]: next }
+  listeners.forEach((listener) =&gt; listener())
+  return next
+}
+
+// The live value of one area, for a hook.
+export function useProfileMock(key) {
+  const read = () =&gt; state[key]
+  return useSyncExternalStore(subscribe, read, read)
+}</code></pre>
+  <p><code>extras</code> holds the profile fields the backend has no column for (username, bio, location, website, photo). They start empty for a real account. The whole store resets on a hard reload, like the watchlist's sample data, and the form says so in a note.</p>
+
+  <!-- STEP 5 -->
+  <h2 id="s5"><span class="step">5</span>The hooks (the waiters)</h2>
+  <p>Every card gets its data from a hook in <code>src/hooks/profile/</code>, one hook per file, like <code>src/hooks/my-domains/</code>. Every data hook returns the same basic shape, <code>QueryResult</code>, which the domain overview and watchlist hooks use too:</p>
+  <pre><code>data       // the data, or undefined while loading
+isLoading  // true the first time → show a skeleton
+isError    // true if loading failed → show an error banner with Retry
+refetch    // the Retry button calls this</code></pre>
+
+  <h3>5a. A real hook: <code>useSignInMethods</code></h3>
+  <p class="file">src/hooks/profile/useSignInMethods.ts</p>
+  <pre><code>export function useSignInMethods() {
+  const query = useGetUserProfileQuery()              // the shared, cached request
+  const user = query.data?.result
+  const data = useMemo(() =&gt; (user ? mapUserToSignInMethods(user) : undefined), [user])
+  return {
+    data,
+    isLoading: query.isLoading,
+    isError: query.isError,
+    refetch: () =&gt; { query.refetch() },
+    canDisconnectGoogle: false,                       // no endpoint yet
+  }
+}</code></pre>
+
+  <h3>5b. A real hook that saves: <code>useProfileDetails</code></h3>
+  <p>This one mixes the real account fields with the sample <code>extras</code>, and its <code>save</code> sends each part to the right place:</p>
+  <p class="file">src/hooks/profile/useProfileDetails.ts (save)</p>
+  <pre><code>const accountChanged = ['fullName', 'email', 'phone', 'telegram'].some((field) =&gt; field in patch)
+if (accountChanged) await setProfile(toUpdateUserBody(saved, { ...saved, ...patch })).unwrap()   // real: PUT /users
+
+// username, bio, location, website, photo → the sample store
+setProfileMock('extras', { ...getProfileMock('extras'), ...localPatch })
+
+// getUserProfile has no cache tag, so refetch by hand (updates every screen)
+const fresh = accountChanged ? (await refetch().unwrap()).result : user</code></pre>
+
+  <h3>5c. A sample hook: <code>useNotificationSettings</code></h3>
+  <p class="file">src/hooks/profile/useNotificationSettings.ts</p>
+  <pre><code>export function useNotificationSettings() {
+  const area = useProfileMockArea('notifications')       // QueryResult from the store
+  const { run: update, isSaving } = useProfileAction(async (patch) =&gt; {
+    await mockSaveDelay()                                  // feels like a network call
+    return setProfileMock('notifications', { ...getProfileMock('notifications'), ...patch })
+  })
+  return { ...area, isMock: true, update, isSaving }
+}</code></pre>
+  <p>The two small helpers keep every sample hook this short:</p>
+  <ul>
+    <li><code>useProfileMockArea(key)</code> uses the shared <code>useMockQuery</code> (from the domain overview hooks) for a short first load, so skeletons show and get tested, then returns the live value from the store.</li>
+    <li><code>useProfileAction(fn)</code> wraps a save with an <code>isSaving</code> flag, for "Saving…" and disabled buttons.</li>
+  </ul>
+  <p>When this area's endpoint ships, only the inside of this hook changes: <code>useProfileMockArea</code> becomes an RTK query, <code>setProfileMock</code> becomes a mutation, and <code>isMock</code> becomes <code>false</code>. The card using it doesn't change.</p>
+
+  <h3>5d. <code>useProfileDraft</code>: the Profile form's edits</h3>
+  <p>The Profile form keeps a <b>draft</b> (your unsaved copy) next to the <b>saved</b> version from <code>useProfileDetails</code>. It compares them to know if anything changed (which enables Save and powers "Discard unsaved changes?"), checks each field with <code>src/helpers/profile/validation.ts</code>, and on Save sends <b>only the changed fields</b> through <code>useProfileDetails().save</code>.</p>
+
+  <!-- STEP 6 -->
+  <h2 id="s6"><span class="step">6</span>Linking a wallet (<code>useLinkWallet</code>)</h2>
+  <p>Each account can have <b>one EVM wallet and one Solana wallet</b>. The Wallets tab offers whichever is missing. Linking uses the same endpoints as the main site's profile page:</p>
+  <ol class="journey">
+    <li>You click <b>Add Another Wallet</b> (or Add EVM Wallet / Add Solana Wallet when neither is linked).</li>
+    <li>The hook creates the AppKit wallet pop up with both the EVM (wagmi) and Solana adapters, and opens it for the right network.</li>
+    <li><b>EVM:</b> once your wallet is connected, it asks the backend for a one time code (<code>GET /web3-auth/generate-nonce</code>), asks your wallet to sign it, and sends the signature to <code>POST /web3-auth/verify</code>, which adds the wallet to your signed in account.</li>
+    <li><b>Solana:</b> once your wallet is connected, it sends its address and your user id to <code>POST /web3-auth/solana-add-wallet</code>.</li>
+    <li>On success the Wallets tab refetches your profile, shows a toast, and the new wallet appears (the tab badge counts it too). Closing the pop up without connecting cancels.</li>
+  </ol>
+  <div class="callout warn"><p><b class="lbl">Why not the normal wallet connect?</b>The marketplace's usual wallet connect calls the <b>sign in</b> endpoints (<code>/web3-auth/login</code>), which can switch you to another account or create a new one. Linking must add the wallet to <b>your</b> account, so it uses the main site's link endpoints instead.</p></div>
+
+  <!-- STEP 7 -->
+  <h2 id="s7"><span class="step">7</span>The components (the customers)</h2>
+  <p>Each tab has a "panel" component that calls the hooks and decides what to draw. The cards inside (switches, rows, forms) only receive values and callbacks as props. Here's the Notifications tab, simplified:</p>
+  <p class="file">composites/profile/notifications/NotificationsTabPanel/NotificationsTabPanel.tsx</p>
+  <pre><code>const notifications = useNotificationSettings()   // sample
+const details = useProfileDetails()                // real (for Telegram)
+
+const handleToggle = async (key, value) =&gt; {
+  const previous = local
+  setLocal({ ...local, [key]: value })            // 1. show it at once
+  try {
+    await notifications.update({ [key]: value })  // 2. save
+  } catch (error) {
+    setLocal(previous)                            // 3. failed? put it back
+    ToastMessage(TOAST_TYPE.ERROR, "Couldn't save that alert", getUserFriendlyToastMessage(error, 'Please try again.'))
+  }
+}
+
+if (notifications.isLoading) return &lt;SettingsCardSkeleton rows={4} /&gt;
+if (notifications.isError)   return &lt;NoticeBanner … Retry calls notifications.refetch /&gt;
+return &lt;NotificationSwitches settings={local} onToggle={handleToggle} isSample={notifications.isMock} /&gt;</code></pre>
+  <p>Notice the panel uses one sample hook and one real hook side by side, and treats them the same way. Errors from either become readable sentences through the app's existing <code>getUserFriendlyToastMessage</code>.</p>
+
+  <h2 id="journey">Two journeys</h2>
+  <h3>Saving your name (real data)</h3>
+  <ol class="journey">
+    <li>You open <code>/profile</code>. <code>ProfileTabPanel</code> calls <code>useProfileDraft</code>, which calls <code>useProfileDetails</code>.</li>
+    <li><code>useProfileDetails</code> calls <code>useGetUserProfileQuery()</code>. If the header already loaded your profile, the answer comes from the cache; otherwise RTK Query sends <code>GET /users/user-multiple-wallet</code>. You see skeletons until it arrives.</li>
+    <li><code>mapUserToDetails</code> turns the answer into the page's shape, and the form fills in.</li>
+    <li>You change your name. The draft now differs from the saved copy, so Save changes lights up.</li>
+    <li>You press Save. <code>useProfileDraft</code> checks the fields, then calls <code>save</code> with only the changed field.</li>
+    <li><code>save</code> sends <code>PUT /users</code> with the body from <code>toUpdateUserBody</code>, then refetches your profile.</li>
+    <li>The fresh profile flows back through the cache to the form, the header and anywhere else your name shows. A toast says "Your profile is saved."</li>
+  </ol>
+  <h3>Turning off "Product news" (sample data)</h3>
+  <ol class="journey">
+    <li>You open the Notifications tab. <code>useNotificationSettings</code> calls <code>useProfileMockArea('notifications')</code>: a short loading moment, then the values from the store.</li>
+    <li>You flip the switch. The panel shows it off straight away and calls <code>update({ productNews: false })</code>.</li>
+    <li>The hook waits briefly, then <code>setProfileMock</code> replaces the notifications area in the store and tells every listener.</li>
+    <li>Every component reading notifications re-renders with the new value. The card keeps its "Sample data" chip. A hard reload brings the Figma values back.</li>
+  </ol>
+
+  <h2 id="real">Real or sample? (per card, 15 October)</h2>
+  <div class="tablecard"><table>
+    <thead><tr><th>Card</th><th>Data</th></tr></thead>
+    <tbody>
+      <tr><td>Profile Information: name, email, mobile, Telegram</td><td><b>Real</b></td></tr>
+      <tr><td>Profile Information: username, bio, location, website, photo</td><td>Sample, kept until reload</td></tr>
+      <tr><td>Public Preview stats, Account rail</td><td>Sample for now. Checked on 15 October: domains owned and listed can come from the same call My Domains uses; completed sales and volume sold probably too, once the backend confirms it on stage; member since needs a small backend change (plan §14.6)</td></tr>
+      <tr><td>How You Sign In</td><td><b>Real</b> (Disconnect Google: coming soon)</td></tr>
+      <tr><td>Change Password</td><td><b>Real</b> (a successful change signs you out to log in again)</td></tr>
+      <tr><td>Active Sessions</td><td>Sample</td></tr>
+      <tr><td>Connected Wallets</td><td><b>Real</b>, including linking (Disconnect: coming soon)</td></tr>
+      <tr><td>Default Network</td><td>Sample</td></tr>
+      <tr><td>Notification switches</td><td>Sample</td></tr>
+      <tr><td>Where To Send Them (Telegram)</td><td><b>Real</b></td></tr>
+      <tr><td>Preferences, Privacy</td><td>Sample (the theme is real, saved on your device)</td></tr>
+      <tr><td>Your Data (export, delete)</td><td>Sample (simulated); the backend has no endpoint for either yet</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="siblings">Same as the other pages</h2>
+  <div class="tablecard"><table>
+    <thead><tr><th>Concern</th><th>My Domains / Watchlist</th><th>Profile</th></tr></thead>
+    <tbody>
+      <tr><td>Real backend calls</td><td>Hooks call RTK Query from <code>src/core/redux/</code></td><td>Same</td></tr>
+      <tr><td>Sample data</td><td><code>src/data/&lt;page&gt;/</code>, shared store with <code>useSyncExternalStore</code></td><td><code>src/data/profile/</code>, same pattern</td></tr>
+      <tr><td>Hook shape</td><td><code>QueryResult</code>, <code>useMockQuery</code> for sample bodies, <code>isMock</code></td><td>Same</td></tr>
+      <tr><td>Hooks</td><td>One per file in <code>src/hooks/&lt;page&gt;/</code></td><td>Same</td></tr>
+      <tr><td>Mappers</td><td><code>src/helpers/&lt;page&gt;/</code></td><td><code>src/helpers/profile/</code></td></tr>
+      <tr><td>Error text</td><td><code>getUserFriendlyToastMessage</code></td><td>Same</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="recipes">Recipes</h2>
+  <h3>Recipe A: the backend shipped notifications. How do I make that card real?</h3>
+  <ol>
+    <li>Add the endpoints to RTK Query in <code>src/core/redux/</code> (and the URLs to <code>src/core/enum/api-endpoint.enum.ts</code> / <code>src/constants/Api.ts</code>), like the existing ones.</li>
+    <li>In <code>src/hooks/profile/useNotificationSettings.ts</code>, replace <code>useProfileMockArea('notifications')</code> with the query and <code>setProfileMock</code> with the mutation. If the backend's shape differs, add a mapper in <code>src/helpers/profile/</code>.</li>
+    <li>Set <code>isMock</code> to <code>false</code> (the chip disappears) and remove <code>notifications</code> from <code>src/data/profile/store.ts</code> and <code>fixtures.ts</code>.</li>
+    <li>Run the type check. The panel and cards don't change.</li>
+  </ol>
+  <h3>Recipe B: every card is real. How do I delete the sample data?</h3>
+  <ol>
+    <li>When no hook imports <code>src/data/profile/</code> any more, delete the folder.</li>
+    <li>Delete <code>useProfileMockArea.ts</code> and the <code>SampleDataChip</code> primitive.</li>
+    <li>Run the type check; it points at anything left over.</li>
+  </ol>
+  <h3>Recipe C: trying the error states</h3>
+  <ul>
+    <li>Change password: a wrong current password comes back from the backend as 401 and shows "Your current password is incorrect." under the field.</li>
+    <li>A card failing to load: each card shows its own error with Retry; the rest of the page keeps working.</li>
+    <li>Delete account (sample): the button stays disabled until you type your username (or your email, while there's no username).</li>
+  </ul>
+
+  <h2 id="faq">FAQ</h2>
+  <div class="card">
+    <h3>Why not just call the backend from the components?</h3>
+    <p>Then every component would repeat loading, errors, saving and reshaping. Hooks do it once, and swapping sample data for real data only touches the hook.</p>
+    <h3>Will real users see John Doe?</h3>
+    <p>No. Profile details are real. Sample values only appear on cards marked "Sample data", and the profile's extra fields (username, bio, location, website, photo) start empty for a real account.</p>
+    <h3>Why do my bio and username disappear when I reload?</h3>
+    <p>The backend can't store them yet, so they live in the page's sample store. The form shows a note about this. They'll be saved for real once the backend adds those fields.</p>
+    <h3>Why does changing my password sign me out?</h3>
+    <p>The main site does the same: you sign in again with the new password.</p>
+    <h3>Where is the theme (light/dark) saved?</h3>
+    <p>On your device, through <code>src/context/ThemeContext.tsx</code>, the same as the header toggle.</p>
+    <h3>Where's the full list of files and the history?</h3>
+    <p>In <code>dev-docs/profile/profile-settings-progress.html</code>. The plan, with the decisions and next steps, is <code>dev-docs/profile/profile-settings-implementation-plan.md</code> (start at §14).</p>
+  </div>
+
+  <footer>Rewritten 15 October 2026 for the <code>profile-settings</code> branch. Local only, like the rest of <code>dev-docs</code>.</footer>
+</div>
+<script>
+  document.getElementById('toggle').addEventListener('click', function () {
+    var root = document.documentElement;
+    var current = root.getAttribute('data-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('dmplan-theme', next); } catch (e) {}
+  });
+</script>
+</body>
+</html>
